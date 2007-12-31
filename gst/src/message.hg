@@ -1,0 +1,202 @@
+#include <gstmm/miniobject.h>
+#include <gstmm/structure.h>
+#include <gstmm/format.h>
+#include <gstmm/element.h>
+#include <gstmm/wrap.h>
+_PINCLUDE(gstmm/private/miniobject_p.h)
+_DEFS(gstmm,gst)
+
+namespace Gst
+{
+
+class Message : public Gst::MiniObject
+{
+protected:
+ _CLASS_GSTMINIOBJECT(Message, GstMessage, GST_MESSAGE, Gst::MiniObject, GstMiniObject)
+ _IGNORE(gst_message_ref, gst_message_unref)
+public:
+  Message();
+
+  const Structure& get_structure();
+
+public:
+  _MEMBER_GET(message_type, type, MessageType, GstMessageType)
+
+  /** Wrap a GtkMessage* in a C++ instance, creating an instance of a derived Gst::Message.
+   * Gst::wrap() would just create a Gst::Message (rather than a derived one) because 
+   * the derived Gst::Message classes do not correspond to GType types in the GStreamer API.
+   */
+  static Glib::RefPtr<Message> wrap(GstMessage* message, bool take_copy=false);
+
+protected: 
+
+  GstMessage * cobj_;
+  Structure structure_;
+};
+
+class MessageApplication : public Message
+{
+public:
+  explicit MessageApplication(GstMessage *message);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
+};
+
+class MessageClockProvide : public Message
+{
+public:
+  explicit MessageClockProvide(GstMessage *message);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock, bool ready);
+  void parse(Glib::RefPtr<Clock>& clock, bool& ready);
+};
+
+class MessageClockLost : public Message
+{
+public:
+  explicit MessageClockLost(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
+  void parse(Glib::RefPtr<Clock>& clock);
+};
+
+class MessageCustom : public Message
+{
+public:
+  explicit MessageCustom(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(MessageType type, const Glib::RefPtr<Object>& src, Structure& structure);
+};
+
+class MessageElement : public Message
+{
+public:
+  explicit MessageElement(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
+};
+
+class MessageEos : public Message
+{
+public:
+  explicit MessageEos(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+};
+
+class MessageError : public Message
+{
+public:
+  explicit MessageError(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
+  void parse(Glib::Error& error, std::string& debug);
+  void parse(Glib::Error& error);
+};
+
+class MessageInfo : public Message
+{
+public:
+  explicit MessageInfo(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
+  void parse(Glib::Error& error, std::string& debug);
+};
+
+class MessageNewClock: public Message
+{
+public:
+  explicit MessageNewClock(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
+  void parse(Glib::RefPtr<Clock>& clock);
+};
+
+class MessageSegmentDone : public Message
+{
+public:
+  explicit MessageSegmentDone(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+  void parse(Format& format, gint64& position);
+};
+
+class MessageSegmentStart : public Message
+{
+public:
+  explicit MessageSegmentStart(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+  void parse(Format& format, gint64& position);
+};
+
+class MessageStateChanged : public Message
+{
+public:
+  explicit MessageStateChanged(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, State oldstate, State newstate, State pending);
+  void parse(State& oldstate, State& newstate, State& pending);
+};
+
+class MessageBuffering : public Message
+{
+public:
+  explicit MessageBuffering(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, int percent);
+  void parse(int& percent);
+};
+
+class MessageWarning : public Message
+{
+public:
+  explicit MessageWarning(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
+  void parse(Glib::Error& error, std::string& debug);
+};
+
+class MessageDuration : public Message
+{
+public:
+  explicit MessageDuration(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+  void parse(Format& format, gint64& position);
+};
+
+class MessageStateDirty : public Message
+{
+public:
+  explicit MessageStateDirty(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+};
+
+class MessageAsyncStart : public Message
+{
+public:
+  explicit MessageAsyncStart(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, bool new_base_time);
+  void parse(bool& new_base_time);
+};
+
+class MessageAsyncDone : public Message
+{
+public:
+  explicit MessageAsyncDone(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+};
+
+class MessageLatency : public Message
+{
+public:
+  explicit MessageLatency(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+};
+
+} //namespace Gst

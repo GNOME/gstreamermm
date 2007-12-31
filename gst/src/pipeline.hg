@@ -1,0 +1,39 @@
+#include <gstmm/bin.h>
+#include <gstmm/bus.h>
+#include <gstmm/clock.h>
+#include <gstmm/enums.h>
+_DEFS(gstmm,gst)
+_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gstmm/private/bin_p.h)
+
+
+namespace Gst
+{
+class Pipeline : public Bin 
+{
+  _CLASS_GOBJECT(Pipeline, GstPipeline, GST_PIPELINE, Bin, GstBin)
+
+protected:
+
+  _CTOR_DEFAULT
+
+public:
+
+  static Glib::RefPtr<Pipeline> create(const std::string& name);
+
+  _WRAP_METHOD(Glib::RefPtr<Bus> get_bus(), gst_pipeline_get_bus)
+  _WRAP_METHOD(Glib::RefPtr<const Bus> get_bus() const, gst_pipeline_get_bus, constversion)
+  _WRAP_METHOD(bool set_clock(const Glib::RefPtr<Clock>& clock), gst_pipeline_set_clock)
+  _WRAP_METHOD(Glib::RefPtr<Clock> get_clock(), gst_pipeline_get_clock)
+  _WRAP_METHOD(Glib::RefPtr<const Clock> get_clock() const, gst_pipeline_get_clock, constversion)
+  _WRAP_METHOD(void use_clock(const Glib::RefPtr<Clock>& clock), gst_pipeline_use_clock)
+  _WRAP_METHOD(void auto_clock(), gst_pipeline_auto_clock)
+  _WRAP_METHOD(void set_new_stream_time(ClockTime time), gst_pipeline_set_new_stream_time)
+  _WRAP_METHOD(ClockTime get_last_stream_time() const, gst_pipeline_get_last_stream_time)
+  _WRAP_METHOD(void set_auto_flush_bus(gboolean auto_flush = true), gst_pipeline_set_auto_flush_bus)
+  _WRAP_METHOD(bool get_auto_flush_bus() const, gst_pipeline_get_auto_flush_bus)
+  _WRAP_METHOD(void set_delay(ClockTime delay), gst_pipeline_set_delay)
+  _WRAP_METHOD(ClockTime get_delay() const, gst_pipeline_get_delay)
+};
+
+} //namespace Gst

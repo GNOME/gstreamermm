@@ -1,0 +1,31 @@
+#include <gstmm/object.h>
+#include <gstmm/caps.h>
+#include <gstmm/pad.h>
+#include <gstmm/enums.h>
+_DEFS(gstmm,gst)
+_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gstmm/private/object_p.h)
+
+namespace Gst
+{
+
+class Pad;
+
+class PadTemplate  : public Object 
+{
+  _CLASS_GOBJECT(PadTemplate, GstPadTemplate, GST_PAD_TEMPLATE, Object, GstObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  Glib::RefPtr<PadTemplate> create(const std::string& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps);
+  _WRAP_METHOD(Glib::RefPtr<Caps> get_caps(), gst_pad_template_get_caps)
+  _WRAP_METHOD(Glib::RefPtr<const Caps> get_caps() const, gst_pad_template_get_caps, constversion)
+
+#m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void pad_created(const Glib::RefPtr<Pad>& pad), "pad-created")
+
+};
+
+} //namespace Gst

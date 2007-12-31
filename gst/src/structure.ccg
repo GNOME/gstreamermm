@@ -1,0 +1,198 @@
+#include <gst/gstvalue.h> //Must be included before gststructure.h
+#include <gst/gststructure.h>
+
+namespace Gst
+{
+// StructureValueProxy
+
+StructureValueProxy::StructureValueProxy(Structure& structure, const std::string& name)
+: m_Structure(structure)
+, m_Name(name)
+{
+}
+
+void
+StructureValueProxy::operator=(const std::string& value)
+{
+  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_STRING, value.c_str(), NULL);
+}
+
+void
+StructureValueProxy::operator=(bool value)
+{
+  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_BOOLEAN, value, NULL);
+}
+
+void
+StructureValueProxy::operator=(gdouble value)
+{
+  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_DOUBLE, value, NULL);
+}
+
+void
+StructureValueProxy::operator=(int value)
+{
+  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_INT, value, NULL);
+}
+
+void
+StructureValueProxy::operator=(const Fraction& value)
+{
+  GValue v = {0,};
+  g_value_init(&v, GST_TYPE_FRACTION);
+  gst_value_set_fraction(&v, value.numerator, value.denominator);
+  gst_structure_set_value(m_Structure.gobj(), m_Name.c_str(), &v);
+  g_value_unset(&v);
+}
+
+// Structure
+
+Structure::Structure(const std::string& name)
+{
+  gobject_ = gst_structure_empty_new(name.c_str());
+}
+
+Structure::Structure(GQuark quark)
+{
+  gobject_ = gst_structure_id_empty_new(quark);
+}
+
+StructureValueProxy
+Structure::operator[](const std::string& name)
+{
+  return StructureValueProxy(*this, name);
+}
+
+void
+Structure::clear()
+{
+  gst_structure_remove_all_fields(gobject_);
+}
+
+int
+Structure::size() const
+{
+  return gst_structure_n_fields(gobject_);
+}
+
+
+//TODO: ValueBase should be used as an output paramter in getters because it is a base type.
+/*
+Glib::ValueBase
+Structure::get_value(const std::string& name) const
+{
+  Glib::ValueBase v;
+  v.init(gst_structure_get_value(gobject_, name.c_str()));
+  return v;
+}
+*/
+
+bool
+Structure::get_boolean(const std::string& name, bool& value) const
+{
+  gboolean val_ = false;
+  const bool has = gst_structure_get_boolean(gobject_, name.c_str(), &val_);
+  if(has)
+  {
+    value = val_;
+  }
+
+  return has;
+}
+
+bool
+Structure::get_int(const std::string& name, int& value) const
+{
+  return gst_structure_get_int(gobject_, name.c_str(), &value);
+}
+
+bool
+Structure::get_uint(const std::string& name, guint& value) const
+{
+  return gst_structure_get_uint(gobject_, name.c_str(), &value);
+}
+
+bool
+Structure::get_fourcc(const std::string& name, guint32& value) const
+{
+  return gst_structure_get_fourcc(gobject_, name.c_str(), &value);
+}
+
+
+bool
+Structure::get_double(const std::string& name, gdouble& value) const
+{
+  return gst_structure_get_double(gobject_, name.c_str(), &value);
+}
+
+std::string
+Structure::get_string(const std::string& name) const
+{
+  return gst_structure_get_string(gobject_, name.c_str());
+}
+
+bool
+Structure::get_date (const std::string& name, Glib::Date& value) const
+{
+  GDate *date = 0;
+  const bool has = gst_structure_get_date(gobject_, name.c_str(), &date);
+  value.set_julian(g_date_get_julian(date));
+  return has;
+}
+
+
+bool
+Structure::get_clock_time(const std::string& name, ClockTime& value) const
+{
+  return gst_structure_get_clock_time(gobject_, name.c_str(), &value);
+}
+
+
+bool
+Structure::get_enum(const std::string& name, GType enumtype, int& value) const
+{
+  return gst_structure_get_enum(gobject_, name.c_str(), enumtype, &value);
+}
+
+
+bool
+Structure::get_fraction(const std::string& name, int& value_numerator, int& value_denominator) const
+{
+  return gst_structure_get_fraction(gobject_, name.c_str(), &value_numerator, &value_denominator);
+}
+
+gboolean
+Structure::foreach_callback(GQuark field_id, const GValue *value, gpointer data)
+{
+  Structure::ForeachSlot& slot = *static_cast<Structure::ForeachSlot*>(data);
+  return slot(field_id, value);
+}
+
+bool
+Structure::foreach(const ForeachSlot& slot)
+{
+  ForeachSlot slot_copy(slot);
+  gst_structure_foreach(gobject_, &foreach_callback, &slot_copy);
+}
+
+gboolean
+Structure::map_callback(GQuark field_id, GValue *value, gpointer data)
+{
+  Structure::MapSlot& slot = *static_cast<Structure::MapSlot*>(data);
+  return slot(field_id, value);
+}
+
+bool
+Structure::map_in_place(const MapSlot& slot)
+{
+  MapSlot slot_copy(slot);
+  gst_structure_map_in_place(gobject_, &map_callback, &slot_copy);
+}
+
+Structure
+Structure::create_from_string(const std::string& the_string)
+{
+  return Structure(gst_structure_from_string(the_string.c_str(), NULL)); 
+}
+
+} //namespace Gst

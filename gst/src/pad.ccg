@@ -1,0 +1,47 @@
+#include <gst/gstpad.h>
+
+namespace Gst
+{
+
+// The C API has gst_pad_new, we just use the very common ::create() here
+Glib::RefPtr<Pad>
+Pad::create(const std::string& name, PadDirection direction)
+{
+  GstPad * pad = gst_pad_new(name.c_str(), GstPadDirection(direction));
+  return Glib::wrap(pad, false);
+}
+
+static void SignalProxy_SlotPadBlockCallback_gst_callback(GstPad* pad, gboolean blocked, gpointer data) 
+{
+  Pad::SlotPadBlockCallback * the_slot = static_cast<Pad::SlotPadBlockCallback*>(data);
+ (*the_slot)(blocked);
+  delete the_slot;
+}
+
+bool Pad::set_blocked_async(bool blocked, const SlotPadBlockCallback& slot)
+{
+  SlotPadBlockCallback* slot_copy = new SlotPadBlockCallback(slot);
+  return bool(gst_pad_set_blocked_async(GST_PAD(gobj()), gboolean(blocked), &SignalProxy_SlotPadBlockCallback_gst_callback, slot_copy));
+}
+
+bool Pad::query_position(Format& format) const
+{
+  return gst_pad_query_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+}
+
+bool Pad::query_duration(Format& format) const
+{
+  return gst_pad_query_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+}
+
+bool Pad::query_peer_position(Format& format) const
+{
+  return gst_pad_query_peer_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+}
+
+bool Pad::query_peer_duration(Format& format) const
+{
+  return gst_pad_query_peer_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+}
+
+} //namespace Gst

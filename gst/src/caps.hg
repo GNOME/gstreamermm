@@ -1,0 +1,65 @@
+#include <gstmm/structure.h>
+#include <gstmm/enums.h>
+#include <gst/gstcaps.h>
+_DEFS(gstmm,gst)
+
+namespace Gst
+{
+
+class Caps 
+{
+  _CLASS_OPAQUE_REFCOUNTED(Caps, GstCaps, NONE, gst_caps_ref, gst_caps_unref)
+  _IGNORE(gst_caps_ref, gst_caps_unref)
+
+public:
+  //TODO: Why doesn't this use _WRAP_CREATE()?
+  //ANS: Could it be because there are two void methods that create a Caps? -Jose
+  static Glib::RefPtr<Caps> create_empty();
+  static Glib::RefPtr<Caps> create_any();
+  static Glib::RefPtr<Caps> create_full(Structure&);
+
+  _WRAP_METHOD(Glib::RefPtr<Caps> copy() const, gst_caps_copy)
+
+  _WRAP_METHOD(Glib::RefPtr<Caps> copy_nth(guint), gst_caps_copy_nth)
+  _WRAP_METHOD(void append(const Glib::RefPtr<Caps>& caps), gst_caps_append)
+  _WRAP_METHOD(void merge(const Glib::RefPtr<Caps>& caps), gst_caps_merge)
+  _WRAP_METHOD(void append_structure(Structure& structure), gst_caps_append_structure)
+  _WRAP_METHOD(void merge_structure(Structure& structure), gst_caps_merge_structure)
+  //TODO: Shouldn't the Structure be reference-counted?
+  _WRAP_METHOD(Structure* get_structure(guint idx), gst_caps_get_structure)
+
+  _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
+  _WRAP_METHOD(guint get_size() const, gst_caps_get_size)
+
+  _WRAP_METHOD(void simple_valist(char* field, const va_list& varargs), gst_caps_set_simple_valist)
+  _WRAP_METHOD(bool is_any() const, gst_caps_is_any)
+  _WRAP_METHOD(bool is_empty() const, gst_caps_is_empty)
+  _WRAP_METHOD(bool is_fixed() const, gst_caps_is_fixed)
+  _WRAP_METHOD(bool is_equal(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_equal)
+  _WRAP_METHOD(bool is_equal_fixed(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_equal_fixed)
+  _WRAP_METHOD(bool is_always_compatible(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_always_compatible)
+  _WRAP_METHOD(bool is_subset(const Glib::RefPtr<Caps>& superset_caps) const, gst_caps_is_subset)
+  _WRAP_METHOD(Glib::RefPtr<Caps> intersect(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_intersect)
+  _WRAP_METHOD(Glib::RefPtr<Caps> unions(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_union)
+  _WRAP_METHOD(Glib::RefPtr<Caps> normalize(), gst_caps_normalize)
+  _WRAP_METHOD(bool do_simplify(), gst_caps_do_simplify)
+  _WRAP_METHOD(xmlNodePtr save_thyself(const xmlNodePtr& parent), gst_caps_save_thyself)
+  _WRAP_METHOD(static Glib::RefPtr<Caps> load_thyself(xmlNodePtr parent), gst_caps_load_thyself)
+
+  //TODO: Shouldn't this use Glib::ustring?
+  _WRAP_METHOD(std::string to_string() const, gst_caps_to_string)
+
+  _WRAP_METHOD(static Glib::RefPtr<Caps> from_string(const std::string& string), gst_caps_from_string)
+
+  _WRAP_METHOD(Glib::RefPtr<Caps> subtract(const Glib::RefPtr<Caps>& subtrahend_caps), gst_caps_subtract)
+  _WRAP_METHOD(Glib::RefPtr<Caps> make_writable(), gst_caps_make_writable)
+  _WRAP_METHOD(void truncate(), gst_caps_truncate)
+  
+  _IGNORE(gst_caps_copy, gst_caps_make_writable)
+
+protected: 
+
+  GstCaps * cobj_;
+};
+
+} //namespace Gst

@@ -1,0 +1,458 @@
+2007-12-21  Murray Cumming  <murrayc@murrayc.com>
+
+	* configure.ac: Add an extra PKG_CHECK_MODULES check (and resulting 
+	variables) when examples are enabled.
+	* examples/Makefile.am_fragment: Use the new variables here.
+	* examples/ogg_player_gtkmm/Makefile.am: Remove the use of pkg-config 
+	here.
+
+2007-12-21  José Alburquerque  <jaalburquerque@cox.com>
+
+	* configure.ac: added --enable-examples option
+	* examples/Makefile.am: added ogg_player_gtkmm to list of directories
+	* examples/ogg_player/main.cc: fixed time output formatting
+	* examples/ogg_player_gtkmm/Makefile.am: added automake compilation
+	file for ogg_player_gtkmm example
+	* examples/ogg_player_gtkmm/PlayerWindow.cc: added source files for
+	* examples/ogg_player_gtkmm/PlayerWindow.h:  for ogg_player_gtkmm
+	* examples/ogg_player_gtkmm/main.cc:         examples
+	* gst/gstmm.h: added <gstmm/query.h> and <gstmm/event.h>
+	* gst/src/Makefile_list_of_hg.am_fragment: added query.hg and event.hg
+	to general hg files
+	* gst/src/caps.hg: made some hidden methods public
+	* gst/src/clock.ccg: renamed get_millesconds() to more appropriate
+	name get_fractional_seconds(); added get_milliseconds(),
+	get_microseconds() and get_nanoseconds()
+	* gst/src/clock.hg: added declarations for get_microseconds(),
+	get_nanoseconds() and get_fractional_seconds()
+	* gst/src/element.hg: renamed seek_simple() method to (overloaded)
+	seek() and fixed seek methods unneeded constant references
+	* gst/src/event.ccg: added new file
+	* gst/src/event.hg: added initial declaration for Gst::Event class
+	* gst/src/query.ccg: added new file
+	* gst/src/query.hg: added initial declaration for Gst::Query class
+
+2007-12-13  José Alburquerque  <jaalburquerque@cox.com>
+
+	* examples/ogg_player/main.cc: Changed pos and len to type gint64
+	instead of Gst::ClockTime (required by Element::query_duration() and
+	Element::query_position()
+	* gst/src/element.hg: re-wrapped query_duration() and query_position()
+	to use gint64 for position and duration as before (format can be
+	something other than ClockTime)
+	* tools/m4/convert_gst.m4: removed unused coversion from
+	Gst::ClockTime& to gint64*
+
+2007-12-13  Siavash Safi  <siavash.safi@gmail.com>
+
+	* configure.ac: updated AC_CONFIG_FILES() to add the new examples
+	* examples/Makefile.am:
+	* examples/element_link/Makefile.am:
+	* examples/element_link/element_link.cc: new example that shows how to
+	link elements
+	* examples/ogg_player/Makefile.am: make oggplayer instead of example
+	* examples/ogg_player/main.cc: added more comments
+	* examples/optiongroup/Makefile.am:
+	* examples/optiongroup/optiongroup.cc: new example that shows how to get
+	an option group from gstmm and add your application-specific
+	command line options
+	* gst/gstmm/init.cc:
+	* gst/gstmm/init.h: added init_check() and init_get_option_group()
+
+2007-12-13  Murray Cumming  <murrayc@murrayc.com>
+
+	* examples/ogg_player/main.cc: Use std::endl instead of \r and 
+	\n.
+	* gst/src/clock.ccg:
+	* gst/src/clock.hg: Use guint instead of unsigned.
+	* gst/src/element.ccg:
+	* gst/src/element.hg:
+	* gst/src/pad.ccg:
+	* gst/src/pad.hg:  Make the query*() methods const.
+
+2007-12-12  José Alburquerque  <jaalburquerque@cox.com>
+
+	* examples/ogg_player/main.cc: modified example to query and show
+	stream position
+	* gst/src/clock.ccg: added get_hours(), get_minutes(), get_seconds()
+	and get_milliseconds() methods for the Gst::ClockTime enum type
+	* gst/src/clock.hg: added get_hours(), get_minutes(), get_seconds()
+	and get_milliseconds declarations
+	* gst/src/element.hg: modified query_position() and query_duration()
+	methods to use a Gst::ClockTime instead of a gint64 and remove wrapped
+	methods from IGNORE list
+	* tools/m4/convert_gst.m4: added conversion from ClockTime& to gint64*
+
+2007-12-12  Murray Cumming  <murrayc@murrayc.com>
+
+	* examples/ogg_player/main.cc: Use dynamic_cast<> instead of static_cast<> 
+	when casting the message. That is safer.
+	* gst/src/message.ccg: wrap(): Do an extra ref if take_copy is true, 
+	fixing a refcount problem when running the ogg_player example.
+
+2007-12-11  José Alburquerque  <jaalburquerque@cox.com>
+
+	* examples/ogg_player/main.cc: changed call message->get_type() to
+	message->get_message_type() in on_bus_message()
+	* gst/src/bus.ccg: changed SignalProxy_Watch_glib_callback() to use
+	Gst::Message::wrap() instead of Gst::wrap() for message
+	* gst/src/bus.hg: changed GstMessage* conversion macro to use
+	Gst::Message::wrap()
+	* gst/src/message.ccg: changed Gst::wrap() calls in Message classes to
+	Gst::Message::wrap() in create() methods and added the
+	new Gst::Message::wrap() method
+	* gst/src/message.hg: added Gst::Message::wrap() declaration
+	* tests/test-miniobject-wrap.cc: modified to use Gst::Message::wrap()
+	form message wrapping
+	* tools/m4/convert_gst.m4: changed GstMessage conversions to use
+	Gst::Message::wrap()
+
+2007-12-11  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/gstmm/init.cc: Call gst_wrap_register_init() to stop the 	
+	crash in Gst::wrap().
+	* tests/test-miniobject-wrap.cc: Test whether Gst::wrap() is returning a 
+	derived Gst::Message. But it is not, because the derived Gst::Message 
+	classes in message.hg do not use _CLASS_GSTMINIOBJECT(), because they do 
+	not match any such types in GStreamer. These classes are invented by 
+	gstreamermm so we probably need yet another wrap() function, which could 
+	be hard-coded as a static method of Gst::Message.
+
+2007-12-11  Murray Cumming  <murrayc@murrayc.com>
+
+	* configure.ac:
+	* gst/gstmm/Makefile.am:
+	* gst/gstmm/wrap.cc:
+	* gst/gstmm/wrap.h: Added a Gst::wrap() system, based on Glib::wrap(), 
+	but without the extra checks for existing instances, because GstMiniObject 
+	has no object data to store the pointer.
+	* gst/gstmm/gst_wrap_init.h: New file to dclare gst_wrap_init().
+	* gst/gstmm/init.cc: init(): Call gst_wrap_init().
+	* tools/Makefile_list_of_sources.am_fragment:
+	* tools/generate_gst_wrap_init.pl.in: Add this script, based on 
+	glibmm/tools/generate_wrap_init.pl, but processing .hg files that 
+	use _CLASS_GSTMINIOBJECT(). This generates gst_wrap_init.cc
+	* build_shared/Makefile_gensrc.am_fragment:
+	Generate gst_wrap_init.cc, as well as wrap_init.cc.
+	* tools/m4/class_gstminiobject.m4: Put wrap() in the Gst namespace 
+	again.
+
+	* gst/src/bus.ccg:
+	* gst/src/bus.hg:
+	* tools/m4/convert_gst.m4: Use Gst::wrap() instead of Glib::wrap() 
+	with GstMessage.
+	* gst/src/message.ccg:
+	* gst/src/message.hg: include gst_wrap.h
+
+	* tests/test-miniobject-wrap.cc: Use Gst::wrap() instead of 
+	Glib::wrap() with GstMessage, but this currently segfaults.
+
+2007-12-11  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/gstmm/miniobject.h: Derive publically from Glib::ObjectBase 
+	to avoid compiler errors about base methods being private.
+	Added the CppObjectType, CppClassType, BaseObjectType, and BaseClassType 
+	typedefs as in Glib::Object.
+	* gst/gstmm/private/Makefile.am:
+	* gst/gstmm/private/miniobject_p.h: Added a Glib::Class declaration for 
+	MiniObject, like the one that Glib::Object has.
+	* gst/gstmm/miniobject.cc: Added the class_init_function() implementation.
+
+	* gst/src/message.ccg:
+	* gst/src/message.hg: Use _CLASS_GSTMINIOBJECT() instead of 
+	_CLASS_OPAQUE_REFCOUNTED() because a) _CLASS_OPAQUE_REFCOUNTED does not allow 
+	anything to be derived from the class that it creates, and b) we hope to get 
+	wrap() working.
+
+	* tools/m4/convert.m4: Use class_gstminiobject.m4.
+	* tools/m4/class_gstminiobject.m4: Remove the Glib::ConstructParams-based 
+	constructors, because GstMiniObject has no GObject properties system.
+	Put the wrap() function in the Glib namespace, though this needs more work 
+	(and probably really needs to not be Glib::wrap()) because Glib::wrap() 
+	needs to use GObject qdata to discover previous C++ instances.
+
+	* tests/Makefile.am:
+	* tests/test-miniobject-wrap.cc: Added a test to show how wrap() is currently 
+	failing.
+
+2007-12-08  Murray Cumming  <murrayc@murrayc.com>
+
+	* examples/ogg_player/main.cc: Some minor changes to make this slightly clearer.
+
+2007-12-08  Murray Cumming,  <murrayc@murrayc.com>
+
+	* examples/ogg_player/main.cc: Set the source location property 
+	from a std:: rather than a gchar*, which seems to avoid a problem with 
+	an unexpected type in the GObject property system. Probably gchar[] 
+	confuses it, but gchar* would work.
+	* gst/src/message.ccg:
+	* gst/src/message.hg: Remove commented-out enums.
+	MessageError::parse(): Add a version without the optional debug parameter.
+	Recode without ScopedPtr, because that obscures it for me.
+
+2007-12-07  José Alburquerque  <jaalburquerque@cox.com>
+ 
+	* gst/src/bus.hg: consolidated add_signal_watch() and
+	add_signal_watch_full() into one method.
+
+	* configure.ac
+	* examples/Makefile.am/
+ 	* examples/ogg_player/:
+	Added an example that plays ogg files.
+
+2007-12-05  José Alburquerque  <jaalburquerque@yahoo.com>
+
+	* gst/src/bus.ccg: added add_watch() method functionality
+	* gst/src/bus.hg: added typedef SlotWatch, wrapped methods
+	add_signal_watch(), add_signal_watch_full(), and
+	remove_signal_watch() and wrapped signals message() and sync_message()
+	* gst/src/gst_signals.defs: sync-message and message had wrong
+	parameter type (GstMessage instead of GstMessage*)
+	* gst/src/message.hg: changed get_type() to be public
+	* tests/Makefile.am: modified to include test-create-bin
+	* tests/test-create-bin.cc: added this test to create a bin and add
+	elements to it (to "catch" errors as API changes)
+	* tests/test-link-elements.cc: Removed a blank line
+	* tools/m4/convert_gst.m4: Added conversion from GstMessageType to
+	Gst::MessageType (for Gst::Message::get_type())
+
+2007-12-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/element.ccg: get_compatible_pad((): Clarify 
+	the comment now that we know that 
+	gst_element_get_compatible_pad() gives us a reference.
+	See gstreamer bug #500919.
+
+2007-12-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/gstmm/init.cc: Add closing } for namespace to 
+	fix the build. I am not sure when this was broken.
+
+2007-11-30  José Alburquerque  <jaalburquerque@cox.net>
+ 
+	* gst/gstmm.h: added <gstmm/pipeline.h>
+ 	* gst/src/bin.ccg: removed 2nd arg from Glib::wrap in
+ 	Gst::Bin::create()
+	* gst/src/pipeline.ccg: removed 2nd arg from Glib::wrap in
+	Gst::Pipeline::create() and fixed Gst:Pipeline::add() unref error
+	* tests/Makefile.am: added test to add element to pipeline and one to
+	link several elements
+	* tests/test-link-elements.cc:
+	* tests/test-pipeline-add-element.cc: Added these tests.
+
+2007-12-01  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/element.hg:
+	* gst/src/pad.hg:
+	* gst/src/padtemplate.hg:
+	* tools/m4/convert_gst.m4: Move the signal conversion 
+	GstPad* -> const Glib::RefPtr<Pad>&
+	into the .hg files and take a reference. I would 
+	rather have duplicates than risk these being hidden in the 
+	.m4 file where they are likely to be wrong.
+
+2007-12-01  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/element.ccg: get_compatible_pad_template():
+	Use wrap(, true) instead of explictly using g_object_ref().
+	* gst/src/structure.ccg:
+	* gst/src/structure.hg: Const corrections and whitespace 
+	corrections.
+	* gst/gstmm/init.cc:
+	* gst/gstmm/init.h: Whitespace corrections.
+
+2007-12-01  Siavash Safi  <siavash.safi@gmail.com>
+
+	* configure.ac: added AC_CONFIG_FILES() for examples
+	* examples/Makefile.am:
+	* examples/Makefile.am_fragment:
+	* examples/README:
+	* examples/init/Makefile.am:
+	* examples/init/init.cc:
+	* gst/gstmm.h: version.h
+	* gst/gstmm/Makefile.am:
+	* gst/gstmm/version.cc:
+	* gst/gstmm/version.h:
+	* gst/src/element.ccg:
+	* gst/src/element.hg: get_compatible_pad_template()
+	* gst/src/padtemplate.hg: predefined Pad, pad_created() signal
+	* gst/src/structure.ccg:
+	* gst/src/structure.hg: get_uint()
+
+2007-11-28  Siavash Safi  <siavash.safi@gmail.com>
+
+	* gst/src/element.hg: seek_simple(), seek()
+	* gst/src/enums.hg: SeekType, SeekFlags (hand-coded)
+	* tools/m4/convert_gst.m4:
+
+2007-11-28  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/error.hg: Removed an unnecessary argument from the 
+	_DEFS() macro.
+
+2007-11-28  José Alburquerque  <jaalburquerque@cox.net>
+
+	* gst/Makefile.am: Renamed some variables from gtkmm to 
+	gstmm.
+	* tests/test-create-element.cc: Output some text also if the 
+	test was successful.
+
+2007-11-23  Siavash Safi  <siavash.safi@gmail.com>
+
+	* gst/src/pad.hg:
+
+2007-11-22  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/gstmm/private/object_p.h: Added this to svn.
+	* gst/gstmm/private/Makefile.am: Add object_p.h to the dist, 
+	to fix distcheck.
+
+2007-11-20  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/gstmm/Makefile.am:
+	* gst/src/object.ccg:
+	* gst/src/object.hg: Remove these .hg and .ccg files.
+	* gst/gstmm/object.cc:
+	* gst/gstmm/object.h:
+	* gst/src/Makefile_list_of_hg.am_fragment:
+	And hand-coded (based on generated code) .h and .cc 
+	files for Gst::Object, doing the ref sink in the 
+	castitem constructor.
+	* gst/src/element.ccg: create(): Don't sink the ref 
+	here, because it is done in the Gst::Object constructor 
+	now. 
+
+2007-11-20  Murray Cumming  <murrayc@murrayc.com>
+
+	* tools/m4/Makefile_list_of_sources.am_fragment:
+	* tools/m4/class_gstclass.m4:
+	* tools/m4/class_gstobject.m4:
+	* tools/m4/convert.m4:
+	Remove GST_OBJECT(). It does not seem useful and it 
+	is likely to cause unexpected errors.
+	* gst/src/object.ccg:
+	* gst/src/object.hg: Sink the floating reference in 
+	the constructor.
+	TODO: Reimplement this as .h/.cc so we can do it in 
+	the GObject* castitem constructor (or hack some m4 
+	in the .hg file to do this.)
+
+	* gst/src/element.ccg:
+	* gst/src/element.hg: create(): Sink the reference 
+	before passing the GObject to Glib::wrap(). This is 
+	temporary until we have fixed Gst::Object as mentioned 
+	above.
+
+	* tools/m4/convert_gst.m4:
+	* gst/src/clock.ccg:
+	* gst/src/clock.hg:
+	* gst/src/bin.ccg:
+	* gst/src/bin.hg:
+	* gst/src/bus.ccg:
+	* gst/src/bus.hg:
+	* gst/src/message.ccg:
+	* gst/src/pad.ccg:
+	* gst/src/pad.hg:
+	* gst/src/padtemplate.ccg:
+	* gst/src/padtemplate.hg:
+	* gst/src/pipeline.ccg:
+	* gst/src/pipeline.hg:
+	* gst/src/systemclock.hg:
+	* gst/src/xml.ccg:
+	* gst/src/xml.hg:
+	Use Glib::wrap() instead of wrap().
+	Remove unnecessary includes.
+
+2007-11-20  Murray Cumming  <murrayc@murrayc.com>
+
+	* tests/Makefile.am: Actually build the test.
+
+2007-11-20  Murray Cumming  <murrayc@murrayc.com>
+
+	* autogen.sh: Use a version of the autogen.sh from cluttermm.
+	This seems more robust. I had a autotools version-mismatch with the 
+	existing one.
+	* configure.ac:
+	* Makefile.am:
+	* tests/Makefile.am: Added tests to the build.
+	* tests/test-create-element.cc: Add a test from José Alburquerque.
+
+2007-11-19  mderezynski derezynski  <mderezynski@gmail.com>
+
+	* autogen.sh:
+	* gst/gstmm.h:
+	* tools/m4/convert_gst.m4:
+	THIS CHANGELOG ENTRY IS UNACCEPTABLE. murrayc.
+
+2007-11-05  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/bin.hg:
+	* gst/src/bus.ccg:
+	* gst/src/bus.hg:
+	* gst/src/caps.ccg:
+	* gst/src/caps.hg:
+	* gst/src/element.ccg:
+	* gst/src/element.hg:
+	* gst/src/pad.ccg:
+	* gst/src/pad.hg:
+	* gst/src/structure.ccg:
+	* gst/src/structure.hg:
+	* gst/src/systemclock.ccg:
+	* gst/src/systemclock.hg:
+	* tools/m4/convert_gst.m4: Use _WRAP_METHOD() instead 
+	of hand-coding methods (though I have not changed the ones 
+	that throw extra exceptions).
+	Soem const corrections.
+
+2007-11-05  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/element.hg: provides_clock(), provide_clock(), 
+	is_locked_state(): Const corrections.
+
+2007-11-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/*.hg
+	* tools/m4/convert_gst.m4: Made some const corrections.
+	We need to investigate whether refreturn is needed for the 
+	getters.
+
+2007-11-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* tools/m4/convert_gst.m4:
+	* gst/src/Makefile.am:
+	* gst/src/: Regenerated .defs files, using the 
+	same filenames as in other *mm files, and removing 
+	the very-split-up .defs file.
+	Several functions and signals were now defined, 
+	so I had to make some corrections and comment out 
+	some signals.
+	Move _WRAP_SIGNAL() and _WRAP_PROPERTY() to the bottom 
+	of files, for consistency with other *mm projects.
+	* tools/extra_defs_gen/generate_defs_gst.cc:
+	Added more types.
+
+2007-11-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/gstmm/Makefile.am:
+	* gst/src/miniobject.ccg:
+	* gst/src/miniobject.hg: Moved to 
+	* gst/gstmm/miniobject.cc:
+	* gst/gstmm/miniobject.h: and made some changes to 
+	make it more like Glib::Object. Now I will try 
+	to see how it can/should be used.
+
+2007-11-03  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/Makefile_list_of_hg.am_fragment:
+	* gst/src/*.[hg|cc]: Renamed, to remove the gst prefix.
+
+	(My previous commit also corrected the indenting.)
+
+2007-11-02  Murray Cumming  <murrayc@murrayc.com>
+
+	* gst/src/gstmessage.hg:
+	* gst/src/gstmessage.ccg: Commented out some code to fix the build.
+	Please try to avoid checking in code that breaks the build.
+
+	And please use the ChangeLog.
+

@@ -1,0 +1,47 @@
+#include <gst/gstformat.h>
+
+namespace Gst
+{
+
+std::string get_format_name(Format format)
+{
+  return gst_format_get_name(GstFormat(format));
+}
+
+GQuark get_format_quark(Format format)
+{
+  return gst_format_to_quark(GstFormat(format));
+}
+
+Format register_format(const std::string& nick, const std::string& description)
+{
+  return Format(gst_format_register(nick.c_str(), description.c_str()));
+}
+
+Format get_format_by_nick(const std::string& nick)
+{
+  return Format(gst_format_get_by_nick(nick.c_str()));
+}
+
+bool formats_contain_format(const Format& formats, Format format)
+{
+  GstFormat gstformats = GstFormat(formats);
+  return gst_formats_contains(&gstformats, GstFormat(format));
+}
+
+bool get_format_details(FormatDefinition &def, Format format)
+{
+  const GstFormatDefinition* gstdef = gst_format_get_details(GstFormat(format));
+
+  g_return_val_if_fail(gstdef != NULL, false);
+
+  def.value = Format(gstdef->value);
+  def.nick = gstdef->nick;
+  def.description = gstdef->description;
+  def.quark = gstdef->quark;
+
+  return true;
+}
+
+} //namespace Gst
+

@@ -1,0 +1,36 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+
+namespace Gst
+{
+
+bool XML::parse_memory(const std::string& buffer, const std::string& root)
+{
+  return gst_xml_parse_memory(this->gobj(),(guchar*)(buffer.c_str()), buffer.size(), root.c_str());
+}
+
+xmlDocPtr write_xml(const Glib::RefPtr<Element>& element)
+{
+  return gst_xml_write(element->gobj());
+}
+
+int write_xml_file(const Glib::RefPtr<Element>& element, const std::string& filename)
+{
+  int file = creat(filename.c_str(), O_EXCL);
+  int result = gst_xml_write_file(element->gobj(),(FILE*) file);
+  int errsv = errno;
+  close(file);
+  if(result == -1)
+    throw Glib::FileError(Glib::FileError::Code(errsv), "failed to write xml file: '" + filename + "'");
+  else
+    return result;
+}
+
+Glib::RefPtr<Element> make_element(const xmlNodePtr& xml_node, const Glib::RefPtr<Object>& parent)
+{
+  return Glib::wrap(gst_xml_make_element(xml_node, parent->gobj()));
+}
+
+} //namespace Gst

@@ -1,0 +1,84 @@
+#ifndef _GSTMM_CONFIG_H
+#define _GSTMM_CONFIG_H 1
+
+/* version numbers */
+#undef GSTMM_MAJOR_VERSION
+#undef GSTMM_MINOR_VERSION
+#undef GSTMM_MICRO_VERSION
+
+// detect common platforms
+#if defined(_WIN32)
+// Win32 compilers have a lot of varation
+#if defined(_MSC_VER)
+#define GSTMM_MSC
+#define GSTMM_WIN32
+#define GSTMM_DLL
+#elif defined(__CYGWIN__)
+#define GSTMM_CONFIGURE
+#elif defined(__MINGW32__)
+#define GSTMM_WIN32
+#define GSTMM_CONFIGURE
+#else
+//AIX clR compiler complains about this even though it doesn't get this far:
+//#warning "Unknown architecture (send me gcc --dumpspecs or equiv)"
+#endif
+#else
+#define GSTMM_CONFIGURE
+#endif /* _WIN32 */
+
+#ifdef GSTMM_CONFIGURE
+/* compiler feature tests that are used during compile time and run-time
+   by gtk-- only. tests used by gdk-- and gtk-- should go into
+   gdk--config.h.in */
+#undef GSTMM_CXX_HAVE_MUTABLE
+#undef GSTMM_CXX_HAVE_NAMESPACES
+//#undef GSTMM_CXX_GAUB
+//#undef GSTMM_CXX_AMBIGUOUS_TEMPLATES
+#undef GSTMM_HAVE_NAMESPACE_STD
+#undef GSTMM_HAVE_STD_ITERATOR_TRAITS
+#undef GSTMM_HAVE_SUN_REVERSE_ITERATOR
+#undef GSTMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+#undef GSTMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+#undef GSTMM_COMPILER_SUN_FORTE
+#undef GSTMM_DEBUG_REFCOUNTING
+#undef GSTMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+#undef GSTMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+#undef GSTMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC
+#undef GSTMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
+#endif
+
+#ifdef GSTMM_MSC
+  #define GSTMM_CXX_HAVE_MUTABLE 1
+  #define GSTMM_CXX_HAVE_NAMESPACES 1
+  #define GSTMM_HAVE_NAMESPACE_STD 1
+  #define GSTMM_HAVE_STD_ITERATOR_TRAITS 1
+  #define GSTMM_HAVE_TEMPLATE_SEQUENCE_CTORS 2
+  #define GSTMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS 1
+  #define GSTMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION 1
+  #define GSTMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS 1
+  #define GSTMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC 1
+  #pragma warning (disable: 4786 4355 4800 4181)
+#endif
+
+#ifndef GSTMM_HAVE_NAMESPACE_STD
+#  define GSTMM_USING_STD(Symbol) namespace std { using ::Symbol; }
+#else
+#  define GSTMM_USING_STD(Symbol) /* empty */
+#endif
+
+#ifdef GSTMM_DLL
+  #if defined(GSTMM_BUILD) && defined(_WINDLL)
+    /* Do not dllexport as it is handled by gendef on MSVC */
+    #define GSTMM_API 
+  #elif !defined(GSTMM_BUILD)
+    #define GSTMM_API __declspec(dllimport)
+  #else
+    /* Build a static library */
+    #define GSTMM_API
+  #endif /* GSTMM_BUILD - _WINDLL */
+#else
+  #define GSTMM_API
+#endif /* GSTMM_DLL */
+
+#endif /* _GSTMM_CONFIG_H */
+

@@ -1,0 +1,53 @@
+#include <gstmm/object.h>
+#include <gstmm/message.h>
+#include <gstmm/clock.h>
+#include <gstmm/enums.h>
+_DEFS(gstmm,gst)
+_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gstmm/private/object_p.h)
+
+namespace Gst
+{
+class Message;
+
+class Bus : public Object
+{
+  _CLASS_GOBJECT(Bus, GstBus, GST_BUS, Object, GstObject)
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+
+  static Glib::RefPtr<Bus> create();
+  _WRAP_METHOD(bool post(const Glib::RefPtr<Message>& message), gst_bus_post)
+  _WRAP_METHOD(bool have_pending() const, gst_bus_have_pending)
+
+  _WRAP_METHOD(Glib::RefPtr<Message> peek(), gst_bus_peek)
+  _WRAP_METHOD(Glib::RefPtr<const Message> peek() const, gst_bus_peek)
+
+  _WRAP_METHOD(Glib::RefPtr<Message> pop(), gst_bus_pop)
+  _WRAP_METHOD(Glib::RefPtr<Message> timed_pop(ClockTime timeout), gst_bus_timed_pop)
+
+  _WRAP_METHOD(void set_flushing(bool flushing = true), gst_bus_set_flushing)
+
+  /** For example,
+   * bool on_bus_watch(const Glib::RefPtr<Bus>& bus, const Glib::RefPtr<Message>& message);
+   */
+  typedef sigc::slot<bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotWatch;
+  void add_watch(const SlotWatch& slot, int priority = G_PRIORITY_DEFAULT);
+  _IGNORE(gst_bus_add_watch, gst_bus_add_watch_full)
+
+  _WRAP_METHOD(void disable_sync_message_emission(), gst_bus_disable_sync_message_emission)
+  _WRAP_METHOD(void enable_sync_message_emission(), gst_bus_enable_sync_message_emission)
+
+  _WRAP_METHOD(void add_signal_watch(int priority = G_PRIORITY_DEFAULT), gst_bus_add_signal_watch_full)
+  _WRAP_METHOD(void remove_signal_watch(), gst_bus_remove_signal_watch)
+  _IGNORE(gst_bus_add_signal_watch)
+
+#m4 _CONVERSION(`GstMessage*',`const Glib::RefPtr<Message>&', `Gst::Message::wrap($3, true)')
+  _WRAP_SIGNAL(void message(const Glib::RefPtr<Message>& message), "message")
+  _WRAP_SIGNAL(void sync_message(const Glib::RefPtr<Message>& message), "sync-message")
+};
+
+} //namespace Gst

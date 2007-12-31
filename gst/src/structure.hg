@@ -1,0 +1,166 @@
+#include <gstmm/clock.h>
+#include <gstmm/enums.h>
+_DEFS(gstmm,gst)
+
+namespace Gst
+{
+
+//TODO: Documenation. What is this?
+//TODO: Put implmenetation in the .ccg file.
+//TODO: Probably use the m_ prefix.
+class Fraction
+{
+public:
+  Fraction(int num, int den)
+  : numerator(num),
+    denominator(den)
+  {}
+
+  Fraction()
+  : numerator(0),
+    denominator(0)
+  {}
+
+  int numerator;
+  int denominator;
+};
+
+//TODO: Use parameter names in method declarations in all these classes.
+
+class Structure;
+
+//TODO: What is this?
+class StructureValueProxy
+{
+public:
+
+  StructureValueProxy(Structure&, const std::string&);
+
+  void operator=(const std::string& src);
+  void operator=(bool src);
+  void operator=(double src);
+  void operator=(int src);
+  void operator=(const Fraction& src);
+
+private:
+
+  Structure& m_Structure;
+  std::string m_Name;
+};
+
+class Structure
+{
+  _CLASS_BOXEDTYPE(Structure, GstStructure, NONE, gst_structure_copy, gst_structure_free)
+
+public:
+
+  typedef sigc::slot<bool, GQuark, const GValue*> ForeachSlot;
+  typedef sigc::slot<bool, GQuark, GValue*> MapSlot;
+
+  //TODO: Why are these public? Can't they just be completely in the .ccg file.
+  static gboolean foreach_callback(GQuark field_id, const GValue *value, gpointer data);
+
+  static gboolean map_callback(GQuark field_id, GValue *value, gpointer data);
+
+public:
+
+  Structure(const std::string& name);
+  Structure(GQuark quark);
+  Structure(const GstStructure*); // for Message::get_structure()
+
+  StructureValueProxy operator[](const std::string&);
+
+  void clear(); // remove_all_fields in C API
+  int size() const;
+
+
+  //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
+  //See Gtk::TreeModel, for instance. murrayc.
+  //Glib::ValueBase id_get_value(GQuark);
+
+  _WRAP_METHOD(void id_set_value(GQuark, const Glib::ValueBase&), gst_structure_id_set_value)
+
+  //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
+  //Glib::ValueBase get_value(const std::string& fieldname) const;
+
+  void set_value(const std::string& fieldname, const Glib::ValueBase& value);
+
+  _WRAP_METHOD(void remove_field(const std::string& fieldname), gst_structure_remove_field)
+  _WRAP_METHOD(GType get_field_type(const std::string& fieldname) const, gst_structure_get_field_type)
+  bool foreach(const ForeachSlot& slot);
+
+  _WRAP_METHOD(bool has_field(const std::string& fieldname) const, gst_structure_has_field)
+  _WRAP_METHOD(bool has_field_typed(const std::string& fieldname, GType type) const, gst_structure_has_field_typed)
+
+  //TODO: Should these use Glib::ustring?
+
+  bool get_boolean(const std::string&, bool& value) const;
+
+  bool get_int(const std::string&, int& value) const;
+
+  bool get_uint(const std::string&, guint& value) const;
+
+  bool get_fourcc(const std::string&, guint32& value) const;
+
+  bool get_double(const std::string&, double& value) const;
+
+  std::string get_string(const std::string& value) const;
+
+  bool get_date(const std::string&, Glib::Date& value) const;
+
+  bool get_clock_time(const std::string&, ClockTime& value) const;
+
+  bool get_enum(const std::string&, GType enumtype, int& value) const;
+
+  bool get_fraction(const std::string&, int& value_numerator, int& value_denominator) const;
+
+  bool map_in_place(const MapSlot& slot);
+
+  static Structure create_from_string(const std::string& the_string);
+
+  _WRAP_METHOD(GQuark get_name_id() const, gst_structure_get_name_id)
+  _WRAP_METHOD(std::string get_name() const, gst_structure_get_name)
+  _WRAP_METHOD(bool has_name(const std::string& name) const, gst_structure_has_name)
+  _WRAP_METHOD(void set_name(const std::string& name), gst_structure_set_name)
+  _WRAP_METHOD(std::string to_string() const, gst_structure_to_string)
+  _WRAP_METHOD(std::string nth_field_name(guint index) const, gst_structure_nth_field_name)
+  _IGNORE(
+      gst_structure_get_date,
+      gst_structure_id_set,
+      gst_structure_id_get_value,
+      gst_structure_remove_fields_valist,
+      gst_structure_fixate_field_boolean,
+      gst_structure_id_set_value,
+      gst_structure_get_enum,
+      gst_structure_get_clock_time,
+      gst_structure_remove_all_fields,
+      gst_structure_get_fraction,
+      gst_structure_remove_field,
+      gst_structure_has_field_typed,
+      gst_structure_get_string,
+      gst_structure_fixate_field_nearest_int,
+      gst_structure_fixate_field_nearest_double,
+      gst_structure_remove_fields,
+      gst_structure_copy,
+      gst_structure_id_set_valist,
+      gst_structure_get_field_type,
+      gst_structure_map_in_place,
+      gst_structure_get_value,
+      gst_structure_free,
+      gst_structure_n_fields,
+      gst_structure_get_double,
+      gst_structure_get_boolean,
+      gst_structure_has_field,
+      gst_structure_set,
+      gst_structure_get_fourcc,
+      gst_structure_set_value,
+      gst_structure_foreach,
+      gst_structure_fixate_field_nearest_fraction,
+      gst_structure_set_valist,
+      gst_structure_set_parent_refcount,
+      gst_structure_get_int,
+      gst_structure_get_uint)
+
+};
+
+} //namespace Gst

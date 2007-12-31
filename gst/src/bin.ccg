@@ -1,0 +1,62 @@
+#include <stdexcept>
+
+namespace Gst
+{
+
+Glib::RefPtr<Bin> Bin::create(const std::string& name)
+{
+  GstElement* bin = gst_bin_new(name.c_str());
+  return Glib::wrap((GstBin*) bin);
+}
+
+Glib::RefPtr<Bin> Bin::add(const Glib::RefPtr<Element>& element)
+{
+  bool result = gst_bin_add(gobj(), element->gobj());
+
+  if(result)
+    return Glib::wrap(gobj(), true);
+  else
+    throw std::runtime_error("Bin '" + get_name() + "' does not want to accept Element '" + element->get_name() + "'");
+}
+
+Glib::RefPtr<Bin> Bin::remove(const Glib::RefPtr<Element>& element)
+{
+  bool result = gst_bin_remove(gobj(), element->gobj());
+
+  if(result)
+    return Glib::RefPtr<Bin>(this);
+  else
+    throw std::runtime_error("Bin '" + get_name() + "' does not want to remove Element '" + element->get_name() + "'");
+}
+
+Glib::RefPtr<Element> Bin::get_by_name(const std::string& element_name)
+{
+  GstElement* element = gst_bin_get_by_name(gobj(), element_name.c_str());
+
+  if(element != NULL)
+    return Glib::wrap(element, false);
+  else
+    throw std::runtime_error("Bin '" + get_name() + "' contains no Element '" + element_name + "'");
+}
+
+Glib::RefPtr<Element> Bin::get_by_name_recurse_up(const std::string& element_name)
+{
+  GstElement* element = gst_bin_get_by_name_recurse_up(gobj(), element_name.c_str());
+
+  if(element != NULL)
+    return Glib::wrap(element, false);
+  else
+    throw std::runtime_error("Bin '" + get_name() + "' contains no Element '" + element_name + "'");
+}
+
+Glib::RefPtr<Pad> Bin::find_unconnected_pad(PadDirection direction)
+{
+  GstPad* pad = gst_bin_find_unconnected_pad(gobj(), GstPadDirection(direction));
+
+  if(pad != NULL)
+    return Glib::wrap(pad, false);
+  else
+    throw std::runtime_error("Bin '" + get_name() + "' contains no unconnected Pad(s)");
+}
+
+} //namespace Gst

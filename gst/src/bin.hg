@@ -1,0 +1,45 @@
+#include <gstmm/element.h>
+#include <gstmm/pad.h>
+#include <gstmm/enums.h>
+_DEFS(gstmm,gst)
+_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gstmm/private/element_p.h)
+
+
+namespace Gst
+{
+
+class Bin : public Element 
+{
+  _CLASS_GOBJECT(Bin, GstBin, GST_BIN, Element, GstElement)
+
+protected:
+
+  _CTOR_DEFAULT
+
+public:
+
+  //TODO: Why doesn't this use _WRAP_CREATE()?
+  //TODO: If this is always ASCII or UTF-8 (not raw data) then use Glib::ustring:
+  static Glib::RefPtr<Bin> create(const std::string& name);
+
+  //TODO: Why do these throw exceptions?
+  //If there is a good reason for it, document that in comments and doxygen documentation. murrayc.
+  Glib::RefPtr<Bin> add(const Glib::RefPtr<Element>& element);
+  Glib::RefPtr<Bin> remove(const Glib::RefPtr<Element>& element);
+
+  //TODO: Why don't these use Glib::ustring? murrayc
+  Glib::RefPtr<Element> get_by_name(const std::string& element_name);
+  Glib::RefPtr<Element> get_by_name_recurse_up(const std::string& element_name);
+  _WRAP_METHOD(Glib::RefPtr<Element> get_by_interface(GType interface), gst_bin_get_by_interface)
+
+  Glib::RefPtr<Pad> find_unconnected_pad(PadDirection direction);
+
+  _IGNORE(gst_bin_add, gst_bin_remove, gst_bin_get_by_name, gst_bin_get_by_name_recurse_up)
+
+#m4 _CONVERSION(`GstElement*',`const Glib::RefPtr<Element>&', `Glib::wrap($3, true)')
+  //TODO: When wrap() works: _WRAP_SIGNAL(void element_added(const Glib::RefPtr<Element>& element), "element-added")
+  //TODO: When wrap() works: _WRAP_SIGNAL(void element_removed(const Glib::RefPtr<Element>& element), "element-removed")
+};
+
+} //namespace Gst

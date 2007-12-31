@@ -1,0 +1,49 @@
+#include <gstmm/bus.h>
+#include <gst/gstclock.h>
+
+namespace Gst
+{
+
+guint get_hours(ClockTime time)
+{
+  return GST_CLOCK_TIME_IS_VALID (time) ? \
+        (guint) (((GstClockTime)(time)) / (GST_SECOND * 60 * 60)) : 99;
+}
+
+guint get_minutes(ClockTime time)
+{
+  return GST_CLOCK_TIME_IS_VALID (time) ? \
+        (guint) ((((GstClockTime)(time)) / (GST_SECOND * 60)) % 60) : 99;
+}
+
+guint get_seconds(ClockTime time)
+{
+  return GST_CLOCK_TIME_IS_VALID (time) ? \
+        (guint) ((((GstClockTime)(time)) / GST_SECOND) % 60) : 99;
+}
+
+guint get_milliseconds(ClockTime time)
+{
+  return GST_CLOCK_TIME_IS_VALID (time) ? \
+        (guint) ((((GstClockTime)(time)) / GST_MSECOND) % 1000) : 999;
+}
+
+guint get_microseconds(ClockTime time)
+{
+  return GST_CLOCK_TIME_IS_VALID (time) ? \
+        (guint) ((((GstClockTime)(time)) / GST_USECOND) % 1000) : 999;
+}
+
+guint get_nanoseconds(ClockTime time)
+{
+  return GST_CLOCK_TIME_IS_VALID (time) ? \
+        (guint) ((((GstClockTime)(time)) / GST_NSECOND) % 1000) : 999;
+}
+
+guint get_fractional_seconds(ClockTime time)
+{
+  return GST_CLOCK_TIME_IS_VALID (time) ? \
+        (guint) (((GstClockTime)(time)) % GST_SECOND) : 999999999;
+}
+
+} //namespace Gst

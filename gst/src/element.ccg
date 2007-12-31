@@ -1,0 +1,68 @@
+#include <stdexcept>
+#include <iostream>
+
+namespace Gst
+{
+
+Glib::RefPtr<Element>
+Element::create(const Glib::ustring& factoryname, const Glib::ustring& name)
+{
+  GstElement* element = gst_element_factory_make(factoryname.c_str(), name.c_str());
+  return Glib::wrap(element);
+}
+
+Glib::RefPtr<Element>
+Element::link(const Glib::RefPtr<Element>& other_element)
+{
+  bool result = gst_element_link(gobj(), other_element->gobj());
+
+  if(result)
+    return other_element;
+  else
+    throw std::runtime_error("failed to link: " + get_name() + "->" + other_element->get_name() + "!\n");
+}
+
+std::string
+Element::state_get_name(State state)
+{
+  return gst_element_state_get_name(GstState(state));
+}
+
+std::string
+Element::state_change_return_get_name(StateChangeReturn state_ret)
+{
+  return gst_element_state_change_return_get_name(GstStateChangeReturn(state_ret));
+}
+
+Glib::RefPtr<Pad> Element::get_compatible_pad(const Glib::RefPtr<Pad>& pad, const Glib::RefPtr<Caps>& caps)
+{
+  GstPad* c_pad = gst_element_get_compatible_pad(gobj(), pad->gobj(), caps->gobj());
+  if(c_pad)
+    return Glib::wrap(c_pad); //gst_element_get_compatible_pad gives us a reference.
+  else
+    throw std::runtime_error("no unlinked Pad in Element '" + get_name() + "' found!");
+}
+
+Glib::RefPtr<PadTemplate> Element::get_compatible_pad_template(const Glib::RefPtr<PadTemplate>& padtemplate)
+{
+  GstPadTemplate* c_padtemplate = gst_element_get_compatible_pad_template(gobj(), padtemplate->gobj());
+  if(c_padtemplate)
+  {
+    return Glib::wrap(c_padtemplate, true /* take reference */); //gst_element_get_compatible_pad_template() does not give us a reference.
+  }
+  else
+    throw std::runtime_error("no compatible PadTemplate with '" + padtemplate->get_name() + "' in Element '" + get_name() + "' found!");
+}
+
+bool Element::query_position(Format& format) const
+{
+  return gst_element_query_position(const_cast<GstElement*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+}
+
+bool Element::query_duration(Format& format) const
+{
+  return gst_element_query_duration(const_cast<GstElement*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+}
+
+
+} //namespace Gst

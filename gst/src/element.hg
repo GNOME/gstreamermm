@@ -1,0 +1,105 @@
+#include <gstmm/object.h>
+#include <gstmm/pad.h>
+#include <gstmm/padtemplate.h>
+#include <gstmm/caps.h>
+#include <gstmm/clock.h>
+#include <gstmm/bus.h>
+#include <gstmm/enums.h>
+#include <gstmm/message.h>
+_DEFS(gstmm,gst)
+_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gstmm/private/object_p.h)
+
+
+namespace Gst
+{
+
+class Bus;
+class Pad;
+class PadTemplate;
+class Message;
+
+class Element : public Object 
+{
+  _CLASS_GOBJECT(Element, GstElement, GST_ELEMENT, Object, GstObject)
+
+protected:
+  //TODO: What C function does this correspond to?
+  _CTOR_DEFAULT
+
+public:
+
+  static Glib::RefPtr<Element> create(const Glib::ustring& factoryname, const Glib::ustring& name);
+  Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
+  static std::string state_get_name(State state);
+  static std::string state_change_return_get_name(StateChangeReturn state_ret);
+  _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
+  _WRAP_METHOD(Glib::RefPtr<Pad> get_pad(const Glib::ustring& name), gst_element_get_pad)
+  _WRAP_METHOD(void create_all_pads(), gst_element_create_all_pads)
+
+  //TODO: Why does this throw an exception? murrayc
+  Glib::RefPtr<Pad> get_compatible_pad(const Glib::RefPtr<Pad>& pad, const Glib::RefPtr<Caps>& caps);
+  Glib::RefPtr<PadTemplate> get_compatible_pad_template(const Glib::RefPtr<PadTemplate>& padtemplate);
+
+  _WRAP_METHOD(Glib::RefPtr<Pad> get_request_pad(const Glib::ustring& name), gst_element_get_request_pad)
+  _WRAP_METHOD(Glib::RefPtr<Pad> get_static_pad(const Glib::ustring& name), gst_element_get_static_pad)
+  _WRAP_METHOD(void no_more_pads(), gst_element_no_more_pads)
+  _WRAP_METHOD(void release_request_pad(const Glib::RefPtr<Pad>& pad), gst_element_release_request_pad)
+  _WRAP_METHOD(bool remove_pad(const Glib::RefPtr<Pad>& pad), gst_element_remove_pad)
+ 
+  _WRAP_METHOD(void unlink(const Glib::RefPtr<Element>& other_element), gst_element_unlink)
+
+  _WRAP_METHOD(bool link_pads(const Glib::ustring& padname, const Glib::RefPtr<Element>& other_element, const Glib::ustring& others_padname), gst_element_link_pads)
+
+  _WRAP_METHOD(void unlink_pads(const Glib::ustring& padname, const Glib::RefPtr<Element>& other_element, const Glib::ustring& other_padname), gst_element_unlink_pads)
+
+  //TODO: Use ustring?:
+  _WRAP_METHOD(bool link_pads_filtered(const char* padname, const Glib::RefPtr<Element>& other_element, const char* others_padname, const Glib::RefPtr<Caps>& filter), gst_element_link_pads_filtered)
+
+  _WRAP_METHOD(bool link_filtered(const Glib::RefPtr<Element>& other_element, const Glib::RefPtr<Caps>& filter), gst_element_link_filtered)
+  _WRAP_METHOD(void set_base_time(ClockTime time), gst_element_set_base_time)
+  _WRAP_METHOD(ClockTime get_base_time() const, gst_element_get_base_time)
+  _WRAP_METHOD(void set_bus(const Glib::RefPtr<Bus>& bus), gst_element_set_bus)
+  _WRAP_METHOD(Glib::RefPtr<Bus> get_bus(), gst_element_get_bus)
+  _WRAP_METHOD(Glib::RefPtr<const Bus> get_bus() const, gst_element_get_bus, constversion)
+
+  _WRAP_METHOD(bool is_indexable() const, gst_element_is_indexable)
+  _WRAP_METHOD(bool requires_clock() const, gst_element_requires_clock)
+  _WRAP_METHOD(bool set_clock(const Clock& clock), gst_element_set_clock)
+  _WRAP_METHOD(Glib::RefPtr<Clock> get_clock(), gst_element_get_clock)
+  _WRAP_METHOD(Glib::RefPtr<const Clock> get_clock() const, gst_element_get_clock, constversion)
+  _WRAP_METHOD(bool provides_clock() const, gst_element_provides_clock)
+  _WRAP_METHOD(Glib::RefPtr<Clock> provide_clock(), gst_element_provide_clock)
+  _WRAP_METHOD(Glib::RefPtr<const Clock> provide_clock() const, gst_element_provide_clock, constversion)
+  _WRAP_METHOD(StateChangeReturn set_state(State state), gst_element_set_state)
+  _WRAP_METHOD(StateChangeReturn get_state(State& state, State& pending, ClockTime timeout) const, gst_element_get_state)
+  _WRAP_METHOD(bool set_locked_state(gboolean locked_state), gst_element_set_locked_state)
+  _WRAP_METHOD(bool is_locked_state() const, gst_element_is_locked_state)
+  _WRAP_METHOD(void abort_state(), gst_element_abort_state)
+  _WRAP_METHOD(StateChangeReturn continue_state(StateChangeReturn prestate_value), gst_element_continue_state)
+  _WRAP_METHOD(void lost_state(), gst_element_lost_state)
+  _WRAP_METHOD(bool sync_state_with_parent(), gst_element_sync_state_with_parent)
+  _WRAP_METHOD(StateChangeReturn change_state(GstStateChange transition), gst_element_change_state)
+
+  _WRAP_METHOD(bool post_message(const Glib::RefPtr<Message>& message), gst_element_post_message)
+
+  _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_element_query_convert)
+  bool query_position(Format& format) const;
+  _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_element_query_position)
+  bool query_duration(Format& format) const;
+  _WRAP_METHOD(bool query_duration(Format& format, gint64& duration) const, gst_element_query_duration)
+
+  _WRAP_METHOD(bool seek(Format format, SeekFlags flags, gint64 position), gst_element_seek_simple)
+  _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType current_type, gint64 current_position, SeekType stop_type, gint64 stop_position), gst_element_seek)
+
+  _IGNORE(gst_element_link, gst_element_get_compatible_pad, gst_element_link_many)
+
+  _WRAP_SIGNAL(void no_more_pads(), "no-more-pads")
+
+#m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void pad_added(const Glib::RefPtr<Pad>& new_pad), "pad-added")
+  _WRAP_SIGNAL(void pad_removed(const Glib::RefPtr<Pad>& old_pad), "pad-removed")
+};
+
+} // namespace Gst
+

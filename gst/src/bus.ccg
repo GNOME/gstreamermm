@@ -1,0 +1,46 @@
+
+static gboolean SignalProxy_Watch_glib_callback(GstBus* bus, GstMessage* message, void* data)
+{
+  Gst::Bus::SlotWatch* the_slot = static_cast<Gst::Bus::SlotWatch*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (*the_slot)(Glib::wrap(bus, true), Gst::Message::wrap(message, true));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void SignalProxy_Watch_glib_callback_destroy(void* data)
+{
+  delete static_cast<Gst::Bus::SlotWatch*>(data);
+}
+
+namespace Gst
+{
+
+Glib::RefPtr<Bus> Bus::create()
+{
+  GstBus* bus = gst_bus_new();
+  return Glib::wrap(bus, false);
+}
+
+void Bus::add_watch(const SlotWatch& slot, int priority) {
+  //Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
+  //It will be deleted when SignalProxy_Watch_glib_callback_destroy() is called.
+  SlotWatch* slot_copy = new SlotWatch(slot);
+  gst_bus_add_watch_full(gobj(), priority,
+        &SignalProxy_Watch_glib_callback, slot_copy,
+        &SignalProxy_Watch_glib_callback_destroy);
+
+}
+
+} //namespace Gst
