@@ -1,3 +1,43 @@
+2007-12-31  José Alburquerque  <jaalburquerque@cox.com>
+
+	* examples/ogg_player_gtkmm/PlayerWindow.cc: modified to remove bus
+	watch when PlayerWindow is destroyed (in destructor)
+	* examples/ogg_player_gtkmm/PlayerWindow.h: added destructor (to
+	remove bus watch) and watch_id variable definition (to store bus watch
+	id)
+	* gst/src/bin.ccg: changed std::string usages to
+	* gst/src/bin.hg:  Glib::ustring
+	* gst/src/bus.ccg: added remove_watch() method and modified
+	add_watch() to return a watch_id
+	* gst/src/bus.hg: modified add_watch() declaration to return unsigned
+	int and added a remove_watch() method
+	* gst/src/caps.hg: used Glib::ustring instead of std::string
+	* gst/src/element.ccg: removed handwritten sate_get_name() and
+	state_change_return_get_name() methods to use _WRAP_METHOD .hg file
+	instead
+	* gst/src/element.hg: used _WRAP_METHOD for state_get_name() and
+	state_change_return_get_name(); used Glib::ustring instead of
+	std::string
+	* gst/src/enums.hg: alphabetized enums; added EventType, TagMergeMode
+	and TagFlag
+	* gst/src/event.ccg: wrapped GstEvent
+	* gst/src/event.hg: wrapped GstEvent
+	* gst/src/format.ccg: used Glib::ustring instead of
+	* gst/src/format.hg:  std::string
+	* gst/src/message.ccg: added MessageAsyncStart::parse() method
+	definition
+	* gst/src/message.hg: cleaned up spacing
+	* gst/src/pad.ccg: used Glib::ustring instead of
+	* gst/src/pad.hg:  std::string
+	* gst/src/padtemplate.ccg: used Glib::ustring instead of
+	* gst/src/padtemplate.hg:  std::string
+	* gst/src/pipeline.ccg: used Glib::ustring instead of
+	* gst/src/pipeline.hg:  std::string
+	* gst/src/structure.ccg: used Glib::ustring instead of
+	* gst/src/structure.hg:  std::string and added parameter names in .hg
+	file
+	* tools/m4/convert_gst.m4: added a GstEventType conversion macro
+
 2008-01-01  Murray Cumming  <murrayc@murrayc.com>
 
 	* gst/gstmm/gst_wrap_init.cc:
@@ -174,7 +214,7 @@
 	constructors, because GstMiniObject has no GObject properties system.
 	Put the wrap() function in the Glib namespace, though this needs more work 
 	(and probably really needs to not be Glib::wrap()) because Glib::wrap() 
-	needs to use GObject qdata to discover previous C++ instances.
+	needs to use GObject qdata to discover previous C+instances.
 
 	* tests/Makefile.am:
 	* tests/test-miniobject-wrap.cc: Added a test to show how wrap() is currently 

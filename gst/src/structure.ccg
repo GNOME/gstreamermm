@@ -5,14 +5,14 @@ namespace Gst
 {
 // StructureValueProxy
 
-StructureValueProxy::StructureValueProxy(Structure& structure, const std::string& name)
+StructureValueProxy::StructureValueProxy(Structure& structure, const Glib::ustring& name)
 : m_Structure(structure)
 , m_Name(name)
 {
 }
 
 void
-StructureValueProxy::operator=(const std::string& value)
+StructureValueProxy::operator=(const Glib::ustring& value)
 {
   gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_STRING, value.c_str(), NULL);
 }
@@ -47,7 +47,7 @@ StructureValueProxy::operator=(const Fraction& value)
 
 // Structure
 
-Structure::Structure(const std::string& name)
+Structure::Structure(const Glib::ustring& name)
 {
   gobject_ = gst_structure_empty_new(name.c_str());
 }
@@ -58,7 +58,7 @@ Structure::Structure(GQuark quark)
 }
 
 StructureValueProxy
-Structure::operator[](const std::string& name)
+Structure::operator[](const Glib::ustring& name)
 {
   return StructureValueProxy(*this, name);
 }
@@ -79,7 +79,7 @@ Structure::size() const
 //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
 /*
 Glib::ValueBase
-Structure::get_value(const std::string& name) const
+Structure::get_value(const Glib::ustring& name) const
 {
   Glib::ValueBase v;
   v.init(gst_structure_get_value(gobject_, name.c_str()));
@@ -88,7 +88,7 @@ Structure::get_value(const std::string& name) const
 */
 
 bool
-Structure::get_boolean(const std::string& name, bool& value) const
+Structure::get_boolean(const Glib::ustring& name, bool& value) const
 {
   gboolean val_ = false;
   const bool has = gst_structure_get_boolean(gobject_, name.c_str(), &val_);
@@ -101,38 +101,38 @@ Structure::get_boolean(const std::string& name, bool& value) const
 }
 
 bool
-Structure::get_int(const std::string& name, int& value) const
+Structure::get_int(const Glib::ustring& name, int& value) const
 {
   return gst_structure_get_int(gobject_, name.c_str(), &value);
 }
 
 bool
-Structure::get_uint(const std::string& name, guint& value) const
+Structure::get_uint(const Glib::ustring& name, guint& value) const
 {
   return gst_structure_get_uint(gobject_, name.c_str(), &value);
 }
 
 bool
-Structure::get_fourcc(const std::string& name, guint32& value) const
+Structure::get_fourcc(const Glib::ustring& name, guint32& value) const
 {
   return gst_structure_get_fourcc(gobject_, name.c_str(), &value);
 }
 
 
 bool
-Structure::get_double(const std::string& name, gdouble& value) const
+Structure::get_double(const Glib::ustring& name, gdouble& value) const
 {
   return gst_structure_get_double(gobject_, name.c_str(), &value);
 }
 
-std::string
-Structure::get_string(const std::string& name) const
+Glib::ustring
+Structure::get_string(const Glib::ustring& name) const
 {
   return gst_structure_get_string(gobject_, name.c_str());
 }
 
 bool
-Structure::get_date (const std::string& name, Glib::Date& value) const
+Structure::get_date (const Glib::ustring& name, Glib::Date& value) const
 {
   GDate *date = 0;
   const bool has = gst_structure_get_date(gobject_, name.c_str(), &date);
@@ -142,21 +142,21 @@ Structure::get_date (const std::string& name, Glib::Date& value) const
 
 
 bool
-Structure::get_clock_time(const std::string& name, ClockTime& value) const
+Structure::get_clock_time(const Glib::ustring& name, ClockTime& value) const
 {
   return gst_structure_get_clock_time(gobject_, name.c_str(), &value);
 }
 
 
 bool
-Structure::get_enum(const std::string& name, GType enumtype, int& value) const
+Structure::get_enum(const Glib::ustring& name, GType enumtype, int& value) const
 {
   return gst_structure_get_enum(gobject_, name.c_str(), enumtype, &value);
 }
 
 
 bool
-Structure::get_fraction(const std::string& name, int& value_numerator, int& value_denominator) const
+Structure::get_fraction(const Glib::ustring& name, int& value_numerator, int& value_denominator) const
 {
   return gst_structure_get_fraction(gobject_, name.c_str(), &value_numerator, &value_denominator);
 }
@@ -190,7 +190,7 @@ Structure::map_in_place(const MapSlot& slot)
 }
 
 Structure
-Structure::create_from_string(const std::string& the_string)
+Structure::create_from_string(const Glib::ustring& the_string)
 {
   return Structure(gst_structure_from_string(the_string.c_str(), NULL)); 
 }

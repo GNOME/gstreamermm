@@ -35,7 +35,8 @@ public:
    * bool on_bus_watch(const Glib::RefPtr<Bus>& bus, const Glib::RefPtr<Message>& message);
    */
   typedef sigc::slot<bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotWatch;
-  void add_watch(const SlotWatch& slot, int priority = G_PRIORITY_DEFAULT);
+  unsigned int add_watch(const SlotWatch& slot, int priority = G_PRIORITY_DEFAULT);
+  bool remove_watch(unsigned int watch_id);
   _IGNORE(gst_bus_add_watch, gst_bus_add_watch_full)
 
   _WRAP_METHOD(void disable_sync_message_emission(), gst_bus_disable_sync_message_emission)

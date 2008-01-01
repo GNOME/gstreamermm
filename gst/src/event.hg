@@ -6,10 +6,124 @@ _DEFS(gstmm,gst)
 
 namespace Gst
 {
+
 class Event : public MiniObject
 {
 protected:
   _CLASS_GSTMINIOBJECT(Event, GstEvent, GST_EVENT, Gst::MiniObject, GstMiniObject)
+
+public:
+  Event();
+  const Structure& get_structure();
+
+public:
+  _MEMBER_GET(event_type, type, EventType, GstEventType)
+
+  /** Wrap a GstEvent* in a C++ instance, creating an instance of a derived
+   * Gst::Event. Gst::wrap() would just create a Gst::Message (rather than a
+   * derived one) because the derived Gst::Event classes do not correspond
+   * to GType types in the GStreamer API.
+   */
+  static Glib::RefPtr<Event> wrap(GstEvent* event, bool take_copy=false);
+
+
+protected:
+  Structure structure_;
+};
+
+class EventBufferSize : public Event
+{
+public:
+  explicit EventBufferSize(GstEvent* event);
+
+  static Glib::RefPtr<Event> create(Format format, gint64 minsize, gint64 maxsize, bool async);
+  void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async);
+};
+
+class EventCustom : public Event
+{
+public:
+  explicit EventCustom(GstEvent* event);
+
+  Glib::RefPtr<Event> create(EventType type, Structure& structure);
+};
+
+class EventEos : public Event
+{
+public:
+  explicit EventEos(GstEvent* event);
+
+  Glib::RefPtr<Event> create();
+};
+
+class EventFlushStart : public Event
+{
+public:
+  explicit EventFlushStart(GstEvent* event);
+
+  Glib::RefPtr<Event> create();
+};
+
+class EventFlushStop : public Event
+{
+public:
+  explicit EventFlushStop(GstEvent* event);
+
+  Glib::RefPtr<Event> create();
+};
+
+class EventLatency : public Event
+{
+public:
+  explicit EventLatency(GstEvent* event);
+
+  Glib::RefPtr<Event> create(ClockTime time);
+  void parse(ClockTime& latency);
+};
+
+class EventNavigation : public Event
+{
+public:
+  explicit EventNavigation(GstEvent* event);
+
+  Glib::RefPtr<Event> create(Structure& structure);
+};
+
+class EventNewSegment : public Event
+{
+public:
+  explicit EventNewSegment(GstEvent* event);
+
+  Glib::RefPtr<Event> create(bool update, double rate, Format format, gint64 strat, gint64 stop, gint64 position, double applied_rate=1.0);
+  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position);
+  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate);
+};
+
+class EventQos : public Event
+{
+public:
+  explicit EventQos(GstEvent* event);
+
+  Glib::RefPtr<Event> create(double proportion, ClockTimeDiff diff, ClockTime timestamp);
+  void parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp);
+};
+
+class EventSeek : public Event
+{
+public:
+  explicit EventSeek(GstEvent* event);
+
+  Glib::RefPtr<Event> create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop);
+  void parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop);
+};
+
+class EventTag : public Event
+{
+public:
+  explicit EventTag(GstEvent* event);
+
+  //TODO: Glib::RefPtr<Event> create(TagList& taglist);
+  //TODO: void parse(TagList& taglist);
 };
 
 }//namespace Gst

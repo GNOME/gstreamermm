@@ -39,6 +39,7 @@ class PlayerWindow : public Gtk::Window
 public:
     PlayerWindow(Glib::RefPtr<Gst::Element> sourceElement,
                  Glib::RefPtr<Gst::Pipeline> mainPipeline);
+    ~PlayerWindow();
 protected:
     Gtk::VBox vBox;
     Gtk::HButtonBox buttonBox;
@@ -66,8 +67,9 @@ protected:
 private:
     Glib::RefPtr<Gst::Element> sourceElement;
     Glib::RefPtr<Gst::Pipeline> mainPipeline;
-    gint64 duration;
     sigc::connection progressConnection;
+    unsigned int watch_id;
+    gint64 duration;
 };
 
 #endif /* _PLAYERWINDOW_H */

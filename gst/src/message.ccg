@@ -265,6 +265,13 @@ Glib::RefPtr<Message> MessageAsyncStart::create(const Glib::RefPtr<Object>& src,
   return Gst::Message::wrap(message, false);
 }
 
+void MessageAsyncStart::parse(bool& base_time)
+{
+  gboolean result;
+  gst_message_parse_async_start(gobj(), &result);
+  base_time = result;
+}
+
 
 MessageAsyncDone::MessageAsyncDone(GstMessage* castitem)
 : Message(castitem)
@@ -351,12 +358,10 @@ Glib::RefPtr<Message> Message::wrap(GstMessage* message, bool take_copy) {
     case GST_MESSAGE_ASYNC_DONE:
       result = Glib::RefPtr<Message>( new Gst::MessageAsyncDone(message) );
       break;
-    //TODO: case GST_MESSAGE_UNKNOWN:
-    //TODO: case GST_MESSAGE_TAG:
-    //TODO: case GST_MESSAGE_STEP_DONE:
-    //TODO: case GST_MESSAGE_STRUCTURE_CHANGE:
-    //TODO: case GST_MESSAGE_STREAM_STATUS:
-    //TODO: case GST_MESSAGE_ANY:
+    //TODO?: case GST_MESSAGE_TAG:
+    //TODO?: case GST_MESSAGE_STEP_DONE:
+    //TODO?: case GST_MESSAGE_STRUCTURE_CHANGE:
+    //TODO?: case GST_MESSAGE_STREAM_STATUS:
     default:
       result = Gst::wrap(message, false);
   }

@@ -16,21 +16,18 @@ protected:
  _IGNORE(gst_message_ref, gst_message_unref)
 public:
   Message();
-
   const Structure& get_structure();
 
 public:
   _MEMBER_GET(message_type, type, MessageType, GstMessageType)
 
-  /** Wrap a GtkMessage* in a C++ instance, creating an instance of a derived Gst::Message.
+  /** Wrap a GstMessage* in a C++ instance, creating an instance of a derived Gst::Message.
    * Gst::wrap() would just create a Gst::Message (rather than a derived one) because 
    * the derived Gst::Message classes do not correspond to GType types in the GStreamer API.
    */
   static Glib::RefPtr<Message> wrap(GstMessage* message, bool take_copy=false);
 
 protected: 
-
-  GstMessage * cobj_;
   Structure structure_;
 };
 
@@ -138,6 +135,10 @@ public:
   static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, State oldstate, State newstate, State pending);
   void parse(State& oldstate, State& newstate, State& pending);
 };
+
+//TODO:class MessageTag : public Message
+//TODO:{
+//TODO:}
 
 class MessageBuffering : public Message
 {

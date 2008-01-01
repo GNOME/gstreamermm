@@ -70,11 +70,12 @@ openButton(Gtk::Stock::OPEN)
     openButton.signal_clicked().connect(sigc::mem_fun(*this,
                                           &PlayerWindow::on_open));
 
-	// get the bus from the pipeline
-	Glib::RefPtr<Gst::Bus> bus = mainPipeline->get_bus();
+    // get the bus from the pipeline
+    Glib::RefPtr<Gst::Bus> bus = mainPipeline->get_bus();
 
-	// Add a bus watch to receive messages from pipeline's bus
-	bus->add_watch( sigc::mem_fun( *this, &PlayerWindow::on_bus_message) );
+    // Add a bus watch to receive messages from pipeline's bus
+    watch_id = bus->add_watch(
+        sigc::mem_fun( *this, &PlayerWindow::on_bus_message) );
 
     progressScale.set_sensitive(false);
     playButton.set_sensitive(false);
@@ -283,7 +284,8 @@ bool PlayerWindow::update_stream_progress(void)
    return true;
 }
 
-void PlayerWindow::display_label_progress(gint64 pos, gint64 len) {
+void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
+{
     std::ostringstream locationStream (std::ostringstream::out);
     std::ostringstream durationStream (std::ostringstream::out);
 
@@ -300,4 +302,9 @@ void PlayerWindow::display_label_progress(gint64 pos, gint64 len) {
         std::setw(9) << std::left << Gst::get_fractional_seconds(len);
 
     progressLabel.set_text(locationStream.str() + " / " + durationStream.str());
+}
+
+PlayerWindow::~PlayerWindow()
+{
+  mainPipeline->get_bus()->remove_watch(watch_id);
 }

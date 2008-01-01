@@ -56,6 +56,7 @@ _CONVERSION(`const gint64&',`gint64',`$3')
 _CONVERSION(`gint64&',`gint64*',`&($3)')
 _CONVERSION(`const double&',`gdouble',`$3')
 _CONVERSION(`GstMessageType',`MessageType',`MessageType($3)')
+_CONVERSION(`GstEventType',`EventType',`EventType($3)')
 
 _CONV_ENUM(Gst,State)
 _CONV_ENUM(Gst,StateChangeReturn)

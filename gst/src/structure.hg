@@ -25,8 +25,6 @@ public:
   int denominator;
 };
 
-//TODO: Use parameter names in method declarations in all these classes.
-
 class Structure;
 
 //TODO: What is this?
@@ -34,9 +32,9 @@ class StructureValueProxy
 {
 public:
 
-  StructureValueProxy(Structure&, const std::string&);
+  StructureValueProxy(Structure& structure, const Glib::ustring& name);
 
-  void operator=(const std::string& src);
+  void operator=(const Glib::ustring& src);
   void operator=(bool src);
   void operator=(double src);
   void operator=(int src);
@@ -45,7 +43,7 @@ public:
 private:
 
   Structure& m_Structure;
-  std::string m_Name;
+  Glib::ustring m_Name;
 };
 
 class Structure
@@ -64,11 +62,11 @@ public:
 
 public:
 
-  Structure(const std::string& name);
+  Structure(const Glib::ustring& name);
   Structure(GQuark quark);
-  Structure(const GstStructure*); // for Message::get_structure()
+  Structure(const GstStructure* castitem); // for Message::get_structure()
 
-  StructureValueProxy operator[](const std::string&);
+  StructureValueProxy operator[](const Glib::ustring& fieldname);
 
   void clear(); // remove_all_fields in C API
   int size() const;
@@ -76,54 +74,52 @@ public:
 
   //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
   //See Gtk::TreeModel, for instance. murrayc.
-  //Glib::ValueBase id_get_value(GQuark);
+  //Glib::ValueBase id_get_value(GQuark field);
 
-  _WRAP_METHOD(void id_set_value(GQuark, const Glib::ValueBase&), gst_structure_id_set_value)
+  _WRAP_METHOD(void id_set_value(GQuark field, const Glib::ValueBase& value), gst_structure_id_set_value)
 
   //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
-  //Glib::ValueBase get_value(const std::string& fieldname) const;
+  //Glib::ValueBase get_value(const Glib::ustring& fieldname) const;
 
-  void set_value(const std::string& fieldname, const Glib::ValueBase& value);
+  void set_value(const Glib::ustring& fieldname, const Glib::ValueBase& value);
 
-  _WRAP_METHOD(void remove_field(const std::string& fieldname), gst_structure_remove_field)
-  _WRAP_METHOD(GType get_field_type(const std::string& fieldname) const, gst_structure_get_field_type)
+  _WRAP_METHOD(void remove_field(const Glib::ustring& fieldname), gst_structure_remove_field)
+  _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
   bool foreach(const ForeachSlot& slot);
 
-  _WRAP_METHOD(bool has_field(const std::string& fieldname) const, gst_structure_has_field)
-  _WRAP_METHOD(bool has_field_typed(const std::string& fieldname, GType type) const, gst_structure_has_field_typed)
+  _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname) const, gst_structure_has_field)
+  _WRAP_METHOD(bool has_field_typed(const Glib::ustring& fieldname, GType type) const, gst_structure_has_field_typed)
 
-  //TODO: Should these use Glib::ustring?
+  bool get_boolean(const Glib::ustring& fieldname, bool& value) const;
 
-  bool get_boolean(const std::string&, bool& value) const;
+  bool get_int(const Glib::ustring& fieldname, int& value) const;
 
-  bool get_int(const std::string&, int& value) const;
+  bool get_uint(const Glib::ustring& fieldname, guint& value) const;
 
-  bool get_uint(const std::string&, guint& value) const;
+  bool get_fourcc(const Glib::ustring& fieldname, guint32& value) const;
 
-  bool get_fourcc(const std::string&, guint32& value) const;
+  bool get_double(const Glib::ustring& fieldname, double& value) const;
 
-  bool get_double(const std::string&, double& value) const;
+  Glib::ustring get_string(const Glib::ustring& fieldname) const;
 
-  std::string get_string(const std::string& value) const;
+  bool get_date(const Glib::ustring& fieldname, Glib::Date& value) const;
 
-  bool get_date(const std::string&, Glib::Date& value) const;
+  bool get_clock_time(const Glib::ustring& fieldname, ClockTime& value) const;
 
-  bool get_clock_time(const std::string&, ClockTime& value) const;
+  bool get_enum(const Glib::ustring& fieldname, GType enumtype, int& value) const;
 
-  bool get_enum(const std::string&, GType enumtype, int& value) const;
-
-  bool get_fraction(const std::string&, int& value_numerator, int& value_denominator) const;
+  bool get_fraction(const Glib::ustring& fieldname, int& value_numerator, int& value_denominator) const;
 
   bool map_in_place(const MapSlot& slot);
 
-  static Structure create_from_string(const std::string& the_string);
+  static Structure create_from_string(const Glib::ustring& the_string);
 
   _WRAP_METHOD(GQuark get_name_id() const, gst_structure_get_name_id)
-  _WRAP_METHOD(std::string get_name() const, gst_structure_get_name)
-  _WRAP_METHOD(bool has_name(const std::string& name) const, gst_structure_has_name)
-  _WRAP_METHOD(void set_name(const std::string& name), gst_structure_set_name)
-  _WRAP_METHOD(std::string to_string() const, gst_structure_to_string)
-  _WRAP_METHOD(std::string nth_field_name(guint index) const, gst_structure_nth_field_name)
+  _WRAP_METHOD(Glib::ustring get_name() const, gst_structure_get_name)
+  _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
+  _WRAP_METHOD(void set_name(const Glib::ustring& name), gst_structure_set_name)
+  _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
+  _WRAP_METHOD(Glib::ustring nth_field_name(guint index) const, gst_structure_nth_field_name)
   _IGNORE(
       gst_structure_get_date,
       gst_structure_id_set,

@@ -3,7 +3,7 @@
 namespace Gst
 {
 
-Glib::RefPtr<Bin> Bin::create(const std::string& name)
+Glib::RefPtr<Bin> Bin::create(const Glib::ustring& name)
 {
   GstElement* bin = gst_bin_new(name.c_str());
   return Glib::wrap((GstBin*) bin);
@@ -29,7 +29,7 @@ Glib::RefPtr<Bin> Bin::remove(const Glib::RefPtr<Element>& element)
     throw std::runtime_error("Bin '" + get_name() + "' does not want to remove Element '" + element->get_name() + "'");
 }
 
-Glib::RefPtr<Element> Bin::get_by_name(const std::string& element_name)
+Glib::RefPtr<Element> Bin::get_by_name(const Glib::ustring& element_name)
 {
   GstElement* element = gst_bin_get_by_name(gobj(), element_name.c_str());
 
@@ -39,7 +39,7 @@ Glib::RefPtr<Element> Bin::get_by_name(const std::string& element_name)
     throw std::runtime_error("Bin '" + get_name() + "' contains no Element '" + element_name + "'");
 }
 
-Glib::RefPtr<Element> Bin::get_by_name_recurse_up(const std::string& element_name)
+Glib::RefPtr<Element> Bin::get_by_name_recurse_up(const Glib::ustring& element_name)
 {
   GstElement* element = gst_bin_get_by_name_recurse_up(gobj(), element_name.c_str());
 

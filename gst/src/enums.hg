@@ -1,3 +1,4 @@
+#include <gst/gstevent.h>
 _DEFS(gstmm,gst)
 
 namespace Gst
@@ -6,14 +7,34 @@ namespace Gst
 _WRAP_ENUM(BusSyncReply, GstBusSyncReply)
 _WRAP_ENUM(ClockEntryType, GstClockEntryType)
 _WRAP_ENUM(ClockReturn, GstClockReturn)
-_WRAP_ENUM(State, GstState)
-_WRAP_ENUM(StateChangeReturn, GstStateChangeReturn)
+
+enum EventType {
+  EVENT_UNKNOWN = GST_EVENT_UNKNOWN,
+  /* bidirectional events */
+  EVENT_FLUSH_START = GST_EVENT_FLUSH_START,
+  EVENT_FLUSH_STOP = GST_EVENT_FLUSH_STOP,
+  /* downstream serialized events */
+  EVENT_EOS = GST_EVENT_EOS,
+  EVENT_NEWSEGMENT = GST_EVENT_NEWSEGMENT,
+  EVENT_TAG = GST_EVENT_TAG,
+  EVENT_BUFFERSIZE = GST_EVENT_BUFFERSIZE,
+  /* upstream events */
+  EVENT_QOS = GST_EVENT_QOS,
+  EVENT_SEEK = GST_EVENT_SEEK,
+  EVENT_NAVIGATION = GST_EVENT_NAVIGATION,
+  EVENT_LATENCY = GST_EVENT_LATENCY,
+
+  /* custom events start here */
+  EVENT_CUSTOM_UPSTREAM = GST_EVENT_CUSTOM_UPSTREAM,
+  EVENT_CUSTOM_DOWNSTREAM = GST_EVENT_CUSTOM_DOWNSTREAM,
+  EVENT_CUSTOM_DOWNSTREAM_OOB = GST_EVENT_CUSTOM_DOWNSTREAM_OOB,
+  EVENT_CUSTOM_BOTH = GST_EVENT_CUSTOM_BOTH,
+  EVENT_CUSTOM_BOTH_OOB = GST_EVENT_CUSTOM_BOTH_OOB
+};
+
 _WRAP_ENUM(Format, GstFormat)
-_WRAP_ENUM(IteratorResult, GstIteratorResult)
 _WRAP_ENUM(IteratorItem, GstIteratorItem)
-_WRAP_ENUM(PadDirection, GstPadDirection)
-_WRAP_ENUM(PadLinkReturn, GstPadLinkReturn)
-_WRAP_ENUM(PadPresence, GstPadPresence)
+_WRAP_ENUM(IteratorResult, GstIteratorResult)
 
 enum MessageType
 {
@@ -138,7 +159,9 @@ enum MessageTypeWarning
    DUMMY_MESSAGE_WARNING   = (1 << 2)
 };
 
-_WRAP_ENUM(SeekType, GstSeekType)
+_WRAP_ENUM(PadDirection, GstPadDirection)
+_WRAP_ENUM(PadLinkReturn, GstPadLinkReturn)
+_WRAP_ENUM(PadPresence, GstPadPresence)
 
 enum SeekFlags
 {
@@ -148,5 +171,11 @@ enum SeekFlags
    SEEK_FLAG_KEY_UNIT = (1 << 2),
    SEEK_FLAG_SEGMENT  = (1 << 3)
 };
+
+_WRAP_ENUM(SeekType, GstSeekType)
+_WRAP_ENUM(State, GstState)
+_WRAP_ENUM(StateChangeReturn, GstStateChangeReturn)
+_WRAP_ENUM(TagMergeMode, GstTagMergeMode)
+_WRAP_ENUM(TagFlag, GstTagFlag)
 
 } //namespace Gst
