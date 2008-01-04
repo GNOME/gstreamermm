@@ -18,6 +18,8 @@ public:
 
 public:
   _MEMBER_GET(event_type, type, EventType, GstEventType)
+  _MEMBER_GET(timestamp, timestamp, ClockTime, guint64)
+  _MEMBER_GET(source, src, Glib::RefPtr<Gst::Object>, GstObject)
 
   /** Wrap a GstEvent* in a C++ instance, creating an instance of a derived
    * Gst::Event. Gst::wrap() would just create a Gst::Message (rather than a
@@ -26,6 +28,12 @@ public:
    */
   static Glib::RefPtr<Event> wrap(GstEvent* event, bool take_copy=false);
 
+  _WRAP_METHOD(static Glib::ustring get_enum_name(EventType type), gst_event_type_get_name)
+  _WRAP_METHOD(static Glib::QueryQuark get_enum_quark(EventType type), gst_event_type_to_quark)
+
+  bool is_downstream() const;
+  bool is_upstream() const;
+  bool is_serialized() const;
 
 protected:
   Structure structure_;
@@ -45,7 +53,7 @@ class EventCustom : public Event
 public:
   explicit EventCustom(GstEvent* event);
 
-  Glib::RefPtr<Event> create(EventType type, Structure& structure);
+  static Glib::RefPtr<Event> create(EventType type, Structure& structure);
 };
 
 class EventEos : public Event
@@ -53,7 +61,7 @@ class EventEos : public Event
 public:
   explicit EventEos(GstEvent* event);
 
-  Glib::RefPtr<Event> create();
+  static Glib::RefPtr<Event> create();
 };
 
 class EventFlushStart : public Event
@@ -61,7 +69,7 @@ class EventFlushStart : public Event
 public:
   explicit EventFlushStart(GstEvent* event);
 
-  Glib::RefPtr<Event> create();
+  static Glib::RefPtr<Event> create();
 };
 
 class EventFlushStop : public Event
@@ -69,7 +77,7 @@ class EventFlushStop : public Event
 public:
   explicit EventFlushStop(GstEvent* event);
 
-  Glib::RefPtr<Event> create();
+  static Glib::RefPtr<Event> create();
 };
 
 class EventLatency : public Event
@@ -77,7 +85,7 @@ class EventLatency : public Event
 public:
   explicit EventLatency(GstEvent* event);
 
-  Glib::RefPtr<Event> create(ClockTime time);
+  static Glib::RefPtr<Event> create(ClockTime time);
   void parse(ClockTime& latency);
 };
 
@@ -86,7 +94,7 @@ class EventNavigation : public Event
 public:
   explicit EventNavigation(GstEvent* event);
 
-  Glib::RefPtr<Event> create(Structure& structure);
+  static Glib::RefPtr<Event> create(Structure& structure);
 };
 
 class EventNewSegment : public Event
@@ -94,7 +102,7 @@ class EventNewSegment : public Event
 public:
   explicit EventNewSegment(GstEvent* event);
 
-  Glib::RefPtr<Event> create(bool update, double rate, Format format, gint64 strat, gint64 stop, gint64 position, double applied_rate=1.0);
+  static Glib::RefPtr<Event> create(bool update, double rate, Format format, gint64 strat, gint64 stop, gint64 position, double applied_rate=1.0);
   void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position);
   void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate);
 };
@@ -104,7 +112,7 @@ class EventQos : public Event
 public:
   explicit EventQos(GstEvent* event);
 
-  Glib::RefPtr<Event> create(double proportion, ClockTimeDiff diff, ClockTime timestamp);
+  static Glib::RefPtr<Event> create(double proportion, ClockTimeDiff diff, ClockTime timestamp);
   void parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp);
 };
 
@@ -113,7 +121,7 @@ class EventSeek : public Event
 public:
   explicit EventSeek(GstEvent* event);
 
-  Glib::RefPtr<Event> create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop);
+  static Glib::RefPtr<Event> create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop);
   void parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop);
 };
 
@@ -122,7 +130,7 @@ class EventTag : public Event
 public:
   explicit EventTag(GstEvent* event);
 
-  //TODO: Glib::RefPtr<Event> create(TagList& taglist);
+  //TODO: static Glib::RefPtr<Event> create(TagList& taglist);
   //TODO: void parse(TagList& taglist);
 };
 

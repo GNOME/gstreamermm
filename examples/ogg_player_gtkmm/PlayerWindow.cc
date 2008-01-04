@@ -20,6 +20,7 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gstmm/clock.h>
+#include <gstmm/event.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -228,7 +229,14 @@ void PlayerWindow::on_forward(void)
         gint64 newPos = ((pos + skipAmount) < duration) ? (pos + skipAmount) :
             duration;
 
-        if (mainPipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+        Glib::RefPtr<Gst::Event> event = Gst::EventSeek::create(1.0, fmt,
+                Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, newPos,
+                Gst::SEEK_TYPE_NONE, -1);
+
+        Glib::RefPtr<Gst::EventSeek> seekEvent =
+            Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
+
+        if (mainPipeline->send_event(seekEvent))
         {
             progressScale.set_value(double(newPos) / duration);
             display_label_progress(newPos, duration);

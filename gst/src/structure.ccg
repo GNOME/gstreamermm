@@ -47,6 +47,20 @@ StructureValueProxy::operator=(const Fraction& value)
 
 // Structure
 
+static gboolean
+Structure_ForEach_gstmm_callback(GQuark field_id, const GValue *value, gpointer data)
+{
+  Structure::ForeachSlot& slot = *static_cast<Structure::ForeachSlot*>(data);
+  return slot(field_id, value);
+}
+
+static gboolean
+Structure_Map_gstmm_callback(GQuark field_id, GValue *value, gpointer data)
+{
+  Structure::MapSlot& slot = *static_cast<Structure::MapSlot*>(data);
+  return slot(field_id, value);
+}
+
 Structure::Structure(const Glib::ustring& name)
 {
   gobject_ = gst_structure_empty_new(name.c_str());
@@ -161,32 +175,18 @@ Structure::get_fraction(const Glib::ustring& name, int& value_numerator, int& va
   return gst_structure_get_fraction(gobject_, name.c_str(), &value_numerator, &value_denominator);
 }
 
-gboolean
-Structure::foreach_callback(GQuark field_id, const GValue *value, gpointer data)
-{
-  Structure::ForeachSlot& slot = *static_cast<Structure::ForeachSlot*>(data);
-  return slot(field_id, value);
-}
-
 bool
 Structure::foreach(const ForeachSlot& slot)
 {
   ForeachSlot slot_copy(slot);
-  gst_structure_foreach(gobject_, &foreach_callback, &slot_copy);
-}
-
-gboolean
-Structure::map_callback(GQuark field_id, GValue *value, gpointer data)
-{
-  Structure::MapSlot& slot = *static_cast<Structure::MapSlot*>(data);
-  return slot(field_id, value);
+  gst_structure_foreach(gobject_, &Structure_ForEach_gstmm_callback, &slot_copy);
 }
 
 bool
 Structure::map_in_place(const MapSlot& slot)
 {
   MapSlot slot_copy(slot);
-  gst_structure_map_in_place(gobject_, &map_callback, &slot_copy);
+  gst_structure_map_in_place(gobject_, &Structure_Map_gstmm_callback, &slot_copy);
 }
 
 Structure

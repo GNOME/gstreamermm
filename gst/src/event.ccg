@@ -1,3 +1,4 @@
+
 namespace Gst
 {
 
@@ -9,6 +10,21 @@ const Structure& Event::get_structure()
 {
   structure_ = Structure(const_cast<GstStructure*>(gst_event_get_structure(gobj())), false);
   return structure_;
+}
+
+bool Event::is_downstream() const
+{
+  return GST_EVENT_IS_DOWNSTREAM(gobj());
+}
+
+bool Event::is_upstream() const
+{
+  return GST_EVENT_IS_UPSTREAM(gobj());
+}
+
+bool Event::is_serialized() const
+{
+  return GST_EVENT_IS_SERIALIZED(gobj());
 }
 
 EventBufferSize::EventBufferSize(GstEvent* castitem) :

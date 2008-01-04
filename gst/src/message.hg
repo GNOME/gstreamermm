@@ -20,12 +20,18 @@ public:
 
 public:
   _MEMBER_GET(message_type, type, MessageType, GstMessageType)
+  _MEMBER_GET(timestamp, timestamp, ClockTime, guint64)
+  _MEMBER_GET(source, src, Glib::RefPtr<Gst::Object>, GstObject)
 
-  /** Wrap a GstMessage* in a C++ instance, creating an instance of a derived Gst::Message.
-   * Gst::wrap() would just create a Gst::Message (rather than a derived one) because 
-   * the derived Gst::Message classes do not correspond to GType types in the GStreamer API.
+  /** Wrap a GstMessage* in a C++ instance, creating an instance of a
+   *  derived Gst::Message.  Gst::wrap() would just create a Gst::Message
+   *  (rather than a derived one) because the derived Gst::Message classes
+   *  do not correspond to GType types in the GStreamer API.
    */
   static Glib::RefPtr<Message> wrap(GstMessage* message, bool take_copy=false);
+
+  _WRAP_METHOD(static Glib::ustring get_enum_name(MessageType type), gst_message_type_get_name)
+  _WRAP_METHOD(static Glib::QueryQuark get_enum_quark(MessageType type), gst_message_type_to_quark)
 
 protected: 
   Structure structure_;

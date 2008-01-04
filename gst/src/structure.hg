@@ -31,7 +31,6 @@ class Structure;
 class StructureValueProxy
 {
 public:
-
   StructureValueProxy(Structure& structure, const Glib::ustring& name);
 
   void operator=(const Glib::ustring& src);
@@ -41,7 +40,6 @@ public:
   void operator=(const Fraction& src);
 
 private:
-
   Structure& m_Structure;
   Glib::ustring m_Name;
 };
@@ -51,17 +49,10 @@ class Structure
   _CLASS_BOXEDTYPE(Structure, GstStructure, NONE, gst_structure_copy, gst_structure_free)
 
 public:
-
   typedef sigc::slot<bool, GQuark, const GValue*> ForeachSlot;
   typedef sigc::slot<bool, GQuark, GValue*> MapSlot;
 
-  //TODO: Why are these public? Can't they just be completely in the .ccg file.
-  static gboolean foreach_callback(GQuark field_id, const GValue *value, gpointer data);
-
-  static gboolean map_callback(GQuark field_id, GValue *value, gpointer data);
-
 public:
-
   Structure(const Glib::ustring& name);
   Structure(GQuark quark);
   Structure(const GstStructure* castitem); // for Message::get_structure()
@@ -70,7 +61,6 @@ public:
 
   void clear(); // remove_all_fields in C API
   int size() const;
-
 
   //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
   //See Gtk::TreeModel, for instance. murrayc.

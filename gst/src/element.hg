@@ -15,9 +15,10 @@ namespace Gst
 {
 
 class Bus;
+class Event;
+class Message;
 class Pad;
 class PadTemplate;
-class Message;
 
 class Element : public Object 
 {
@@ -31,8 +32,8 @@ public:
 
   static Glib::RefPtr<Element> create(const Glib::ustring& factoryname, const Glib::ustring& name);
   Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
-  _WRAP_METHOD(static Glib::ustring state_get_name(State state), gst_element_state_get_name)
-  _WRAP_METHOD(static Glib::ustring state_change_return_get_name(StateChangeReturn state_ret), gst_element_state_change_return_get_name)
+  _WRAP_METHOD(static Glib::ustring get_enum_name(State state), gst_element_state_get_name)
+  _WRAP_METHOD(static Glib::ustring get_enum_name(StateChangeReturn state_ret), gst_element_state_change_return_get_name)
   _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
   _WRAP_METHOD(Glib::RefPtr<Pad> get_pad(const Glib::ustring& name), gst_element_get_pad)
   _WRAP_METHOD(void create_all_pads(), gst_element_create_all_pads)
@@ -84,13 +85,16 @@ public:
   _WRAP_METHOD(bool post_message(const Glib::RefPtr<Message>& message), gst_element_post_message)
 
   _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_element_query_convert)
-  bool query_position(Format& format) const;
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_element_query_position)
-  bool query_duration(Format& format) const;
   _WRAP_METHOD(bool query_duration(Format& format, gint64& duration) const, gst_element_query_duration)
+
+  bool query_position(Format& format) const;
+  bool query_duration(Format& format) const;
 
   _WRAP_METHOD(bool seek(Format format, SeekFlags flags, gint64 position), gst_element_seek_simple)
   _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType current_type, gint64 current_position, SeekType stop_type, gint64 stop_position), gst_element_seek)
+
+  bool send_event(const Glib::RefPtr<Event>& event);
 
   _IGNORE(gst_element_link, gst_element_get_compatible_pad, gst_element_link_many)
 

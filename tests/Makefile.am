@@ -2,8 +2,9 @@ INCLUDES=-I$(top_srcdir) -I$(top_srcdir)/gst @GSTMM_CFLAGS@
 
 LDADD=$(top_builddir)/gst/gstmm/libgstmm-1.0.la
 
-noinst_PROGRAMS = test-create-element test-pipeline-add-element test-link-elements \
-                  test-create-bin test-message-wrap test-miniobject-wrap
+noinst_PROGRAMS = test-create-element test-pipeline-add-element \
+                  test-link-elements test-create-bin test-miniobject-wrap \
+                  test-message-wrap test-event-wrap
 
 test_create_element_SOURCES=test-create-element.cc
 test_create_element_LDFLAGS=@GSTMM_LIBS@
@@ -22,6 +23,9 @@ test_miniobject_wrap_LDFLAGS=@GSTMM_LIBS@
 
 test_message_wrap_SOURCES=test-message-wrap.cc
 test_message_wrap_LDFLAGS=@GSTMM_LIBS@
+
+test_event_wrap_SOURCES=test-event-wrap.cc
+test_event_wrap_LDFLAGS=@GSTMM_LIBS@
 
 #runtestbasic runtestlangs \
 #runtestsearch runtestmimetypes \
