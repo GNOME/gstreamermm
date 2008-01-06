@@ -13,6 +13,7 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::EventLatency> event_latency = Glib::RefPtr<Gst::EventLatency>::cast_dynamic(event);
   std::cout << "event is a Gst::EventLatency: " << (bool)event_latency  << std::endl;
+  std::cout << "event type name: '" << Gst::get_name(event->get_event_type()) << "'" << std::endl;
 
   return 0;
 }
