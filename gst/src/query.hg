@@ -6,10 +6,113 @@ _DEFS(gstmm,gst)
 
 namespace Gst
 {
+
+struct QueryTypeDefinition
+{
+  QueryType             value;
+  Glib::ustring         nick;
+  Glib::ustring         description;
+  Glib::QueryQuark      quark;
+};
+
 class Query : public MiniObject
 {
 protected:
   _CLASS_GSTMINIOBJECT(Query, GstQuery, GST_QUERY, Gst::MiniObject, GstMiniObject)
+
+public:
+  const Structure& get_structure();
+
+public:
+  _MEMBER_GET(query_type, type, QueryType, GstQueryType)
+
+  /** Wrap a GstQuery* in a C++ instance, creating an instance of a derived
+   * Gst::Query. Gst::wrap() would just create a Gst::Query (rather than a
+   * derived one) because the derived Gst::Query classes do not correspond
+   * to GType types in the GStreamer API.
+   */
+  static Glib::RefPtr<Query> wrap(GstQuery* query, bool take_copy=false);
+
+  _WRAP_METHOD(static QueryType register_query_type(const Glib::ustring& nick, const Glib::ustring& description), gst_query_type_register)
+  _WRAP_METHOD(static QueryType get_query_type(const Glib::ustring& nick), gst_query_type_get_by_nick)
+  //TODO: static bool query_types_contains(const std::vector<const QueryType>& types, QueryType type)
+
+  bool get_details(QueryType type, QueryTypeDefinition& def);
+
+protected:
+  Structure structure_;
+};
+
+class QueryConvert : public Query
+{
+public:
+  explicit QueryConvert(GstQuery* query);
+
+  static Glib::RefPtr<Query> create(Format src_format, gint64 value, Format dest_format);
+  void set(Format src_format, gint64 src_value, Format dest_format, gint64 dest_value);
+  void parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value);
+};
+
+class QueryPosition : public Query
+{
+public:
+  explicit QueryPosition(GstQuery* query);
+
+  static Glib::RefPtr<Query> create(Format format);
+  void set(Format format, gint64 position);
+  void parse(Format& format, gint64& position);
+};
+
+class QueryDuration : public Query
+{
+public:
+  explicit QueryDuration(GstQuery* query);
+
+  static Glib::RefPtr<Query> create(Format format);
+  void set(Format format, gint64 duration);
+  void parse(Format& format, gint64& duration);
+};
+
+class QueryLatency : public Query
+{
+public:
+  explicit QueryLatency(GstQuery* query);
+
+  static Glib::RefPtr<Query> create();
+  void set(bool live, ClockTime min_latency, ClockTime max_latency);
+  void parse(bool& live, ClockTime& min_latency, ClockTime& max_latency);
+};
+
+class QuerySeeking : public Query
+{
+public:
+  explicit QuerySeeking(GstQuery* query);
+
+  static Glib::RefPtr<Query> create(Format format);
+  void set(Format format, bool seeakable, gint64 segment_start, gint64 segment_end);
+  void parse(Format& format, bool& seekable, gint64& segment_start, gint64& segment_end);
+};
+
+class QueryFormats : public Query
+{
+public:
+  explicit QueryFormats(GstQuery* query);
+
+  static Glib::RefPtr<Query> create();
+  void set(int n_formats, const va_list& varargs);
+  //TODO: set(int n_formats, const std::vector<const Format>& formats);
+  void parse(guint& n_formats);
+  void parse(guint nth, Format& format);
+};
+
+class QuerySegment : public Query
+{
+public:
+  explicit QuerySegment(GstQuery* query);
+
+  static Glib::RefPtr<Query> create(Format format);
+  void set(double rate, Format format, gint64 start_value, gint64 stop_value);
+  void parse(double& rate, Format& format, gint64& start_value, gint64& stop_value);
 };
 
 }//namespace Gst

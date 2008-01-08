@@ -4,7 +4,7 @@ LDADD=$(top_builddir)/gst/gstmm/libgstmm-1.0.la
 
 noinst_PROGRAMS = test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \
-                  test-message-wrap test-event-wrap
+                  test-message-wrap test-event-wrap test-query-wrap
 
 test_create_element_SOURCES=test-create-element.cc
 test_create_element_LDFLAGS=@GSTMM_LIBS@
@@ -26,6 +26,9 @@ test_message_wrap_LDFLAGS=@GSTMM_LIBS@
 
 test_event_wrap_SOURCES=test-event-wrap.cc
 test_event_wrap_LDFLAGS=@GSTMM_LIBS@
+
+test_query_wrap_SOURCES=test-query-wrap.cc
+test_query_wrap_LDFLAGS=@GSTMM_LIBS@
 
 #runtestbasic runtestlangs \
 #runtestsearch runtestmimetypes \

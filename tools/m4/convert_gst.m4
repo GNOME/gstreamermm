@@ -57,6 +57,8 @@ _CONVERSION(`GstMessageType',`MessageType',`MessageType($3)')
 _CONVERSION(`MessageType',`GstMessageType',`GstMessageType($3)')
 _CONVERSION(`GstEventType',`EventType',`EventType($3)')
 _CONVERSION(`EventType',`GstEventType',`GstEventType($3)')
+_CONVERSION(`GstQueryType',`QueryType',`QueryType($3)')
+_CONVERSION(`QueryType',`GstQueryType',`GstQueryType($3)')
 
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 
