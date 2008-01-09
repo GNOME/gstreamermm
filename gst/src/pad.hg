@@ -1,9 +1,4 @@
-#include <string>
-#include <gst/gst.h>
 #include <gstmm/object.h>
-#include <gstmm/element.h>
-#include <gstmm/padtemplate.h>
-#include <gstmm/format.h>
 #include <gstmm/enums.h>
 _DEFS(gstmm,gst)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -11,7 +6,10 @@ _PINCLUDE(gstmm/private/object_p.h)
 
 namespace Gst
 {
+
+class Caps;
 class Element;
+class PadTemplate;
 
 class Pad : public Object 
 {
@@ -21,8 +19,6 @@ protected:
   _CTOR_DEFAULT
 
 public:
-
-
   // The C API has gst_pad_new, we just use the very common ::create() here
   static Glib::RefPtr<Pad> create(const Glib::ustring& name, PadDirection direction);
 
@@ -92,7 +88,6 @@ public:
 
   bool set_blocked_async(bool blocked, const SlotPadBlockCallback& slot);
 
-
   //_WRAP_SIGNAL(void have_data(const Glib::RefPtr<MiniObject>& mini_obj), "have-data")
 
 #m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
@@ -103,7 +98,6 @@ public:
   _WRAP_PROPERTY("caps", Glib::RefPtr<Caps>)
   _WRAP_PROPERTY("direction", PadDirection)
   _WRAP_PROPERTY("template", PadTemplate)
-
 };
 
 } // namespace Gst

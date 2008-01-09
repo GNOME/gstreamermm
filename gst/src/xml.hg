@@ -1,5 +1,4 @@
 #include <gstmm/object.h>
-#include <gstmm/element.h>
 #include <gstmm/enums.h>
 _DEFS(gstmm,gst)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -8,17 +7,16 @@ _PINCLUDE(gstmm/private/object_p.h)
 namespace Gst
 {
 
+class Element;
+
 class XML : public Object
 {
-
   _CLASS_GOBJECT(XML, GstXML, GST_XML, Object, GstObject)
 
 protected:
-
   _CTOR_DEFAULT
 
 public:
-
   _WRAP_CREATE()
 
   _WRAP_METHOD(bool parse_doc(xmlDocPtr doc, const std::string& root), gst_xml_parse_doc)
@@ -30,7 +28,6 @@ public:
   _IGNORE(gst_xml_parse_memory)
 
   //TODO: Is this useful? _WRAP_SIGNAL(void object_loaded(Glib::RefPtr<Object> object, xmlNode* xml_node), "object-loaded")
-
 };
 
 xmlDocPtr write_xml(const Glib::RefPtr<Element>& element);
@@ -38,4 +35,3 @@ int write_xml_file(const Glib::RefPtr<Element>& element, const std::string& file
 Glib::RefPtr<Element> make_element(const xmlNodePtr& xml_node, const Glib::RefPtr<Object>& parent);
 
 } //namespace Gst
-

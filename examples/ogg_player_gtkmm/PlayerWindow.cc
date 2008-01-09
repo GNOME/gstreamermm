@@ -19,8 +19,10 @@
 
 #include <gtkmm/stock.h>
 #include <gtkmm/filechooserdialog.h>
+#include <gstmm/bus.h>
 #include <gstmm/clock.h>
 #include <gstmm/event.h>
+#include <gstmm/message.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>

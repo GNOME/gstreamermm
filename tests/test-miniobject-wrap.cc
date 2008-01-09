@@ -1,4 +1,6 @@
 #include <gstmm.h>
+#include <gst/gstbin.h>
+#include <gst/gsterror.h>
 #include <iostream>
 
 int main (int argc, char* argv[])

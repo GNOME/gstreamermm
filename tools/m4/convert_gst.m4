@@ -37,6 +37,7 @@ _CONVERSION(`GstMessage*',`Glib::RefPtr<Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<const Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Message>&',`GstMessage*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Event>&',`GstEvent*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Query>&',`GstQuery*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Caps>&',`GstCaps*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Bus>&',`GstBus*',__CONVERT_REFPTR_TO_P)
 
@@ -52,6 +53,9 @@ _CONVERSION(`SeekFlags',`GstSeekFlags',`(GstSeekFlags($3))')
 _CONVERSION(`const gint64&',`gint64',`$3')
 _CONVERSION(`gint64&',`gint64*',`&($3)')
 _CONVERSION(`const double&',`gdouble',`$3')
+
+_CONVERSION(`StateChange',`GstStateChange',`GstStateChange($3)')
+_CONVERSION(`GstStateChange',`StateChange',`StateChange($3)')
 
 _CONVERSION(`GstMessageType',`MessageType',`MessageType($3)')
 _CONVERSION(`MessageType',`GstMessageType',`GstMessageType($3)')

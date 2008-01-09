@@ -1,6 +1,5 @@
 #include <gstmm/object.h>
 #include <gstmm/enums.h>
-#include <gst/gstclock.h>
 _DEFS(gstmm,gst)
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstmm/private/object_p.h)
@@ -10,10 +9,8 @@ namespace Gst
 
 class ClockID
 {
-
   _CLASS_OPAQUE_REFCOUNTED(ClockID, GstClockID, NONE, gst_clock_id_ref, gst_clock_id_unref)
   _IGNORE(gst_clock_id_ref, gst_clock_id_unref)
-
 };
 
 typedef GstClockTime ClockTime;
@@ -32,17 +29,14 @@ guint get_fractional_seconds(ClockTime time);
 
 class Clock : public Object
 {
-
   _CLASS_GOBJECT(Clock, GstClock, GST_CLOCK, Object, GstObject)
 
 protected:
-
   //TODO: What C function does this correspond to?
   //TODO: Add a create()?
   _CTOR_DEFAULT()
 
 public:
-
   _WRAP_METHOD(bool add_observation(ClockTime slave_time, ClockTime master_time, gdouble* result), gst_clock_add_observation)
   _WRAP_METHOD(bool set_master(const Clock& master_clock), gst_clock_set_master)
   _WRAP_METHOD(Glib::RefPtr<Clock> get_master(), gst_clock_get_master)
@@ -54,7 +48,6 @@ public:
   _WRAP_METHOD(ClockTime get_internal_time() const, gst_clock_get_internal_time)
   _WRAP_METHOD(ClockTime adjust_unlocked(ClockTime internal_time), gst_clock_adjust_unlocked)
   _WRAP_METHOD(ClockTime unadjust_unlocked(ClockTime external_time), gst_clock_unadjust_unlocked)
-
 };
 
 } //namespace Gst

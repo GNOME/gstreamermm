@@ -1,24 +1,21 @@
 #include <gstmm/object.h>
-#include <gstmm/pad.h>
-#include <gstmm/padtemplate.h>
-#include <gstmm/caps.h>
 #include <gstmm/clock.h>
-#include <gstmm/bus.h>
 #include <gstmm/enums.h>
-#include <gstmm/message.h>
 _DEFS(gstmm,gst)
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstmm/private/object_p.h)
-
 
 namespace Gst
 {
 
 class Bus;
+class Caps;
+class Clock;
 class Event;
 class Message;
 class Pad;
 class PadTemplate;
+class Query;
 
 class Element : public Object 
 {
@@ -29,7 +26,6 @@ protected:
   _CTOR_DEFAULT
 
 public:
-
   static Glib::RefPtr<Element> create(const Glib::ustring& factoryname, const Glib::ustring& name);
   Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
   _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
@@ -64,7 +60,7 @@ public:
 
   _WRAP_METHOD(bool is_indexable() const, gst_element_is_indexable)
   _WRAP_METHOD(bool requires_clock() const, gst_element_requires_clock)
-  _WRAP_METHOD(bool set_clock(const Clock& clock), gst_element_set_clock)
+  _WRAP_METHOD(bool set_clock(const Glib::RefPtr<Clock>& clock), gst_element_set_clock)
   _WRAP_METHOD(Glib::RefPtr<Clock> get_clock(), gst_element_get_clock)
   _WRAP_METHOD(Glib::RefPtr<const Clock> get_clock() const, gst_element_get_clock, constversion)
   _WRAP_METHOD(bool provides_clock() const, gst_element_provides_clock)
@@ -78,10 +74,11 @@ public:
   _WRAP_METHOD(StateChangeReturn continue_state(StateChangeReturn prestate_value), gst_element_continue_state)
   _WRAP_METHOD(void lost_state(), gst_element_lost_state)
   _WRAP_METHOD(bool sync_state_with_parent(), gst_element_sync_state_with_parent)
-  _WRAP_METHOD(StateChangeReturn change_state(GstStateChange transition), gst_element_change_state)
+  _WRAP_METHOD(StateChangeReturn change_state(StateChange transition), gst_element_change_state)
 
   _WRAP_METHOD(bool post_message(const Glib::RefPtr<Message>& message), gst_element_post_message)
 
+  _WRAP_METHOD(bool query(const Glib::RefPtr<Query>& query), gst_element_query)
   _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_element_query_convert)
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_element_query_position)
   _WRAP_METHOD(bool query_duration(Format& format, gint64& duration) const, gst_element_query_duration)

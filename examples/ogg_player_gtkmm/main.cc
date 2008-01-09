@@ -20,6 +20,7 @@
 #include <gtkmm/main.h>
 #include <gstmm/init.h>
 #include <gstmm/element.h>
+#include <gstmm/pad.h>
 #include <gstmm/pipeline.h>
 #include <iostream>
 #include "PlayerWindow.h"
