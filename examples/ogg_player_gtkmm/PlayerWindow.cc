@@ -227,14 +227,13 @@ void PlayerWindow::on_forward(void)
     gint64 pos;
     Gst::Format fmt = Gst::FORMAT_TIME;
 
-    Glib::RefPtr<Gst::Query> query =
-            Gst::QueryPosition::create(fmt);
+    Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
-    Glib::RefPtr<Gst::QueryPosition> posQuery =
-        Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
-
-    if (mainPipeline->query(posQuery))
+    if (mainPipeline->query(query))
     {
+        Glib::RefPtr<Gst::QueryPosition> posQuery =
+            Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+
         posQuery->parse(fmt, pos);
 
         gint64 newPos = ((pos + skipAmount) < duration) ? (pos + skipAmount) :
