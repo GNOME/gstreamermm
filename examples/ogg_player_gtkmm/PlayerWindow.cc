@@ -23,6 +23,7 @@
 #include <gstmm/clock.h>
 #include <gstmm/event.h>
 #include <gstmm/message.h>
+#include <gstmm/query.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -226,8 +227,16 @@ void PlayerWindow::on_forward(void)
     gint64 pos;
     Gst::Format fmt = Gst::FORMAT_TIME;
 
-    if (mainPipeline->query_position(fmt, pos))
+    Glib::RefPtr<Gst::Query> query =
+            Gst::QueryPosition::create(fmt);
+
+    Glib::RefPtr<Gst::QueryPosition> posQuery =
+        Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+
+    if (mainPipeline->query(posQuery))
     {
+        posQuery->parse(fmt, pos);
+
         gint64 newPos = ((pos + skipAmount) < duration) ? (pos + skipAmount) :
             duration;
 

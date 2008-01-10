@@ -40,6 +40,11 @@ void QueryConvert::set(Format src_format, gint64 src_value, Format dest_format, 
   gst_query_set_convert(gobj(), GstFormat(src_format), src_value, GstFormat(dest_format), dest_value);
 }
 
+void QueryConvert::parse(Format& dest_format, gint64& dest_value)
+{
+  gst_query_parse_convert(gobj(), NULL, NULL, (GstFormat*)(&dest_format), &dest_value);
+}
+
 void QueryConvert::parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value)
 {
   gst_query_parse_convert(gobj(), (GstFormat*)(&src_format), &src_value, (GstFormat*)(&dest_format), &dest_value);
