@@ -13,8 +13,15 @@ bool print_stream_position(void)
  gint64 pos = 0;
  gint64 len = 0;
 
- if (pipeline->query_position(fmt, pos)
+ Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
+
+   Glib::RefPtr<Gst::QueryPosition> posQuery =
+        Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+
+ if (pipeline->query(query)
    && pipeline->query_duration(fmt, len)) {
+
+   posQuery->parse(fmt, pos);
 
    std::cout << std::right << "Time: " << std::setfill('0') <<
      std::setw(3) << Gst::get_hours(pos) << ":" <<
