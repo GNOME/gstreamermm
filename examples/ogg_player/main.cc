@@ -15,11 +15,11 @@ bool print_stream_position(void)
 
  Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
-   Glib::RefPtr<Gst::QueryPosition> posQuery =
-        Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
-
  if (pipeline->query(query)
    && pipeline->query_duration(fmt, len)) {
+
+   Glib::RefPtr<Gst::QueryPosition> posQuery =
+        Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
 
    posQuery->parse(fmt, pos);
 
