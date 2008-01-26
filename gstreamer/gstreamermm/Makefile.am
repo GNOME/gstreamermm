@@ -4,7 +4,7 @@
 SUBDIRS                 = private
 
 sublib_name             = gstreamermm
-sublib_libname          = gstreamermm-1.0
+sublib_libname          = gstreamermm-0.10
 sublib_libversion       = $(LIBGSTMM_SO_VERSION)
 sublib_namespace        = Gst
 sublib_cflags           = $(GSTMM_CFLAGS)
@@ -23,8 +23,8 @@ sublib_files_extra_general_deprecated_h =
 
 include $(top_srcdir)/build_shared/Makefile_build.am_fragment
 
-lib_LTLIBRARIES = libgstreamermm-1.0.la
-libgstreamermm_1_0_la_SOURCES = $(files_built_cc) $(files_extra_cc)
-libgstreamermm_1_0_la_LDFLAGS = $(common_ldflags)
-libgstreamermm_1_0_la_LIBADD  = $(GSTMM_LIBS)
+lib_LTLIBRARIES = libgstreamermm-0.10.la
+libgstreamermm_0_10_la_SOURCES = $(files_built_cc) $(files_extra_cc)
+libgstreamermm_0_10_la_LDFLAGS = $(common_ldflags)
+libgstreamermm_0_10_la_LIBADD  = $(GSTMM_LIBS)
 

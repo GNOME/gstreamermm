@@ -1,6 +1,6 @@
 INCLUDES=-I$(top_srcdir) -I$(top_srcdir)/gstreamer @GSTMM_CFLAGS@
 
-LDADD=$(top_builddir)/gstreamer/gstreamermm/libgstreamermm-1.0.la
+LDADD=$(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la
 
 noinst_PROGRAMS = test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \

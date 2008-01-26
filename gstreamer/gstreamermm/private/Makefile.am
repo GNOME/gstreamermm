@@ -11,7 +11,7 @@ files_extra_all_p_h	= object_p.h miniobject_p.h
 dist_sources = $(files_built_all_p_h) $(files_extra_all_p_h)
 DISTFILES = $(DIST_COMMON) $(dist_sources)
 
-private_includedir	= $(includedir)/gstreamermm-1.0/gstreamermm/private
+private_includedir	= $(includedir)/gstreamermm-0.10/gstreamermm/private
 private_include_HEADERS	= $(files_built_p_h) $(files_extra_p_h)
 
 maintainer-clean-local:
