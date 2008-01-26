@@ -19,11 +19,11 @@
 
 #include <gtkmm/stock.h>
 #include <gtkmm/filechooserdialog.h>
-#include <gstmm/bus.h>
-#include <gstmm/clock.h>
-#include <gstmm/event.h>
-#include <gstmm/message.h>
-#include <gstmm/query.h>
+#include <gstreamermm/bus.h>
+#include <gstreamermm/clock.h>
+#include <gstreamermm/event.h>
+#include <gstreamermm/message.h>
+#include <gstreamermm/query.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>

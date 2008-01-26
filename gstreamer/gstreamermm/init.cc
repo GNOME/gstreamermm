@@ -1,6 +1,6 @@
-#include <gstmm/init.h>
-#include <gstmm/wrap.h>
-#include <gstmm/gst_wrap_init.h>
+#include <gstreamermm/init.h>
+#include <gstreamermm/wrap.h>
+#include <gstreamermm/gst_wrap_init.h>
 #include <gst/gst.h>
 
 namespace Gst

@@ -1,5 +1,5 @@
-#include <gstmm/object.h>
-#include <gstmm/private/object_p.h>
+#include <gstreamermm/object.h>
+#include <gstreamermm/private/object_p.h>
 
 #include <gst/gstobject.h>
 

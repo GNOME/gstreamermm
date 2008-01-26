@@ -24,8 +24,8 @@
 #include <glib/gmacros.h>
 
 #include <vector>
-#include <gstmm/miniobject.h>
-#include <gstmm/wrap.h>
+#include <gstreamermm/miniobject.h>
+#include <gstreamermm/wrap.h>
 
 #include <glibmmconfig.h>
 GLIBMM_USING_STD(vector)

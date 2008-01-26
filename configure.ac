@@ -19,7 +19,7 @@ pushdef([GSTMM_MICRO_VERSION],     [0])
 pushdef([GSTMM_EXTRA_VERSION],     [])
 pushdef([GSTMM_VERSION], GSTMM_MAJOR_VERSION.GSTMM_MINOR_VERSION.GSTMM_MICRO_VERSION[]GSTMM_EXTRA_VERSION)
 AC_INIT([gstreamermm], GSTMM_VERSION, [Milosz Derezynski <internalerror@gmail.com>, Rob Page <page.rob@gmail.com>, Dodji Seketeli <dodji@gnome.org>])
-AC_CONFIG_SRCDIR([gst/gstmmconfig.h.in])
+AC_CONFIG_SRCDIR([gstreamer/gstmmconfig.h.in])
 AC_PREREQ(2.59)
 
 #########################################################################
@@ -62,7 +62,7 @@ AC_CONFIG_AUX_DIR(scripts)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 
 dnl Specify a configuration file (no autoheader)
-AM_CONFIG_HEADER(config.h gst/gstmmconfig.h)
+AM_CONFIG_HEADER(config.h gstreamer/gstmmconfig.h)
 AM_MAINTAINER_MODE
 AL_ACLOCAL_INCLUDE(scripts)
 
@@ -298,11 +298,11 @@ AUTOHEADER=':'
 AC_CONFIG_FILES([
   Makefile
 
-  gst/Makefile
-  gst/gstreamermm-1.0.pc
-    gst/src/Makefile
-    gst/gstmm/Makefile
-      gst/gstmm/private/Makefile
+  gstreamer/Makefile
+  gstreamer/gstreamermm-1.0.pc
+    gstreamer/src/Makefile
+    gstreamer/gstreamermm/Makefile
+      gstreamer/gstreamermm/private/Makefile
 
   tools/Makefile
     tools/generate_gst_wrap_init.pl

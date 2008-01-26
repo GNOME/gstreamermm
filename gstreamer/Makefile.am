@@ -1,4 +1,4 @@
-SUBDIRS = src gstmm
+SUBDIRS = src gstreamermm
 
 EXTRA_DIST = README gstmmconfig.h.in gstreamermm-1.0.pc.in gstreamermm.h
 

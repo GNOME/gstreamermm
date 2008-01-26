@@ -18,8 +18,8 @@ test -z "$srcdir" && srcdir=.
 PKG_NAME="gstreamermm"
 
 (test -f $srcdir/configure.ac \
-  && test -d $srcdir/gst/src \
-  && test -d $srcdir/gst/gstmm) || {
+  && test -d $srcdir/gstreamer/src \
+  && test -d $srcdir/gstreamer/gstreamermm) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
     echo " top-level $PKG_NAME directory"
     exit 1

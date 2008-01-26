@@ -31,8 +31,8 @@
 #include <gtkmm/label.h>
 #include <gtkmm/button.h>
 #include <gtkmm/scale.h>
-#include <gstmm/element.h>
-#include <gstmm/pipeline.h>
+#include <gstreamermm/element.h>
+#include <gstreamermm/pipeline.h>
 
 class PlayerWindow : public Gtk::Window
 {

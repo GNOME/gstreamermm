@@ -1,5 +1,5 @@
-#include <gstmm/miniobject.h>
-#include <gstmm/private/miniobject_p.h>
+#include <gstreamermm/miniobject.h>
+#include <gstreamermm/private/miniobject_p.h>
 
 namespace Gst
 {
