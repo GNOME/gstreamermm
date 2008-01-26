@@ -18,7 +18,7 @@ pushdef([GSTMM_MINOR_VERSION],     [1])
 pushdef([GSTMM_MICRO_VERSION],     [0])
 pushdef([GSTMM_EXTRA_VERSION],     [])
 pushdef([GSTMM_VERSION], GSTMM_MAJOR_VERSION.GSTMM_MINOR_VERSION.GSTMM_MICRO_VERSION[]GSTMM_EXTRA_VERSION)
-AC_INIT([gstmm], GSTMM_VERSION, [Milosz Derezynski <internalerror@gmail.com>, Rob Page <page.rob@gmail.com>, Dodji Seketeli <dodji@gnome.org>])
+AC_INIT([gstreamermm], GSTMM_VERSION, [Milosz Derezynski <internalerror@gmail.com>, Rob Page <page.rob@gmail.com>, Dodji Seketeli <dodji@gnome.org>])
 AC_CONFIG_SRCDIR([gst/gstmmconfig.h.in])
 AC_PREREQ(2.59)
 
@@ -36,9 +36,9 @@ popdef([GSTMM_MICRO_VERSION])
 popdef([GSTMM_EXTRA_VERSION])
 popdef([GSTMM_VERSION])
 GSTMM_RELEASE=$GSTMM_MAJOR_VERSION.$GSTMM_MINOR_VERSION
-AC_DEFINE_UNQUOTED(GSTMM_MAJOR_VERSION, $GSTMM_MAJOR_VERSION, [Major version of gstmm])
-AC_DEFINE_UNQUOTED(GSTMM_MINOR_VERSION, $GSTMM_MINOR_VERSION, [Minor version of gstmm])
-AC_DEFINE_UNQUOTED(GSTMM_MICRO_VERSION, $GSTMM_MICRO_VERSION, [Micro version of gstmm])
+AC_DEFINE_UNQUOTED(GSTMM_MAJOR_VERSION, $GSTMM_MAJOR_VERSION, [Major version of gstreamermm])
+AC_DEFINE_UNQUOTED(GSTMM_MINOR_VERSION, $GSTMM_MINOR_VERSION, [Minor version of gstreamermm])
+AC_DEFINE_UNQUOTED(GSTMM_MICRO_VERSION, $GSTMM_MICRO_VERSION, [Micro version of gstreamermm])
 AC_SUBST(GSTMM_MAJOR_VERSION)
 AC_SUBST(GSTMM_MINOR_VERSION)
 AC_SUBST(GSTMM_MICRO_VERSION)
@@ -111,22 +111,22 @@ AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
 AL_PROG_GNU_M4(AC_MSG_ERROR([dnl
-SUN m4 does not work for building gstmm. 
+SUN m4 does not work for building gstreamermm. 
 Please install GNU m4.]))
 
 AL_PROG_GNU_MAKE(AC_MSG_ERROR([dnl
-SUN make does not work for building gstmm.
+SUN make does not work for building gstreamermm.
 Please install GNU make.]))
 
 
 #########################################################################
 #  Dependancy checks (gtkmm is only used by examples)
 #########################################################################
-gstmm_min_glibmm_version=2.8.0
-gstmm_min_gtkmm_version=2.10
-gstmm_min_gst_version=0.10
+gstreamermm_min_glibmm_version=2.8.0
+gstreamermm_min_gtkmm_version=2.10
+gstreamermm_min_gst_version=0.10
 
-PKG_CHECK_MODULES(GSTMM, glibmm-2.4 >= ${gstmm_min_glibmm_version} gstreamer-0.10 >= ${gstmm_min_gst_version})
+PKG_CHECK_MODULES(GSTMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-0.10 >= ${gstreamermm_min_gst_version})
 AC_SUBST(GSTMM_CFLAGS)
 AC_SUBST(GSTMM_LIBS)
 
@@ -228,7 +228,7 @@ AC_ARG_ENABLE(examples,
 if test "x$enable_examples" = "xyes"; then
 
 #Extra dependencies needed for the examples. Use --enable-examples=no to build the library without this.
-PKG_CHECK_MODULES(GSTMM_EXAMPLES, gtkmm-2.4 >= ${gstmm_min_gtkmm_version})
+PKG_CHECK_MODULES(GSTMM_EXAMPLES, gtkmm-2.4 >= ${gstreamermm_min_gtkmm_version})
 AC_SUBST(GSTMM_EXAMPLES_CFLAGS)
 AC_SUBST(GSTMM_EXAMPLES_LIBS)
 
@@ -299,7 +299,7 @@ AC_CONFIG_FILES([
   Makefile
 
   gst/Makefile
-  gst/gstmm-1.0.pc
+  gst/gstreamermm-1.0.pc
     gst/src/Makefile
     gst/gstmm/Makefile
       gst/gstmm/private/Makefile

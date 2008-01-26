@@ -1,4 +1,4 @@
-#include <gstmm.h>
+#include <gstreamermm.h>
 #include <gst/gstbin.h>
 #include <gst/gsterror.h>
 #include <iostream>

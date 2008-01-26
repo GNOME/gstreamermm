@@ -1,4 +1,4 @@
-#include <gstmm.h>
+#include <gstreamermm.h>
 #include <stdexcept>
 #include <iostream>
 

@@ -1,4 +1,4 @@
-#include <gstmm.h>
+#include <gstreamermm.h>
 #include <iostream>
 
 Glib::OptionEntry make_entry(const Glib::ustring& long_name, const gchar& short_name, const Glib::ustring& description)

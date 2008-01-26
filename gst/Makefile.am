@@ -1,14 +1,13 @@
 SUBDIRS = src gstmm
 
-EXTRA_DIST = README gstmmconfig.h.in \
-gstmm-1.0.pc.in gstmm.h
+EXTRA_DIST = README gstmmconfig.h.in gstreamermm-1.0.pc.in gstreamermm.h
 
-gstmm_includedir      = $(includedir)/gstmm-1.0
-gstmm_include_DATA  	= gstmm.h
+gstreamermm_includedir = $(includedir)/gstreamermm-1.0
+gstreamermm_include_DATA = gstreamermm.h
 
-gstmm_configdir       = $(libdir)/gstmm-1.0/include
-gstmm_config_DATA     = gstmmconfig.h
+gstreamermm_configdir       = $(libdir)/gstreamermm-1.0/include
+gstreamermm_config_DATA     = gstmmconfig.h
 
 pkgconfigdir          = $(libdir)/pkgconfig
-pkgconfig_DATA        = gstmm-1.0.pc
+pkgconfig_DATA        = gstreamermm-1.0.pc
 
