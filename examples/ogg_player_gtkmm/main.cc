@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * main.cc
- * Copyright (C) The gstmm development team 2007 <gtkmm-list@gnome.org>
+ * Copyright (C) The GStreamermm Development Team 2007 <gtkmm-list@gnome.org>
  * 
  * main.cc is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

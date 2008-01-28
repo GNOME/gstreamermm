@@ -1,7 +1,7 @@
-#include <gstmm/message.h>
+#include <gstreamermm/message.h>
 #include <gst/gstbus.h>
 
-static gboolean SignalProxy_Watch_gstmm_callback(GstBus* bus, GstMessage* message, void* data)
+static gboolean SignalProxy_Watch_gstreamermm_callback(GstBus* bus, GstMessage* message, void* data)
 {
   Gst::Bus::SlotWatch* the_slot = static_cast<Gst::Bus::SlotWatch*>(data);
 
@@ -21,7 +21,7 @@ static gboolean SignalProxy_Watch_gstmm_callback(GstBus* bus, GstMessage* messag
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
-static void SignalProxy_Watch_gstmm_callback_destroy(void* data)
+static void SignalProxy_Watch_gstreamermm_callback_destroy(void* data)
 {
   delete static_cast<Gst::Bus::SlotWatch*>(data);
 }
@@ -38,11 +38,11 @@ Glib::RefPtr<Bus> Bus::create()
 guint Bus::add_watch(const SlotWatch& slot, int priority)
 {
   //Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
-  //It will be deleted when SignalProxy_Watch_gstmm_callback_destroy() is called.
+  //It will be deleted when SignalProxy_Watch_gstreamermm_callback_destroy() is called.
   SlotWatch* slot_copy = new SlotWatch(slot);
   return gst_bus_add_watch_full(gobj(), priority,
-    &SignalProxy_Watch_gstmm_callback, slot_copy,
-    &SignalProxy_Watch_gstmm_callback_destroy);
+    &SignalProxy_Watch_gstreamermm_callback, slot_copy,
+    &SignalProxy_Watch_gstreamermm_callback_destroy);
 
 }
 

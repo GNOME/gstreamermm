@@ -55,8 +55,8 @@ void wrap_register_init()
 
   if(!Gst::quark_)
   {
-    Gst::quark_ = g_quark_from_static_string("gstmm__Gst::quark_");
-    Gst::quark_cpp_wrapper_deleted_ = g_quark_from_static_string("gstmm__Gst::quark_cpp_wrapper_deleted_");
+    Gst::quark_ = g_quark_from_static_string("gstreamermm__Gst::quark_");
+    Gst::quark_cpp_wrapper_deleted_ = g_quark_from_static_string("gstreamermm__Gst::quark_cpp_wrapper_deleted_");
   }
 
   if(!wrap_func_table)
@@ -139,8 +139,8 @@ Gst::MiniObject* wrap_create_new_wrapper_for_interface(GstMiniObject* object, GT
   // We can't do this check for GstMiniObject (as we do it in Glib::wrap())
   // because GstMiniObject has no equivalent for g_object_get_qdata().
   /*
-  const bool gstmm_wrapper_already_deleted = (bool)g_object_get_qdata(G_TYPE_FROM_INSTANCE(object->instance), Glib::quark_cpp_wrapper_deleted_);
-  if(gstmm_wrapper_already_deleted)
+  const bool gstreamermm_wrapper_already_deleted = (bool)g_object_get_qdata(G_TYPE_FROM_INSTANCE(object->instance), Glib::quark_cpp_wrapper_deleted_);
+  if(gstreamermm_wrapper_already_deleted)
   {
     g_warning("Gst::wrap_create_new_wrapper: Attempted to create a 2nd C++ wrapper for a C instance whose C++ wrapper has been deleted.");
     return 0;

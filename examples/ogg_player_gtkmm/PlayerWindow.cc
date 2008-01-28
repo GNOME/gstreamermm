@@ -1,6 +1,6 @@
 //           PlayerWindow.cc
 //  Tue Dec 18 18:47:47 2007
-//  Copyright  2007  The gstmm development team
+//  Copyright  2007  The GStreamermm Development Team
 //  <gtkmm-list@gnome.org>
 
 // This program is free software; you can redistribute it and/or modify

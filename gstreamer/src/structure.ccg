@@ -48,14 +48,14 @@ StructureValueProxy::operator=(const Fraction& value)
 // Structure
 
 static gboolean
-Structure_ForEach_gstmm_callback(GQuark field_id, const GValue *value, gpointer data)
+Structure_ForEach_gstreamermm_callback(GQuark field_id, const GValue *value, gpointer data)
 {
   Structure::ForeachSlot& slot = *static_cast<Structure::ForeachSlot*>(data);
   return slot(field_id, value);
 }
 
 static gboolean
-Structure_Map_gstmm_callback(GQuark field_id, GValue *value, gpointer data)
+Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, gpointer data)
 {
   Structure::MapSlot& slot = *static_cast<Structure::MapSlot*>(data);
   return slot(field_id, value);
@@ -179,14 +179,14 @@ bool
 Structure::foreach(const ForeachSlot& slot)
 {
   ForeachSlot slot_copy(slot);
-  gst_structure_foreach(gobject_, &Structure_ForEach_gstmm_callback, &slot_copy);
+  gst_structure_foreach(gobject_, &Structure_ForEach_gstreamermm_callback, &slot_copy);
 }
 
 bool
 Structure::map_in_place(const MapSlot& slot)
 {
   MapSlot slot_copy(slot);
-  gst_structure_map_in_place(gobject_, &Structure_Map_gstmm_callback, &slot_copy);
+  gst_structure_map_in_place(gobject_, &Structure_Map_gstreamermm_callback, &slot_copy);
 }
 
 Structure

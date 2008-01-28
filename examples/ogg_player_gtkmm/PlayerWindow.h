@@ -2,7 +2,7 @@
  *            PlayerWindow.h
  *
  *  Tue Dec 18 18:48:33 2007
- *  Copyright  2007  The gstmm development team
+ *  Copyright  2007  The GStreamermm Development Team
  *  <gtkmm-list@gnome.org>
  ****************************************************************************/
 
