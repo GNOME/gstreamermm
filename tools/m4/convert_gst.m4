@@ -65,6 +65,7 @@ _CONVERSION(`GstQueryType',`QueryType',`QueryType($3)')
 _CONVERSION(`QueryType',`GstQueryType',`GstQueryType($3)')
 
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
+_CONVERSION(`Glib::QueryQuark',`GQuark',`$3')
 
 _CONV_ENUM(Gst,State)
 _CONV_ENUM(Gst,StateChangeReturn)

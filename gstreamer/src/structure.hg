@@ -33,11 +33,11 @@ class StructureValueProxy
 public:
   StructureValueProxy(Structure& structure, const Glib::ustring& name);
 
-  void operator=(const Glib::ustring& src);
-  void operator=(bool src);
-  void operator=(double src);
-  void operator=(int src);
-  void operator=(const Fraction& src);
+  void set(const Glib::ValueBase& value);
+  StructureValueProxy& operator=(const Glib::ValueBase& value);
+  StructureValueProxy& operator=(const Fraction& src);
+  void get(Glib::ValueBase& value) const;
+  operator bool();
 
 private:
   Structure& m_Structure;
@@ -54,19 +54,19 @@ public:
 
 public:
   Structure(const Glib::ustring& name);
-  Structure(GQuark quark);
+  Structure(Glib::QueryQuark quark);
   Structure(const GstStructure* castitem); // for Message::get_structure()
 
   StructureValueProxy operator[](const Glib::ustring& fieldname);
 
-  void clear(); // remove_all_fields in C API
-  int size() const;
+  _WRAP_METHOD(int size() const, gst_structure_n_fields)
+  _WRAP_METHOD(void clear(), gst_structure_remove_all_fields)
 
   //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
   //See Gtk::TreeModel, for instance. murrayc.
-  //Glib::ValueBase id_get_value(GQuark field);
+  //Glib::ValueBase id_get_value(Glib::QueryQuark field);
 
-  _WRAP_METHOD(void id_set_value(GQuark field, const Glib::ValueBase& value), gst_structure_id_set_value)
+  _WRAP_METHOD(void id_set_value(Glib::QueryQuark field, const Glib::ValueBase& value), gst_structure_id_set_value)
 
   //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
   //Glib::ValueBase get_value(const Glib::ustring& fieldname) const;
@@ -104,7 +104,7 @@ public:
 
   static Structure create_from_string(const Glib::ustring& the_string);
 
-  _WRAP_METHOD(GQuark get_name_id() const, gst_structure_get_name_id)
+  _WRAP_METHOD(Glib::QueryQuark get_name_id() const, gst_structure_get_name_id)
   _WRAP_METHOD(Glib::ustring get_name() const, gst_structure_get_name)
   _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
   _WRAP_METHOD(void set_name(const Glib::ustring& name), gst_structure_set_name)

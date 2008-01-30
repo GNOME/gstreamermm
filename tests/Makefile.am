@@ -4,7 +4,8 @@ LDADD=$(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la
 
 noinst_PROGRAMS = test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \
-                  test-message-wrap test-event-wrap test-query-wrap
+                  test-message-wrap test-event-wrap test-query-wrap \
+		  test-structure
 
 test_create_element_SOURCES=test-create-element.cc
 test_create_element_LDFLAGS=@GSTMM_LIBS@
@@ -29,6 +30,9 @@ test_event_wrap_LDFLAGS=@GSTMM_LIBS@
 
 test_query_wrap_SOURCES=test-query-wrap.cc
 test_query_wrap_LDFLAGS=@GSTMM_LIBS@
+
+test_structure_SOURCES=test-structure.cc
+test_structure_LDFLAGS=@GSTMM_LIBS@
 
 #runtestbasic runtestlangs \
 #runtestsearch runtestmimetypes \

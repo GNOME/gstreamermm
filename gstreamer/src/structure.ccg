@@ -11,31 +11,19 @@ StructureValueProxy::StructureValueProxy(Structure& structure, const Glib::ustri
 {
 }
 
-void
-StructureValueProxy::operator=(const Glib::ustring& value)
+void StructureValueProxy::set(const Glib::ValueBase& value)
 {
-  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_STRING, value.c_str(), NULL);
+  gst_structure_set_value(m_Structure.gobj(), m_Name.c_str(), value.gobj());
 }
 
-void
-StructureValueProxy::operator=(bool value)
+StructureValueProxy&
+StructureValueProxy::operator=(const Glib::ValueBase& value)
 {
-  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_BOOLEAN, value, NULL);
+  set(value);
+  return *this;
 }
 
-void
-StructureValueProxy::operator=(gdouble value)
-{
-  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_DOUBLE, value, NULL);
-}
-
-void
-StructureValueProxy::operator=(int value)
-{
-  gst_structure_set(m_Structure.gobj(), m_Name.c_str(), G_TYPE_INT, value, NULL);
-}
-
-void
+StructureValueProxy&
 StructureValueProxy::operator=(const Fraction& value)
 {
   GValue v = {0,};
@@ -43,6 +31,19 @@ StructureValueProxy::operator=(const Fraction& value)
   gst_value_set_fraction(&v, value.numerator, value.denominator);
   gst_structure_set_value(m_Structure.gobj(), m_Name.c_str(), &v);
   g_value_unset(&v);
+  return *this;
+}
+
+void StructureValueProxy::get(Glib::ValueBase& value) const
+{
+  const GValue* gval = gst_structure_get_value(m_Structure.gobj(), m_Name.c_str());
+  value.init(gval);
+}
+
+StructureValueProxy::operator bool() {
+  Glib::ValueBase val;
+  get(val);
+  return (G_VALUE_TYPE(val.gobj()) == 0) ? false : true;
 }
 
 // Structure
@@ -66,7 +67,7 @@ Structure::Structure(const Glib::ustring& name)
   gobject_ = gst_structure_empty_new(name.c_str());
 }
 
-Structure::Structure(GQuark quark)
+Structure::Structure(Glib::QueryQuark quark)
 {
   gobject_ = gst_structure_id_empty_new(quark);
 }
@@ -76,19 +77,6 @@ Structure::operator[](const Glib::ustring& name)
 {
   return StructureValueProxy(*this, name);
 }
-
-void
-Structure::clear()
-{
-  gst_structure_remove_all_fields(gobject_);
-}
-
-int
-Structure::size() const
-{
-  return gst_structure_n_fields(gobject_);
-}
-
 
 //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
 /*
