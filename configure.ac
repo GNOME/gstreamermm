@@ -15,7 +15,7 @@
 #We use pushdef here because we can't use shell variables before AC_INIT, but we want to use a variable with AC_INIT:
 pushdef([GSTMM_MAJOR_VERSION],     [0])
 pushdef([GSTMM_MINOR_VERSION],     [9])
-pushdef([GSTMM_MICRO_VERSION],     [1])
+pushdef([GSTMM_MICRO_VERSION],     [2])
 pushdef([GSTMM_EXTRA_VERSION],     [])
 pushdef([GSTMM_VERSION], GSTMM_MAJOR_VERSION.GSTMM_MINOR_VERSION.GSTMM_MICRO_VERSION[]GSTMM_EXTRA_VERSION)
 AC_INIT([gstreamermm], GSTMM_VERSION, [Milosz Derezynski <internalerror@gmail.com>, Rob Page <page.rob@gmail.com>, Dodji Seketeli <dodji@gnome.org>])
