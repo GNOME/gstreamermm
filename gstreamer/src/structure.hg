@@ -5,45 +5,6 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-//TODO: Documenation. What is this?
-//TODO: Put implmenetation in the .ccg file.
-//TODO: Probably use the m_ prefix.
-class Fraction
-{
-public:
-  Fraction(int num, int den)
-  : numerator(num),
-    denominator(den)
-  {}
-
-  Fraction()
-  : numerator(0),
-    denominator(0)
-  {}
-
-  int numerator;
-  int denominator;
-};
-
-class Structure;
-
-//TODO: What is this?
-class StructureValueProxy
-{
-public:
-  StructureValueProxy(Structure& structure, const Glib::ustring& name);
-
-  void set(const Glib::ValueBase& value);
-  StructureValueProxy& operator=(const Glib::ValueBase& value);
-  StructureValueProxy& operator=(const Fraction& src);
-  void get(Glib::ValueBase& value) const;
-  operator bool();
-
-private:
-  Structure& m_Structure;
-  Glib::ustring m_Name;
-};
-
 class Structure
 {
   _CLASS_BOXEDTYPE(Structure, GstStructure, NONE, gst_structure_copy, gst_structure_free)
@@ -54,49 +15,44 @@ public:
 
 public:
   Structure(const Glib::ustring& name);
-  Structure(Glib::QueryQuark quark);
-  Structure(const GstStructure* castitem); // for Message::get_structure()
-
-  StructureValueProxy operator[](const Glib::ustring& fieldname);
+  Structure(const Glib::QueryQuark& quark);
 
   _WRAP_METHOD(int size() const, gst_structure_n_fields)
   _WRAP_METHOD(void clear(), gst_structure_remove_all_fields)
 
-  //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
-  //See Gtk::TreeModel, for instance. murrayc.
-  //Glib::ValueBase id_get_value(Glib::QueryQuark field);
+  void get_field(const Glib::QueryQuark& field, Glib::ValueBase& value) const;
 
-  _WRAP_METHOD(void id_set_value(Glib::QueryQuark field, const Glib::ValueBase& value), gst_structure_id_set_value)
+  _WRAP_METHOD(void set_field(const Glib::QueryQuark& field, const Glib::ValueBase& value), gst_structure_id_set_value)
 
-  //TODO: ValueBase should be used as an output paramter in getters because it is a base type.
-  //Glib::ValueBase get_value(const Glib::ustring& fieldname) const;
+  void get_field(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  void set_value(const Glib::ustring& fieldname, const Glib::ValueBase& value);
+  _WRAP_METHOD(void set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value), gst_structure_set_value)
 
   _WRAP_METHOD(void remove_field(const Glib::ustring& fieldname), gst_structure_remove_field)
   _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
+
   bool foreach(const ForeachSlot& slot);
 
   _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname) const, gst_structure_has_field)
-  _WRAP_METHOD(bool has_field_typed(const Glib::ustring& fieldname, GType type) const, gst_structure_has_field_typed)
+  _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname, GType type) const, gst_structure_has_field_typed)
 
-  bool get_boolean(const Glib::ustring& fieldname, bool& value) const;
+  bool get_boolean(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  bool get_int(const Glib::ustring& fieldname, int& value) const;
+  bool get_int(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  bool get_uint(const Glib::ustring& fieldname, guint& value) const;
+  bool get_uint(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  bool get_fourcc(const Glib::ustring& fieldname, guint32& value) const;
+  bool get_fourcc(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  bool get_double(const Glib::ustring& fieldname, double& value) const;
+  bool get_double(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  Glib::ustring get_string(const Glib::ustring& fieldname) const;
+  bool get_string(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
   bool get_date(const Glib::ustring& fieldname, Glib::Date& value) const;
 
-  bool get_clock_time(const Glib::ustring& fieldname, ClockTime& value) const;
+  bool get_clock_time(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  bool get_enum(const Glib::ustring& fieldname, GType enumtype, int& value) const;
+  bool get_enum(const Glib::ustring& fieldname, GType enumtype, Glib::ValueBase& value) const;
 
   bool get_fraction(const Glib::ustring& fieldname, int& value_numerator, int& value_denominator) const;
 

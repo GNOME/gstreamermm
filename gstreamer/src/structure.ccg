@@ -3,50 +3,6 @@
 
 namespace Gst
 {
-// StructureValueProxy
-
-StructureValueProxy::StructureValueProxy(Structure& structure, const Glib::ustring& name)
-: m_Structure(structure)
-, m_Name(name)
-{
-}
-
-void StructureValueProxy::set(const Glib::ValueBase& value)
-{
-  gst_structure_set_value(m_Structure.gobj(), m_Name.c_str(), value.gobj());
-}
-
-StructureValueProxy&
-StructureValueProxy::operator=(const Glib::ValueBase& value)
-{
-  set(value);
-  return *this;
-}
-
-StructureValueProxy&
-StructureValueProxy::operator=(const Fraction& value)
-{
-  GValue v = {0,};
-  g_value_init(&v, GST_TYPE_FRACTION);
-  gst_value_set_fraction(&v, value.numerator, value.denominator);
-  gst_structure_set_value(m_Structure.gobj(), m_Name.c_str(), &v);
-  g_value_unset(&v);
-  return *this;
-}
-
-void StructureValueProxy::get(Glib::ValueBase& value) const
-{
-  const GValue* gval = gst_structure_get_value(m_Structure.gobj(), m_Name.c_str());
-  value.init(gval);
-}
-
-StructureValueProxy::operator bool() {
-  Glib::ValueBase val;
-  get(val);
-  return (G_VALUE_TYPE(val.gobj()) == 0) ? false : true;
-}
-
-// Structure
 
 static gboolean
 Structure_ForEach_gstreamermm_callback(GQuark field_id, const GValue *value, gpointer data)
@@ -67,114 +23,142 @@ Structure::Structure(const Glib::ustring& name)
   gobject_ = gst_structure_empty_new(name.c_str());
 }
 
-Structure::Structure(Glib::QueryQuark quark)
+Structure::Structure(const Glib::QueryQuark& quark)
 {
   gobject_ = gst_structure_id_empty_new(quark);
 }
 
-StructureValueProxy
-Structure::operator[](const Glib::ustring& name)
+void
+Structure::get_field(const Glib::QueryQuark& quark, Glib::ValueBase& value) const
 {
-  return StructureValueProxy(*this, name);
+  value.init(gst_structure_id_get_value(gobj(), quark));
 }
 
-//TODO: ValueBase should be used as an output paramter in getters because it is a base type.
-/*
-Glib::ValueBase
-Structure::get_value(const Glib::ustring& name) const
+void
+Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  Glib::ValueBase v;
-  v.init(gst_structure_get_value(gobject_, name.c_str()));
-  return v;
-}
-*/
-
-bool
-Structure::get_boolean(const Glib::ustring& name, bool& value) const
-{
-  gboolean val_ = false;
-  const bool has = gst_structure_get_boolean(gobject_, name.c_str(), &val_);
-  if(has)
-  {
-    value = val_;
-  }
-
-  return has;
+  value.init(gst_structure_get_value(gobj(), name.c_str()));
 }
 
 bool
-Structure::get_int(const Glib::ustring& name, int& value) const
+Structure::get_boolean(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  return gst_structure_get_int(gobject_, name.c_str(), &value);
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_BOOLEAN);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
 }
 
 bool
-Structure::get_uint(const Glib::ustring& name, guint& value) const
+Structure::get_int(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  return gst_structure_get_uint(gobject_, name.c_str(), &value);
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_INT);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
 }
 
 bool
-Structure::get_fourcc(const Glib::ustring& name, guint32& value) const
+Structure::get_uint(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  return gst_structure_get_fourcc(gobject_, name.c_str(), &value);
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_UINT);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
+}
+
+bool
+Structure::get_fourcc(const Glib::ustring& name, Glib::ValueBase& value) const
+{
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_UINT);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
 }
 
 
 bool
-Structure::get_double(const Glib::ustring& name, gdouble& value) const
+Structure::get_double(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  return gst_structure_get_double(gobject_, name.c_str(), &value);
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_DOUBLE);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
 }
 
-Glib::ustring
-Structure::get_string(const Glib::ustring& name) const
+bool
+Structure::get_string(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  return gst_structure_get_string(gobject_, name.c_str());
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_STRING);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
 }
 
 bool
 Structure::get_date (const Glib::ustring& name, Glib::Date& value) const
 {
   GDate *date = 0;
-  const bool has = gst_structure_get_date(gobject_, name.c_str(), &date);
+  const bool has = gst_structure_get_date(gobj(), name.c_str(), &date);
   value.set_julian(g_date_get_julian(date));
   return has;
 }
 
 
 bool
-Structure::get_clock_time(const Glib::ustring& name, ClockTime& value) const
+Structure::get_clock_time(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  return gst_structure_get_clock_time(gobject_, name.c_str(), &value);
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_UINT64);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
 }
 
 
 bool
-Structure::get_enum(const Glib::ustring& name, GType enumtype, int& value) const
+Structure::get_enum(const Glib::ustring& name, GType enum_type, Glib::ValueBase& value) const
 {
-  return gst_structure_get_enum(gobject_, name.c_str(), enumtype, &value);
+  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), enum_type);
+
+  if (result)
+    value.init(gst_structure_get_value(gobj(), name.c_str()));
+
+  return result;
 }
 
 
 bool
 Structure::get_fraction(const Glib::ustring& name, int& value_numerator, int& value_denominator) const
 {
-  return gst_structure_get_fraction(gobject_, name.c_str(), &value_numerator, &value_denominator);
+  return gst_structure_get_fraction(gobj(), name.c_str(), &value_numerator, &value_denominator);
 }
 
 bool
 Structure::foreach(const ForeachSlot& slot)
 {
   ForeachSlot slot_copy(slot);
-  gst_structure_foreach(gobject_, &Structure_ForEach_gstreamermm_callback, &slot_copy);
+  gst_structure_foreach(gobj(), &Structure_ForEach_gstreamermm_callback, &slot_copy);
 }
 
 bool
 Structure::map_in_place(const MapSlot& slot)
 {
   MapSlot slot_copy(slot);
-  gst_structure_map_in_place(gobject_, &Structure_Map_gstreamermm_callback, &slot_copy);
+  gst_structure_map_in_place(gobj(), &Structure_Map_gstreamermm_callback, &slot_copy);
 }
 
 Structure

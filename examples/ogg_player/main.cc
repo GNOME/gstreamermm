@@ -85,7 +85,7 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 int main(int argc, char* argv[])
 {
   // check input arguments
-  if (argc != 2)
+  if (argc < 2)
   {
     std::cout << "Usage: " << argv[0] << " <Ogg/Vorbis filename>" << std::endl;
     return -1;
