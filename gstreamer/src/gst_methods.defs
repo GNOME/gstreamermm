@@ -423,6 +423,46 @@
   )
 )
 
+(define-enum EventType
+  (in-module "Gst")
+  (c-name "GstEventType")
+  (gtype-id "GST_TYPE_EVENT_TYPE")
+  (values
+    '("gst-event-unknown" "GST_EVENT_UNKNOWN")
+    '("0)" "0)")
+    '("gst-event-flush-start" "GST_EVENT_FLUSH_START")
+    '("flag(both))" "FLAG(BOTH))")
+    '("gst-event-flush-stop" "GST_EVENT_FLUSH_STOP")
+    '("flag(both)" "FLAG(BOTH)")
+    '("gst-event-eos" "GST_EVENT_EOS")
+    '("flag(downstream)" "FLAG(DOWNSTREAM)")
+    '("gst-event-newsegment" "GST_EVENT_NEWSEGMENT")
+    '("flag(downstream)" "FLAG(DOWNSTREAM)")
+    '("gst-event-tag" "GST_EVENT_TAG")
+    '("flag(downstream)" "FLAG(DOWNSTREAM)")
+    '("gst-event-buffersize" "GST_EVENT_BUFFERSIZE")
+    '("flag(downstream)" "FLAG(DOWNSTREAM)")
+    '("gst-event-qos" "GST_EVENT_QOS")
+    '("flag(upstream))" "FLAG(UPSTREAM))")
+    '("gst-event-seek" "GST_EVENT_SEEK")
+    '("flag(upstream))" "FLAG(UPSTREAM))")
+    '("gst-event-navigation" "GST_EVENT_NAVIGATION")
+    '("flag(upstream))" "FLAG(UPSTREAM))")
+    '("gst-event-latency" "GST_EVENT_LATENCY")
+    '("flag(upstream))" "FLAG(UPSTREAM))")
+    '("gst-event-custom-upstream" "GST_EVENT_CUSTOM_UPSTREAM")
+    '("flag(upstream))" "FLAG(UPSTREAM))")
+    '("gst-event-custom-downstream" "GST_EVENT_CUSTOM_DOWNSTREAM")
+    '("flag(downstream)" "FLAG(DOWNSTREAM)")
+    '("gst-event-custom-downstream-oob" "GST_EVENT_CUSTOM_DOWNSTREAM_OOB")
+    '("flag(downstream))" "FLAG(DOWNSTREAM))")
+    '("gst-event-custom-both" "GST_EVENT_CUSTOM_BOTH")
+    '("flag(both)" "FLAG(BOTH)")
+    '("gst-event-custom-both-oob" "GST_EVENT_CUSTOM_BOTH_OOB")
+    '("flag(both))" "FLAG(BOTH))")
+  )
+)
+
 (define-enum SeekType
   (in-module "Gst")
   (c-name "GstSeekType")
@@ -887,15 +927,7 @@
 )
 
 
-;; From gettext.h
-
-
-
 ;; From glib-compat.h
-
-
-
-;; From glib-compat-private.h
 
 
 
@@ -2673,20 +2705,16 @@
 
 ;; From gstevent.h
 
-(define-function gst_event_type_get_name
+(define-method get_name
+  (of-object "GstEventType")
   (c-name "gst_event_type_get_name")
   (return-type "const-gchar*")
-  (parameters
-    '("GstEventType" "type")
-  )
 )
 
-(define-function gst_event_type_to_quark
+(define-method to_quark
+  (of-object "GstEventType")
   (c-name "gst_event_type_to_quark")
   (return-type "GQuark")
-  (parameters
-    '("GstEventType" "type")
-  )
 )
 
 (define-method get_flags
@@ -3101,14 +3129,6 @@
   (c-name "gst_update_registry")
   (return-type "gboolean")
 )
-
-
-
-;; From gst-i18n-app.h
-
-
-
-;; From gst-i18n-lib.h
 
 
 
@@ -3760,20 +3780,16 @@
   (return-type "GType")
 )
 
-(define-function gst_message_type_get_name
+(define-method get_name
+  (of-object "GstMessageType")
   (c-name "gst_message_type_get_name")
   (return-type "const-gchar*")
-  (parameters
-    '("GstMessageType" "type")
-  )
 )
 
-(define-function gst_message_type_to_quark
+(define-method to_quark
+  (of-object "GstMessageType")
   (c-name "gst_message_type_to_quark")
   (return-type "GQuark")
-  (parameters
-    '("GstMessageType" "type")
-  )
 )
 
 (define-function gst_message_new_error
@@ -5223,6 +5239,23 @@
   (return-type "GType")
 )
 
+(define-function gst_plugin_register_static
+  (c-name "gst_plugin_register_static")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "major_version")
+    '("gint" "minor_version")
+    '("const-gchar*" "name")
+    '("gchar*" "description")
+    '("GstPluginInitFunc" "init_func")
+    '("const-gchar*" "version")
+    '("const-gchar*" "license")
+    '("const-gchar*" "source")
+    '("const-gchar*" "package")
+    '("const-gchar*" "origin")
+  )
+)
+
 (define-method get_name
   (of-object "GstPlugin")
   (c-name "gst_plugin_get_name")
@@ -5322,14 +5355,6 @@
     '("GList*" "list")
   )
 )
-
-
-
-;; From gst_private.h
-
-
-
-;; From gstquark.h
 
 
 
@@ -5626,28 +5651,6 @@
   (parameters
     '("guint" "nth")
     '("GstFormat*" "format")
-  )
-)
-
-
-
-;; From gstregistrybinary.h
-
-(define-method binary_write_cache
-  (of-object "GstRegistry")
-  (c-name "gst_registry_binary_write_cache")
-  (return-type "gboolean")
-  (parameters
-    '("const-char*" "location")
-  )
-)
-
-(define-method binary_read_cache
-  (of-object "GstRegistry")
-  (c-name "gst_registry_binary_read_cache")
-  (return-type "gboolean")
-  (parameters
-    '("const-char*" "location")
   )
 )
 
@@ -7969,6 +7972,11 @@
     '("gboolean" "ghost_unconnected_pads")
     '("GError**" "err")
   )
+)
+
+(define-function gst_util_get_timestamp
+  (c-name "gst_util_get_timestamp")
+  (return-type "GstClockTime")
 )
 
 

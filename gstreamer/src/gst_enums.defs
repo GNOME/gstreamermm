@@ -1,4 +1,4 @@
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstbin.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstbin.h
 
 (define-enum-extended BinFlags
   (in-module "Gst")
@@ -7,7 +7,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstbuffer.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstbuffer.h
 
 (define-enum-extended BufferFlag
   (in-module "Gst")
@@ -17,14 +17,17 @@
   )
 )
 
-(define-enum-extended BufferCopyFlags
+(define-flags-extended BufferCopyFlags
   (in-module "Gst")
   (c-name "GstBufferCopyFlags")
   (values
+    '("flags" "GST_BUFFER_COPY_FLAGS" "1 << 0")
+    '("timestamps" "GST_BUFFER_COPY_TIMESTAMPS" "1 << 1")
+    '("caps" "GST_BUFFER_COPY_CAPS" "1 << 2")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstbus.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstbus.h
 
 (define-enum-extended BusFlags
   (in-module "Gst")
@@ -43,16 +46,17 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstcaps.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstcaps.h
 
-(define-enum-extended CapsFlags
+(define-flags-extended CapsFlags
   (in-module "Gst")
   (c-name "GstCapsFlags")
   (values
+    '("y" "GST_CAPS_FLAGS_ANY" "1 << 0")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstclock.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstclock.h
 
 (define-enum-extended ClockReturn
   (in-module "Gst")
@@ -84,16 +88,20 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstdebugutils.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstdebugutils.h
 
-(define-enum-extended DebugGraphDetails
+(define-flags-extended DebugGraphDetails
   (in-module "Gst")
   (c-name "GstDebugGraphDetails")
   (values
+    '("media-type" "GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE" "1<<0")
+    '("caps-details" "GST_DEBUG_GRAPH_SHOW_CAPS_DETAILS" "1<<1")
+    '("non-default-params" "GST_DEBUG_GRAPH_SHOW_NON_DEFAULT_PARAMS" "1<<2")
+    '("states" "GST_DEBUG_GRAPH_SHOW_STATES" "1<<3")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstelement.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstelement.h
 
 (define-enum-extended State
   (in-module "Gst")
@@ -132,7 +140,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gsterror.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gsterror.h
 
 (define-enum-extended CoreError
   (in-module "Gst")
@@ -211,7 +219,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstevent.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstevent.h
 
 (define-flags-extended EventTypeFlags
   (in-module "Gst")
@@ -223,7 +231,37 @@
   )
 )
 
-
+(define-enum-extended EventType
+  (in-module "Gst")
+  (c-name "GstEventType")
+  (values
+    '("gst-event-unknown" "GST_EVENT_UNKNOWN" "#error")
+    '("0)" "0)" "1")
+    '("gst-event-flush-start" "GST_EVENT_FLUSH_START" "2")
+    '("flag(both))" "FLAG(BOTH))" "3")
+    '("gst-event-flush-stop" "GST_EVENT_FLUSH_STOP" "4")
+    '("gst-event-eos" "GST_EVENT_EOS" "6")
+    '("gst-event-newsegment" "GST_EVENT_NEWSEGMENT" "8")
+    '("gst-event-tag" "GST_EVENT_TAG" "10")
+    '("gst-event-buffersize" "GST_EVENT_BUFFERSIZE" "12")
+    '("gst-event-qos" "GST_EVENT_QOS" "14")
+    '("flag(upstream))" "FLAG(UPSTREAM))" "15")
+    '("gst-event-seek" "GST_EVENT_SEEK" "16")
+    '("flag(upstream))" "FLAG(UPSTREAM))" "17")
+    '("gst-event-navigation" "GST_EVENT_NAVIGATION" "18")
+    '("flag(upstream))" "FLAG(UPSTREAM))" "19")
+    '("gst-event-latency" "GST_EVENT_LATENCY" "20")
+    '("flag(upstream))" "FLAG(UPSTREAM))" "21")
+    '("gst-event-custom-upstream" "GST_EVENT_CUSTOM_UPSTREAM" "22")
+    '("flag(upstream))" "FLAG(UPSTREAM))" "23")
+    '("gst-event-custom-downstream" "GST_EVENT_CUSTOM_DOWNSTREAM" "24")
+    '("gst-event-custom-downstream-oob" "GST_EVENT_CUSTOM_DOWNSTREAM_OOB" "26")
+    '("flag(downstream))" "FLAG(DOWNSTREAM))" "27")
+    '("gst-event-custom-both" "GST_EVENT_CUSTOM_BOTH" "28")
+    '("gst-event-custom-both-oob" "GST_EVENT_CUSTOM_BOTH_OOB" "30")
+    '("flag(both))" "FLAG(BOTH))" "31")
+  )
+)
 
 (define-enum-extended SeekType
   (in-module "Gst")
@@ -236,15 +274,19 @@
   )
 )
 
-(define-enum-extended SeekFlags
+(define-flags-extended SeekFlags
   (in-module "Gst")
   (c-name "GstSeekFlags")
   (values
-    '("e" "GST_SEEK_FLAG_NONE" "0")
+    '("none" "GST_SEEK_FLAG_NONE" "0")
+    '("flush" "GST_SEEK_FLAG_FLUSH" "1 << 0")
+    '("accurate" "GST_SEEK_FLAG_ACCURATE" "1 << 1")
+    '("key-unit" "GST_SEEK_FLAG_KEY_UNIT" "1 << 2")
+    '("segment" "GST_SEEK_FLAG_SEGMENT" "1 << 3")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstformat.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstformat.h
 
 (define-enum-extended Format
   (in-module "Gst")
@@ -259,7 +301,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstindex.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstindex.h
 
 (define-enum-extended IndexCertainty
   (in-module "Gst")
@@ -292,11 +334,14 @@
   )
 )
 
-(define-enum-extended AssocFlags
+(define-flags-extended AssocFlags
   (in-module "Gst")
   (c-name "GstAssocFlags")
   (values
-    '("e" "GST_ASSOCIATION_FLAG_NONE" "0")
+    '("none" "GST_ASSOCIATION_FLAG_NONE" "0")
+    '("key-unit" "GST_ASSOCIATION_FLAG_KEY_UNIT" "1 << 0")
+    '("delta-unit" "GST_ASSOCIATION_FLAG_DELTA_UNIT" "1 << 1")
+    '("last" "GST_ASSOCIATION_FLAG_LAST" "1 << 8")
   )
 )
 
@@ -317,7 +362,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstinfo.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstinfo.h
 
 (define-enum-extended DebugLevel
   (in-module "Gst")
@@ -358,7 +403,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstiterator.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstiterator.h
 
 (define-enum-extended IteratorResult
   (in-module "Gst")
@@ -381,36 +426,63 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstmessage.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstmessage.h
 
-(define-enum-extended MessageType
+(define-flags-extended MessageType
   (in-module "Gst")
   (c-name "GstMessageType")
   (values
     '("unknown" "GST_MESSAGE_UNKNOWN" "0")
-    '("any" "GST_MESSAGE_ANY" "4294967295")
+    '("eos" "GST_MESSAGE_EOS" "1 << 0")
+    '("error" "GST_MESSAGE_ERROR" "1 << 1")
+    '("warning" "GST_MESSAGE_WARNING" "1 << 2")
+    '("info" "GST_MESSAGE_INFO" "1 << 3")
+    '("tag" "GST_MESSAGE_TAG" "1 << 4")
+    '("buffering" "GST_MESSAGE_BUFFERING" "1 << 5")
+    '("state-changed" "GST_MESSAGE_STATE_CHANGED" "1 << 6")
+    '("state-dirty" "GST_MESSAGE_STATE_DIRTY" "1 << 7")
+    '("step-done" "GST_MESSAGE_STEP_DONE" "1 << 8")
+    '("clock-provide" "GST_MESSAGE_CLOCK_PROVIDE" "1 << 9")
+    '("clock-lost" "GST_MESSAGE_CLOCK_LOST" "1 << 10")
+    '("new-clock" "GST_MESSAGE_NEW_CLOCK" "1 << 11")
+    '("structure-change" "GST_MESSAGE_STRUCTURE_CHANGE" "1 << 12")
+    '("stream-status" "GST_MESSAGE_STREAM_STATUS" "1 << 13")
+    '("application" "GST_MESSAGE_APPLICATION" "1 << 14")
+    '("element" "GST_MESSAGE_ELEMENT" "1 << 15")
+    '("segment-start" "GST_MESSAGE_SEGMENT_START" "1 << 16")
+    '("segment-done" "GST_MESSAGE_SEGMENT_DONE" "1 << 17")
+    '("duration" "GST_MESSAGE_DURATION" "1 << 18")
+    '("latency" "GST_MESSAGE_LATENCY" "1 << 19")
+    '("async-start" "GST_MESSAGE_ASYNC_START" "1 << 20")
+    '("async-done" "GST_MESSAGE_ASYNC_DONE" "1 << 21")
+    '("any" "GST_MESSAGE_ANY" "0xFFFFFFFFFFFFFFFF")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstminiobject.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstminiobject.h
 
-(define-enum-extended MiniObjectFlags
+(define-flags-extended MiniObjectFlags
   (in-module "Gst")
   (c-name "GstMiniObjectFlags")
   (values
+    '("readonly" "GST_MINI_OBJECT_FLAG_READONLY" "1<<0")
+    '("last" "GST_MINI_OBJECT_FLAG_LAST" "1<<4")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstobject.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstobject.h
 
-(define-enum-extended ObjectFlags
+(define-flags-extended ObjectFlags
   (in-module "Gst")
   (c-name "GstObjectFlags")
   (values
+    '("disposing" "GST_OBJECT_DISPOSING" "1<<0")
+    '("floating" "GST_OBJECT_FLOATING" "1<<1")
+    '("flag-last" "GST_OBJECT_FLAG_LAST" "1<<4")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstpad.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstpad.h
 
 (define-enum-extended PadLinkReturn
   (in-module "Gst")
@@ -470,7 +542,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstpadtemplate.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstpadtemplate.h
 
 (define-enum-extended PadPresence
   (in-module "Gst")
@@ -489,7 +561,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstparse.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstparse.h
 
 (define-enum-extended ParseError
   (in-module "Gst")
@@ -505,7 +577,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstpipeline.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstpipeline.h
 
 (define-enum-extended PipelineFlags
   (in-module "Gst")
@@ -514,7 +586,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstpluginfeature.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstpluginfeature.h
 
 (define-enum-extended Rank
   (in-module "Gst")
@@ -527,7 +599,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstplugin.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstplugin.h
 
 (define-enum-extended PluginError
   (in-module "Gst")
@@ -539,39 +611,15 @@
   )
 )
 
-(define-enum-extended PluginFlags
+(define-flags-extended PluginFlags
   (in-module "Gst")
   (c-name "GstPluginFlags")
   (values
+    '("d" "GST_PLUGIN_FLAG_CACHED" "1<<0")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstquark.h
-
-(define-enum-extended QuarkId
-  (in-module "Gst")
-  (c-name "GstQuarkId")
-  (values
-    '("format" "GST_QUARK_FORMAT" "0")
-    '("current" "GST_QUARK_CURRENT" "1")
-    '("duration" "GST_QUARK_DURATION" "2")
-    '("rate" "GST_QUARK_RATE" "3")
-    '("seekable" "GST_QUARK_SEEKABLE" "4")
-    '("segment-start" "GST_QUARK_SEGMENT_START" "5")
-    '("segment-end" "GST_QUARK_SEGMENT_END" "6")
-    '("src-format" "GST_QUARK_SRC_FORMAT" "7")
-    '("src-value" "GST_QUARK_SRC_VALUE" "8")
-    '("dest-format" "GST_QUARK_DEST_FORMAT" "9")
-    '("dest-value" "GST_QUARK_DEST_VALUE" "10")
-    '("start-format" "GST_QUARK_START_FORMAT" "11")
-    '("start-value" "GST_QUARK_START_VALUE" "12")
-    '("stop-format" "GST_QUARK_STOP_FORMAT" "13")
-    '("stop-value" "GST_QUARK_STOP_VALUE" "14")
-    '("max" "GST_QUARK_MAX" "15")
-  )
-)
-
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gstquery.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstquery.h
 
 (define-enum-extended QueryType
   (in-module "Gst")
@@ -590,7 +638,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gsttaglist.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gsttaglist.h
 
 (define-enum-extended TagMergeMode
   (in-module "Gst")
@@ -619,7 +667,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gsttask.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gsttask.h
 
 (define-enum-extended TaskState
   (in-module "Gst")
@@ -631,16 +679,18 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gsttrace.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gsttrace.h
 
-(define-enum-extended AllocTraceFlags
+(define-flags-extended AllocTraceFlags
   (in-module "Gst")
   (c-name "GstAllocTraceFlags")
   (values
+    '("live" "GST_ALLOC_TRACE_LIVE" "1 << 0")
+    '("mem-live" "GST_ALLOC_TRACE_MEM_LIVE" "1 << 1")
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gsttypefind.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gsttypefind.h
 
 (define-enum-extended TypeFindProbability
   (in-module "Gst")
@@ -654,7 +704,7 @@
   )
 )
 
-;; From /home/murrayc/svn/gnome220/gstreamer/gst/gsturi.h
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gsturi.h
 
 (define-enum-extended URIType
   (in-module "Gst")

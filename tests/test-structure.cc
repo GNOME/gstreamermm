@@ -9,7 +9,6 @@ int main (int argc, char* argv[])
   Glib::RefPtr<Gst::Query> latencyQuery = Gst::QueryLatency::create();
   Gst::Structure structure = latencyQuery->get_structure();
 
-
   Glib::Value<Glib::ustring> stringValue;
   stringValue.init(Glib::Value<Glib::ustring>::value_type());
   stringValue.set("Hello; This is a ustring.");
