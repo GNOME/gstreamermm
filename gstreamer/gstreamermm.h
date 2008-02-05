@@ -2,6 +2,7 @@
 #define _GSTREAMERMM_H_
 
 #include <gstreamermm/bin.h>
+#include <gstreamermm/buffer.h>
 #include <gstreamermm/bus.h>
 #include <gstreamermm/caps.h>
 #include <gstreamermm/clock.h>
