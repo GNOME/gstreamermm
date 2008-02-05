@@ -16,10 +16,6 @@ public:
   const Structure& get_structure();
 
 public:
-  _MEMBER_GET(event_type, type, EventType, GstEventType)
-  _MEMBER_GET(timestamp, timestamp, ClockTime, guint64)
-  _MEMBER_GET(source, src, Glib::RefPtr<Gst::Object>, GstObject)
-
   /** Wrap a GstEvent* in a C++ instance, creating an instance of a derived
    * Gst::Event. Gst::wrap() would just create a Gst::Event (rather than a
    * derived one) because the derived Gst::Event classes do not correspond
@@ -30,6 +26,10 @@ public:
   bool is_downstream() const;
   bool is_upstream() const;
   bool is_serialized() const;
+
+  _MEMBER_GET(event_type, type, EventType, GstEventType)
+  _MEMBER_GET(timestamp, timestamp, ClockTime, guint64)
+  _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
 
 protected:
   Structure structure_;

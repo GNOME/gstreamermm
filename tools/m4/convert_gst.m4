@@ -8,7 +8,9 @@ _CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
 _CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
 ')dnl
 
-_CONVERSION(`GstObject',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3, true)')
+_CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
+_CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
+
 #_CONVERSION(`Glib::RefPtr<Object>&',`GstObject*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`State&',`GstState*',`((GstState*) (&($3)))')
 _CONVERSION(`GstClockTime',`ClockTime',`$3')
@@ -44,7 +46,6 @@ _CONVERSION(`GstBuffer*',`Glib::RefPtr<Buffer>',`wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Buffer>&',`GstBuffer*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Buffer>&',`const GstBuffer*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<Buffer>',`GstBuffer*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`GstCaps*',`Glib::RefPtr<Caps const>',`wrap($3)')
 
 _CONVERSION(`Structure&',`GstStructure*',`((GstStructure*)(&($3)))')
 _CONVERSION(`GstStructure*',`Structure*',`((Structure*) ($3))')

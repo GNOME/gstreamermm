@@ -1,0 +1,69 @@
+#include <gstreamermm/miniobject.h>
+#include <gstreamermm/wrap.h>
+#include <gstreamermm/enums.h>
+#include <gstreamermm/caps.h>
+#include <gstreamermm/clock.h>
+_PINCLUDE(gstreamermm/private/miniobject_p.h)
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class Buffer : public MiniObject
+{
+protected:
+  _CLASS_GSTMINIOBJECT(Buffer, GstBuffer, GST_BUFFER, Gst::MiniObject, GstMiniObject)
+
+public:
+  static Glib::RefPtr<Buffer> create(const guint& size);
+
+  _WRAP_METHOD(guint flags() const, GST_BUFFER_FLAGS)
+  _WRAP_METHOD(bool flag_is_set(BufferFlag flag) const, GST_BUFFER_FLAG_IS_SET)
+  _WRAP_METHOD(void flag_set(BufferFlag flag), GST_BUFFER_FLAG_SET)
+  _WRAP_METHOD(void flag_unset(BufferFlag flag), GST_BUFFER_FLAG_UNSET)
+
+  _WRAP_METHOD(Glib::RefPtr<Buffer> copy() const, gst_buffer_copy)
+
+  _WRAP_METHOD(void copy_metadata(const Glib::RefPtr<Buffer>& source_buffer, BufferCopyFlags flags), gst_buffer_copy_metadata)
+
+  _WRAP_METHOD(bool is_metadata_writable() const, gst_buffer_is_metadata_writable)
+
+  //This is not const because it sometimes returns the same buffer:
+  _WRAP_METHOD(Glib::RefPtr<Buffer> make_writable(), gst_buffer_make_writable)
+
+  //This is const because it always returns a new buffer:
+  _WRAP_METHOD(Glib::RefPtr<Buffer> make_metadata_writable() const, gst_buffer_make_metadata_writable)
+
+  // TODO: Do we need to hand code this to throw an exception when the C API returns NULL ?
+  _WRAP_METHOD(Glib::RefPtr<Caps> get_caps(), gst_buffer_get_caps)
+  _WRAP_METHOD(Glib::RefPtr<Caps const> get_caps() const, gst_buffer_get_caps, constversion)
+
+  _WRAP_METHOD(void set_caps(const Glib::RefPtr<Caps>& caps), gst_buffer_set_caps)
+
+  // TODO: Do we need to hand code this to throw an exception when the C API returns NULL ?
+  _WRAP_METHOD(Glib::RefPtr<Buffer> create_sub(const guint& offset, const guint& size), gst_buffer_create_sub)
+  _WRAP_METHOD(Glib::RefPtr<Buffer const> create_sub(const guint& offset, const guint& size) const, gst_buffer_create_sub, constversion)
+
+  _WRAP_METHOD(bool is_span_fast(const Glib::RefPtr<Buffer>& other_buffer) const, gst_buffer_is_span_fast)
+
+  //This is const because it always returns a new buffer:
+  _WRAP_METHOD(Glib::RefPtr<Buffer> span(const guint32& offset, const Glib::RefPtr<Buffer>& other_buffer, const guint32& len) const, gst_buffer_span)
+
+  _WRAP_METHOD(Glib::RefPtr<Buffer> join(const Glib::RefPtr<Buffer>& other_buffer), gst_buffer_join)
+
+  //This is const because it always returns a new buffer:
+  _WRAP_METHOD(Glib::RefPtr<Buffer> join(const Glib::RefPtr<Buffer>& other_buffer) const, gst_buffer_join)
+
+  //This is const because it always returns a new buffer: (TODO: though maybe not: see the documentation. murrayc)
+  _WRAP_METHOD(Glib::RefPtr<Buffer> merge(const Glib::RefPtr<Buffer>& other_buffer) const, gst_buffer_merge)
+
+  _MEMBER_GET(data, data, guint8*, guint8*)
+  _MEMBER_GET(size, size, guint, guint)
+  _MEMBER_GET(timestamp, timestamp, ClockTime, GstClockTime)
+  _MEMBER_GET(duration, duration, ClockTime, GstClockTime)
+  _MEMBER_GET(offset, offset, guint64, guint64)
+  _MEMBER_GET(offset_end, offset_end, guint64, guint64)
+  _MEMBER_GET(malloc_data, malloc_data, guint8*, guint8*)
+};
+
+}//namespace Gst

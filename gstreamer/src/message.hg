@@ -16,9 +16,6 @@ public:
   const Structure& get_structure();
 
 public:
-  _MEMBER_GET(message_type, type, MessageType, GstMessageType)
-  _MEMBER_GET(timestamp, timestamp, ClockTime, guint64)
-  _MEMBER_GET(source, src, Glib::RefPtr<Gst::Object>, GstObject)
 
   /** Wrap a GstMessage* in a C++ instance, creating an instance of a
    *  derived Gst::Message.  Gst::wrap() would just create a Gst::Message
@@ -26,6 +23,10 @@ public:
    *  do not correspond to GType types in the GStreamer API.
    */
   static Glib::RefPtr<Message> wrap(GstMessage* message, bool take_copy=false);
+
+  _MEMBER_GET(message_type, type, MessageType, GstMessageType)
+  _MEMBER_GET(timestamp, timestamp, ClockTime, guint64)
+  _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
 
 protected: 
   Structure structure_;
