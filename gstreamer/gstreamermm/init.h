@@ -1,6 +1,6 @@
 // -*- c++ -*-
-#ifndef _GSTMM_INIT_H
-#define _GSTMM_INIT_H
+#ifndef _GSTREAMERMM_INIT_H
+#define _GSTREAMERMM_INIT_H
 
 #include "wrap_init.h"
 #include <string.h>
@@ -14,5 +14,5 @@ Glib::OptionGroup init_get_option_group();
   
 }//end namespace Gst
 
-#endif //_GSTMM_INIT_H
+#endif //_GSTREAMERMM_INIT_H
 

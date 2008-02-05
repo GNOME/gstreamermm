@@ -5,9 +5,9 @@ SUBDIRS                 = private
 
 sublib_name             = gstreamermm
 sublib_libname          = gstreamermm-0.10
-sublib_libversion       = $(LIBGSTMM_SO_VERSION)
+sublib_libversion       = $(LIBGSTREAMERMM_SO_VERSION)
 sublib_namespace        = Gst
-sublib_cflags           = $(GSTMM_CFLAGS)
+sublib_cflags           = $(GSTREAMERMM_CFLAGS)
 sublib_topdir           = gstreamer
 sublib_win32_dlls_libs	=
 
@@ -26,5 +26,5 @@ include $(top_srcdir)/build_shared/Makefile_build.am_fragment
 lib_LTLIBRARIES = libgstreamermm-0.10.la
 libgstreamermm_0_10_la_SOURCES = $(files_built_cc) $(files_extra_cc)
 libgstreamermm_0_10_la_LDFLAGS = $(common_ldflags)
-libgstreamermm_0_10_la_LIBADD  = $(GSTMM_LIBS)
+libgstreamermm_0_10_la_LIBADD  = $(GSTREAMERMM_LIBS)
 

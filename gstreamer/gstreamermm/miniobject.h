@@ -1,5 +1,5 @@
-#ifndef _GSTMM_MINIOBJECT_H
-#define _GSTMM_MINIOBJECT_H
+#ifndef _GSTREAMERMM_MINIOBJECT_H
+#define _GSTREAMERMM_MINIOBJECT_H
 
 #include <glibmm/objectbase.h>
 #include <gst/gstminiobject.h>
@@ -71,5 +71,5 @@ namespace Glib
 } //namespace Glib
 */
 
-#endif //#ifndef _GSTMM_MINIOBJECT_H
+#endif //#ifndef _GSTREAMERMM_MINIOBJECT_H
 

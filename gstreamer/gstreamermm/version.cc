@@ -1,14 +1,14 @@
 #include "version.h"
-#include <gstmmconfig.h>
+#include <gstreamermmconfig.h>
 
 namespace Gst
 {
 
 void version(guint& major, guint& minor, guint& micro)
 {
-  major = GSTMM_MAJOR_VERSION;
-  minor = GSTMM_MINOR_VERSION;
-  micro = GSTMM_MICRO_VERSION;
+  major = GSTREAMERMM_MAJOR_VERSION;
+  minor = GSTREAMERMM_MINOR_VERSION;
+  micro = GSTREAMERMM_MICRO_VERSION;
 }
 
 }//end namespace Gst

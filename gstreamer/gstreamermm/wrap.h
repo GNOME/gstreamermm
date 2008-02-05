@@ -1,6 +1,6 @@
 // -*- c++ -*-
-#ifndef _GSTMM_WRAP_H
-#define _GSTMM_WRAP_H
+#ifndef _GSTREAMERMM_WRAP_H
+#define _GSTREAMERMM_WRAP_H
 
 /* $Id: wrap.h 447 2007-10-03 09:51:41Z murrayc $ */
 
@@ -162,5 +162,5 @@ extern GLIBMM_API GQuark quark_cpp_wrapper_deleted_;
 } // namespace Gst
 
 
-#endif /* _GSTMM_WRAP_H */
+#endif /* _GSTREAMERMM_WRAP_H */
 

@@ -13,37 +13,37 @@
 #
 
 #We use pushdef here because we can't use shell variables before AC_INIT, but we want to use a variable with AC_INIT:
-pushdef([GSTMM_MAJOR_VERSION],     [0])
-pushdef([GSTMM_MINOR_VERSION],     [9])
-pushdef([GSTMM_MICRO_VERSION],     [2])
-pushdef([GSTMM_EXTRA_VERSION],     [])
-pushdef([GSTMM_VERSION], GSTMM_MAJOR_VERSION.GSTMM_MINOR_VERSION.GSTMM_MICRO_VERSION[]GSTMM_EXTRA_VERSION)
-AC_INIT([gstreamermm], GSTMM_VERSION, [Milosz Derezynski <internalerror@gmail.com>, Rob Page <page.rob@gmail.com>, Dodji Seketeli <dodji@gnome.org>])
-AC_CONFIG_SRCDIR([gstreamer/gstmmconfig.h.in])
+pushdef([GSTREAMERMM_MAJOR_VERSION],     [0])
+pushdef([GSTREAMERMM_MINOR_VERSION],     [9])
+pushdef([GSTREAMERMM_MICRO_VERSION],     [2])
+pushdef([GSTREAMERMM_EXTRA_VERSION],     [])
+pushdef([GSTREAMERMM_VERSION], GSTREAMERMM_MAJOR_VERSION.GSTREAMERMM_MINOR_VERSION.GSTREAMERMM_MICRO_VERSION[]GSTREAMERMM_EXTRA_VERSION)
+AC_INIT([gstreamermm], GSTREAMERMM_VERSION, [Milosz Derezynski <internalerror@gmail.com>, Rob Page <page.rob@gmail.com>, Dodji Seketeli <dodji@gnome.org>])
+AC_CONFIG_SRCDIR([gstreamer/gstreamermmconfig.h.in])
 AC_PREREQ(2.59)
 
 #########################################################################
 #  Version and initialization
 #########################################################################
-[GSTMM_MAJOR_VERSION]=GSTMM_MAJOR_VERSION
-[GSTMM_MINOR_VERSION]=GSTMM_MINOR_VERSION
-[GSTMM_MICRO_VERSION]=GSTMM_MICRO_VERSION
-[GSTMM_EXTRA_VERSION]=GSTMM_EXTRA_VERSION
-[GSTMM_VERSION]=GSTMM_VERSION
-popdef([GSTMM_MAJOR_VERSION])
-popdef([GSTMM_MINOR_VERSION])
-popdef([GSTMM_MICRO_VERSION])
-popdef([GSTMM_EXTRA_VERSION])
-popdef([GSTMM_VERSION])
-GSTMM_RELEASE=$GSTMM_MAJOR_VERSION.$GSTMM_MINOR_VERSION
-AC_DEFINE_UNQUOTED(GSTMM_MAJOR_VERSION, $GSTMM_MAJOR_VERSION, [Major version of gstreamermm])
-AC_DEFINE_UNQUOTED(GSTMM_MINOR_VERSION, $GSTMM_MINOR_VERSION, [Minor version of gstreamermm])
-AC_DEFINE_UNQUOTED(GSTMM_MICRO_VERSION, $GSTMM_MICRO_VERSION, [Micro version of gstreamermm])
-AC_SUBST(GSTMM_MAJOR_VERSION)
-AC_SUBST(GSTMM_MINOR_VERSION)
-AC_SUBST(GSTMM_MICRO_VERSION)
-AC_SUBST(GSTMM_VERSION)
-AC_SUBST(GSTMM_RELEASE)
+[GSTREAMERMM_MAJOR_VERSION]=GSTREAMERMM_MAJOR_VERSION
+[GSTREAMERMM_MINOR_VERSION]=GSTREAMERMM_MINOR_VERSION
+[GSTREAMERMM_MICRO_VERSION]=GSTREAMERMM_MICRO_VERSION
+[GSTREAMERMM_EXTRA_VERSION]=GSTREAMERMM_EXTRA_VERSION
+[GSTREAMERMM_VERSION]=GSTREAMERMM_VERSION
+popdef([GSTREAMERMM_MAJOR_VERSION])
+popdef([GSTREAMERMM_MINOR_VERSION])
+popdef([GSTREAMERMM_MICRO_VERSION])
+popdef([GSTREAMERMM_EXTRA_VERSION])
+popdef([GSTREAMERMM_VERSION])
+GSTREAMERMM_RELEASE=$GSTREAMERMM_MAJOR_VERSION.$GSTREAMERMM_MINOR_VERSION
+AC_DEFINE_UNQUOTED(GSTREAMERMM_MAJOR_VERSION, $GSTREAMERMM_MAJOR_VERSION, [Major version of gstreamermm])
+AC_DEFINE_UNQUOTED(GSTREAMERMM_MINOR_VERSION, $GSTREAMERMM_MINOR_VERSION, [Minor version of gstreamermm])
+AC_DEFINE_UNQUOTED(GSTREAMERMM_MICRO_VERSION, $GSTREAMERMM_MICRO_VERSION, [Micro version of gstreamermm])
+AC_SUBST(GSTREAMERMM_MAJOR_VERSION)
+AC_SUBST(GSTREAMERMM_MINOR_VERSION)
+AC_SUBST(GSTREAMERMM_MICRO_VERSION)
+AC_SUBST(GSTREAMERMM_VERSION)
+AC_SUBST(GSTREAMERMM_RELEASE)
 
 #
 # +1 : ? : +1  == new interface that does not break old one
@@ -52,8 +52,8 @@ AC_SUBST(GSTMM_RELEASE)
 #  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
 #                 better
 # CURRENT : REVISION : AGE
-LIBGSTMM_SO_VERSION=2:1:0
-AC_SUBST(LIBGSTMM_SO_VERSION)
+LIBGSTREAMERMM_SO_VERSION=2:1:0
+AC_SUBST(LIBGSTREAMERMM_SO_VERSION)
 
 AC_CONFIG_AUX_DIR(scripts)
 
@@ -62,7 +62,7 @@ AC_CONFIG_AUX_DIR(scripts)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 
 dnl Specify a configuration file (no autoheader)
-AM_CONFIG_HEADER(config.h gstreamer/gstmmconfig.h)
+AM_CONFIG_HEADER(config.h gstreamer/gstreamermmconfig.h)
 AM_MAINTAINER_MODE
 AL_ACLOCAL_INCLUDE(scripts)
 
@@ -126,9 +126,9 @@ gstreamermm_min_glibmm_version=2.8.0
 gstreamermm_min_gtkmm_version=2.10
 gstreamermm_min_gst_version=0.10
 
-PKG_CHECK_MODULES(GSTMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-0.10 >= ${gstreamermm_min_gst_version})
-AC_SUBST(GSTMM_CFLAGS)
-AC_SUBST(GSTMM_LIBS)
+PKG_CHECK_MODULES(GSTREAMERMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-0.10 >= ${gstreamermm_min_gst_version})
+AC_SUBST(GSTREAMERMM_CFLAGS)
+AC_SUBST(GSTREAMERMM_LIBS)
 
 # This macro is installed by glibmm
 # Doxygen needs the path to the installed perl.
@@ -188,10 +188,10 @@ AC_LANG_CPLUSPLUS
 
 
 # Create a list of input directories for Doxygen.
-#GSTMM_DOXYGEN_INPUT_SUBDIRS([gst])
+#GSTREAMERMM_DOXYGEN_INPUT_SUBDIRS([gst])
 
 # Evaluate the --enable-warnings=level option.
-GSTMM_ARG_ENABLE_WARNINGS()
+GSTREAMERMM_ARG_ENABLE_WARNINGS()
 
 # Add an --enable-use-deprecations configure option:
 AC_ARG_ENABLE(deprecations,
@@ -228,9 +228,9 @@ AC_ARG_ENABLE(examples,
 if test "x$enable_examples" = "xyes"; then
 
 #Extra dependencies needed for the examples. Use --enable-examples=no to build the library without this.
-PKG_CHECK_MODULES(GSTMM_EXAMPLES, gtkmm-2.4 >= ${gstreamermm_min_gtkmm_version})
-AC_SUBST(GSTMM_EXAMPLES_CFLAGS)
-AC_SUBST(GSTMM_EXAMPLES_LIBS)
+PKG_CHECK_MODULES(GSTREAMERMM_EXAMPLES, gtkmm-2.4 >= ${gstreamermm_min_gtkmm_version})
+AC_SUBST(GSTREAMERMM_EXAMPLES_CFLAGS)
+AC_SUBST(GSTREAMERMM_EXAMPLES_LIBS)
 
 EXAMPLE_SUBDIR="examples"
 AC_CONFIG_FILES([
@@ -288,7 +288,7 @@ AC_SUBST(DOCS_SUBDIR)
 
 # Dummy conditional just to make automake-1.4 happy.
 # We need an always-false condition in docs/Makefile.am.
-AM_CONDITIONAL(GSTMM_FALSE,[false])
+AM_CONDITIONAL(GSTREAMERMM_FALSE,[false])
 
 # HACK:  Assign a dummy in order to prevent execution of autoheader by the
 # maintainer-mode rules.  That would fail since we aren't using autoheader.

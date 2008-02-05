@@ -1,5 +1,5 @@
-#ifndef _GSTMM_OBJECT_H
-#define _GSTMM_OBJECT_H
+#ifndef _GSTREAMERMM_OBJECT_H
+#define _GSTREAMERMM_OBJECT_H
 
 
 #include <glibmm.h>
@@ -136,5 +136,5 @@ namespace Glib
 }
 
 
-#endif /* _GSTMM_OBJECT_H */
+#endif /* _GSTREAMERMM_OBJECT_H */
 

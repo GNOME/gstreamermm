@@ -1,5 +1,5 @@
-#ifndef _GSTMM_H_
-#define _GSTMM_H_
+#ifndef _GSTREAMERMM_H_
+#define _GSTREAMERMM_H_
 
 #include <gstreamermm/bin.h>
 #include <gstreamermm/bus.h>
@@ -25,5 +25,5 @@
 #include <gstreamermm/version.h>
 #include <gstreamermm/wrap_init.h>
 
-#endif // _GSTMM_H
+#endif // _GSTREAMERMM_H
 

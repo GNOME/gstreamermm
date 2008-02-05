@@ -1,5 +1,5 @@
-#ifndef _GSTMM_MINIOBJECT_P_H
-#define _GSTMM_MINIOBJECT_P_H
+#ifndef _GSTREAMERMM_MINIOBJECT_P_H
+#define _GSTREAMERMM_MINIOBJECT_P_H
 
 #include <glibmm/class.h>
 
@@ -26,5 +26,5 @@ public:
 } // namespace Gst
 
 
-#endif /* _GSTMM_MINIOBJECT_P_H */
+#endif /* _GSTREAMERMM_MINIOBJECT_P_H */
 
