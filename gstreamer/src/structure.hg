@@ -15,18 +15,13 @@ public:
 
 public:
   Structure(const Glib::ustring& name);
-  Structure(const Glib::QueryQuark& quark);
 
   _WRAP_METHOD(int size() const, gst_structure_n_fields)
   _WRAP_METHOD(void clear(), gst_structure_remove_all_fields)
 
-  void get_field(const Glib::QueryQuark& field, Glib::ValueBase& value) const;
-
-  _WRAP_METHOD(void set_field(const Glib::QueryQuark& field, const Glib::ValueBase& value), gst_structure_id_set_value)
+  _WRAP_METHOD(void set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value), gst_structure_set_value)
 
   void get_field(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
-
-  _WRAP_METHOD(void set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value), gst_structure_set_value)
 
   _WRAP_METHOD(void remove_field(const Glib::ustring& fieldname), gst_structure_remove_field)
   _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)

@@ -5,7 +5,6 @@ int main (int argc, char* argv[])
 {
   Gst::init(argc, argv);
 
-  Glib::ustring fieldName = "field";
   Glib::RefPtr<Gst::Query> latencyQuery = Gst::QueryLatency::create();
   Gst::Structure structure = latencyQuery->get_structure();
 
@@ -13,10 +12,10 @@ int main (int argc, char* argv[])
   stringValue.init(Glib::Value<Glib::ustring>::value_type());
   stringValue.set("Hello; This is a ustring.");
 
-  structure.set_field(fieldName, stringValue);
+  structure.set_field("string", stringValue);
 
   Glib::Value<Glib::ustring> value;
-  structure.get_field(fieldName, value);
+  structure.get_field("string", value);
   std::cout << "value = '" << value.get() << "'" << std::endl;
 
   return 0;
