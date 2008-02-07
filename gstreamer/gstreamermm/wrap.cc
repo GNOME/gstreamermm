@@ -1,9 +1,8 @@
 // -*- c++ -*-
 /* $Id: wrap.cc 447 2007-10-03 09:51:41Z murrayc $ */
-
 /* wrap.cc
  *
- * Copyright (C) 1998-2002 The gtkmm Development Team
+ * Copyright (C) 2008 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
