@@ -2,10 +2,13 @@ INCLUDES=-I$(top_srcdir) -I$(top_srcdir)/gstreamer @GSTREAMERMM_CFLAGS@
 
 LDADD=$(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la
 
-noinst_PROGRAMS = test-create-element test-pipeline-add-element \
+noinst_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \
                   test-message-wrap test-event-wrap test-query-wrap \
 		  test-structure
+
+test_caps_SOURCES=test-caps.cc
+test_caps_LDFLAGS=@GSTREAMERMM_LIBS@
 
 test_create_element_SOURCES=test-create-element.cc
 test_create_element_LDFLAGS=@GSTREAMERMM_LIBS@

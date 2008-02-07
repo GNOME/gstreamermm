@@ -12,7 +12,7 @@ int main (int argc, char* argv[])
   stringValue.init(Glib::Value<Glib::ustring>::value_type());
   stringValue.set("Hello; This is a ustring.");
 
-  structure.set_field("string", stringValue);
+  structure.set_field(Glib::Quark("string"), stringValue);
 
   Glib::Value<Glib::ustring> value;
   structure.get_field("string", value);

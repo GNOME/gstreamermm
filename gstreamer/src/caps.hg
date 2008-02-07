@@ -15,10 +15,12 @@ public:
   //TODO: Why doesn't this use _WRAP_CREATE()?
   static Glib::RefPtr<Caps> create();
   static Glib::RefPtr<Caps> create_any();
+  static Glib::RefPtr<Caps> create_simple(const Glib::ustring& media_type);
+
+  //TODO: Parameter should be a list of Structures
   static Glib::RefPtr<Caps> create_full(Structure&);
 
   _WRAP_METHOD(Glib::RefPtr<Caps> copy() const, gst_caps_copy)
-
   _WRAP_METHOD(Glib::RefPtr<Caps> copy_nth(guint), gst_caps_copy_nth)
   _WRAP_METHOD(void append(const Glib::RefPtr<Caps>& caps), gst_caps_append)
   _WRAP_METHOD(void merge(const Glib::RefPtr<Caps>& caps), gst_caps_merge)
@@ -30,20 +32,29 @@ public:
   _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
   _WRAP_METHOD(guint get_size() const, gst_caps_get_size)
 
+  //TODO: Want to return RefPtr to Caps but using RefPtr in expressions such
+  //TODO: as 'caps->set_simple(name1, value1)->set_simple(name2, value2)' a
+  //TODO: causes Structure immutability warnings because the Caps is referenced
+  //TODO: more than once in the expression
+  void set_simple(const Glib::ustring& name, const Glib::ValueBase& value);
+
+  //TODO: Is this method useful? -Jose
   _WRAP_METHOD(void set_simple_valist(char* field, const va_list& varargs), gst_caps_set_simple_valist)
+
   _WRAP_METHOD(bool is_any() const, gst_caps_is_any)
-  _WRAP_METHOD(bool is_empty() const, gst_caps_is_empty)
-  _WRAP_METHOD(bool is_fixed() const, gst_caps_is_fixed)
-  _WRAP_METHOD(bool is_equal(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_equal)
-  _WRAP_METHOD(bool is_equal_fixed(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_equal_fixed)
-  _WRAP_METHOD(bool is_always_compatible(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_always_compatible)
-  _WRAP_METHOD(bool is_subset(const Glib::RefPtr<Caps>& superset_caps) const, gst_caps_is_subset)
+  _WRAP_METHOD(bool empty() const, gst_caps_is_empty)
+  _WRAP_METHOD(bool fixed() const, gst_caps_is_fixed)
+  _WRAP_METHOD(bool equals(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_equal)
+  _WRAP_METHOD(bool equals_fixed(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_equal_fixed)
+  _WRAP_METHOD(bool always_compatible(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_always_compatible)
+  _WRAP_METHOD(bool subset(const Glib::RefPtr<Caps>& superset_caps) const, gst_caps_is_subset)
   _WRAP_METHOD(Glib::RefPtr<Caps> intersect(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_intersect)
+  //Not named union because it is a C++ keyword
   _WRAP_METHOD(Glib::RefPtr<Caps> unions(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_union)
   _WRAP_METHOD(Glib::RefPtr<Caps> normalize(), gst_caps_normalize)
-  _WRAP_METHOD(bool do_simplify(), gst_caps_do_simplify)
-  _WRAP_METHOD(xmlNodePtr save_thyself(const xmlNodePtr& parent), gst_caps_save_thyself)
-  _WRAP_METHOD(static Glib::RefPtr<Caps> load_thyself(xmlNodePtr parent), gst_caps_load_thyself)
+  _WRAP_METHOD(bool simplify(), gst_caps_do_simplify)
+  _WRAP_METHOD(xmlNodePtr save(const xmlNodePtr& parent), gst_caps_save_thyself)
+  _WRAP_METHOD(static Glib::RefPtr<Caps> load(xmlNodePtr parent), gst_caps_load_thyself)
 
   _WRAP_METHOD(Glib::ustring to_string() const, gst_caps_to_string)
 

@@ -7,20 +7,53 @@ namespace Gst
 Glib::RefPtr<Caps>
 Caps::create()
 {
-  return Glib::wrap(gst_caps_new_empty(), false);
+  return Glib::wrap(gst_caps_new_empty());
 }
 
 Glib::RefPtr<Caps>
 Caps::create_any()
 {
-  return Glib::wrap(gst_caps_new_any(), false);
+  return Glib::wrap(gst_caps_new_any());
+}
+
+/*
+  This method is implemented because gst_caps_new_simple is a variable argument
+  function and cannot be wrapped.  In addition, because gst_caps_new_simple
+  creates a GstStructure for the GstCaps and will not be called, we must create
+  our own GstStructure here and append it to the GstCaps.
+*/
+Glib::RefPtr<Caps>
+Caps::create_simple(const Glib::ustring& media_type)
+{
+  Glib::RefPtr<Caps> result = Glib::wrap(gst_caps_new_empty());
+  GstStructure* gst_struct = gst_structure_empty_new(media_type.c_str());
+  gst_caps_append_structure(result->gobj(), gst_struct);
+  return result;
 }
 
 Glib::RefPtr<Caps>
 Caps::create_full(Structure& structure)
 {
-  return Glib::wrap(gst_caps_new_full(structure.gobj()), false);
+  return Glib::wrap(gst_caps_new_full(structure.gobj()));
 }
 
+/*
+  This method is implemented because gst_caps_set_simple is a variable argument
+  function and cannot be wrapped.  In addition, in order for
+  gst_caps_set_simple to work, this Caps must be "simple", ie, it must only
+  have one GstStructure (gst_caps_set_simple checks for this).  Here we must
+  set the field in the Structure ourselves so we must check for only one
+  Structure ourselves also (because we wont be calling gst_caps_set_simple)
+*/
+//Glib::RefPtr<Caps>
+void
+Caps::set_simple(const Glib::ustring& name, const Glib::ValueBase& value)
+{
+  //g_return_val_if_fail((gobj()->structs->len == 1), Glib::RefPtr<Caps>());
+  g_return_if_fail((gobj()->structs->len == 1));
+  gst_structure_set_value(gst_caps_get_structure(gobj(), 0), name.c_str(), value.gobj());
+
+  //return Glib::wrap(gobj(), true);
+}
 
 } //namespace Gst
