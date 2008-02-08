@@ -1,0 +1,54 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstchildproxy.h>
+#include <glibmm/interface.h>
+#include <gstreamermm/object.h>
+
+_DEFS(gstreamermm,gst)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gstreamermm/private/object_p.h)
+
+namespace Gst
+{
+
+/** ChildProxy — Interface for multi child elements.
+ * This interface abstracts handling of property sets for child elements.
+ * Imagine elements such as mixers or polyphonic generators. They all have
+ * multiple Pad or some kind of voice objects. The element acts as a parent
+ * for those child objects. Each child has the same properties.
+ *
+ * By implementing this interface the child properties can be accessed from
+ * the parent element by using child_proxy_get() and child_proxy_set().
+ *
+ * Property names are written as "child-name::property-name". The whole naming
+ * scheme is recursive. Thus "child1::child2::property" is valid too, if
+ * "child1" also implements the ChildProxy interface.
+ *
+ * @newin2p16
+ */
+class ChildProxy : public Glib::Interface
+{
+  _CLASS_INTERFACE(ChildProxy, GstChildProxy, GST_CHILD_PROXY, GstChildProxyInterface)
+};
+
+} // namespace Gst
+

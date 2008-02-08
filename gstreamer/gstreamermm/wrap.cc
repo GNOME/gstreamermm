@@ -1,5 +1,6 @@
 // -*- c++ -*-
 /* $Id: wrap.cc 447 2007-10-03 09:51:41Z murrayc $ */
+
 /* wrap.cc
  *
  * Copyright (C) 2008 The gstreamermm Development Team

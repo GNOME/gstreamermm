@@ -1,4 +1,5 @@
 // -*- c++ -*-
+
 /* gstreamermm - a C++ wrapper for gstreamer
  *
  * Copyright 2008 The gstreamermm Development Team

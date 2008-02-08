@@ -5,6 +5,7 @@
 #include <gstreamermm/buffer.h>
 #include <gstreamermm/bus.h>
 #include <gstreamermm/caps.h>
+#include <gstreamermm/childproxy.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/enums.h>
@@ -20,6 +21,7 @@
 #include <gstreamermm/query.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
+#include <gstreamermm/value.h>
 #include <gstreamermm/xml.h>
 
 #include <gstreamermm/init.h>
