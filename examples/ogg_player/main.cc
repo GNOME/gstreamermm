@@ -1,3 +1,5 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
 /* gstreamermm - a C++ wrapper for gstreamer
  *
  * Copyright 2008 The gstreamermm Development Team
@@ -28,35 +30,35 @@ Glib::RefPtr<Gst::Element> decoder;
 
 bool print_stream_position(void)
 {
- Gst::Format fmt = Gst::FORMAT_TIME;
- gint64 pos = 0;
- gint64 len = 0;
+  Gst::Format fmt = Gst::FORMAT_TIME;
+  gint64 pos = 0;
+  gint64 len = 0;
 
- Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
+  Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
- if (pipeline->query(query)
-   && pipeline->query_duration(fmt, len)) {
+  if (pipeline->query(query)
+    && pipeline->query_duration(fmt, len)) {
 
-   Glib::RefPtr<Gst::QueryPosition> posQuery =
+    Glib::RefPtr<Gst::QueryPosition> posQuery =
         Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
 
-   posQuery->parse(fmt, pos);
+    posQuery->parse(fmt, pos);
 
-   std::cout << std::right << "Time: " << std::setfill('0') <<
-     std::setw(3) << Gst::get_hours(pos) << ":" <<
-     std::setw(2) << Gst::get_minutes(pos) << ":" <<
-     std::setw(2) << Gst::get_seconds(pos) << "." <<
-     std::setw(9) << std::left << Gst::get_fractional_seconds(pos);
+    std::cout << std::right << "Time: " << std::setfill('0') <<
+      std::setw(3) << Gst::get_hours(pos) << ":" <<
+      std::setw(2) << Gst::get_minutes(pos) << ":" <<
+      std::setw(2) << Gst::get_seconds(pos) << "." <<
+      std::setw(9) << std::left << Gst::get_fractional_seconds(pos);
 
-   std::cout << std::right << "/" <<
-     std::setw(3) << Gst::get_hours(len) << ":" <<
-     std::setw(2) << Gst::get_minutes(len) << ":" <<
-     std::setw(2) << Gst::get_seconds(len) << "." <<
-     std::setw(9) << std::left << Gst::get_fractional_seconds(len) <<
-     std::endl << std::flush;
- }
+    std::cout << std::right << "/" <<
+      std::setw(3) << Gst::get_hours(len) << ":" <<
+      std::setw(2) << Gst::get_minutes(len) << ":" <<
+      std::setw(2) << Gst::get_seconds(len) << "." <<
+      std::setw(9) << std::left << Gst::get_fractional_seconds(len) <<
+      std::endl << std::flush;
+  }
 
- return true;
+  return true;
 }
 
 // This function is used to receive asynchronous messages in the main loop.
@@ -154,7 +156,6 @@ int main(int argc, char* argv[])
 
   // Add a bus watch to the default main context with the default priority.
   bus->add_watch( sigc::ptr_fun(&on_bus_message) );
-
 
   // Put all elements in a pipeline:
   try

@@ -1,3 +1,5 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
+
 /* gstreamermm - a C++ wrapper for gstreamer
  *
  * Copyright 2008 The gstreamermm Development Team
