@@ -8,6 +8,7 @@
 #include <gstreamermm/childproxy.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/element.h>
+#include <gstreamermm/elementfactory.h>
 #include <gstreamermm/enums.h>
 #include <gstreamermm/error.h>
 #include <gstreamermm/event.h>
@@ -18,6 +19,8 @@
 #include <gstreamermm/pad.h>
 #include <gstreamermm/padtemplate.h>
 #include <gstreamermm/pipeline.h>
+#include <gstreamermm/plugin.h>
+#include <gstreamermm/pluginfeature.h>
 #include <gstreamermm/query.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
