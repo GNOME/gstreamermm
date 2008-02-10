@@ -13,6 +13,7 @@
 #include <gstreamermm/error.h>
 #include <gstreamermm/event.h>
 #include <gstreamermm/format.h>
+#include <gstreamermm/index.h>
 #include <gstreamermm/iterator.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/object.h>
