@@ -1,0 +1,101 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gstreamermm/object.h>
+#include <gstreamermm/enums.h>
+_DEFS(gstreamermm,gst)
+_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gstreamermm/private/object_p.h)
+
+namespace Gst
+{
+
+/** The basic element of an index.
+ */
+class IndexEntry
+{
+  _CLASS_OPAQUE_COPYABLE(IndexEntry, GstIndexEntry, NONE, gst_index_entry_copy, gst_index_entry_free)
+public:
+  _WRAP_METHOD(bool assoc_map(Format format, gint64& value), gst_index_entry_assoc_map)
+
+};
+
+/** A group of related entries in an index.
+ */
+class IndexGroup
+{
+  _CLASS_GENERIC(IndexGroup, GstIndexGroup)
+};
+
+/** An association in an entry.
+ */
+class IndexAssociation
+{
+  _CLASS_GENERIC(IndexAssociation, GstIndexAssociation)
+};
+
+
+/** Gst::Index is used to generate a stream index of one or more elements in a pipeline.
+ */
+class Index : public Object 
+{
+  _CLASS_GOBJECT(Index, GstIndex, GST_INDEX, Object, GstObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_METHOD(bool is_readable() const, GST_INDEX_IS_READABLE)
+  _WRAP_METHOD(bool is_writable() const, GST_INDEX_IS_WRITABLE)
+  _WRAP_METHOD(void commit(int id), gst_index_commit)
+  _WRAP_METHOD(gint get_group() const, gst_index_get_group)
+  _WRAP_METHOD(gint new_group(), gst_index_new_group)
+  _WRAP_METHOD(bool set_group(int group_number), gst_index_set_group)
+  _WRAP_METHOD(void set_certainty(IndexCertainty certainty), gst_index_set_certainty)
+  _WRAP_METHOD(IndexCertainty set_certainty() const, gst_index_get_certainty)
+  _WRAP_METHOD(bool get_writer_id(const Glib::RefPtr<Gst::Object>& writer, int& id) const, gst_index_get_writer_id)
+  _WRAP_METHOD(IndexEntry add_format(int id, Format format), gst_index_add_format)
+  _WRAP_METHOD(IndexEntry add_association(int id, AssocFlags flags, int n, const IndexAssociation& list), gst_index_add_associationv)
+  _WRAP_METHOD(IndexEntry add_id(int id, const Glib::ustring& description), gst_index_add_id)
+
+  //TODO: Reorder parameters to allow default values?
+  _WRAP_METHOD(IndexEntry get_assoc_entry(int id, IndexLookupMethod method, AssocFlags flags, Format format, gint64 value) const, gst_index_get_assoc_entry)
+
+  /** For example,
+   * @code
+   * bool on_index_filter(IndexEntry entry);
+   * @endcode
+   */ 
+  typedef sigc::slot<bool, IndexEntry> SlotIndexFilter;
+
+  void set_filter(const SlotIndexFilter& slot);
+
+  /** For example,
+   * @code
+   * bool on_index_resolve(const Glib::RefPtr<Gst::Object>& writer, Glib::ustring& writer_string);
+   * @endcode
+   */ 
+  typedef sigc::slot<bool, const Glib::RefPtr<Gst::Object>&, Glib::ustring&> SlotIndexResolver;
+
+  void set_resolver(const SlotIndexResolver& slot);
+};
+
+}//namespace Gst
