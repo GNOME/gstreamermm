@@ -39,6 +39,12 @@ protected:
   _CTOR_DEFAULT()
 
 public:
+  /** For example,
+   * bool on_bus_watch(const Glib::RefPtr<Bus>& bus, const
+   * Glib::RefPtr<Message>& message);
+   */
+  typedef sigc::slot< bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotWatch;
+
   static Glib::RefPtr<Bus> create();
   _WRAP_METHOD(bool post(const Glib::RefPtr<Message>& message), gst_bus_post)
   _WRAP_METHOD(bool have_pending() const, gst_bus_have_pending)
@@ -51,18 +57,14 @@ public:
 
   _WRAP_METHOD(void set_flushing(bool flushing = true), gst_bus_set_flushing)
 
-  /** For example,
-   * bool on_bus_watch(const Glib::RefPtr<Bus>& bus, const Glib::RefPtr<Message>& message);
-   */
-  typedef sigc::slot<bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotWatch;
-  guint add_watch(const SlotWatch& slot, int priority = G_PRIORITY_DEFAULT);
+  guint add_watch(const SlotWatch& slot, int priority = Glib::PRIORITY_DEFAULT);
   bool remove_watch(guint watch_id);
   _IGNORE(gst_bus_add_watch, gst_bus_add_watch_full)
 
   _WRAP_METHOD(void disable_sync_message_emission(), gst_bus_disable_sync_message_emission)
   _WRAP_METHOD(void enable_sync_message_emission(), gst_bus_enable_sync_message_emission)
 
-  _WRAP_METHOD(void add_signal_watch(int priority = G_PRIORITY_DEFAULT), gst_bus_add_signal_watch_full)
+  _WRAP_METHOD(void add_signal_watch(int priority = Glib::PRIORITY_DEFAULT), gst_bus_add_signal_watch_full)
   _WRAP_METHOD(void remove_signal_watch(), gst_bus_remove_signal_watch)
   _IGNORE(gst_bus_add_signal_watch)
 

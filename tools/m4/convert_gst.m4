@@ -11,6 +11,7 @@ _CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
 _CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`Glib::unwrap($3)')
+_CONVERSION(`GstObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap($3)')
 
 #_CONVERSION(`Glib::RefPtr<Object>&',`GstObject*', `Glib::unwrap($3)')
 _CONVERSION(`State&',`GstState*',`((GstState*) (&($3)))')
@@ -56,6 +57,8 @@ _CONVERSION(`const Glib::RefPtr<Caps>&',`const GstCaps*', `Glib::unwrap($3)')
 _CONVERSION(`const xmlNodePtr&',`xmlNodePtr',`$3')
 _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 _CONVERSION(`GstBus*',`Glib::RefPtr<Bus>',`Glib::wrap($3)')
+
+_CONVERSION(`TypeNameData&',`GstTypeNameData*',`(GstTypeName*)(&$3)')
 
 _CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
 _CONVERSION(`const gint64&',`gint64',`$3')
