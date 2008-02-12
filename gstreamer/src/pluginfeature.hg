@@ -28,9 +28,10 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace Gst
 {
 
-class TypeNameData
+struct TypeNameData
 {
-  _CLASS_GENERIC(TypeNameData, GstTypeNameData)
+  Glib::ustring         name;
+  GType                 type;
 };
 
 /** This is a base class for anything that can be added to a Plugin.
@@ -46,7 +47,8 @@ public:
    */
   typedef sigc::slot< bool, const Glib::RefPtr<PluginFeature>& > SlotFeatureFilter;
 
-  _WRAP_METHOD(bool type_name_filter(const TypeNameData& data) const, gst_plugin_feature_type_name_filter)
+  bool type_name_filter(const TypeNameData& data) const;
+
   _WRAP_METHOD(void set_rank(guint rank), gst_plugin_feature_set_rank)
   _WRAP_METHOD(void set_name(const Glib::ustring& name), gst_plugin_feature_set_name)
   _WRAP_METHOD(guint get_rank() const, gst_plugin_feature_get_rank)
