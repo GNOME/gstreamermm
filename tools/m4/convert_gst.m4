@@ -58,9 +58,14 @@ _CONVERSION(`const xmlNodePtr&',`xmlNodePtr',`$3')
 _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 _CONVERSION(`GstBus*',`Glib::RefPtr<Bus>',`Glib::wrap($3)')
 
+#PluginFeature
 _CONVERSION(`const TypeNameData&',`GstTypeNameData*',`($2)(&($3))')
 _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<PluginFeature>',`Glib::wrap($3)')
 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<PluginFeature> >',`GList*',`($3).data()')
+
+#Plugin
+_CONVERSION(`GstPlugin*',`Glib::RefPtr<Plugin>',`Glib::wrap($3)')
+_CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
 
 _CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
 _CONVERSION(`const gint64&',`gint64',`$3')

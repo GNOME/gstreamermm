@@ -19,3 +19,34 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+static gboolean SignalProxy_Init_gstreamermm_callback(GstPlugin* plugin, void* data)
+{
+  Gst::Plugin::SlotInit* the_slot = static_cast<Gst::Plugin::SlotInit*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (*the_slot)(Glib::wrap(plugin, true));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+namespace Gst
+{
+
+/*
+bool Plugin::register_static(int major_version, int minor_version, const Glib::ustring& name, const Glib::ustring& description, SlotInit init_slot, const Glib::ustring& version, const Glib::ustring& license, const Glib::ustring& source, const Glib::ustring& package, const Glib::ustring& origin)
+{
+  return gst_plugin_register_static(major_version, minor_version, name.c_str(), description.c_str(), init_slot, version.c_str(), license.c_str(), source.c_str(), package.c_str(), origin.c_str());
+}
+*/
+
+} //namespace Gst

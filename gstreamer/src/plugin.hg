@@ -28,6 +28,8 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace Gst
 {
 
+//TODO: Deal with struct PluginDesc and SlotInit
+
 //TODO: Edit references below to use gstreamermm classes/methods
 
 /** Plugin — Container for features loaded from a shared object module.
@@ -50,15 +52,46 @@ namespace Gst
  * statically link plugins to an app or even use GStreamer without a plugin
  * repository in which case gst_plugin_load() can be needed to bring the plugin
  * into memory.
- *
- * @newin2p16
  */
 class Plugin : public Object
 {
   _CLASS_GOBJECT(Plugin, GstPlugin, GST_PLUGIN, Object, GstObject)
 
 public:
+  /** For example,
+   * bool on_plugin_init(const Glib::RefPtr<Plugin>& plugin);
+   */
+  typedef sigc::slot< bool, const Glib::RefPtr<Plugin>& > SlotInit;
 
+  /** For example,
+   * bool on_plugin_filter(const Glib::RefPtr<Plugin>& plugin);
+   */
+
+  typedef sigc::slot< bool, const Glib::RefPtr<Plugin>& > SlotFilter;
+
+  _WRAP_METHOD(static Glib::QueryQuark error_quark(), gst_plugin_error_quark)
+  _WRAP_METHOD(Glib::ustring get_name() const, gst_plugin_get_name)
+  _WRAP_METHOD(Glib::ustring get_description() const, gst_plugin_get_description)
+  _WRAP_METHOD(Glib::ustring get_filename() const, gst_plugin_get_filename)
+  _WRAP_METHOD(Glib::ustring get_license() const, gst_plugin_get_license)
+  _WRAP_METHOD(Glib::ustring get_package() const, gst_plugin_get_package)
+  _WRAP_METHOD(Glib::ustring get_origin() const, gst_plugin_get_origin)
+  _WRAP_METHOD(Glib::ustring get_source() const, gst_plugin_get_source)
+  _WRAP_METHOD(Glib::ustring get_version() const, gst_plugin_get_version)
+
+  _WRAP_METHOD(GModule* get_module() const, gst_plugin_get_module)
+
+  _WRAP_METHOD(bool loaded() const, gst_plugin_is_loaded)
+  _WRAP_METHOD(bool name_filter(const Glib::ustring& name) const, gst_plugin_name_filter)
+
+  _WRAP_METHOD(static Glib::RefPtr<Plugin> load_file(const Glib::ustring& name), gst_plugin_load_file, errthrow)
+
+  _WRAP_METHOD(Glib::RefPtr<Plugin> load(), gst_plugin_load)
+  _WRAP_METHOD(static Glib::RefPtr<Plugin> load_by_name(const Glib::ustring& name), gst_plugin_load_by_name)
+  _WRAP_METHOD(static void free(Glib::ListHandle< Glib::RefPtr<Plugin> >), gst_plugin_list_free)
+
+  //TODO: Does this need to be wrapped?  How do I handle the slot since the GstPluginInitFunc type doesn't have a "gpointer* data" parameter?
+  //static bool register_static(int major_version, int minor_version, const Glib::ustring& name, const Glib::ustring& description, SlotInit init_slot, const Glib::ustring& version, const Glib::ustring& license, const Glib::ustring& source, const Glib::ustring& package, const Glib::ustring& origin);
 };
 
 } // namespace Gst
