@@ -51,17 +51,18 @@ public:
   Glib::RefPtr<Bin> add(const Glib::RefPtr<Element>& element);
   Glib::RefPtr<Bin> remove(const Glib::RefPtr<Element>& element);
 
-  Glib::RefPtr<Element> get_by_name(const Glib::ustring& element_name);
-  Glib::RefPtr<Element> get_by_name_recurse_up(const Glib::ustring& element_name);
-  _WRAP_METHOD(Glib::RefPtr<Element> get_by_interface(GType interface), gst_bin_get_by_interface)
+  _WRAP_METHOD(Glib::RefPtr<Element> get_element(const Glib::ustring& name), gst_bin_get_by_name)
+  _WRAP_METHOD(Glib::RefPtr<Element> get_element_recurse_up(const Glib::ustring& name), gst_bin_get_by_name_recurse_up)
+  _WRAP_METHOD(Glib::RefPtr<Element> get_element(GType interface), gst_bin_get_by_interface)
+  _WRAP_METHOD(Glib::RefPtr<Pad> find_unconnected_pad(PadDirection dir), gst_bin_find_unconnected_pad)
 
-  Glib::RefPtr<Pad> find_unconnected_pad(PadDirection direction);
-
-  _IGNORE(gst_bin_add, gst_bin_remove, gst_bin_get_by_name, gst_bin_get_by_name_recurse_up)
+  _IGNORE(gst_bin_add, gst_bin_remove)
 
 #m4 _CONVERSION(`GstElement*',`const Glib::RefPtr<Element>&', `Glib::wrap($3, true)')
-  //TODO: When wrap() works: _WRAP_SIGNAL(void element_added(const Glib::RefPtr<Element>& element), "element-added")
-  //TODO: When wrap() works: _WRAP_SIGNAL(void element_removed(const Glib::RefPtr<Element>& element), "element-removed")
+  _WRAP_SIGNAL(void element_added(const Glib::RefPtr<Element>& element), "element-added")
+  _WRAP_SIGNAL(void element_removed(const Glib::RefPtr<Element>& element), "element-removed")
+
+  _WRAP_PROPERTY("async-handling", bool)
 };
 
 } //namespace Gst

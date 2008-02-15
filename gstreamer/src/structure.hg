@@ -27,6 +27,21 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+/** Structure — Generic structure containing fields of names and values.
+ * A Structure is a collection of key/value pairs. The keys are expressed as
+ * GQuarks and the values can be of any GType.
+ *
+ * In addition to the key/value pairs, a Structure also has a name. The name
+ * starts with a letter and can be folled by letters, numbers and any of
+ * "/-_.:".
+ *
+ * Structure is used by various GStreamer subsystems to store information in a
+ * flexible and extensible way. A Structure does not have a refcount because it
+ * usually is part of a higher level object such as Caps. It provides a means
+ * to enforce mutability using the refcount of the parent.
+ *
+ * Last reviewed on 2007-10-16 (0.10.15)
+ */
 class Structure
 {
   _CLASS_BOXEDTYPE(Structure, GstStructure, NONE, gst_structure_copy, gst_structure_free)
@@ -38,8 +53,8 @@ public:
 public:
   Structure(const Glib::ustring& name);
 
-  _WRAP_METHOD(int size() const, gst_structure_n_fields)
-  _WRAP_METHOD(void clear(), gst_structure_remove_all_fields)
+  _WRAP_METHOD(int get_size() const, gst_structure_n_fields)
+  _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
 
   _WRAP_METHOD(void set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value), gst_structure_set_value)
 
@@ -53,6 +68,8 @@ public:
   _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname) const, gst_structure_has_field)
   _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname, GType type) const, gst_structure_has_field_typed)
 
+  /**
+   */
   bool get_boolean(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
   bool get_int(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
