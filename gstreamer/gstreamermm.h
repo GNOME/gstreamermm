@@ -12,8 +12,10 @@
 #include <gstreamermm/enums.h>
 #include <gstreamermm/error.h>
 #include <gstreamermm/event.h>
+#include <gstreamermm/filter.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/index.h>
+#include <gstreamermm/indexfactory.h>
 #include <gstreamermm/iterator.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/object.h>

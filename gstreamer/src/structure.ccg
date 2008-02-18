@@ -22,22 +22,30 @@
 #include <gst/gstvalue.h> //Must be included before gststructure.h
 #include <gst/gststructure.h>
 
-namespace Gst
-{
-
 static gboolean
-Structure_ForEach_gstreamermm_callback(GQuark field_id, const GValue *value, gpointer data)
+Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, gpointer data)
 {
-  Structure::ForeachSlot& slot = *static_cast<Structure::ForeachSlot*>(data);
-  return slot(field_id, value);
+  Glib::ValueBase val_base;
+  val_base.init(value);
+
+  Gst::Structure::SlotForeach& slot = *static_cast<Gst::Structure::SlotForeach*>(data);
+
+  return slot(Glib::QueryQuark(field_id), val_base);
 }
 
 static gboolean
 Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, gpointer data)
 {
-  Structure::MapSlot& slot = *static_cast<Structure::MapSlot*>(data);
-  return slot(field_id, value);
+  Glib::ValueBase val_base;
+  val_base.init(value);
+
+  Gst::Structure::SlotMap& slot = *static_cast<Gst::Structure::SlotMap*>(data);
+
+  return slot(Glib::QueryQuark(field_id), val_base);
 }
+
+namespace Gst
+{
 
 Structure::Structure(const Glib::ustring& name)
 {
@@ -158,16 +166,16 @@ Structure::get_fraction(const Glib::ustring& name, int& value_numerator, int& va
 }
 
 bool
-Structure::foreach(const ForeachSlot& slot)
+Structure::foreach(const SlotForeach& slot)
 {
-  ForeachSlot slot_copy(slot);
-  gst_structure_foreach(gobj(), &Structure_ForEach_gstreamermm_callback, &slot_copy);
+  SlotForeach slot_copy(slot);
+  gst_structure_foreach(gobj(), &Structure_Foreach_gstreamermm_callback, &slot_copy);
 }
 
 bool
-Structure::map_in_place(const MapSlot& slot)
+Structure::map_in_place(const SlotMap& slot)
 {
-  MapSlot slot_copy(slot);
+  SlotMap slot_copy(slot);
   gst_structure_map_in_place(gobj(), &Structure_Map_gstreamermm_callback, &slot_copy);
 }
 

@@ -1,0 +1,54 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstelement.h>
+#include <gstreamermm/pluginfeature.h>
+
+_DEFS(gstreamermm,gst)
+_PINCLUDE(gstreamermm/private/pluginfeature_p.h)
+
+namespace Gst
+{
+
+class Index;
+
+/** IndexFactory — Create Indexes from a factory.
+ * IndexFactory is used to dynamically create Index implementations.
+ */
+class IndexFactory : public PluginFeature
+{
+  _CLASS_GOBJECT(IndexFactory, GstIndexFactory, GST_INDEX_FACTORY, PluginFeature, GstPluginFeature)
+  _CUSTOM_DTOR
+
+protected:
+  _WRAP_CTOR(IndexFactory(const Glib::ustring& name, const Glib::ustring& longdesc, GType type), gst_index_factory_new)
+
+public:
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::ustring& longdesc, GType type)
+
+  _WRAP_METHOD(static Glib::RefPtr<IndexFactory> find(const Glib::ustring& name), gst_index_factory_find)
+  _WRAP_METHOD(Glib::RefPtr<Index> make(), gst_index_factory_create)
+
+  _WRAP_METHOD(static Glib::RefPtr<Index> make(const Glib::ustring& factory_name), gst_index_factory_make)
+};
+
+} // namespace Gst
+
