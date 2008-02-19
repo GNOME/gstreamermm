@@ -1,0 +1,64 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gsttask.h>
+
+static void SignalProxy_Task_gstreamermm_callback(void* data)
+{
+  Gst::Task::SlotTask* the_slot = static_cast<Gst::Task::SlotTask*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*the_slot)();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+namespace Gst
+{
+
+Glib::RefPtr<Task> Task::create(const SlotTask& slot)
+{
+  //Create a copy of the slot.  A pointer to this copy will be passed through
+  //the call back's data parameter.  It will be destroyed in the Task's
+  //destructor
+  SlotTask *slot_copy = new SlotTask(slot);
+
+  Glib::RefPtr<Task> task = Glib::wrap(gst_task_create(&SignalProxy_Task_gstreamermm_callback, slot_copy));
+  task->slot = slot_copy;
+  return task;
+}
+
+Task::~Task()
+{
+  // Delete task's slot upon destruction
+  delete this->slot;
+}
+
+} //namespace Gst

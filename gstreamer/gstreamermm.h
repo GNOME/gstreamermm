@@ -21,12 +21,14 @@
 #include <gstreamermm/object.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/padtemplate.h>
+#include <gstreamermm/parse.h>
 #include <gstreamermm/pipeline.h>
 #include <gstreamermm/plugin.h>
 #include <gstreamermm/pluginfeature.h>
 #include <gstreamermm/query.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
+#include <gstreamermm/task.h>
 #include <gstreamermm/value.h>
 #include <gstreamermm/xml.h>
 

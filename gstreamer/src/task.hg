@@ -1,0 +1,87 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gstreamermm/enums.h>
+#include <gstreamermm/object.h>
+
+_DEFS(gstreamermm,gst)
+_PINCLUDE(gstreamermm/private/object_p.h)
+
+namespace Gst
+{
+
+/** Task — Abstraction of GStreamer streaming threads.
+ * Task is used by Element and Pad to provide the data passing threads in a
+ * Pipeline.
+ *
+ * A Pad will typically start a Task to push or pull data to/from the peer
+ * pads. Most source elements start a Task to push data. In some cases a
+ * demuxer element can start a Task to pull data from a peer element. This is
+ * typically done when the demuxer can perform random access on the upstream
+ * peer element for improved performance.
+ *
+ * Although convenience functions exist on Pad to start/pause/stop tasks, it
+ * might sometimes be needed to create a Task manually if it is not related to
+ * a Pad.
+ *
+ * Before the Task can be run, it needs a Glib::StaticRecMutex that can be set
+ * with set_lock().
+ *
+ * The task can be started, paused and stopped with start(), pause() and stop()
+ * respectively.
+ *
+ * A Task will repeadedly call the SlotTask that was provided when creating the
+ * task with create(). Before calling the function it will acquire the provided
+ * lock.
+ *
+ * Stopping a task with stop() will not immediatly make sure the task is not
+ * running anymore. Use join() to make sure the task is completely stopped and
+ * the thread is stopped.
+ *
+ * Last reviewed on 2006-02-13 (0.10.4)
+ */
+class Task : public Object
+{
+  _CLASS_GOBJECT(Task, GstTask, GST_TASK, Object, GstObject)
+  _CUSTOM_DTOR()
+
+public:
+  /** For example,
+   * void on_do_task();
+   */
+  typedef sigc::slot<void> SlotTask;
+
+  static Glib::RefPtr<Task> create(const SlotTask& slot);
+
+  _WRAP_METHOD(static void cleanup_all(), gst_task_cleanup_all)
+  _WRAP_METHOD(TaskState get_state(), gst_task_get_state)
+  _WRAP_METHOD(bool join(), gst_task_join)
+  _WRAP_METHOD(bool pause(), gst_task_pause)
+  _WRAP_METHOD(void set_lock(Glib::StaticRecMutex& mutex), gst_task_set_lock)
+  _WRAP_METHOD(bool start(), gst_task_start)
+  _WRAP_METHOD(bool stop(), gst_task_stop)
+
+protected:
+  SlotTask* slot;
+};
+
+} // namespace Gst
+

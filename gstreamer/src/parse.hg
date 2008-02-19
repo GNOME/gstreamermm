@@ -1,0 +1,95 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class Element;
+
+/** GstParse — Get a pipeline from a text pipeline description.
+ * The methods in this class allow to create a pipeline based on the syntax
+ * used in the gst-launch utillity.
+ */
+class Parse
+{
+
+public:
+  /** Get the error quark used by the parsing subsystem.
+   * @return the quark of the parse errors.
+   */
+  static Glib::QueryQuark error_quark();
+
+  /** Create a new pipeline based on command line syntax. Please note that you
+   * might get a return value that is not NULL even though the error is set. In
+   * this case there was a recoverable parsing error and you can try to play
+   * the pipeline.
+   * @param pipeline_description the command line describing the pipeline
+   * @param error the error message in case of an erroneous pipeline.
+   * @return a new element on success, NULL on failure. If more than one
+   * toplevel element is specified by the pipeline_description, all elements
+   * are put into a Pipeline, which than is returned.
+
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  static Glib::RefPtr<Element> launch(const Glib::ustring& pipeline_description);
+#else
+  static Glib::RefPtr<Element> launch(const Glib::ustring& pipeline_description, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Create a new element based on command line syntax. An error does not
+   * mean that the pipeline could not be constructed.
+   * @param argv null-terminated array of arguments
+   * @param error will contain an error message if an erroneuos pipeline is
+   * specified. 
+   * @return a new element on success and NULL on failure.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  static Glib::RefPtr<Element> launchv(const gchar *argv[]);
+#else
+  static Glib::RefPtr<Element> launchv(const gchar *argv[], std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** This is a convenience wrapper around launch() to create a Bin from a
+   * gst-launch-style pipeline description. See launch() and the gst-launch man
+   * page for details about the syntax. Ghost pads on the bin for unconnected
+   * source or sink pads within the bin can automatically be created (but only
+   * a maximum of one ghost pad for each direction will be created; if you
+   * expect multiple unconnected source pads or multiple unconnected sink pads
+   * and want them all ghosted, you will have to create the ghost pads
+   * yourself).
+   *
+   * @param bin_description command line describing the bin
+   * @param ghost_unconnected_pads whether to automatically create ghost pads
+   * for unconnected source or sink pads within the bin
+   * @param err where to store the error message in case of an error
+   * @return a newly-created bin, or NULL if an error occurred.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  static Glib::RefPtr<Element> get_bin(const Glib::ustring& bin_description, bool ghost_unconnected_pads);
+#else
+  static Glib::RefPtr<Element> get_bin(const Glib::ustring& bin_description, bool ghost_unconnected_pads, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+};
+
+} // namespace Gst
