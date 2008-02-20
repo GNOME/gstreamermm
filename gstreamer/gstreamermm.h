@@ -29,6 +29,7 @@
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
 #include <gstreamermm/task.h>
+#include <gstreamermm/urihandler.h>
 #include <gstreamermm/value.h>
 #include <gstreamermm/xml.h>
 
