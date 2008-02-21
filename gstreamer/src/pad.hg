@@ -20,6 +20,7 @@
  */
 
 #include <gstreamermm/object.h>
+#include <gstreamermm/miniobject.h>
 #include <gstreamermm/enums.h>
 
 _DEFS(gstreamermm,gst)
@@ -61,8 +62,11 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Caps> get_negotiated_caps(), gst_pad_get_negotiated_caps)
   _WRAP_METHOD(Glib::RefPtr<const Caps> get_negotiated_caps() const, gst_pad_get_negotiated_caps, constversion)
 
-  // hand coded because we need to copy the Caps
+  // Hand coded because the documentation tells us that we need to copy the Caps
+  //TODO: Should/Could this be const?
+  //TODO: Documentation.
   Glib::RefPtr<Caps> get_pad_template_caps();
+
   _WRAP_METHOD(bool set_caps (const Glib::RefPtr<Caps>& caps), gst_pad_set_caps)
   _WRAP_METHOD(Glib::RefPtr<Pad> get_peer(), gst_pad_get_peer)
   _WRAP_METHOD(Glib::RefPtr<const Pad> get_peer() const, gst_pad_get_peer, constversion)
@@ -122,6 +126,8 @@ public:
   bool query_peer_duration(Format& format) const;
    _WRAP_METHOD(bool query_peer_duration(Format& format, gint64& duration) const, gst_pad_query_peer_duration)
    _WRAP_METHOD(bool query_peer_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_pad_query_peer_convert)
+
+  //TODO: Use ArrayHandle?
   _WRAP_METHOD(const QueryType* get_query_types() const, gst_pad_get_query_types)
   _WRAP_METHOD(const QueryType* get_query_types_default() const, gst_pad_get_query_types_default)
 
@@ -159,9 +165,9 @@ public:
 
 #m4 _CONVERSION(`GstMiniObject*',`const Glib::RefPtr<MiniObject>&',`wrap($3, false)')
 
-// TODO: this fails to compile! is there something wrong with unwrap() ?
-//#m4 _CONVERSION(`const Glib::RefPtr<MiniObject>&',`GstMiniObject*',`unwrap($3)')
-// _WRAP_SIGNAL(bool have_data(const Glib::RefPtr<MiniObject>& mini_obj), "have-data")
+#m4 _CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`Gst::unwrap($3)')
+#m4 _CONVERSION(`GstMiniObject*',`const Glib::RefPtr<Gst::MiniObject>&',`Gst::wrap($3)')
+  _WRAP_SIGNAL(bool have_data(const Glib::RefPtr<Gst::MiniObject>& mini_obj), "have-data")
 
 #m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void linked(const Glib::RefPtr<Pad>& peer_pad), "linked")

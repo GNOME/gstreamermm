@@ -12,7 +12,6 @@ _CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
 _CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`Glib::unwrap($3)')
-_CONVERSION(`GstObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap($3)')
 
 #Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Buffer>',`wrap($3)')
@@ -92,7 +91,7 @@ _CONVERSION(`Structure&',`GstStructure*',`((GstStructure*)(&($3)))')
 _CONVERSION(`GstStructure*',`Structure*',`((Structure*) ($3))')
 
 #URIHandler
-_CONVERSION(`GstURIHandler*',`const Glib::RefPtr<URIHandler>&',`Glib::wrap($3)')
+#_CONVERSION(`GstURIHandler*',`const Glib::RefPtr<URIHandler>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')
 
 #General Conversions

@@ -43,12 +43,19 @@ public:
 
   _WRAP_METHOD(bool parse_doc(xmlDocPtr doc, const std::string& root), gst_xml_parse_doc)
   _WRAP_METHOD(bool parse_file(const std::string& filename, const std::string& root), gst_xml_parse_file)
+
+  //TODO: Documentation.
   bool parse_memory(const std::string& buffer, const std::string& root);
+
+  //Note: gst_xml_get_element() returns a reference.
   _WRAP_METHOD(Glib::RefPtr<Element> get_element(const std::string& name), gst_xml_get_element)
   _WRAP_METHOD(Glib::RefPtr<const Element> get_element(const std::string& name) const, gst_xml_get_element, constversion)
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Element> >',`$2($3, Glib::OWNERSHIP_NONE)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Element> > get_topelements() const, gst_xml_get_topelements)
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Element> > get_topelements(), gst_xml_get_topelements)
+
+#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Element> >',`$2($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Element> > get_topelements() const, gst_xml_get_topelements)
 
   _IGNORE(gst_xml_parse_memory)
 

@@ -71,10 +71,17 @@ public:
   void reference() const;
   void unreference() const;
 
+  ///Provides access to the underlying C GstMiniObject.
+  GstMiniObject*       gobj()       { return reinterpret_cast<GstMiniObject*>(gobject_); }
+
+  ///Provides access to the underlying C GstMiniObject.
+  const GstMiniObject* gobj() const { return reinterpret_cast<GstMiniObject*>(gobject_); }
+
+
   // static void replace(Glib::RefPtr<Gst::MiniObject> & olddata, Glib::RefPtr<Gst::MiniObject> & newdata);
 
 protected:
-  GstMiniObject* gobject_;
+  GstMiniObject* gobject_; //TODO: Doesn't this shadow a member variable in Glib::ObjectBase?
 };
 
 } // namespace Gst
