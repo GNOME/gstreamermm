@@ -54,6 +54,8 @@ _CONVERSION(`GstElementFactory*',`Glib::RefPtr<ElementFactory>',`Glib::wrap($3)'
 _CONVERSION(`const Glib::RefPtr<Event>&',`GstEvent*', `Glib::unwrap($3)')
 
 #Index
+_CONVERSION(`GstIndex*',`Glib::RefPtr<Index>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Index>&',`GstIndex*',`Glib::unwrap($3)')
 _CONVERSION(`GstIndexEntry*',`IndexEntry',`Glib::wrap($3)')
 _CONVERSION(`const IndexAssociation&',`const GstIndexAssociation*',`((GstIndexAssociation*)(&($3)))')
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Index>',`Glib::wrap($3)')
@@ -95,6 +97,7 @@ _CONVERSION(`const Glib::RefPtr<URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)
 
 #General Conversions
 _CONVERSION(`guint64',`ClockTime',`(ClockTime ($3))')
+_CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff ($3)')
 _CONVERSION(`const URIType',`const GstURIType',`(GstURIType($3))')
 _CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
 _CONVERSION(`gint64&',`gint64*',`&($3)')
@@ -106,6 +109,7 @@ _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 _CONVERSION(`const xmlNodePtr&',`xmlNodePtr',`$3')
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
+_CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
 _CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`($3).gobj()')
 

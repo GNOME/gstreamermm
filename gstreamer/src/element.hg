@@ -34,6 +34,7 @@ class Caps;
 class Clock;
 class ElementFactory;
 class Event;
+class Index;
 class Message;
 class Pad;
 class PadTemplate;
@@ -79,6 +80,9 @@ public:
   _WRAP_METHOD(void set_bus(const Glib::RefPtr<Bus>& bus), gst_element_set_bus)
   _WRAP_METHOD(Glib::RefPtr<Bus> get_bus(), gst_element_get_bus)
   _WRAP_METHOD(Glib::RefPtr<const Bus> get_bus() const, gst_element_get_bus, constversion)
+  _WRAP_METHOD(void set_index(const Glib::RefPtr<Index>& index), gst_element_set_index)
+  _WRAP_METHOD(Glib::RefPtr<Index> get_index(), gst_element_get_index)
+  _WRAP_METHOD(Glib::RefPtr<Index const> get_index() const, gst_element_get_index, constversion)
   _WRAP_METHOD(Glib::RefPtr<ElementFactory> get_factory(), gst_element_get_factory)
   _WRAP_METHOD(bool is_indexable() const, gst_element_is_indexable)
   _WRAP_METHOD(bool requires_clock() const, gst_element_requires_clock)
@@ -98,8 +102,9 @@ public:
   _WRAP_METHOD(bool sync_state_with_parent(), gst_element_sync_state_with_parent)
   _WRAP_METHOD(StateChangeReturn change_state(StateChange transition), gst_element_change_state)
 
+  _WRAP_METHOD(void message_full(MessageType message_type, GQuark domain, int code, const Glib::ustring& message, const Glib::ustring& debug, const Glib::ustring& filename, const Glib::ustring& function_name, int line_number), gst_element_message_full)
   _WRAP_METHOD(bool post_message(const Glib::RefPtr<Message>& message), gst_element_post_message)
-
+  _WRAP_METHOD(const QueryType* get_query_types() const, gst_element_get_query_types)
   _WRAP_METHOD(bool query(const Glib::RefPtr<Query>& query), gst_element_query)
   _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_element_query_convert)
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_element_query_position)
@@ -113,7 +118,9 @@ public:
 
   bool send_event(const Glib::RefPtr<Event>& event);
 
-  _IGNORE(gst_element_link, gst_element_get_compatible_pad, gst_element_link_many)
+  _WRAP_METHOD(bool implements_interface(GType iface_type), gst_element_implements_interface)
+
+  _IGNORE(gst_element_link, gst_element_unlink_many, gst_element_get_compatible_pad, gst_element_get_compatible_pad_template, gst_element_link_many, gst_element_send_event)
 
   _WRAP_SIGNAL(void no_more_pads(), "no-more-pads")
 

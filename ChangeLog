@@ -1,3 +1,40 @@
+2008-02-18  Siavash Safi  <siavash.safi@gmail.com>
+
+	* gstreamer/src/bin.hg: Ignored gst_bin_add_many, gst_bin_remove_many
+	* gstreamer/src/buffer.hg: Ignored gst_buffer_stamp (deprecated in C API)
+	* gstreamer/src/bus.hg: Added pop_filtered, timed_pop_filtered, poll
+	* gstreamer/src/caps.hg: Ignored gst_caps_set_simple
+	* gstreamer/src/element.ccg:
+	* gstreamer/src/element.hg: Added set_index, get_index, message_full,
+	get_query_types, implements_interface, ignored
+	gst_element_unlink_many, gst_element_get_compatible_pad_template,
+	gst_element_send_event
+	* gstreamer/src/enums.hg: Added FlowReturn
+	* gstreamer/src/gst_others.defs: Added the defenition for
+	Buffer::make_writable
+	* gstreamer/src/gst_signals.defs: Corrected Pad::have_data signal
+	parameter manually
+	* gstreamer/src/pad.ccg:
+	* gstreamer/src/pad.hg: Added get_pad_template_caps, alloc_buffer,
+	alloc_buffer_and_set_caps, get_range, proxy_getcaps, push, push_event,
+	send_event, event_default, query, peer_query, query_default,
+	get_query_types, get_query_types_default, get_internal_links,
+	get_internal_links_default, chain,
+	Ignored all *_function methods,
+	Corrected have_data signal (the conversion doesn't work)
+	* gstreamer/src/padtemplate.hg: Ignored gst_pad_template_pad_created
+	which is a signal and already wrapped
+	* gstreamer/src/pluginfeature.hg: Ignored
+	gst_plugin_feature_type_name_filter which was hand coded
+	* gstreamer/src/xml.hg: Corrected the const version of get_element,
+	Added get_topelements
+	* tools/m4/convert_gst.m4: Added conversions:
+	`GstIndex*' to `Glib::RefPtr<Index>'
+	`const Glib::RefPtr<Index>&' to `GstIndex*'
+	`ClockTimeDiff' to `GstClockTimeDiff'
+	`const GstQueryType*' to `const QueryType*'
+	Bug #517208.
+
 2008-02-19  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/gstreamermm.h:
@@ -7,7 +44,7 @@
 	* gstreamer/src/urihandler.ccg:
 	* gstreamer/src/urihandler.hg:
 	* tools/m4/convert_gst.m4: Added urihandler and related
-	enums+conersions; Manually included the "new-uri" signal def in defs
+	enums+conversions; Manually included the "new-uri" signal def in defs
 	file.  Must fix "const gchar*" parameter problem before wrapping
 	signal in *.hg file.
 

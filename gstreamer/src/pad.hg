@@ -29,9 +29,12 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace Gst
 {
 
+class Buffer;
 class Caps;
 class Element;
+class Event;
 class PadTemplate;
+class Query;
 
 class Pad : public Object 
 {
@@ -58,6 +61,8 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Caps> get_negotiated_caps(), gst_pad_get_negotiated_caps)
   _WRAP_METHOD(Glib::RefPtr<const Caps> get_negotiated_caps() const, gst_pad_get_negotiated_caps, constversion)
 
+  // hand coded because we need to copy the Caps
+  Glib::RefPtr<Caps> get_pad_template_caps();
   _WRAP_METHOD(bool set_caps (const Glib::RefPtr<Caps>& caps), gst_pad_set_caps)
   _WRAP_METHOD(Glib::RefPtr<Pad> get_peer(), gst_pad_get_peer)
   _WRAP_METHOD(Glib::RefPtr<const Pad> get_peer() const, gst_pad_get_peer, constversion)
@@ -73,7 +78,15 @@ public:
   _WRAP_METHOD(void remove_buffer_probe(guint handler_id), gst_pad_remove_buffer_probe)
   _WRAP_METHOD(void remove_event_probe(guint handler_id), gst_pad_remove_event_probe)
 
+  FlowReturn alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buf);
+  FlowReturn alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buf);
+
+  FlowReturn get_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer);
+
   _WRAP_METHOD(bool accept_caps(const Glib::RefPtr<Caps>& caps), gst_pad_accept_caps)
+
+  _WRAP_METHOD(Glib::RefPtr<Caps> proxy_getcaps(), gst_pad_proxy_getcaps)
+  _WRAP_METHOD(Glib::RefPtr<Caps const> proxy_getcaps() const, gst_pad_proxy_getcaps, constversion)
 
   _WRAP_METHOD(bool proxy_setcaps(const Glib::RefPtr<Caps>& caps), gst_pad_proxy_setcaps)
 
@@ -81,11 +94,24 @@ public:
 
   _WRAP_METHOD(bool peer_accept_caps(const Glib::RefPtr<Caps>& caps), gst_pad_peer_accept_caps)
 
-  _WRAP_METHOD(bool check_pull_range() const, gst_pad_check_pull_range)
+  // This method is written manually because an extra ref is necessary
+  FlowReturn push(const Glib::RefPtr<Buffer>& buffer);
 
+  // This method is written manually because an extra ref is necessary
+  bool push_event(const Glib::RefPtr<Event>& event);
+
+
+  _WRAP_METHOD(bool check_pull_range() const, gst_pad_check_pull_range)
+  FlowReturn pull_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer);
   _WRAP_METHOD(bool activate_pull(bool active = true), gst_pad_activate_pull)
   _WRAP_METHOD(bool activate_push(bool active = true), gst_pad_activate_push)
 
+  // This method is written manually because an extra ref is necessary
+  bool send_event(const Glib::RefPtr<Event>& event);
+  _WRAP_METHOD(bool event_default(const Glib::RefPtr<Event>& event), gst_pad_event_default)
+  _WRAP_METHOD(bool query(const Glib::RefPtr<Query>& query), gst_pad_query)
+  _WRAP_METHOD(bool peer_query(const Glib::RefPtr<Query>& query), gst_pad_peer_query)
+  _WRAP_METHOD(bool query_default(const Glib::RefPtr<Query>& query), gst_pad_query_default)
   bool query_position(Format& format) const;
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_pad_query_position)
   bool query_duration(Format& format) const;
@@ -96,21 +122,46 @@ public:
   bool query_peer_duration(Format& format) const;
    _WRAP_METHOD(bool query_peer_duration(Format& format, gint64& duration) const, gst_pad_query_peer_duration)
    _WRAP_METHOD(bool query_peer_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_pad_query_peer_convert)
+  _WRAP_METHOD(const QueryType* get_query_types() const, gst_pad_get_query_types)
+  _WRAP_METHOD(const QueryType* get_query_types_default() const, gst_pad_get_query_types_default)
+
+#m4 _CONVERSION(`GList*', `Glib::ListHandle< Glib::RefPtr<Pad> >', `$2($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Pad> > get_internal_links(), gst_pad_get_internal_links)
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Pad> > get_internal_links_default(), gst_pad_get_internal_links_default)
+
+  // This method is written manually because an extra ref is necessary
+  FlowReturn chain(const Glib::RefPtr<Buffer>& buffer);
 
   _WRAP_METHOD(bool pause_task() , gst_pad_pause_task)
   _WRAP_METHOD(bool stop_task() , gst_pad_stop_task)
   _WRAP_METHOD(bool set_active(bool active = true), gst_pad_set_active)
 
-  _IGNORE(gst_pad_set_blocked_async, gst_pad_query_position, 
-          gst_pad_query_duration, gst_pad_query_convert,
-          gst_pad_query_peer_position, gst_pad_query_peer_duration,
-          gst_pad_query_peer_convert)
+  _IGNORE(gst_pad_set_blocked_async, gst_pad_send_event,
+          gst_pad_query_position, gst_pad_query_duration,
+          gst_pad_query_convert, gst_pad_query_peer_position,
+          gst_pad_query_peer_duration, gst_pad_query_peer_convert,
+          gst_pad_push, gst_pad_push_event, gst_pad_chain,
+          gst_pad_alloc_buffer, gst_pad_alloc_buffer_and_set_caps,
+          gst_pad_get_range, gst_pad_pull_range,
+	  gst_pad_set_bufferalloc_function, gst_pad_set_activatepush_function,
+	  gst_pad_set_acceptcaps_function, gst_pad_set_event_function,
+	  gst_pad_set_getrange_function, gst_pad_set_unlink_function,
+	  gst_pad_set_activate_function, gst_pad_set_getcaps_function,
+	  gst_pad_set_setcaps_function, gst_pad_set_activatepull_function,
+	  gst_pad_set_query_type_function, gst_pad_set_checkgetrange_function,
+	  gst_pad_set_link_function, gst_pad_set_query_function,
+	  gst_pad_set_fixatecaps_function,gst_pad_set_chain_function,
+	  gst_pad_set_internal_link_function, gst_pad_get_pad_template_caps)
 
   typedef sigc::slot<void, bool> SlotPadBlockCallback;
 
   bool set_blocked_async(bool blocked, const SlotPadBlockCallback& slot);
 
-  //_WRAP_SIGNAL(void have_data(const Glib::RefPtr<MiniObject>& mini_obj), "have-data")
+#m4 _CONVERSION(`GstMiniObject*',`const Glib::RefPtr<MiniObject>&',`wrap($3, false)')
+
+// TODO: this fails to compile! is there something wrong with unwrap() ?
+//#m4 _CONVERSION(`const Glib::RefPtr<MiniObject>&',`GstMiniObject*',`unwrap($3)')
+// _WRAP_SIGNAL(bool have_data(const Glib::RefPtr<MiniObject>& mini_obj), "have-data")
 
 #m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void linked(const Glib::RefPtr<Pad>& peer_pad), "linked")

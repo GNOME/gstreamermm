@@ -54,7 +54,9 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Message> peek() const, gst_bus_peek)
 
   _WRAP_METHOD(Glib::RefPtr<Message> pop(), gst_bus_pop)
+  _WRAP_METHOD(Glib::RefPtr<Message> pop_filtered(MessageType message_type), gst_bus_pop_filtered)
   _WRAP_METHOD(Glib::RefPtr<Message> timed_pop(ClockTime timeout), gst_bus_timed_pop)
+  _WRAP_METHOD(Glib::RefPtr<Message> timed_pop_filtered(ClockTime timeout, MessageType message_type), gst_bus_timed_pop_filtered)
 
   _WRAP_METHOD(void set_flushing(bool flushing = true), gst_bus_set_flushing)
 
@@ -67,6 +69,7 @@ public:
 
   _WRAP_METHOD(void add_signal_watch(int priority = Glib::PRIORITY_DEFAULT), gst_bus_add_signal_watch_full)
   _WRAP_METHOD(void remove_signal_watch(), gst_bus_remove_signal_watch)
+  _WRAP_METHOD(Glib::RefPtr<Message> poll(MessageType message_type, ClockTimeDiff timeout), gst_bus_poll)
   _IGNORE(gst_bus_add_signal_watch)
 
 #m4 _CONVERSION(`GstMessage*',`const Glib::RefPtr<Message>&', `Gst::Message::wrap($3, true)')
