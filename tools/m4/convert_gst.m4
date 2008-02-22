@@ -81,17 +81,20 @@ _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
 #PluginFeature
 _CONVERSION(`const TypeNameData&',`GstTypeNameData*',`($2)(&($3))')
 _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<PluginFeature>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<PluginFeature>&',`GstPluginFeature*',`Glib::unwrap($3)')
 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<PluginFeature> >',`GList*',`($3).data()')
 
 #Query
 _CONVERSION(`const Glib::RefPtr<Query>&',`GstQuery*', `Glib::unwrap($3)')
+
+#Registry
+_CONVERSION(`GstRegistry*',`Glib::RefPtr<Registry>', `Glib::wrap($3)')
 
 #Structure
 _CONVERSION(`Structure&',`GstStructure*',`((GstStructure*)(&($3)))')
 _CONVERSION(`GstStructure*',`Structure*',`((Structure*) ($3))')
 
 #URIHandler
-#_CONVERSION(`GstURIHandler*',`const Glib::RefPtr<URIHandler>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')
 
 #General Conversions

@@ -1,0 +1,110 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstregistry.h>
+#include <gstreamermm/pluginfeature.h>
+#include <gstreamermm/plugin.h>
+
+static gboolean Registry_Plugin_Filter_gstreamermm_callback(GstPlugin* plugin, void* data)
+{
+  Gst::Plugin::SlotFilter* the_slot = static_cast<Gst::Plugin::SlotFilter*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (*the_slot)(Glib::wrap(plugin, true));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static gboolean Registry_PluginFeature_Filter_gstreamermm_callback(GstPluginFeature* feature, void* data)
+{
+  Gst::PluginFeature::SlotFilter* the_slot = static_cast<Gst::PluginFeature::SlotFilter*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (*the_slot)(Glib::wrap(feature, true));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+namespace Gst
+{
+
+Glib::ListHandle< Glib::RefPtr<Plugin> >
+Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first)
+{
+  Plugin::SlotFilter slot_copy(filter);
+  GList* list = gst_registry_plugin_filter(gobj(), &Registry_Plugin_Filter_gstreamermm_callback, first, &slot_copy);
+  return Glib::ListHandle< Glib::RefPtr<Plugin> >(list, Glib::OWNERSHIP_DEEP);
+}
+
+Glib::ListHandle< Glib::RefPtr<PluginFeature> >
+Registry::get_feature_list(const PluginFeature::SlotFilter& filter, bool first)
+{
+  PluginFeature::SlotFilter slot_copy(filter);
+  GList* list = gst_registry_feature_filter(gobj(), &Registry_PluginFeature_Filter_gstreamermm_callback, first, &slot_copy);
+  return Glib::ListHandle< Glib::RefPtr<PluginFeature> >(list, Glib::OWNERSHIP_DEEP);
+}
+
+#ifdef USE_BINARY_REGISTRY
+
+bool Registry::binary_read_cache(const Glib::ustring& location)
+{
+  return gst_registry_binary_read_cache(gobj(), location.c_str());
+}
+
+bool Registry::binary_write_cache(const Glib::ustring& location)
+{
+  return gst_registry_binary_write_cache(gobj(), location.c_str());
+}
+
+#else
+
+bool Registry::xml_read_cache(const Glib::ustring& location)
+{
+  return gst_registry_xml_read_cache(gobj(), location.c_str());
+}
+
+bool Registry::xml_write_cache(const Glib::ustring& location)
+{
+  return gst_registry_xml_write_cache(gobj(), location.c_str());
+}
+
+#endif
+
+} //namespace Gst

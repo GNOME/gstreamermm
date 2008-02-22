@@ -58,14 +58,8 @@ class Plugin : public Object
 
 public:
   /** For example,
-   * bool on_plugin_init(const Glib::RefPtr<Plugin>& plugin);
-   */
-  typedef sigc::slot< bool, const Glib::RefPtr<Plugin>& > SlotInit;
-
-  /** For example,
    * bool on_plugin_filter(const Glib::RefPtr<Plugin>& plugin);
    */
-
   typedef sigc::slot< bool, const Glib::RefPtr<Plugin>& > SlotFilter;
 
   _WRAP_METHOD(static Glib::QueryQuark error_quark(), gst_plugin_error_quark)
@@ -81,16 +75,12 @@ public:
   _WRAP_METHOD(GModule* get_module() const, gst_plugin_get_module)
 
   _WRAP_METHOD(bool is_loaded() const, gst_plugin_is_loaded)
-  _WRAP_METHOD(bool name_filter(const Glib::ustring& name) const, gst_plugin_name_filter)
 
   _WRAP_METHOD(static Glib::RefPtr<Plugin> load_file(const Glib::ustring& name), gst_plugin_load_file, errthrow)
 
   _WRAP_METHOD(Glib::RefPtr<Plugin> load(), gst_plugin_load)
   _WRAP_METHOD(static Glib::RefPtr<Plugin> load_by_name(const Glib::ustring& name), gst_plugin_load_by_name)
   _WRAP_METHOD(static void free(Glib::ListHandle< Glib::RefPtr<Plugin> >), gst_plugin_list_free)
-
-  //TODO: Does this need to be wrapped?  How do I handle the slot since the GstPluginInitFunc type doesn't have a "gpointer* data" parameter?
-  //static bool register_static(int major_version, int minor_version, const Glib::ustring& name, const Glib::ustring& description, SlotInit init_slot, const Glib::ustring& version, const Glib::ustring& license, const Glib::ustring& source, const Glib::ustring& package, const Glib::ustring& origin);
 };
 
 } // namespace Gst
