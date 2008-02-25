@@ -199,12 +199,12 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
     if (mainPipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
     {
         display_label_progress(newPos, duration);
-	return true;
+        return true;
     }
     else
     {
         std::cerr << "Could not seek!" << std::endl;
-	return false;
+        return false;
     }
 }
 

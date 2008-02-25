@@ -1,0 +1,103 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gstreamermm/clock.h>
+#include <gstreamermm/enums.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+/** GstSegment — Structure describing the configured region of interest in a
+ * media file.
+ * This helper structure holds the relevant values for tracking the region of
+ * interest in a media file, called a segment.
+ *
+ * The structure can be used for two purposes:
+ * 
+ *  - performing seeks (handling seek events)
+ *  - tracking playback regions (handling newsegment events)
+ *
+ * The segment is usually configured by the application with a seek event which
+ * is propagated upstream and eventually handled by an element that performs
+ * the seek.
+ *
+ * The configured segment is then propagated back downstream with a newsegment
+ * event. This information is then used to clip media to the segment
+ * boundaries.
+ *
+ * A segment structure is initialized with init(), which takes a Format that
+ * will be used as the format of the segment values. The segment will be
+ * configured with a start value of 0 and a stop/duration of -1, which is
+ * undefined. The default rate and applied_rate is 1.0.
+ *
+ * If the segment is used for managing seeks, the segment duration should be
+ * set with set_duration(). The public duration field contains the duration of
+ * the segment. When using the segment for seeking, the start and time members
+ * should normally be left to their default 0 value. The stop position is left
+ * to -1 unless explicitly configured to a different value after a seek event.
+ *
+ * The current position in the segment should be set with the set_last_stop().
+ * The public last_stop field contains the last set stop position in the
+ * segment.
+ *
+ * For elements that perform seeks, the current segment should be updated with
+ * the set_seek() and the values from the seek event. This method will update
+ * all the segment fields. The last_stop field will contain the new playback
+ * position. If the cur_type was different from SEEK_TYPE_NONE, playback
+ * continues from the last_stop position, possibly with updated flags or rate.
+ *
+ * For elements that want to use Segment to track the playback region, use
+ * set_newsegment() to update the segment fields with the information from the
+ * newsegment event. The clip() method can be used to check and clip the media
+ * data to the segment boundaries.
+ *
+ * For elements that want to synchronize to the pipeline clock,
+ * convert_to_running_time() can be used to convert a timestamp to a value that
+ * can be used to synchronize to the clock. This function takes into account
+ * all accumulated segments as well as any rate or applied_rate conversions.
+ *
+ * For elements that need to perform operations on media data in stream_time,
+ * convert_to_stream_time() can be used to convert a timestamp and the segment
+ * info to stream time (which is always between 0 and the duration of the
+ * stream).
+ *
+ * Last reviewed on 2007-05-17 (0.10.13)
+ */
+class Segment
+{
+  _CLASS_BOXEDTYPE(Segment, GstSegment, gst_segment_new, gst_segment_copy, gst_segment_free)
+
+public:
+  _WRAP_METHOD(bool clip(Format format, gint64 start, gint64 stop, gint64& clip_start, gint64& clip_stop), gst_segment_clip)
+  _WRAP_METHOD(void init(Format format), gst_segment_init)
+  _WRAP_METHOD(void set_duration(Format format, gint64 duration), gst_segment_set_duration)
+  _WRAP_METHOD(void set_last_stop(Format format, gint64 position), gst_segment_set_last_stop)
+  _WRAP_METHOD(void set_newsegment(bool update, double rate, Format format, gint64 start, gint64 stop, gint64 time), gst_segment_set_newsegment)
+  _WRAP_METHOD(void set_newsegment_full(bool update, double rate, double applied_rate, Format format, gint64 start, gint64 stop, gint64 time), gst_segment_set_newsegment_full)
+  _WRAP_METHOD(void set_seek(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop, bool& update), gst_segment_set_seek)
+  _WRAP_METHOD(gint64 convert_to_running_time(Format format, gint64 position), gst_segment_to_running_time)
+  _WRAP_METHOD(gint64 convert_to_stream_time(Format format, gint64 position), gst_segment_to_stream_time)
+
+};
+
+} //namespace Gst
