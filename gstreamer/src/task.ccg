@@ -21,7 +21,7 @@
 
 #include <gst/gsttask.h>
 
-static void SignalProxy_Task_gstreamermm_callback(void* data)
+static void Task_Task_gstreamermm_callback(void* data)
 {
   Gst::Task::SlotTask* the_slot = static_cast<Gst::Task::SlotTask*>(data);
 
@@ -50,7 +50,7 @@ Glib::RefPtr<Task> Task::create(const SlotTask& slot)
   //destructor
   SlotTask *slot_copy = new SlotTask(slot);
 
-  Glib::RefPtr<Task> task = Glib::wrap(gst_task_create(&SignalProxy_Task_gstreamermm_callback, slot_copy));
+  Glib::RefPtr<Task> task = Glib::wrap(gst_task_create(&Task_Task_gstreamermm_callback, slot_copy));
   task->slot = slot_copy;
   return task;
 }

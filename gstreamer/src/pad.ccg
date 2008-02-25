@@ -121,17 +121,17 @@ FlowReturn Pad::chain(const Glib::RefPtr<Buffer>& buffer)
   gst_pad_chain(gobj(), buffer->gobj());
 }
 
-static void SignalProxy_SlotPadBlockCallback_gst_callback(GstPad* pad, gboolean blocked, gpointer data) 
+static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, gpointer data)
 {
-  Pad::SlotPadBlockCallback * the_slot = static_cast<Pad::SlotPadBlockCallback*>(data);
+  Pad::SlotBlock * the_slot = static_cast<Pad::SlotBlock*>(data);
  (*the_slot)(blocked);
   delete the_slot;
 }
 
-bool Pad::set_blocked_async(bool blocked, const SlotPadBlockCallback& slot)
+bool Pad::set_blocked_async(bool blocked, const SlotBlock& slot)
 {
-  SlotPadBlockCallback* slot_copy = new SlotPadBlockCallback(slot);
-  return bool(gst_pad_set_blocked_async(GST_PAD(gobj()), gboolean(blocked), &SignalProxy_SlotPadBlockCallback_gst_callback, slot_copy));
+  SlotBlock* slot_copy = new SlotBlock(slot);
+  return bool(gst_pad_set_blocked_async(GST_PAD(gobj()), gboolean(blocked), &Pad_Block_gstreamermm_callback, slot_copy));
 }
 
 } //namespace Gst

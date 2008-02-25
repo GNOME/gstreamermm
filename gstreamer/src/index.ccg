@@ -24,26 +24,25 @@
 namespace Gst
 {
 
-static gboolean SignalProxy_SlotIndexFilter(GstIndex* index, GstIndexEntry* entry, gpointer data)
+static gboolean Index_Filter_gstreamermm_callback(GstIndex* index, GstIndexEntry* entry, gpointer data)
 {
-  Index::SlotIndexFilter * the_slot = static_cast<Index::SlotIndexFilter*>(data);
+  Index::SlotFilter * the_slot = static_cast<Index::SlotFilter*>(data);
   
   IndexEntry cpp_entry = Glib::wrap(entry, true);
   const gboolean result = (*the_slot)(cpp_entry);
   return result;
 }
 
-
-static void SignalProxy_SlotIndexDestroy(gpointer data)
+static void Index_Filter_gstreamermm_callback_destroy(gpointer data)
 {
-  Index::SlotIndexFilter* the_slot = static_cast<Index::SlotIndexFilter*>(data);
+  Index::SlotFilter* the_slot = static_cast<Index::SlotFilter*>(data);
   if(the_slot)
     delete the_slot;
 }
 
-static gboolean SignalProxy_SlotIndexResolver(GstIndex *index, GstObject *writer, gchar **writer_string, gpointer data)
+static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *writer, gchar **writer_string, gpointer data)
 {
-  Index::SlotIndexResolver * the_slot = static_cast<Index::SlotIndexResolver*>(data);
+  Index::SlotResolver * the_slot = static_cast<Index::SlotResolver*>(data);
 
   Glib::RefPtr<Gst::Object> cpp_writer = Glib::wrap(writer, true);
   Glib::ustring cpp_writer_string;
@@ -57,17 +56,17 @@ static gboolean SignalProxy_SlotIndexResolver(GstIndex *index, GstObject *writer
   return result;
 }
 
-void Index::set_filter(const SlotIndexFilter& slot)
+void Index::set_filter(const SlotFilter& slot)
 {
-  SlotIndexFilter* slot_copy = new SlotIndexFilter(slot); //Deleted in SignalProxy_SlotIndexDestroy.
-  gst_index_set_filter_full(gobj(), &SignalProxy_SlotIndexFilter, slot_copy, &SignalProxy_SlotIndexDestroy);
+  SlotFilter* slot_copy = new SlotFilter(slot); //Deleted in Index_Filter_gstreamermm_callback_destroy
+  gst_index_set_filter_full(gobj(), &Index_Filter_gstreamermm_callback, slot_copy, &Index_Filter_gstreamermm_callback_destroy);
 }
 
-void Index::set_resolver(const SlotIndexResolver& slot)
+void Index::set_resolver(const SlotResolver& slot)
 {
   //TODO: We need a destroy callback to destroy the slot_copy.
-  SlotIndexResolver* slot_copy = new SlotIndexResolver(slot); 
-  gst_index_set_resolver(gobj(), &SignalProxy_SlotIndexResolver, slot_copy);
+  SlotResolver* slot_copy = new SlotResolver(slot); 
+  gst_index_set_resolver(gobj(), &Index_Resolver_gstreamermm_callback, slot_copy);
 }
 
 }//namespace Gst
