@@ -27,9 +27,10 @@ namespace Gst
 static gboolean Index_Filter_gstreamermm_callback(GstIndex* index, GstIndexEntry* entry, gpointer data)
 {
   Index::SlotFilter * the_slot = static_cast<Index::SlotFilter*>(data);
-  
+
+  Glib::RefPtr<Index> cpp_index = Glib::wrap(index, true);
   IndexEntry cpp_entry = Glib::wrap(entry, true);
-  const gboolean result = (*the_slot)(cpp_entry);
+  const gboolean result = (*the_slot)(cpp_index, cpp_entry);
   return result;
 }
 
@@ -44,9 +45,10 @@ static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *
 {
   Index::SlotResolver * the_slot = static_cast<Index::SlotResolver*>(data);
 
+  Glib::RefPtr<Index> cpp_index = Glib::wrap(index, true);
   Glib::RefPtr<Gst::Object> cpp_writer = Glib::wrap(writer, true);
   Glib::ustring cpp_writer_string;
-  const gboolean result = (*the_slot)(cpp_writer, cpp_writer_string);
+  const gboolean result = (*the_slot)(cpp_index, cpp_writer, cpp_writer_string);
   
   if(writer_string)
   {

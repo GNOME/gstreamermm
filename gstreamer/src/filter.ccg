@@ -48,7 +48,8 @@ Glib::ListHandle< Glib::RefPtr<Glib::Object> >
 Filter::run(const Glib::ListHandle<Glib::RefPtr<Glib::Object> >& list, const SlotFilter& slot, bool first)
 {
   SlotFilter slot_copy(slot);
-  gst_filter_run(list.data(), &Filter_Filter_gstreamermm_callback, first, &slot_copy);
+  // TODO: we don't know the ownership of the items, I filed bug #518627 for GStreamer
+  return Glib::ListHandle< Glib::RefPtr<Glib::Object> >(gst_filter_run(list.data(), &Filter_Filter_gstreamermm_callback, first, &slot_copy), Glib::OWNERSHIP_NONE);
 }
 
 } //namespace Gst

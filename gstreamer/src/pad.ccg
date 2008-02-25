@@ -72,13 +72,13 @@ FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buff
 FlowReturn Pad::push(const Glib::RefPtr<Buffer>& buffer)
 {
   buffer->reference();
-  gst_pad_push(gobj(), buffer->gobj());
+  return FlowReturn(gst_pad_push(gobj(), buffer->gobj()));
 }
 
 bool Pad::push_event(const Glib::RefPtr<Event>& event)
 {
   event->reference();
-  gst_pad_push_event(gobj(), event->gobj());
+  return gst_pad_push_event(gobj(), event->gobj());
 }
 
 FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer)
@@ -92,7 +92,7 @@ FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buf
 bool Pad::send_event(const Glib::RefPtr<Event>& event)
 {
   event->reference();
-  gst_pad_send_event(gobj(), event->gobj());
+  return gst_pad_send_event(gobj(), event->gobj());
 }
 
 bool Pad::query_position(Format& format) const
@@ -118,13 +118,15 @@ bool Pad::query_peer_duration(Format& format) const
 FlowReturn Pad::chain(const Glib::RefPtr<Buffer>& buffer)
 {
   buffer->reference();
-  gst_pad_chain(gobj(), buffer->gobj());
+  return FlowReturn(gst_pad_chain(gobj(), buffer->gobj()));
 }
 
 static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, gpointer data)
 {
   Pad::SlotBlock * the_slot = static_cast<Pad::SlotBlock*>(data);
- (*the_slot)(blocked);
+
+  Glib::RefPtr<Pad> cpp_pad = Glib::wrap(pad, true);
+  (*the_slot)(cpp_pad, blocked);
   delete the_slot;
 }
 

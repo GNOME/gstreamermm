@@ -84,12 +84,12 @@ bool Element::query_duration(Format& format) const
   return gst_element_query_duration(const_cast<GstElement*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
 }
 
- // This method is written manually because an extra ref is necessary. See
- // gst_element_send_event() docs
- bool Element::send_event(const Glib::RefPtr<Event>& event)
+// This method is written manually because an extra ref is necessary. See
+// gst_element_send_event() docs
+bool Element::send_event(const Glib::RefPtr<Event>& event)
 {
   event->reference();
-  gst_element_send_event(gobj(), event->gobj());
+  return gst_element_send_event(gobj(), event->gobj());
 }
 
 } //namespace Gst

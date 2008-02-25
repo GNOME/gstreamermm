@@ -98,7 +98,7 @@ openButton(Gtk::Stock::OPEN)
 }
 
 // This function is used to receive asynchronous messages from mainPipeline's bus
-bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& bus,
+bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus_not_used */,
 					const Glib::RefPtr<Gst::Message>& message)
 {
     switch (message->get_message_type())
@@ -192,14 +192,20 @@ void PlayerWindow::on_stop(void)
     progressScale.set_value(0);
 }
 
-bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType type, double value)
+bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
     gint64 newPos = gint64(value * duration);
 
     if (mainPipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+    {
         display_label_progress(newPos, duration);
+	return true;
+    }
     else
+    {
         std::cerr << "Could not seek!" << std::endl;
+	return false;
+    }
 }
 
 void PlayerWindow::on_rewind(void)

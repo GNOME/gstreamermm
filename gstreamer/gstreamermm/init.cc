@@ -46,16 +46,12 @@ void init(int& argc, char**& argv)
 
 bool init_check(int& argc, char**& argv, Glib::Error& error)
 {
-  static bool s_init = false;
-  if(!s_init)
-  {
-    Glib::init();
-    GError* c_error;
-    gst_init_check(&argc, &argv, &c_error);
-    error = Glib::Error(c_error);
-    Gst::wrap_init();
-    s_init = true;
-  }
+  Glib::init();
+  GError* c_error;
+  bool result = gst_init_check(&argc, &argv, &c_error);
+  error = Glib::Error(c_error);
+  Gst::wrap_init();
+  return result;
 }
 
 Glib::OptionGroup init_get_option_group()
