@@ -16,6 +16,7 @@
 #include <gstreamermm/format.h>
 #include <gstreamermm/index.h>
 #include <gstreamermm/indexfactory.h>
+#include <gstreamermm/interface.h>
 #include <gstreamermm/iterator.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/object.h>
