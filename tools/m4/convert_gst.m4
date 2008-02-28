@@ -78,12 +78,12 @@ _CONVERSION(`const Glib::RefPtr<Pad>&',`GstPad*', `Glib::unwrap($3)')
 #Plugin
 _CONVERSION(`const Glib::RefPtr<Plugin>&',`GstPlugin*',`Glib::unwrap($3)')
 _CONVERSION(`GstPlugin*',`Glib::RefPtr<Plugin>',`Glib::wrap($3)')
-_CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
+_CONVERSION(`GstPlugin*',`const Glib::RefPtr<Plugin>&',`Glib::wrap($3)')
 
 #PluginFeature
 _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<PluginFeature>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PluginFeature>&',`GstPluginFeature*',`Glib::unwrap($3)')
-_CONVERSION(`Glib::ListHandle< Glib::RefPtr<PluginFeature> >',`GList*',`($3).data()')
+_CONVERSION(`GstPluginFeature*',`const Glib::RefPtr<PluginFeature>&',`Glib::wrap($3)')
 
 #Query
 _CONVERSION(`const Glib::RefPtr<Query>&',`GstQuery*', `Glib::unwrap($3)')
@@ -122,11 +122,14 @@ _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
 _CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`($3).gobj()')
 
 #List Conversions
+_CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
+_CONVERSION(`Glib::ListHandle< Glib::RefPtr<PluginFeature> >',`GList*',`($3).data()')
 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
 
 #String Conversions
 _CONVERSION(`const std::string&',`const guchar*',`(const guchar*) ($3.c_str())')
 _CONVERSION(`gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+_CONVERSION(`const gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 
 #Other Conversions
 _CONVERSION(`const xmlNodePtr&',`xmlNodePtr',`$3')
