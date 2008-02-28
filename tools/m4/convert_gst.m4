@@ -8,6 +8,8 @@ _CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
 _CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
 ')dnl
 
+###############Gstreamermm Class Conversions######################
+
 #Gst::Object
 _CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
@@ -79,7 +81,6 @@ _CONVERSION(`GstPlugin*',`Glib::RefPtr<Plugin>',`Glib::wrap($3)')
 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
 
 #PluginFeature
-_CONVERSION(`const TypeNameData&',`GstTypeNameData*',`($2)(&($3))')
 _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<PluginFeature>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PluginFeature>&',`GstPluginFeature*',`Glib::unwrap($3)')
 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<PluginFeature> >',`GList*',`($3).data()')
@@ -97,24 +98,40 @@ _CONVERSION(`GstStructure*',`Structure*',`((Structure*) ($3))')
 #URIHandler
 _CONVERSION(`const Glib::RefPtr<URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')
 
-#General Conversions
-_CONVERSION(`guint64',`ClockTime',`(ClockTime ($3))')
-_CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff ($3)')
-_CONVERSION(`const URIType',`const GstURIType',`(GstURIType($3))')
-_CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
+###################General Conversions############################
+
+#Basic General Conversions
 _CONVERSION(`gint64&',`gint64*',`&($3)')
 _CONVERSION(`bool&',`gboolean*',`(($2) &($3))')
 _CONVERSION(`const guint&',`guint',`$3')
 _CONVERSION(`const guint32&',`guint32',`$3')
-_CONVERSION(`const std::string&',`const guchar*',`(const guchar*) ($3.c_str())')
-_CONVERSION(`gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+
+#Basic Gstreamermm Conversions
+_CONVERSION(`guint64',`ClockTime',`(ClockTime ($3))')
+_CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff ($3)')
+_CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
+_CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
+_CONVERSION(`const URIType',`const GstURIType',`(GstURIType($3))')
+
+#C++ Conversions
 _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
-_CONVERSION(`const xmlNodePtr&',`xmlNodePtr',`$3')
+
+#Glibmm Conversions
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
-_CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
-_CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
 _CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`($3).gobj()')
+
+#List Conversions
+_CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
+
+#String Conversions
+_CONVERSION(`const std::string&',`const guchar*',`(const guchar*) ($3.c_str())')
+_CONVERSION(`gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+
+#Other Conversions
+_CONVERSION(`const xmlNodePtr&',`xmlNodePtr',`$3')
+
+#############################Enums####################################
 
 _CONV_ENUM(Gst,AssocFlags)
 _CONV_ENUM(Gst,BufferCopyFlags)

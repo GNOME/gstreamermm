@@ -45,8 +45,8 @@ class Plugin;
  * ElementFactory is used to create instances of elements. A Elementfactory can
  * be added to a Plugin as it is also a PluginFeature.
  *
- * Use the find() and create() functions to create element instances or use
- * make() as a convenient shortcut.
+ * Use the find() and create() functions to create element instances. or use
+ * the static create() as a convenient shortcut.
  *
  * The following code example shows you how to create a GstFileSrc element.
  *
@@ -58,7 +58,6 @@ class ElementFactory : public PluginFeature
   _CLASS_GOBJECT(ElementFactory, GstElementFactory, GST_ELEMENT_FACTORY, PluginFeature, GstPluginFeature)
 
 public:
-  _WRAP_METHOD(static bool register_factory(const Glib::RefPtr<Plugin>& plugin, const Glib::ustring& name, guint rank, GType type), gst_element_register)
   _WRAP_METHOD(static Glib::RefPtr<ElementFactory> find(const Glib::ustring& name), gst_element_factory_find)
   _WRAP_METHOD(GType get_element_type() const, gst_element_factory_get_element_type)
   _WRAP_METHOD(Glib::ustring get_long_name() const, gst_element_factory_get_longname)
@@ -67,15 +66,20 @@ public:
   _WRAP_METHOD(Glib::ustring get_author() const, gst_element_factory_get_author)
   _WRAP_METHOD(guint get_num_pad_templates() const, gst_element_factory_get_num_pad_templates)
   _WRAP_METHOD(int get_uri_type() const, gst_element_factory_get_uri_type)
+
+  //TODO: Is the conversion from gchar** to Glb::StringArrayHandle used here valid?
   _WRAP_METHOD(Glib::StringArrayHandle get_uri_protocols() const, gst_element_factory_get_uri_protocols)
+
   _WRAP_METHOD(bool has_interface(const Glib::ustring& name) const, gst_element_factory_has_interface)
   _WRAP_METHOD(Glib::RefPtr<Element> create(const Glib::ustring& name), gst_element_factory_create)
-  _WRAP_METHOD(static Glib::RefPtr<Element> make(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
+  _WRAP_METHOD(static Glib::RefPtr<Element> create(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
   _WRAP_METHOD(bool can_sink_caps(const Glib::RefPtr<const Caps>& caps) const, gst_element_factory_can_sink_caps)
   _WRAP_METHOD(bool can_src_caps(const Glib::RefPtr<const Caps>& caps) const, gst_element_factory_can_src_caps)
 
 #m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const PadTemplate> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const PadTemplate> > get_static_pad_templates(), gst_element_factory_get_static_pad_templates)
+
+  _IGNORE(gst_element_register)
 };
 
 } // namespace Gst
