@@ -20,6 +20,7 @@
  */
 
 #include <gstreamermm/object.h>
+#include <gstreamermm/interface.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/enums.h>
 
@@ -40,16 +41,52 @@ class Pad;
 class PadTemplate;
 class Query;
 
-class Element : public Object 
+/** Element — Abstract base class for all pipeline elements.
+ * Element is the abstract base class needed to construct an element that can
+ * be used in a GStreamer pipeline. Please refer to the plugin writers guide
+ * for more information on creating Element subclasses.
+ *
+ * The name of a Element can be get with get_name() and set with set_name().
+ *
+ * All elements have pads (of the type Pad). These pads link to pads on other
+ * elements. Buffer flow between these linked pads. A Element has a GList of
+ * Pad structures for all their input (or sink) and output (or source) pads.
+ * Core and plug-in writers can add and remove pads with add_pad() and
+ * remove_pad().
+ *
+ * A pad of an element can be retrieved by name with get_pad(). An iterator of
+ * all pads can be retrieved with gst_element_iterate_pads().
+ *
+ * Elements can be linked through their pads. Use the link() function to link
+ * elements. Use link_filtered() to link two elements constrained by a
+ * specified set of Caps. For finer control, use link_pads() and
+ * link_pads_filtered() to specify the pads to link on each element by name.
+ *
+ * Each element has a state (see State). You can get and set the state of an
+ * element with get_state() and set_state(). To get a string representation of
+ * a State, use state_get_name().
+ *
+ * You can get and set a Clock on an element using get_clock() and set_clock().
+ * Some elements can provide a clock for the pipeline if provides_clock()
+ * returns TRUE. With the provide_clock() method one can retrieve the clock
+ * provided by such an element. Not all elements require a clock to operate
+ * correctly. If requires_clock() returns TRUE, a clock should be set on the
+ * element with set_clock().
+ *
+ * Note that clock slection and distribution is normally handled by the
+ * toplevel Pipeline so the clock functions are only to be used in very
+ * specific situations.
+ *
+ * Last reviewed on 2006-03-12 (0.10.5)
+ */
+class Element
+: public Gst::Object,
+  public Gst::Interface
 {
-  _CLASS_GOBJECT(Element, GstElement, GST_ELEMENT, Object, GstObject)
-
-protected:
-  //TODO: What C function does this correspond to?
-  _CTOR_DEFAULT
+  _CLASS_GOBJECT(Element, GstElement, GST_ELEMENT, Gst::Object, GstObject)
+  _IMPLEMENTS_INTERFACE(Gst::Interface)
 
 public:
-  static Glib::RefPtr<Element> create(const Glib::ustring& factoryname, const Glib::ustring& name);
   Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
   _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
   _WRAP_METHOD(Glib::RefPtr<Pad> get_pad(const Glib::ustring& name), gst_element_get_pad)

@@ -33,8 +33,8 @@ int main (int argc, char* argv[])
   pipeline = Gst::Pipeline::create("my-pipeline");
   bin = Gst::Bin::create("my-bin");
 
-  source = Gst::Element::create("fakesrc", "source");
-  sink = Gst::Element::create("fakesink", "sink");
+  source = Gst::ElementFactory::create("fakesrc", "source");
+  sink = Gst::ElementFactory::create("fakesink", "sink");
 
   bin->add(source)->add(sink);
 
@@ -44,4 +44,13 @@ int main (int argc, char* argv[])
   std::cout << "Successfully added elements '" << source->get_name() <<
     "' and '" << sink->get_name() << "' to bin '" <<
       bin->get_name() << "'." << std::endl;
+
+  // use childproxy interface to get bin children count
+  std::cout << "'" << bin->get_name() << "' children count  = " << bin->get_children_count() << "." << std::endl;
+
+  // use childproxy interface to get bin's first child
+  Glib::RefPtr<Gst::Element> element = Glib::RefPtr<Gst::Element>::cast_dynamic(bin->get_child(0));
+  std::cout << "'" << bin->get_name() << "' first child is '" << element->get_name() << "'." << std::endl;
+
+  return 0;
 }

@@ -123,23 +123,23 @@ int main(int argc, char* argv[])
 
   // Create the elements
   // Reads file from disk
-  Glib::RefPtr<Gst::Element> source = Gst::Element::create("filesrc", "file-source");
+  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create("filesrc", "file-source");
   std::cout << "source=" << source << std::endl;
 
   // Parses the ogg streams into elementary streams (note that an ogg file may contain a video stream too)
-  Glib::RefPtr<Gst::Element> parser = Gst::Element::create("oggdemux", "ogg-parser");
+  Glib::RefPtr<Gst::Element> parser = Gst::ElementFactory::create("oggdemux", "ogg-parser");
   std::cout << "parser=" << parser << std::endl;
 
   // Decodes a vorbis stream
-  decoder = Gst::Element::create("vorbisdec", "vorbis-decoder");
+  decoder = Gst::ElementFactory::create("vorbisdec", "vorbis-decoder");
   std::cout << "decoder=" << decoder << std::endl;
 
   // Converts audio() to a format which can be used by the next element
-  Glib::RefPtr<Gst::Element> conv = Gst::Element::create("audioconvert", "converter");
+  Glib::RefPtr<Gst::Element> conv = Gst::ElementFactory::create("audioconvert", "converter");
   std::cout << "conv=" << conv << std::endl;
 
   // Outputs sound to an ALSA audio device
-  Glib::RefPtr<Gst::Element> sink = Gst::Element::create("alsasink", "alsa-output");
+  Glib::RefPtr<Gst::Element> sink = Gst::ElementFactory::create("alsasink", "alsa-output");
   std::cout << "sink=" << sink << std::endl;
 
   if (!pipeline || !source || !parser || !decoder || !conv || !sink)

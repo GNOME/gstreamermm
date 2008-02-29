@@ -31,9 +31,9 @@ int main (int argc, char* argv[])
 
   pipeline = Gst::Pipeline::create("my-pipeline");
 
-  source = Gst::Element::create("fakesrc", "source");
-  filter = Gst::Element::create("identity", "filter");
-  sink = Gst::Element::create("fakesink", "sink");
+  source = Gst::ElementFactory::create("fakesrc", "source");
+  filter = Gst::ElementFactory::create("identity", "filter");
+  sink = Gst::ElementFactory::create("fakesink", "sink");
 
   pipeline->add(source)->add(filter)->add(sink);
   source->link(filter)->link(sink);
