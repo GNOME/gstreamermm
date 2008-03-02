@@ -46,6 +46,7 @@ _CONVERSION(`Glib::RefPtr<Element>',`GstElement*', `Glib::unwrap($3)')
 _CONVERSION(`GstElement*',`Glib::RefPtr<Element>',`Glib::wrap($3)')
 _CONVERSION(`GstElement*',`Glib::RefPtr<const Element>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Element>&',`GstElement*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Element>&',`GstElement*', `const_cast<GstElement*>(Glib::unwrap($3))')
 _CONVERSION(`State&',`GstState*',`((GstState*) (&($3)))')
 
 #ElementFactory
