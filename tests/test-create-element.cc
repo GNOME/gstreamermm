@@ -32,9 +32,17 @@ int main (int argc, char* argv[])
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 
-  if(Gst::Interface::element_implements(element, Gst::URIHandler::get_type())) {
-    std::cout << "element '" << element->get_name() << "' implements URIHandler interface." << std::endl;
-    Glib::RefPtr<Gst::URIHandler> handler = Gst::Interface::cast <Gst::URIHandler>(element);
-    std::cout << "handler memory = '" << handler << "'." << std::endl;
+  if(Gst::Interface::element_implements(element, Gst::URIHandler::get_type()))
+  {
+    std::cout << "element '" << element->get_name() <<
+      "' implements URIHandler interface." << std::endl;
+
+    Glib::RefPtr< Gst::ElementInterfaced<Gst::URIHandler> > handler =
+      Gst::Interface::cast <Gst::URIHandler>(element);
+
+    handler->set_uri("file:///tmp/media.file");
+
+    std::cout << handler->get_name() << " uri = '" << handler->get_uri() <<
+      "'." << std::endl;
   }
 }

@@ -35,6 +35,7 @@ class Clock;
 class ElementFactory;
 class Event;
 class Index;
+class Interface;
 class Message;
 class Pad;
 class PadTemplate;
@@ -81,6 +82,9 @@ class Query;
 class Element : public Gst::Object
 {
   _CLASS_GOBJECT(Element, GstElement, GST_ELEMENT, Gst::Object, GstObject)
+
+protected:
+  _CTOR_DEFAULT
 
 public:
   Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
@@ -169,6 +173,33 @@ public:
   _WRAP_SIGNAL(void pad_added(const Glib::RefPtr<Pad>& new_pad), "pad-added")
   _WRAP_SIGNAL(void pad_removed(const Glib::RefPtr<Pad>& old_pad), "pad-removed")
 };
+
+template <class T_Interface>
+class ElementInterfaced
+: public Element,
+  public T_Interface
+{
+protected:
+  ElementInterfaced(const ElementInterfaced&);
+  ElementInterfaced& operator=(const ElementInterfaced&);
+
+protected:
+  ElementInterfaced(GstElement* castitem);
+
+private:
+  friend class Gst::Interface;
+};
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+template <class T_Interface>
+ElementInterfaced<T_Interface>::ElementInterfaced(GstElement* castitem)
+{
+  gobject_ = (GObject*)castitem;
+  gst_object_ref(Element::gobj());
+}
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Gst
 
