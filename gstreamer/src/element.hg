@@ -179,6 +179,9 @@ class ElementInterfaced
 : public Element,
   public T_Interface
 {
+public:
+  virtual ~ElementInterfaced();
+
 protected:
   ElementInterfaced(const ElementInterfaced&);
   ElementInterfaced& operator=(const ElementInterfaced&);
@@ -192,11 +195,23 @@ private:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
+void ElementInterfaced_WeakNotify_gstreamermm_callback(gpointer data, GObject* where_the_object_was);
+
 template <class T_Interface>
 ElementInterfaced<T_Interface>::ElementInterfaced(GstElement* castitem)
 {
   gobject_ = (GObject*)castitem;
   gst_object_ref(Element::gobj());
+  g_object_weak_ref(gobject_,
+    &ElementInterfaced_WeakNotify_gstreamermm_callback, this);
+}
+
+template <class T_Interface>
+ElementInterfaced<T_Interface>::~ElementInterfaced()
+{
+  // Set the gobject_ to NULL so that when this is deleted, the gobject doesn't
+  // go with it and other elements "wrapping" the gobject are not affected
+  gobject_ = 0;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
