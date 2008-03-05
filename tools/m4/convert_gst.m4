@@ -96,6 +96,9 @@ _CONVERSION(`GstRegistry*',`Glib::RefPtr<Registry>', `Glib::wrap($3)')
 _CONVERSION(`Structure&',`GstStructure*',`((GstStructure*)(&($3)))')
 _CONVERSION(`GstStructure*',`Structure*',`((Structure*) ($3))')
 
+#TagList
+_CONVERSION(`const Glib::RefPtr<const TagList>&',`const GstTagList*', `Glib::unwrap($3)')
+
 #URIHandler
 _CONVERSION(`const Glib::RefPtr<URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')
 
@@ -161,5 +164,6 @@ _CONV_ENUM(Gst,SeekType)
 _CONV_ENUM(Gst,State)
 _CONV_ENUM(Gst,StateChange)
 _CONV_ENUM(Gst,StateChangeReturn)
+_CONV_ENUM(Gst,TagMergeMode)
 _CONV_ENUM(Gst,TaskState)
 _CONV_ENUM(Gst,URIType)
