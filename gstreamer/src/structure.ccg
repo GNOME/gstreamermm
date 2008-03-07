@@ -58,6 +58,18 @@ Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
   value.init(gst_structure_get_value(gobj(), name.c_str()));
 }
 
+Structure&
+Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value)
+{
+  gst_structure_set_value(gobj(), fieldname.c_str(), value.gobj());
+}
+
+Structure&
+Structure::remove_field(const Glib::ustring& fieldname)
+{
+  gst_structure_remove_field(gobj(), fieldname.c_str());
+}
+
 bool
 Structure::get_boolean(const Glib::ustring& name, Glib::ValueBase& value) const
 {

@@ -33,7 +33,11 @@ int main (int argc, char* argv[])
   stringValue.init(Glib::Value<Glib::ustring>::value_type());
   stringValue.set("Hello; This is a ustring.");
 
-  structure.set_field(Glib::Quark("string"), stringValue);
+  Glib::Value<int> intValue;
+  intValue.init(Glib::Value<int>::value_type());
+  intValue.set(100);
+
+  structure.set_field(Glib::Quark("string"), stringValue).set_field("integer", intValue);
 
   Glib::Value<Glib::ustring> value;
   structure.get_field("string", value);

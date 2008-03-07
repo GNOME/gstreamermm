@@ -60,53 +60,172 @@ public:
 public:
   Structure(const Glib::ustring& name);
 
-  _WRAP_METHOD(int get_size() const, gst_structure_n_fields)
-  _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
+  _WRAP_METHOD(Glib::ustring get_name() const, gst_structure_get_name)
+  _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
+  _WRAP_METHOD(void set_name(const Glib::ustring& name), gst_structure_set_name)
+  _WRAP_METHOD(Glib::QueryQuark get_name_id() const, gst_structure_get_name_id)
 
-  _WRAP_METHOD(void set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value), gst_structure_set_value)
-
+  /** Get the value of the field with name fieldname.
+   *
+   * @param fieldname the name of the field to get
+   * @param value the Value class in which to store the value
+   */
   void get_field(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  _WRAP_METHOD(void remove_field(const Glib::ustring& fieldname), gst_structure_remove_field)
+  /** Sets the field with the given name field to value. If the field does not
+   * exist, it is created. If the field exists, the previous value is replaced
+   * and freed. Returns this Structure for continued setting convenience.
+   *
+   * @param fieldname the name of the field to set
+   * @param value the new value of the field 
+   * @return this Structure
+   */
+  Structure& set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value);
+
+  /** Removes the field with the given name. If the field with the given name
+   * does not exist, the structure is unchanged. Returns this Structure for
+   * continued setting convenience.
+   *
+   * @param fieldname the name of the field to remove
+   * @return this Structure
+   */
+  Structure& remove_field(const Glib::ustring& fieldname);
+
+  _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
   _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
 
   bool foreach(const SlotForeach& slot);
 
+  _WRAP_METHOD(int get_size() const, gst_structure_n_fields)
   _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname) const, gst_structure_has_field)
   _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname, GType type) const, gst_structure_has_field_typed)
 
-  /**
+  /** Sets the GValue of value to the boolean value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a boolean, this
+   * function returns FALSE.
    */
   bool get_boolean(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the int value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain an int, this function
+   * returns FALSE returns FALSE
+   */
   bool get_int(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the uint value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain an uint, this
+   * function returns FALSE returns FALSE
+   */
   bool get_uint(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the fourc value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a fourc, this
+   * function returns FALSE returns FALSE
+   */
   bool get_fourcc(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the double value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a double, this
+   * function returns FALSE returns FALSE
+   */
   bool get_double(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the string value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a string, this
+   * function returns FALSE returns FALSE
+   */
   bool get_string(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the GDate value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a GDate, this
+   * function returns FALSE returns FALSE
+   */
   bool get_date(const Glib::ustring& fieldname, Glib::Date& value) const;
 
+  /** Sets the GValue of value to the ClockTime value of the given field.
+   * Caller is responsible for making sure the field exists and has the correct
+   * type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a ClockTime, this
+   * function returns FALSE returns FALSE
+   */
   bool get_clock_time(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the enum value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a enum, this
+   * function returns FALSE returns FALSE
+   */
   bool get_enum(const Glib::ustring& fieldname, GType enumtype, Glib::ValueBase& value) const;
 
+  /** Sets the GValue of value to the Fraction value of the given field. Caller
+   * is responsible for making sure the field exists and has the correct type.
+   *
+   * @param fieldname the name of a field
+   * @param value the Value class to set
+   * @return TRUE if the value could be set correctly. If there was no field
+   * with fieldname or the existing field did not contain a Fraction, this
+   * function returns FALSE returns FALSE
+   */
   bool get_fraction(const Glib::ustring& fieldname, int& value_numerator, int& value_denominator) const;
 
+  /** Calls the provided slot once for each field in the Structure. In contrast
+   * to foreach(), the function may modify but not delete the fields. The
+   * structure must be mutable.
+   *
+   * @param slot a slot to call for each field
+   * @return TRUE if the supplied slot returns TRUE For each of the fields,
+   * FALSE otherwise.
+   */
   bool map_in_place(const SlotMap& slot);
+
+  _WRAP_METHOD(Glib::ustring nth_field_name(guint index) const, gst_structure_nth_field_name)
+  _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
 
   static Structure create_from_string(const Glib::ustring& the_string);
 
-  _WRAP_METHOD(Glib::QueryQuark get_name_id() const, gst_structure_get_name_id)
-  _WRAP_METHOD(Glib::ustring get_name() const, gst_structure_get_name)
-  _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
-  _WRAP_METHOD(void set_name(const Glib::ustring& name), gst_structure_set_name)
-  _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
-  _WRAP_METHOD(Glib::ustring nth_field_name(guint index) const, gst_structure_nth_field_name)
   _IGNORE(
       gst_structure_get_date,
       gst_structure_id_set,
