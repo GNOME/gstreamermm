@@ -46,14 +46,16 @@ Caps::create_simple(const Glib::ustring& media_type)
   return result;
 }
 
-/*
 Glib::RefPtr<Caps>
-Caps::create_full(Structure& structure)
+Caps::create(Structure& structure)
 {
   return Glib::wrap(gst_caps_new_full(structure.gobj()));
 }
-*/
 
+//TODO: Want to return RefPtr to Caps but using RefPtr in expressions such
+//TODO: as 'caps->set_simple(name1, value1)->set_simple(name2, value2)' a
+//TODO: causes Structure immutability warnings because the Caps is referenced
+//TODO: more than once in the expression
 /*
   This method is implemented because gst_caps_set_simple is a variable argument
   function and cannot be wrapped.  In addition, in order for
@@ -71,6 +73,12 @@ Caps::set_simple(const Glib::ustring& name, const Glib::ValueBase& value)
   gst_structure_set_value(gst_caps_get_structure(gobj(), 0), name.c_str(), value.gobj());
 
   //return Glib::wrap(gobj(), true);
+}
+
+const Structure& Caps::get_structure(guint idx) const
+{
+  const_cast<Caps*>(this)->structure_ = Structure(gst_caps_get_structure(gobj(), idx));
+  return structure_;
 }
 
 } //namespace Gst

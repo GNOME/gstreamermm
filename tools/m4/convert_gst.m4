@@ -93,8 +93,7 @@ _CONVERSION(`const Glib::RefPtr<Query>&',`GstQuery*', `Glib::unwrap($3)')
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Registry>', `Glib::wrap($3)')
 
 #Structure
-_CONVERSION(`Structure&',`GstStructure*',`((GstStructure*)(&($3)))')
-_CONVERSION(`GstStructure*',`Structure*',`((Structure*) ($3))')
+_CONVERSION(`Structure&',`GstStructure*',`(($3).gobj())')
 
 #TagList
 _CONVERSION(`const Glib::RefPtr<const TagList>&',`const GstTagList*', `Glib::unwrap($3)')
