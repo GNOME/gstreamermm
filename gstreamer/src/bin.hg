@@ -40,14 +40,11 @@ class Bin
   _IMPLEMENTS_INTERFACE(ChildProxy)
 
 protected:
-  _CTOR_DEFAULT
+  _WRAP_CTOR(Bin(const Glib::ustring& name), gst_bin_new)
 
 public:
-  //TODO: Why doesn't this use _WRAP_CREATE()?
-  static Glib::RefPtr<Bin> create(const Glib::ustring& name);
+  _WRAP_CREATE(const Glib::ustring& name)
 
-  //TODO: Why do these throw exceptions?
-  //If there is a good reason for it, document that in comments and doxygen documentation. murrayc.
   Glib::RefPtr<Bin> add(const Glib::RefPtr<Element>& element);
   Glib::RefPtr<Bin> remove(const Glib::RefPtr<Element>& element);
 

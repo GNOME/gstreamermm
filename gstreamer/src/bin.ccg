@@ -27,30 +27,36 @@
 namespace Gst
 {
 
-Glib::RefPtr<Bin> Bin::create(const Glib::ustring& name)
-{
-  GstElement* bin = gst_bin_new(name.c_str());
-  return Glib::wrap((GstBin*) bin);
-}
-
 Glib::RefPtr<Bin> Bin::add(const Glib::RefPtr<Element>& element)
 {
   bool result = gst_bin_add(gobj(), element->gobj());
 
-  if(result)
+  if(result) {
+
+    // When adding an element to a bin, an extra ref is needed because bin
+    // takes ownership of element and wants to unref the element itself when
+    // the bin is destroyed.  Without ref, when RefPtr tries to unref the last
+    // reference a warning is issued.  Even with extra ref, element is
+    // destroyed when bin unrefs the element when the bin is completely
+    // unreffed and all RefPtrs unref element.  Removing element from the bin
+    // will also get rid of the extra ref (gst_bin_remove() does this)
+    element->reference();
+
     return Glib::wrap(gobj(), true);
+  }
   else
-    throw std::runtime_error("Bin '" + get_name() + "' does not want to accept Element '" + element->get_name() + "'");
+    return Glib::RefPtr<Bin>(0);
 }
 
 Glib::RefPtr<Bin> Bin::remove(const Glib::RefPtr<Element>& element)
 {
   bool result = gst_bin_remove(gobj(), element->gobj());
 
-  if(result)
-    return Glib::RefPtr<Bin>(this);
+  if(result) {
+    return Glib::wrap(gobj(), true);
+  }
   else
-    throw std::runtime_error("Bin '" + get_name() + "' does not want to remove Element '" + element->get_name() + "'");
+    return Glib::RefPtr<Bin>(0);
 }
 
 } //namespace Gst
