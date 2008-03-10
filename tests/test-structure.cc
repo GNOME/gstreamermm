@@ -26,8 +26,7 @@ int main (int argc, char* argv[])
 {
   Gst::init(argc, argv);
 
-  Glib::RefPtr<Gst::Query> latencyQuery = Gst::QueryLatency::create();
-  Gst::Structure structure = latencyQuery->get_structure();
+  Gst::Structure structure("my_structure");
 
   Glib::Value<Glib::ustring> stringValue;
   stringValue.init(Glib::Value<Glib::ustring>::value_type());
@@ -39,9 +38,13 @@ int main (int argc, char* argv[])
 
   structure.set_field(Glib::Quark("string"), stringValue).set_field("integer", intValue);
 
-  Glib::Value<Glib::ustring> value;
-  structure.get_field("string", value);
-  std::cout << "value = '" << value.get() << "'" << std::endl;
+  Glib::Value<Glib::ustring> value1;
+  structure.get_field("string", value1);
+  std::cout << "value1 = '" << value1.get() << "'" << std::endl;
+
+  Glib::Value<int> value2;
+  structure.get_field("integer", value2);
+  std::cout << "value2 = '" << value2.get() << "'" << std::endl;
 
   return 0;
 }
