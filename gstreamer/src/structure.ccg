@@ -23,25 +23,29 @@
 #include <gst/gststructure.h>
 
 static gboolean
-Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, gpointer data)
+Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, void* data)
 {
   Glib::ValueBase val_base;
   val_base.init(value);
 
-  Gst::Structure::SlotForeach& slot = *static_cast<Gst::Structure::SlotForeach*>(data);
+  Gst::Structure::SlotForeach* slot = static_cast<Gst::Structure::SlotForeach*>(data);
 
-  return slot(Glib::QueryQuark(field_id), val_base);
+  bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
+  delete slot;
+  return result;
 }
 
 static gboolean
-Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, gpointer data)
+Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, void* data)
 {
   Glib::ValueBase val_base;
   val_base.init(value);
 
-  Gst::Structure::SlotMap& slot = *static_cast<Gst::Structure::SlotMap*>(data);
+  Gst::Structure::SlotMap* slot = static_cast<Gst::Structure::SlotMap*>(data);
 
-  return slot(Glib::QueryQuark(field_id), val_base);
+  bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
+  delete slot;
+  return result;
 }
 
 namespace Gst
@@ -182,15 +186,15 @@ Structure::get_fraction(const Glib::ustring& name, int& value_numerator, int& va
 bool
 Structure::foreach(const SlotForeach& slot)
 {
-  SlotForeach slot_copy(slot);
-  return gst_structure_foreach(gobj(), &Structure_Foreach_gstreamermm_callback, &slot_copy);
+  SlotForeach* slot_copy = new SlotForeach(slot);
+  return gst_structure_foreach(gobj(), &Structure_Foreach_gstreamermm_callback, slot_copy);
 }
 
 bool
 Structure::map_in_place(const SlotMap& slot)
 {
-  SlotMap slot_copy(slot);
-  return gst_structure_map_in_place(gobj(), &Structure_Map_gstreamermm_callback, &slot_copy);
+  SlotMap* slot_copy = new SlotMap(slot);
+  return gst_structure_map_in_place(gobj(), &Structure_Map_gstreamermm_callback, slot_copy);
 }
 
 Structure

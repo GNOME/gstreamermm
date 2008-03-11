@@ -21,6 +21,34 @@
 
 #include <gst/gstclock.h>
 
+static gboolean ClockID_Clock_gstreamermm_callback(GstClock* clock, GstClockTime time, GstClockID id, void* data)
+{
+  Gst::ClockID::SlotClock* the_slot = static_cast<Gst::ClockID::SlotClock*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    bool result = (*the_slot)(Glib::wrap(clock, true), time, Glib::wrap((GstClockID*)(&id), true));
+
+    //Delete the once executing slot before returning result
+    delete the_slot;
+
+    return result;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  //Delete the once executing slot before returning result
+  delete the_slot;
+
+  return 0; // arbitrary value
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
 namespace Gst
 {
 
@@ -64,6 +92,12 @@ guint get_fractional_seconds(ClockTime time)
 {
   return GST_CLOCK_TIME_IS_VALID (time) ? \
         (guint) (((GstClockTime)(time)) % GST_SECOND) : 999999999;
+}
+
+ClockReturn ClockID::wait_async(const SlotClock& slot)
+{
+  SlotClock* slot_copy = new SlotClock(slot);
+  return (ClockReturn) gst_clock_id_wait_async(gobj(), &ClockID_Clock_gstreamermm_callback, slot_copy);
 }
 
 } //namespace Gst

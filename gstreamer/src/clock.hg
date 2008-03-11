@@ -29,10 +29,37 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace Gst
 {
 
+class Clock;
+
+/** A datatype to hold the handle to an outstanding sync or async clock
+ * callback.
+ */
 class ClockID
 {
   _CLASS_OPAQUE_REFCOUNTED(ClockID, GstClockID, NONE, gst_clock_id_ref, gst_clock_id_unref)
   _IGNORE(gst_clock_id_ref, gst_clock_id_unref)
+
+public:
+  /** For example,
+   * bool on_clock(const Glib::RefPtr<Clock>& clock, ClockTime time, const
+   * Glib::RefPtr<ClockID>& id);
+   */
+  typedef sigc::slot< bool, const Glib::RefPtr<Clock>&, ClockTime, const Glib::RefPtr<ClockID>& > SlotClock;
+
+  _WRAP_METHOD(ClockTime get_time(), gst_clock_id_get_time)
+  _WRAP_METHOD(ClockReturn wait(ClockTimeDiff& jitter), gst_clock_id_wait)
+
+  /** Register a slot on the given GstClockID id with the given slot. When
+   * passing a GstClockID with an invalid time to this function, the slot will
+   * be called immediatly with a time set to CLOCK_TIME_NONE. The slot will be
+   * called when the time of id has been reached.
+   *
+   * @param slot The slot to callback
+   * @return the result of the non blocking wait. MT safe. 
+   */
+  ClockReturn wait_async(const SlotClock& slot);
+
+  _WRAP_METHOD(void unschedule(), gst_clock_id_unschedule)
 };
 
 //Note that ClockTime is an enum.  That's why these are not member functions of a class
@@ -45,6 +72,79 @@ guint get_microseconds(ClockTime time);
 guint get_nanoseconds(ClockTime time);
 guint get_fractional_seconds(ClockTime time);
 
+/** Clock — Abstract class for global clocks.
+ * GStreamer uses a global clock to synchronize the plugins in a pipeline.
+ * Different clock implementations are possible by implementing this abstract
+ * base class.
+ *
+ * The Clock returns a monotonically increasing time with the method
+ * get_time(). Its accuracy and base time depend on the specific clock
+ * implementation but time is always expressed in nanoseconds. Since the
+ * baseline of the clock is undefined, the clock time returned is not
+ * meaningful in itself, what matters are the deltas between two clock times.
+ * The time returned by a clock is called the absolute time.
+ *
+ * The pipeline uses the clock to calculate the stream time. Usually all
+ * renderers synchronize to the global clock using the buffer timestamps, the
+ * newsegment events and the element's base time, see Pipeline.
+ *
+ * A clock implementation can support periodic and single shot clock
+ * notifications both synchronous and asynchronous.
+ *
+ * One first needs to create a ClockID for the periodic or single shot
+ * notification using create_single_shot_id() or create_periodic_id().
+ *
+ * To perform a blocking wait for the specific time of the ClockID use the
+ * ClockID::wait() method. To receive a callback when the specific time is
+ * reached in the clock use ClockID::wait_async(). Both these calls can be
+ * interrupted with the ClockID::unschedule() call. If the blocking wait is
+ * unscheduled a return value of CLOCK_UNSCHEDULED is returned.
+ *
+ * Periodic callbacks scheduled async will be repeadedly called automatically
+ * until it is unscheduled. To schedule a sync periodic callback, wait() should
+ * be called repeadedly.
+ *
+ * The async callbacks can happen from any thread, either provided by the core or from a streaming thread. The application should be prepared for this.
+ *
+ * A ClockID that has been unscheduled cannot be used again for any wait
+ * operation, a new ClockID should be created.
+ *
+ * It is possible to perform a blocking wait on the same ClockID from multiple
+ * threads. However, registering the same ClockID for multiple async
+ * notifications is not possible, the slot will only be called for the thread
+ * registering the entry last.
+ *
+ * None of the wait operations unref the ClockID, the owner is responsible for
+ * unreffing the ids itself. This holds for both periodic and single shot
+ * notifications. The reason being that the owner of the ClockID has to keep a
+ * handle to the ClockID to unblock the wait on FLUSHING events or state
+ * changes and if the entry would be unreffed automatically, the handle might
+ * become invalid without any notification. (The RefPtr takes care of unreffing
+ * in this case)
+ *
+ * These clock operations do not operate on the stream time, so the callbacks
+ * will also occur when not in PLAYING state as if the clock just keeps on
+ * running. Some clocks however do not progress when the element that provided
+ * the clock is not PLAYING.
+ *
+ * When a clock has the CLOCK_FLAG_CAN_SET_MASTER flag set, it can be slaved to
+ * another Clock with the set_master() method. The clock will then
+ * automatically be synchronized to this master clock by repeadedly sampling
+ * the master clock and the slave clock and recalibrating the slave clock with
+ * set_calibration(). This feature is mostly useful for plugins that have an
+ * internal clock but must operate with another clock selected by the Pipeline.
+ * They can track the offset and rate difference of their internal clock
+ * relative to the master clock by using the get_calibration() method.
+ *
+ * The master/slave synchronisation can be tuned with the "timeout",
+ * "window-size" and "window-threshold" properties. The "timeout" property
+ * defines the interval to sample the master clock and run the calibration
+ * functions. "window-size" defines the number of samples to use when
+ * calibrating and "window-threshold" defines the minimum number of samples
+ * before the calibration is performed.
+ *
+ * Last reviewed on 2006-08-11 (0.10.10)
+ */
 class Clock : public Object
 {
   _CLASS_GOBJECT(Clock, GstClock, GST_CLOCK, Object, GstObject)
@@ -56,8 +156,8 @@ public:
   _WRAP_METHOD(ClockTime set_resolution(ClockTime resolution), gst_clock_set_resolution)
   _WRAP_METHOD(ClockTime get_resolution() const, gst_clock_get_resolution)
   _WRAP_METHOD(ClockTime get_time() const, gst_clock_get_time)
-  //  _WRAP_METHOD(Glib::RefPtr<ClockID> new_single_shot_id(ClockTime time), gst_clock_new_single_shot_id)
-  //  _WRAP_METHOD(Glib::RefPtr<ClockID> new_periodic_id(ClockTime start_time, ClockTime intervals), gst_clock_new_periodic_id)
+  //TODO: _WRAP_METHOD(Glib::RefPtr<ClockID> create_single_shot_id(ClockTime time), gst_clock_new_single_shot_id)
+  //TODO: _WRAP_METHOD(Glib::RefPtr<ClockID> create_periodic_id(ClockTime start_time, ClockTime intervals), gst_clock_new_periodic_id)
   _WRAP_METHOD(ClockTime get_internal_time() const, gst_clock_get_internal_time)
   _WRAP_METHOD(ClockTime adjust_unlocked(ClockTime internal_time), gst_clock_adjust_unlocked)
   _WRAP_METHOD(ClockTime unadjust_unlocked(ClockTime external_time), gst_clock_unadjust_unlocked)

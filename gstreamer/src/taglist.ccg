@@ -23,10 +23,12 @@
 
 /*
 static gboolean
-TagList_Foreach_gstreamermm_callback(const GstTagList* list, const gchar *tag, gpointer data)
+TagList_Foreach_gstreamermm_callback(const GstTagList* list, const gchar *tag, void* data)
 {
-  Gst::TagList::SlotForeach& slot = *static_cast<Gst::TagList::SlotForeach*>(data);
-  return slot(Glib::wrap(list), Glib::ustring(value));
+  Gst::TagList::SlotForeach* slot = static_cast<Gst::TagList::SlotForeach*>(data);
+  bool result = (*slot)(Glib::wrap(list), Glib::ustring(value));
+  delete slot;
+  return result;
 }
 */
 
@@ -37,8 +39,8 @@ namespace Gst
 void
 TagList::foreach(const SlotForeach& slot)
 {
-  SlotForeach slot_copy(slot);
-  gst_taglist_foreach(gobj(), &TagList_Foreach_gstreamermm_callback, &slot_copy);
+  SlotForeach* slot_copy = new SlotForeach(slot);
+  gst_taglist_foreach(gobj(), &TagList_Foreach_gstreamermm_callback, slot_copy);
 }
 */
 
