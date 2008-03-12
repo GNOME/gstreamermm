@@ -36,15 +36,34 @@ int main (int argc, char* argv[])
   intValue.init(Glib::Value<int>::value_type());
   intValue.set(100);
 
-  structure.set_field(Glib::Quark("string"), stringValue).set_field("integer", intValue);
+  Glib::Value<Gst::Fraction> fractValue;
+  fractValue.init(Glib::Value<Gst::Fraction>::value_type());
+  fractValue.set(Gst::Fraction(1,2));
+
+  Glib::Value<Gst::FractionRange> rangeValue;
+  rangeValue.init(Glib::Value<Gst::FractionRange>::value_type());
+  rangeValue.set(Gst::FractionRange(Gst::Fraction(1,2), Gst::Fraction(3,4)));
+
+  structure.set_field(Glib::Quark("string"), stringValue).set_field("integer", intValue).set_field("fraction", fractValue).set_field("range", rangeValue);
 
   Glib::Value<Glib::ustring> value1;
   structure.get_field("string", value1);
-  std::cout << "value1 = '" << value1.get() << "'" << std::endl;
+  std::cout << "string value = '" << value1.get() << "'" << std::endl;
 
   Glib::Value<int> value2;
   structure.get_field("integer", value2);
-  std::cout << "value2 = '" << value2.get() << "'" << std::endl;
+  std::cout << "integer value = '" << value2.get() << "'" << std::endl;
+
+  Glib::Value<Gst::Fraction> value3;
+  structure.get_field("fraction", value3);
+  std::cout << "fraction value = '" << value3.get().num << "/" <<
+      value3.get().denom << "'" << std::endl;
+
+  Glib::Value<Gst::FractionRange> value4;
+  structure.get_field("range", value4);
+  std::cout << "fractional range value = '[(" << value4.get().min.num << "/" <<
+      value4.get().min.denom << "), (" << value4.get().max.num << "/" <<
+          value4.get().max.denom << ")]'" << std::endl;
 
   return 0;
 }
