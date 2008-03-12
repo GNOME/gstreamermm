@@ -60,57 +60,7 @@ Structure::Structure(const Glib::ustring& name)
 void
 Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  const GValue* v = gst_structure_get_value(gobj(), name.c_str());
-
-  GType type = G_VALUE_TYPE(v);
-
-  if (type == GST_TYPE_FRACTION)
-  {
-    value.init(Glib::Value<Fraction>::value_type());
-
-    Glib::Value<Fraction>* fract =
-        static_cast< Glib::Value<Fraction>* >(&value);
-
-    fract->set(Fraction(gst_value_get_fraction_numerator(v),
-        gst_value_get_fraction_denominator(v)));
-  }
-  else if (type == GST_TYPE_INT_RANGE)
-  {
-    value.init(Glib::Value<IntRange>::value_type());
-
-    Glib::Value<IntRange>* range =
-        static_cast< Glib::Value<IntRange>* >(&value);
-
-    range->set(IntRange(gst_value_get_int_range_min(v),
-        gst_value_get_int_range_max(v)));
-  }
-  else if (type == GST_TYPE_DOUBLE_RANGE)
-  {
-    value.init(Glib::Value<DoubleRange>::value_type());
-
-    Glib::Value<DoubleRange>* range =
-        static_cast< Glib::Value<DoubleRange>* >(&value);
-
-    range->set(DoubleRange(gst_value_get_double_range_min(v),
-        gst_value_get_double_range_max(v)));
-  }
-  else if (type == GST_TYPE_FRACTION_RANGE)
-  {
-    const GValue* min = gst_value_get_fraction_range_min(v);
-    const GValue* max = gst_value_get_fraction_range_max(v);
-
-    value.init(Glib::Value<FractionRange>::value_type());
-
-    Glib::Value<FractionRange>* range =
-        static_cast< Glib::Value<FractionRange>* >(&value);
-
-    range->set(FractionRange(Fraction(gst_value_get_fraction_numerator(min),
-        gst_value_get_fraction_denominator(min)),
-            Fraction(gst_value_get_fraction_numerator(max),
-                gst_value_get_fraction_denominator(max))));
-  }
-  else
-    value.init(v);
+  value.init(gst_structure_get_value(gobj(), name.c_str()));
 }
 
 Structure&

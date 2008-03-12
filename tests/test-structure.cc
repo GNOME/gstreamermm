@@ -54,16 +54,18 @@ int main (int argc, char* argv[])
   structure.get_field("integer", value2);
   std::cout << "integer value = '" << value2.get() << "'" << std::endl;
 
-  Glib::Value<Gst::Fraction> value3;
+  Glib::ValueBase value3;
   structure.get_field("fraction", value3);
-  std::cout << "fraction value = '" << value3.get().num << "/" <<
-      value3.get().denom << "'" << std::endl;
+  Gst::Fraction fract(value3);
+  std::cout << "fraction value = '" << fract.num << "/" <<
+      fract.denom << "'" << std::endl;
 
-  Glib::Value<Gst::FractionRange> value4;
+  Glib::ValueBase value4;
   structure.get_field("range", value4);
-  std::cout << "fractional range value = '[(" << value4.get().min.num << "/" <<
-      value4.get().min.denom << "), (" << value4.get().max.num << "/" <<
-          value4.get().max.denom << ")]'" << std::endl;
+  Gst::FractionRange range(value4);
+  std::cout << "fractional range value = '[(" << range.min.num << "/" <<
+      range.min.denom << "), (" << range.max.num << "/" << range.max.denom <<
+          ")]'" << std::endl;
 
   return 0;
 }

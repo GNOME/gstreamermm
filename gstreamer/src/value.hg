@@ -29,19 +29,23 @@ namespace Gst
 
 /** Represents a fraction for use to store in Structures of Caps as a value
  * representing a property (see GStreamer Application Development Manual
- * section 8.2.2 for explanation).  The class can be used in setting and
- * getting a Structure's field like so:
+ * section 8.2.2 for explanation).  When the value is set, it is transformed to
+ * a GStreamer GType so retrieving the value is a bit different.  The class can
+ * be used in setting and getting a Structure's field like so:
  *
  * @code
- * Glib::Value<Gst::Fraction> fract_value;
- * fract_value.init(Glib::Value<Gst::Fraction>::value_type());
- * fract_value.set(Gst::Fraction(25,1));
+ * Glib::Value<Gst::Fraction> value;
+ * value.init(Glib::Value<Gst::Fraction>::value_type());
+ * value.set(Gst::Fraction(25,1));
  *
  * Gst::Structure structure("my-structure");
- * structure.set_field("framerate", fract_value);
+ * structure.set_field("framerate", value);
  * ...
- * Glib::Value<Gst::Fraction> fract_copy;
- * structure.get_field("framerate", fract_copy);
+ * Glib::ValueBase gst_value;
+ * structure.get_field("framerate", gst_value);
+ * Gst::Fraction fract(gst_value);
+ * int numerator = fract.num;
+ * ...
  * @code
  */
 class Fraction
@@ -50,27 +54,33 @@ public:
   Fraction();
   Fraction(int num, int denom);
   Fraction(const Fraction& f);
+  Fraction(const Glib::ValueBase& gst_fraction_value);
 public:
   int num;
   int denom;
 };
 
 
-/** Represents a integer range (min - max) for use to store in Structures of
+/** Represents an integer range (min - max) for use to store in Structures of
  * Caps as a value representing a property (see GStreamer Application
- * Development Manual section 8.2.2 for explanation).  The class can be used in
- * setting and getting a Structure's field like so:
+ * Development Manual section 8.2.2 for explanation).  When the value is set,
+ * it is transformed to a GStreamer GType so retrieving the value is a bit
+ * different.  The class can be used in setting and getting a Structure's field
+ * like so:
  *
  * @code
- * Glib::Value<Gst::IntRange> range;
- * range.init(Glib::Value<Gst::IntRange>::value_type());
- * range.set(Gst::IntRange(8000, 50000));
+ * Glib::Value<Gst::IntRange> value;
+ * value.init(Glib::Value<Gst::IntRange>::value_type());
+ * value.set(Gst::IntRange(8000, 50000));
  *
  * Gst::Structure structure("my-structure");
- * structure.set_field("rate", range);
+ * structure.set_field("rate", value);
  * ...
- * Glib::Value<Gst::IntRange> range_copy;
- * structure.get_field("rate", range_copy);
+ * Glib::ValueBase gst_value;
+ * structure.get_field("rate", gst_value);
+ * Gst::IntRange range(gst_value);
+ * int max = range.max;
+ * ...
  * @code
  */
 class IntRange
@@ -79,26 +89,32 @@ public:
   IntRange();
   IntRange(int min, int max);
   IntRange(const IntRange& r);
+  IntRange(const Glib::ValueBase& gst_int_range_value);
 public:
   int min;
   int max;
 };
 
-/** Represents a floating (double) range (min - max) for use to store in
- * Structures of Caps as a value representing a property (see GStreamer
- * Application Development Manual section 8.2.2 for explanation).  The class
- * can be used in setting and getting a Structure's field like so:
+/** Represents a double range (min - max) for use to store in Structures of
+ * Caps as a value representing a property (see GStreamer Application
+ * Development Manual section 8.2.2 for explanation).  When the value is set,
+ * it is transformed to a GStreamer GType so retrieving the value is a bit
+ * different.  The class can be used in setting and getting a Structure's field
+ * like so:
  *
  * @code
- * Glib::Value<Gst::DoubleRange> range;
- * range.init(Glib::Value<Gst::DoubleRange>::value_type());
- * range.set(Gst::DoubleRange(44.1, 48.0));
+ * Glib::Value<Gst::DoubleRange> value;
+ * value.init(Glib::Value<Gst::DoubleRange>::value_type());
+ * value.set(Gst::DoubleRange(44.1, 48.0));
  *
  * Gst::Structure structure("my-structure");
- * structure.set_field("rate", range);
+ * structure.set_field("rate", value);
  * ...
- * Glib::Value<Gst::DoubleRange> range_copy;
- * structure.get_field("rate", range_copy);
+ * Glib::ValueBase gst_value;
+ * structure.get_field("rate", gst_value);
+ * Gst::DoubleRange range(gst_value);
+ * double min = range.min;
+ * ...
  * @code
  */
 class DoubleRange
@@ -107,6 +123,7 @@ public:
   DoubleRange();
   DoubleRange(double min, double max);
   DoubleRange(const DoubleRange& r);
+  DoubleRange(const Glib::ValueBase& gst_double_range_value);
 public:
   double min;
   double max;
@@ -115,19 +132,23 @@ public:
 
 /** Represents a fractional range for use to store in Structures of Caps as a
  * value representing a property (see GStreamer Application Development Manual
- * section 8.2.2 for explanation).  The class can be used in setting and
- * getting a Structure's field like so:
+ * section 8.2.2 for explanation).  When the value is set, it is transformed to
+ * a GStreamer GType so retrieving the value is a bit different.  The class can
+ * be used in setting and getting a Structure's field like so:
  *
  * @code
- * Glib::Value<Gst::FractionRange> range;
- * range.init(Glib::Value<Gst::Fraction>::value_type());
- * range.set(Gst::FractionRange(Gst::Fraction(1,2), Gst::Fraction(3,4));
+ * Glib::Value<Gst::FractionRange> value;
+ * value.init(Glib::Value<Gst::Fraction>::value_type());
+ * value.set(Gst::FractionRange(Gst::Fraction(1,2), Gst::Fraction(3,4)));
  *
  * Gst::Structure structure("my-structure");
- * structure.set_field("range", range);
+ * structure.set_field("range", value);
  * ...
- * Glib::Value<Gst::FractionRange> range_copy;
- * structure.get_field("range", range_copy);
+ * Glib::ValueBase gst_value;
+ * structure.get_field("rate", gst_value);
+ * Gst::FractionRange range(gst_value);
+ * int min_numerator = range.min.num;
+ * ...
  * @code
  */
 class FractionRange
@@ -136,6 +157,7 @@ public:
   FractionRange();
   FractionRange(const Fraction& min, const Fraction& max);
   FractionRange(const FractionRange& r);
+  FractionRange(const Glib::ValueBase& gst_fraction_range_value);
 public:
   Fraction min;
   Fraction max;
