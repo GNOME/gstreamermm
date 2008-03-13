@@ -36,5 +36,7 @@ int main (int argc, char* argv[])
   std::cout << "event is a Gst::EventLatency: " << (bool)event_latency  << std::endl;
   std::cout << "event type name: '" << Gst::get_name(event->get_event_type()) << "'" << std::endl;
 
+  std::cout << "Event structure name: '" << event->get_structure()->get_name() << "'" << std::endl;
+
   return 0;
 }

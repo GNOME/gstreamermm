@@ -24,10 +24,17 @@
 namespace Gst
 {
 
-const Structure& Query::get_structure()
+const Structure* Query::get_structure()
 {
-  structure_ = Structure(const_cast<GstStructure*>(gst_query_get_structure(gobj())));
-  return structure_;
+  static bool got_structure = false;
+
+  if(!got_structure) {
+    Structure temp(const_cast<GstStructure*>(gst_query_get_structure(gobj())), false);
+    structure_.swap(temp);
+    got_structure = true;
+  }
+
+  return &structure_;
 }
 
 bool get_details(QueryType type, QueryTypeDefinition &def)

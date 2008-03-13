@@ -24,10 +24,17 @@
 namespace Gst
 {
 
-const Structure& Event::get_structure()
+const Structure* Event::get_structure()
 {
-  structure_ = Structure(const_cast<GstStructure*>(gst_event_get_structure(gobj())));
-  return structure_;
+  static bool got_structure = false;
+
+  if(!got_structure) {
+    Structure temp(const_cast<GstStructure*>(gst_event_get_structure(gobj())), false);
+    structure_.swap(temp);
+    got_structure = true;
+  }
+
+  return &structure_;
 }
 
 bool Event::is_downstream() const
