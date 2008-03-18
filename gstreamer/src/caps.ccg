@@ -21,6 +21,7 @@
 
 #include <gst/gstcaps.h>
 #include <gstreamermm/structure.h>
+#include <map>
 
 namespace Gst
 {
@@ -49,7 +50,47 @@ Caps::create_simple(const Glib::ustring& media_type)
 Glib::RefPtr<Caps>
 Caps::create(Structure& structure)
 {
+  //Since caps now owns structure, do not let wrapper destroy structure (caps
+  //will do that itself)
+  structure.set_destroy(false);
+
   return Glib::wrap(gst_caps_new_full(structure.gobj()));
+}
+
+void Caps::append_structure(Structure& structure)
+{
+  //Since caps now owns structure, do not let wrapper destroy structure (caps
+  //will do that itself)
+  structure.set_destroy(false);
+
+  gst_caps_append_structure(gobj(), structure.gobj());
+}
+
+void Caps::merge_structure(Structure& structure)
+{
+  //Since caps now owns structure, do not let wrapper destroy structure (caps
+  //will do that itself)
+  structure.set_destroy(false);
+
+  gst_caps_merge_structure(gobj(), structure.gobj());
+}
+
+const Structure* Caps::get_structure(guint idx) const
+{
+  static std::map<guint,Structure> structures;
+
+  GstStructure* structure = gst_caps_get_structure(gobj(), idx);
+
+  if (structure)
+  {
+    if (structures[idx].gobj() != structure) {
+      Structure temp(structure, false /*don't copy*/, false /*don't destroy*/);
+      structures[idx].swap(temp);
+    }
+    return &structures[idx];
+  }
+
+  return NULL;
 }
 
 //TODO: Want to return RefPtr to Caps but using RefPtr in expressions such
@@ -57,28 +98,24 @@ Caps::create(Structure& structure)
 //TODO: causes Structure immutability warnings because the Caps is referenced
 //TODO: more than once in the expression
 /*
-  This method is implemented because gst_caps_set_simple is a variable argument
-  function and cannot be wrapped.  In addition, in order for
-  gst_caps_set_simple to work, this Caps must be "simple", ie, it must only
-  have one GstStructure (gst_caps_set_simple checks for this).  Here we must
-  set the field in the Structure ourselves so we must check for only one
-  Structure ourselves also (because we wont be calling gst_caps_set_simple)
+  This method is implemented in place of gst_caps_set_simple which is a
+  variable argument function and cannot be wrapped.  We don't call
+  gst_caps_set_simple() directly because we are using a Glib::ValueBase as the
+  value to be set instead of listing out each field in the value as would be
+  done with gst_caps_set_simple()
 */
 //Glib::RefPtr<Caps>
 void
 Caps::set_simple(const Glib::ustring& name, const Glib::ValueBase& value)
 {
-  //g_return_val_if_fail((gobj()->structs->len == 1), Glib::RefPtr<Caps>());
-  g_return_if_fail((gobj()->structs->len == 1));
-  gst_structure_set_value(gst_caps_get_structure(gobj(), 0), name.c_str(), value.gobj());
+  g_return_if_fail((gobj()->structs->len == 1)); // Not simple
+  g_return_if_fail (g_atomic_int_get(&(gobj())->refcount) == 1); // IS_WRITABLE(caps) fails
+
+  //Use Gst::Structure so gstremermm GTypes like Gst::Value<Gst::IntRange> are
+  //converted to GStreamer types when they are stored in structure
+  const_cast<Structure*>(get_structure(0))->set_field(name, value);
 
   //return Glib::wrap(gobj(), true);
-}
-
-const Structure& Caps::get_structure(guint idx) const
-{
-  const_cast<Caps*>(this)->structure_ = Structure(gst_caps_get_structure(gobj(), idx));
-  return structure_;
 }
 
 } //namespace Gst

@@ -1,3 +1,31 @@
+2008-03-18  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* tools/m4/class_boxedtype_ncopy.m4: 
+	* tools/m4/convert.m4: Added wrapper to be used with GstStructure
+	which with GstCaps wants wrapper to work with original gobject and not
+	to be delete when its ownership has been taken over by the GstCaps.
+
+	* gstreamer/src/structure.hg: Modified Gst::Structure to use
+	_CLASS_BOXED_TYPE_NCOPY so that it mostly doesn't copy the gobject and
+	is flexible at destroying underlying gobject when wrapper is destroyed
+	which makes it easier for Gst::Caps to "take ownership" of
+	Gst::Structures
+
+	* gstreamer/src/caps.ccg:
+	* gstreamer/src/caps.hg: Reimplemented get_structure() to function
+	properly and to return a const Gst::Structure*.  Modified
+	create(Gst::Structure&) to "take ownership" of the Gst::Structure (as
+	GstCaps does with underlying gobject).  Also handwrote
+	append_structure() and merge_structure() to "take ownership" of the
+	Gst::Structure which is appended/merged (as GstCaps does with
+	underlying gobject)
+
+	* tests/Makefile.am:
+	* tests/test-caps-structures.cc: Added test to add/remove and get
+	Gst::Structures in a Gst::Caps
+
+	* docs/Makefile.am: Added copyright statement at top
+
 2008-03-13  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/event.ccg:

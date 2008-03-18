@@ -82,20 +82,27 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Caps> copy_nth(guint nth), gst_caps_copy_nth)
   _WRAP_METHOD(void append(const Glib::RefPtr<Caps>& caps), gst_caps_append)
   _WRAP_METHOD(void merge(const Glib::RefPtr<Caps>& caps), gst_caps_merge)
-  _WRAP_METHOD(void append_structure(Structure& structure), gst_caps_append_structure)
-  _WRAP_METHOD(void merge_structure(Structure& structure), gst_caps_merge_structure)
 
-  /** Finds the structure in caps that has the index index, and returns it.
+  /** Appends structure to caps. The structure is not copied; caps becomes the
+   * owner of structure.
+   *
+   * @param structure the Structure to append
+   */
+  void append_structure(Structure& structure);
+
+  /** Appends structure to caps if its not already expressed by caps. The
+   * structure is not copied; caps becomes the owner of structure.
+   *
+   * @param structure the Structure to merge
+   */
+  void merge_structure(Structure& structure);
+
+  /** Finds the structure in caps that has the index idx, and returns it.
    *
    * @param index the index of the structure
    * @return the Structure corresponding to index
    */
-
-  /** (Please note that when Structures are assigned, the original is copied
-   * which means that the copy may be modifiable but the original never is.
-   * Also, if the original changes for any reason, the copy will not.)
-   */
-  const Structure& get_structure(guint idx) const;
+  const Structure* get_structure(guint idx) const;
 
   _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
   _WRAP_METHOD(guint get_size() const, gst_caps_get_size)
@@ -133,10 +140,6 @@ public:
   _WRAP_METHOD(void truncate(), gst_caps_truncate)
   
   _IGNORE(gst_caps_copy, gst_caps_set_simple, gst_caps_make_writable)
-
-private:
-  Structure structure_;
-  
 };
 
 } //namespace Gst
