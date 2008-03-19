@@ -22,24 +22,52 @@
 #include <gstreamermm.h>
 #include <iostream>
 
+// Following code adapted from GStreamer Application Development Manual
+// section 8.3.2 (feature negotiation)
+
+int link_elements_with_filter (const Glib::RefPtr<Gst::Element> e1,
+  const Glib::RefPtr<Gst::Element> e2)
+{
+  Glib::Value<int> widthValue;
+  widthValue.init(Glib::Value<int>::value_type());
+  widthValue.set(384);
+
+  Glib::Value<int> heightValue;
+  heightValue.init(Glib::Value<int>::value_type());
+  heightValue.set(288);
+
+  Glib::Value<Gst::Fraction> rateValue;
+  rateValue.init(Glib::Value<Gst::Fraction>::value_type());
+  rateValue.set(Gst::Fraction(25, 1));
+
+  Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create(
+    Gst::Structure("video/x-raw-yuv").set_field("width", widthValue).set_field("height", heightValue).set_field("framerate", rateValue));
+
+  caps->append_structure(
+    Gst::Structure("video/x-raw-rgb").set_field("width", widthValue)
+      .set_field("height", heightValue).set_field("framerate", rateValue));
+
+  return e1->link_filtered(e2, caps);
+}
+
 int main (int argc, char* argv[])
 {
+  Glib::RefPtr<Gst::Pipeline> pipeline;
+  Glib::RefPtr<Gst::Element> e1, e2;
+
   Gst::init(argc, argv);
 
-  Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw-yuv");
- 
-  //caps->set_simple("width", Glib::Value<int>(384));
-  //caps->set_simple("height", Glib::Value<int>(288));
+  pipeline = Gst::Pipeline::create("pipeline");
 
-  Glib::Value<int> width, height;
-  width.init(G_TYPE_INT);
-  width.set(384);
+  e1 = Gst::ElementFactory::create("fakesrc", "source");
+  e2 = Gst::ElementFactory::create("fakesink", "sink");
 
-  height.init(G_TYPE_INT);
-  height.set(288);
+  pipeline->add(e1)->add(e2);
 
-  caps->set_simple("width", width);
-  caps->set_simple("height", height);
+  if (!link_elements_with_filter(e1, e2))
+    std::cerr << "Falied to link e1 and e2." << std::endl;
+  else
+    std::cerr << "Succeeded linking e1 and e2 with filter." << std::endl;
 
   return 0;
 }
