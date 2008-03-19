@@ -27,11 +27,78 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+/** Represents a 4 byte identifier (used in codecs) for use to store in
+ * Structures of Caps as a value representing a property (see GStreamer
+ * Application Development Manual section 8.2.2 and GstValue docs for
+ * explanation).  When the value is set, it is transformed to a GStreamer GType
+ * so retrieving the value is a bit different.  The class can be used in
+ * setting and getting a Structure's field like so:
+ *
+ * @code
+ * Glib::Value<Gst::Fourcc> value;
+ * value.init(Glib::Value<Gst::Fourcc>::value_type());
+ * value.set(Gst::Fourcc('M', 'J', 'P', 'G'));
+ *
+ * Gst::Structure structure("my-structure");
+ * structure.set_field("id", value);
+ * ...
+ * Glib::ValueBase gst_value;
+ * structure.get_field("id", gst_value);
+ * Gst::Fourcc fourcc(gst_value);
+ * char first_char = fourcc.first;
+ * ...
+ * @endcode
+ */
+class Fourcc
+{
+public:
+  /** Construct an undefined Fourcc
+   */
+  Fourcc();
+
+  /** Construct a Fourcc from 4 characters
+   */
+  Fourcc(char first, char second, char third, char fourth);
+
+  /** Construct a Fourcc from an input string. Caller is responsible for
+   * ensuring the input string consists of at least four characters.
+   */
+  Fourcc(const Glib::ustring& s);
+
+  /** Construct a Fourcc from a 32 bit unsigned integer
+   */
+  Fourcc(guint32 fourcc);
+
+  /** Construct a Fourcc from another
+   */
+  Fourcc(const Fourcc& f);
+
+  /** Cosntruct a Fourcc from a GST_TYPE_FOURCC
+   */
+  Fourcc(const Glib::ValueBase& gst_fraction_value);
+
+public:
+  /** Gets the four characters converted into a guint32 fourcc value with host
+   * endianness.
+   */
+  guint32 get_fourcc() const;
+
+public:
+  char first;
+  char second;
+  char third;
+  char fourth;
+
+private:
+  void get_ccs(guint32 fourcc);
+};
+
 /** Represents a fraction for use to store in Structures of Caps as a value
  * representing a property (see GStreamer Application Development Manual
- * section 8.2.2 for explanation).  When the value is set, it is transformed to
- * a GStreamer GType so retrieving the value is a bit different.  The class can
- * be used in setting and getting a Structure's field like so:
+ * section 8.2.2 and GstValue docs for explanation).  When the value is set, it
+ * is transformed to a GStreamer GType so retrieving the value is a bit
+ * different.  The class can be used in setting and getting a Structure's field
+ * like so:
  *
  * @code
  * Glib::Value<Gst::Fraction> value;
@@ -51,10 +118,22 @@ namespace Gst
 class Fraction
 {
 public:
+  /** Constructs a zero Fraction (0/1)
+   */
   Fraction();
+
+  /** Constructs a Fraction (num/denom)
+   */
   Fraction(int num, int denom);
+
+  /** Constructs a Fraction from another
+   */
   Fraction(const Fraction& f);
+
+  /** Constructs a Fraction from a GST_TYPE_FRACTION
+   */
   Fraction(const Glib::ValueBase& gst_fraction_value);
+
 public:
   int num;
   int denom;
@@ -62,10 +141,10 @@ public:
 
 /** Represents an integer range (min - max) for use to store in Structures of
  * Caps as a value representing a property (see GStreamer Application
- * Development Manual section 8.2.2 for explanation).  When the value is set,
- * it is transformed to a GStreamer GType so retrieving the value is a bit
- * different.  The class can be used in setting and getting a Structure's field
- * like so:
+ * Development Manual section 8.2.2 and GstValue docs for explanation).  When
+ * the value is set, it is transformed to a GStreamer GType so retrieving the
+ * value is a bit different.  The class can be used in setting and getting a
+ * Structure's field like so:
  *
  * @code
  * Glib::Value<Gst::IntRange> value;
@@ -85,10 +164,22 @@ public:
 class IntRange
 {
 public:
+  /** Constructs a zero IntRange (0 - 0)
+   */
   IntRange();
+
+  /** Constructs an IntRange (min - max)
+   */
   IntRange(int min, int max);
+
+  /** Constructs an IntRange from another
+   */
   IntRange(const IntRange& r);
+
+  /** Constructs an IntRange from a GST_TYPE_INT_RANGE
+   */
   IntRange(const Glib::ValueBase& gst_int_range_value);
+
 public:
   int min;
   int max;
@@ -96,10 +187,10 @@ public:
 
 /** Represents a double range (min - max) for use to store in Structures of
  * Caps as a value representing a property (see GStreamer Application
- * Development Manual section 8.2.2 for explanation).  When the value is set,
- * it is transformed to a GStreamer GType so retrieving the value is a bit
- * different.  The class can be used in setting and getting a Structure's field
- * like so:
+ * Development Manual section 8.2.2 and GstValue docs for explanation).  When
+ * the value is set, it is transformed to a GStreamer GType so retrieving the
+ * value is a bit different.  The class can be used in setting and getting a
+ * Structure's field like so:
  *
  * @code
  * Glib::Value<Gst::DoubleRange> value;
@@ -119,10 +210,22 @@ public:
 class DoubleRange
 {
 public:
+  /** Constructs a zero DoubleRange (0.0 - 0.0)
+   */
   DoubleRange();
+
+  /** Constructs a DoubleRange (min - max)
+   */
   DoubleRange(double min, double max);
+
+  /** Constructs a DoubleRange from another
+   */
   DoubleRange(const DoubleRange& r);
+
+  /** Constructs a DoubleRange from a GST_TYPE_DOUBLE_RANGE
+   */
   DoubleRange(const Glib::ValueBase& gst_double_range_value);
+
 public:
   double min;
   double max;
@@ -130,9 +233,10 @@ public:
 
 /** Represents a fractional range for use to store in Structures of Caps as a
  * value representing a property (see GStreamer Application Development Manual
- * section 8.2.2 for explanation).  When the value is set, it is transformed to
- * a GStreamer GType so retrieving the value is a bit different.  The class can
- * be used in setting and getting a Structure's field like so:
+ * section 8.2.2 and GstValue docs for explanation).  When the value is set, it
+ * is transformed to a GStreamer GType so retrieving the value is a bit
+ * different.  The class can be used in setting and getting a Structure's field
+ * like so:
  *
  * @code
  * Glib::Value<Gst::FractionRange> value;
@@ -152,10 +256,22 @@ public:
 class FractionRange
 {
 public:
+  /** Constructs a zero FractionRange (0/1 - 0/1)
+   */
   FractionRange();
+
+  /** Constructs a FractionRange (min - max)
+   */
   FractionRange(const Fraction& min, const Fraction& max);
+
+  /** Constructs a FractionRange from another
+   */
   FractionRange(const FractionRange& r);
+
+  /** Constructs a FractionRange from a GST_TYPE_FRACTION_RANGE
+   */
   FractionRange(const Glib::ValueBase& gst_fraction_range_value);
+
 public:
   Fraction min;
   Fraction max;

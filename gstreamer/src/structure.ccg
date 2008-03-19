@@ -22,6 +22,7 @@
 #include <gst/gstvalue.h> //Must be included before gststructure.h
 #include <gst/gststructure.h>
 #include <gstreamermm/value.h>
+#include <gstreamermm/miniobject.h>
 
 static gboolean
 Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, void* data)
@@ -68,13 +69,13 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
 {
   GType type = G_VALUE_TYPE(value.gobj());
 
-  if (type == Glib::Value<Fraction>::value_type())
+  if (type == Glib::Value<Fourcc>::value_type())
   {
-     const Glib::Value<Fraction>* fract =
-        static_cast< const Glib::Value<Fraction>* >(&value);
+     const Glib::Value<Fourcc>* fourcc =
+        static_cast< const Glib::Value<Fourcc>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION,
-        fract->get().num, fract->get().denom, NULL);
+     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FOURCC,
+        fourcc->get().get_fourcc(), NULL);
   }
   else if (type == Glib::Value<IntRange>::value_type())
   {
@@ -92,6 +93,14 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DOUBLE_RANGE,
         range->get().min, range->get().max, NULL);
   }
+  else if (type == Glib::Value<Fraction>::value_type())
+  {
+     const Glib::Value<Fraction>* fract =
+        static_cast< const Glib::Value<Fraction>* >(&value);
+
+     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION,
+        fract->get().num, fract->get().denom, NULL);
+  }
   else if (type == Glib::Value<FractionRange>::value_type())
   {
      const Glib::Value<FractionRange>* range =
@@ -100,6 +109,30 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION_RANGE,
          range->get().min.num, range->get().min.denom, range->get().max.num,
              range->get().max.denom, NULL);
+  }
+  else if (type == Glib::Value<Glib::Date>::value_type())
+  {
+     const Glib::Value<Glib::Date>* date =
+        static_cast< const Glib::Value<Glib::Date>* >(&value);
+
+     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DATE,
+         date->get().gobj(), NULL);
+  }
+  else if (type == Glib::Value<Structure>::value_type())
+  {
+     const Glib::Value<Structure>* obj =
+        static_cast< const Glib::Value<Structure>* >(&value);
+
+     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_STRUCTURE,
+        obj->get().gobj(), NULL);
+  }
+  else if (type == Glib::Value<MiniObject>::value_type())
+  {
+     const Glib::Value<MiniObject>* obj =
+        static_cast< const Glib::Value<MiniObject>* >(&value);
+
+     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_MINI_OBJECT,
+        obj->get().gobj(), NULL);
   }
   else 
     gst_structure_set_value(gobj(), fieldname.c_str(), value.gobj());
@@ -182,11 +215,11 @@ Structure::get_string(const Glib::ustring& name, Glib::ValueBase& value) const
 }
 
 bool
-Structure::get_date (const Glib::ustring& name, Glib::Date& value) const
+Structure::get_date (const Glib::ustring& name, Glib::Date& date) const
 {
-  GDate *date = 0;
-  const bool has = gst_structure_get_date(gobj(), name.c_str(), &date);
-  value.set_julian(g_date_get_julian(date));
+  GDate *gdate = 0;
+  const bool has = gst_structure_get_date(gobj(), name.c_str(), &gdate);
+  date.set_julian(g_date_get_julian(gdate));
   return has;
 }
 
@@ -216,9 +249,9 @@ Structure::get_enum(const Glib::ustring& name, GType enum_type, Glib::ValueBase&
 
 
 bool
-Structure::get_fraction(const Glib::ustring& name, int& value_numerator, int& value_denominator) const
+Structure::get_fraction(const Glib::ustring& name, Gst::Fraction& f) const
 {
-  return gst_structure_get_fraction(gobj(), name.c_str(), &value_numerator, &value_denominator);
+  return gst_structure_get_fraction(gobj(), name.c_str(), &f.num, &f.denom);
 }
 
 bool

@@ -20,6 +20,7 @@
  */
 
 #include <gstreamermm.h>
+#include <glibmm/date.h>
 #include <iostream>
 
 int main (int argc, char* argv[])
@@ -44,7 +45,13 @@ int main (int argc, char* argv[])
   rangeValue.init(Glib::Value<Gst::FractionRange>::value_type());
   rangeValue.set(Gst::FractionRange(Gst::Fraction(1,2), Gst::Fraction(3,4)));
 
-  structure.set_field(Glib::Quark("string"), stringValue).set_field("integer", intValue).set_field("fraction", fractValue).set_field("range", rangeValue);
+  Glib::Date date;
+  date.set_time_current();
+  Glib::Value<Glib::Date> dateValue;
+  dateValue.init(Glib::Value<Glib::Date>::value_type());
+  dateValue.set(date);
+
+  structure.set_field(Glib::Quark("string"), stringValue).set_field("integer", intValue).set_field("fraction", fractValue).set_field("range", rangeValue).set_field("date", dateValue);
 
   Glib::Value<Glib::ustring> value1;
   structure.get_field("string", value1);
@@ -66,6 +73,12 @@ int main (int argc, char* argv[])
   std::cout << "fractional range value = '[(" << range.min.num << "/" <<
       range.min.denom << "), (" << range.max.num << "/" << range.max.denom <<
           ")]'" << std::endl;
+
+  Glib::ValueBase value5;
+  structure.get_field("date", value5);
+  Glib::Date date_copy(*gst_value_get_date(value5.gobj()));
+  std::cout << "date value = " <<  date_copy.get_month() << "/" <<
+      (int) date_copy.get_day() << "/" << date_copy.get_year() << std::endl;
 
   return 0;
 }

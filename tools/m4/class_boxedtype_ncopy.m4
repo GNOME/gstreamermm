@@ -1,5 +1,6 @@
 dnl Modified from class_boxed_type.m4 in glibmm (designed to work in a similar
-dnl fashion except that the gobject is not copied if it can be helped)
+dnl fashion except that the gobject is not copied if it can be helped and
+dnl destruction of underlying gobject at wrapper destruction is flexible)
 
 define(`_CLASS_BOXEDTYPE_NCOPY',`dnl
 _PUSH()

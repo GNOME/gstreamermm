@@ -22,6 +22,54 @@
 namespace Gst
 {
 
+Fourcc::Fourcc() : first(0), second(0), third(0), fourth(0)
+{}
+
+Fourcc::Fourcc(char first, char second, char third, char fourth)
+: first(first), second(second), third(third), fourth(fourth)
+{}
+
+Fourcc::Fourcc(const Glib::ustring& s)
+: first(0), second(0), third(0), fourth(0)
+{
+  guint32 fourcc = GST_STR_FOURCC(s.c_str());
+  get_ccs(fourcc);
+
+}
+
+Fourcc::Fourcc(guint32 fourcc)
+: first(0), second(0), third(0), fourth(0)
+{
+  get_ccs(fourcc);
+}
+
+Fourcc::Fourcc(const Fourcc& f)
+: first(f.first), second(f.second), third(f.third), fourth(f.fourth)
+{}
+
+Fourcc::Fourcc(const Glib::ValueBase& value)
+: first(0), second(0), third(0), fourth(0)
+{
+  if(G_VALUE_TYPE(value.gobj()) == GST_TYPE_FOURCC)
+  {
+    int fourcc = gst_value_get_fourcc(value.gobj());
+    get_ccs(fourcc);
+  }
+}
+
+guint32 Fourcc::get_fourcc() const
+{
+  return GST_MAKE_FOURCC(first, second, third, fourth);
+}
+
+void Fourcc::get_ccs(guint32 fourcc)
+{
+  first = fourcc & 0xff;
+  second = (fourcc >> 8) & 0xff;
+  third = (fourcc >> 16) & 0xff;
+  fourth = (fourcc >> 24) & 0xff;
+}
+
 Fraction::Fraction() : num(0), denom(1)
 {}
 

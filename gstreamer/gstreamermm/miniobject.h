@@ -30,7 +30,6 @@ class MiniObject_Class;
 
 /** This is a base class for some gstreamermm objects.
  * It is similar to Glib::Object but has no GObject property or signal support.
- * Use Gst::wrap() (instead of Glib::wrap()) to create C++ instances that wrap C instances.
  */
 class MiniObject : public Glib::ObjectBase
 {
@@ -47,7 +46,7 @@ public:
   //friend Glib::wrap;
 
   MiniObject();
-  MiniObject(GstMiniObject* castitem);
+  MiniObject(GstMiniObject* castitem, bool take_copy = false);
 
 public:
   virtual ~MiniObject();
@@ -55,7 +54,6 @@ public:
   //Note that we don't add a constructor for gst_mini_object_new()
   //because it's just an equivalent for g_object_new(), 
   //which is just an equivalent for C++'s new(). 
-
 
 //private:
   // noncopyable
@@ -79,6 +77,9 @@ public:
 
 
   // static void replace(Glib::RefPtr<Gst::MiniObject> & olddata, Glib::RefPtr<Gst::MiniObject> & newdata);
+
+protected:
+  void swap(MiniObject& other);
 
 protected:
   GstMiniObject* gobject_; //TODO: Doesn't this shadow a member variable in Glib::ObjectBase?
