@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "version.h"
+#include <gstreamermm/version.h>
 #include <gstreamermmconfig.h>
 
 namespace Gst

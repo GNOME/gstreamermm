@@ -22,8 +22,8 @@
 #ifndef _GSTREAMERMM_INIT_H
 #define _GSTREAMERMM_INIT_H
 
-#include "wrap_init.h"
-#include <string.h>
+#include <glibmm/error.h>
+#include <glibmm/optiongroup.h>
 
 namespace Gst
 {
