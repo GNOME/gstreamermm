@@ -55,6 +55,9 @@ AC_SUBST(GSTREAMERMM_RELEASE)
 LIBGSTREAMERMM_SO_VERSION=2:1:0
 AC_SUBST(LIBGSTREAMERMM_SO_VERSION)
 
+LIBGSTREAMERBASEMM_SO_VERSION=2:1:0
+AC_SUBST(LIBGSTREAMERBASEMM_SO_VERSION)
+
 AC_CONFIG_AUX_DIR(scripts)
 
 # Initialize automake stuff
@@ -62,7 +65,7 @@ AC_CONFIG_AUX_DIR(scripts)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 
 dnl Specify a configuration file (no autoheader)
-AM_CONFIG_HEADER(config.h gstreamer/gstreamermmconfig.h)
+AM_CONFIG_HEADER(config.h gstreamer/gstreamermmconfig.h gstreamerbase/gstreamerbasemmconfig.h)
 AM_MAINTAINER_MODE
 AL_ACLOCAL_INCLUDE(scripts)
 
@@ -129,6 +132,10 @@ gstreamermm_min_gst_version=0.10
 PKG_CHECK_MODULES(GSTREAMERMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-0.10 >= ${gstreamermm_min_gst_version})
 AC_SUBST(GSTREAMERMM_CFLAGS)
 AC_SUBST(GSTREAMERMM_LIBS)
+
+PKG_CHECK_MODULES(GSTREAMERBASEMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-plugins-base-0.10 >= ${gstreamermm_min_gst_version})
+AC_SUBST(GSTREAMERBASEMM_CFLAGS)
+AC_SUBST(GSTREAMERBASEMM_LIBS)
 
 # This macro is installed by glibmm
 # Doxygen needs the path to the installed perl.
@@ -303,6 +310,12 @@ AC_CONFIG_FILES([
     gstreamer/src/Makefile
     gstreamer/gstreamermm/Makefile
       gstreamer/gstreamermm/private/Makefile
+
+  gstreamerbase/Makefile
+  gstreamerbase/gstreamerbasemm-0.10.pc
+    gstreamerbase/src/Makefile
+    gstreamerbase/gstreamerbasemm/Makefile
+      gstreamerbase/gstreamerbasemm/private/Makefile
 
   tools/Makefile
     tools/generate_gst_wrap_init.pl

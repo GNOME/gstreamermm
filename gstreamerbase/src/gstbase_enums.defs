@@ -1,0 +1,677 @@
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/audio/gstbaseaudiosink.h
+
+(define-enum-extended BaseAudioSinkSlaveMethod
+  (in-module "Gst")
+  (c-name "GstBaseAudioSinkSlaveMethod")
+  (values
+    '("resample" "GST_BASE_AUDIO_SINK_SLAVE_RESAMPLE" "0")
+    '("skew" "GST_BASE_AUDIO_SINK_SLAVE_SKEW" "1")
+    '("none" "GST_BASE_AUDIO_SINK_SLAVE_NONE" "2")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/audio/gstringbuffer.h
+
+(define-enum-extended RingBufferState
+  (in-module "Gst")
+  (c-name "GstRingBufferState")
+  (values
+    '("stopped" "GST_RING_BUFFER_STATE_STOPPED" "0")
+    '("paused" "GST_RING_BUFFER_STATE_PAUSED" "1")
+    '("started" "GST_RING_BUFFER_STATE_STARTED" "2")
+  )
+)
+
+(define-enum-extended RingBufferSegState
+  (in-module "Gst")
+  (c-name "GstRingBufferSegState")
+  (values
+    '("invalid" "GST_SEGSTATE_INVALID" "0")
+    '("empty" "GST_SEGSTATE_EMPTY" "1")
+    '("filled" "GST_SEGSTATE_FILLED" "2")
+    '("partial" "GST_SEGSTATE_PARTIAL" "3")
+  )
+)
+
+(define-enum-extended BufferFormatType
+  (in-module "Gst")
+  (c-name "GstBufferFormatType")
+  (values
+    '("linear" "GST_BUFTYPE_LINEAR" "0")
+    '("float" "GST_BUFTYPE_FLOAT" "1")
+    '("mu-law" "GST_BUFTYPE_MU_LAW" "2")
+    '("a-law" "GST_BUFTYPE_A_LAW" "3")
+    '("ima-adpcm" "GST_BUFTYPE_IMA_ADPCM" "4")
+    '("mpeg" "GST_BUFTYPE_MPEG" "5")
+    '("gsm" "GST_BUFTYPE_GSM" "6")
+    '("iec958" "GST_BUFTYPE_IEC958" "7")
+    '("ac3" "GST_BUFTYPE_AC3" "8")
+    '("eac3" "GST_BUFTYPE_EAC3" "9")
+    '("dts" "GST_BUFTYPE_DTS" "10")
+  )
+)
+
+(define-enum-extended BufferFormat
+  (in-module "Gst")
+  (c-name "GstBufferFormat")
+  (values
+    '("unknown" "GST_UNKNOWN" "0")
+    '("s8" "GST_S8" "1")
+    '("u8" "GST_U8" "2")
+    '("s16-le" "GST_S16_LE" "3")
+    '("s16-be" "GST_S16_BE" "4")
+    '("u16-le" "GST_U16_LE" "5")
+    '("u16-be" "GST_U16_BE" "6")
+    '("s24-le" "GST_S24_LE" "7")
+    '("s24-be" "GST_S24_BE" "8")
+    '("u24-le" "GST_U24_LE" "9")
+    '("u24-be" "GST_U24_BE" "10")
+    '("s32-le" "GST_S32_LE" "11")
+    '("s32-be" "GST_S32_BE" "12")
+    '("u32-le" "GST_U32_LE" "13")
+    '("u32-be" "GST_U32_BE" "14")
+    '("s24-3le" "GST_S24_3LE" "15")
+    '("s24-3be" "GST_S24_3BE" "16")
+    '("u24-3le" "GST_U24_3LE" "17")
+    '("u24-3be" "GST_U24_3BE" "18")
+    '("s20-3le" "GST_S20_3LE" "19")
+    '("s20-3be" "GST_S20_3BE" "20")
+    '("u20-3le" "GST_U20_3LE" "21")
+    '("u20-3be" "GST_U20_3BE" "22")
+    '("s18-3le" "GST_S18_3LE" "23")
+    '("s18-3be" "GST_S18_3BE" "24")
+    '("u18-3le" "GST_U18_3LE" "25")
+    '("u18-3be" "GST_U18_3BE" "26")
+    '("float32-le" "GST_FLOAT32_LE" "27")
+    '("float32-be" "GST_FLOAT32_BE" "28")
+    '("float64-le" "GST_FLOAT64_LE" "29")
+    '("float64-be" "GST_FLOAT64_BE" "30")
+    '("mu-law" "GST_MU_LAW" "31")
+    '("a-law" "GST_A_LAW" "32")
+    '("ima-adpcm" "GST_IMA_ADPCM" "33")
+    '("mpeg" "GST_MPEG" "34")
+    '("gsm" "GST_GSM" "35")
+    '("iec958" "GST_IEC958" "36")
+    '("ac3" "GST_AC3" "37")
+    '("eac3" "GST_EAC3" "38")
+    '("dts" "GST_DTS" "39")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/audio/multichannel.h
+
+(define-enum-extended AudioChannelPosition
+  (in-module "Gst")
+  (c-name "GstAudioChannelPosition")
+  (values
+    '("invalid" "GST_AUDIO_CHANNEL_POSITION_INVALID" "-1")
+    '("front-mono" "GST_AUDIO_CHANNEL_POSITION_FRONT_MONO" "0")
+    '("front-left" "GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT" "1")
+    '("front-right" "GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT" "2")
+    '("rear-center" "GST_AUDIO_CHANNEL_POSITION_REAR_CENTER" "3")
+    '("rear-left" "GST_AUDIO_CHANNEL_POSITION_REAR_LEFT" "4")
+    '("rear-right" "GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT" "5")
+    '("lfe" "GST_AUDIO_CHANNEL_POSITION_LFE" "6")
+    '("front-center" "GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER" "7")
+    '("front-left-of-center" "GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER" "8")
+    '("front-right-of-center" "GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT_OF_CENTER" "9")
+    '("side-left" "GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT" "10")
+    '("side-right" "GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT" "11")
+    '("none" "GST_AUDIO_CHANNEL_POSITION_NONE" "12")
+    '("num" "GST_AUDIO_CHANNEL_POSITION_NUM" "13")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/cdda/gstcddabasesrc.h
+
+(define-enum-extended CddaBaseSrcMode
+  (in-module "Gst")
+  (c-name "GstCddaBaseSrcMode")
+  (values
+    '("normal" "GST_CDDA_BASE_SRC_MODE_NORMAL" "0")
+    '("continuous" "GST_CDDA_BASE_SRC_MODE_CONTINUOUS" "1")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/fft/gstfft.h
+
+(define-enum-extended FFTWindow
+  (in-module "Gst")
+  (c-name "GstFFTWindow")
+  (values
+    '("rectangular" "GST_FFT_WINDOW_RECTANGULAR" "0")
+    '("hamming" "GST_FFT_WINDOW_HAMMING" "1")
+    '("hann" "GST_FFT_WINDOW_HANN" "2")
+    '("bartlett" "GST_FFT_WINDOW_BARTLETT" "3")
+    '("blackman" "GST_FFT_WINDOW_BLACKMAN" "4")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/interfaces/colorbalance.h
+
+(define-enum-extended ColorBalanceType
+  (in-module "Gst")
+  (c-name "GstColorBalanceType")
+  (values
+    '("hardware" "GST_COLOR_BALANCE_HARDWARE" "0")
+    '("software" "GST_COLOR_BALANCE_SOFTWARE" "1")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/interfaces/mixer.h
+
+(define-enum-extended MixerType
+  (in-module "Gst")
+  (c-name "GstMixerType")
+  (values
+    '("hardware" "GST_MIXER_HARDWARE" "0")
+    '("software" "GST_MIXER_SOFTWARE" "1")
+  )
+)
+
+(define-enum-extended MixerMessageType
+  (in-module "Gst")
+  (c-name "GstMixerMessageType")
+  (values
+    '("invalid" "GST_MIXER_MESSAGE_INVALID" "0")
+    '("mute-toggled" "GST_MIXER_MESSAGE_MUTE_TOGGLED" "1")
+    '("record-toggled" "GST_MIXER_MESSAGE_RECORD_TOGGLED" "2")
+    '("volume-changed" "GST_MIXER_MESSAGE_VOLUME_CHANGED" "3")
+    '("option-changed" "GST_MIXER_MESSAGE_OPTION_CHANGED" "4")
+    '("options-list-changed" "GST_MIXER_MESSAGE_OPTIONS_LIST_CHANGED" "5")
+    '("mixer-changed" "GST_MIXER_MESSAGE_MIXER_CHANGED" "6")
+  )
+)
+
+(define-flags-extended MixerFlags
+  (in-module "Gst")
+  (c-name "GstMixerFlags")
+  (values
+    '("none" "GST_MIXER_FLAG_NONE" "0")
+    '("auto-notifications" "GST_MIXER_FLAG_AUTO_NOTIFICATIONS" "1<<0")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/interfaces/mixertrack.h
+
+(define-flags-extended MixerTrackFlags
+  (in-module "Gst")
+  (c-name "GstMixerTrackFlags")
+  (values
+    '("input" "GST_MIXER_TRACK_INPUT" "1<<0")
+    '("output" "GST_MIXER_TRACK_OUTPUT" "1<<1")
+    '("mute" "GST_MIXER_TRACK_MUTE" "1<<2")
+    '("record" "GST_MIXER_TRACK_RECORD" "1<<3")
+    '("master" "GST_MIXER_TRACK_MASTER" "1<<4")
+    '("software" "GST_MIXER_TRACK_SOFTWARE" "1<<5")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/interfaces/tunerchannel.h
+
+(define-flags-extended TunerChannelFlags
+  (in-module "Gst")
+  (c-name "GstTunerChannelFlags")
+  (values
+    '("input" "GST_TUNER_CHANNEL_INPUT" "1<<0")
+    '("output" "GST_TUNER_CHANNEL_OUTPUT" "1<<1")
+    '("frequency" "GST_TUNER_CHANNEL_FREQUENCY" "1<<2")
+    '("audio" "GST_TUNER_CHANNEL_AUDIO" "1<<3")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/netbuffer/gstnetbuffer.h
+
+(define-enum-extended NetType
+  (in-module "Gst")
+  (c-name "GstNetType")
+  (values
+    '("unknown" "GST_NET_TYPE_UNKNOWN" "0")
+    '("ip4" "GST_NET_TYPE_IP4" "1")
+    '("ip6" "GST_NET_TYPE_IP6" "2")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/rtp/gstrtcpbuffer.h
+
+(define-enum-extended RTCPType
+  (in-module "Gst")
+  (c-name "GstRTCPType")
+  (values
+    '("invalid" "GST_RTCP_TYPE_INVALID" "0")
+    '("sr" "GST_RTCP_TYPE_SR" "200")
+    '("rr" "GST_RTCP_TYPE_RR" "201")
+    '("sdes" "GST_RTCP_TYPE_SDES" "202")
+    '("bye" "GST_RTCP_TYPE_BYE" "203")
+    '("app" "GST_RTCP_TYPE_APP" "204")
+  )
+)
+
+(define-enum-extended RTCPSDESType
+  (in-module "Gst")
+  (c-name "GstRTCPSDESType")
+  (values
+    '("invalid" "GST_RTCP_SDES_INVALID" "-1")
+    '("end" "GST_RTCP_SDES_END" "0")
+    '("cname" "GST_RTCP_SDES_CNAME" "1")
+    '("name" "GST_RTCP_SDES_NAME" "2")
+    '("email" "GST_RTCP_SDES_EMAIL" "3")
+    '("phone" "GST_RTCP_SDES_PHONE" "4")
+    '("loc" "GST_RTCP_SDES_LOC" "5")
+    '("tool" "GST_RTCP_SDES_TOOL" "6")
+    '("note" "GST_RTCP_SDES_NOTE" "7")
+    '("priv" "GST_RTCP_SDES_PRIV" "8")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/rtp/gstrtppayloads.h
+
+(define-enum-extended RTPPayload
+  (in-module "Gst")
+  (c-name "GstRTPPayload")
+  (values
+    '("pcmu" "GST_RTP_PAYLOAD_PCMU" "0")
+    '("1016" "GST_RTP_PAYLOAD_1016" "1")
+    '("g721" "GST_RTP_PAYLOAD_G721" "2")
+    '("gsm" "GST_RTP_PAYLOAD_GSM" "3")
+    '("g723" "GST_RTP_PAYLOAD_G723" "4")
+    '("dvi4-8000" "GST_RTP_PAYLOAD_DVI4_8000" "5")
+    '("dvi4-16000" "GST_RTP_PAYLOAD_DVI4_16000" "6")
+    '("lpc" "GST_RTP_PAYLOAD_LPC" "7")
+    '("pcma" "GST_RTP_PAYLOAD_PCMA" "8")
+    '("g722" "GST_RTP_PAYLOAD_G722" "9")
+    '("l16-stereo" "GST_RTP_PAYLOAD_L16_STEREO" "10")
+    '("l16-mono" "GST_RTP_PAYLOAD_L16_MONO" "11")
+    '("qcelp" "GST_RTP_PAYLOAD_QCELP" "12")
+    '("cn" "GST_RTP_PAYLOAD_CN" "13")
+    '("mpa" "GST_RTP_PAYLOAD_MPA" "14")
+    '("g728" "GST_RTP_PAYLOAD_G728" "15")
+    '("dvi4-11025" "GST_RTP_PAYLOAD_DVI4_11025" "16")
+    '("dvi4-22050" "GST_RTP_PAYLOAD_DVI4_22050" "17")
+    '("g729" "GST_RTP_PAYLOAD_G729" "18")
+    '("cellb" "GST_RTP_PAYLOAD_CELLB" "25")
+    '("jpeg" "GST_RTP_PAYLOAD_JPEG" "26")
+    '("nv" "GST_RTP_PAYLOAD_NV" "28")
+    '("h261" "GST_RTP_PAYLOAD_H261" "31")
+    '("mpv" "GST_RTP_PAYLOAD_MPV" "32")
+    '("mp2t" "GST_RTP_PAYLOAD_MP2T" "33")
+    '("h263" "GST_RTP_PAYLOAD_H263" "34")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/rtsp/gstrtspdefs.h
+
+(define-enum-extended RTSPResult
+  (in-module "Gst")
+  (c-name "GstRTSPResult")
+  (values
+    '("ok" "GST_RTSP_OK" "0")
+    '("error" "GST_RTSP_ERROR" "-1")
+    '("einval" "GST_RTSP_EINVAL" "-2")
+    '("eintr" "GST_RTSP_EINTR" "-3")
+    '("enomem" "GST_RTSP_ENOMEM" "-4")
+    '("eresolv" "GST_RTSP_ERESOLV" "-5")
+    '("enotimpl" "GST_RTSP_ENOTIMPL" "-6")
+    '("esys" "GST_RTSP_ESYS" "-7")
+    '("eparse" "GST_RTSP_EPARSE" "-8")
+    '("ewsastart" "GST_RTSP_EWSASTART" "-9")
+    '("ewsaversion" "GST_RTSP_EWSAVERSION" "-10")
+    '("eeof" "GST_RTSP_EEOF" "-11")
+    '("enet" "GST_RTSP_ENET" "-12")
+    '("enotip" "GST_RTSP_ENOTIP" "-13")
+    '("etimeout" "GST_RTSP_ETIMEOUT" "-14")
+    '("elast" "GST_RTSP_ELAST" "-15")
+  )
+)
+
+(define-flags-extended RTSPEvent
+  (in-module "Gst")
+  (c-name "GstRTSPEvent")
+  (values
+    '("read" "GST_RTSP_EV_READ" "1 << 0")
+    '("write" "GST_RTSP_EV_WRITE" "1 << 1")
+  )
+)
+
+(define-enum-extended RTSPFamily
+  (in-module "Gst")
+  (c-name "GstRTSPFamily")
+  (values
+    '("none" "GST_RTSP_FAM_NONE" "0")
+    '("inet" "GST_RTSP_FAM_INET" "1")
+    '("inet6" "GST_RTSP_FAM_INET6" "2")
+  )
+)
+
+(define-enum-extended RTSPState
+  (in-module "Gst")
+  (c-name "GstRTSPState")
+  (values
+    '("invalid" "GST_RTSP_STATE_INVALID" "0")
+    '("init" "GST_RTSP_STATE_INIT" "1")
+    '("ready" "GST_RTSP_STATE_READY" "2")
+    '("seeking" "GST_RTSP_STATE_SEEKING" "3")
+    '("playing" "GST_RTSP_STATE_PLAYING" "4")
+    '("recording" "GST_RTSP_STATE_RECORDING" "5")
+  )
+)
+
+(define-flags-extended RTSPVersion
+  (in-module "Gst")
+  (c-name "GstRTSPVersion")
+  (values
+    '("invalid" "GST_RTSP_VERSION_INVALID" "0x00")
+    '("1-0" "GST_RTSP_VERSION_1_0" "0x10")
+  )
+)
+
+(define-flags-extended RTSPMethod
+  (in-module "Gst")
+  (c-name "GstRTSPMethod")
+  (values
+    '("invalid" "GST_RTSP_INVALID" "0")
+    '("describe" "GST_RTSP_DESCRIBE" "1 << 0")
+    '("announce" "GST_RTSP_ANNOUNCE" "1 << 1")
+    '("get-parameter" "GST_RTSP_GET_PARAMETER" "1 << 2")
+    '("options" "GST_RTSP_OPTIONS" "1 << 3")
+    '("pause" "GST_RTSP_PAUSE" "1 << 4")
+    '("play" "GST_RTSP_PLAY" "1 << 5")
+    '("record" "GST_RTSP_RECORD" "1 << 6")
+    '("redirect" "GST_RTSP_REDIRECT" "1 << 7")
+    '("setup" "GST_RTSP_SETUP" "1 << 8")
+    '("set-parameter" "GST_RTSP_SET_PARAMETER" "1 << 9")
+    '("teardown" "GST_RTSP_TEARDOWN" "1 << 10")
+  )
+)
+
+(define-flags-extended RTSPAuthMethod
+  (in-module "Gst")
+  (c-name "GstRTSPAuthMethod")
+  (values
+    '("none" "GST_RTSP_AUTH_NONE" "0x00")
+    '("basic" "GST_RTSP_AUTH_BASIC" "0x01")
+    '("digest" "GST_RTSP_AUTH_DIGEST" "0x02")
+  )
+)
+
+(define-enum-extended RTSPHeaderField
+  (in-module "Gst")
+  (c-name "GstRTSPHeaderField")
+  (values
+    '("invalid" "GST_RTSP_HDR_INVALID" "0")
+    '("accept" "GST_RTSP_HDR_ACCEPT" "1")
+    '("accept-encoding" "GST_RTSP_HDR_ACCEPT_ENCODING" "2")
+    '("accept-language" "GST_RTSP_HDR_ACCEPT_LANGUAGE" "3")
+    '("allow" "GST_RTSP_HDR_ALLOW" "4")
+    '("authorization" "GST_RTSP_HDR_AUTHORIZATION" "5")
+    '("bandwidth" "GST_RTSP_HDR_BANDWIDTH" "6")
+    '("blocksize" "GST_RTSP_HDR_BLOCKSIZE" "7")
+    '("cache-control" "GST_RTSP_HDR_CACHE_CONTROL" "8")
+    '("conference" "GST_RTSP_HDR_CONFERENCE" "9")
+    '("connection" "GST_RTSP_HDR_CONNECTION" "10")
+    '("content-base" "GST_RTSP_HDR_CONTENT_BASE" "11")
+    '("content-encoding" "GST_RTSP_HDR_CONTENT_ENCODING" "12")
+    '("content-language" "GST_RTSP_HDR_CONTENT_LANGUAGE" "13")
+    '("content-length" "GST_RTSP_HDR_CONTENT_LENGTH" "14")
+    '("content-location" "GST_RTSP_HDR_CONTENT_LOCATION" "15")
+    '("content-type" "GST_RTSP_HDR_CONTENT_TYPE" "16")
+    '("cseq" "GST_RTSP_HDR_CSEQ" "17")
+    '("date" "GST_RTSP_HDR_DATE" "18")
+    '("expires" "GST_RTSP_HDR_EXPIRES" "19")
+    '("from" "GST_RTSP_HDR_FROM" "20")
+    '("if-modified-since" "GST_RTSP_HDR_IF_MODIFIED_SINCE" "21")
+    '("last-modified" "GST_RTSP_HDR_LAST_MODIFIED" "22")
+    '("proxy-authenticate" "GST_RTSP_HDR_PROXY_AUTHENTICATE" "23")
+    '("proxy-require" "GST_RTSP_HDR_PROXY_REQUIRE" "24")
+    '("public" "GST_RTSP_HDR_PUBLIC" "25")
+    '("range" "GST_RTSP_HDR_RANGE" "26")
+    '("referer" "GST_RTSP_HDR_REFERER" "27")
+    '("require" "GST_RTSP_HDR_REQUIRE" "28")
+    '("retry-after" "GST_RTSP_HDR_RETRY_AFTER" "29")
+    '("rtp-info" "GST_RTSP_HDR_RTP_INFO" "30")
+    '("scale" "GST_RTSP_HDR_SCALE" "31")
+    '("session" "GST_RTSP_HDR_SESSION" "32")
+    '("server" "GST_RTSP_HDR_SERVER" "33")
+    '("speed" "GST_RTSP_HDR_SPEED" "34")
+    '("transport" "GST_RTSP_HDR_TRANSPORT" "35")
+    '("unsupported" "GST_RTSP_HDR_UNSUPPORTED" "36")
+    '("user-agent" "GST_RTSP_HDR_USER_AGENT" "37")
+    '("via" "GST_RTSP_HDR_VIA" "38")
+    '("www-authenticate" "GST_RTSP_HDR_WWW_AUTHENTICATE" "39")
+    '("client-challenge" "GST_RTSP_HDR_CLIENT_CHALLENGE" "40")
+    '("real-challenge1" "GST_RTSP_HDR_REAL_CHALLENGE1" "41")
+    '("real-challenge2" "GST_RTSP_HDR_REAL_CHALLENGE2" "42")
+    '("real-challenge3" "GST_RTSP_HDR_REAL_CHALLENGE3" "43")
+    '("subscribe" "GST_RTSP_HDR_SUBSCRIBE" "44")
+    '("alert" "GST_RTSP_HDR_ALERT" "45")
+    '("client-id" "GST_RTSP_HDR_CLIENT_ID" "46")
+    '("company-id" "GST_RTSP_HDR_COMPANY_ID" "47")
+    '("guid" "GST_RTSP_HDR_GUID" "48")
+    '("region-data" "GST_RTSP_HDR_REGION_DATA" "49")
+    '("max-asm-width" "GST_RTSP_HDR_MAX_ASM_WIDTH" "50")
+    '("language" "GST_RTSP_HDR_LANGUAGE" "51")
+    '("player-start-time" "GST_RTSP_HDR_PLAYER_START_TIME" "52")
+    '("location" "GST_RTSP_HDR_LOCATION" "53")
+  )
+)
+
+(define-enum-extended RTSPStatusCode
+  (in-module "Gst")
+  (c-name "GstRTSPStatusCode")
+  (values
+    '("invalid" "GST_RTSP_STS_INVALID" "0")
+    '("continue" "GST_RTSP_STS_CONTINUE" "100")
+    '("ok" "GST_RTSP_STS_OK" "200")
+    '("created" "GST_RTSP_STS_CREATED" "201")
+    '("low-on-storage" "GST_RTSP_STS_LOW_ON_STORAGE" "250")
+    '("multiple-choices" "GST_RTSP_STS_MULTIPLE_CHOICES" "300")
+    '("moved-permanently" "GST_RTSP_STS_MOVED_PERMANENTLY" "301")
+    '("move-temporarily" "GST_RTSP_STS_MOVE_TEMPORARILY" "302")
+    '("see-other" "GST_RTSP_STS_SEE_OTHER" "303")
+    '("not-modified" "GST_RTSP_STS_NOT_MODIFIED" "304")
+    '("use-proxy" "GST_RTSP_STS_USE_PROXY" "305")
+    '("bad-request" "GST_RTSP_STS_BAD_REQUEST" "400")
+    '("unauthorized" "GST_RTSP_STS_UNAUTHORIZED" "401")
+    '("payment-required" "GST_RTSP_STS_PAYMENT_REQUIRED" "402")
+    '("forbidden" "GST_RTSP_STS_FORBIDDEN" "403")
+    '("not-found" "GST_RTSP_STS_NOT_FOUND" "404")
+    '("method-not-allowed" "GST_RTSP_STS_METHOD_NOT_ALLOWED" "405")
+    '("not-acceptable" "GST_RTSP_STS_NOT_ACCEPTABLE" "406")
+    '("proxy-auth-required" "GST_RTSP_STS_PROXY_AUTH_REQUIRED" "407")
+    '("request-timeout" "GST_RTSP_STS_REQUEST_TIMEOUT" "408")
+    '("gone" "GST_RTSP_STS_GONE" "410")
+    '("length-required" "GST_RTSP_STS_LENGTH_REQUIRED" "411")
+    '("precondition-failed" "GST_RTSP_STS_PRECONDITION_FAILED" "412")
+    '("request-entity-too-large" "GST_RTSP_STS_REQUEST_ENTITY_TOO_LARGE" "413")
+    '("request-uri-too-large" "GST_RTSP_STS_REQUEST_URI_TOO_LARGE" "414")
+    '("unsupported-media-type" "GST_RTSP_STS_UNSUPPORTED_MEDIA_TYPE" "415")
+    '("parameter-not-understood" "GST_RTSP_STS_PARAMETER_NOT_UNDERSTOOD" "451")
+    '("conference-not-found" "GST_RTSP_STS_CONFERENCE_NOT_FOUND" "452")
+    '("not-enough-bandwidth" "GST_RTSP_STS_NOT_ENOUGH_BANDWIDTH" "453")
+    '("session-not-found" "GST_RTSP_STS_SESSION_NOT_FOUND" "454")
+    '("method-not-valid-in-this-state" "GST_RTSP_STS_METHOD_NOT_VALID_IN_THIS_STATE" "455")
+    '("header-field-not-valid-for-resource" "GST_RTSP_STS_HEADER_FIELD_NOT_VALID_FOR_RESOURCE" "456")
+    '("invalid-range" "GST_RTSP_STS_INVALID_RANGE" "457")
+    '("parameter-is-readonly" "GST_RTSP_STS_PARAMETER_IS_READONLY" "458")
+    '("aggregate-operation-not-allowed" "GST_RTSP_STS_AGGREGATE_OPERATION_NOT_ALLOWED" "459")
+    '("only-aggregate-operation-allowed" "GST_RTSP_STS_ONLY_AGGREGATE_OPERATION_ALLOWED" "460")
+    '("unsupported-transport" "GST_RTSP_STS_UNSUPPORTED_TRANSPORT" "461")
+    '("destination-unreachable" "GST_RTSP_STS_DESTINATION_UNREACHABLE" "462")
+    '("internal-server-error" "GST_RTSP_STS_INTERNAL_SERVER_ERROR" "500")
+    '("not-implemented" "GST_RTSP_STS_NOT_IMPLEMENTED" "501")
+    '("bad-gateway" "GST_RTSP_STS_BAD_GATEWAY" "502")
+    '("service-unavailable" "GST_RTSP_STS_SERVICE_UNAVAILABLE" "503")
+    '("gateway-timeout" "GST_RTSP_STS_GATEWAY_TIMEOUT" "504")
+    '("rtsp-version-not-supported" "GST_RTSP_STS_RTSP_VERSION_NOT_SUPPORTED" "505")
+    '("option-not-supported" "GST_RTSP_STS_OPTION_NOT_SUPPORTED" "551")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/rtsp/gstrtspmessage.h
+
+(define-enum-extended RTSPMsgType
+  (in-module "Gst")
+  (c-name "GstRTSPMsgType")
+  (values
+    '("invalid" "GST_RTSP_MESSAGE_INVALID" "0")
+    '("request" "GST_RTSP_MESSAGE_REQUEST" "1")
+    '("response" "GST_RTSP_MESSAGE_RESPONSE" "2")
+    '("data" "GST_RTSP_MESSAGE_DATA" "3")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/rtsp/gstrtsprange.h
+
+(define-enum-extended RTSPRangeUnit
+  (in-module "Gst")
+  (c-name "GstRTSPRangeUnit")
+  (values
+    '("smpte" "GST_RTSP_RANGE_SMPTE" "0")
+    '("smpte-30-drop" "GST_RTSP_RANGE_SMPTE_30_DROP" "1")
+    '("smpte-25" "GST_RTSP_RANGE_SMPTE_25" "2")
+    '("npt" "GST_RTSP_RANGE_NPT" "3")
+    '("clock" "GST_RTSP_RANGE_CLOCK" "4")
+  )
+)
+
+(define-enum-extended RTSPTimeType
+  (in-module "Gst")
+  (c-name "GstRTSPTimeType")
+  (values
+    '("seconds" "GST_RTSP_TIME_SECONDS" "0")
+    '("now" "GST_RTSP_TIME_NOW" "1")
+    '("end" "GST_RTSP_TIME_END" "2")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/rtsp/gstrtsptransport.h
+
+(define-flags-extended RTSPTransMode
+  (in-module "Gst")
+  (c-name "GstRTSPTransMode")
+  (values
+    '("unknown" "GST_RTSP_TRANS_UNKNOWN" "0")
+    '("rtp" "GST_RTSP_TRANS_RTP" "1 << 0")
+    '("rdt" "GST_RTSP_TRANS_RDT" "1 << 1")
+  )
+)
+
+(define-flags-extended RTSPProfile
+  (in-module "Gst")
+  (c-name "GstRTSPProfile")
+  (values
+    '("unknown" "GST_RTSP_PROFILE_UNKNOWN" "0")
+    '("avp" "GST_RTSP_PROFILE_AVP" "1 << 0")
+    '("savp" "GST_RTSP_PROFILE_SAVP" "1 << 1")
+  )
+)
+
+(define-flags-extended RTSPLowerTrans
+  (in-module "Gst")
+  (c-name "GstRTSPLowerTrans")
+  (values
+    '("unknown" "GST_RTSP_LOWER_TRANS_UNKNOWN" "0")
+    '("udp" "GST_RTSP_LOWER_TRANS_UDP" "1 << 0")
+    '("udp-mcast" "GST_RTSP_LOWER_TRANS_UDP_MCAST" "1 << 1")
+    '("tcp" "GST_RTSP_LOWER_TRANS_TCP" "1 << 2")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/sdp/gstsdp.h
+
+(define-enum-extended SDPResult
+  (in-module "Gst")
+  (c-name "GstSDPResult")
+  (values
+    '("ok" "GST_SDP_OK" "0")
+    '("einval" "GST_SDP_EINVAL" "-1")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/tag/gsttagdemux.h
+
+(define-enum-extended TagDemuxResult
+  (in-module "Gst")
+  (c-name "GstTagDemuxResult")
+  (values
+    '("broken-tag" "GST_TAG_DEMUX_RESULT_BROKEN_TAG" "0")
+    '("again" "GST_TAG_DEMUX_RESULT_AGAIN" "1")
+    '("ok" "GST_TAG_DEMUX_RESULT_OK" "2")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/tag/tag.h
+
+(define-enum-extended TagImageType
+  (in-module "Gst")
+  (c-name "GstTagImageType")
+  (values
+    '("undefined" "GST_TAG_IMAGE_TYPE_UNDEFINED" "0")
+    '("front-cover" "GST_TAG_IMAGE_TYPE_FRONT_COVER" "1")
+    '("back-cover" "GST_TAG_IMAGE_TYPE_BACK_COVER" "2")
+    '("leaflet-page" "GST_TAG_IMAGE_TYPE_LEAFLET_PAGE" "3")
+    '("medium" "GST_TAG_IMAGE_TYPE_MEDIUM" "4")
+    '("lead-artist" "GST_TAG_IMAGE_TYPE_LEAD_ARTIST" "5")
+    '("artist" "GST_TAG_IMAGE_TYPE_ARTIST" "6")
+    '("conductor" "GST_TAG_IMAGE_TYPE_CONDUCTOR" "7")
+    '("band-orchestra" "GST_TAG_IMAGE_TYPE_BAND_ORCHESTRA" "8")
+    '("composer" "GST_TAG_IMAGE_TYPE_COMPOSER" "9")
+    '("lyricist" "GST_TAG_IMAGE_TYPE_LYRICIST" "10")
+    '("recording-location" "GST_TAG_IMAGE_TYPE_RECORDING_LOCATION" "11")
+    '("during-recording" "GST_TAG_IMAGE_TYPE_DURING_RECORDING" "12")
+    '("during-performance" "GST_TAG_IMAGE_TYPE_DURING_PERFORMANCE" "13")
+    '("video-capture" "GST_TAG_IMAGE_TYPE_VIDEO_CAPTURE" "14")
+    '("fish" "GST_TAG_IMAGE_TYPE_FISH" "15")
+    '("illustration" "GST_TAG_IMAGE_TYPE_ILLUSTRATION" "16")
+    '("band-artist-logo" "GST_TAG_IMAGE_TYPE_BAND_ARTIST_LOGO" "17")
+    '("publisher-studio-logo" "GST_TAG_IMAGE_TYPE_PUBLISHER_STUDIO_LOGO" "18")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/video/video.h
+
+(define-enum-extended VideoFormat
+  (in-module "Gst")
+  (c-name "GstVideoFormat")
+  (values
+    '("unknown" "GST_VIDEO_FORMAT_UNKNOWN" "0")
+    '("i420" "GST_VIDEO_FORMAT_I420" "1")
+    '("yv12" "GST_VIDEO_FORMAT_YV12" "2")
+    '("yuy2" "GST_VIDEO_FORMAT_YUY2" "3")
+    '("uyvy" "GST_VIDEO_FORMAT_UYVY" "4")
+    '("ayuv" "GST_VIDEO_FORMAT_AYUV" "5")
+    '("rgbx" "GST_VIDEO_FORMAT_RGBx" "6")
+    '("bgrx" "GST_VIDEO_FORMAT_BGRx" "7")
+    '("xrgb" "GST_VIDEO_FORMAT_xRGB" "8")
+    '("xbgr" "GST_VIDEO_FORMAT_xBGR" "9")
+    '("rgba" "GST_VIDEO_FORMAT_RGBA" "10")
+    '("bgra" "GST_VIDEO_FORMAT_BGRA" "11")
+    '("argb" "GST_VIDEO_FORMAT_ARGB" "12")
+    '("abgr" "GST_VIDEO_FORMAT_ABGR" "13")
+    '("rgb" "GST_VIDEO_FORMAT_RGB" "14")
+    '("bgr" "GST_VIDEO_FORMAT_BGR" "15")
+    '("y41b" "GST_VIDEO_FORMAT_Y41B" "16")
+    '("y42b" "GST_VIDEO_FORMAT_Y42B" "17")
+  )
+)
+
+;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/pbutils/install-plugins.h
+
+(define-enum-extended InstallPluginsReturn
+  (in-module "Gst")
+  (c-name "GstInstallPluginsReturn")
+  (values
+    '("success" "GST_INSTALL_PLUGINS_SUCCESS" "0")
+    '("not-found" "GST_INSTALL_PLUGINS_NOT_FOUND" "1")
+    '("error" "GST_INSTALL_PLUGINS_ERROR" "2")
+    '("partial-success" "GST_INSTALL_PLUGINS_PARTIAL_SUCCESS" "3")
+    '("user-abort" "GST_INSTALL_PLUGINS_USER_ABORT" "4")
+    '("crashed" "GST_INSTALL_PLUGINS_CRASHED" "100")
+    '("invalid" "GST_INSTALL_PLUGINS_INVALID" "101")
+    '("started-ok" "GST_INSTALL_PLUGINS_STARTED_OK" "200")
+    '("internal-failure" "GST_INSTALL_PLUGINS_INTERNAL_FAILURE" "201")
+    '("helper-missing" "GST_INSTALL_PLUGINS_HELPER_MISSING" "202")
+    '("install-in-progress" "GST_INSTALL_PLUGINS_INSTALL_IN_PROGRESS" "203")
+  )
+)
+
