@@ -6,4 +6,4 @@ LIBS = $(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4
 
 noinst_PROGRAMS = generate_extra_defs generate_defs_gstbase
 generate_extra_defs_SOURCES = generate_defs_gst.cc
-generate_defs_gst_base_SOURCES = generate_defs_gstbase.cc
+generate_defs_gstbase_SOURCES = generate_defs_gstbase.cc
