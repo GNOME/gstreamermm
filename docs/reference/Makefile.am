@@ -1,27 +1,49 @@
-doxyfile=Doxyfile
 doxygenprog=@DOXYGEN@
 
-html/index.html:
-	rm -rf html
-	$(doxygenprog) $(doxyfile)
-
-htmlfiles=$(shell ls -1 html/*.html)
-pngfiles=$(shell ls -1 html/*.png)
-giffiles=$(shell ls -1 html/*.gif)
-cssfiles=$(shell ls -1 html/*.css)
-websitefiles=reference-index.txt
+doxygen_configfile=Doxyfile
+doxygen_configfile_source = $(srcdir)/Doxyfile.in
+beautify_docs = @GMMPROC_DIR@/beautify_docs.pl
 
 docdir = $(datadir)/doc/gstreamermm-0.10/docs
-htmldocumentationdir=$(docdir)/reference/html
-htmldocumentation_DATA=$(htmlfiles) $(pngfiles) $(giffiles) $(cssfiles)
+referencedir=$(docdir)/reference/html
 
-all: html/index.html
+EXTRA_DIST=$(doxygen_configfile) html reference-index.txt
 
-clean-local:
-	-rm -rf html
-	-rm doxygen-warnings.txt
+HTML_INDEX=html/index.html
 
-EXTRA_DIST=$(doxyfile) $(htmlfiles) \
-$(pngfiles) $(giffiles) $(cssfiles) \
-$(websitefiles)
+$(HTML_INDEX): $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/gstreamer/gstreamermm/*.h $(top_srcdir)/gstreamerbase/gstreamerbasemm/*.h
+	rm -rf html
+	$(doxygenprog) $(doxygen_configfile)
+	$(PERL_PATH) $(beautify_docs) html && touch $@
+
+doc-clean:
+	rm -rf html
+	rm -f doxygen-warnings.txt
+
+install-reference: $(HTML_INDEX)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(referencedir)
+	@dir='$(<D)'; for p in $$dir/*.html $$dir/*.css $$dir/*.png; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(referencedir)/$$f"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(referencedir)/$$f; \
+	done
+
+uninstall-reference: $(HTML_INDEX)
+	@$(NORMAL_UNINSTALL)
+	@dir='$(<D)'; for p in $$dir/*.html $$dir/*.css $$dir/*.png; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(referencedir)/$$f"; \
+	  rm -f $(DESTDIR)$(referencedir)/$$f; \
+	done
+
+all-local: $(HTML_INDEX)
+
+install-data-local: install-reference
+
+uninstall-local: uninstall-reference
+
+maintainer-clean-local: doc-clean
+
+.PHONY: doc-clean install-reference uninstall-reference
 

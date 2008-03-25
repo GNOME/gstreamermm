@@ -27,5 +27,13 @@ dist-hook:
 
 #include $(top_srcdir)/docs/Makefile_web.am_fragment
 
-.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild
+doc-clean-recursive:
+	(cd docs && $(MAKE) $(AM_MAKEFLAGS) doc-clean)
+
+doc-clean: doc-clean-recursive
+
+doc-rebuild:
+	(cd docs && $(MAKE) $(AM_MAKEFLAGS) doc-rebuild)
+
+.PHONY: doc-clean doc-clean-recursive doc-rebuild
 
