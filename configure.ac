@@ -272,6 +272,22 @@ if test x$enable_debug = xyes ; then
     CFLAGS="$DEBUG_OPTIONS"
 fi
 
+# Create a list of input directories for Doxygen.  We have to check wether
+# we are building in the source directory, because Doxygen doesn't like
+# duplicated directories in the input list.
+GSTREAMERMM_DOXYGEN_INPUT=''
+gstmm_srcdir=`cd "$srcdir" && pwd`
+gstmm_builddir=`pwd`
+for sublib in gstreamer gstreamerbase
+do
+  if [ "x$gstmm_builddir"  = "x$gstmm_srcdir" ]; then
+    GSTREAMERMM_DOXYGEN_INPUT="$GSTREAMERMM_DOXYGEN_INPUT $gstmm_builddir/$sublib/$sublib""mm/"
+  else
+    GSTREAMERMM_DOXYGEN_INPUT="$GSTREAMERMM_DOXYGEN_INPUT $gstmm_srcdir/$sublib/$sublib""mm/"
+  fi
+done
+AC_SUBST(GSTREAMERMM_DOXYGEN_INPUT)
+
 AC_ARG_ENABLE(docs, [AC_HELP_STRING([--enable-docs],
               [build the included docs [default=yes]])],,
                       [enable_docs=yes])
