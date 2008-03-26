@@ -829,6 +829,25 @@
   )
 )
 
+(define-enum InstallPluginsReturn
+  (in-module "Gst")
+  (c-name "GstInstallPluginsReturn")
+  (gtype-id "GST_TYPE_INSTALL_PLUGINS_RETURN")
+  (values
+    '("success" "GST_INSTALL_PLUGINS_SUCCESS")
+    '("not-found" "GST_INSTALL_PLUGINS_NOT_FOUND")
+    '("error" "GST_INSTALL_PLUGINS_ERROR")
+    '("partial-success" "GST_INSTALL_PLUGINS_PARTIAL_SUCCESS")
+    '("user-abort" "GST_INSTALL_PLUGINS_USER_ABORT")
+    '("crashed" "GST_INSTALL_PLUGINS_CRASHED")
+    '("invalid" "GST_INSTALL_PLUGINS_INVALID")
+    '("started-ok" "GST_INSTALL_PLUGINS_STARTED_OK")
+    '("internal-failure" "GST_INSTALL_PLUGINS_INTERNAL_FAILURE")
+    '("helper-missing" "GST_INSTALL_PLUGINS_HELPER_MISSING")
+    '("install-in-progress" "GST_INSTALL_PLUGINS_INSTALL_IN_PROGRESS")
+  )
+)
+
 (define-enum VideoFormat
   (in-module "Gst")
   (c-name "GstVideoFormat")
@@ -852,25 +871,6 @@
     '("bgr" "GST_VIDEO_FORMAT_BGR")
     '("y41b" "GST_VIDEO_FORMAT_Y41B")
     '("y42b" "GST_VIDEO_FORMAT_Y42B")
-  )
-)
-
-(define-enum InstallPluginsReturn
-  (in-module "Gst")
-  (c-name "GstInstallPluginsReturn")
-  (gtype-id "GST_TYPE_INSTALL_PLUGINS_RETURN")
-  (values
-    '("success" "GST_INSTALL_PLUGINS_SUCCESS")
-    '("not-found" "GST_INSTALL_PLUGINS_NOT_FOUND")
-    '("error" "GST_INSTALL_PLUGINS_ERROR")
-    '("partial-success" "GST_INSTALL_PLUGINS_PARTIAL_SUCCESS")
-    '("user-abort" "GST_INSTALL_PLUGINS_USER_ABORT")
-    '("crashed" "GST_INSTALL_PLUGINS_CRASHED")
-    '("invalid" "GST_INSTALL_PLUGINS_INVALID")
-    '("started-ok" "GST_INSTALL_PLUGINS_STARTED_OK")
-    '("internal-failure" "GST_INSTALL_PLUGINS_INTERNAL_FAILURE")
-    '("helper-missing" "GST_INSTALL_PLUGINS_HELPER_MISSING")
-    '("install-in-progress" "GST_INSTALL_PLUGINS_INSTALL_IN_PROGRESS")
   )
 )
 
@@ -4859,217 +4859,6 @@
 
 
 
-;; From gstvideofilter.h
-
-(define-function gst_video_filter_get_type
-  (c-name "gst_video_filter_get_type")
-  (return-type "GType")
-)
-
-
-
-;; From gstvideosink.h
-
-(define-function gst_video_sink_get_type
-  (c-name "gst_video_sink_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_video_sink_center_rect
-  (c-name "gst_video_sink_center_rect")
-  (return-type "none")
-  (parameters
-    '("GstVideoRectangle" "src")
-    '("GstVideoRectangle" "dst")
-    '("GstVideoRectangle*" "result")
-    '("gboolean" "scaling")
-  )
-)
-
-
-
-;; From video.h
-
-(define-function gst_video_get_size
-  (c-name "gst_video_get_size")
-  (return-type "gboolean")
-  (parameters
-    '("GstPad*" "pad")
-    '("gint*" "width")
-    '("gint*" "height")
-  )
-)
-
-(define-function gst_video_calculate_display_ratio
-  (c-name "gst_video_calculate_display_ratio")
-  (return-type "gboolean")
-  (parameters
-    '("guint*" "dar_n")
-    '("guint*" "dar_d")
-    '("guint" "video_width")
-    '("guint" "video_height")
-    '("guint" "video_par_n")
-    '("guint" "video_par_d")
-    '("guint" "display_par_n")
-    '("guint" "display_par_d")
-  )
-)
-
-(define-function gst_video_format_parse_caps
-  (c-name "gst_video_format_parse_caps")
-  (return-type "gboolean")
-  (parameters
-    '("GstCaps*" "caps")
-    '("GstVideoFormat*" "format")
-    '("int*" "width")
-    '("int*" "height")
-  )
-)
-
-(define-function gst_video_parse_caps_framerate
-  (c-name "gst_video_parse_caps_framerate")
-  (return-type "gboolean")
-  (parameters
-    '("GstCaps*" "caps")
-    '("int*" "fps_n")
-    '("int*" "fps_d")
-  )
-)
-
-(define-function gst_video_parse_caps_pixel_aspect_ratio
-  (c-name "gst_video_parse_caps_pixel_aspect_ratio")
-  (return-type "gboolean")
-  (parameters
-    '("GstCaps*" "caps")
-    '("int*" "par_n")
-    '("int*" "par_d")
-  )
-)
-
-(define-method new_caps
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_new_caps")
-  (return-type "GstCaps*")
-  (parameters
-    '("int" "width")
-    '("int" "height")
-    '("int" "framerate_n")
-    '("int" "framerate_d")
-    '("int" "par_n")
-    '("int" "par_d")
-  )
-)
-
-(define-function gst_video_format_from_fourcc
-  (c-name "gst_video_format_from_fourcc")
-  (return-type "GstVideoFormat")
-  (parameters
-    '("guint32" "fourcc")
-  )
-)
-
-(define-method to_fourcc
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_to_fourcc")
-  (return-type "guint32")
-)
-
-(define-method is_rgb
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_is_rgb")
-  (return-type "gboolean")
-)
-
-(define-method is_yuv
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_is_yuv")
-  (return-type "gboolean")
-)
-
-(define-method has_alpha
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_has_alpha")
-  (return-type "gboolean")
-)
-
-(define-method get_row_stride
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_get_row_stride")
-  (return-type "int")
-  (parameters
-    '("int" "component")
-    '("int" "width")
-  )
-)
-
-(define-method get_pixel_stride
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_get_pixel_stride")
-  (return-type "int")
-  (parameters
-    '("int" "component")
-  )
-)
-
-(define-method get_component_width
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_get_component_width")
-  (return-type "int")
-  (parameters
-    '("int" "component")
-    '("int" "width")
-  )
-)
-
-(define-method get_component_height
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_get_component_height")
-  (return-type "int")
-  (parameters
-    '("int" "component")
-    '("int" "height")
-  )
-)
-
-(define-method get_component_offset
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_get_component_offset")
-  (return-type "int")
-  (parameters
-    '("int" "component")
-    '("int" "width")
-    '("int" "height")
-  )
-)
-
-(define-method get_size
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_get_size")
-  (return-type "int")
-  (parameters
-    '("int" "width")
-    '("int" "height")
-  )
-)
-
-(define-method convert
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_convert")
-  (return-type "gboolean")
-  (parameters
-    '("int" "width")
-    '("int" "height")
-    '("int" "fps_n")
-    '("int" "fps_d")
-    '("GstFormat" "src_format")
-    '("gint64" "src_value")
-    '("GstFormat" "dest_format")
-    '("gint64*" "dest_value")
-  )
-)
-
-
-
 ;; From descriptions.h
 
 (define-function gst_pb_utils_add_codec_description_to_tag_list
@@ -5335,6 +5124,217 @@
 (define-function gst_pb_utils_init
   (c-name "gst_pb_utils_init")
   (return-type "none")
+)
+
+
+
+;; From gstvideofilter.h
+
+(define-function gst_video_filter_get_type
+  (c-name "gst_video_filter_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gstvideosink.h
+
+(define-function gst_video_sink_get_type
+  (c-name "gst_video_sink_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_sink_center_rect
+  (c-name "gst_video_sink_center_rect")
+  (return-type "none")
+  (parameters
+    '("GstVideoRectangle" "src")
+    '("GstVideoRectangle" "dst")
+    '("GstVideoRectangle*" "result")
+    '("gboolean" "scaling")
+  )
+)
+
+
+
+;; From video.h
+
+(define-function gst_video_get_size
+  (c-name "gst_video_get_size")
+  (return-type "gboolean")
+  (parameters
+    '("GstPad*" "pad")
+    '("gint*" "width")
+    '("gint*" "height")
+  )
+)
+
+(define-function gst_video_calculate_display_ratio
+  (c-name "gst_video_calculate_display_ratio")
+  (return-type "gboolean")
+  (parameters
+    '("guint*" "dar_n")
+    '("guint*" "dar_d")
+    '("guint" "video_width")
+    '("guint" "video_height")
+    '("guint" "video_par_n")
+    '("guint" "video_par_d")
+    '("guint" "display_par_n")
+    '("guint" "display_par_d")
+  )
+)
+
+(define-function gst_video_format_parse_caps
+  (c-name "gst_video_format_parse_caps")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps*" "caps")
+    '("GstVideoFormat*" "format")
+    '("int*" "width")
+    '("int*" "height")
+  )
+)
+
+(define-function gst_video_parse_caps_framerate
+  (c-name "gst_video_parse_caps_framerate")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps*" "caps")
+    '("int*" "fps_n")
+    '("int*" "fps_d")
+  )
+)
+
+(define-function gst_video_parse_caps_pixel_aspect_ratio
+  (c-name "gst_video_parse_caps_pixel_aspect_ratio")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps*" "caps")
+    '("int*" "par_n")
+    '("int*" "par_d")
+  )
+)
+
+(define-method new_caps
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_new_caps")
+  (return-type "GstCaps*")
+  (parameters
+    '("int" "width")
+    '("int" "height")
+    '("int" "framerate_n")
+    '("int" "framerate_d")
+    '("int" "par_n")
+    '("int" "par_d")
+  )
+)
+
+(define-function gst_video_format_from_fourcc
+  (c-name "gst_video_format_from_fourcc")
+  (return-type "GstVideoFormat")
+  (parameters
+    '("guint32" "fourcc")
+  )
+)
+
+(define-method to_fourcc
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_to_fourcc")
+  (return-type "guint32")
+)
+
+(define-method is_rgb
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_is_rgb")
+  (return-type "gboolean")
+)
+
+(define-method is_yuv
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_is_yuv")
+  (return-type "gboolean")
+)
+
+(define-method has_alpha
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_has_alpha")
+  (return-type "gboolean")
+)
+
+(define-method get_row_stride
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_get_row_stride")
+  (return-type "int")
+  (parameters
+    '("int" "component")
+    '("int" "width")
+  )
+)
+
+(define-method get_pixel_stride
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_get_pixel_stride")
+  (return-type "int")
+  (parameters
+    '("int" "component")
+  )
+)
+
+(define-method get_component_width
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_get_component_width")
+  (return-type "int")
+  (parameters
+    '("int" "component")
+    '("int" "width")
+  )
+)
+
+(define-method get_component_height
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_get_component_height")
+  (return-type "int")
+  (parameters
+    '("int" "component")
+    '("int" "height")
+  )
+)
+
+(define-method get_component_offset
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_get_component_offset")
+  (return-type "int")
+  (parameters
+    '("int" "component")
+    '("int" "width")
+    '("int" "height")
+  )
+)
+
+(define-method get_size
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_get_size")
+  (return-type "int")
+  (parameters
+    '("int" "width")
+    '("int" "height")
+  )
+)
+
+(define-method convert
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_convert")
+  (return-type "gboolean")
+  (parameters
+    '("int" "width")
+    '("int" "height")
+    '("int" "fps_n")
+    '("int" "fps_d")
+    '("GstFormat" "src_format")
+    '("gint64" "src_value")
+    '("GstFormat" "dest_format")
+    '("gint64*" "dest_value")
+  )
 )
 
 
