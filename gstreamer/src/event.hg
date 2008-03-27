@@ -19,15 +19,49 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gst/gstevent.h>
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/wrap.h>
+#include <gstreamermm/format.h>
 
 _DEFS(gstreamermm,gst)
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
 
 namespace Gst
 {
+
+enum EventType
+{
+  EVENT_UNKNOWN = GST_EVENT_UNKNOWN,
+  /* bidirectional events */
+  EVENT_FLUSH_START = GST_EVENT_FLUSH_START,
+  EVENT_FLUSH_STOP = GST_EVENT_FLUSH_STOP,
+  /* downstream serialized events */
+  EVENT_EOS = GST_EVENT_EOS,
+  EVENT_NEWSEGMENT = GST_EVENT_NEWSEGMENT,
+  EVENT_TAG = GST_EVENT_TAG,
+  EVENT_BUFFERSIZE = GST_EVENT_BUFFERSIZE,
+  /* upstream events */
+  EVENT_QOS = GST_EVENT_QOS,
+  EVENT_SEEK = GST_EVENT_SEEK,
+  EVENT_NAVIGATION = GST_EVENT_NAVIGATION,
+  EVENT_LATENCY = GST_EVENT_LATENCY,
+
+  /* custom events start here */
+  EVENT_CUSTOM_UPSTREAM = GST_EVENT_CUSTOM_UPSTREAM,
+  EVENT_CUSTOM_DOWNSTREAM = GST_EVENT_CUSTOM_DOWNSTREAM,
+  EVENT_CUSTOM_DOWNSTREAM_OOB = GST_EVENT_CUSTOM_DOWNSTREAM_OOB,
+  EVENT_CUSTOM_BOTH = GST_EVENT_CUSTOM_BOTH,
+  EVENT_CUSTOM_BOTH_OOB = GST_EVENT_CUSTOM_BOTH_OOB
+};
+
+_WRAP_ENUM(SeekType, GstSeekType)
+_WRAP_ENUM(SeekFlags, GstSeekFlags)
+_WRAP_ENUM(EventTypeFlags, GstEventTypeFlags)
+
+Glib::ustring get_name(EventType t);
+Glib::QueryQuark get_quark(EventType t);
 
 class Event : public MiniObject
 {

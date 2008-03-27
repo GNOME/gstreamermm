@@ -19,107 +19,15 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gstclock.h>
-#include <gst/gstevent.h>
+#include <gst/gstminiobject.h>
 #include <gst/gstelement.h>
-#include <gst/gsturi.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-typedef GstClockTime ClockTime;
-typedef GstClockTimeDiff ClockTimeDiff;
-const ClockTime CLOCK_TIME_NONE = GST_CLOCK_TIME_NONE;
-
-_WRAP_ENUM(AssocFlags, GstAssocFlags)
-_WRAP_ENUM(BufferCopyFlags, GstBufferCopyFlags)
-_WRAP_ENUM(BufferFlag, GstBufferFlag)
-_WRAP_ENUM(BusSyncReply, GstBusSyncReply)
-_WRAP_ENUM(ClockEntryType, GstClockEntryType)
-_WRAP_ENUM(ClockFlags, GstClockFlags)
-_WRAP_ENUM(ClockReturn, GstClockReturn)
-
-enum EventType
-{
-  EVENT_UNKNOWN = GST_EVENT_UNKNOWN,
-  /* bidirectional events */
-  EVENT_FLUSH_START = GST_EVENT_FLUSH_START,
-  EVENT_FLUSH_STOP = GST_EVENT_FLUSH_STOP,
-  /* downstream serialized events */
-  EVENT_EOS = GST_EVENT_EOS,
-  EVENT_NEWSEGMENT = GST_EVENT_NEWSEGMENT,
-  EVENT_TAG = GST_EVENT_TAG,
-  EVENT_BUFFERSIZE = GST_EVENT_BUFFERSIZE,
-  /* upstream events */
-  EVENT_QOS = GST_EVENT_QOS,
-  EVENT_SEEK = GST_EVENT_SEEK,
-  EVENT_NAVIGATION = GST_EVENT_NAVIGATION,
-  EVENT_LATENCY = GST_EVENT_LATENCY,
-
-  /* custom events start here */
-  EVENT_CUSTOM_UPSTREAM = GST_EVENT_CUSTOM_UPSTREAM,
-  EVENT_CUSTOM_DOWNSTREAM = GST_EVENT_CUSTOM_DOWNSTREAM,
-  EVENT_CUSTOM_DOWNSTREAM_OOB = GST_EVENT_CUSTOM_DOWNSTREAM_OOB,
-  EVENT_CUSTOM_BOTH = GST_EVENT_CUSTOM_BOTH,
-  EVENT_CUSTOM_BOTH_OOB = GST_EVENT_CUSTOM_BOTH_OOB
-};
-
-_WRAP_ENUM(FlowReturn, GstFlowReturn)
-_WRAP_ENUM(Format, GstFormat)
-_WRAP_ENUM(IndexCertainty, GstIndexCertainty)
-_WRAP_ENUM(IndexEntryType, GstIndexEntryType)
-_WRAP_ENUM(IndexFlags, GstIndexFlags)
-_WRAP_ENUM(IndexLookupMethod, GstIndexLookupMethod)
-_WRAP_ENUM(IndexResolverMethod, GstIndexResolverMethod)
-_WRAP_ENUM(IteratorItem, GstIteratorItem)
-_WRAP_ENUM(IteratorResult, GstIteratorResult)
-_WRAP_ENUM(MessageType, GstMessageType)
 _WRAP_ENUM(MiniObjectFlags, GstMiniObjectFlags)
-_WRAP_ENUM(PadDirection, GstPadDirection)
-_WRAP_ENUM(PadLinkReturn, GstPadLinkReturn)
-_WRAP_ENUM(PadPresence, GstPadPresence)
-_WRAP_ENUM(ParseError, GstParseError)
-_WRAP_ENUM(PluginError, GstPluginError)
-_WRAP_ENUM(QueryType, GstQueryType)
-_WRAP_ENUM(Rank, GstRank)
-_WRAP_ENUM(SeekFlags, GstSeekFlags)
-_WRAP_ENUM(SeekType, GstSeekType)
 _WRAP_ENUM(State, GstState)
-_WRAP_ENUM(TaskState, GstTaskState)
-
-enum URIType
-{
-  URI_UNKNOWN = GST_URI_UNKNOWN,
-  URI_SINK = GST_URI_SINK,
-  URI_SRC = GST_URI_SRC 
-};
-
-enum StateChange
-{
-  STATE_CHANGE_NULL_TO_READY = GST_STATE_CHANGE_NULL_TO_READY,
-  STATE_CHANGE_READY_TO_PAUSED = GST_STATE_CHANGE_READY_TO_PAUSED,
-  STATE_CHANGE_PAUSED_TO_PLAYING = GST_STATE_CHANGE_PAUSED_TO_PLAYING,
-  STATE_CHANGE_PLAYING_TO_PAUSED = GST_STATE_CHANGE_PLAYING_TO_PAUSED,
-  STATE_CHANGE_PAUSED_TO_READY = GST_STATE_CHANGE_PAUSED_TO_READY,
-  STATE_CHANGE_READY_TO_NULL = GST_STATE_CHANGE_READY_TO_NULL 
-};
-
-_WRAP_ENUM(StateChangeReturn, GstStateChangeReturn)
-_WRAP_ENUM(TagMergeMode, GstTagMergeMode)
-_WRAP_ENUM(TagFlag, GstTagFlag)
-
-Glib::ustring get_name(EventType t);
-Glib::ustring get_name(Format f);
-Glib::ustring get_name(MessageType t);
-Glib::ustring get_name(QueryType t);
-Glib::ustring get_name(State s);
-Glib::ustring get_name(StateChangeReturn s);
-
-Glib::QueryQuark get_quark(EventType t);
-Glib::QueryQuark get_quark(Format f);
-Glib::QueryQuark get_quark(MessageType t);
-Glib::QueryQuark get_quark(QueryType t);
 
 } //namespace Gst

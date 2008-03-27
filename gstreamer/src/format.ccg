@@ -19,10 +19,20 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gstformat.h>
+#include <gst/gstenumtypes.h>
 
 namespace Gst
 {
+
+Glib::ustring get_name(Format f)
+{
+  return gst_format_get_name(GstFormat(f));
+}
+
+Glib::QueryQuark get_quark(Format f)
+{
+  return Glib::QueryQuark(gst_format_to_quark(GstFormat(f)));
+}
 
 Format register_format(const Glib::ustring& nick, const Glib::ustring& description)
 {

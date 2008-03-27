@@ -19,28 +19,34 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gstreamermm/enums.h>
+#include <gst/gstformat.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
-  struct FormatDefinition
-  {
-    Format              value;
-    Glib::ustring       nick;
-    Glib::ustring       description;
-    Glib::QueryQuark    quark;
-  };
 
-  //Note that GstFormat is an enum. That's why these are not member functions of a class.
+_WRAP_ENUM(Format, GstFormat)
 
-  Format register_format(const Glib::ustring& nick, const Glib::ustring&description);
-  Format get_format(const Glib::ustring& nick);
+struct FormatDefinition
+{
+  Format              value;
+  Glib::ustring       nick;
+  Glib::ustring       description;
+  Glib::QueryQuark    quark;
+};
 
-  //TODO: first arg is an array of Formats
-  //TODO: bool formats_contain_format(const Format& formats, Format format);
+Glib::ustring get_name(Format f);
+Glib::QueryQuark get_quark(Format f);
 
-  bool get_details(Format format, FormatDefinition& def);
+//Note that GstFormat is an enum. That's why these are not member functions of a class.
+
+Format register_format(const Glib::ustring& nick, const Glib::ustring&description);
+Format get_format(const Glib::ustring& nick);
+
+//TODO: first arg is an array of Formats
+//TODO: bool formats_contain_format(const Format& formats, Format format);
+
+bool get_details(Format format, FormatDefinition& def);
 
 } //namespace Gst

@@ -20,7 +20,7 @@
  */
 
 #include <stdexcept>
-#include <gst/gstelement.h>
+#include <gst/gstenumtypes.h>
 #include <gst/gstinterface.h>
 #include <gst/gstutils.h>
 #include <gstreamermm/bus.h>
@@ -28,7 +28,6 @@
 #include <gstreamermm/elementfactory.h>
 #include <gstreamermm/event.h>
 #include <gstreamermm/index.h>
-#include <gstreamermm/message.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/padtemplate.h>
 #include <gstreamermm/query.h>
@@ -40,6 +39,16 @@ void ElementInterfaced_WeakNotify_gstreamermm_callback(void* data,
 GObject* where_the_object_was)
 {
   delete (Gst::Element*) data;
+}
+
+Glib::ustring get_name(State s)
+{
+  return gst_element_state_get_name(GstState(s));
+}
+
+Glib::ustring get_name(StateChangeReturn s)
+{
+  return gst_element_state_change_return_get_name(GstStateChangeReturn(s));
 }
 
 Glib::RefPtr<Element>

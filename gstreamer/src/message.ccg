@@ -19,8 +19,20 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gst/gstenumtypes.h>
+
 namespace Gst
 {
+
+Glib::ustring get_name(MessageType t)
+{
+  return gst_message_type_get_name(GstMessageType(t));
+}
+
+Glib::QueryQuark get_quark(MessageType t)
+{
+  return Glib::QueryQuark(gst_message_type_to_quark(GstMessageType(t)));
+}
 
 const Structure*
 Message::get_structure()

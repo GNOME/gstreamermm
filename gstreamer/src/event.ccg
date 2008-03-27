@@ -19,10 +19,20 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gstevent.h>
+#include <gst/gstenumtypes.h>
 
 namespace Gst
 {
+
+Glib::ustring get_name(EventType t)
+{
+  return gst_event_type_get_name(GstEventType(t));
+}
+
+Glib::QueryQuark get_quark(EventType t)
+{
+  return Glib::QueryQuark(gst_event_type_to_quark(GstEventType(t)));
+}
 
 const Structure* Event::get_structure()
 {

@@ -19,9 +19,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gst/gstelement.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/enums.h>
+#include <gstreamermm/event.h>
+#include <gstreamermm/message.h>
+#include <gstreamermm/query.h>
 
 _DEFS(gstreamermm,gst)
 _PINCLUDE(gstreamermm/private/object_p.h)
@@ -40,6 +44,23 @@ class Message;
 class Pad;
 class PadTemplate;
 class Query;
+
+_WRAP_ENUM(ElementFlags, GstElementFlags)
+
+enum StateChange
+{
+  STATE_CHANGE_NULL_TO_READY = GST_STATE_CHANGE_NULL_TO_READY,
+  STATE_CHANGE_READY_TO_PAUSED = GST_STATE_CHANGE_READY_TO_PAUSED,
+  STATE_CHANGE_PAUSED_TO_PLAYING = GST_STATE_CHANGE_PAUSED_TO_PLAYING,
+  STATE_CHANGE_PLAYING_TO_PAUSED = GST_STATE_CHANGE_PLAYING_TO_PAUSED,
+  STATE_CHANGE_PAUSED_TO_READY = GST_STATE_CHANGE_PAUSED_TO_READY,
+  STATE_CHANGE_READY_TO_NULL = GST_STATE_CHANGE_READY_TO_NULL 
+};
+
+_WRAP_ENUM(StateChangeReturn, GstStateChangeReturn)
+
+Glib::ustring get_name(State s);
+Glib::ustring get_name(StateChangeReturn s);
 
 /** Element — Abstract base class for all pipeline elements.
  * Element is the abstract base class needed to construct an element that can

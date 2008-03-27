@@ -1,7 +1,6 @@
 doxygenprog=@DOXYGEN@
 
 doxygen_configfile=Doxyfile
-doxygen_configfile_source = $(srcdir)/Doxyfile.in
 beautify_docs = @GMMPROC_DIR@/beautify_docs.pl
 
 docdir = $(datadir)/doc/gstreamermm-0.10/docs
@@ -11,7 +10,7 @@ EXTRA_DIST=$(doxygen_configfile) html reference-index.txt
 
 HTML_INDEX=html/index.html
 
-$(HTML_INDEX): $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/gstreamer/gstreamermm/*.h $(top_srcdir)/gstreamerbase/gstreamerbasemm/*.h
+$(HTML_INDEX): $(doxygen_configfile) $(beautify_docs_source) $(top_srcdir)/gstreamer/gstreamermm/*.h $(top_srcdir)/gstreamerbase/gstreamerbasemm/*.h
 	rm -rf html
 	$(doxygenprog) $(doxygen_configfile)
 	$(PERL_PATH) $(beautify_docs) html && touch $@

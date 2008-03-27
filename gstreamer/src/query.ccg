@@ -19,10 +19,20 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gstquery.h>
+#include <gst/gstenumtypes.h>
 
 namespace Gst
 {
+
+Glib::ustring get_name(QueryType t)
+{
+  return gst_query_type_get_name(GstQueryType(t));
+}
+
+Glib::QueryQuark get_quark(QueryType t)
+{
+  return Glib::QueryQuark(gst_query_type_to_quark(GstQueryType(t)));
+}
 
 const Structure* Query::get_structure()
 {
