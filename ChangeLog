@@ -1,3 +1,19 @@
+2008-03-28  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/gstreamermm/init.cc: Modified init() to call
+	GstBase::wrap_init() (which initializes list of wrapper functions for
+	gstreamerbasemm)
+	* Makefile.am: Changed order of subdirectories so that gstreamerbase
+	is built before gstreamer directory (since gstreamermm depends on
+	gstreamerbasemm -- Gst::init() calls GstBase::wrap_init())
+	* build_shared/Makefile_build.am_fragment: Added gstreamerbase
+	includes to "all_includes" so that Gst::init() knows about
+	GstBase::wrap_init()
+	* gstreamer/gstreamermm/Makefile.am: Added libgstreamerbasemm-0.10.la
+	to list of libs to be linked to gstreamermm so that
+	GstBase::wrap_init() is linked in and Gst::init() does not get an
+	undefined reference error
+
 2008-03-27  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/enums.ccg: Changed general include to more specific

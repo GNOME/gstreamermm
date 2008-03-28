@@ -21,6 +21,7 @@
 #include <gstreamermm/wrap.h>
 #include <gstreamermm/wrap_init.h>
 #include <gstreamermm/gst_wrap_init.h>
+#include <gstreamerbasemm/wrap_init.h>
 #include <glibmm/init.h>
 #include <gst/gst.h>
 
@@ -41,6 +42,9 @@ void init(int& argc, char**& argv)
     //For Gst::wrap(), for Gst::MiniObject-derived classes.
     Gst::wrap_register_init();
     Gst::gst_wrap_init();
+
+    //Initialize wraping for gstreamerbasemm co-library
+    GstBase::wrap_init();
 
     s_init = true;
   }
