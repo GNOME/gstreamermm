@@ -1,0 +1,69 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/interfaces/xoverlay.h>
+#include <glibmm/interface.h>
+
+_DEFS(gstreamerbasemm,gstbase)
+
+namespace GstBase
+{
+
+/** XOverlay — Interface for setting/getting a Window on elements supporting
+ * it.
+ * The XOverlay interface is used for 2 main purposes :
+ *
+ * - To get a grab on the Window where the video sink element is going to
+ * render. This is achieved by either being informed about the Window
+ * identifier that the video sink element generated, or by forcing the video
+ * sink element to use a specific Window identifier for rendering.
+ * - To force a redrawing of the latest video frame the video sink element
+ * displayed on the Window. Indeed if the Pipeline is in STATE_PAUSED state,
+ * moving the Window around will damage its content. Application developers
+ * will want to handle the Expose events themselves and force the video sink
+ * element to refresh the Window's content.
+ *
+ * Using the Window created by the video sink is probably the simplest
+ * scenario, in some cases, though, it might not be flexible enough for
+ * application developers if they need to catch events such as mouse moves and
+ * button clicks.
+ *
+ * Setting a specific Window identifier on the video sink element is the most
+ * flexible solution but it has some issues. Indeed the application needs to
+ * set its Window identifier at the right time to avoid internal Window
+ * creation from the video sink element. To solve this issue a Message is
+ * posted on the bus to inform the application that it should set the Window
+ * identifier immediately. Here is an example on how to do that correctly:
+ */
+class XOverlay : public Glib::Interface
+{
+  _CLASS_INTERFACE(XOverlay, GstXOverlay, GST_X_OVERLAY, GstXOverlayClass)
+
+public:
+  _WRAP_METHOD(void set_xwindow_id(gulong xwindow_id), gst_x_overlay_set_xwindow_id)
+  _WRAP_METHOD(void got_xwindow_id(gulong xwindow_id), gst_x_overlay_got_xwindow_id)
+  _WRAP_METHOD(void prepare_xwindow_id(), gst_x_overlay_prepare_xwindow_id)
+  _WRAP_METHOD(void expose(), gst_x_overlay_expose)
+  _WRAP_METHOD(void handle_events(bool handle_events), gst_x_overlay_handle_events)
+};
+
+} // namespace GstBase
+
