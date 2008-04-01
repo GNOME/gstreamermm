@@ -42,7 +42,7 @@ rewindButton(Gtk::Stock::MEDIA_REWIND),
 forwardButton(Gtk::Stock::MEDIA_FORWARD),
 openButton(Gtk::Stock::OPEN)
 {
-    set_title("Gstmm Ogg Player Example");
+    set_title("gstreamermm Ogg Player Example");
 
     add(vBox);
     vBox.pack_start(progressLabel);
@@ -269,12 +269,12 @@ void PlayerWindow::on_open(void)
     static Glib::ustring workingDir = Glib::get_home_dir();
     
     Gtk::FileChooserDialog chooser(*this,
-                        "Select Ogg file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+                        "Select ogg file", Gtk::FILE_CHOOSER_ACTION_OPEN);
 
     Gtk::FileFilter filter;
     filter.add_mime_type("application/ogg");
     filter.set_name("Ogg files");
-    
+
     chooser.set_filter(filter);
 
     chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);

@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
   Gst::version(major, minor, micro);
 
-  std::cout << "This program is linked against GStreamermm " << major << "." << minor << "." << micro << std::endl;
+  std::cout << "This program is linked against gstreamermm " << major << "." << minor << "." << micro << std::endl;
 
   return 0;
 }
