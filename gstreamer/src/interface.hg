@@ -39,7 +39,7 @@ class Interface : public Glib::Interface
 public:
   _WRAP_METHOD(static bool element_implements(const Glib::RefPtr<const Element>&element, GType iface_type), gst_element_implements_interface)
 
-  template <class T_CastTo> inline
+  template <class T_CastTo>
   static Glib::RefPtr< ElementInterfaced<T_CastTo> > cast(const Glib::RefPtr<Element>& element);
 
   _IGNORE(gst_element_remove_pad,
@@ -102,12 +102,21 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-template <class T_CastTo> inline
+template <class T_CastTo>
 Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> > Interface::cast(const Glib::RefPtr<Element>& element)
 {
-  void* result = gst_implements_interface_cast(element->gobj(), T_CastTo::get_type());
-  Gst::ElementInterfaced<T_CastTo>* element_interfaced = new ElementInterfaced<T_CastTo>((GstElement*) result);
-  return Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> >(element_interfaced);
+  if (gst_element_implements_interface(element->gobj(), T_CastTo::get_type()))
+  {
+    void* result =
+      gst_implements_interface_cast(element->gobj(), T_CastTo::get_type());
+
+    Gst::ElementInterfaced<T_CastTo>* element_interfaced =
+      new ElementInterfaced<T_CastTo>((GstElement*) result);
+
+    return Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> >(element_interfaced);
+  }
+  else
+    return Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> >(0);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

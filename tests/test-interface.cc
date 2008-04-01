@@ -20,15 +20,41 @@
  */
 
 #include <gstreamermm.h>
+#include <gstreamerbasemm.h>
 #include <iostream>
 
 int main (int argc, char* argv[])
 {
   Gst::init(argc, argv);
 
-  Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create("fakesrc", "source");
+  Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create("filesrc", "source");
 
-  if(element)
+  if (element)
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
+
+  Glib::RefPtr< Gst::ElementInterfaced<Gst::URIHandler> > handler =
+    Gst::Interface::cast <Gst::URIHandler>(element);
+
+  if(handler)
+  {
+    std::cout << "element '" << element->get_name() <<
+      "' implements URIHandler interface." << std::endl;
+
+    handler->set_uri("file:///tmp/media.file");
+
+    std::cout << handler->get_name() << " uri = '" << handler->get_uri() <<
+      "'." << std::endl;
+  }
+
+  Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
+    Gst::Interface::cast <GstBase::XOverlay>(element);
+
+  if(xoverlay)
+  {
+    std::cout << "element '" << element->get_name() <<
+      "' implements XOverlay interface." << std::endl;
+
+    xoverlay->handle_events(false);
+  }
 }

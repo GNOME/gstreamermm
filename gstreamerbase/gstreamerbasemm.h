@@ -4,8 +4,8 @@
 //#include <gstreamerbasemm/bin.h>
 
 #include <gstreamerbasemm/init.h>
-#include <gstreamerbasemm/version.h>
 #include <gstreamerbasemm/wrap_init.h>
+#include <gstreamerbasemm/xoverlay.h>
 
 #endif // _GSTREAMERBASEMM_H
 
