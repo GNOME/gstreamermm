@@ -247,6 +247,7 @@ AC_CONFIG_FILES([
     examples/element_link/Makefile
     examples/ogg_player/Makefile
     examples/ogg_player_gtkmm/Makefile
+    examples/media_player_gtkmm/Makefile
     ])
 AC_SUBST(EXAMPLE_SUBDIR)
 else
