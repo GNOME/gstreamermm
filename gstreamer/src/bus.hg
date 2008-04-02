@@ -87,40 +87,79 @@ protected:
 
 public:
   /** For example,
-   * bool on_bus_watch(const Glib::RefPtr<Bus>& bus, const
+   * bool on_bus_message(const Glib::RefPtr<Bus>& bus, const
    * Glib::RefPtr<Message>& message);
    */
-  typedef sigc::slot< bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotWatch;
+  typedef sigc::slot< bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessage;
+
+  /** For example,
+   * BusSyncReply on_bus_sync_message(const Glib::RefPtr<Bus>& bus, const
+   * Glib::RefPtr<Message>& message);
+   */
+  typedef sigc::slot< BusSyncReply, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessageSync;
 
   static Glib::RefPtr<Bus> create();
+
   _WRAP_METHOD(bool post(const Glib::RefPtr<Message>& message), gst_bus_post)
   _WRAP_METHOD(bool have_pending() const, gst_bus_have_pending)
-
   _WRAP_METHOD(Glib::RefPtr<Message> peek(), gst_bus_peek)
   _WRAP_METHOD(Glib::RefPtr<const Message> peek() const, gst_bus_peek)
-
   _WRAP_METHOD(Glib::RefPtr<Message> pop(), gst_bus_pop)
   _WRAP_METHOD(Glib::RefPtr<Message> pop(MessageType message_type), gst_bus_pop_filtered)
   _WRAP_METHOD(Glib::RefPtr<Message> pop(ClockTime timeout), gst_bus_timed_pop)
   _WRAP_METHOD(Glib::RefPtr<Message> pop(ClockTime timeout, MessageType message_type), gst_bus_timed_pop_filtered)
-
   _WRAP_METHOD(void set_flushing(bool flushing = true), gst_bus_set_flushing)
 
-  guint add_watch(const SlotWatch& slot, int priority = Glib::PRIORITY_DEFAULT);
+  /** Adds a bus watch to the default main context with the given priority.
+   * The slot is used to receive asynchronous messages in the main loop.
+   *
+   * The watch can be removed using remove_watch() or by returning FALSE from
+   * slot.
+   *
+   * @param slot The slot to call when a message is received.
+   * @param priority The priority of the watch.
+   * @return The event source id. MT safe.
+   */
+  guint add_watch(const SlotMessage& slot, int priority = Glib::PRIORITY_DEFAULT);
+
+  /** Removes bus watch with event source id from main context.
+   *
+   * @param The event source id.
+   * @return true if removal was succesful, false otherwise.
+   */
   bool remove_watch(guint watch_id);
-  _IGNORE(gst_bus_add_watch, gst_bus_add_watch_full)
+
+  /** Sets the synchronous handler on the bus. The slot will be called every
+   * time a new message is posted on the bus. Note that the function will be
+   * called in the same thread context as the posting object (synchronously).
+   * This function is usually only called by the creator of the bus.
+   * Applications should handle messages asynchronously using the watch and
+   * poll functions.
+   *
+   * You cannot replace an existing sync_handler. You can clear the existing
+   * handler with clear_sync_handler().
+   *
+   * @param slot The handler slot to install
+   */
+  void set_sync_handler(const SlotMessageSync& slot);
+
+  /** Clears the existing synchronous handler from bus.
+   */
+  void clear_sync_handler();
 
   _WRAP_METHOD(void disable_sync_message_emission(), gst_bus_disable_sync_message_emission)
   _WRAP_METHOD(void enable_sync_message_emission(), gst_bus_enable_sync_message_emission)
-
   _WRAP_METHOD(void add_signal_watch(int priority = Glib::PRIORITY_DEFAULT), gst_bus_add_signal_watch_full)
   _WRAP_METHOD(void remove_signal_watch(), gst_bus_remove_signal_watch)
   _WRAP_METHOD(Glib::RefPtr<Message> poll(MessageType message_type, ClockTimeDiff timeout), gst_bus_poll)
-  _IGNORE(gst_bus_add_signal_watch)
 
 #m4 _CONVERSION(`GstMessage*',`const Glib::RefPtr<Message>&', `Gst::Message::wrap($3, true)')
   _WRAP_SIGNAL(void message(const Glib::RefPtr<Message>& message), "message")
   _WRAP_SIGNAL(void sync_message(const Glib::RefPtr<Message>& message), "sync-message")
+
+  _IGNORE(gst_bus_add_watch,
+          gst_bus_add_watch_full,
+          gst_bus_add_signal_watch)
 };
 
 } //namespace Gst

@@ -21,9 +21,9 @@
 
 #include <gst/gstenumtypes.h>
 
-static gboolean Bus_Watch_gstreamermm_callback(GstBus* bus, GstMessage* message, void* data)
+static gboolean Bus_Message_gstreamermm_callback(GstBus* bus, GstMessage* message, void* data)
 {
-  Gst::Bus::SlotWatch* the_slot = static_cast<Gst::Bus::SlotWatch*>(data);
+  Gst::Bus::SlotMessage* the_slot = static_cast<Gst::Bus::SlotMessage*>(data);
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
@@ -41,9 +41,29 @@ static gboolean Bus_Watch_gstreamermm_callback(GstBus* bus, GstMessage* message,
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
-static void Bus_Watch_gstreamermm_callback_destroy(void* data)
+static void Bus_Message_gstreamermm_callback_destroy(void* data)
 {
-  delete static_cast<Gst::Bus::SlotWatch*>(data);
+  delete static_cast<Gst::Bus::SlotMessage*>(data);
+}
+
+static GstBusSyncReply Bus_Message_Sync_gstreamermm_callback(GstBus* bus, GstMessage* message, void* data)
+{
+  Gst::Bus::SlotMessageSync* the_slot = static_cast<Gst::Bus::SlotMessageSync*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (GstBusSyncReply)((*the_slot)(Glib::wrap(bus, true), Gst::Message::wrap(message, true)));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return GST_BUS_PASS; // pass message to async queue
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 namespace Gst
@@ -55,19 +75,33 @@ Glib::RefPtr<Bus> Bus::create()
   return Glib::wrap(bus, false);
 }
 
-guint Bus::add_watch(const SlotWatch& slot, int priority)
+guint Bus::add_watch(const SlotMessage& slot, int priority)
 {
   //Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
-  //It will be deleted when Bus_Watch_gstreamermm_callback_destroy() is called.
-  SlotWatch* slot_copy = new SlotWatch(slot);
+  //It will be deleted when Bus_Message_gstreamermm_callback_destroy() is called.
+  SlotMessage* slot_copy = new SlotMessage(slot);
   return gst_bus_add_watch_full(gobj(), priority,
-    &Bus_Watch_gstreamermm_callback, slot_copy,
-    &Bus_Watch_gstreamermm_callback_destroy);
+    &Bus_Message_gstreamermm_callback, slot_copy,
+    &Bus_Message_gstreamermm_callback_destroy);
 }
 
 bool Bus::remove_watch(guint id)
 {
   return g_source_remove(id);
+}
+
+void Bus::set_sync_handler(const SlotMessageSync& slot)
+{
+  static SlotMessageSync slot_copy;
+  slot_copy = slot;
+  gst_bus_set_sync_handler(gobj(), &Bus_Message_Sync_gstreamermm_callback, &slot_copy);
+}
+
+void Bus::clear_sync_handler()
+{
+  // Clear existing sync handler by calling with NULL (see
+  // gst_bus_set_sync_handler docs)
+  gst_bus_set_sync_handler(gobj(), NULL, NULL);
 }
 
 } //namespace Gst
