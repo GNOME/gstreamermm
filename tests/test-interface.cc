@@ -43,6 +43,18 @@ int main (int argc, char* argv[])
 
     handler->set_uri("file:///tmp/media.file");
 
+    // Test ambiguity of ElementInterfaced<>::gobj() methods
+    GstElement* gstElement = handler->gobj();
+    const GstElement* constGstElement = handler->gobj();
+    GstElement* gstElementCopy = handler->gobj_copy();
+
+    if (!gstElement || !constGstElement || !gstElementCopy)
+    {
+      std::cout << "Underlying gobject methods of cast object didn't work." <<
+        std::endl;
+    }
+
+    // Use interface methods
     std::cout << handler->get_name() << " uri = '" << handler->get_uri() <<
       "'." << std::endl;
   }
@@ -55,6 +67,7 @@ int main (int argc, char* argv[])
     std::cout << "element '" << element->get_name() <<
       "' implements XOverlay interface." << std::endl;
 
+    // Use interface methods
     xoverlay->handle_events(false);
   }
 }

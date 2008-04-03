@@ -200,6 +200,12 @@ class ElementInterfaced
   public T_Interface
 {
 public:
+  // Make calls involving underlying gobject unambiguous (specifically, gobj()
+  // is ambiguous when called from an ElementInterfaced<..> class
+  GstElement* gobj();
+  const GstElement* gobj() const;
+  GstElement* gobj_copy();
+
   ~ElementInterfaced();
 
 protected:
@@ -226,6 +232,24 @@ ElementInterfaced<T_Interface>::ElementInterfaced(GstElement* castitem)
     g_object_weak_ref(gobject_,
       &ElementInterfaced_WeakNotify_gstreamermm_callback, this);
   }
+}
+
+template <class T_Interface>
+GstElement* ElementInterfaced<T_Interface>::gobj()
+{
+  return Element::gobj();
+}
+
+template <class T_Interface>
+const GstElement* ElementInterfaced<T_Interface>::gobj() const
+{
+  return Element::gobj();
+}
+
+template <class T_Interface>
+GstElement* ElementInterfaced<T_Interface>::gobj_copy()
+{
+  return Element::gobj_copy();
 }
 
 template <class T_Interface>
