@@ -69,12 +69,6 @@ static GstBusSyncReply Bus_Message_Sync_gstreamermm_callback(GstBus* bus, GstMes
 namespace Gst
 {
 
-Glib::RefPtr<Bus> Bus::create()
-{
-  GstBus* bus = gst_bus_new();
-  return Glib::wrap(bus, false);
-}
-
 guint Bus::add_watch(const SlotMessage& slot, int priority)
 {
   //Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
@@ -93,15 +87,13 @@ bool Bus::remove_watch(guint id)
 void Bus::set_sync_handler(const SlotMessageSync& slot)
 {
   static SlotMessageSync slot_copy;
+
+  // Clear a possibly existing sync handler by calling with NULL before setting
+  // a new one (see gst_bus_set_sync_handler docs)
+  gst_bus_set_sync_handler(gobj(), NULL, NULL);
+
   slot_copy = slot;
   gst_bus_set_sync_handler(gobj(), &Bus_Message_Sync_gstreamermm_callback, &slot_copy);
-}
-
-void Bus::clear_sync_handler()
-{
-  // Clear existing sync handler by calling with NULL (see
-  // gst_bus_set_sync_handler docs)
-  gst_bus_set_sync_handler(gobj(), NULL, NULL);
 }
 
 } //namespace Gst

@@ -5,7 +5,8 @@ LDADD=$(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la
 noinst_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \
                   test-message-wrap test-event-wrap test-query-wrap \
-		  test-structure test-caps-structures test-interface
+		  test-structure test-caps-structures test-interface \
+		  test-create-bus
 
 test_caps_SOURCES=test-caps.cc
 test_caps_LDFLAGS=@GSTREAMERMM_LIBS@
@@ -42,6 +43,9 @@ test_caps_structures_LDFLAGS=@GSTREAMERMM_LIBS@
 
 test_interface_SOURCES=test-interface.cc
 test_interface_LDFLAGS=@GSTREAMERMM_LIBS@
+
+test_create_bus_SOURCES=test-create-bus.cc
+test_create_bus_LDFLAGS=@GSTREAMERMM_LIBS@
 
 #runtestbasic runtestlangs \
 #runtestsearch runtestmimetypes \

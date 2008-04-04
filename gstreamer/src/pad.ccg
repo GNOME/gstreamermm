@@ -25,18 +25,19 @@
 #include <gstreamermm/caps.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/event.h>
-#include <gstreamermm/query.h>
+#include <gstreamermm/padtemplate.h>
+
+static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, void* data)
+{
+  Gst::Pad::SlotBlock * the_slot = static_cast<Gst::Pad::SlotBlock*>(data);
+
+  Glib::RefPtr<Gst::Pad> cpp_pad = Glib::wrap(pad, true);
+  (*the_slot)(cpp_pad, blocked);
+  delete the_slot;
+}
 
 namespace Gst
 {
-
-// The C API has gst_pad_new, we just use the very common ::create() here
-Glib::RefPtr<Pad>
-Pad::create(const Glib::ustring& name, PadDirection direction)
-{
-  GstPad * pad = gst_pad_new(name.c_str(), GstPadDirection(direction));
-  return Glib::wrap(pad, false);
-}
 
 Glib::RefPtr<Caps> Pad::get_pad_template_caps()
 {
@@ -121,16 +122,7 @@ FlowReturn Pad::chain(const Glib::RefPtr<Buffer>& buffer)
   return FlowReturn(gst_pad_chain(gobj(), buffer->gobj()));
 }
 
-static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, void* data)
-{
-  Pad::SlotBlock * the_slot = static_cast<Pad::SlotBlock*>(data);
-
-  Glib::RefPtr<Pad> cpp_pad = Glib::wrap(pad, true);
-  (*the_slot)(cpp_pad, blocked);
-  delete the_slot;
-}
-
-bool Pad::set_blocked_async(bool blocked, const SlotBlock& slot)
+bool Pad::set_blocked_async(const SlotBlock& slot, bool blocked)
 {
   SlotBlock* slot_copy = new SlotBlock(slot);
   return bool(gst_pad_set_blocked_async(GST_PAD(gobj()), gboolean(blocked), &Pad_Block_gstreamermm_callback, slot_copy));

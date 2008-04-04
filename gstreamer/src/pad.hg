@@ -50,15 +50,22 @@ class Pad : public Object
   _CLASS_GOBJECT(Pad, GstPad, GST_PAD, Object, GstObject)
 
 protected:
-  _CTOR_DEFAULT
+  _WRAP_CTOR(Pad(const Glib::ustring& name, PadDirection dir), gst_pad_new)
+  _WRAP_CTOR(Pad(const Glib::RefPtr<PadTemplate>& pad_template, const Glib::ustring& name), gst_pad_new_from_template)
 
 public:
-  // The C API has gst_pad_new, we just use the very common ::create() here
-  static Glib::RefPtr<Pad> create(const Glib::ustring& name, PadDirection direction);
+  /** For example,
+   * void on_block(const Glib::RefPtr<Pad>& pad, bool blocked);
+   */
+  typedef sigc::slot<void, const Glib::RefPtr<Pad>&, bool> SlotBlock;
+
+  _WRAP_CREATE(const Glib::ustring& name, PadDirection dir)
+  _WRAP_CREATE(const Glib::RefPtr<PadTemplate>& pad_template, const Glib::ustring& name)
 
   _WRAP_METHOD(PadDirection get_direction() const, gst_pad_get_direction)
   _WRAP_METHOD(Glib::RefPtr<Element> get_parent_element(), gst_pad_get_parent_element)
   _WRAP_METHOD(Glib::RefPtr<const Element> get_parent_element() const, gst_pad_get_parent_element, constversion)
+  _WRAP_METHOD(Glib::RefPtr<PadTemplate> get_pad_template() const, gst_pad_get_pad_template)
   _WRAP_METHOD(PadLinkReturn link(const Glib::RefPtr<Pad>& sink_pad), gst_pad_link)
   _WRAP_METHOD(bool unlink(const Glib::RefPtr<Pad>& sink_pad), gst_pad_unlink)
   _WRAP_METHOD(bool is_linked() const, gst_pad_is_linked)
@@ -83,6 +90,24 @@ public:
   _WRAP_METHOD(void use_fixed_caps(), gst_pad_use_fixed_caps)
   _WRAP_METHOD(bool is_active() const, gst_pad_is_active)
   _WRAP_METHOD(bool set_blocked(bool blocked = true), gst_pad_set_blocked)
+
+  /** Blocks or unblocks the dataflow on a pad asynchronously. The provided
+   * slot is called when the operation succeeds; this happens right before the
+   * next attempt at pushing a buffer on the pad.
+   *
+   * This can take a while as the pad can only become blocked when real
+   * dataflow is happening. When the pipeline is stalled, for example in
+   * PAUSED, this can take an indeterminate amount of time. Be careful with
+   * this blocking call as it might not return for reasons stated above.
+   *
+   * @param slot SlotBlock that will be called when the operation succeeds
+   * @param blocked boolean indicating whether the pad should be blocked or
+   * unblocked
+   * @return TRUE if the pad could be blocked. This function can fail if the
+   * pad was already in the requested state. MT safe.
+   */
+  bool set_blocked_async(const SlotBlock& slot, bool blocked = true);
+
   _WRAP_METHOD(bool is_blocked() const, gst_pad_is_blocked)
   _WRAP_METHOD(bool is_blocking() const, gst_pad_is_blocking)
 
@@ -166,13 +191,6 @@ public:
 	  gst_pad_set_link_function, gst_pad_set_query_function,
 	  gst_pad_set_fixatecaps_function,gst_pad_set_chain_function,
 	  gst_pad_set_internal_link_function, gst_pad_get_pad_template_caps)
-
-  /** For example,
-   * void on_block(const Glib::RefPtr<Pad>& pad, bool blocked);
-   */
-  typedef sigc::slot<void, const Glib::RefPtr<Pad>&, bool> SlotBlock;
-
-  bool set_blocked_async(bool blocked, const SlotBlock& slot);
 
 #m4 _CONVERSION(`GstMiniObject*',`const Glib::RefPtr<MiniObject>&',`wrap($3, false)')
 

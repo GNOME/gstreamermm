@@ -100,7 +100,7 @@ public:
    */
   typedef sigc::slot< BusSyncReply, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessageSync;
 
-  static Glib::RefPtr<Bus> create();
+  _WRAP_CREATE()
 
   _WRAP_METHOD(bool post(const Glib::RefPtr<Message>& message), gst_bus_post)
   _WRAP_METHOD(bool have_pending() const, gst_bus_have_pending)
@@ -138,16 +138,9 @@ public:
    * Applications should handle messages asynchronously using the watch and
    * poll functions.
    *
-   * You cannot replace an existing sync_handler. You can clear the existing
-   * handler with clear_sync_handler().
-   *
    * @param slot The handler slot to install
    */
   void set_sync_handler(const SlotMessageSync& slot);
-
-  /** Clears the existing synchronous handler from bus.
-   */
-  void clear_sync_handler();
 
   _WRAP_METHOD(void disable_sync_message_emission(), gst_bus_disable_sync_message_emission)
   _WRAP_METHOD(void enable_sync_message_emission(), gst_bus_enable_sync_message_emission)

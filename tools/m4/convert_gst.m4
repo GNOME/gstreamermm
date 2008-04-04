@@ -76,6 +76,10 @@ _CONVERSION(`GstPad*',`Glib::RefPtr<const Pad>',`Glib::wrap($3)')
 #_CONVERSION(`Glib::RefPtr<Pad>',`GstPad*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Pad>&',`GstPad*', `Glib::unwrap($3)')
 
+#PadTemplate
+_CONVERSION(`const Glib::RefPtr<PadTemplate>&',`GstPadTemplate*', `Glib::unwrap($3)')
+_CONVERSION(`GstPadTemplate*',`Glib::RefPtr<PadTemplate>', `Glib::wrap($3)')
+
 #Plugin
 _CONVERSION(`const Glib::RefPtr<Plugin>&',`GstPlugin*',`Glib::unwrap($3)')
 _CONVERSION(`GstPlugin*',`Glib::RefPtr<Plugin>',`Glib::wrap($3)')
