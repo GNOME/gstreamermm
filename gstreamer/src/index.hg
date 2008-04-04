@@ -90,13 +90,18 @@ public:
 
   /** For example,
    * bool on_filter(const Glib::RefPtr<Index>& index, IndexEntry entry);
+   * The filter function should return true if the entry is to be added to the
+   * index, false otherwise.
    */ 
   typedef sigc::slot<bool, const Glib::RefPtr<Index>&, IndexEntry> SlotFilter;
 
   void set_filter(const SlotFilter& slot);
 
   /** For example,
-   * bool on_resolve(const Glib::RefPtr<Gst::Object>& writer, Glib::ustring& writer_string);
+   * bool on_resolve(const Glib::RefPtr<Gst::Object>& writer, Glib::ustring&
+   * writer_string);
+   * The resolve function should return true if an id could be assigned to
+   * writer.
    */ 
   typedef sigc::slot<bool, const Glib::RefPtr<Index>&, const Glib::RefPtr<Gst::Object>&, Glib::ustring&> SlotResolver;
 
