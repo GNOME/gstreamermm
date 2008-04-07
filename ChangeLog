@@ -1,3 +1,23 @@
+2008-04-07  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/src/pad.ccg:
+	* gstreamer/src/pad.hg: Added add_{data,buffer,event}_probe() methods
+	which accepts a slot (SlotData) to be called whenever data, an event,
+	or a buffer passes through the pad.  Filed bug #526814 requesting
+	enhancement to allow a disconnect callback to be called when "probes"
+	are disconnected so that slot copies can be easily deleted on
+	disconnections.
+
+	Found that the "have-data" signal does not work on its own (connecting
+	to it never calls slot) because C API doesn't transmit signal unless
+	one of the add_*_probe() methods is used (see gst_pad_add_data_probe()
+	implementation in gstutils.c) so unwrapped the signal to disallow
+	possible confusion and let developers use add_*_probe() methods which
+	will work.
+
+	* examples/ogg_player/main.cc: Modified example to exemplify use
+	Gst::Pad::add_data_probe() method
+
 2008-04-04  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/bus.ccg:

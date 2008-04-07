@@ -59,6 +59,14 @@ public:
    */
   typedef sigc::slot<void, const Glib::RefPtr<Pad>&, bool> SlotBlock;
 
+  /** For example,
+   * bool on_have_data(const Glib::RefPtr<Pad>& pad, const
+   * Glib::RefPtr<MiniObjec>& data);
+   * The on_have_data method should return TRUE to keep the data in the
+   * pipeline, FALSE to drop it (throw it away)
+   */
+  typedef sigc::slot< bool, const Glib::RefPtr<Pad>&, const Glib::RefPtr<MiniObject>& > SlotData;
+
   _WRAP_CREATE(const Glib::ustring& name, PadDirection dir)
   _WRAP_CREATE(const Glib::RefPtr<PadTemplate>& pad_template, const Glib::ustring& name)
 
@@ -110,6 +118,46 @@ public:
 
   _WRAP_METHOD(bool is_blocked() const, gst_pad_is_blocked)
   _WRAP_METHOD(bool is_blocking() const, gst_pad_is_blocking)
+
+  /** Adds a "data probe" to a pad. The slot will be called whenever data
+   * passes through a pad. In this case data means both events and buffers. The
+   * probe will be called with the data as an argument. Note that the data will
+   * have a reference count greater than 1, so it will be immutable -- you must
+   * not change it.
+   *
+   * For source pads, the probe will be called after the blocking function, if
+   * any (see set_blocked_async()), but before looking up the peer to chain to.
+   * For sink pads, the probe function will be called before configuring the
+   * sink with new caps, if any, and before calling the pad's chain function.
+   *
+   * Your data probe should return TRUE to let the data continue to flow, or
+   * FALSE to drop it. Dropping data is rarely useful, but occasionally comes
+   * in handy with events.
+   *
+   * To remove a probe, use the appropriate function, such as
+   * remove_data_probe().
+   *
+   * @param slot The slot to call when data is passed over pad (note: slot is
+   * not copied because it is connected to a signal)
+   * @return The handler id which may be used to remove the connection later.
+   */
+  gulong add_data_probe(const SlotData& slot);
+
+  /** Adds a probe that will be called for all buffers passing through a pad.
+   * See add_data_probe() for more information.
+   *
+   * @param slot The slot to call when buffers are passed over pad
+   * @return The handler id
+   */
+  gulong add_buffer_probe(const SlotData& slot);
+
+  /** Adds a probe that will be called for all events passing through a pad.
+   * See add_data_probe() for more information.
+   *
+   * @param slot The slot to call when events are passed over pad
+   * @return The handler id
+   */
+  gulong add_event_probe(const SlotData& slot);
 
   _WRAP_METHOD(void remove_data_probe(guint handler_id), gst_pad_remove_data_probe)
   _WRAP_METHOD(void remove_buffer_probe(guint handler_id), gst_pad_remove_buffer_probe)
@@ -192,11 +240,6 @@ public:
 	  gst_pad_set_fixatecaps_function,gst_pad_set_chain_function,
 	  gst_pad_set_internal_link_function, gst_pad_get_pad_template_caps)
 
-#m4 _CONVERSION(`GstMiniObject*',`const Glib::RefPtr<MiniObject>&',`wrap($3, false)')
-
-#m4 _CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`Gst::unwrap($3)')
-#m4 _CONVERSION(`GstMiniObject*',`const Glib::RefPtr<Gst::MiniObject>&',`Gst::wrap($3)')
-  _WRAP_SIGNAL(bool have_data(const Glib::RefPtr<Gst::MiniObject>& mini_obj), "have-data")
 
 #m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void linked(const Glib::RefPtr<Pad>& peer_pad), "linked")

@@ -27,6 +27,7 @@
 Glib::RefPtr<Glib::MainLoop> mainloop;
 Glib::RefPtr<Gst::Pipeline> pipeline;
 Glib::RefPtr<Gst::Element> decoder;
+gulong data_probe_id;
 
 bool print_stream_position(void)
 {
@@ -103,6 +104,15 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   newPad->link(sinkPad);
 }
 
+bool on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad,
+        const Glib::RefPtr<Gst::MiniObject>& data)
+{
+    std::cout << "Sink pad '" << pad->get_name() << "' has received data;";
+    std::cout << " will now remove sink data probe id: " << data_probe_id << std::endl;
+    pad->remove_data_probe(data_probe_id);
+    return true;
+}
+
 int main(int argc, char* argv[])
 {
   // check input arguments
@@ -147,6 +157,11 @@ int main(int argc, char* argv[])
     std::cerr << "One element could not be created" << std::endl;
     return -1;
   }
+
+    data_probe_id = sink->get_pad("sink")->add_data_probe(
+            sigc::ptr_fun(&on_sink_pad_have_data));
+    std::cout << "sink data probe id = " << data_probe_id << std::endl;
+
 
   // Set filename property on the file source. Also add a message handler:
   source->set_property("location", std::string(argv[1]));

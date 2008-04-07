@@ -31,9 +31,51 @@ static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, void* 
 {
   Gst::Pad::SlotBlock * the_slot = static_cast<Gst::Pad::SlotBlock*>(data);
 
-  Glib::RefPtr<Gst::Pad> cpp_pad = Glib::wrap(pad, true);
-  (*the_slot)(cpp_pad, blocked);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*the_slot)(Glib::wrap(pad), blocked);
+    delete the_slot;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  //Delete once excuting slot
   delete the_slot;
+}
+
+static bool Pad_Data_gstreamermm_callback(GstPad* pad, GstMiniObject* mini_obj, void* data)
+{
+  Gst::Pad::SlotData* the_slot = static_cast<Gst::Pad::SlotData*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (*the_slot)(Glib::wrap(pad, true), Gst::wrap(mini_obj, true));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return TRUE; // Keep data
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void Pad_Data_gstreamermm_callback_disconnect(void* data, GClosure* closure)
+{
+  Gst::Pad::SlotData* the_slot = static_cast<Gst::Pad::SlotData*>(data);
+
+  if (the_slot)
+    delete the_slot;
 }
 
 namespace Gst
@@ -126,6 +168,30 @@ bool Pad::set_blocked_async(const SlotBlock& slot, bool blocked)
 {
   SlotBlock* slot_copy = new SlotBlock(slot);
   return bool(gst_pad_set_blocked_async(GST_PAD(gobj()), gboolean(blocked), &Pad_Block_gstreamermm_callback, slot_copy));
+}
+
+gulong Pad::add_data_probe(const SlotData& slot)
+{
+  SlotData* slot_copy = new SlotData(slot);
+
+  //return gst_pad_add_data_probe_full(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy, &Pad_Data_gstreamermm_callback_disconnect);
+  return gst_pad_add_data_probe(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy);
+}
+
+gulong Pad::add_buffer_probe(const SlotData& slot)
+{
+  SlotData* slot_copy = new SlotData(slot);
+
+  //return gst_pad_add_buffer_probe_full(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy, &Pad_Data_gstreamermm_callback_disconnect);
+  return gst_pad_add_buffer_probe(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy);
+}
+
+gulong Pad::add_event_probe(const SlotData& slot)
+{
+  SlotData* slot_copy = new SlotData(slot);
+
+  //return gst_pad_add_event_probe_full(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy, &Pad_Data_gstreamermm_callback_disconnect);
+  return gst_pad_add_event_probe(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy);
 }
 
 } //namespace Gst
