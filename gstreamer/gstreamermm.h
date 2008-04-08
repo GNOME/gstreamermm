@@ -14,6 +14,7 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/filter.h>
 #include <gstreamermm/format.h>
+#include <gstreamermm/ghostpad.h>
 #include <gstreamermm/index.h>
 #include <gstreamermm/indexfactory.h>
 #include <gstreamermm/interface.h>

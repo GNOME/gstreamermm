@@ -25,8 +25,6 @@
 #include <gstreamermm/message.h>
 
 _DEFS(gstreamermm,gst)
-_PINCLUDE(glibmm/private/object_p.h)
-_PINCLUDE(gstreamermm/private/object_p.h)
 
 namespace Gst
 {
@@ -66,10 +64,10 @@ _WRAP_ENUM(BusSyncReply, GstBusSyncReply)
  * asynchronous callbacks.
  *
  * It is also possible to get messages from the bus without any thread
- * marshalling with the gst_bus_set_sync_handler() method. This makes it
- * possible to react to a message in the same thread that posted the message on
- * the bus. This should only be used if the application is able to deal with
- * messages from different threads.
+ * marshalling with the set_sync_handler() method. This makes it possible to
+ * react to a message in the same thread that posted the message on the bus.
+ * This should only be used if the application is able to deal with messages
+ * from different threads.
  *
  * Every Pipeline has one bus.
  *
@@ -141,6 +139,11 @@ public:
    * @param slot The handler slot to install
    */
   void set_sync_handler(const SlotMessageSync& slot);
+
+  _IGNORE(gst_bus_set_sync_handler,
+         gst_bus_sync_handler,
+         gst_bus_sync_signal_handler,
+         gst_bus_async_signal_func)
 
   _WRAP_METHOD(void disable_sync_message_emission(), gst_bus_disable_sync_message_emission)
   _WRAP_METHOD(void enable_sync_message_emission(), gst_bus_enable_sync_message_emission)

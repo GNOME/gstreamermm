@@ -1,0 +1,106 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gstreamermm/pad.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+/** GhostPad — Pseudo link pads.
+ * GhostPads are useful when organizing pipelines with Bin like elements. The
+ * idea here is to create hierarchical element graphs. The bin element contains
+ * a sub-graph. Now one would like to treat the bin-element like other
+ * Elements. This is where GhostPads come into play. A GhostPad acts as a proxy
+ * for another pad. Thus the bin can have sink and source ghost-pads that are
+ * associated with sink and source pads of the child elements.
+ *
+ * If the target pad is known at creation time, create() with a Pad argument is
+ * the method to use to get a ghost-pad. Otherwise one can use create() with a
+ * PadDirection argument to create the ghost-pad and use set_target() to
+ * establish the association later on.
+ *
+ * Note that GhostPads add overhead to the data processing of a pipeline.
+ *
+ * Last reviewed on 2005-11-18 (0.9.5)
+ */
+class GhostPad : public Pad
+{
+  _CLASS_GOBJECT(GhostPad, GstGhostPad, GST_GHOST_PAD, Pad, GstPad)
+
+protected:
+  _WRAP_CTOR(GhostPad(const Glib::ustring& name, const Glib::RefPtr<Pad>& target), gst_ghost_pad_new)
+  _WRAP_CTOR(GhostPad(const Glib::ustring& name, PadDirection dir), gst_ghost_pad_new_no_target)
+  _WRAP_CTOR(GhostPad(const Glib::ustring& name, const Glib::RefPtr<Pad>& target, const Glib::RefPtr<PadTemplate>& templ), gst_ghost_pad_new_from_template)
+  _WRAP_CTOR(GhostPad(const Glib::ustring& name, const Glib::RefPtr<PadTemplate>& templ), gst_ghost_pad_new_no_target_from_template)
+
+public:
+  /** Create a new ghostpad with target as the target. The direction will be
+   * taken from the target pad. target must be unlinked.
+   *
+   * Will ref the target.
+   *
+   * @param name the name of the new pad.
+   * @param target the pad to ghost.
+   * @returns a new GhostPad, or NULL in case of an error.
+   */
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::RefPtr<Pad>& target)
+
+  /** Create a new ghostpad without a target with the given direction. A target
+   * can be set on the ghostpad later with the set_target() function.
+   *
+   * The created ghostpad will not have a padtemplate.
+   *
+   * @param name the name of the new pad.
+   * @param dir the direction of the ghostpad
+   * @return a new GhostPad, or NULL in case of an error. 
+   */
+  _WRAP_CREATE(const Glib::ustring& name, PadDirection dir)
+
+  /** Create a new ghostpad with target as the target. The direction will be
+   * taken from the target pad. The template used on the ghostpad will be
+   * template.
+   *
+   * Will ref the target.
+   *
+   * @param name the name of the new pad.
+   * @param target the pad to ghost.
+   * @param templ the PadTemplate to use on the ghostpad.
+   * @return Returns a new GhostPad, or NULL in case of an error.
+   */
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::RefPtr<Pad>& target, const Glib::RefPtr<PadTemplate>& templ)
+
+  /** Create a new ghostpad based on templ, without setting a target. The
+   * direction will be taken from the templ.
+   *
+   * @param name the name of the new pad.
+   * @param templ the PadTemplate to create the ghostpad from.
+   * @return a new GhostPad, or NULL in case of an error.
+   */
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::RefPtr<PadTemplate>& templ)
+
+  _WRAP_METHOD(bool set_target(const Glib::RefPtr<Pad>& new_target), gst_ghost_pad_set_target)
+  _WRAP_METHOD(Glib::RefPtr<Pad> get_target(), gst_ghost_pad_get_target)
+};
+
+} // namespace Gst
+
