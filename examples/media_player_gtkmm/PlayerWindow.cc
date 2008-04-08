@@ -23,7 +23,9 @@
 #include <gtkmm/filechooserdialog.h>
 #include <gdk/gdkx.h>
 #include <gstreamermm/bus.h>
+#include <gstreamermm/caps.h>
 #include <gstreamermm/clock.h>
+#include <gstreamermm/buffer.h>
 #include <gstreamermm/event.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/query.h>
@@ -34,8 +36,8 @@
 #include <iomanip>
 #include "PlayerWindow.h"
 
-PlayerWindow::PlayerWindow(Glib::RefPtr<Gst::Element> playbin,
-                                Glib::RefPtr<Gst::Pipeline> mainPipeline) :
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin,
+        const Glib::RefPtr<Gst::Element>& videoSink) :
 vBox(false, 5),
 progressLabel("000:00:00.000000000 / 000:00:00.000000000"),
 playButton(Gtk::Stock::MEDIA_PLAY),
@@ -48,10 +50,10 @@ openButton(Gtk::Stock::OPEN)
     set_title("gstreamermm Media Player Example");
 
     add(vBox);
-    vBox.pack_start(videoArea);
-    vBox.pack_start(progressLabel);
-    vBox.pack_start(progressScale);
-    vBox.pack_start(buttonBox);
+    vBox.pack_start(videoArea, Gtk::PACK_EXPAND_WIDGET);
+    vBox.pack_start(progressLabel, Gtk::PACK_SHRINK);
+    vBox.pack_start(progressScale, Gtk::PACK_SHRINK);
+    vBox.pack_start(buttonBox, Gtk::PACK_SHRINK);
 
     progressLabel.set_alignment(Gtk::ALIGN_CENTER);
 
@@ -81,7 +83,7 @@ openButton(Gtk::Stock::OPEN)
                                           &PlayerWindow::on_open));
 
     // get the bus from the pipeline
-    Glib::RefPtr<Gst::Bus> bus = mainPipeline->get_bus();
+    Glib::RefPtr<Gst::Bus> bus = playbin->get_bus();
 
     // Add a sync handler to receive synchronous messages from pipeline's
     // bus (this is done so that videoArea can be set up for drawing at an
@@ -101,7 +103,7 @@ openButton(Gtk::Stock::OPEN)
     forwardButton.set_sensitive(false);
 
     this->playbin = playbin;
-    this->mainPipeline = mainPipeline;
+    this->videoSink = videoSink;
 
     show_all_children();
     pauseButton.hide();
@@ -127,14 +129,14 @@ Gst::BusSyncReply PlayerWindow::on_bus_message_sync(
 
     if (xoverlay)
     {
-        gulong xWindowId = GDK_WINDOW_XID(Glib::unwrap(videoArea.get_window()));
+        gulong xWindowId = GDK_WINDOW_XID(videoArea.get_window()->gobj());
         xoverlay->set_xwindow_id(xWindowId);
     }
 
     return Gst::BUS_DROP;
 }
 
-// This function is used to receive asynchronous messages from mainPipeline's bus
+// This function is used to receive asynchronous messages from playbin's bus
 bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus_not_used */,
 					const Glib::RefPtr<Gst::Message>& message)
 {
@@ -201,6 +203,30 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus_not_used 
     return true;
 }
 
+bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
+        const Glib::RefPtr<Gst::MiniObject>& data)
+{
+    Glib::RefPtr<Gst::Buffer> buffer = Glib::RefPtr<Gst::Buffer>::cast_dynamic(data);
+
+    if (buffer) {
+        Glib::Value<int> widthValue;
+        Glib::Value<int> heightValue;
+
+        Glib::RefPtr<Gst::Caps> caps = buffer->get_caps();
+        caps->get_structure(0)->get_field("width", widthValue);
+        caps->get_structure(0)->get_field("height", heightValue);
+
+        videoArea.set_size_request(widthValue.get(), heightValue.get());
+        resize(1, 1);       // Resize to minimum when first playing by making size
+        check_resize();     // smallest then resizing according to video new size
+    }
+
+    pad->remove_buffer_probe(pad_probe_id);
+    pad_probe_id = 0; // Clear probe id to indicate that it has been removed
+
+    return true; // Keep buffer in pipeline (do not throw away)
+}
+
 void PlayerWindow::on_play(void)
 {
     progressScale.set_sensitive(true);
@@ -220,7 +246,7 @@ void PlayerWindow::on_play(void)
                              &PlayerWindow::update_stream_progress), 200);
 
     // set Gstmm pipeline to play mode
-	mainPipeline->set_state(Gst::STATE_PLAYING);
+	playbin->set_state(Gst::STATE_PLAYING);
 }
  
 void PlayerWindow::on_pause(void)
@@ -235,7 +261,7 @@ void PlayerWindow::on_pause(void)
     progressConnection.disconnect();
     
     // set Gstmm pipeline to pause mode
-	mainPipeline->set_state(Gst::STATE_PAUSED);
+	playbin->set_state(Gst::STATE_PAUSED);
 }
  
 void PlayerWindow::on_stop(void)
@@ -255,16 +281,27 @@ void PlayerWindow::on_stop(void)
     progressConnection.disconnect();
 
     // set Gstmm pipeline to inactive mode
-	mainPipeline->set_state(Gst::STATE_NULL);
+	playbin->set_state(Gst::STATE_NULL);
+
+    // reset display
     display_label_progress(0, duration);
     progressScale.set_value(0);
+
+    // Remove video sink pad buffer probe if after playing, probe id is
+    // not zero (means probe was not removed because media had no video and
+    // video_pad_got_buffer method never got a chance to remove probe)
+    if (pad_probe_id != 0)
+    {
+        videoSink->get_pad("sink")->remove_buffer_probe(pad_probe_id);
+        pad_probe_id  = 0;
+    }
 }
 
 bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
     gint64 newPos = gint64(value * duration);
 
-    if (mainPipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+    if (playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
     {
         display_label_progress(newPos, duration);
         return true;
@@ -283,13 +320,13 @@ void PlayerWindow::on_rewind(void)
     gint64 pos;
     Gst::Format fmt = Gst::FORMAT_TIME;
 
-    if (mainPipeline->query_position(fmt, pos))
+    if (playbin->query_position(fmt, pos))
     {
         gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
 
-        if (mainPipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos)) {
-            display_label_progress(newPos, duration);
+        if (playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos)) {
             progressScale.set_value(double(newPos) / duration);
+            display_label_progress(newPos, duration);
         }
         else
             std::cerr << "Could not seek!" << std::endl;
@@ -305,7 +342,7 @@ void PlayerWindow::on_forward(void)
 
     Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
-    if (mainPipeline->query(query))
+    if (playbin->query(query))
     {
         Glib::RefPtr<Gst::QueryPosition> posQuery =
             Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
@@ -322,7 +359,7 @@ void PlayerWindow::on_forward(void)
         Glib::RefPtr<Gst::EventSeek> seekEvent =
             Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
 
-        if (mainPipeline->send_event(seekEvent))
+        if (playbin->send_event(seekEvent))
         {
             progressScale.set_value(double(newPos) / duration);
             display_label_progress(newPos, duration);
@@ -349,8 +386,22 @@ void PlayerWindow::on_open(void)
     if (response == Gtk::RESPONSE_OK) {
         workingDir = chooser.get_current_folder();
 
-        // Set filename property on the file source. Also add a message handler:
-        playbin->set_property("uri", chooser.get_uri());
+        // Set uri property on the playbin.
+        Glib::RefPtr<Gst::Element>::cast_dynamic(playbin)->
+                set_property("uri", chooser.get_uri());
+
+        // Resize videoArea and window to minimum when opening a file
+        videoArea.set_size_request(0, 0);
+        resize(1, 1);
+
+        // Add buffer probe to video sink pad when file is opened which will
+        // be removed after first buffer is received in on_video_pad_got_buffer
+        // method (if there's video).  When first buffer arrives, video
+        // size can be extracted.  If there's no video, probe will be
+        // removed when media stops in on_stop method
+        pad_probe_id = videoSink->get_pad("sink")->add_buffer_probe(
+            sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
+
         set_title(Glib::filename_display_basename(chooser.get_filename()));
 
         playButton.set_sensitive(true);
@@ -363,8 +414,8 @@ bool PlayerWindow::update_stream_progress(void)
     Gst::Format fmt = Gst::FORMAT_TIME;
     gint64 pos = 0;
 
-    if (mainPipeline->query_position(fmt, pos)
-    && mainPipeline->query_duration(fmt, duration)) {
+    if (playbin->query_position(fmt, pos)
+    && playbin->query_duration(fmt, duration)) {
         progressScale.set_value(double(pos) / duration);
         display_label_progress(pos, duration);
     }
@@ -394,5 +445,5 @@ void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
 
 PlayerWindow::~PlayerWindow()
 {
-  mainPipeline->get_bus()->remove_watch(watch_id);
+  playbin->get_bus()->remove_watch(watch_id);
 }

@@ -35,8 +35,9 @@
 class PlayerWindow : public Gtk::Window
 {
 public:
-    PlayerWindow(Glib::RefPtr<Gst::Element> playbin,
-                 Glib::RefPtr<Gst::Pipeline> mainPipeline);
+    PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin,
+            const Glib::RefPtr<Gst::Element>& videoSink);
+
     ~PlayerWindow();
 protected:
     Gtk::VBox vBox;
@@ -58,6 +59,9 @@ protected:
     virtual bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus,
                             const Glib::RefPtr<Gst::Message>& message);
 
+    virtual bool on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
+                            const Glib::RefPtr<Gst::MiniObject>& buffer);
+
     virtual void on_play(void);
     virtual void on_pause(void);
     virtual void on_stop(void);
@@ -69,11 +73,12 @@ protected:
     bool update_stream_progress(void);
     void display_label_progress(gint64 pos, gint64 len);
 private:
-    Glib::RefPtr<Gst::Element> playbin;
-    Glib::RefPtr<Gst::Pipeline> mainPipeline;
+    Glib::RefPtr<Gst::Pipeline> playbin;
+    Glib::RefPtr<Gst::Element> videoSink;
     sigc::connection progressConnection;
-    unsigned int watch_id;
+    guint watch_id;
     gint64 duration;
+    gulong pad_probe_id;
 };
 
 #endif /* _PLAYERWINDOW_H */

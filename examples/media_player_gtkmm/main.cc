@@ -34,38 +34,31 @@ main (int argc, char *argv[])
     Gtk::Main kit(argc, argv);
     Gst::init(argc, argv);
 
-    // Create the pipeline
-    Glib::RefPtr<Gst::Pipeline> pipeline = Gst::Pipeline::create("media-player");
-
     // Create the elements
 
     // Autoplays any media type.  Implements GstBase::XOverlay so accepts
     // a window id in which to draw video
-    Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create("playbin", "media-playbin");
+    Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create("playbin", "media-player");
+    Glib::RefPtr<Gst::Pipeline> playbinPipeline = Glib::RefPtr<Gst::Pipeline>::cast_dynamic(playbin);
 
-    if (!pipeline || !playbin)
+    // Video sink where video (if any) will be drawn
+    Glib::RefPtr<Gst::Element> videoSink = Gst::ElementFactory::create("ximagesink", "video-sink");
+
+    if (!playbinPipeline || !videoSink)
     {
-        std::cerr << "One element could not be created" << std::endl;
+        std::cerr << "One of the elements for media player could not be created." << std::endl;
         return -1;
     }
 
-    // Put elements in a pipeline:
-    try
-    {
-        pipeline->add(playbin);
-    }
-    catch(const Glib::Error& ex)
-    {
-        std::cerr << "Error while adding elements to the pipeline: " << ex.what() << std::endl;
-        return -1;
-    }
+    // set the playbin's video-sink property so that videoSink is used for video display
+    playbinPipeline->set_property("video-sink", videoSink);
 
-    PlayerWindow mainWindow(playbin, pipeline);
+    PlayerWindow mainWindow(playbinPipeline, videoSink);
 
     kit.run(mainWindow);
 
     // Clean up nicely:
-    pipeline->set_state(Gst::STATE_NULL);
+    playbinPipeline->set_state(Gst::STATE_NULL);
 
     return 0;
 }
