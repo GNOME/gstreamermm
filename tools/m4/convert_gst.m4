@@ -100,7 +100,8 @@ _CONVERSION(`GstRegistry*',`Glib::RefPtr<Registry>', `Glib::wrap($3)')
 _CONVERSION(`Structure&',`GstStructure*',`(($3).gobj())')
 
 #TagList
-_CONVERSION(`const Glib::RefPtr<const TagList>&',`const GstTagList*', `Glib::unwrap($3)')
+_CONVERSION(`const TagList&',`const GstTagList*',`(($3).gobj())')
+_CONVERSION(`GstTagList*',`TagList',`Glib::wrap($3)')
 
 #URIHandler
 _CONVERSION(`const Glib::RefPtr<URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')
@@ -114,11 +115,12 @@ _CONVERSION(`const guint&',`guint',`$3')
 _CONVERSION(`const guint32&',`guint32',`$3')
 
 #Basic Gstreamermm Conversions
-_CONVERSION(`guint64',`ClockTime',`(ClockTime ($3))')
 _CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff ($3)')
 _CONVERSION(`ClockTimeDiff&',`GstClockTimeDiff*',`(GstClockTimeDiff*)(&($3))')
 _CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
 _CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
+_CONVERSION(`GstTagFlag',`TagFlag',`(TagFlag)($3)')
+_CONVERSION(`guint64',`ClockTime',`(ClockTime ($3))')
 _CONVERSION(`const URIType',`const GstURIType',`(GstURIType($3))')
 
 #C++ Conversions

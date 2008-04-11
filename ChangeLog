@@ -1,3 +1,20 @@
+2008-04-11  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/src/taglist.hg: Wrapped some of GstTagList by using
+	GstStructure as C type of class macro (instead of GstTagList) after
+	getting idea by commenting on related bug report #518934.  Got stuck
+	using "Gst::TagList Glib::wrap(GstStructure*)" which ambiguates
+	"Gst::Structure Glib::wrap(GstStructure*)".  The ambiguity holds even
+	if GstTagList is used for class macro C type because GstTagList is
+	declared as "typedef GstStructure GstTagList" in gsttaglist.h instead
+	of "typdef struct _GstTagList GstTagList" as it should be.  I
+	explained the problem in bug report (I had even submitted a patch),
+	but it seems developers are unwilling to fix it.  I don't see how
+	GstTagList will be wrapped otherwise so I'll be leaving taglist.hg as
+	is for now.
+
+	* tools/m4/convert_gst.m4: Added conversions for GstTagList
+
 2008-04-10  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/pad.ccg: Modified the add_{data,event,buffer}_probe()
