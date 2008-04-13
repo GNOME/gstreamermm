@@ -1,3 +1,32 @@
+2008-04-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* tools/m4/class_boxedtype_ncopy_extra.m4:
+	* tools/m4/convert.m4: Added new class macro
+	_CLASS_BOXEDTYPE_NCOPY_EXTRA which is like the class macro used for
+	Gst::Structure but adds extra dummy param to wrap method to
+	disambiguate definitions of "Gst::Structure Glib::wrap(GstStructure*)"
+	and "Gst::TagList Glib::wrap(GstStructure*)" (because GstTagList is
+	declared as "typedef GstStructure GstTagList" in GStreamer API which
+	in essence makes it a GstStructure)
+
+	* gstreamer/src/taglist.hg: Added class docs and modified to use class
+	macro _CLASS_BOXEDTYPE_NCOPY_EXTRA
+
+	* gstreamer/gstreamermm/taglist.cc:
+	* gstreamer/gstreamermm/taglist.h: Furthermore, had to add actual
+	gmmproc generated source files in order to manually remove the
+	standard 'extern "C" { typedef struct _GstTagList GstTagList; }' at
+	top of *.h file, again, because GStreamer API does not define
+	GstTagList in a standard way.  In bug report #518934 developers seem
+	not to want to fix this.  Will post last comment in report informing
+	that they are not following GObject definition standards to see if
+	perhaps they will reconsider for future.
+
+	taglist.hg has to be added to
+	gstreamer/src/Makefile_list_of_hg.am_fragment when changed to
+	regenerate these files and then removed and the 'extern "C" { ...}'
+	has to be removed from the *.h file to keep build process working.
+
 2008-04-11  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/taglist.hg: Wrapped some of GstTagList by using
