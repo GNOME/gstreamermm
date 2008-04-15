@@ -39,10 +39,9 @@ _CONVERSION(`const Glib::RefPtr<Clock>&',`GstClock*', `Glib::unwrap($3)')
 _CONVERSION(`const Clock&',`GstClock*',`((GstClock*) (&($3)))')
 
 #ClockID
-_CONVERSION(`GstClockID',`Glib::RefPtr<ClockID>',`$3')
-_CONVERSION(`Glib::RefPtr<ClockID>',`GstClockID',`(GstClockID ($3))')
-_CONVERSION(`const Glib::RefPtr<ClockID>&',`GstClockEntry*',`(GstClockEntry*)(*(($3)->gobj()))')
-_CONVERSION(`GstClockEntry*',`const Glib::RefPtr<ClockID>&',`Glib::wrap((GstClockID*)(&($3)))')
+_CONVERSION(`GstClockID',`Glib::RefPtr<ClockID>',`Glib::wrap((GstClockEntry*)($3))')
+_CONVERSION(`const Glib::RefPtr<ClockID>&',`GstClockEntry*',`($3)->gobj()')
+_CONVERSION(`GstClockEntry*',`const Glib::RefPtr<ClockID>&',`Glib::wrap($3)')
 
 #Element
 _CONVERSION(`Glib::RefPtr<Element>',`GstElement*', `Glib::unwrap($3)')
