@@ -14,6 +14,7 @@ _CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
 _CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`Glib::unwrap($3)')
 
 #Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Buffer>',`wrap($3)')
@@ -40,6 +41,8 @@ _CONVERSION(`const Clock&',`GstClock*',`((GstClock*) (&($3)))')
 #ClockID
 _CONVERSION(`GstClockID',`Glib::RefPtr<ClockID>',`$3')
 _CONVERSION(`Glib::RefPtr<ClockID>',`GstClockID',`(GstClockID ($3))')
+_CONVERSION(`const Glib::RefPtr<ClockID>&',`GstClockEntry*',`(GstClockEntry*)(*(($3)->gobj()))')
+_CONVERSION(`GstClockEntry*',`const Glib::RefPtr<ClockID>&',`Glib::wrap((GstClockID*)(&($3)))')
 
 #Element
 _CONVERSION(`Glib::RefPtr<Element>',`GstElement*', `Glib::unwrap($3)')
@@ -69,6 +72,7 @@ _CONVERSION(`GstIndexFactory*',`Glib::RefPtr<IndexFactory>',`Glib::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<const Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Message>&',`GstMessage*', `Glib::unwrap($3)')
+_CONVERSION(`GstMessage*',`const Glib::RefPtr<Message>&',`Gst::Message::wrap($3)')
 
 #Pad
 _CONVERSION(`GstPad*',`Glib::RefPtr<Pad>',`Glib::wrap($3)')
@@ -118,6 +122,7 @@ _CONVERSION(`const guint32&',`guint32',`$3')
 _CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff ($3)')
 _CONVERSION(`ClockTimeDiff&',`GstClockTimeDiff*',`(GstClockTimeDiff*)(&($3))')
 _CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
+_CONVERSION(`GstClockTimeDiff*',`ClockTimeDiff&',`(ClockTimeDiff&)(*($3))')
 _CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
 _CONVERSION(`GstTagFlag',`TagFlag',`(TagFlag)($3)')
 _CONVERSION(`guint64',`ClockTime',`(ClockTime ($3))')

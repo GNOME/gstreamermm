@@ -3,10 +3,89 @@
 ; define-vfunc is g*mm-specific
 ; These are hand-written.
 
-; GAsyncResult
+; GstBin
 
-(define-vfunc get_source_object
-  (of-object "GAsyncResult")
-  (return-type "GObject*")
+(define-vfunc add_element
+  (of-object "GstBin")
+  (return-type "gboolean")
+  (parameters
+   '("GstElement*" "element")
+  )
 )
 
+(define-vfunc remove_element
+  (of-object "GstBin")
+  (return-type "gboolean")
+  (parameters
+   '("GstElement*" "element")
+  )
+)
+
+(define-vfunc handle_message
+  (of-object "GstBin")
+  (return-type "void")
+  (parameters
+   '("GstMessage*" "message")
+  )
+)
+
+; GstChildProxy
+
+(define-vfunc get_child_by_index
+  (of-object "GstChildProxy")
+  (return-type "GstObject*")
+  (parameters
+   '("guint" "index")
+  )
+)
+
+(define-vfunc get_children_count
+  (of-object "GstChildProxy")
+  (return-type "guint")
+)
+
+; GstClock
+
+(define-vfunc change_resolution
+  (of-object "GstClock")
+  (return-type "GstClockTime")
+  (parameters
+   '("GstClockTime" "old_resolution")
+   '("GstClockTime" "new_resolution")
+  )
+)
+
+(define-vfunc get_resolution
+  (of-object "GstClock")
+  (return-type "GstClockTime")
+)
+
+(define-vfunc get_internal_time
+  (of-object "GstClock")
+  (return-type "GstClockTime")
+)
+
+(define-vfunc wait_async
+  (of-object "GstClock")
+  (return-type "GstClockReturn")
+  (parameters
+   '("GstClockEntry*" "entry")
+  )
+)
+
+(define-vfunc unschedule
+  (of-object "GstClock")
+  (return-type "void")
+  (parameters
+   '("GstClockEntry*" "entry")
+  )
+)
+
+(define-vfunc wait_jitter
+  (of-object "GstClock")
+  (return-type "GstClockReturn")
+  (parameters
+   '("GstClockEntry*" "entry")
+   '("GstClockTimeDiff*" "jitter")
+  )
+)

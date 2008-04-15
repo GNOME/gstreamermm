@@ -30,6 +30,7 @@
 #include <gstreamermm/query.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
+#include <gstreamermm/taglist.h>
 #include <gstreamermm/tagsetter.h>
 #include <gstreamermm/task.h>
 #include <gstreamermm/urihandler.h>
