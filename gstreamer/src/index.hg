@@ -41,7 +41,7 @@ class IndexEntry
 {
   _CLASS_OPAQUE_COPYABLE(IndexEntry, GstIndexEntry, NONE, gst_index_entry_copy, gst_index_entry_free)
 public:
-  _WRAP_METHOD(bool assoc_map(Format format, gint64& value), gst_index_entry_assoc_map)
+  _WRAP_METHOD(bool assoc_map(Format format, gint64& value) const, gst_index_entry_assoc_map)
 
 };
 
@@ -104,6 +104,10 @@ public:
   typedef sigc::slot<bool, const Glib::RefPtr<Index>&, const Glib::RefPtr<Gst::Object>&, Glib::ustring&> SlotResolver;
 
   void set_resolver(const SlotResolver& slot);
+
+  _WRAP_SIGNAL(void entry_added(const IndexEntry& entry), "entry-added")
+
+  _WRAP_PROPERTY("resolver", Gst::Index::SlotResolver)
 };
 
 }//namespace Gst
