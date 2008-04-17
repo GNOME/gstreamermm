@@ -24,18 +24,3 @@
 #include <gst/gstenumtypes.h>
 
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
-
-namespace Gst
-{
-
-Glib::RefPtr<Buffer> Buffer::create(const guint& size)
-{
-  GstBuffer* buffer = gst_buffer_try_new_and_alloc(size);
-
-  if(buffer != NULL)
-    return wrap(buffer, false);
-  else
-    throw std::runtime_error("not enough memory to allocate the buffer");
-}
-
-}//namespace Gst

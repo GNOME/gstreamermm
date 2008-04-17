@@ -98,6 +98,10 @@ public:
    */
   typedef sigc::slot< BusSyncReply, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessageSync;
 
+  /** Creates a new Gst::Bus instance.
+   *
+   * @return the new Gst::Bus instance
+   */
   _WRAP_CREATE()
 
   _WRAP_METHOD(bool post(const Glib::RefPtr<Message>& message), gst_bus_post)
@@ -152,7 +156,20 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Message> poll(MessageType message_type, ClockTimeDiff timeout), gst_bus_poll)
 
 #m4 _CONVERSION(`GstMessage*',`const Glib::RefPtr<Message>&', `Gst::Message::wrap($3, true)')
+
+  /** A message has been posted on the bus. This signal is emitted from a
+   * GSource added to the mainloop. this signal will only be emitted when there
+   * is a mainloop running.
+   */
   _WRAP_SIGNAL(void message(const Glib::RefPtr<Message>& message), "message")
+
+  /** A message has been posted on the bus. This signal is emitted from the
+   * thread that posted the message so one has to be careful with locking.
+   *
+   * This signal will not be emitted by default, you have to enable it with
+   * enable_sync_message_emission().
+   *
+   */
   _WRAP_SIGNAL(void sync_message(const Glib::RefPtr<Message>& message), "sync-message")
 
   _IGNORE(gst_bus_add_watch,

@@ -34,6 +34,8 @@ Glib::RefPtr<Bin> Bin::add(const Glib::RefPtr<Element>& element)
 {
   bool result = gst_bin_add(gobj(), element->gobj());
 
+  // If addition successful, return RefPtr<..> to this bin, otherwise return
+  // NULL RefPtr<...>
   if(result) {
 
     // When adding an element to a bin, an extra ref is needed because bin
@@ -55,6 +57,8 @@ Glib::RefPtr<Bin> Bin::remove(const Glib::RefPtr<Element>& element)
 {
   bool result = gst_bin_remove(gobj(), element->gobj());
 
+  // If removal successful, return RefPtr<..> to this bin, otherwise return
+  // NULL RefPtr<...>
   if(result) {
     return Glib::wrap(gobj(), true);
   }
