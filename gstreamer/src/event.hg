@@ -62,6 +62,36 @@ _WRAP_ENUM(EventTypeFlags, GstEventTypeFlags)
 Glib::ustring get_name(EventType t);
 Glib::QueryQuark get_quark(EventType t);
 
+/** Gst::Event — A structure describing events that are passed up and down a
+ * pipeline.
+ * The event class provides factory methods to construct and functions query
+ * (parse) events.
+ *
+ * Events are usually created by using the Gst::Event derrived classes'
+ * create() methods. To send an event application will usually use
+ * Gst::Element::send_event() and elements will use Gst::Pad::send_event() or
+ * Gst::Pad::push_event().
+ *
+ * Events that have been received can be parsed with their respective parse()
+ * functions.
+ *
+ * Events are passed between elements in parallel to the data stream. Some
+ * events are serialized with buffers, others are not. Some events only travel
+ * downstream, others only upstream. Some events can travel both upstream and
+ * downstream.
+ *
+ * The events are used to signal special conditions in the datastream such as
+ * EOS (end of stream) or the start of a new stream-segment. Events are also
+ * used to flush the pipeline of any pending data.
+ *
+ * Most of the event API is used inside plugins. Applications usually only
+ * construct and use seek events. To do that Gst::EventSeek::create() is used
+ * to create a seek event. It takes the needed parameters to specity seeking
+ * time and mode.  The event is then sent to the element like so:
+ * @code
+ * pipeline->send_event(event);
+ * @endcode
+ */
 class Event : public MiniObject
 {
 protected:
@@ -69,7 +99,7 @@ protected:
 
 public:
   /** Get the structure of an event.
-   * @return The Structure of the event (unmodifiable)
+   * @return The Gst::Structure of the event (unmodifiable)
    */
   const Structure* get_structure();
 

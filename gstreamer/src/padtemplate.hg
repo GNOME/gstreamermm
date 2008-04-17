@@ -29,28 +29,79 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+_WRAP_ENUM(PadTemplateFlags, GstPadTemplateFlags)
 _WRAP_ENUM(PadPresence, GstPadPresence)
 
 class Caps;
 class Pad;
 
+/** Gst::PadTemplate — Describe the media type of a pad.
+ * Padtemplates describe the possible media types a pad or an elementfactory
+ * can handle. This allows for both inspection of handled types before loading
+ * the element plugin as well as identifying pads on elements that are not yet
+ * created (request or sometimes pads).
+ *
+ * Gst::Pad and PadTemplates have Gst::Caps attached to it to describe the
+ * media type they are capable of dealing with. get_caps() is used to get the
+ * caps of a padtemplate. It's not possible to modify the caps of a padtemplate
+ * after creation.
+ *
+ * PadTemplates have a Gst::PadPresence property which identifies the lifetime
+ * of the pad and that can be retrieved with get_presence(). Also the direction
+ * of the pad can be retrieved from the GstPadTemplate with get_direction().
+ *
+ * The get_name_template() method is important for Gst::PAD_REQUEST pads
+ * because it has to be used as the name in the
+ * Gst::Element::get_request_pad() call to instantiate a pad from this
+ * template.
+ *
+ * Padtemplates can be created with create().
+
+ * A padtemplate can be used to create a pad (see Gst::Pad::create() methods).
+ */
 class PadTemplate  : public Object 
 {
   _CLASS_GOBJECT(PadTemplate, GstPadTemplate, GST_PAD_TEMPLATE, Object, GstObject)
 
 protected:
-  _CTOR_DEFAULT
+  _WRAP_CTOR(PadTemplate(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps), gst_pad_template_new)
 
 public:
-  Glib::RefPtr<PadTemplate> create(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps);
+  /** Creates a new pad template with a name according to the given template
+   * and with the given arguments. This functions takes ownership of the
+   * provided caps, so be sure to not use them afterwards.
+   *
+   * @param name_template the name template.
+   * @param direction the Gst::PadDirection of the template.
+   * @param presence the Gst::PadPresence of the pad.
+   * @param caps a Gst::Caps set for the template. The caps are taken ownership
+   * of.
+   * @return a new Gst::PadTemplate.
+   */
+  _WRAP_CREATE(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps)
+
   _WRAP_METHOD(Glib::RefPtr<Caps> get_caps(), gst_pad_template_get_caps)
   _WRAP_METHOD(Glib::RefPtr<const Caps> get_caps() const, gst_pad_template_get_caps, constversion)
 
+  /** Get the nametemplate of the padtemplate.
+   */
+  _MEMBER_GET(name_template, name_template, Glib::ustring, gchar*)
+
+  /** Get the Gst::PadDirection of the padtemplate.
+   */
+  _MEMBER_GET(direction, direction, PadDirection, GstPadDirection)
+
+  /** Get the Gst::PadPresence of the padtemplate.
+   */
+  _MEMBER_GET(presence, presence, PadPresence, GstPadPresence)
+
 #m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
+
+  /** This signal is fired when an element creates a pad from this template.
+   */
   _WRAP_SIGNAL(void pad_created(const Glib::RefPtr<Pad>& pad), "pad-created")
 
   _IGNORE(gst_pad_template_pad_created)
-
 };
 
 } //namespace Gst

@@ -43,32 +43,33 @@ _WRAP_ENUM(PadLinkReturn, GstPadLinkReturn)
 _WRAP_ENUM(FlowReturn, GstFlowReturn)
 _WRAP_ENUM(ActivateMode, GstActivateMode)
 
-/** Pad — Object contained by elements that allows links to other elements.
- * An Element is linked to other elements via "pads", which are extremely
+/** Gst::Pad — Object contained by elements that allows links to other
+ * elements.
+ * A Gst::Element is linked to other elements via "pads", which are extremely
  * light-weight generic link points. After two pads are retrieved from an
  * element with Element::get_pad(), the pads can be link with link(). (For
  * quick links, you can also use Element::link(), which will make the obvious
  * link for you if it's straightforward.)
  *
- * Pads are typically created from a PadTemplate with the create() method that
- * takes a PadTemplate.
+ * Pads are typically created from a Gst::PadTemplate with the create() method
+ * that takes a Gst::PadTemplate.
  *
- * Pads have Caps attached to it to describe the media type they are capable of
- * dealing with. get_caps() and set_caps() are used to manipulate the caps of
- * the pads. Pads created from a pad template cannot set capabilities that are
- * incompatible with the pad template capabilities.
+ * Pads have Gst::Caps attached to it to describe the media type they are
+ * capable of dealing with. get_caps() and set_caps() are used to manipulate
+ * the caps of the pads. Pads created from a pad template cannot set
+ * capabilities that are incompatible with the pad template capabilities.
  *
  * Pads without pad templates can be created with create(), which takes a
  * direction and a name as an argument.
  *
- * get_parent_element() will retrieve the Element that owns the pad.
+ * get_parent_element() will retrieve the Gst::Element that owns the pad.
  *
- * An Element creating a pad will typically use the underlying C API to
+ * A Gst::Element creating a pad will typically use the underlying C API to
  * register callbacks for various events on the pads.
  *
  * Elements will use push() and pull_range() to push out or pull in a buffer.
  *
- * To send an Event on a pad, use send_event() and push_event().
+ * To send a Gst::Event on a pad, use send_event() and push_event().
  *
  * Last reviewed on 2006-07-06 (0.10.9)
  */
@@ -82,13 +83,13 @@ protected:
 
 public:
   /** For example,
-   * void on_block(const Glib::RefPtr<Pad>& pad, bool blocked);
+   * void on_block(const Glib::RefPtr<Gst::Pad>& pad, bool blocked);
    */
   typedef sigc::slot<void, const Glib::RefPtr<Pad>&, bool> SlotBlock;
 
   /** For example,
-   * bool on_have_data(const Glib::RefPtr<Pad>& pad, const
-   * Glib::RefPtr<MiniObjec>& data);
+   * bool on_have_data(const Glib::RefPtr<Gst::Pad>& pad, const
+   * Glib::RefPtr<Gst::MiniObjec>& data);
    * The on_have_data method should return TRUE to keep the data in the
    * pipeline, FALSE to drop it (throw it away)
    */

@@ -28,18 +28,18 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-/** ChildProxy — Interface for multi child elements.
+/** Gst::ChildProxy — An interface for multi child elements.
  * This interface abstracts handling of property sets for child elements.
  * Imagine elements such as mixers or polyphonic generators. They all have
- * multiple Pad or some kind of voice objects. The element acts as a parent
- * for those child objects. Each child has the same properties.
+ * multiple Gst::Pad or some kind of voice objects. The element acts as a
+ * parent for those child objects. Each child has the same properties.
  *
  * By implementing this interface the child properties can be accessed from
- * the parent element by using child_proxy_get() and child_proxy_set().
+ * the parent element by using get_proxy_property() and set_proxy_property().
  *
  * Property names are written as "child-name::property-name". The whole naming
  * scheme is recursive. Thus "child1::child2::property" is valid too, if
- * "child1" also implements the ChildProxy interface.
+ * "child1" also implements the Gst::ChildProxy interface.
  */
 class ChildProxy : public Glib::Interface
 {
@@ -52,11 +52,42 @@ public:
 
   //TODO: should gst_child_proxy_lookup() be wrapped?
 
-  void get_proxy_property(const Glib::ustring& name, Glib::ValueBase& value);
+  /** Gets a single property using the Gst::ChildProxy mechanism.
+   * @param name the property to get
+   * @param value an empty Glib::ValueBase in which to store the property
+   * @return this Gst::ChildProxy so more properties can be gotten if needed
+   */
+  Glib::RefPtr<ChildProxy> get_proxy_property(const Glib::ustring& name, Glib::ValueBase& value);
+
+  /** Gets properties of the parent object and its children.
+   * @param first_prop_name name of the first property to get
+   * @param var_args return location for the first property, followed
+   * optionally by more name/return location pairs, followed by NULL
+   */
   void get_proxy_valist(const Glib::ustring& first_prop_name, va_list& var_args);
-  void set_proxy_property(const Glib::ustring& name, const Glib::ValueBase& value);
+
+  /** Sets a single property using the Gst::ChildProxy mechanism.
+   * @param name the property to get
+   * @param value the Glib::ValueBase to set the property to (non-empty)
+   * @return this Gst::ChildProxy so more properties can be set
+   */
+  Glib::RefPtr<ChildProxy> set_proxy_property(const Glib::ustring& name, const Glib::ValueBase& value);
+
+  /** Sets properties of the parent object and its children.
+   * @param first_prop_name name of the first property to set
+   * @param var_args alue for the first property, followed optionally by more
+   * name/value pairs, followed by NULL
+   */
   void set_proxy_valist(const Glib::ustring& first_prop_name, const va_list& var_args);
+
+  /** Emits the "child-added" signal.
+   * @param child the newly added child
+   */
   void child_added(const Glib::RefPtr<Gst::Object>& child);
+
+  /** Emits the "child-removed" signal.
+   * @param child the newly added child
+   */
   void child_removed(const Glib::RefPtr<Gst::Object>& child);
 
 #m4 _CONVERSION(`GstObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap($3)')

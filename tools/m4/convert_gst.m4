@@ -129,6 +129,7 @@ _CONVERSION(`const guint&',`guint',`$3')
 _CONVERSION(`const guint32&',`guint32',`$3')
 
 #Basic Gstreamermm Conversions
+_CONVERSION(`ClockTime&',`GstClockTime*',`(GstClockTime*)(&($3))')
 _CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff ($3)')
 _CONVERSION(`ClockTimeDiff&',`GstClockTimeDiff*',`(GstClockTimeDiff*)(&($3))')
 _CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')

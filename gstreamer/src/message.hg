@@ -36,6 +36,21 @@ _WRAP_ENUM(MessageType, GstMessageType)
 Glib::ustring get_name(MessageType t);
 Glib::QueryQuark get_quark(MessageType t);
 
+/** Gst::Message — Lightweight objects to signal the application of pipeline
+ * events.
+ * Messages are implemented as a subclass of Gst::MiniObject with a generic
+ * Gst::Structure as the content. This allows for writing custom messages
+ * without requiring an API change while allowing a wide range of different
+ * types of messages.
+ *
+ * Messages are posted by objects in the pipeline and are passed to the
+ * application using the Gst::Bus.
+ *
+ * The basic use pattern of posting a message on a Gst::Bus is as follows: 
+ * @code
+ * bus->post(Gst::MessageEos::create(my_element));
+ * @endcode
+ */
 class Message : public Gst::MiniObject
 {
 protected:
@@ -43,7 +58,7 @@ protected:
  _IGNORE(gst_message_ref, gst_message_unref)
 public:
   /** Get the structure of a message.
-   * @return The Structure of the message (unmodifiable)
+   * @return The Gst::Structure of the message (unmodifiable)
    */
   const Structure* get_structure();
 

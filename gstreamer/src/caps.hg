@@ -29,23 +29,23 @@ namespace Gst
 
 struct Structure;
 
-/** Caps — A structure describing sets of media formats.
- * Caps (capabilities) are lighweight refcounted objects describing media
- * types. They are composed of an array of Structure.
+/** Gst::Caps — A structure describing sets of media formats.
+ * Gst::Caps (capabilities) are lighweight refcounted objects describing media
+ * types. They are composed of an array of Gst::Structure.
  *
- * Caps are exposed on PadTemplate to describe all possible types a given pad
- * can handle. They are also stored in the Registry along with a description of
- * the Element.
+ * Gst::Caps are exposed on Gst::PadTemplate to describe all possible types a
+ * given pad can handle. They are also stored in the Gst::Registry along with a
+ * description of the Gst::Element.
  *
- * Caps are exposed on the element pads using the Gst::Pad::get_caps() method.
- * This method describes the possible types that the pad can handle or produce
- * at runtime.
+ * Gst::Caps are exposed on the element pads using the Gst::Pad::get_caps()
+ * method.  This method describes the possible types that the pad can handle or
+ * produce at runtime.
  *
- * Caps are also attached to buffers to describe to content of the data pointed
- * to by the buffer with Gst::Buffer:set_caps(). Caps attached to a Buffer
- * allow for format negotiation upstream and downstream.
+ * Gst::Caps are also attached to buffers to describe to content of the data
+ * pointed to by the buffer with Gst::Buffer::set_caps(). Gst::Caps attached to
+ * a Gst::Buffer allow for format negotiation upstream and downstream.
  *
- * A Caps can be constructed with the following code fragment:
+ * A Gst::Caps can be constructed with the following code fragment:
  *
  * TODO: Insert C++ translated code fragment from C API docs
  */
@@ -55,26 +55,25 @@ class Caps
   _IGNORE(gst_caps_ref, gst_caps_unref)
 
 public:
-  /** Creates a new Caps that indicates that it is compatible with any media
-   * format.
+  /** Creates a new Gst::Caps that indicates that it is compatible with any
+   * media format.
    *
-   * @return the new Caps
+   * @return the new Gst::Caps
    */
   static Glib::RefPtr<Caps> create_any();
 
-  /** Creates a new Caps that contains one Structure. Caller is responsible for
-   * unreffing the returned caps.
+  /** Creates a new Gst::Caps that contains one Gst::Structure.
    *
    * @param media_type the media type of the structure
-   * @return the new GstCaps
+   * @return the new Gst::Caps
    */
   static Glib::RefPtr<Caps> create_simple(const Glib::ustring& media_type);
 
-  /** Creates a new GstCaps and adds the first Structure given. The structure
-   * is not copied; the returned Caps owns the structure.
+  /** Creates a new Gst::Caps and adds the first Gst::Structure given. The
+   * structure is not copied; the returned Gst::Caps owns the structure.
    *
    * @param first_struct the first structure to add
-   * @return Returns the new GstCaps
+   * @return Returns the new Gst::Caps
    */
   static Glib::RefPtr<Caps> create(Structure& first_struct);
 
@@ -86,29 +85,29 @@ public:
   /** Appends structure to caps. The structure is not copied; caps becomes the
    * owner of structure.
    *
-   * @param structure the Structure to append
+   * @param structure the Gst::Structure to append
    */
   void append_structure(Structure& structure);
 
   /** Appends structure to caps if its not already expressed by caps. The
    * structure is not copied; caps becomes the owner of structure.
    *
-   * @param structure the Structure to merge
+   * @param structure the Gst::Structure to merge
    */
   void merge_structure(Structure& structure);
 
   /** Finds the structure in caps that has the index idx, and returns it.
    *
    * @param index the index of the structure
-   * @return the Structure corresponding to index
+   * @return the Gst::Structure corresponding to index
    */
   const Structure* get_structure(guint idx) const;
 
   _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
   _WRAP_METHOD(guint size() const, gst_caps_get_size)
 
-  /** Sets a fields in a simple Caps. A simple Caps is one that only has one
-   * structure.
+  /** Sets a fields in a simple Gst::Caps. A simple Gst::Caps is one that only
+   * has one structure.
    *
    * @param field field to set
    * @param value the value which the field should be set to

@@ -36,16 +36,16 @@ _WRAP_ENUM(BusSyncReply, GstBusSyncReply)
 
 //TODO: Correct C API reference in class docs below:
 
-/** Bus — Asynchronous message bus subsystem.
- * The Bus is an object responsible for delivering Messages in a first-in
+/** Gst::Bus — Asynchronous message bus subsystem.
+ * The Gst::Bus is an object responsible for delivering Messages in a first-in
  * first-out way from the streaming threads to the application.
  *
  * Since the application typically only wants to deal with delivery of these
- * messages from one thread, the Bus will marshall the messages between
+ * messages from one thread, the Gst::Bus will marshall the messages between
  * different threads. This is important since the actual streaming of media is
  * done in another thread than the application.
  *
- * The Bus provides support for GSource based notifications. This makes it
+ * The Gst::Bus provides support for GSource based notifications. This makes it
  * possible to handle the delivery in the glib mainloop.
  *
  * The GSource callback function gst_bus_async_signal_func() can be used to
@@ -69,10 +69,10 @@ _WRAP_ENUM(BusSyncReply, GstBusSyncReply)
  * This should only be used if the application is able to deal with messages
  * from different threads.
  *
- * Every Pipeline has one bus.
+ * Every Gst::Pipeline has one bus.
  *
- * Note that a Pipeline will set its bus into flushing state when changing from
- * READY to NULL state.
+ * Note that a Gst::Pipeline will set its bus into flushing state when changing
+ * from READY to NULL state.
  *
  * Last reviewed on 2006-03-12 (0.10.5)
  */
@@ -85,16 +85,16 @@ protected:
 
 public:
   /** For example,
-   * bool on_bus_message(const Glib::RefPtr<Bus>& bus, const
-   * Glib::RefPtr<Message>& message);
+   * bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const
+   * Glib::RefPtr<Gst::Message>& message);
    * The message function should return true if it wants to continue to receive
    * messages, false otherwise.
    */
   typedef sigc::slot< bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessage;
 
   /** For example,
-   * BusSyncReply on_bus_sync_message(const Glib::RefPtr<Bus>& bus, const
-   * Glib::RefPtr<Message>& message);
+   * BusSyncReply on_bus_sync_message(const Glib::RefPtr<Gst::Bus>& bus, const
+   * Glib::RefPtr<Gst::Message>& message);
    */
   typedef sigc::slot< BusSyncReply, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessageSync;
 
@@ -138,7 +138,8 @@ public:
    * called in the same thread context as the posting object (synchronously).
    * This function is usually only called by the creator of the bus.
    * Applications should handle messages asynchronously using the watch and
-   * poll functions.
+   * poll functions or enable the "sync-message" signal emission with
+   * enable_sync_message_emission().
    *
    * @param slot The handler slot to install
    */
