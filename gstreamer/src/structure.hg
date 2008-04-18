@@ -28,18 +28,18 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-/** Structure — Generic structure containing fields of names and values.
- * A Structure is a collection of key/value pairs. The keys are expressed as
- * GQuarks and the values can be of any GType.
+/** Gst::Structure — Generic structure containing fields of names and values.
+ * A Gst::Structure is a collection of key/value pairs. The keys are expressed
+ * as GQuarks and the values can be of any GType.
  *
- * In addition to the key/value pairs, a Structure also has a name. The name
- * starts with a letter and can be folled by letters, numbers and any of
+ * In addition to the key/value pairs, a Gst::Structure also has a name. The
+ * name starts with a letter and can be folled by letters, numbers and any of
  * "/-_.:".
  *
- * Structure is used by various GStreamer subsystems to store information in a
- * flexible and extensible way. A Structure does not have a refcount because it
- * usually is part of a higher level object such as Caps. It provides a means
- * to enforce mutability using the refcount of the parent.
+ * Gst::Structure is used by various GStreamer subsystems to store information
+ * in a flexible and extensible way. A Gst::Structure does not have a refcount
+ * because it usually is part of a higher level object such as Gst::Caps. It
+ * provides a means to enforce mutability using the refcount of the parent.
  *
  * Last reviewed on 2007-10-16 (0.10.15)
  */
@@ -79,7 +79,7 @@ public:
 
   /** Sets the field with the given name field to value. If the field does not
    * exist, it is created. If the field exists, the previous value is replaced
-   * and freed. Returns this Structure for continued setting convenience.
+   * and freed. Returns this Gst::Structure for continued setting convenience.
    * Please note that when setting special GStreamer fields such as
    * Glib::Value<Gst::IntRange> and Glib::Value<Gst::Fraction> (using classes
    * in value.h) they are converted to the GStreamer GTypes and thus when
@@ -88,22 +88,29 @@ public:
    *
    * @param fieldname the name of the field to set
    * @param value the new value of the field 
-   * @return this Structure
+   * @return this Gst::Structure
    */
   Structure& set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value);
 
   /** Removes the field with the given name. If the field with the given name
-   * does not exist, the structure is unchanged. Returns this Structure for
-   * continued setting convenience.
+   * does not exist, the structure is unchanged. Returns this Gst::Structure
+   * for continued setting convenience.
    *
    * @param fieldname the name of the field to remove
-   * @return this Structure
+   * @return this Gst::Structure
    */
   Structure& remove_field(const Glib::ustring& fieldname);
 
   _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
   _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
 
+  /** Calls the provided slot once for each field in the Gst::Structure. The
+   * slot must not modify the fields. Also see map_in_place().
+   *
+   * @param slot a slot to call for each field
+   * @return TRUE if the supplied slot returns TRUE For each of the fields,
+   * FALSE otherwise.
+   */
   bool foreach(const SlotForeach& slot);
 
   _WRAP_METHOD(int size() const, gst_structure_n_fields)
@@ -187,15 +194,15 @@ public:
    */
   bool get_date(const Glib::ustring& fieldname, Glib::Date& value) const;
 
-  /** Sets the GValue of value to the ClockTime value of the given field.
+  /** Sets the GValue of value to the Gst::ClockTime value of the given field.
    * Caller is responsible for making sure the field exists and has the correct
    * type.
    *
    * @param fieldname the name of a field
    * @param value the Value class to set
    * @return TRUE if the value could be set correctly. If there was no field
-   * with fieldname or the existing field did not contain a ClockTime, this
-   * function returns FALSE returns FALSE
+   * with fieldname or the existing field did not contain a Gst::ClockTime,
+   * this function returns FALSE returns FALSE
    */
   bool get_clock_time(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
@@ -210,20 +217,21 @@ public:
    */
   bool get_enum(const Glib::ustring& fieldname, GType enumtype, Glib::ValueBase& value) const;
 
-  /** Sets the GValue of value to the Fraction value of the given field. Caller
-   * is responsible for making sure the field exists and has the correct type.
+  /** Sets the GValue of value to the Gst::Fraction value of the given field.
+   * Caller is responsible for making sure the field exists and has the correct
+   * type.
    *
    * @param fieldname the name of a field
-   * @param fraction the Fraction class to set
+   * @param fraction the Gst::Fraction class to set
    * @return TRUE if the value could be set correctly. If there was no field
-   * with fieldname or the existing field did not contain a Fraction, this
+   * with fieldname or the existing field did not contain a Gst::Fraction, this
    * function returns FALSE returns FALSE
    */
   bool get_fraction(const Glib::ustring& fieldname, Gst::Fraction& fraction) const;
 
-  /** Calls the provided slot once for each field in the Structure. In contrast
-   * to foreach(), the function may modify but not delete the fields. The
-   * structure must be mutable.
+  /** Calls the provided slot once for each field in the Gst::Structure. In
+   * contrast to foreach(), the function may modify but not delete the fields.
+   * The structure must be mutable.
    *
    * @param slot a slot to call for each field
    * @return TRUE if the supplied slot returns TRUE For each of the fields,

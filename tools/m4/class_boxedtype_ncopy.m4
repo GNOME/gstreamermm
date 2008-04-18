@@ -222,7 +222,11 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
   ///Provides access to the underlying C instance. The caller is responsible for freeing it. Use when directly setting fields in structs.
   __CNAME__* gobj_copy() const;
 
-  //Change whether wrapper should destroy gobject or not when wrapper is deleted.
+  /** Change whether the wrapper should destroy the underlying gobject or not
+   * when the wrapper is deleted.
+   * @param destroy whether or not the wrapper should destroy the underlying
+   * gobject when it is destroyed
+   */
   void set_destroy(bool destroy);
 
 protected:

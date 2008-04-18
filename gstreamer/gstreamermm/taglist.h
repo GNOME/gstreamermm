@@ -105,7 +105,7 @@ namespace Gst
 {
 
 
-/** TagList — List of tags and values used to describe media metadata.
+/** Gst::TagList — List of tags and values used to describe media metadata.
  */
 class TagList
 {
@@ -137,7 +137,11 @@ class TagList
   ///Provides access to the underlying C instance. The caller is responsible for freeing it. Use when directly setting fields in structs.
   GstTagList* gobj_copy() const;
 
-  //Change whether wrapper should destroy gobject or not when wrapper is deleted.
+  /** Change whether the wrapper should destroy the underlying gobject or not
+   * when the wrapper is deleted.
+   * @param destroy whether or not the wrapper should destroy the underlying
+   * gobject when it is destroyed
+   */
   void set_destroy(bool destroy);
 
 protected:
@@ -151,7 +155,7 @@ private:
 
 public:
   /** For example,
-   * void on_foreach(const TagList& taglist, const Glib::Ustring& tag);
+   * void on_foreach(const Gst::TagList& taglist, const Glib::Ustring& tag);
    */
   typedef sigc::slot<void, const TagList&, const Glib::ustring&> SlotForeach;
 
@@ -214,6 +218,11 @@ public:
    */
   TagList merge(const TagList& other, TagMergeMode mode);
 
+  /** Calls the given slot for each tag inside the tag list. Note that if there
+   * is no tag, the slot won't be called at all.
+   *
+   * @param slot slot to be called for each tag
+   */
   void foreach(const SlotForeach& slot);
 
 

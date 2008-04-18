@@ -32,17 +32,17 @@ namespace Gst
 class Plugin;
 class PluginFeature;
 
-/** Registry — Abstract base class for management of Plugin objects.
+/** Gst::Registry — Abstract base class for management of Gst::Plugin objects.
   * One registry holds the metadata of a set of plugins. All registries build
   * the GstRegistryPool.
   *
   * Design:
   *
-  * The Registry object is a list of plugins and some functions for dealing
-  * with them. Plugins are matched 1-1 with a file on disk, and may or may
-  * not be loaded at a given time. There may be multiple Registry objects,
-  * but the "default registry" is the only object that has any meaning to the
-  * core.
+  * The Gst::Registry object is a list of plugins and some functions for
+  * dealing with them. Gst::Plugins are matched 1-1 with a file on disk, and
+  * may or may not be loaded at a given time. There may be multiple
+  * Gst::Registry objects, but the "default registry" is the only object that
+  * has any meaning to the core.
   *
   * The registry.xml file is actually a cache of plugin information. This is
   * unlike versions prior to 0.10, where the registry file was the primary
@@ -115,7 +115,7 @@ public:
    *
    * @param filter the filter to use
    * @param first only return first match
-   * @return a List of Plugin. MT safe.
+   * @return a List of Gst::Plugin. MT safe.
    *
    */
   Glib::ListHandle< Glib::RefPtr<Plugin> > get_plugin_list(const Plugin::SlotFilter& filter, bool first);
@@ -127,7 +127,7 @@ public:
    * @param registry registry to query
    * @param filter the filter to use
    * @param first only return first match
-   * @return a List of plugin features. MT safe.
+   * @return a List of Gst::PluginFeature. MT safe.
    */
   Glib::ListHandle< Glib::RefPtr<PluginFeature> > get_feature_list(const PluginFeature::SlotFilter& filter, bool first);
 
@@ -142,14 +142,14 @@ public:
 #ifdef USE_BINARY_REGISTRY
   /** Read the contents of the binary cache file at location into registry.
    *
-   * @param location : 	a filename
+   * @param location a filename
    * @return TRUE on success.
    */
   bool binary_read_cache(const Glib::ustring& location);
 
   /** Write the registry to a cache to file at given location.
    *
-   * @param location : 	a filename
+   * @param location a filename
    * @return TRUE on success.
    */
   void binary_write_cache(const Glib::ustring& location);
@@ -164,8 +164,8 @@ public:
   /** Write registry in an XML format at the location given by location.
    * Directories are automatically created.
    *
-   * @param location : 	a filename
-   * @return Returns : 	TRUE on success.
+   * @param location a filename
+   * @return TRUE on success.
    */
   bool xml_write_cache(const Glib::ustring& location);
 #endif
@@ -175,7 +175,14 @@ public:
   _WRAP_METHOD(void add_feature(const Glib::RefPtr<PluginFeature>& feature), gst_registry_add_feature)
   _WRAP_METHOD(static bool check_feature_version(const Glib::ustring& feature_name, guint min_major, guint min_minor, guint min_micro), gst_default_registry_check_feature_version)
 
+  /** Signals that a feature has been added to the registry (possibly replacing
+   * a previously-added one by the same name)
+   */
   _WRAP_SIGNAL(void feature_added(const Glib::RefPtr<PluginFeature>& feature), "feature-added")
+
+  /** Signals that a plugin has been added to the registry (possibly replacing
+   * a previously-added one by the same name)
+   */
   _WRAP_SIGNAL(void plugin_added(const Glib::RefPtr<Plugin>& plugin), "plugin-added")
 
   _IGNORE(gst_registry_feature_filter,

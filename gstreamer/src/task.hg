@@ -29,29 +29,29 @@ namespace Gst
 
 _WRAP_ENUM(TaskState, GstTaskState)
 
-/** Task — Abstraction of GStreamer streaming threads.
- * Task is used by Element and Pad to provide the data passing threads in a
- * Pipeline.
+/** Gst::Task — Abstraction of GStreamer streaming threads.
+ * Gst::Task is used by Gst::Element and Gst::Pad to provide the data passing
+ * threads in a Gst::Pipeline.
  *
- * A Pad will typically start a Task to push or pull data to/from the peer
- * pads. Most source elements start a Task to push data. In some cases a
- * demuxer element can start a Task to pull data from a peer element. This is
- * typically done when the demuxer can perform random access on the upstream
- * peer element for improved performance.
+ * A Gst::Pad will typically start a Gst::Task to push or pull data to/from the
+ * peer pads. Most source elements start a Gst::Task to push data. In some
+ * cases a demuxer element can start a Gst::Task to pull data from a peer
+ * element. This is typically done when the demuxer can perform random access
+ * on the upstream peer element for improved performance.
  *
- * Although convenience functions exist on Pad to start/pause/stop tasks, it
- * might sometimes be needed to create a Task manually if it is not related to
- * a Pad.
+ * Although convenience functions exist on Gst::Pad to start/pause/stop tasks,
+ * it might sometimes be needed to create a Gst::Task manually if it is not
+ * related to a Gst::Pad.
  *
- * Before the Task can be run, it needs a Glib::StaticRecMutex that can be set
- * with set_lock().
+ * Before the Gst::Task can be run, it needs a Glib::StaticRecMutex that can be
+ * set with set_lock().
  *
  * The task can be started, paused and stopped with start(), pause() and stop()
  * respectively.
  *
- * A Task will repeadedly call the SlotTask that was provided when creating the
- * task with create(). Before calling the function it will acquire the provided
- * lock.
+ * A Gst::Task will repeadedly call the Gst::Task::SlotTask that was provided
+ * when creating the task with create(). Before calling the function it will
+ * acquire the provided lock.
  *
  * Stopping a task with stop() will not immediatly make sure the task is not
  * running anymore. Use join() to make sure the task is completely stopped and
@@ -70,6 +70,15 @@ public:
    */
   typedef sigc::slot<void> SlotTask;
 
+  /** Create a new Gst::Task that will repeadedly call the provided slot as a
+   * parameter. Typically the task will run in a new thread.
+   *
+   * The slot cannot be changed after the task has been created. You must
+   * create a new Gst::Task to change the slot.
+   *
+   * @param slot The Gst::Task::SlotTask to use
+   * @return A new Gst::Task. MT safe.
+   */
   static Glib::RefPtr<Task> create(const SlotTask& slot);
 
   _WRAP_METHOD(static void cleanup_all(), gst_task_cleanup_all)

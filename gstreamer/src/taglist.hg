@@ -29,7 +29,7 @@ namespace Gst
 _WRAP_ENUM(TagMergeMode, GstTagMergeMode)
 _WRAP_ENUM(TagFlag, GstTagFlag)
 
-/** TagList — List of tags and values used to describe media metadata.
+/** Gst::TagList — List of tags and values used to describe media metadata.
  */
 class TagList
 {
@@ -37,7 +37,7 @@ class TagList
 
 public:
   /** For example,
-   * void on_foreach(const TagList& taglist, const Glib::Ustring& tag);
+   * void on_foreach(const Gst::TagList& taglist, const Glib::Ustring& tag);
    */
   typedef sigc::slot<void, const TagList&, const Glib::ustring&> SlotForeach;
 
@@ -51,6 +51,11 @@ public:
   _WRAP_METHOD(void insert(const TagList& other, TagMergeMode mode), gst_tag_list_insert)
   _WRAP_METHOD(TagList merge(const TagList& other, TagMergeMode mode), gst_tag_list_merge)
 
+  /** Calls the given slot for each tag inside the tag list. Note that if there
+   * is no tag, the slot won't be called at all.
+   *
+   * @param slot slot to be called for each tag
+   */
   void foreach(const SlotForeach& slot);
 };
 
