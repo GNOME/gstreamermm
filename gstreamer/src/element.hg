@@ -184,14 +184,37 @@ public:
   _WRAP_METHOD(bool query(const Glib::RefPtr<Query>& query), gst_element_query)
   _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_element_query_convert)
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_element_query_position)
+
+  /** Queries an element for the stream position.
+   *
+   * @param format a pointer to the Gst::Format asked for. On return will
+   * contain the Gst::Format used.
+   * @return TRUE if the query could be performed.
+   */
+  bool query_position(Format& format) const;
+
   _WRAP_METHOD(bool query_duration(Format& format, gint64& duration) const, gst_element_query_duration)
 
-  bool query_position(Format& format) const;
+  /** Queries an element for the total stream duration.
+   *
+   * @param format a pointer to the Gst::Format asked for. On return contains
+   * the Gst::Format used.
+   * @return TRUE if the query could be performed.
+   */
   bool query_duration(Format& format) const;
 
   _WRAP_METHOD(bool seek(Format format, SeekFlags flags, gint64 position), gst_element_seek_simple)
   _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType current_type, gint64 current_position, SeekType stop_type, gint64 stop_position), gst_element_seek)
 
+  /** Sends an event to an element. If the element doesn't implement an event
+   * handler, the event will be pushed on a random linked sink pad for upstream
+   * events or a random linked source pad for downstream events.
+   *
+   * This function takes owership of the provided event.
+   *
+   * @param event the Gst::Event to send to the element.
+   * @return TRUE if the event was handled. MT safe. 
+   */
   bool send_event(const Glib::RefPtr<Event>& event);
 
   _WRAP_METHOD(bool implements_interface(GType iface_type), gst_element_implements_interface)
@@ -264,6 +287,37 @@ public:
 
 };
 
+/** Templated class used for casting Gst::Element to interfaces that its
+ * underlying gobject implements.
+ * Gst::ElementInterfaced is a templated class which, in conjunction with
+ * Gst::Interface::cast(), is used to cast a Gst::Element obtained by
+ * Gst::ElementFactory::create() into underlying GStreamer interfaces that the
+ * element may implement.  A 'filesrc' element, for example, implements the
+ * Gst::URIHandler interface (which is not reflected in a Gst::Element obtained
+ * from a Gst::ElementFactory).  To use the Gst::URIHandler methods with a
+ * 'filesrc' element obtained from a Gst::ElementFactory, one would do the
+ * following:
+ * @code
+ * ...
+ * Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create("filesrc",
+ * "source");
+ *
+ * Glib::RefPtr< Gst::ElementInterfaced<Gst::URIHandler> > handler =
+ *   Gst::Interface::cast <Gst::URIHandler>(element);
+ *
+ * if(handler)
+ * {
+ *   std::cout << "element '" << element->get_name() <<
+ *     "' implements URIHandler interface." << std::endl;
+ *
+ *   handler->set_uri("file:///tmp/media.file");
+ *
+ *   // Use uri handler interface method
+ *   std::cout << handler->get_name() << " uri = '" << handler->get_uri() <<
+ *     "'." << std::endl;
+ * }
+ * @endcode
+ */
 template <class T_Interface>
 class ElementInterfaced
 : public Element,
