@@ -28,25 +28,62 @@ namespace Gst
 
 _WRAP_ENUM(Format, GstFormat)
 
+/** A format definition is used to get details of a Gst::Format by
+ * Gst::get_details().
+ */
 struct FormatDefinition
 {
-  Format              value;
+  /// The unique id of this format
+  Gst::Format         value;
+  /// A short nick of the format
   Glib::ustring       nick;
+  /// A longer description of the format
   Glib::ustring       description;
+  /// A quark for the nick 
   Glib::QueryQuark    quark;
 };
 
+/** Get a printable name for the given format. Do not modify or free.
+ * 
+ * @param format a Gst::Format
+ * @return the name of the format or NULL if the format is unknow
+ */
 Glib::ustring get_name(Format f);
+
+/** Get the unique quark for the given format.
+ *
+ * @param format a Gst::Format
+ * @return the quark associated with the format or 0 if the format is unknown. 
+ */
 Glib::QueryQuark get_quark(Format f);
 
-//Note that GstFormat is an enum. That's why these are not member functions of a class.
-
+/** Create a new Gst::Format based on the nick or return an already registered
+ * format with that nick.
+ *
+ * @param nick The nick of the new format
+ * @param description The description of the new format
+ * @return A new Gst::Format or an already registered format with the same
+ * nick. MT safe.
+ */
 Format register_format(const Glib::ustring& nick, const Glib::ustring&description);
+
+/** Return the format registered with the given nick.
+ *
+ * @param nick The nick of the format
+ * @return The format with nick or Gst::FORMAT_UNDEFINED if the format was not
+ * registered.
+ */
 Format get_format(const Glib::ustring& nick);
 
 //TODO: first arg is an array of Formats
 //TODO: bool formats_contain_format(const Format& formats, Format format);
 
+/** Get details about the given format.
+ *
+ * @param format The format to get details of
+ * @param The Gst::FormatDefinition in which to store details of format.
+ * @return true if successful, false otherwise. MT safe.
+ */
 bool get_details(Format format, FormatDefinition& def);
 
 } //namespace Gst

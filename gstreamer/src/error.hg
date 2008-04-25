@@ -24,10 +24,221 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-  _WRAP_GERROR(CoreError, GstCoreError, GST_CORE_ERROR, NO_GTYPE)
-  _WRAP_GERROR(LibraryError, GstLibraryError, GST_LIBRARY_ERROR, NO_GTYPE)
-  _WRAP_GERROR(ResourceError, GstResourceError, GST_RESOURCE_ERROR, NO_GTYPE)
-  _WRAP_GERROR(StreamError, GstStreamError, GST_STREAM_ERROR, NO_GTYPE)
+/** GStreamer elements can throw non-fatal warnings and fatal errors.
+ * Higher-level elements and applications can programatically filter the ones
+ * they are interested in or can recover from, and have a default handler
+ * handle the rest of them. Both warnings and fatal errors are treated
+ * similarly.
+ *
+ * Core errors are errors inside the core GStreamer library:
+ *
+ * - FAILED - a general error which doesn't fit in any other category. Make
+ * sure you add a custom message to the error call.
+ * - TOO_LAZY - do not use this except as a placeholder for deciding where to
+ * go while developing code.
+ * - NOT_IMPLEMENTED - use this when you do not want to implement this
+ * functionality yet.
+ * - STATE_CHANGE - used for state change errors.
+ * - PAD - used for pad-related errors.
+ * - THREAD - used for thread-related errors.
+ * - NEGOTIATION - used for negotiation-related errors.
+ * - EVENT - used for event-related errors.
+ * - SEEK - used for seek-related errors.
+ * - CAPS - used for caps-related errors.
+ * - TAG - used for negotiation-related errors.
+ * - MISSING_PLUGIN - used if a plugin is missing.
+ * - CLOCK - used for clock related errors.
+ * - DISABLED - used if functionality has been disabled at compile time (Since:
+ * 0.10.13).
+ * - NUM_ERRORS - the number of core error types.
+ *
+ * Elements do not have the context required to decide what to do with
+ * errors. As such, they should only inform about errors, and stop their
+ * processing. In short, an element doesn't know what it is being used for.
+ *
+ * It is the application or compound element using the given element that has
+ * more context about the use of the element. Errors can be received by
+ * listening to the Gst::Bus of the element/pipeline for Gst::Message objects
+ * with the type Gst::MESSAGE_ERROR or Gst::MESSAGE_WARNING. The thrown
+ * errors should be inspected, and filtered if appropriate.
+ *
+ * An application is expected to, by default, present the user with a dialog
+ * box (or an equivalent) showing the error message. The dialog should also
+ * allow a way to get at the additional debug information, so the user can
+ * provide bug reporting information.
+ *
+ * A compound element is expected to forward errors by default higher up the
+ * hierarchy; this is done by default in the same way as for other types of
+ * Gst::Message.
+ *
+ * When applications or compound elements trigger errors that they can
+ * recover from, they can filter out these errors and take appropriate
+ * action. For example, an application that gets an error from xvimagesink
+ * that indicates all XVideo ports are taken, the application can attempt to
+ * use another sink instead.
+ */
+
+_WRAP_GERROR(CoreError, GstCoreError, GST_CORE_ERROR, NO_GTYPE)
+
+/** GStreamer elements can throw non-fatal warnings and fatal errors.
+ * Higher-level elements and applications can programatically filter the ones
+ * they are interested in or can recover from, and have a default handler
+ * handle the rest of them. Both warnings and fatal errors are treated
+ * similarly.
+ *
+ * Library errors are for errors from the library being used by elements
+ * (initializing, finalizing, settings, ...)
+ *
+ * - FAILED - a general error which doesn't fit in any other category. Make
+ * sure you add a custom message to the error call.
+ * - TOO_LAZY - do not use this except as a placeholder for deciding where to
+ * go while developing code.
+ * - INIT - used when the library could not be opened.
+ * - SHUTDOWN - used when the library could not be closed.
+ * - SETTINGS - used when the library doesn't accept settings.
+ * - ENCODE - used when the library generated an encoding error.
+ * - NUM_ERRORS - the number of library error types.
+ *
+ * Elements do not have the context required to decide what to do with
+ * errors. As such, they should only inform about errors, and stop their
+ * processing. In short, an element doesn't know what it is being used for.
+ *
+ * It is the application or compound element using the given element that has
+ * more context about the use of the element. Errors can be received by
+ * listening to the Gst::Bus of the element/pipeline for Gst::Message objects
+ * with the type Gst::MESSAGE_ERROR or Gst::MESSAGE_WARNING. The thrown
+ * errors should be inspected, and filtered if appropriate.
+ *
+ * An application is expected to, by default, present the user with a dialog
+ * box (or an equivalent) showing the error message. The dialog should also
+ * allow a way to get at the additional debug information, so the user can
+ * provide bug reporting information.
+ *
+ * A compound element is expected to forward errors by default higher up the
+ * hierarchy; this is done by default in the same way as for other types of
+ * Gst::Message.
+ *
+ * When applications or compound elements trigger errors that they can
+ * recover from, they can filter out these errors and take appropriate
+ * action. For example, an application that gets an error from xvimagesink
+ * that indicates all XVideo ports are taken, the application can attempt to
+ * use another sink instead.
+ */
+_WRAP_GERROR(LibraryError, GstLibraryError, GST_LIBRARY_ERROR, NO_GTYPE)
+
+/** GStreamer elements can throw non-fatal warnings and fatal errors.
+ * Higher-level elements and applications can programatically filter the ones
+ * they are interested in or can recover from, and have a default handler
+ * handle the rest of them. Both warnings and fatal errors are treated
+ * similarly.
+ *
+ * Resource errors are for any resource used by an element: memory, files,
+ * network connections, process space, ... They're typically used by source and
+ * sink elements.
+ *
+ * - FAILED - a general error which doesn't fit in any other category. Make
+ * sure you add a custom message to the error call.
+ * - TOO_LAZY - do not use this except as a placeholder for deciding where to
+ * go while developing code.
+ * - NOT_FOUND - used when the resource could not be found.
+ * - BUSY - used when resource is busy.
+ * - OPEN_READ - used when resource fails to open for reading.
+ * - OPEN_WRITE - used when resource fails to open for writing.
+ * - OPEN_READ_WRITE - used when resource cannot be opened for both reading and
+ * writing, or either (but unspecified which).
+ * - CLOSE - used when the resource can't be closed.
+ * - READ - used when the resource can't be read from.
+ * - WRITE - used when the resource can't be written to.
+ * - SEEK - used when a seek on the resource fails.
+ * - SYNC - used when a synchronize on the resource fails.
+ * - SETTINGS - used when settings can't be manipulated on.
+ * - NO_SPACE_LEFT - used when the resource has no space left.
+ * - NUM_ERRORS - the number of resource error types.
+ *
+ * Elements do not have the context required to decide what to do with
+ * errors. As such, they should only inform about errors, and stop their
+ * processing. In short, an element doesn't know what it is being used for.
+ *
+ * It is the application or compound element using the given element that has
+ * more context about the use of the element. Errors can be received by
+ * listening to the Gst::Bus of the element/pipeline for Gst::Message objects
+ * with the type Gst::MESSAGE_ERROR or Gst::MESSAGE_WARNING. The thrown
+ * errors should be inspected, and filtered if appropriate.
+ *
+ * An application is expected to, by default, present the user with a dialog
+ * box (or an equivalent) showing the error message. The dialog should also
+ * allow a way to get at the additional debug information, so the user can
+ * provide bug reporting information.
+ *
+ * A compound element is expected to forward errors by default higher up the
+ * hierarchy; this is done by default in the same way as for other types of
+ * Gst::Message.
+ *
+ * When applications or compound elements trigger errors that they can
+ * recover from, they can filter out these errors and take appropriate
+ * action. For example, an application that gets an error from xvimagesink
+ * that indicates all XVideo ports are taken, the application can attempt to
+ * use another sink instead.
+ */
+_WRAP_GERROR(ResourceError, GstResourceError, GST_RESOURCE_ERROR, NO_GTYPE)
+
+/** GStreamer elements can throw non-fatal warnings and fatal errors.
+ * Higher-level elements and applications can programatically filter the ones
+ * they are interested in or can recover from, and have a default handler
+ * handle the rest of them. Both warnings and fatal errors are treated
+ * similarly.
+ *
+ * Stream errors are for anything related to the stream being processed: format
+ * errors, media type errors, ... They're typically used by decoders, demuxers,
+ * converters, ...
+ * 
+ * - FAILED - a general error which doesn't fit in any other category. Make
+ * sure you add a custom message to the error call.
+ * - TOO_LAZY - do not use this except as a placeholder for deciding where to
+ * go while developing code.
+ * - NOT_IMPLEMENTED - use this when you do not want to implement this
+ * functionality yet.
+ * - TYPE_NOT_FOUND - used when the element doesn't know the stream's type.
+ * - WRONG_TYPE - used when the element doesn't handle this type of stream.
+ * - CODEC_NOT_FOUND - used when there's no codec to handle the stream's type.
+ * - DECODE - used when decoding fails.
+ * - ENCODE - used when encoding fails.
+ * - DEMUX - used when demuxing fails.
+ * - MUX - used when muxing fails.
+ * - FORMAT - used when the stream is of the wrong format (for example, wrong
+ * caps).
+ * - DECRYPT - used when the stream is encrypted and can't be decrypted because
+ * this is not supported by the element. (Since: 0.10.20)
+ * - DECRYPT_NOKEY - used when the stream is encrypted and can't be decrypted
+ * because no suitable key is available. (Since: 0.10.20)
+ * - NUM_ERRORS - the number of stream error types.
+ *
+ * Elements do not have the context required to decide what to do with
+ * errors. As such, they should only inform about errors, and stop their
+ * processing. In short, an element doesn't know what it is being used for.
+ *
+ * It is the application or compound element using the given element that has
+ * more context about the use of the element. Errors can be received by
+ * listening to the Gst::Bus of the element/pipeline for Gst::Message objects
+ * with the type Gst::MESSAGE_ERROR or Gst::MESSAGE_WARNING. The thrown
+ * errors should be inspected, and filtered if appropriate.
+ *
+ * An application is expected to, by default, present the user with a dialog
+ * box (or an equivalent) showing the error message. The dialog should also
+ * allow a way to get at the additional debug information, so the user can
+ * provide bug reporting information.
+ *
+ * A compound element is expected to forward errors by default higher up the
+ * hierarchy; this is done by default in the same way as for other types of
+ * Gst::Message.
+ *
+ * When applications or compound elements trigger errors that they can
+ * recover from, they can filter out these errors and take appropriate
+ * action. For example, an application that gets an error from xvimagesink
+ * that indicates all XVideo ports are taken, the application can attempt to
+ * use another sink instead.
+ */
+_WRAP_GERROR(StreamError, GstStreamError, GST_STREAM_ERROR, NO_GTYPE)
 
 } // namespace Gst
 

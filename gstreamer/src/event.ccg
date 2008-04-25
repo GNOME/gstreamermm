@@ -78,17 +78,6 @@ void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize, bo
   async = result;
 }
 
-EventCustom::EventCustom(GstEvent* castitem) :
-Event(castitem)
-{
-}
-
-Glib::RefPtr<Event> EventCustom::create(EventType type, Structure& structure)
-{
-  GstEvent* event = gst_event_new_custom(GstEventType(type), structure.gobj());
-  return Gst::Event::wrap(event, false);
-}
-
 EventEos::EventEos(GstEvent* castitem) :
 Event(castitem)
 {
@@ -256,13 +245,6 @@ Glib::RefPtr<Event> Event::wrap(GstEvent* event, bool take_copy) {
       break;
     case GST_EVENT_LATENCY:
       result = Glib::RefPtr<Event>( new Gst::EventLatency(event) );
-      break;
-    case GST_EVENT_CUSTOM_UPSTREAM:
-    case GST_EVENT_CUSTOM_DOWNSTREAM:
-    case GST_EVENT_CUSTOM_DOWNSTREAM_OOB:
-    case GST_EVENT_CUSTOM_BOTH:
-    case GST_EVENT_CUSTOM_BOTH_OOB:
-      result = Glib::RefPtr<Event>( new Gst::EventCustom(event) );
       break;
     default:
       result = Gst::wrap(event, false);
