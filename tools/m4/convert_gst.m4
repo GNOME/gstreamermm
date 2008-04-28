@@ -154,6 +154,7 @@ _CONVERSION(`Glib::ListHandle< Glib::RefPtr<PluginFeature> >',`GList*',`($3).dat
 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
 _CONVERSION(`const GstQueryType*',`Glib::ArrayHandle<QueryType>',`Glib::ArrayHandle<QueryType>((QueryType*)($3), Glib::OWNERSHIP_SHALLOW)')
 _CONVERSION(`const Glib::ArrayHandle<QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
+_CONVERSION(`Glib::ArrayHandle<QueryType>',`const GstQueryType*',`(GstQueryType*)(($3).data())')
 
 #String Conversions
 _CONVERSION(`const std::string&',`const guchar*',`(const guchar*) ($3.c_str())')
