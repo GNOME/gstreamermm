@@ -28,7 +28,17 @@ namespace Gst
 
 class Element;
 
-_WRAP_ENUM(ParseError, GstParseError)
+/** The different parsing errors that can occur.
+ *
+ * - SYNTAX - A syntax error occured.
+ * - NO_SUCH_ELEMENT - The description contained an unknown element
+ * - NO_SUCH_PROPERTY - An element did not have a specified property
+ * - LINK - There was an error linking two pads.
+ * - COULD_NOT_SET_PROPERTY - There was an error setting a property
+ * - EMPTY_BIN - An empty bin was specified.
+ * - EMPTY - An empty description was specified
+ */
+_WRAP_GERROR(ParseError, GstParseError, GST_PARSE_ERROR)
 
 /** Gst::Parse — Get a pipeline from a text pipeline description.
  * The methods in this class allow to create a pipeline based on the syntax
@@ -36,7 +46,6 @@ _WRAP_ENUM(ParseError, GstParseError)
  */
 class Parse
 {
-
 public:
   /** Get the error quark used by the parsing subsystem.
    * @return the quark of the parse errors.
@@ -52,7 +61,8 @@ public:
    * @return a new element on success, NULL on failure. If more than one
    * toplevel element is specified by the pipeline_description, all elements
    * are put into a Gst::Pipeline, which than is returned.
-
+   * @throw Gst::CoreError
+   * @throw Gst::ParseError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   static Glib::RefPtr<Element> launch(const Glib::ustring& pipeline_description);
@@ -66,6 +76,8 @@ public:
    * @param error will contain an error message if an erroneuos pipeline is
    * specified. 
    * @return a new element on success and NULL on failure.
+   * @throw Gst::CoreError
+   * @throw Gst::ParseError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   static Glib::RefPtr<Element> launchv(const gchar *argv[]);
@@ -87,13 +99,14 @@ public:
    * for unconnected source or sink pads within the bin
    * @param err where to store the error message in case of an error
    * @return a newly-created bin, or NULL if an error occurred.
+   * @throw Gst::CoreError
+   * @throw Gst::ParseError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   static Glib::RefPtr<Element> get_bin(const Glib::ustring& bin_description, bool ghost_unconnected_pads);
 #else
   static Glib::RefPtr<Element> get_bin(const Glib::ustring& bin_description, bool ghost_unconnected_pads, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-
 };
 
 } // namespace Gst
