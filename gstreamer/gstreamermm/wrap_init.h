@@ -26,6 +26,9 @@
 
 namespace Gst
 {
+  /** Initializes the main gstreamermm wrapping system.  There's no need to use
+   * this function directly; instead use Gst::init() or Gst::init_check().
+   */
   void wrap_init();
 }
 

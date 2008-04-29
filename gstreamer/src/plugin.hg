@@ -27,7 +27,13 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-_WRAP_ENUM(PluginError, GstPluginError)
+/** The plugin loading errors
+ *
+ * - MODULE - The plugin could not be loaded
+ * - DEPENDENCIES - The plugin has unresolved dependencies
+ * - NAME_MISMATCH - The plugin has already be loaded from a different file
+ */
+_WRAP_GERROR(PluginError, GstPluginError, GST_PLUGIN_ERROR)
 
 //TODO: Edit references below to use gstreamermm classes/methods
 
@@ -79,7 +85,9 @@ public:
 
   _WRAP_METHOD(bool is_loaded() const, gst_plugin_is_loaded)
 
-  _WRAP_METHOD(static Glib::RefPtr<Plugin> load_file(const Glib::ustring& name), gst_plugin_load_file, errthrow)
+  /** @throw Gst::PluginError
+   */
+  _WRAP_METHOD(static Glib::RefPtr<Plugin> load_file(const Glib::ustring& filename), gst_plugin_load_file, errthrow)
 
   _WRAP_METHOD(Glib::RefPtr<Plugin> load(), gst_plugin_load)
   _WRAP_METHOD(static Glib::RefPtr<Plugin> load_by_name(const Glib::ustring& name), gst_plugin_load_by_name)

@@ -50,17 +50,29 @@ void init(int& argc, char**& argv)
   }
 }
 
-bool init_check(int& argc, char**& argv, Glib::Error& error)
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool init_check(int& argc, char**& argv)
+#else
+bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   Glib::init();
-  GError* c_error;
-  bool result = gst_init_check(&argc, &argv, &c_error);
-  error = Glib::Error(c_error);
+  GError* gerror = 0;
+  bool result = gst_init_check(&argc, &argv, &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
   Gst::wrap_init();
   return result;
 }
 
-Glib::OptionGroup init_get_option_group()
+Glib::OptionGroup get_option_group()
 {
   return Glib::OptionGroup(gst_init_get_option_group());
 }

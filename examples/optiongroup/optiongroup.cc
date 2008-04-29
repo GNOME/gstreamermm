@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 
   m_OptionContext.set_main_group(m_OptionGroup);
 
-  Glib::OptionGroup m_GstOptiongroup = Gst::init_get_option_group();
+  Glib::OptionGroup m_GstOptiongroup = Gst::get_option_group();
   m_OptionContext.add_group(m_GstOptiongroup);
 
   try

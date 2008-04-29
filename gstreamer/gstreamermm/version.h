@@ -24,7 +24,15 @@
 
 namespace Gst
 {
+
+  /** Gets the version number of the gstreamermm library.
+   *
+   * @param major pointer to a guint to store the major version number
+   * @param minor pointer to a guint to store the minor version number
+   * @param micro pointer to a guint to store the micro version number
+   */
   void version(guint& major, guint& minor, guint& micro);
+
 }//end namespace Gst
 
 #endif //_GSTREAMERMM_VERSION_H
