@@ -20,6 +20,8 @@
  */
 
 #include <gst/gstenumtypes.h>
+#include <gstreamermm/structure.h>
+#include <gstreamermm/taglist.h>
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
 
 namespace Gst
@@ -200,13 +202,19 @@ Event(castitem)
 {
 }
 
-//TODO: Glib::RefPtr<Event> EventTag::create(TagList& taglist)
-//TODO: {
-//TODO: }
+Glib::RefPtr<Event> EventTag::create(TagList& taglist)
+{
+  GstEvent* event = gst_event_new_tag(taglist.gobj());
+  return Gst::Event::wrap(event, false);
+}
 
-//TODO: void EventTag::parse(TagList& taglist)
-//TODO: {
-//TODO: }
+void EventTag::parse(TagList& taglist)
+{
+  GstTagList* gst_taglist = gst_tag_list_new();
+  gst_event_parse_tag(gobj(), &gst_taglist);
+  TagList parsed_taglist(gst_taglist);
+  taglist.swap(parsed_taglist);
+}
 
 Glib::RefPtr<Event> Event::wrap(GstEvent* event, bool take_copy) {
 

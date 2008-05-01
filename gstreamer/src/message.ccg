@@ -20,6 +20,8 @@
  */
 
 #include <gst/gstenumtypes.h>
+#include <gstreamermm/structure.h>
+#include <gstreamermm/taglist.h>
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
 
 namespace Gst
@@ -244,6 +246,24 @@ MessageBuffering::MessageBuffering(GstMessage* castitem)
 {
 }
 
+MessageTag::MessageTag(GstMessage* castitem)
+: Message(castitem)
+{
+}
+
+Glib::RefPtr<Message> MessageTag::create(const Glib::RefPtr<Object>& src, TagList& taglist)
+{
+  GstMessage* message = gst_message_new_tag(src->gobj(), taglist.gobj());
+  return Gst::Message::wrap(message, false);
+}
+
+void MessageTag::parse(TagList& taglist)
+{
+  GstTagList* gst_tag_list = gst_tag_list_new();
+  gst_message_parse_tag(gobj(), &gst_tag_list);
+  TagList result(gst_tag_list);
+  taglist.swap(result);
+}
 
 Glib::RefPtr<Message> MessageBuffering::create(const Glib::RefPtr<Object>& src, int percent)
 {
@@ -350,6 +370,9 @@ Glib::RefPtr<Message> Message::wrap(GstMessage* message, bool take_copy) {
     case GST_MESSAGE_INFO:
       result = Glib::RefPtr<Message>( new Gst::MessageInfo(message) );
       break;
+    case GST_MESSAGE_TAG:
+      result = Glib::RefPtr<Message>( new Gst::MessageTag(message) );
+      break;
     case GST_MESSAGE_BUFFERING:
       result = Glib::RefPtr<MessageBuffering>( new Gst::MessageBuffering(message) );
       break;
@@ -392,7 +415,6 @@ Glib::RefPtr<Message> Message::wrap(GstMessage* message, bool take_copy) {
     case GST_MESSAGE_ASYNC_DONE:
       result = Glib::RefPtr<Message>( new Gst::MessageAsyncDone(message) );
       break;
-    //TODO?: case GST_MESSAGE_TAG:
     //TODO?: case GST_MESSAGE_STEP_DONE:
     //TODO?: case GST_MESSAGE_STRUCTURE_CHANGE:
     //TODO?: case GST_MESSAGE_STREAM_STATUS:

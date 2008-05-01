@@ -20,10 +20,9 @@
  */
 
 #include <gst/gstmessage.h>
-#include <gstreamermm/miniobject.h>
-#include <gstreamermm/structure.h>
 #include <gstreamermm/wrap.h>
 #include <gstreamermm/format.h>
+#include <gstreamermm/clock.h>
 #include <gstreamermm/enums.h>
 
 _DEFS(gstreamermm,gst)
@@ -35,6 +34,9 @@ _WRAP_ENUM(MessageType, GstMessageType)
 
 Glib::ustring get_name(MessageType t);
 Glib::QueryQuark get_quark(MessageType t);
+
+class Structure;
+class TagList;
 
 /** Gst::Message — Lightweight objects to signal the application of pipeline
  * events.
@@ -180,9 +182,14 @@ public:
   void parse(State& oldstate, State& newstate, State& pending);
 };
 
-//TODO:class MessageTag : public Message
-//TODO:{
-//TODO:}
+class MessageTag : public Message
+{
+public:
+  explicit MessageTag(GstMessage* castitem);
+
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, TagList& taglist);
+  void parse(TagList& taglist);
+};
 
 class MessageBuffering : public Message
 {

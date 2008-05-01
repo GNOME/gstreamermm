@@ -20,10 +20,9 @@
  */
 
 #include <gst/gstevent.h>
-#include <gstreamermm/miniobject.h>
-#include <gstreamermm/structure.h>
 #include <gstreamermm/wrap.h>
 #include <gstreamermm/format.h>
+#include <gstreamermm/clock.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -58,6 +57,9 @@ enum EventType
 _WRAP_ENUM(SeekType, GstSeekType)
 _WRAP_ENUM(SeekFlags, GstSeekFlags)
 _WRAP_ENUM(EventTypeFlags, GstEventTypeFlags)
+
+class Structure;
+class TagList;
 
 /** Get a printable name for the given event type.
  *
@@ -498,8 +500,16 @@ class EventTag : public Event
 public:
   explicit EventTag(GstEvent* event);
 
-  //TODO: static Glib::RefPtr<Event> create(TagList& taglist);
-  //TODO: void parse(TagList& taglist);
+  /** Generates a metadata tag event from the given taglist.
+   * @param taglist metadata list
+   * @return a new Gst::Event
+   */
+  static Glib::RefPtr<Event> create(TagList& taglist);
+
+  /** Parses a tag event and stores the results in the given taglist location.
+   * @param taglist pointer to metadata list 
+   */
+  void parse(TagList& taglist);
 };
 
 } //namespace Gst
