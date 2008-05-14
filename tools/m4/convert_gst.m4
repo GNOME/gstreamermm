@@ -19,8 +19,10 @@ _CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`Glib::unwrap($3)')
 #Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Buffer>',`wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Buffer>&',`GstBuffer*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>(Glib::unwrap($3))')
 _CONVERSION(`const Glib::RefPtr<Buffer>&',`const GstBuffer*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Buffer>',`GstBuffer*', `Glib::unwrap($3)')
+
 
 #Bus
 _CONVERSION(`const Glib::RefPtr<Bus>&',`GstBus*', `Glib::unwrap($3)')

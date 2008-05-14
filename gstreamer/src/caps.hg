@@ -55,6 +55,7 @@ class Caps
   _IGNORE(gst_caps_ref, gst_caps_unref)
 
 public:
+
   /** Creates a new Gst::Caps that indicates that it is compatible with any
    * media format.
    *
@@ -77,26 +78,30 @@ public:
    */
   static Glib::RefPtr<Caps> create(Structure& first_struct);
 
+  _WRAP_METHOD(static Glib::RefPtr<Caps> create_from_string(const Glib::ustring& string), gst_caps_from_string)
+
+
   _WRAP_METHOD(Glib::RefPtr<Caps> copy() const, gst_caps_copy)
-  _WRAP_METHOD(Glib::RefPtr<Caps> copy_nth(guint nth), gst_caps_copy_nth)
+  _WRAP_METHOD(Glib::RefPtr<Caps> copy_nth(guint nth) const, gst_caps_copy_nth)
   _WRAP_METHOD(void append(const Glib::RefPtr<Caps>& caps), gst_caps_append)
   _WRAP_METHOD(void merge(const Glib::RefPtr<Caps>& caps), gst_caps_merge)
 
-  /** Appends structure to caps. The structure is not copied; caps becomes the
-   * owner of structure.
+  //TODO: This talk of ownership is strange. Say what it really means somewhere. murrayc.
+  /** Appends a structure to caps. The structure is not copied. This Caps becomes the
+   * owner of @a structure.
    *
    * @param structure the Gst::Structure to append
    */
   void append_structure(Structure& structure);
 
-  /** Appends structure to caps if its not already expressed by caps. The
-   * structure is not copied; caps becomes the owner of structure.
+  /** Appendsa  structure to caps if its not already expressed by caps. The
+   * structure is not copied. This Caps becomes the owner of @a structure.
    *
    * @param structure the Gst::Structure to merge
    */
   void merge_structure(Structure& structure);
 
-  /** Finds the structure in caps that has the index idx, and returns it.
+  /** Finds the structure in caps that has the index @a idx, and returns it.
    *
    * @param index the index of the structure
    * @return the Gst::Structure corresponding to index
@@ -106,13 +111,14 @@ public:
   _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
   _WRAP_METHOD(guint size() const, gst_caps_get_size)
 
-  /** Sets a fields in a simple Gst::Caps. A simple Gst::Caps is one that only
+  /** Sets fields in a simple Gst::Caps. A simple Gst::Caps is one that only
    * has one structure.
    *
    * @param field field to set
    * @param value the value which the field should be set to
    */
   void set_simple(const Glib::ustring& name, const Glib::ValueBase& value);
+  _IGNORE(gst_caps_set_simple)
 
   _WRAP_METHOD(void set_simple_valist(char* field, const va_list& varargs), gst_caps_set_simple_valist)
 
@@ -123,17 +129,26 @@ public:
   _WRAP_METHOD(bool equals_fixed(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_equal_fixed)
   _WRAP_METHOD(bool is_always_compatible(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_always_compatible)
   _WRAP_METHOD(bool is_subset(const Glib::RefPtr<Caps>& superset_caps) const, gst_caps_is_subset)
+
+  //TODO: Rename as create_*()?
+  //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Caps> get_intersect(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_intersect)
+
+  //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Caps> get_union(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_union)
-  _WRAP_METHOD(Glib::RefPtr<Caps> normalize(), gst_caps_normalize)
+
+  //This is const (returns a non const) because it always creates a new instance:
+  _WRAP_METHOD(Glib::RefPtr<Caps> normalize() const, gst_caps_normalize)
+
   _WRAP_METHOD(bool simplify(), gst_caps_do_simplify)
+
+  //TODO: Add overloads (and dependency) for libxml++?
   _WRAP_METHOD(xmlNodePtr save(const xmlNodePtr& parent) const, gst_caps_save_thyself)
   _WRAP_METHOD(static Glib::RefPtr<Caps> load(xmlNodePtr parent), gst_caps_load_thyself)
 
   _WRAP_METHOD(Glib::ustring to_string() const, gst_caps_to_string)
 
-  _WRAP_METHOD(static Glib::RefPtr<Caps> from_string(const Glib::ustring& string), gst_caps_from_string)
-
+ //TODO: Rename as create_*()?
   _WRAP_METHOD(Glib::RefPtr<Caps> subtract(const Glib::RefPtr<const Caps>& subtrahend_caps), gst_caps_subtract)
   _WRAP_METHOD(Glib::RefPtr<Caps> make_writable(), gst_caps_make_writable)
   _WRAP_METHOD(void truncate(), gst_caps_truncate)

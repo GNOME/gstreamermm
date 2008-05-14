@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
   // interval to regularly print the position of the stream
   Glib::signal_timeout().connect(sigc::ptr_fun(&print_stream_position), 200);
 
-  // Now set to playing and iterate:
+  // Now set to playing and iterate: TODO: What is iterated? Is the comment wrong?
   std::cout << "Setting to PLAYING." << std::endl;
   pipeline->set_state(Gst::STATE_PLAYING);
   std::cout << "Running." << std::endl;

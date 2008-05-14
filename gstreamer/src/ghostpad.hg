@@ -55,14 +55,12 @@ protected:
   _WRAP_CTOR(GhostPad(const Glib::ustring& name, const Glib::RefPtr<PadTemplate>& templ), gst_ghost_pad_new_no_target_from_template)
 
 public:
-  /** Create a new ghostpad with target as the target. The direction will be
-   * taken from the target pad. target must be unlinked.
+  /** Create a new ghostpad with @a target as the target. The direction will be
+   * taken from the target pad. @a target must be unlinked.
    *
-   * Will ref the target.
-   *
-   * @param name the name of the new pad.
-   * @param target the pad to ghost.
-   * @returns a new Gst::GhostPad, or NULL in case of an error.
+   * @param name The name of the new pad.
+   * @param target The pad to ghost.
+   * @returns A new Gst::GhostPad, or an empty RefPtr in case of an error.
    */
   _WRAP_CREATE(const Glib::ustring& name, const Glib::RefPtr<Pad>& target)
 
@@ -71,36 +69,36 @@ public:
    *
    * The created ghostpad will not have a padtemplate.
    *
-   * @param name the name of the new pad.
-   * @param dir the direction of the ghostpad
-   * @return a new Gst::GhostPad, or NULL in case of an error. 
+   * @param name The name of the new pad.
+   * @param dir The direction of the ghostpad
+   * @return A new Gst::GhostPad, or an empty RefPtr in case of an error. 
    */
   _WRAP_CREATE(const Glib::ustring& name, PadDirection dir)
 
-  /** Create a new ghostpad with target as the target. The direction will be
+  /** Create a new ghostpad with @a target as the target. The direction will be
    * taken from the target pad. The template used on the ghostpad will be
    * template.
    *
-   * Will ref the target.
-   *
-   * @param name the name of the new pad.
-   * @param target the pad to ghost.
-   * @param templ the Gst::PadTemplate to use on the ghostpad.
-   * @return a new Gst::GhostPad, or NULL in case of an error.
+   * @param name The name of the new pad.
+   * @param target The pad to ghost.
+   * @param templ The Gst::PadTemplate to use on the ghostpad.
+   * @return a new Gst::GhostPad, or an empty RefPtr in case of an error.
    */
   _WRAP_CREATE(const Glib::ustring& name, const Glib::RefPtr<Pad>& target, const Glib::RefPtr<PadTemplate>& templ)
 
-  /** Create a new ghostpad based on templ, without setting a target. The
-   * direction will be taken from the templ.
+  /** Create a new ghostpad based on @a templ, without setting a target. The
+   * direction will be taken from @a templ.
    *
-   * @param name the name of the new pad.
-   * @param templ the Gst::PadTemplate to create the ghostpad from.
-   * @return a new Gst::GhostPad, or NULL in case of an error.
+   * @param name The name of the new pad.
+   * @param templ The Gst::PadTemplate to create the ghostpad from.
+   * @return A new Gst::GhostPad, or an empty RefPtr in case of an error.
    */
   _WRAP_CREATE(const Glib::ustring& name, const Glib::RefPtr<PadTemplate>& templ)
 
   _WRAP_METHOD(bool set_target(const Glib::RefPtr<Pad>& newtarget), gst_ghost_pad_set_target)
+
   _WRAP_METHOD(Glib::RefPtr<Pad> get_target(), gst_ghost_pad_get_target)
+  _WRAP_METHOD(Glib::RefPtr<const Pad> get_target() const, gst_ghost_pad_get_target)
 };
 
 } // namespace Gst

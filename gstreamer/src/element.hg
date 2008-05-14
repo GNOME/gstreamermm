@@ -47,6 +47,7 @@ class TagList;
 
 _WRAP_ENUM(ElementFlags, GstElementFlags)
 
+//TODO: Why not use _WRAP_ELEM() here?
 enum StateChange
 {
   STATE_CHANGE_NULL_TO_READY = GST_STATE_CHANGE_NULL_TO_READY,
@@ -58,6 +59,8 @@ enum StateChange
 };
 
 _WRAP_ENUM(StateChangeReturn, GstStateChangeReturn)
+
+//TODO: Use a namespace or prefix, because Gst::get_name() is too generic. murrayc.
 
 /**  Gets a string representing the given state.
  *
@@ -121,11 +124,18 @@ protected:
   _CTOR_DEFAULT
 
 public:
+  //TODO Add const version?
   Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
+
   _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
+
+  //TODO: Remove this (and make sure it is really deprecated in the C API),
+  //because the C API says it should not be used because it has unclear refcounting:
   _WRAP_METHOD(Glib::RefPtr<Pad> get_pad(const Glib::ustring& name), gst_element_get_pad)
+
   _WRAP_METHOD(void create_all_pads(), gst_element_create_all_pads)
 
+  //TODO: If these get* functions are creators, then maybe rename to create*()? murrayc
   Glib::RefPtr<Pad> get_compatible_pad(const Glib::RefPtr<Pad>& pad, const Glib::RefPtr<Caps>& caps);
   Glib::RefPtr<PadTemplate> get_compatible_pad_template(const Glib::RefPtr<PadTemplate>& padtemplate);
 
@@ -153,10 +163,12 @@ public:
 
   //Note: gst_element_get_index provides a reference.
   _WRAP_METHOD(Glib::RefPtr<Index> get_index(), gst_element_get_index)
-  _WRAP_METHOD(Glib::RefPtr<Index const> get_index() const, gst_element_get_index, constversion)
+  _WRAP_METHOD(Glib::RefPtr<const Index > get_index() const, gst_element_get_index, constversion)
 
 
-  _WRAP_METHOD(Glib::RefPtr<ElementFactory> get_factory(), gst_element_get_factory)
+  _WRAP_METHOD(Glib::RefPtr<ElementFactory> get_factory(), gst_element_get_factory, refresult)
+  _WRAP_METHOD(Glib::RefPtr<const ElementFactory> get_factory() const, gst_element_get_factory, refresult, constversion)
+
   _WRAP_METHOD(bool is_indexable() const, gst_element_is_indexable)
   _WRAP_METHOD(bool requires_clock() const, gst_element_requires_clock)
   _WRAP_METHOD(bool set_clock(const Glib::RefPtr<Clock>& clock), gst_element_set_clock)
@@ -174,7 +186,7 @@ public:
   _WRAP_METHOD(void lost_state(), gst_element_lost_state)
   _WRAP_METHOD(bool sync_state_with_parent(), gst_element_sync_state_with_parent)
   _WRAP_METHOD(StateChangeReturn change_state(StateChange transition), gst_element_change_state)
-  _WRAP_METHOD(void found_tags(TagList& list), gst_element_found_tags)
+  _WRAP_METHOD(void found_tags(TagList& list), gst_element_found_tags) //TODO: Use return value instead?
   _WRAP_METHOD(void found_tags_for_pad(const Glib::RefPtr<Pad>& pad, TagList& list), gst_element_found_tags_for_pad)
 
   //TODO: Change the parameter order?

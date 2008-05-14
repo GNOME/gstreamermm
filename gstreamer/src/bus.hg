@@ -88,7 +88,7 @@ public:
    * bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const
    * Glib::RefPtr<Gst::Message>& message);
    * The message function should return true if it wants to continue to receive
-   * messages, false otherwise.
+   * messages, or false otherwise.
    */
   typedef sigc::slot< bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessage;
 
@@ -100,24 +100,27 @@ public:
 
   /** Creates a new Gst::Bus instance.
    *
-   * @return the new Gst::Bus instance
+   * @return The new Gst::Bus instance.
    */
   _WRAP_CREATE()
 
   _WRAP_METHOD(bool post(const Glib::RefPtr<Message>& message), gst_bus_post)
   _WRAP_METHOD(bool have_pending() const, gst_bus_have_pending)
+
   _WRAP_METHOD(Glib::RefPtr<Message> peek(), gst_bus_peek)
   _WRAP_METHOD(Glib::RefPtr<const Message> peek() const, gst_bus_peek)
+
   _WRAP_METHOD(Glib::RefPtr<Message> pop(), gst_bus_pop)
   _WRAP_METHOD(Glib::RefPtr<Message> pop(MessageType message_type), gst_bus_pop_filtered)
   _WRAP_METHOD(Glib::RefPtr<Message> pop(ClockTime timeout), gst_bus_timed_pop)
   _WRAP_METHOD(Glib::RefPtr<Message> pop(ClockTime timeout, MessageType message_type), gst_bus_timed_pop_filtered)
+
   _WRAP_METHOD(void set_flushing(bool flushing = true), gst_bus_set_flushing)
 
   /** Adds a bus watch to the default main context with the given priority.
    * The slot is used to receive asynchronous messages in the main loop.
    *
-   * The watch can be removed using remove_watch() or by returning FALSE from
+   * The watch can be removed using remove_watch() or by returning false from
    * slot.
    *
    * @param slot The slot to call when a message is received.

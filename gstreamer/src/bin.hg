@@ -116,7 +116,7 @@ class Pad;
  *
  * A Gst::Bin will by default forward any event sent to it to all sink
  * elements. If all the sinks return TRUE, the bin will also return TRUE, else
- * FALSE is returned. If no sinks are in the bin, the event handler will return
+ * false is returned. If no sinks are in the bin, the event handler will return
  * TRUE.
  *
  * Last reviewed on 2006-04-28 (0.10.6)
@@ -169,10 +169,28 @@ public:
    */
   Glib::RefPtr<Bin> remove(const Glib::RefPtr<Element>& element);
 
+  //TODO: Just add a bool recurse_up = false parameter? 
   _WRAP_METHOD(Glib::RefPtr<Element> get_element(const Glib::ustring& name), gst_bin_get_by_name)
+  _WRAP_METHOD(Glib::RefPtr<const Element> get_element(const Glib::ustring& name) const, gst_bin_get_by_name)
+
   _WRAP_METHOD(Glib::RefPtr<Element> get_element_recurse_up(const Glib::ustring& name), gst_bin_get_by_name_recurse_up)
+  _WRAP_METHOD(Glib::RefPtr<const Element> get_element_recurse_up(const Glib::ustring& name) const, gst_bin_get_by_name_recurse_up)
+ 
   _WRAP_METHOD(Glib::RefPtr<Element> get_element(GType interface), gst_bin_get_by_interface)
+  _WRAP_METHOD(Glib::RefPtr<const Element> get_element(GType interface) const, gst_bin_get_by_interface)
+
   _WRAP_METHOD(Glib::RefPtr<Pad> find_unconnected_pad(PadDirection dir), gst_bin_find_unconnected_pad)
+  _WRAP_METHOD(Glib::RefPtr<const Pad> find_unconnected_pad(PadDirection dir) const, gst_bin_find_unconnected_pad)
+
+/* TODO:
+GstIterator*    gst_bin_iterate_elements	 (GstBin *bin);
+GstIterator*    gst_bin_iterate_sorted		 (GstBin *bin);
+GstIterator*    gst_bin_iterate_recurse		 (GstBin *bin);
+
+GstIterator*	gst_bin_iterate_sinks		 (GstBin *bin);
+GstIterator*	gst_bin_iterate_sources		 (GstBin *bin);
+GstIterator*	gst_bin_iterate_all_by_interface (GstBin *bin, GType iface);
+*/
 
   _IGNORE(gst_bin_add, gst_bin_remove, gst_bin_add_many, gst_bin_remove_many)
 

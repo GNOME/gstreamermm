@@ -48,7 +48,13 @@ class ElementFactory : public PluginFeature
   _CLASS_GOBJECT(ElementFactory, GstElementFactory, GST_ELEMENT_FACTORY, PluginFeature, GstPluginFeature)
 
 public:
+
+  //TODO: Rename as create_*()? How is this different to gst_element_factory_create()?
   _WRAP_METHOD(static Glib::RefPtr<ElementFactory> find(const Glib::ustring& name), gst_element_factory_find)
+
+  _WRAP_METHOD(Glib::RefPtr<Element> create(const Glib::ustring& name), gst_element_factory_create)
+  _WRAP_METHOD(static Glib::RefPtr<Element> create(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
+  
   _WRAP_METHOD(GType get_element_type() const, gst_element_factory_get_element_type)
   _WRAP_METHOD(Glib::ustring get_long_name() const, gst_element_factory_get_longname)
   _WRAP_METHOD(Glib::ustring get_kclass() const, gst_element_factory_get_klass)
@@ -57,12 +63,10 @@ public:
   _WRAP_METHOD(guint get_num_pad_templates() const, gst_element_factory_get_num_pad_templates)
   _WRAP_METHOD(int get_uri_type() const, gst_element_factory_get_uri_type)
 
-  //TODO: Is the conversion from gchar** to Glb::StringArrayHandle used here valid?
+  //TODO: Is the conversion from gchar** to Glb::StringArrayHandle used here valid? Check ownership.
   _WRAP_METHOD(Glib::StringArrayHandle get_uri_protocols() const, gst_element_factory_get_uri_protocols)
 
   _WRAP_METHOD(bool has_interface(const Glib::ustring& name) const, gst_element_factory_has_interface)
-  _WRAP_METHOD(Glib::RefPtr<Element> create(const Glib::ustring& name), gst_element_factory_create)
-  _WRAP_METHOD(static Glib::RefPtr<Element> create(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
   _WRAP_METHOD(bool can_sink_caps(const Glib::RefPtr<const Caps>& caps) const, gst_element_factory_can_sink_caps)
   _WRAP_METHOD(bool can_src_caps(const Glib::RefPtr<const Caps>& caps) const, gst_element_factory_can_src_caps)
 
