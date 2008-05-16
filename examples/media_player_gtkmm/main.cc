@@ -26,7 +26,7 @@
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
 #include <iostream>
-#include "PlayerWindow.h"
+#include "player_window.h"
 
 int
 main (int argc, char *argv[])

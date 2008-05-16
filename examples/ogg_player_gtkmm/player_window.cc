@@ -29,7 +29,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include "PlayerWindow.h"
+#include "player_window.h"
 
 PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Element>& source_element, const Glib::RefPtr<Gst::Pipeline>& main_pipeline)
 : m_vbox(false, 5),

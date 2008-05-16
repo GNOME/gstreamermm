@@ -34,7 +34,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include "PlayerWindow.h"
+#include "player_window.h"
 
 PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& videoSink)
 : m_vbox(false, 6),

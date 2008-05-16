@@ -1,6 +1,6 @@
 include $(top_srcdir)/examples/Makefile.am_fragment
 
 #Build the executable, but don't install it.
-noinst_PROGRAMS = oggplayer
-oggplayer_SOURCES = main.cc PlayerWindow.cc PlayerWindow.h
+noinst_PROGRAMS = example
+example_SOURCES = main.cc player_window.cc player_window.h
 

@@ -26,7 +26,7 @@
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
 #include <iostream>
-#include "PlayerWindow.h"
+#include "player_window.h"
 
 Glib::RefPtr<Gst::Pipeline> pipeline;
 Glib::RefPtr<Gst::Element> decoder;
