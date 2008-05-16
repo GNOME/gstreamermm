@@ -23,13 +23,12 @@
 #include <iostream>
 #include <iomanip>
 
-// Global objects are usually a bad thing. For the purpose of this example, we will use them, however.
 Glib::RefPtr<Glib::MainLoop> mainloop;
 Glib::RefPtr<Gst::Pipeline> pipeline;
 Glib::RefPtr<Gst::Element> decoder;
-gulong data_probe_id;
+gulong data_probe_id = 0;
 
-bool print_stream_position(void)
+bool on_timeout()
 {
   Gst::Format fmt = Gst::FORMAT_TIME;
   gint64 pos = 0;
@@ -38,12 +37,13 @@ bool print_stream_position(void)
   Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
   if (pipeline->query(query)
-    && pipeline->query_duration(fmt, len)) {
-
-    Glib::RefPtr<Gst::QueryPosition> posQuery =
+    && pipeline->query_duration(fmt, len))
+  {
+    //TODO: Document why we do this cast:
+    Glib::RefPtr<Gst::QueryPosition> query_pos =
       Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
-
-    posQuery->parse(fmt, pos);
+    if(query_pos)
+      query_pos->parse(fmt, pos);
 
     std::cout << std::right << "Time: " << std::setfill('0') <<
       std::setw(3) << Gst::get_hours(pos) << ":" <<
@@ -122,34 +122,35 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  // initialize Gstreamermm
+  // Initialize Gstreamermm:
   Gst::init(argc, argv);
 
   mainloop = Glib::MainLoop::create();
 
-  // Create the pipeline
+  // Create the pipeline:
   pipeline = Gst::Pipeline::create("audio-player");
   std::cout << "pipeline=" << pipeline << std::endl;
 
-  // Create the elements
-  // Reads file from disk
-  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create("filesrc", "file-source");
+  // Create the elements:
+
+  // filsrc reads the file from disk:
+  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("filesrc");
   std::cout << "source=" << source << std::endl;
 
-  // Parses the ogg streams into elementary streams (note that an ogg file may contain a video stream too)
-  Glib::RefPtr<Gst::Element> parser = Gst::ElementFactory::create("oggdemux", "ogg-parser");
+  // oggdemux parses the ogg streams into elementary streams (audio and video):
+  Glib::RefPtr<Gst::Element> parser = Gst::ElementFactory::create_element("oggdemux");
   std::cout << "parser=" << parser << std::endl;
 
-  // Decodes a vorbis stream
-  decoder = Gst::ElementFactory::create("vorbisdec", "vorbis-decoder");
+  // vorbisdec decodes a vorbis (audio) stream:
+  decoder = Gst::ElementFactory::create_element("vorbisdec", "vorbis-decoder");
   std::cout << "decoder=" << decoder << std::endl;
 
-  // Converts audio() to a format which can be used by the next element
-  Glib::RefPtr<Gst::Element> conv = Gst::ElementFactory::create("audioconvert", "converter");
+  // audioconvert converts raw audio to a format which can be used by the next element
+  Glib::RefPtr<Gst::Element> conv = Gst::ElementFactory::create_element("audioconvert");
   std::cout << "conv=" << conv << std::endl;
 
   // Outputs sound to an ALSA audio device
-  Glib::RefPtr<Gst::Element> sink = Gst::ElementFactory::create("alsasink", "alsa-output");
+  Glib::RefPtr<Gst::Element> sink = Gst::ElementFactory::create_element("alsasink");
   std::cout << "sink=" << sink << std::endl;
 
   if (!pipeline || !source || !parser || !decoder || !conv || !sink)
@@ -163,7 +164,6 @@ int main(int argc, char* argv[])
   std::cout << "sink data probe id = " << data_probe_id << std::endl;
 
 
-  // //eireuo
   // Set filename property on the file source. Also add a message handler:
   source->set_property("location", std::string(argv[1]));
 
@@ -194,9 +194,9 @@ int main(int argc, char* argv[])
 
   decoder->link(conv)->link(sink);
 
-  // Call print_stream_position function at a 200ms
+  // Call on_timeout function at a 200ms
   // interval to regularly print the position of the stream
-  Glib::signal_timeout().connect(sigc::ptr_fun(&print_stream_position), 200);
+  Glib::signal_timeout().connect(sigc::ptr_fun(&on_timeout), 200);
 
   // Now set to playing and iterate: TODO: What is iterated? Is the comment wrong?
   std::cout << "Setting to PLAYING." << std::endl;

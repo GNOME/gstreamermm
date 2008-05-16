@@ -133,7 +133,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus_not_used 
     return true;
 }
 
-void PlayerWindow::on_play(void)
+void PlayerWindow::on_play()
 {
     progressScale.set_sensitive(true);
     playButton.set_sensitive(false);
@@ -155,7 +155,7 @@ void PlayerWindow::on_play(void)
 	mainPipeline->set_state(Gst::STATE_PLAYING);
 }
  
-void PlayerWindow::on_pause(void)
+void PlayerWindow::on_pause()
 {
     playButton.set_sensitive(true);
     pauseButton.set_sensitive(false);
@@ -170,7 +170,7 @@ void PlayerWindow::on_pause(void)
 	mainPipeline->set_state(Gst::STATE_PAUSED);
 }
  
-void PlayerWindow::on_stop(void)
+void PlayerWindow::on_stop()
 {
     progressScale.set_sensitive(false);
     playButton.set_sensitive(true);
@@ -208,7 +208,7 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
     }
 }
 
-void PlayerWindow::on_rewind(void)
+void PlayerWindow::on_rewind()
 {
     static const gint64 skipAmount = GST_SECOND * 2;
 
@@ -228,7 +228,7 @@ void PlayerWindow::on_rewind(void)
     }
 }
 
-void PlayerWindow::on_forward(void)
+void PlayerWindow::on_forward()
 {
     static const gint64 skipAmount = GST_SECOND * 3;
 
@@ -264,7 +264,7 @@ void PlayerWindow::on_forward(void)
     }
 }
 
-void PlayerWindow::on_open(void)
+void PlayerWindow::on_open()
 {
     static Glib::ustring workingDir = Glib::get_home_dir();
     
@@ -296,7 +296,7 @@ void PlayerWindow::on_open(void)
     }
 }
 
-bool PlayerWindow::update_stream_progress(void)
+bool PlayerWindow::update_stream_progress()
 {
     Gst::Format fmt = Gst::FORMAT_TIME;
     gint64 pos = 0;

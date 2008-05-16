@@ -59,8 +59,8 @@ int main (int argc, char* argv[])
 
   pipeline = Gst::Pipeline::create("pipeline");
 
-  e1 = Gst::ElementFactory::create("fakesrc", "source");
-  e2 = Gst::ElementFactory::create("fakesink", "sink");
+  e1 = Gst::ElementFactory::create_element("fakesrc", "source");
+  e2 = Gst::ElementFactory::create_element("fakesink", "sink");
 
   pipeline->add(e1)->add(e2);
 

@@ -52,9 +52,20 @@ public:
   //TODO: Rename as create_*()? How is this different to gst_element_factory_create()?
   _WRAP_METHOD(static Glib::RefPtr<ElementFactory> find(const Glib::ustring& name), gst_element_factory_find)
 
-  _WRAP_METHOD(Glib::RefPtr<Element> create(const Glib::ustring& name), gst_element_factory_create)
-  _WRAP_METHOD(static Glib::RefPtr<Element> create(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
+  //Note that name can't be NULL here, though it seems like gstreamer should allow that as for gst_element_factory_make().
+  //TODO: Wrap, but with a different name to avoid the clash: _WRAP_METHOD(Glib::RefPtr<Element> create_element(const Glib::ustring& name), gst_element_factory_create)
+
+  //TODO: Customize documentatoin to avoid mention of NULL for name.
+  _WRAP_METHOD(static Glib::RefPtr<Element> create_element(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
   
+  /** Create a new element of the type defined by the given element factory, 
+   * with a guaranteed unique name consisting of the element factory name and a number.
+   * @param factoryname A named factory to instantiate.
+   * @param name Name of new element.
+   * @return New Gst::Element or an empty RefPtr if unable to create element.
+   */
+  static Glib::RefPtr<Element> create_element(const Glib::ustring& factory_name);
+
   _WRAP_METHOD(GType get_element_type() const, gst_element_factory_get_element_type)
   _WRAP_METHOD(Glib::ustring get_long_name() const, gst_element_factory_get_longname)
   _WRAP_METHOD(Glib::ustring get_kclass() const, gst_element_factory_get_klass)

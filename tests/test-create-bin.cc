@@ -33,8 +33,8 @@ int main (int argc, char* argv[])
   pipeline = Gst::Pipeline::create("my-pipeline");
   bin = Gst::Bin::create("my-bin");
 
-  source = Gst::ElementFactory::create("fakesrc", "source");
-  sink = Gst::ElementFactory::create("fakesink", "sink");
+  source = Gst::ElementFactory::create_element("fakesrc", "source");
+  sink = Gst::ElementFactory::create_element("fakesink", "sink");
 
   bin->add(source)->add(sink);
 

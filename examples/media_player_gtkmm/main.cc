@@ -38,11 +38,11 @@ main (int argc, char *argv[])
 
     // Autoplays any media type.  Implements GstBase::XOverlay so accepts
     // a window id in which to draw video
-    Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create("playbin", "media-player");
+    Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create_element("playbin");
     Glib::RefPtr<Gst::Pipeline> playbinPipeline = Glib::RefPtr<Gst::Pipeline>::cast_dynamic(playbin);
 
     // Video sink where video (if any) will be drawn
-    Glib::RefPtr<Gst::Element> videoSink = Gst::ElementFactory::create("ximagesink", "video-sink");
+    Glib::RefPtr<Gst::Element> videoSink = Gst::ElementFactory::create_element("ximagesink");
 
     if (!playbinPipeline || !videoSink)
     {

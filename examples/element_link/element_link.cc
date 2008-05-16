@@ -37,9 +37,9 @@ int main(int argc, char** argv)
   // create elements
   try
   {
-    m_Element_Source = Gst::ElementFactory::create("fakesrc", "source");
-    m_Element_Filter = Gst::ElementFactory::create("identity", "filter");
-    m_Element_Sink = Gst::ElementFactory::create("fakesink", "sink");
+    m_Element_Source = Gst::ElementFactory::create_element("fakesrc");
+    m_Element_Filter = Gst::ElementFactory::create_element("identity");
+    m_Element_Sink = Gst::ElementFactory::create_element("fakesink");
   }
   catch(std::runtime_error& error)
   {

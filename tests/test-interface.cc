@@ -27,7 +27,7 @@ int main (int argc, char* argv[])
 {
   Gst::init(argc, argv);
 
-  Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create("filesrc", "source");
+  Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("filesrc", "source");
 
   if (element)
     std::cout << "Successfully created gst element '" <<

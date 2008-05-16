@@ -27,7 +27,7 @@ int main (int argc, char* argv[])
   Gst::init(argc, argv);
 
   Glib::RefPtr<Gst::Pipeline> pipeline = Gst::Pipeline::create("my-pipeline");
-  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create("fakesrc", "source");
+  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("fakesrc", "source");
 
   pipeline->add(source);
 

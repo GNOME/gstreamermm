@@ -62,15 +62,15 @@ protected:
     virtual bool on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
                             const Glib::RefPtr<Gst::MiniObject>& buffer);
 
-    virtual void on_play(void);
-    virtual void on_pause(void);
-    virtual void on_stop(void);
+    virtual void on_play();
+    virtual void on_pause();
+    virtual void on_stop();
     virtual bool on_scale_value_changed(Gtk::ScrollType type, double value);
-    virtual void on_rewind(void);
-    virtual void on_forward(void);
-    virtual void on_open(void);
+    virtual void on_rewind();
+    virtual void on_forward();
+    virtual void on_open();
 protected:
-    bool update_stream_progress(void);
+    bool update_stream_progress();
     void display_label_progress(gint64 pos, gint64 len);
 private:
     Glib::RefPtr<Gst::Pipeline> playbin;
