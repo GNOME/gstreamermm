@@ -63,7 +63,7 @@ bool on_timeout()
 }
 
 // This function is used to receive asynchronous messages in the main loop.
-bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus_not_used */, const Glib::RefPtr<Gst::Message>& message)
+bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<Gst::Message>& message)
 {
   switch (message->get_message_type()) {
     case Gst::MESSAGE_EOS:
@@ -115,12 +115,14 @@ bool on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad,
 
 int main(int argc, char* argv[])
 {
-  // check input arguments
+  // Check input arguments:
   if (argc < 2)
   {
     std::cout << "Usage: " << argv[0] << " <Ogg/Vorbis filename>" << std::endl;
     return -1;
   }
+
+  const std::string filename = argv[1];
 
   // Initialize Gstreamermm:
   Gst::init(argc, argv);
@@ -129,51 +131,56 @@ int main(int argc, char* argv[])
 
   // Create the pipeline:
   pipeline = Gst::Pipeline::create("audio-player");
-  std::cout << "pipeline=" << pipeline << std::endl;
 
   // Create the elements:
 
   // filsrc reads the file from disk:
   Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("filesrc");
-  std::cout << "source=" << source << std::endl;
+  if(!source)
+    std::cerr << "filesrc element could not be created." << std::endl;
 
   // oggdemux parses the ogg streams into elementary streams (audio and video):
   Glib::RefPtr<Gst::Element> parser = Gst::ElementFactory::create_element("oggdemux");
-  std::cout << "parser=" << parser << std::endl;
+  if(!parser)
+    std::cerr << "oggdemux element could not be created." << std::endl;
 
   // vorbisdec decodes a vorbis (audio) stream:
-  decoder = Gst::ElementFactory::create_element("vorbisdec", "vorbis-decoder");
-  std::cout << "decoder=" << decoder << std::endl;
+  decoder = Gst::ElementFactory::create_element("vorbisdec");
+  if(!decoder)
+    std::cerr << "vorbisdec element could not be created." << std::endl;
 
   // audioconvert converts raw audio to a format which can be used by the next element
   Glib::RefPtr<Gst::Element> conv = Gst::ElementFactory::create_element("audioconvert");
-  std::cout << "conv=" << conv << std::endl;
+  if(!conv)
+    std::cerr << "audioconvert element could not be created." << std::endl;
 
   // Outputs sound to an ALSA audio device
   Glib::RefPtr<Gst::Element> sink = Gst::ElementFactory::create_element("alsasink");
-  std::cout << "sink=" << sink << std::endl;
+  if(!sink)
+    std::cerr << "alsasink element could not be created." << std::endl;
 
+  //Check that the elements were created:
   if (!pipeline || !source || !parser || !decoder || !conv || !sink)
   {
     std::cerr << "One element could not be created" << std::endl;
     return -1;
   }
 
-  data_probe_id = sink->get_pad("sink")->add_data_probe(
-    sigc::ptr_fun(&on_sink_pad_have_data));
-  std::cout << "sink data probe id = " << data_probe_id << std::endl;
+  Glib::RefPtr<Gst::Pad> pad = sink->get_pad("sink");
+  if(pad)
+    data_probe_id = pad->add_data_probe( sigc::ptr_fun(&on_sink_pad_have_data) );
+  //std::cout << "sink data probe id = " << data_probe_id << std::endl;
 
 
-  // Set filename property on the file source. Also add a message handler:
-  source->set_property("location", std::string(argv[1]));
+  // Set the filename property on the file source.
+  source->set_property("location", filename);
 
-  // get the bus from the pipeline
+  // Get the bus from the pipeline, 
+  // and add a bus watch to the default main context with the default priority:
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
-
-  // Add a bus watch to the default main context with the default priority.
   bus->add_watch( sigc::ptr_fun(&on_bus_message) );
 
-  // Put all elements in a pipeline:
+  // Put all the elements in a pipeline, linked to each other:
   try
   {
     pipeline->add(source)->add(parser)->add(decoder)->add(conv)->add(sink);
@@ -185,6 +192,7 @@ int main(int argc, char* argv[])
   }
 
   // Link together:
+  // TODO: Why isn't this done during add()?:
   source->link(parser);
 
   // We cannot link the parser and decoder yet, 
@@ -198,7 +206,7 @@ int main(int argc, char* argv[])
   // interval to regularly print the position of the stream
   Glib::signal_timeout().connect(sigc::ptr_fun(&on_timeout), 200);
 
-  // Now set to playing and iterate: TODO: What is iterated? Is the comment wrong?
+  // Now set to playing and start the main loop:
   std::cout << "Setting to PLAYING." << std::endl;
   pipeline->set_state(Gst::STATE_PLAYING);
   std::cout << "Running." << std::endl;

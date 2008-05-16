@@ -34,39 +34,40 @@
 class PlayerWindow : public Gtk::Window
 {
 public:
-    PlayerWindow(Glib::RefPtr<Gst::Element> sourceElement,
-                 Glib::RefPtr<Gst::Pipeline> mainPipeline);
-    ~PlayerWindow();
+  PlayerWindow(const Glib::RefPtr<Gst::Element>& sourceElement, const Glib::RefPtr<Gst::Pipeline>& mainPipeline);
+  virtual ~PlayerWindow();
+
 protected:
-    Gtk::VBox vBox;
-    Gtk::HButtonBox buttonBox;
-    Gtk::Label progressLabel;
-    Gtk::HScale progressScale;
-    Gtk::Button playButton;
-    Gtk::Button pauseButton;
-    Gtk::Button stopButton;
-    Gtk::Button rewindButton;
-    Gtk::Button forwardButton;
-    Gtk::Button openButton;
-protected:
-    virtual bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus,
-                            const Glib::RefPtr<Gst::Message>& message);
-    virtual void on_play();
-    virtual void on_pause();
-    virtual void on_stop();
-    virtual bool on_scale_value_changed(Gtk::ScrollType type, double value);
-    virtual void on_rewind();
-    virtual void on_forward();
-    virtual void on_open();
-protected:
-    bool update_stream_progress();
-    void display_label_progress(gint64 pos, gint64 len);
-private:
-    Glib::RefPtr<Gst::Element> sourceElement;
-    Glib::RefPtr<Gst::Pipeline> mainPipeline;
-    sigc::connection progressConnection;
-    unsigned int watch_id;
-    gint64 duration;
+
+  //Signal handlers:
+  bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
+  void on_play();
+  void on_pause();
+  void on_stop();
+  bool on_scale_value_changed(Gtk::ScrollType type, double value);
+  void on_rewind();
+  void on_forward();
+  void on_open();
+
+  bool update_stream_progress();
+  void display_label_progress(gint64 pos, gint64 len);
+
+  Gtk::VBox m_vbox;
+  Gtk::HButtonBox m_button_box;
+  Gtk::Label m_progress_label;
+  Gtk::HScale m_progress_scale;
+  Gtk::Button m_play_button;
+  Gtk::Button m_pause_button;
+  Gtk::Button m_stop_button;
+  Gtk::Button m_rewind_button;
+  Gtk::Button m_forward_button;
+  Gtk::Button m_open_button;
+
+  Glib::RefPtr<Gst::Element> m_source_element;
+  Glib::RefPtr<Gst::Pipeline> m_main_pipeline;
+  sigc::connection m_progress_connection;
+  unsigned int m_watch_id;
+  gint64 m_duration;
 };
 
 #endif /* _PLAYERWINDOW_H */

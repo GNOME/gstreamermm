@@ -25,38 +25,31 @@
 
 int main(int argc, char** argv)
 {
-  Glib::RefPtr<Gst::Pipeline> m_Pipeline;
-  Glib::RefPtr<Gst::Element> m_Element_Source, m_Element_Filter, m_Element_Sink;
+  Glib::RefPtr<Gst::Pipeline> pipeline;
+  Glib::RefPtr<Gst::Element> element_source, element_filter, element_sink;
 
-  // init Gstreamermm
+  // Initialize Gstreamermm:
   Gst::init(argc, argv);
 
-  // create pipeline
-  m_Pipeline = Gst::Pipeline::create("my-pipeline");
+  // Create pipeline:
+  pipeline = Gst::Pipeline::create("my-pipeline");
 
-  // create elements
+  // Create elements:
+  element_source = Gst::ElementFactory::create_element("fakesrc");
+  element_filter = Gst::ElementFactory::create_element("identity");
+  element_sink = Gst::ElementFactory::create_element("fakesink");
+
+  // We must add the elements to the pipeline before linking them:
+  pipeline->add(element_source)->add(element_filter)->add(element_sink);
+
+  // Link
   try
   {
-    m_Element_Source = Gst::ElementFactory::create_element("fakesrc");
-    m_Element_Filter = Gst::ElementFactory::create_element("identity");
-    m_Element_Sink = Gst::ElementFactory::create_element("fakesink");
+    element_source->link(element_filter)->link(element_sink);
   }
-  catch(std::runtime_error& error)
+  catch(const std::runtime_error& error)
   {
-    std::cout << error.what();
-  }
-
-  // we must add the elements to the pipeline before linking them
-  m_Pipeline->add(m_Element_Source)->add(m_Element_Filter)->add(m_Element_Sink);
-
-  // link
-  try
-  {
-    m_Element_Source->link(m_Element_Filter)->link(m_Element_Sink);
-  }
-  catch(std::runtime_error& error)
-  {
-    std::cout << error.what();
+    std::cout << error.what() << std::endl;
   }
 
   return 0;

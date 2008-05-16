@@ -31,306 +31,307 @@
 #include <iomanip>
 #include "PlayerWindow.h"
 
-PlayerWindow::PlayerWindow(Glib::RefPtr<Gst::Element> sourceElement,
-                                Glib::RefPtr<Gst::Pipeline> mainPipeline) :
-vBox(false, 5),
-progressLabel("000:00:00.000000000 / 000:00:00.000000000"),
-playButton(Gtk::Stock::MEDIA_PLAY),
-pauseButton(Gtk::Stock::MEDIA_PAUSE),
-stopButton(Gtk::Stock::MEDIA_STOP),
-rewindButton(Gtk::Stock::MEDIA_REWIND),
-forwardButton(Gtk::Stock::MEDIA_FORWARD),
-openButton(Gtk::Stock::OPEN)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Element>& source_element, const Glib::RefPtr<Gst::Pipeline>& main_pipeline)
+: m_vbox(false, 5),
+  m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
+  m_play_button(Gtk::Stock::MEDIA_PLAY),
+  m_pause_button(Gtk::Stock::MEDIA_PAUSE),
+  m_stop_button(Gtk::Stock::MEDIA_STOP),
+  m_rewind_button(Gtk::Stock::MEDIA_REWIND),
+  m_forward_button(Gtk::Stock::MEDIA_FORWARD),
+  m_open_button(Gtk::Stock::OPEN)
 {
-    set_title("gstreamermm Ogg Player Example");
+  set_title("gstreamermm Ogg Player Example");
 
-    add(vBox);
-    vBox.pack_start(progressLabel);
-    vBox.pack_start(progressScale);
-    vBox.pack_start(buttonBox);
+  add(m_vbox);
+  m_vbox.pack_start(m_progress_label);
+  m_vbox.pack_start(m_progress_scale);
+  m_vbox.pack_start(m_button_box);
 
-    progressLabel.set_alignment(Gtk::ALIGN_CENTER);
+  m_progress_label.set_alignment(Gtk::ALIGN_CENTER);
 
-    progressScale.set_range(0, 1);
-    progressScale.set_draw_value(false);
-    progressScale.signal_change_value().connect(
-                sigc::mem_fun(*this, &PlayerWindow::on_scale_value_changed));
+  m_progress_scale.set_range(0, 1);
+  m_progress_scale.set_draw_value(false);
+  m_progress_scale.signal_change_value().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_scale_value_changed));
 
-    buttonBox.pack_start(playButton);
-    buttonBox.pack_start(pauseButton);
-    buttonBox.pack_start(stopButton);
-    buttonBox.pack_start(rewindButton);
-    buttonBox.pack_start(forwardButton);
-    buttonBox.pack_start(openButton);
+  m_button_box.pack_start(m_play_button);
+  m_button_box.pack_start(m_pause_button);
+  m_button_box.pack_start(m_stop_button);
+  m_button_box.pack_start(m_rewind_button);
+  m_button_box.pack_start(m_forward_button);
+  m_button_box.pack_start(m_open_button);
 
-    playButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_play));
-    pauseButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_pause));
-    stopButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_stop));
-    rewindButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_rewind));
-    forwardButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_forward));
-    openButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_open));
+  m_play_button.signal_clicked().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_play ));
+  m_pause_button.signal_clicked().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_pause) );
+  m_stop_button.signal_clicked().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_stop) );
+  m_rewind_button.signal_clicked().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_rewind) );
+  m_forward_button.signal_clicked().connect(
+    sigc::mem_fun(*this,  &PlayerWindow::on_forward) );
+  m_open_button.signal_clicked().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_open) );
 
-    // get the bus from the pipeline
-    Glib::RefPtr<Gst::Bus> bus = mainPipeline->get_bus();
+  // get the bus from the pipeline
+  Glib::RefPtr<Gst::Bus> bus = main_pipeline->get_bus();
 
-    // Add a bus watch to receive messages from pipeline's bus
-    watch_id = bus->add_watch(
-        sigc::mem_fun( *this, &PlayerWindow::on_bus_message) );
+  // Add a bus watch to receive messages from pipeline's bus
+  m_watch_id = bus->add_watch(
+    sigc::mem_fun( *this, &PlayerWindow::on_bus_message) );
 
-    progressScale.set_sensitive(false);
-    playButton.set_sensitive(false);
-    pauseButton.set_sensitive(false);
-    stopButton.set_sensitive(false);
-    rewindButton.set_sensitive(false);
-    forwardButton.set_sensitive(false);
+  m_progress_scale.set_sensitive(false);
+  m_play_button.set_sensitive(false);
+  m_pause_button.set_sensitive(false);
+  m_stop_button.set_sensitive(false);
+  m_rewind_button.set_sensitive(false);
+  m_forward_button.set_sensitive(false);
 
-    this->sourceElement = sourceElement;
-    this->mainPipeline = mainPipeline;
+  m_source_element = source_element;
+  m_main_pipeline = main_pipeline;
 
-    show_all_children();
-    pauseButton.hide();
+  show_all_children();
+  m_pause_button.hide();
 }
 
-// This function is used to receive asynchronous messages from mainPipeline's bus
-bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus_not_used */,
-					const Glib::RefPtr<Gst::Message>& message)
+// This function is used to receive asynchronous messages from main_pipeline's bus
+bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<Gst::Message>& message)
 {
-    switch (message->get_message_type())
+  switch (message->get_message_type())
+  {
+    case Gst::MESSAGE_EOS:
+      on_stop();
+      break;
+    case Gst::MESSAGE_ERROR:
     {
-        case Gst::MESSAGE_EOS:
-            on_stop();
-            break;
-        case Gst::MESSAGE_ERROR:
-        {
-            Glib::RefPtr<Gst::MessageError> msgError =
-                Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
-            if(msgError)
-            {
-                Glib::Error err;
-                std::string debug; //TODO: Maybe this should be an optional parameter.
-                msgError->parse(err, debug);
-                std::cerr << "Error: " << err.what() << std::endl;
-            }
-            else
-                std::cerr << "Error." << std::endl;
+      Glib::RefPtr<Gst::MessageError> msgError =
+        Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
+      if(msgError)
+      {
+        Glib::Error err;
+        std::string debug; //TODO: Maybe this should be an optional parameter.
+        msgError->parse(err, debug);
+        std::cerr << "Error: " << err.what() << std::endl;
+      }
+      else
+        std::cerr << "Error." << std::endl;
 
-            on_stop();
-            break;
-        }
-        default:
-        {
-        //std::cout << "debug: on_bus_message: unhandled message=" << G_OBJECT_TYPE_NAME(message->gobj()) << std::endl;
-        }
-        break;
+      on_stop();
+      break;
     }
+    default:
+    {
+    //std::cout << "debug: on_bus_message: unhandled message=" << G_OBJECT_TYPE_NAME(message->gobj()) << std::endl;
+    }
+    break;
+  }
 
-    return true;
+  return true;
 }
 
 void PlayerWindow::on_play()
 {
-    progressScale.set_sensitive(true);
-    playButton.set_sensitive(false);
-    pauseButton.set_sensitive(true);
-    stopButton.set_sensitive(true);
-    rewindButton.set_sensitive(true);
-    forwardButton.set_sensitive(true);
-    openButton.set_sensitive(false);
+  m_progress_scale.set_sensitive(true);
+  m_play_button.set_sensitive(false);
+  m_pause_button.set_sensitive(true);
+  m_stop_button.set_sensitive(true);
+  m_rewind_button.set_sensitive(true);
+  m_forward_button.set_sensitive(true);
+  m_open_button.set_sensitive(false);
 
-    playButton.hide();
-    pauseButton.show();
+  m_play_button.hide();
+  m_pause_button.show();
 
-	// Call update_stream_progress function at a 200ms
-	// interval to regularly update the position of the stream
-	progressConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
-                             &PlayerWindow::update_stream_progress), 200);
+  // Call update_stream_progress function at a 200ms
+  // interval to regularly update the position of the stream
+  m_progress_connection = Glib::signal_timeout().connect(
+    sigc::mem_fun(*this, &PlayerWindow::update_stream_progress), 200);
 
-    // set Gstmm pipeline to play mode
-	mainPipeline->set_state(Gst::STATE_PLAYING);
+  // set Gstmm pipeline to play mode
+  m_main_pipeline->set_state(Gst::STATE_PLAYING);
 }
  
 void PlayerWindow::on_pause()
 {
-    playButton.set_sensitive(true);
-    pauseButton.set_sensitive(false);
+  m_play_button.set_sensitive(true);
+  m_pause_button.set_sensitive(false);
 
-    pauseButton.hide();
-    playButton.show();
+  m_pause_button.hide();
+  m_play_button.show();
 
-    // disconnect progress callback
-    progressConnection.disconnect();
-    
-    // set Gstmm pipeline to pause mode
-	mainPipeline->set_state(Gst::STATE_PAUSED);
+  // disconnect progress callback
+  m_progress_connection.disconnect();
+  
+  // set Gstmm pipeline to pause mode
+  m_main_pipeline->set_state(Gst::STATE_PAUSED);
 }
  
 void PlayerWindow::on_stop()
 {
-    progressScale.set_sensitive(false);
-    playButton.set_sensitive(true);
-    pauseButton.set_sensitive(false);
-    stopButton.set_sensitive(false);
-    rewindButton.set_sensitive(false);
-    forwardButton.set_sensitive(false);
-    openButton.set_sensitive(true);
+  m_progress_scale.set_sensitive(false);
+  m_play_button.set_sensitive(true);
+  m_pause_button.set_sensitive(false);
+  m_stop_button.set_sensitive(false);
+  m_rewind_button.set_sensitive(false);
+  m_forward_button.set_sensitive(false);
+  m_open_button.set_sensitive(true);
 
-    pauseButton.hide();
-    playButton.show();
+  m_pause_button.hide();
+  m_play_button.show();
 
-    // disconnect progress callback
-    progressConnection.disconnect();
+  // disconnect progress callback
+  m_progress_connection.disconnect();
 
-    // set Gstmm pipeline to inactive mode
-	mainPipeline->set_state(Gst::STATE_NULL);
-    display_label_progress(0, duration);
-    progressScale.set_value(0);
+  // set Gstmm pipeline to inactive mode
+  m_main_pipeline->set_state(Gst::STATE_NULL);
+  display_label_progress(0, m_duration);
+  m_progress_scale.set_value(0);
 }
 
 bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
-    gint64 newPos = gint64(value * duration);
+  gint64 newPos = gint64(value * m_duration);
 
-    if (mainPipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
-    {
-        display_label_progress(newPos, duration);
-        return true;
-    }
-    else
-    {
-        std::cerr << "Could not seek!" << std::endl;
-        return false;
-    }
+  if(m_main_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+  {
+    display_label_progress(newPos, m_duration);
+    return true;
+  }
+  else
+  {
+    std::cerr << "Could not seek!" << std::endl;
+    return false;
+  }
 }
 
 void PlayerWindow::on_rewind()
 {
-    static const gint64 skipAmount = GST_SECOND * 2;
+  static const gint64 skipAmount = GST_SECOND * 2;
 
-    gint64 pos;
-    Gst::Format fmt = Gst::FORMAT_TIME;
+  gint64 pos = 0;
+  Gst::Format fmt = Gst::FORMAT_TIME;
 
-    if (mainPipeline->query_position(fmt, pos))
+  if(m_main_pipeline->query_position(fmt, pos))
+  {
+    gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
+
+    if(m_main_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
     {
-        gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
-
-        if (mainPipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos)) {
-            display_label_progress(newPos, duration);
-            progressScale.set_value(double(newPos) / duration);
-        }
-        else
-            std::cerr << "Could not seek!" << std::endl;
+      display_label_progress(newPos, m_duration);
+      m_progress_scale.set_value(double(newPos) / m_duration);
     }
+    else
+      std::cerr << "Could not seek!" << std::endl;
+  }
 }
 
 void PlayerWindow::on_forward()
 {
-    static const gint64 skipAmount = GST_SECOND * 3;
+  static const gint64 skipAmount = GST_SECOND * 3;
 
-    gint64 pos;
-    Gst::Format fmt = Gst::FORMAT_TIME;
+  gint64 pos = 0;
+  Gst::Format fmt = Gst::FORMAT_TIME;
 
-    Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
+  Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
-    if (mainPipeline->query(query))
+  if(m_main_pipeline->query(query))
+  {
+    Glib::RefPtr<Gst::QueryPosition> posQuery =
+      Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+
+    posQuery->parse(fmt, pos);
+
+    gint64 newPos = ((pos + skipAmount) < m_duration) ? (pos + skipAmount) :
+      m_duration;
+
+    Glib::RefPtr<Gst::Event> event = Gst::EventSeek::create(1.0, fmt,
+      Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, newPos,
+      Gst::SEEK_TYPE_NONE, -1);
+
+    Glib::RefPtr<Gst::EventSeek> seekEvent =
+      Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
+
+    if(m_main_pipeline->send_event(seekEvent))
     {
-        Glib::RefPtr<Gst::QueryPosition> posQuery =
-            Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
-
-        posQuery->parse(fmt, pos);
-
-        gint64 newPos = ((pos + skipAmount) < duration) ? (pos + skipAmount) :
-            duration;
-
-        Glib::RefPtr<Gst::Event> event = Gst::EventSeek::create(1.0, fmt,
-                Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, newPos,
-                Gst::SEEK_TYPE_NONE, -1);
-
-        Glib::RefPtr<Gst::EventSeek> seekEvent =
-            Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
-
-        if (mainPipeline->send_event(seekEvent))
-        {
-            progressScale.set_value(double(newPos) / duration);
-            display_label_progress(newPos, duration);
-        }
-        else
-            std::cerr << "Could not seek!" << std::endl;
+      m_progress_scale.set_value(double(newPos) / m_duration);
+      display_label_progress(newPos, m_duration);
     }
+    else
+      std::cerr << "Could not seek!" << std::endl;
+  }
 }
 
 void PlayerWindow::on_open()
 {
-    static Glib::ustring workingDir = Glib::get_home_dir();
-    
-    Gtk::FileChooserDialog chooser(*this,
-                        "Select ogg file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  static Glib::ustring workingDir = Glib::get_home_dir();
+  
+  Gtk::FileChooserDialog chooser(*this,
+            "Select ogg file", Gtk::FILE_CHOOSER_ACTION_OPEN);
 
-    Gtk::FileFilter filter;
-    filter.add_mime_type("application/ogg");
-    filter.set_name("Ogg files");
+  Gtk::FileFilter filter;
+  filter.add_mime_type("application/ogg");
+  filter.set_name("Ogg files");
 
-    chooser.set_filter(filter);
+  chooser.set_filter(filter);
 
-    chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    
-    chooser.set_current_folder(workingDir);
-    
-    int response = chooser.run();
-    
-    if (response == Gtk::RESPONSE_OK) {
-        workingDir = chooser.get_current_folder();
+  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+  
+  chooser.set_current_folder(workingDir);
+  
+  const int response = chooser.run();
+  if(response == Gtk::RESPONSE_OK)
+  {
+    workingDir = chooser.get_current_folder();
 
-        // Set filename property on the file source. Also add a message handler:
-        sourceElement->set_property("location", chooser.get_filename());
-        set_title(Glib::filename_display_basename(chooser.get_filename()));
+    // Set filename property on the file source. Also add a message handler:
+    m_source_element->set_property("location", chooser.get_filename());
+    set_title(Glib::filename_display_basename(chooser.get_filename()));
 
-        playButton.set_sensitive(true);
-        display_label_progress(0, 0);
-    }
+    m_play_button.set_sensitive(true);
+    display_label_progress(0, 0);
+  }
 }
 
 bool PlayerWindow::update_stream_progress()
 {
-    Gst::Format fmt = Gst::FORMAT_TIME;
-    gint64 pos = 0;
+  Gst::Format fmt = Gst::FORMAT_TIME;
+  gint64 pos = 0;
 
-    if (mainPipeline->query_position(fmt, pos)
-    && mainPipeline->query_duration(fmt, duration)) {
-        progressScale.set_value(double(pos) / duration);
-        display_label_progress(pos, duration);
-    }
+  if(m_main_pipeline->query_position(fmt, pos)
+    && m_main_pipeline->query_duration(fmt, m_duration))
+  {
+    m_progress_scale.set_value(double(pos) / m_duration);
+    display_label_progress(pos, m_duration);
+  }
 
    return true;
 }
 
 void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
 {
-    std::ostringstream locationStream (std::ostringstream::out);
-    std::ostringstream durationStream (std::ostringstream::out);
+  std::ostringstream locationStream(std::ostringstream::out);
+  std::ostringstream durationStream(std::ostringstream::out);
 
-    locationStream << std::right << std::setfill('0') << 
-        std::setw(3) << Gst::get_hours(pos) << ":" <<
-        std::setw(2) << Gst::get_minutes(pos) << ":" <<
-        std::setw(2) << Gst::get_seconds(pos) << "." <<
-        std::setw(9) << std::left << Gst::get_fractional_seconds(pos);
+  locationStream << std::right << std::setfill('0') << 
+    std::setw(3) << Gst::get_hours(pos) << ":" <<
+    std::setw(2) << Gst::get_minutes(pos) << ":" <<
+    std::setw(2) << Gst::get_seconds(pos) << "." <<
+    std::setw(9) << std::left << Gst::get_fractional_seconds(pos);
 
-    durationStream << std::right << std::setfill('0') <<
-        std::setw(3) << Gst::get_hours(len) << ":" <<
-        std::setw(2) << Gst::get_minutes(len) << ":" <<
-        std::setw(2) << Gst::get_seconds(len) << "." <<
-        std::setw(9) << std::left << Gst::get_fractional_seconds(len);
+  durationStream << std::right << std::setfill('0') <<
+    std::setw(3) << Gst::get_hours(len) << ":" <<
+    std::setw(2) << Gst::get_minutes(len) << ":" <<
+    std::setw(2) << Gst::get_seconds(len) << "." <<
+    std::setw(9) << std::left << Gst::get_fractional_seconds(len);
 
-    progressLabel.set_text(locationStream.str() + " / " + durationStream.str());
+  m_progress_label.set_text(locationStream.str() + " / " + durationStream.str());
 }
 
 PlayerWindow::~PlayerWindow()
 {
-  mainPipeline->get_bus()->remove_watch(watch_id);
+  m_main_pipeline->get_bus()->remove_watch(m_watch_id);
 }
+

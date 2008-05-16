@@ -35,50 +35,45 @@
 class PlayerWindow : public Gtk::Window
 {
 public:
-    PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin,
-            const Glib::RefPtr<Gst::Element>& videoSink);
+  PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& videoSink);
+  virtual ~PlayerWindow();
 
-    ~PlayerWindow();
 protected:
-    Gtk::VBox vBox;
-    Gtk::HButtonBox buttonBox;
-    Gtk::DrawingArea videoArea;
-    Gtk::Label progressLabel;
-    Gtk::HScale progressScale;
-    Gtk::Button playButton;
-    Gtk::Button pauseButton;
-    Gtk::Button stopButton;
-    Gtk::Button rewindButton;
-    Gtk::Button forwardButton;
-    Gtk::Button openButton;
+
+  //Signal handlers:
+  Gst::BusSyncReply on_bus_message_sync(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
+  bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
+  bool on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad, const Glib::RefPtr<Gst::MiniObject>& buffer);
+  void on_play();
+  void on_pause();
+  void on_stop();
+  bool on_scale_value_changed(Gtk::ScrollType type, double value);
+  void on_rewind();
+  void on_forward();
+  void on_open();
+
+  bool update_stream_progress();
+  void display_label_progress(gint64 pos, gint64 len);
+
 protected:
-    virtual Gst::BusSyncReply on_bus_message_sync(
-        const Glib::RefPtr<Gst::Bus>& bus,
-        const Glib::RefPtr<Gst::Message>& message);
+  Gtk::VBox m_vbox;
+  Gtk::HButtonBox m_button_box;
+  Gtk::DrawingArea m_video_area;
+  Gtk::Label m_progress_label;
+  Gtk::HScale m_progress_scale;
+  Gtk::Button m_play_button;
+  Gtk::Button m_pause_button;
+  Gtk::Button m_stop_button;
+  Gtk::Button m_rewind_button;
+  Gtk::Button m_forward_button;
+  Gtk::Button m_open_button;
 
-    virtual bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus,
-                            const Glib::RefPtr<Gst::Message>& message);
-
-    virtual bool on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
-                            const Glib::RefPtr<Gst::MiniObject>& buffer);
-
-    virtual void on_play();
-    virtual void on_pause();
-    virtual void on_stop();
-    virtual bool on_scale_value_changed(Gtk::ScrollType type, double value);
-    virtual void on_rewind();
-    virtual void on_forward();
-    virtual void on_open();
-protected:
-    bool update_stream_progress();
-    void display_label_progress(gint64 pos, gint64 len);
-private:
-    Glib::RefPtr<Gst::Pipeline> playbin;
-    Glib::RefPtr<Gst::Element> videoSink;
-    sigc::connection progressConnection;
-    guint watch_id;
-    gint64 duration;
-    gulong pad_probe_id;
+  Glib::RefPtr<Gst::Pipeline> m_play_bin;
+  Glib::RefPtr<Gst::Element> m_video_sink;
+  sigc::connection m_progress_connection;
+  guint m_watch_id;
+  gint64 m_duration;
+  gulong m_pad_probe_id;
 };
 
 #endif /* _PLAYERWINDOW_H */

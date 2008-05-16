@@ -242,7 +242,6 @@ AC_SUBST(GSTREAMERMM_EXAMPLES_LIBS)
 EXAMPLE_SUBDIR="examples"
 AC_CONFIG_FILES([
     examples/Makefile
-    examples/init/Makefile
     examples/optiongroup/Makefile
     examples/element_link/Makefile
     examples/ogg_player/Makefile

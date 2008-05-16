@@ -31,34 +31,34 @@
 int
 main (int argc, char *argv[])
 {
-    Gtk::Main kit(argc, argv);
-    Gst::init(argc, argv);
+  Gtk::Main kit(argc, argv);
+  Gst::init(argc, argv);
 
-    // Create the elements
+  // Create the elements
 
-    // Autoplays any media type.  Implements GstBase::XOverlay so accepts
-    // a window id in which to draw video
-    Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create_element("playbin");
-    Glib::RefPtr<Gst::Pipeline> playbinPipeline = Glib::RefPtr<Gst::Pipeline>::cast_dynamic(playbin);
+  // Autoplays any media type.  Implements GstBase::XOverlay so accepts
+  // a window id in which to draw video
+  Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create_element("playbin");
+  Glib::RefPtr<Gst::Pipeline> playbinPipeline = Glib::RefPtr<Gst::Pipeline>::cast_dynamic(playbin);
 
-    // Video sink where video (if any) will be drawn
-    Glib::RefPtr<Gst::Element> videoSink = Gst::ElementFactory::create_element("ximagesink");
+  // Video sink where video (if any) will be drawn
+  Glib::RefPtr<Gst::Element> videoSink = Gst::ElementFactory::create_element("ximagesink");
 
-    if (!playbinPipeline || !videoSink)
-    {
-        std::cerr << "One of the elements for media player could not be created." << std::endl;
-        return -1;
-    }
+  if (!playbinPipeline || !videoSink)
+  {
+    std::cerr << "One of the elements for media player could not be created." << std::endl;
+    return -1;
+  }
 
-    // set the playbin's video-sink property so that videoSink is used for video display
-    playbinPipeline->set_property("video-sink", videoSink);
+  // set the playbin's video-sink property so that videoSink is used for video display
+  playbinPipeline->set_property("video-sink", videoSink);
 
-    PlayerWindow mainWindow(playbinPipeline, videoSink);
+  PlayerWindow mainWindow(playbinPipeline, videoSink);
 
-    kit.run(mainWindow);
+  kit.run(mainWindow);
 
-    // Clean up nicely:
-    playbinPipeline->set_state(Gst::STATE_NULL);
+  // Clean up nicely:
+  playbinPipeline->set_state(Gst::STATE_NULL);
 
-    return 0;
+  return 0;
 }

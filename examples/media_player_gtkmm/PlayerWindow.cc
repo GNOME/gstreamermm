@@ -36,414 +36,383 @@
 #include <iomanip>
 #include "PlayerWindow.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin,
-        const Glib::RefPtr<Gst::Element>& videoSink) :
-vBox(false, 5),
-progressLabel("000:00:00.000000000 / 000:00:00.000000000"),
-playButton(Gtk::Stock::MEDIA_PLAY),
-pauseButton(Gtk::Stock::MEDIA_PAUSE),
-stopButton(Gtk::Stock::MEDIA_STOP),
-rewindButton(Gtk::Stock::MEDIA_REWIND),
-forwardButton(Gtk::Stock::MEDIA_FORWARD),
-openButton(Gtk::Stock::OPEN)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& videoSink)
+: m_vbox(false, 6),
+  m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
+  m_play_button(Gtk::Stock::MEDIA_PLAY),
+  m_pause_button(Gtk::Stock::MEDIA_PAUSE),
+  m_stop_button(Gtk::Stock::MEDIA_STOP),
+  m_rewind_button(Gtk::Stock::MEDIA_REWIND),
+  m_forward_button(Gtk::Stock::MEDIA_FORWARD),
+  m_open_button(Gtk::Stock::OPEN)
 {
-    set_title("gstreamermm Media Player Example");
+  set_title("gstreamermm Media Player Example");
 
-    add(vBox);
-    vBox.pack_start(videoArea, Gtk::PACK_EXPAND_WIDGET);
-    vBox.pack_start(progressLabel, Gtk::PACK_SHRINK);
-    vBox.pack_start(progressScale, Gtk::PACK_SHRINK);
-    vBox.pack_start(buttonBox, Gtk::PACK_SHRINK);
+  add(m_vbox);
+  m_vbox.pack_start(m_video_area, Gtk::PACK_EXPAND_WIDGET);
+  m_vbox.pack_start(m_progress_label, Gtk::PACK_SHRINK);
+  m_vbox.pack_start(m_progress_scale, Gtk::PACK_SHRINK);
+  m_vbox.pack_start(m_button_box, Gtk::PACK_SHRINK);
 
-    progressLabel.set_alignment(Gtk::ALIGN_CENTER);
+  m_progress_label.set_alignment(Gtk::ALIGN_CENTER);
 
-    progressScale.set_range(0, 1);
-    progressScale.set_draw_value(false);
-    progressScale.signal_change_value().connect(
-                sigc::mem_fun(*this, &PlayerWindow::on_scale_value_changed));
+  m_progress_scale.set_range(0, 1);
+  m_progress_scale.set_draw_value(false);
+  m_progress_scale.signal_change_value().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_scale_value_changed) );
 
-    buttonBox.pack_start(playButton);
-    buttonBox.pack_start(pauseButton);
-    buttonBox.pack_start(stopButton);
-    buttonBox.pack_start(rewindButton);
-    buttonBox.pack_start(forwardButton);
-    buttonBox.pack_start(openButton);
+  m_button_box.pack_start(m_play_button);
+  m_button_box.pack_start(m_pause_button);
+  m_button_box.pack_start(m_stop_button);
+  m_button_box.pack_start(m_rewind_button);
+  m_button_box.pack_start(m_forward_button);
+  m_button_box.pack_start(m_open_button);
 
-    playButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_play));
-    pauseButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_pause));
-    stopButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_stop));
-    rewindButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_rewind));
-    forwardButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_forward));
-    openButton.signal_clicked().connect(sigc::mem_fun(*this,
-                                          &PlayerWindow::on_open));
+  m_play_button.signal_clicked().connect(sigc::mem_fun(*this,
+                      &PlayerWindow::on_play));
+  m_pause_button.signal_clicked().connect(sigc::mem_fun(*this,
+                      &PlayerWindow::on_pause));
+  m_stop_button.signal_clicked().connect(sigc::mem_fun(*this,
+                      &PlayerWindow::on_stop));
+  m_rewind_button.signal_clicked().connect(sigc::mem_fun(*this,
+                      &PlayerWindow::on_rewind));
+  m_forward_button.signal_clicked().connect(sigc::mem_fun(*this,
+                      &PlayerWindow::on_forward));
+  m_open_button.signal_clicked().connect(sigc::mem_fun(*this,
+                      &PlayerWindow::on_open));
 
-    // get the bus from the pipeline
-    Glib::RefPtr<Gst::Bus> bus = playbin->get_bus();
+  // get the bus from the pipeline
+  Glib::RefPtr<Gst::Bus> bus = playbin->get_bus();
 
-    // Add a sync handler to receive synchronous messages from pipeline's
-    // bus (this is done so that videoArea can be set up for drawing at an
-    // exact appropriate time
-    bus->set_sync_handler(
-        sigc::mem_fun(*this, &PlayerWindow::on_bus_message_sync));
+  // Add a sync handler to receive synchronous messages from pipeline's
+  // bus (this is done so that m_video_area can be set up for drawing at an
+  // exact appropriate time
+  bus->set_sync_handler(
+    sigc::mem_fun(*this, &PlayerWindow::on_bus_message_sync));
 
-    // Add a bus watch to receive messages from pipeline's bus
-    watch_id = bus->add_watch(
-        sigc::mem_fun(*this, &PlayerWindow::on_bus_message) );
+  // Add a bus watch to receive messages from pipeline's bus
+  m_watch_id = bus->add_watch(
+    sigc::mem_fun(*this, &PlayerWindow::on_bus_message) );
 
-    progressScale.set_sensitive(false);
-    playButton.set_sensitive(false);
-    pauseButton.set_sensitive(false);
-    stopButton.set_sensitive(false);
-    rewindButton.set_sensitive(false);
-    forwardButton.set_sensitive(false);
+  m_progress_scale.set_sensitive(false);
+  m_play_button.set_sensitive(false);
+  m_pause_button.set_sensitive(false);
+  m_stop_button.set_sensitive(false);
+  m_rewind_button.set_sensitive(false);
+  m_forward_button.set_sensitive(false);
 
-    this->playbin = playbin;
-    this->videoSink = videoSink;
+  m_play_bin = playbin;
+  m_video_sink = videoSink;
 
-    show_all_children();
-    pauseButton.hide();
+  show_all_children();
+  m_pause_button.hide();
 }
 
 // This function is used to receive asynchronous messages from mainPipeline's bus
 Gst::BusSyncReply PlayerWindow::on_bus_message_sync(
-        const Glib::RefPtr<Gst::Bus>& /* bus_not_used */,
-        const Glib::RefPtr<Gst::Message>& message)
+    const Glib::RefPtr<Gst::Bus>& /* bus */,
+    const Glib::RefPtr<Gst::Message>& message)
 {
-    // ignore anything but 'prepare-xwindow-id' element messages
-    if (message->get_message_type() != Gst::MESSAGE_ELEMENT)
-        return Gst::BUS_PASS;
+  // ignore anything but 'prepare-xwindow-id' element messages
+  if(message->get_message_type() != Gst::MESSAGE_ELEMENT)
+    return Gst::BUS_PASS;
 
-    if (!message->get_structure()->has_name("prepare-xwindow-id"))
-       return Gst::BUS_PASS;
+  if(!message->get_structure()->has_name("prepare-xwindow-id"))
+     return Gst::BUS_PASS;
 
-    Glib::RefPtr<Gst::Element> element =
-            Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source());
+  Glib::RefPtr<Gst::Element> element =
+      Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source());
 
-    Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
-            Gst::Interface::cast <GstBase::XOverlay>(element);
+  Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
+      Gst::Interface::cast <GstBase::XOverlay>(element);
 
-    if (xoverlay)
-    {
-        gulong xWindowId = GDK_WINDOW_XID(videoArea.get_window()->gobj());
-        xoverlay->set_xwindow_id(xWindowId);
-    }
+  if(xoverlay)
+  {
+    const gulong xWindowId = GDK_WINDOW_XID(m_video_area.get_window()->gobj());
+    xoverlay->set_xwindow_id(xWindowId);
+  }
 
-    return Gst::BUS_DROP;
+  return Gst::BUS_DROP;
 }
 
-// This function is used to receive asynchronous messages from playbin's bus
-bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus_not_used */,
-					const Glib::RefPtr<Gst::Message>& message)
+// This function is used to receive asynchronous messages from play_bin's bus
+bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
+          const Glib::RefPtr<Gst::Message>& message)
 {
-    switch (message->get_message_type())
+  switch (message->get_message_type())
+  {
+    case Gst::MESSAGE_EOS:
     {
-        case Gst::MESSAGE_EOS:
-            on_stop();
-            break;
-        case Gst::MESSAGE_ERROR:
-        {
-            Glib::RefPtr<Gst::MessageError> msgError =
-                Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
-            if(msgError)
-            {
-                Glib::Error err;
-                std::string debug; //TODO: Maybe this should be an optional parameter.
-                msgError->parse(err, debug);
-                std::cerr << "Error: " << err.what() << std::endl;
-            }
-            else
-                std::cerr << "Error." << std::endl;
-{
-    switch (message->get_message_type())
+      on_stop();
+      break;
+    }
+    case Gst::MESSAGE_ERROR:
     {
-        case Gst::MESSAGE_EOS:
-            on_stop();
-            break;
-        case Gst::MESSAGE_ERROR:
-        {
-            Glib::RefPtr<Gst::MessageError> msgError =
-                Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
-            if(msgError)
-            {
-                Glib::Error err;
-                std::string debug; //TODO: Maybe this should be an optional parameter.
-                msgError->parse(err, debug);
-                std::cerr << "Error: " << err.what() << std::endl;
-            }
-            else
-                std::cerr << "Error." << std::endl;
+      Glib::RefPtr<Gst::MessageError> msgError = Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
+      if(msgError)
+      {
+        Glib::Error err;
+        std::string debug; //TODO: Maybe this should be an optional parameter.
+        msgError->parse(err, debug);
+        std::cerr << "Error: " << err.what() << std::endl;
+      }
+      else
+        std::cerr << "Error." << std::endl;
 
-            on_stop();
-            break;
-        }
-        default:
-        {
-        //std::cout << "debug: on_bus_message: unhandled message=" << G_OBJECT_TYPE_NAME(message->gobj()) << std::endl;
-        }
-        break;
+      on_stop();
+      break;
     }
-
-    return true;
-}
-            on_stop();
-            break;
-        }
-        default:
-        {
-        //std::cout << "debug: on_bus_message: unhandled message=" << G_OBJECT_TYPE_NAME(message->gobj()) << std::endl;
-        }
-        break;
+    default:
+    {
+      //std::cout << "debug: on_bus_message: unhandled message=" << G_OBJECT_TYPE_NAME(message->gobj()) << std::endl;
     }
+  }
 
-    return true;
+  return true;
 }
 
 bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
-        const Glib::RefPtr<Gst::MiniObject>& data)
+    const Glib::RefPtr<Gst::MiniObject>& data)
 {
-    Glib::RefPtr<Gst::Buffer> buffer = Glib::RefPtr<Gst::Buffer>::cast_dynamic(data);
+  Glib::RefPtr<Gst::Buffer> buffer = Glib::RefPtr<Gst::Buffer>::cast_dynamic(data);
 
-    if (buffer) {
-        Glib::Value<int> widthValue;
-        Glib::Value<int> heightValue;
+  if(buffer) {
+    Glib::Value<int> widthValue;
+    Glib::Value<int> heightValue;
 
-        Glib::RefPtr<Gst::Caps> caps = buffer->get_caps();
-        caps->get_structure(0)->get_field("width", widthValue);
-        caps->get_structure(0)->get_field("height", heightValue);
+    Glib::RefPtr<Gst::Caps> caps = buffer->get_caps();
+    caps->get_structure(0)->get_field("width", widthValue);
+    caps->get_structure(0)->get_field("height", heightValue);
 
-        videoArea.set_size_request(widthValue.get(), heightValue.get());
-        resize(1, 1);       // Resize to minimum when first playing by making size
-        check_resize();     // smallest then resizing according to video new size
-    }
+    m_video_area.set_size_request(widthValue.get(), heightValue.get());
+    resize(1, 1);     // Resize to minimum when first playing by making size
+    check_resize();   // smallest then resizing according to video new size
+  }
 
-    pad->remove_buffer_probe(pad_probe_id);
-    pad_probe_id = 0; // Clear probe id to indicate that it has been removed
+  pad->remove_buffer_probe(m_pad_probe_id);
+  m_pad_probe_id = 0; // Clear probe id to indicate that it has been removed
 
-    return true; // Keep buffer in pipeline (do not throw away)
+  return true; // Keep buffer in pipeline (do not throw away)
 }
 
 void PlayerWindow::on_play()
 {
-    progressScale.set_sensitive(true);
-    playButton.set_sensitive(false);
-    pauseButton.set_sensitive(true);
-    stopButton.set_sensitive(true);
-    rewindButton.set_sensitive(true);
-    forwardButton.set_sensitive(true);
-    openButton.set_sensitive(false);
+  m_progress_scale.set_sensitive(true);
+  m_play_button.set_sensitive(false);
+  m_pause_button.set_sensitive(true);
+  m_stop_button.set_sensitive(true);
+  m_rewind_button.set_sensitive(true);
+  m_forward_button.set_sensitive(true);
+  m_open_button.set_sensitive(false);
 
-    playButton.hide();
-    pauseButton.show();
+  m_play_button.hide();
+  m_pause_button.show();
 
-	// Call update_stream_progress function at a 200ms
-	// interval to regularly update the position of the stream
-	progressConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
-                             &PlayerWindow::update_stream_progress), 200);
+  // Call update_stream_progress function at a 200ms
+  // interval to regularly update the position of the stream
+  m_progress_connection = Glib::signal_timeout().connect(
+    sigc::mem_fun(*this, &PlayerWindow::update_stream_progress), 200);
 
-    // set Gstmm pipeline to play mode
-	playbin->set_state(Gst::STATE_PLAYING);
+  // set Gstmm pipeline to play mode
+  m_play_bin->set_state(Gst::STATE_PLAYING);
 }
  
 void PlayerWindow::on_pause()
 {
-    playButton.set_sensitive(true);
-    pauseButton.set_sensitive(false);
+  m_play_button.set_sensitive(true);
+  m_pause_button.set_sensitive(false);
 
-    pauseButton.hide();
-    playButton.show();
+  m_pause_button.hide();
+  m_play_button.show();
 
-    // disconnect progress callback
-    progressConnection.disconnect();
-    
-    // set Gstmm pipeline to pause mode
-	playbin->set_state(Gst::STATE_PAUSED);
+  // disconnect progress callback
+  m_progress_connection.disconnect();
+  
+  // set Gstmm pipeline to pause mode
+  m_play_bin->set_state(Gst::STATE_PAUSED);
 }
  
 void PlayerWindow::on_stop()
 {
-    progressScale.set_sensitive(false);
-    playButton.set_sensitive(true);
-    pauseButton.set_sensitive(false);
-    stopButton.set_sensitive(false);
-    rewindButton.set_sensitive(false);
-    forwardButton.set_sensitive(false);
-    openButton.set_sensitive(true);
+  m_progress_scale.set_sensitive(false);
+  m_play_button.set_sensitive(true);
+  m_pause_button.set_sensitive(false);
+  m_stop_button.set_sensitive(false);
+  m_rewind_button.set_sensitive(false);
+  m_forward_button.set_sensitive(false);
+  m_open_button.set_sensitive(true);
 
-    pauseButton.hide();
-    playButton.show();
+  m_pause_button.hide();
+  m_play_button.show();
 
-    // disconnect progress callback
-    progressConnection.disconnect();
+  // disconnect progress callback
+  m_progress_connection.disconnect();
 
-    // set Gstmm pipeline to inactive mode
-	playbin->set_state(Gst::STATE_NULL);
+  // set Gstmm pipeline to inactive mode
+  m_play_bin->set_state(Gst::STATE_NULL);
 
-    // reset display
-    display_label_progress(0, duration);
-    progressScale.set_value(0);
+  // reset display
+  display_label_progress(0, m_duration);
+  m_progress_scale.set_value(0);
 
-    // Remove video sink pad buffer probe if after playing, probe id is
-    // not zero (means probe was not removed because media had no video and
-    // video_pad_got_buffer method never got a chance to remove probe)
-    if (pad_probe_id != 0)
-    {
-        videoSink->get_pad("sink")->remove_buffer_probe(pad_probe_id);
-        pad_probe_id  = 0;
-    }
+  // Remove video sink pad buffer probe if after playing, probe id is
+  // not zero (means probe was not removed because media had no video and
+  // video_pad_got_buffer method never got a chance to remove probe)
+  if(m_pad_probe_id != 0)
+  {
+    m_video_sink->get_pad("sink")->remove_buffer_probe(m_pad_probe_id);
+    m_pad_probe_id  = 0;
+  }
 }
 
 bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
-    gint64 newPos = gint64(value * duration);
+  gint64 newPos = gint64(value * m_duration);
 
-    if (playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
-    {
-        display_label_progress(newPos, duration);
-        return true;
-    }
-    else
-    {
-        std::cerr << "Could not seek!" << std::endl;
-        return false;
-    }
+  if(m_play_bin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+  {
+    display_label_progress(newPos, m_duration);
+    return true;
+  }
+  else
+  {
+    std::cerr << "Could not seek!" << std::endl;
+    return false;
+  }
 }
 
 void PlayerWindow::on_rewind()
 {
-    static const gint64 skipAmount = GST_SECOND * 2;
+  static const gint64 skipAmount = GST_SECOND * 2;
 
-    gint64 pos;
-    Gst::Format fmt = Gst::FORMAT_TIME;
+  gint64 pos = 0;
+  Gst::Format fmt = Gst::FORMAT_TIME;
 
-    if (playbin->query_position(fmt, pos))
-    {
-        gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
+  if(m_play_bin->query_position(fmt, pos))
+  {
+    gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
 
-        if (playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos)) {
-            progressScale.set_value(double(newPos) / duration);
-            display_label_progress(newPos, duration);
-        }
-        else
-            std::cerr << "Could not seek!" << std::endl;
+    if(m_play_bin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos)) {
+      m_progress_scale.set_value(double(newPos) / m_duration);
+      display_label_progress(newPos, m_duration);
     }
+    else
+      std::cerr << "Could not seek!" << std::endl;
+  }
 }
 
 void PlayerWindow::on_forward()
 {
-    static const gint64 skipAmount = GST_SECOND * 3;
+  static const gint64 skipAmount = GST_SECOND * 3;
 
-    gint64 pos;
-    Gst::Format fmt = Gst::FORMAT_TIME;
+  gint64 pos = 0;
+  Gst::Format fmt = Gst::FORMAT_TIME;
 
-    Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
+  Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
-    if (playbin->query(query))
+  if(m_play_bin->query(query))
+  {
+    Glib::RefPtr<Gst::QueryPosition> posQuery =
+      Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+
+    posQuery->parse(fmt, pos);
+
+    gint64 newPos = ((pos + skipAmount) < m_duration) ? (pos + skipAmount) :
+      m_duration;
+
+    Glib::RefPtr<Gst::Event> event = Gst::EventSeek::create(1.0, fmt,
+        Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, newPos,
+        Gst::SEEK_TYPE_NONE, -1);
+
+    Glib::RefPtr<Gst::EventSeek> seekEvent =
+      Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
+
+    if(m_play_bin->send_event(seekEvent))
     {
-        Glib::RefPtr<Gst::QueryPosition> posQuery =
-            Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
-
-        posQuery->parse(fmt, pos);
-
-        gint64 newPos = ((pos + skipAmount) < duration) ? (pos + skipAmount) :
-            duration;
-
-        Glib::RefPtr<Gst::Event> event = Gst::EventSeek::create(1.0, fmt,
-                Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, newPos,
-                Gst::SEEK_TYPE_NONE, -1);
-
-        Glib::RefPtr<Gst::EventSeek> seekEvent =
-            Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
-
-        if (playbin->send_event(seekEvent))
-        {
-            progressScale.set_value(double(newPos) / duration);
-            display_label_progress(newPos, duration);
-        }
-        else
-            std::cerr << "Could not seek!" << std::endl;
+      m_progress_scale.set_value(double(newPos) / m_duration);
+      display_label_progress(newPos, m_duration);
     }
+    else
+      std::cerr << "Could not seek!" << std::endl;
+  }
 }
 
 void PlayerWindow::on_open()
 {
-    static Glib::ustring workingDir = Glib::get_home_dir();
-    
-    Gtk::FileChooserDialog chooser(*this,
-                        "Select a media file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  static Glib::ustring workingDir = Glib::get_home_dir();
+  
+  Gtk::FileChooserDialog chooser(*this,
+            "Select a media file", Gtk::FILE_CHOOSER_ACTION_OPEN);
 
-    chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-    chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-    
-    chooser.set_current_folder(workingDir);
-    
-    int response = chooser.run();
-    
-    if (response == Gtk::RESPONSE_OK) {
-        workingDir = chooser.get_current_folder();
+  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+  
+  chooser.set_current_folder(workingDir);
+  
+  int response = chooser.run();
+  
+  if(response == Gtk::RESPONSE_OK) {
+    workingDir = chooser.get_current_folder();
 
-        // Set uri property on the playbin.
-        Glib::RefPtr<Gst::Element>::cast_dynamic(playbin)->
-                set_property("uri", chooser.get_uri());
+    // Set uri property on the playbin.
+    Glib::RefPtr<Gst::Element>::cast_dynamic(m_play_bin)->
+        set_property("uri", chooser.get_uri());
 
-        // Resize videoArea and window to minimum when opening a file
-        videoArea.set_size_request(0, 0);
-        resize(1, 1);
+    // Resize m_video_area and window to minimum when opening a file
+    m_video_area.set_size_request(0, 0);
+    resize(1, 1);
 
-        // Add buffer probe to video sink pad when file is opened which will
-        // be removed after first buffer is received in on_video_pad_got_buffer
-        // method (if there's video).  When first buffer arrives, video
-        // size can be extracted.  If there's no video, probe will be
-        // removed when media stops in on_stop method
-        pad_probe_id = videoSink->get_pad("sink")->add_buffer_probe(
-            sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
+    // Add buffer probe to video sink pad when file is opened which will
+    // be removed after first buffer is received in on_video_pad_got_buffer
+    // method (if there's video).  When first buffer arrives, video
+    // size can be extracted.  If there's no video, probe will be
+    // removed when media stops in on_stop method
+    m_pad_probe_id = m_video_sink->get_pad("sink")->add_buffer_probe(
+      sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
 
-        set_title(Glib::filename_display_basename(chooser.get_filename()));
+    set_title(Glib::filename_display_basename(chooser.get_filename()));
 
-        playButton.set_sensitive(true);
-        display_label_progress(0, 0);
-    }
+    m_play_button.set_sensitive(true);
+    display_label_progress(0, 0);
+  }
 }
 
 bool PlayerWindow::update_stream_progress()
 {
-    Gst::Format fmt = Gst::FORMAT_TIME;
-    gint64 pos = 0;
+  Gst::Format fmt = Gst::FORMAT_TIME;
+  gint64 pos = 0;
 
-    if (playbin->query_position(fmt, pos)
-    && playbin->query_duration(fmt, duration)) {
-        progressScale.set_value(double(pos) / duration);
-        display_label_progress(pos, duration);
-    }
+  if(m_play_bin->query_position(fmt, pos)
+    && m_play_bin->query_duration(fmt, m_duration))
+  {
+    m_progress_scale.set_value(double(pos) / m_duration);
+    display_label_progress(pos, m_duration);
+  }
 
    return true;
 }
 
 void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
 {
-    std::ostringstream locationStream (std::ostringstream::out);
-    std::ostringstream durationStream (std::ostringstream::out);
+  std::ostringstream locationStream (std::ostringstream::out);
+  std::ostringstream durationStream (std::ostringstream::out);
 
-    locationStream << std::right << std::setfill('0') << 
-        std::setw(3) << Gst::get_hours(pos) << ":" <<
-        std::setw(2) << Gst::get_minutes(pos) << ":" <<
-        std::setw(2) << Gst::get_seconds(pos) << "." <<
-        std::setw(9) << std::left << Gst::get_fractional_seconds(pos);
+  locationStream << std::right << std::setfill('0') << 
+    std::setw(3) << Gst::get_hours(pos) << ":" <<
+    std::setw(2) << Gst::get_minutes(pos) << ":" <<
+    std::setw(2) << Gst::get_seconds(pos) << "." <<
+    std::setw(9) << std::left << Gst::get_fractional_seconds(pos);
 
-    durationStream << std::right << std::setfill('0') <<
-        std::setw(3) << Gst::get_hours(len) << ":" <<
-        std::setw(2) << Gst::get_minutes(len) << ":" <<
-        std::setw(2) << Gst::get_seconds(len) << "." <<
-        std::setw(9) << std::left << Gst::get_fractional_seconds(len);
+  durationStream << std::right << std::setfill('0') <<
+    std::setw(3) << Gst::get_hours(len) << ":" <<
+    std::setw(2) << Gst::get_minutes(len) << ":" <<
+    std::setw(2) << Gst::get_seconds(len) << "." <<
+    std::setw(9) << std::left << Gst::get_fractional_seconds(len);
 
-    progressLabel.set_text(locationStream.str() + " / " + durationStream.str());
+  m_progress_label.set_text(locationStream.str() + " / " + durationStream.str());
 }
 
 PlayerWindow::~PlayerWindow()
 {
-  playbin->get_bus()->remove_watch(watch_id);
+  m_play_bin->get_bus()->remove_watch(m_watch_id);
 }
