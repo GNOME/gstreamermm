@@ -36,7 +36,9 @@ int main (int argc, char* argv[])
   std::cout << "query is a Gst::QueryPosition: " << (bool)query_position  << std::endl;
   std::cout << "query type name: '" << Gst::get_name(query->get_query_type()) << "'" << std::endl;
 
-  std::cout << "Query structure name: '" << query->get_structure()->get_name() << "'" << std::endl;
+  const Gst::Structure structure = query->get_structure();
+  if(structure)
+    std::cout << "Query structure name: '" << structure.get_name() << "'" << std::endl;
 
   return 0;
 }

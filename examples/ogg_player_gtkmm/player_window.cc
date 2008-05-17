@@ -75,12 +75,13 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Element>& source_element, con
   m_open_button.signal_clicked().connect(
     sigc::mem_fun(*this, &PlayerWindow::on_button_open) );
 
-  // get the bus from the pipeline
-  Glib::RefPtr<Gst::Bus> bus = main_pipeline->get_bus();
-
   // Add a bus watch to receive messages from pipeline's bus
-  m_watch_id = bus->add_watch(
-    sigc::mem_fun( *this, &PlayerWindow::on_bus_message) );
+  Glib::RefPtr<Gst::Bus> bus = main_pipeline->get_bus();
+  if(bus)
+  {
+    m_watch_id = bus->add_watch(
+      sigc::mem_fun( *this, &PlayerWindow::on_bus_message) );
+  }
 
   m_progress_scale.set_sensitive(false);
   m_play_button.set_sensitive(false);
@@ -99,13 +100,16 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Element>& source_element, con
 // This function is used to receive asynchronous messages from main_pipeline's bus
 bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<Gst::Message>& message)
 {
-  switch (message->get_message_type())
+  switch(message->get_message_type())
   {
     case Gst::MESSAGE_EOS:
+      //We reached the end of the file, so stop playing:
       on_button_stop();
       break;
     case Gst::MESSAGE_ERROR:
     {
+      //There was an error, so stop playing, 
+      //and output some information to stdout:
       Glib::RefPtr<Gst::MessageError> error_message =
         Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
       if(error_message)
@@ -144,11 +148,11 @@ void PlayerWindow::on_button_play()
   m_pause_button.show();
 
   // Call on_timeout function at a 200ms
-  // interval to regularly update the position of the stream
+  // interval to regularly update the position of the stream:
   m_progress_connection = Glib::signal_timeout().connect(
     sigc::mem_fun(*this, &PlayerWindow::on_timeout), 200);
 
-  // set Gstmm pipeline to play mode
+  // Set the pipeline to play mode:
   m_main_pipeline->set_state(Gst::STATE_PLAYING);
 }
  
@@ -160,10 +164,10 @@ void PlayerWindow::on_button_pause()
   m_pause_button.hide();
   m_play_button.show();
 
-  // disconnect progress callback
+  // Disconnect progress callback:
   m_progress_connection.disconnect();
   
-  // set Gstmm pipeline to pause mode
+  // Set the pipeline to pause mode:
   m_main_pipeline->set_state(Gst::STATE_PAUSED);
 }
  
@@ -180,10 +184,10 @@ void PlayerWindow::on_button_stop()
   m_pause_button.hide();
   m_play_button.show();
 
-  // disconnect progress callback
+  // Disconnect progress callback:
   m_progress_connection.disconnect();
 
-  // set Gstmm pipeline to inactive mode
+  // Set the pipeline to inactive mode:
   m_main_pipeline->set_state(Gst::STATE_NULL);
   display_label_progress(0, m_duration);
   m_progress_scale.set_value(0);
@@ -191,45 +195,45 @@ void PlayerWindow::on_button_stop()
 
 bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
-  gint64 newPos = gint64(value * m_duration);
+  const gint64 new_pos = gint64(value * m_duration);
 
-  if(m_main_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+  if(m_main_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, new_pos))
   {
-    display_label_progress(newPos, m_duration);
+    display_label_progress(new_pos, m_duration);
     return true;
   }
   else
   {
-    std::cerr << "Could not seek!" << std::endl;
+    std::cerr << "Could not seek." << std::endl;
     return false;
   }
 }
 
 void PlayerWindow::on_button_rewind()
 {
-  static const gint64 skipAmount = GST_SECOND * 2;
+  static const gint64 skip_amount = GST_SECOND * 2;
 
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;
 
   if(m_main_pipeline->query_position(fmt, pos))
   {
-    const gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
+    const gint64 new_pos = (pos > skip_amount) ? (pos - skip_amount) : 0;
 
-    if(m_main_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+    if(m_main_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, new_pos))
     {
-      display_label_progress(newPos, m_duration);
-      m_progress_scale.set_value(double(newPos) / m_duration);
+      display_label_progress(new_pos, m_duration);
+      m_progress_scale.set_value(double(new_pos) / m_duration);
     }
     else
-      std::cerr << "Could not seek!" << std::endl;
+      std::cerr << "Could not seek." << std::endl;
   }
 }
 
 void PlayerWindow::on_button_forward()
 {
   //TODO: Wrap GST_SECOND:
-  static const gint64 skipAmount = GST_SECOND * 3;
+  static const gint64 skip_amount = GST_SECOND * 3;
 
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;
@@ -243,11 +247,11 @@ void PlayerWindow::on_button_forward()
 
     posQuery->parse(fmt, pos);
 
-    gint64 newPos = ((pos + skipAmount) < m_duration) ? (pos + skipAmount) :
-      m_duration;
+    const gint64 new_pos =
+      ((pos + skip_amount) < m_duration) ? (pos + skip_amount) : m_duration;
 
     Glib::RefPtr<Gst::Event> event = Gst::EventSeek::create(1.0, fmt,
-      Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, newPos,
+      Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, new_pos,
       Gst::SEEK_TYPE_NONE, -1);
 
     Glib::RefPtr<Gst::EventSeek> seekEvent =
@@ -255,11 +259,11 @@ void PlayerWindow::on_button_forward()
 
     if(m_main_pipeline->send_event(seekEvent))
     {
-      m_progress_scale.set_value(double(newPos) / m_duration);
-      display_label_progress(newPos, m_duration);
+      m_progress_scale.set_value(double(new_pos) / m_duration);
+      display_label_progress(new_pos, m_duration);
     }
     else
-      std::cerr << "Could not seek!" << std::endl;
+      std::cerr << "Could not seek." << std::endl;
   }
 }
 
@@ -314,21 +318,21 @@ bool PlayerWindow::on_timeout()
 void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
 {
   std::ostringstream locationStream(std::ostringstream::out);
-  std::ostringstream durationStream(std::ostringstream::out);
-
   locationStream << std::right << std::setfill('0') << 
     std::setw(3) << Gst::get_hours(pos) << ":" <<
     std::setw(2) << Gst::get_minutes(pos) << ":" <<
     std::setw(2) << Gst::get_seconds(pos) << "." <<
     std::setw(9) << std::left << Gst::get_fractional_seconds(pos);
 
+  std::ostringstream durationStream(std::ostringstream::out);
   durationStream << std::right << std::setfill('0') <<
     std::setw(3) << Gst::get_hours(len) << ":" <<
     std::setw(2) << Gst::get_minutes(len) << ":" <<
     std::setw(2) << Gst::get_seconds(len) << "." <<
     std::setw(9) << std::left << Gst::get_fractional_seconds(len);
 
-  m_progress_label.set_text(locationStream.str() + " / " + durationStream.str());
+  m_progress_label.set_text(
+    locationStream.str() + " / " + durationStream.str() );
 }
 
 PlayerWindow::~PlayerWindow()

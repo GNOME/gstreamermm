@@ -54,14 +54,19 @@ int main (int argc, char* argv[])
 
   for (int i = 0; i < 2; i++) {
     Glib::Value<Glib::ustring> v;
-    const Gst::Structure* s = caps->get_structure(i);
-    s->get_field("message", v);
-    std::cout << s->get_name() << ": " << v.get() << std::endl;
+    const Gst::Structure s = caps->get_structure(i);
+    if(s)
+    {
+      s.get_field("message", v);
+      std::cout << s.get_name() << ": " << v.get() << std::endl;
+    }
   }
 
   caps->remove_structure(1);
 
-  std::cout << "Caps structure index 1 = " << caps->get_structure(1)->get_name() << std::endl;
+  const Gst::Structure structure = caps->get_structure(1);
+  if(structure)
+    std::cout << "Caps structure index 1 = " << structure.get_name() << std::endl;
 
   return 0;
 }

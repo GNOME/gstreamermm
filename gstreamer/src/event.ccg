@@ -37,14 +37,12 @@ Glib::QueryQuark get_quark(EventType t)
   return Glib::QueryQuark(gst_event_type_to_quark(GstEventType(t)));
 }
 
-const Structure* Event::get_structure()
+Structure Event::get_structure() const
 {
   static Structure structure;
 
-  GstStructure* gst_structure = const_cast<GstStructure*>(gst_event_get_structure(gobj()));
-  Structure temp(gst_structure, false /*don't copy*/, false /*don't destroy*/);
-  structure.swap(temp);
-  return &structure;
+  GstStructure* gst_structure = const_cast<GstStructure*>(gst_event_get_structure(const_cast<GstEvent*>(gobj())));
+  return Structure(gst_structure, true /* take_copy */);
 }
 
 bool Event::is_downstream() const

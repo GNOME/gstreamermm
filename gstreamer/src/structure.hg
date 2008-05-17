@@ -45,25 +45,14 @@ namespace Gst
  */
 class Structure
 {
-  _CLASS_BOXEDTYPE_NCOPY(Structure, GstStructure, NONE, gst_structure_copy, gst_structure_free)
-
+ _CLASS_BOXEDTYPE(Structure, GstStructure, NONE, gst_structure_copy, gst_structure_free)
 public:
-  /** For example,
-   * bool on_foreach(const Glib::QueryQuark& id, const Glib::ValueBase& value);
-   * The foreach function should return true if foreach operation should
-   * continue, false if operation should stop with false.
-   */
-  typedef sigc::slot<bool, const Glib::QueryQuark&, const Glib::ValueBase&> SlotForeach;
 
-  /** For example,
-   * bool on_map(const Glib::QueryQuark& id, Glib::ValueBase& value);
-   * The map function should return true if map operation should continue,
-   * false if operation should stop with false.
-   */
-  typedef sigc::slot<bool, const Glib::QueryQuark&, Glib::ValueBase&> SlotMap;
+  explicit Structure(const Glib::ustring& name);
 
-public:
-  Structure(const Glib::ustring& name);
+  /** Use this to discover if the Structure is a valid object.
+   */
+  operator bool() const;
 
   _WRAP_METHOD(Glib::ustring get_name() const, gst_structure_get_name)
   _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
@@ -92,6 +81,9 @@ public:
    */
   Structure& set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value);
 
+  //Only for use inside gstreamermm:
+  static void _set_gstructure_field(GstStructure* cstructure, const Glib::ustring& fieldname, const Glib::ValueBase& value);
+
   /** Removes the field with the given name. If the field with the given name
    * does not exist, the structure is unchanged. Returns this Gst::Structure
    * for continued setting convenience.
@@ -103,6 +95,13 @@ public:
 
   _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
   _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
+
+  /** For example,
+   * bool on_foreach(const Glib::QueryQuark& id, const Glib::ValueBase& value);
+   * The foreach function should return true if foreach operation should
+   * continue, false if operation should stop with false.
+   */
+  typedef sigc::slot<bool, const Glib::QueryQuark&, const Glib::ValueBase&> SlotForeach;
 
   /** Calls the provided slot once for each field in the Gst::Structure. The
    * slot must not modify the fields. Also see map_in_place().
@@ -229,6 +228,13 @@ public:
    */
   bool get_fraction(const Glib::ustring& fieldname, Gst::Fraction& fraction) const;
 
+  /** For example,
+   * bool on_map(const Glib::QueryQuark& id, Glib::ValueBase& value);
+   * The map function should return true if map operation should continue,
+   * false if operation should stop with false.
+   */
+  typedef sigc::slot<bool, const Glib::QueryQuark&, Glib::ValueBase&> SlotMap;
+
   /** Calls the provided slot once for each field in the Gst::Structure. In
    * contrast to foreach(), the function may modify but not delete the fields.
    * The structure must be mutable.
@@ -239,7 +245,7 @@ public:
    */
   bool map_in_place(const SlotMap& slot);
 
-  _WRAP_METHOD(Glib::ustring nth_field_name(guint index) const, gst_structure_nth_field_name)
+  _WRAP_METHOD(Glib::ustring get_nth_field_name(guint index) const, gst_structure_nth_field_name)
   _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
 
   static Structure create_from_string(const Glib::ustring& the_string);

@@ -117,7 +117,7 @@ Gst::BusSyncReply PlayerWindow::on_bus_message_sync(
   if(message->get_message_type() != Gst::MESSAGE_ELEMENT)
     return Gst::BUS_PASS;
 
-  if(!message->get_structure()->has_name("prepare-xwindow-id"))
+  if(!message->get_structure().has_name("prepare-xwindow-id"))
      return Gst::BUS_PASS;
 
   Glib::RefPtr<Gst::Element> element =
@@ -177,16 +177,24 @@ bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
   Glib::RefPtr<Gst::Buffer> buffer = Glib::RefPtr<Gst::Buffer>::cast_dynamic(data);
 
   if(buffer) {
-    Glib::Value<int> widthValue;
-    Glib::Value<int> heightValue;
+    Glib::Value<int> width_value;
+    Glib::Value<int> height_value;
 
     Glib::RefPtr<Gst::Caps> caps = buffer->get_caps();
-    caps->get_structure(0)->get_field("width", widthValue);
-    caps->get_structure(0)->get_field("height", heightValue);
 
-    m_video_area.set_size_request(widthValue.get(), heightValue.get());
-    resize(1, 1);     // Resize to minimum when first playing by making size
-    check_resize();   // smallest then resizing according to video new size
+    const Gst::Structure structure = caps->get_structure(0);
+    if(structure)
+    {
+      structure.get_field("width", width_value);
+      structure.get_field("height", height_value);
+    }
+
+    m_video_area.set_size_request(width_value.get(), height_value.get());
+
+    // Resize to minimum when first playing by making size 
+    // smallest then resizing according to video new size:
+    resize(1, 1);
+    check_resize();
   }
 
   pad->remove_buffer_probe(m_pad_probe_id);
@@ -277,7 +285,7 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
   }
   else
   {
-    std::cerr << "Could not seek!" << std::endl;
+    std::cerr << "Could not seek." << std::endl;
     return false;
   }
 }
@@ -298,7 +306,7 @@ void PlayerWindow::on_button_rewind()
       display_label_progress(newPos, m_duration);
     }
     else
-      std::cerr << "Could not seek!" << std::endl;
+      std::cerr << "Could not seek." << std::endl;
   }
 }
 
@@ -334,7 +342,7 @@ void PlayerWindow::on_button_forward()
       display_label_progress(newPos, m_duration);
     }
     else
-      std::cerr << "Could not seek!" << std::endl;
+      std::cerr << "Could not seek." << std::endl;
   }
 }
 

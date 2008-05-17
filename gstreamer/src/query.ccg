@@ -35,14 +35,10 @@ Glib::QueryQuark get_quark(QueryType t)
   return Glib::QueryQuark(gst_query_type_to_quark(GstQueryType(t)));
 }
 
-const Structure* Query::get_structure()
+Structure Query::get_structure() const
 {
-  static Structure structure;
-
-  GstStructure* gst_structure = const_cast<GstStructure*>(gst_query_get_structure(gobj()));
-  Structure temp(gst_structure, false /*don't copy*/, false /*don't destroy*/);
-  structure.swap(temp);
-  return &structure;
+  GstStructure* gst_structure = const_cast<GstStructure*>(gst_query_get_structure(const_cast<GstQuery*>(gobj())));
+  return Structure(gst_structure, true /* take_copy */);
 }
 
 bool get_details(QueryType type, QueryTypeDefinition &def)

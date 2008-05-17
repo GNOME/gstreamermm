@@ -1,5 +1,52 @@
 2008-05-17  Murray Cumming  <murrayc@murrayc.com>
 
+	* gstreamer/src/structure.ccg:
+	* gstreamer/src/structure.hg: Use _CLASS_BOXEDTYPE() instead of the 
+	custom _CLASS_BOXEDTYPE_NCOPY() macro, so we can just use this by 
+	copying it instead of having strange ownership rules.
+	Add operator bool() to check for invalid instances.
+
+	* gstreamer/src/caps.ccg:
+	* gstreamer/src/caps.hg: create(), append_structure(), 
+	merge_structure(): Take a const Structure& instead of taking ownership.
+	get_structure(): Return by value.
+	Remove set_simple_valist() because it does not seem useful.
+
+	* gstreamer/src/event.ccg:
+	* gstreamer/src/event.hg: get_structure():
+	* gstreamer/src/message.ccg:
+	* gstreamer/src/message.hg: get_structure():
+	* gstreamer/src/query.ccg:
+	* gstreamer/src/query.hg: get_structure(): Return by copy.
+
+	* examples/element_link/element_link.cc:
+	* examples/media_player_gtkmm/player_window.cc:
+	* examples/ogg_player/main.cc:
+	* examples/ogg_player_gtkmm/main.cc:
+	* examples/ogg_player_gtkmm/player_window.cc:
+	* tests/test-caps-structures.cc (main):
+	* tests/test-event-wrap.cc (main):
+	* tests/test-message-wrap.cc (main):
+	* tests/test-query-wrap.cc (main): Adapted to the changed API.
+
+2008-05-17  Murray Cumming  <murrayc@murrayc.com>
+
+	* gstreamer/src/bin.ccg:
+	* gstreamer/src/bin.hg: Make add() throw an exception, needed for 
+	chaining. The examples already try/catch this, assuming that it did 
+	already throw.
+	* gstreamer/src/element.ccg:
+	* gstreamer/src/element.hg: Document that link() throws an exception.
+	Include <stdexcept> so applications can catch runtime_error.
+
+	* examples/element_link/element_link.cc?
+	* examples/media_player_gtkmm/player_window.c:
+	* examples/ogg_player/main.cc:
+	* examples/ogg_player_gtkmm/player_window.cc: try/catch when using 
+	link(), because it throws an exception.
+
+2008-05-17  Murray Cumming  <murrayc@murrayc.com>
+
 	* gstreamer/src/message.ccg:
 	* gstreamer/src/message.hg: Implement MessageInfo::parse() and add a 
 	method overload without the debug parameter. 

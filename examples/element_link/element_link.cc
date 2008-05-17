@@ -20,7 +20,6 @@
  */
 
 #include <gstreamermm.h>
-#include <stdexcept>
 #include <iostream>
 
 int main(int argc, char** argv)
@@ -42,14 +41,14 @@ int main(int argc, char** argv)
   // We must add the elements to the pipeline before linking them:
   pipeline->add(element_source)->add(element_filter)->add(element_sink);
 
-  // Link
+  // Link the elements together:
   try
   {
     element_source->link(element_filter)->link(element_sink);
   }
   catch(const std::runtime_error& error)
   {
-    std::cout << error.what() << std::endl;
+    std::cout << "Exception while linking: " << error.what() << std::endl;
   }
 
   return 0;

@@ -58,6 +58,11 @@ Structure::Structure(const Glib::ustring& name)
   gobject_ = gst_structure_empty_new(name.c_str());
 }
 
+Structure::operator bool() const
+{
+  return gobject_ != 0;
+}
+
 void
 Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
 {
@@ -67,14 +72,21 @@ Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
 Structure&
 Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value)
 {
-  GType type = G_VALUE_TYPE(value.gobj());
+  _set_gstructure_field(gobj(), fieldname, value);
+
+  return *this;
+}
+
+void Structure::_set_gstructure_field(GstStructure* cstructure, const Glib::ustring& fieldname, const Glib::ValueBase& value)
+{
+  const GType type = G_VALUE_TYPE(value.gobj());
 
   if (type == Glib::Value<Fourcc>::value_type())
   {
      const Glib::Value<Fourcc>* fourcc =
         static_cast< const Glib::Value<Fourcc>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FOURCC,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_FOURCC,
         fourcc->get().get_fourcc(), NULL);
   }
   else if (type == Glib::Value<IntRange>::value_type())
@@ -82,7 +94,7 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      const Glib::Value<IntRange>* range =
         static_cast< const Glib::Value<IntRange>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_INT_RANGE,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_INT_RANGE,
         range->get().min, range->get().max, NULL);
   }
   else if (type == Glib::Value<DoubleRange>::value_type())
@@ -90,7 +102,7 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      const Glib::Value<DoubleRange>* range =
         static_cast< const Glib::Value<DoubleRange>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DOUBLE_RANGE,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_DOUBLE_RANGE,
         range->get().min, range->get().max, NULL);
   }
   else if (type == Glib::Value<Fraction>::value_type())
@@ -98,7 +110,7 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      const Glib::Value<Fraction>* fract =
         static_cast< const Glib::Value<Fraction>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_FRACTION,
         fract->get().num, fract->get().denom, NULL);
   }
   else if (type == Glib::Value<FractionRange>::value_type())
@@ -106,7 +118,7 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      const Glib::Value<FractionRange>* range =
         static_cast< const Glib::Value<FractionRange>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION_RANGE,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_FRACTION_RANGE,
          range->get().min.num, range->get().min.denom, range->get().max.num,
              range->get().max.denom, NULL);
   }
@@ -115,7 +127,7 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      const Glib::Value<Glib::Date>* date =
         static_cast< const Glib::Value<Glib::Date>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DATE,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_DATE,
          date->get().gobj(), NULL);
   }
   else if (type == Glib::Value<Structure>::value_type())
@@ -123,7 +135,7 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      const Glib::Value<Structure>* obj =
         static_cast< const Glib::Value<Structure>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_STRUCTURE,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_STRUCTURE,
         obj->get().gobj(), NULL);
   }
   else if (type == Glib::Value<MiniObject>::value_type())
@@ -131,13 +143,14 @@ Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& valu
      const Glib::Value<MiniObject>* obj =
         static_cast< const Glib::Value<MiniObject>* >(&value);
 
-     gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_MINI_OBJECT,
+     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_MINI_OBJECT,
         obj->get().gobj(), NULL);
   }
-  else 
-    gst_structure_set_value(gobj(), fieldname.c_str(), value.gobj());
-
-  return *this;
+  else
+  {
+    //TODO: Why not just use this instead of all the if/else stuff above? murrayc
+    gst_structure_set_value(cstructure, fieldname.c_str(), value.gobj());
+  }
 }
 
 Structure&

@@ -101,7 +101,15 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   // We can now link this pad with the audio decoder
   std::cout << "Dynamic pad created. Linking parser/decoder." << std::endl;
   Glib::RefPtr<Gst::Pad> sinkPad = decoder->get_pad("sink");
-  newPad->link(sinkPad);
+
+  try
+  {
+    newPad->link(sinkPad);
+  }
+  catch(const std::runtime_error& ex)
+  {
+    std::cerr << "Exception caught while linking: " << ex.what() << std::endl;
+  }
 }
 
 bool on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad,
@@ -181,7 +189,8 @@ int main(int argc, char* argv[])
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
   bus->add_watch( sigc::ptr_fun(&on_bus_message) );
 
-  // Put all the elements in a pipeline, linked to each other:
+
+  // Put all the elements in a pipeline:
   try
   {
     pipeline->add(source)->add(parser)->add(decoder)->add(conv)->add(sink);
@@ -192,22 +201,30 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  // Link together:
-  // TODO: Why isn't this done during add()?:
-  source->link(parser);
 
-  // We cannot link the parser and decoder yet, 
-  // because the parser uses dynamic pads. For that,
-  // we set a pad-added signal handler:
-  parser->signal_pad_added().connect( sigc::ptr_fun(&on_parser_pad_added) );
+  // Link the elements together:
+  try
+  {
+    source->link(parser);
 
-  decoder->link(conv)->link(sink);
+    // We cannot link the parser and decoder yet, 
+    // because the parser uses dynamic pads.
+    // So we do it later in a pad-added signal handler:
+    parser->signal_pad_added().connect( sigc::ptr_fun(&on_parser_pad_added) );
+
+    decoder->link(conv)->link(sink);
+  }
+  catch(const std::runtime_error& ex)
+  {
+    std::cout << "Exception while linking elements: " << ex.what() << std::endl;
+  }
+
 
   // Call on_timeout function at a 200ms
   // interval to regularly print the position of the stream
   Glib::signal_timeout().connect(sigc::ptr_fun(&on_timeout), 200);
 
-  // Now set to playing and start the main loop:
+  // Now set the whole pipeline to playing and start the main loop:
   std::cout << "Setting to PLAYING." << std::endl;
   pipeline->set_state(Gst::STATE_PLAYING);
   std::cout << "Running." << std::endl;

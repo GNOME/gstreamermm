@@ -40,7 +40,9 @@ int main (int argc, char* argv[])
   std::cout << "message is a Gst::MessageWarning: " << (bool)message_warning  << std::endl;
   std::cout << "message type name: '" << Gst::get_name(message->get_message_type()) << "'"  << std::endl;
 
-  std::cout << "Message structure name: '" << message->get_structure()->get_name() << "'" << std::endl;
+  const Gst::Structure structure = message->get_structure();
+  if(structure)
+    std::cout << "Message structure name: '" << structure.get_name() << "'" << std::endl;
 
   return 0;
 }

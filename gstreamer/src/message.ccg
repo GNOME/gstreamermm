@@ -37,15 +37,12 @@ Glib::QueryQuark get_quark(MessageType t)
   return Glib::QueryQuark(gst_message_type_to_quark(GstMessageType(t)));
 }
 
-const Structure*
-Message::get_structure()
+Structure Message::get_structure() const
 {
   static Structure structure;
 
-  GstStructure* gst_structure = const_cast<GstStructure*>(gst_message_get_structure(gobj()));
-  Structure temp(gst_structure, false /*don't copy*/, false /*don't destroy*/);
-  structure.swap(temp);
-  return &structure;
+  GstStructure* gst_structure = const_cast<GstStructure*>(gst_message_get_structure(const_cast<GstMessage*>(gobj())));
+  return Structure(gst_structure, true /* take_copy */);
 }
 
 MessageApplication::MessageApplication(GstMessage* castitem)
