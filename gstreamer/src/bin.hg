@@ -22,6 +22,7 @@
 #include <gstreamermm/element.h>
 #include <gstreamermm/childproxy.h>
 #include <gstreamermm/pad.h>
+#include <stdexcept> //Because add() throws std::runtime_error.
 
 _DEFS(gstreamermm,gst)
 
@@ -139,17 +140,19 @@ public:
    */
   _WRAP_CREATE(const Glib::ustring& name)
 
-  /** Adds the given element to the bin. Sets the element's parent, and thus
-   * takes ownership of the element. An element can only be added to one bin.
+  /** Adds the given element to the bin.
+   * This sets the element's parent, and thus takes ownership of the element.
+   * An element can only be added to one bin.
    *
-   * If the element's pads are linked to other pads, the pads will be unlinked
+   * If the element's pads are linked to other pads then the pads will be unlinked
    * before the element is added to the bin.
    *
    * MT safe.
    *
-   * @param element the Gst::Element to add
-   * @return this Gst::Bin if successful (for further adding if wanted), NULL
-   * otherwise
+   * @param element The Gst::Element to add.
+   * @return this Gst::Bin if successful, for chained calls to add().
+   *
+   * @throws std::runtime_error if the Bin does not want to accept the Element.
    */
   Glib::RefPtr<Bin> add(const Glib::RefPtr<Element>& element);
 

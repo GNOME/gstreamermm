@@ -26,6 +26,7 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/query.h>
+#include <stdexcept> //Because link() throws std::runtime_error
 
 _DEFS(gstreamermm,gst)
 
@@ -124,7 +125,10 @@ protected:
   _CTOR_DEFAULT
 
 public:
-  //TODO Add const version?
+  /** TODO: Documentation
+   *
+   * @throws std::runtime_error
+   */
   Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
 
   _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
