@@ -56,9 +56,8 @@ protected:
   void on_button_forward();
   void on_button_open();
   bool on_scale_value_changed(Gtk::ScrollType type, double value);
+  bool on_timeout();
 
-
-  bool update_stream_progress();
   void display_label_progress(gint64 pos, gint64 len);
 
 protected:

@@ -75,8 +75,8 @@ Glib::RefPtr<Message> MessageClockProvide::create(const Glib::RefPtr<Object>& sr
 
 void MessageClockProvide::parse(Glib::RefPtr<Clock>& clock, bool& ready)
 {
-  GstClock* cclock;
-  gboolean ready_;
+  GstClock* cclock = 0;
+  gboolean ready_ = FALSE;
   gst_message_parse_clock_provide(gobj(), &cclock, &ready_);
   clock = Glib::wrap(cclock);
   ready = ready_;
@@ -96,7 +96,7 @@ Glib::RefPtr<Message> MessageClockLost::create(const Glib::RefPtr<Object>& src, 
 
 void MessageClockLost::parse(Glib::RefPtr<Clock>& clock)
 {
-  GstClock* cclock;
+  GstClock* cclock = 0;
   gst_message_parse_clock_lost(gobj(), &cclock);
   clock = Glib::wrap(cclock, false);
 }
@@ -151,7 +151,7 @@ Glib::RefPtr<Message> MessageError::create(const Glib::RefPtr<Object>& src, Glib
 
 void MessageError::parse(Glib::Error& error, std::string& debug)
 {
-  GError *c_error = 0;
+  GError* c_error = 0;
   gchar* c_debug = 0;
   gst_message_parse_error(gobj(), &c_error, &c_debug);
 
@@ -170,7 +170,7 @@ void MessageError::parse(Glib::Error& error, std::string& debug)
 
 void MessageError::parse(Glib::Error& error)
 {
-  GError *c_error = 0;
+  GError* c_error = 0;
   gst_message_parse_error(gobj(), &c_error, NULL);
 
   if(c_error)
@@ -190,6 +190,38 @@ Glib::RefPtr<Message> MessageInfo::create(const Glib::RefPtr<Object>& src, Glib:
 {
   GstMessage* message = gst_message_new_info(src->gobj(), error.gobj(),(gchar*)(debug.c_str()));
   return Gst::Message::wrap(message, false);
+}
+
+
+void MessageInfo::parse(Glib::Error& error, std::string& debug)
+{
+  GError* c_error = 0;
+  gchar* c_debug = 0;
+  gst_message_parse_info(gobj(), &c_error, &c_debug);
+
+  if(c_debug)
+  {
+    debug = c_debug;
+    g_free(c_debug);
+  }
+
+  if(c_error)
+  {
+    error = Glib::Error(c_error); 
+    g_error_free(c_error);
+  }
+}
+
+void MessageInfo::parse(Glib::Error& error)
+{
+  GError* c_error = 0;
+  gst_message_parse_info(gobj(), &c_error, NULL);
+
+  if(c_error)
+  {
+    error = Glib::Error(c_error); 
+    g_error_free(c_error);
+  }
 }
 
 

@@ -209,10 +209,10 @@ void PlayerWindow::on_button_play()
   m_play_button.hide();
   m_pause_button.show();
 
-  // Call update_stream_progress function at a 200ms
+  // Call on_timeout function at a 200ms
   // interval to regularly update the position of the stream
   m_timeout_connection = Glib::signal_timeout().connect(
-    sigc::mem_fun(*this, &PlayerWindow::update_stream_progress), 200);
+    sigc::mem_fun(*this, &PlayerWindow::on_timeout), 200);
 
   // set the pipeline to play mode:
   m_play_bin->set_state(Gst::STATE_PLAYING);
@@ -268,7 +268,7 @@ void PlayerWindow::on_button_stop()
 
 bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
-  gint64 newPos = gint64(value * m_duration);
+  const gint64 newPos = gint64(value * m_duration);
 
   if(m_play_bin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
   {
@@ -377,7 +377,7 @@ void PlayerWindow::on_button_open()
   }
 }
 
-bool PlayerWindow::update_stream_progress()
+bool PlayerWindow::on_timeout()
 {
   Gst::Format fmt = Gst::FORMAT_TIME;
   gint64 pos = 0;

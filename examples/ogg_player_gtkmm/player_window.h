@@ -49,7 +49,7 @@ protected:
   void on_button_forward();
   void on_button_open();
 
-  bool update_stream_progress();
+  bool on_timeout();
   void display_label_progress(gint64 pos, gint64 len);
 
   Gtk::VBox m_vbox;

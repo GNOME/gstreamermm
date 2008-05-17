@@ -106,13 +106,12 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const
       break;
     case Gst::MESSAGE_ERROR:
     {
-      Glib::RefPtr<Gst::MessageError> msgError =
+      Glib::RefPtr<Gst::MessageError> error_message =
         Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
-      if(msgError)
+      if(error_message)
       {
         Glib::Error err;
-        std::string debug; //TODO: Maybe this should be an optional parameter.
-        msgError->parse(err, debug);
+        error_message->parse(err); //TODO: Make err the return type?
         std::cerr << "Error: " << err.what() << std::endl;
       }
       else
@@ -123,7 +122,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const
     }
     default:
     {
-    //std::cout << "debug: on_bus_message: unhandled message=" << G_OBJECT_TYPE_NAME(message->gobj()) << std::endl;
+      //std::cout << "debug: on_bus_message: unhandled message=" << G_OBJECT_TYPE_NAME(message->gobj()) << std::endl;
     }
     break;
   }
@@ -133,21 +132,21 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const
 
 void PlayerWindow::on_button_play()
 {
-  m_progress_scale.set_sensitive(true);
+  m_progress_scale.set_sensitive();
   m_play_button.set_sensitive(false);
-  m_pause_button.set_sensitive(true);
-  m_stop_button.set_sensitive(true);
-  m_rewind_button.set_sensitive(true);
-  m_forward_button.set_sensitive(true);
+  m_pause_button.set_sensitive();
+  m_stop_button.set_sensitive();
+  m_rewind_button.set_sensitive();
+  m_forward_button.set_sensitive();
   m_open_button.set_sensitive(false);
 
   m_play_button.hide();
   m_pause_button.show();
 
-  // Call update_stream_progress function at a 200ms
+  // Call on_timeout function at a 200ms
   // interval to regularly update the position of the stream
   m_progress_connection = Glib::signal_timeout().connect(
-    sigc::mem_fun(*this, &PlayerWindow::update_stream_progress), 200);
+    sigc::mem_fun(*this, &PlayerWindow::on_timeout), 200);
 
   // set Gstmm pipeline to play mode
   m_main_pipeline->set_state(Gst::STATE_PLAYING);
@@ -155,7 +154,7 @@ void PlayerWindow::on_button_play()
  
 void PlayerWindow::on_button_pause()
 {
-  m_play_button.set_sensitive(true);
+  m_play_button.set_sensitive();
   m_pause_button.set_sensitive(false);
 
   m_pause_button.hide();
@@ -171,12 +170,12 @@ void PlayerWindow::on_button_pause()
 void PlayerWindow::on_button_stop()
 {
   m_progress_scale.set_sensitive(false);
-  m_play_button.set_sensitive(true);
+  m_play_button.set_sensitive();
   m_pause_button.set_sensitive(false);
   m_stop_button.set_sensitive(false);
   m_rewind_button.set_sensitive(false);
   m_forward_button.set_sensitive(false);
-  m_open_button.set_sensitive(true);
+  m_open_button.set_sensitive();
 
   m_pause_button.hide();
   m_play_button.show();
@@ -215,7 +214,7 @@ void PlayerWindow::on_button_rewind()
 
   if(m_main_pipeline->query_position(fmt, pos))
   {
-    gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
+    const gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
 
     if(m_main_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
     {
@@ -229,6 +228,7 @@ void PlayerWindow::on_button_rewind()
 
 void PlayerWindow::on_button_forward()
 {
+  //TODO: Wrap GST_SECOND:
   static const gint64 skipAmount = GST_SECOND * 3;
 
   gint64 pos = 0;
@@ -265,38 +265,38 @@ void PlayerWindow::on_button_forward()
 
 void PlayerWindow::on_button_open()
 {
-  Glib::ustring workingDir = Glib::get_home_dir();
+  static Glib::ustring working_dir = Glib::get_home_dir();
   
+  //Offer a file chooser dialog to the user:
   Gtk::FileChooserDialog chooser(*this,
-            "Select ogg file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+    "Select ogg file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+  chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 
   Gtk::FileFilter filter;
   filter.add_mime_type("application/ogg");
   filter.set_name("Ogg files");
-
   chooser.set_filter(filter);
-
-  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-  chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
   
-  chooser.set_current_folder(workingDir);
+  chooser.set_current_folder(working_dir);
   
   const int response = chooser.run();
   if(response == Gtk::RESPONSE_OK)
   {
-    workingDir = chooser.get_current_folder();
+    working_dir = chooser.get_current_folder();
 
     // Set filename property on the file source. 
     // TODO: Create a FileSrc class that we can dynamic_cast<> to, so we can use property_location()?
-    m_source_element->set_property("location", chooser.get_filename());
-    set_title( Glib::filename_display_basename(chooser.get_filename()) );
+    const std::string filename = chooser.get_filename(); //TODO: Can this use a URI?
+    m_source_element->set_property("location", filename);
+    set_title( Glib::filename_display_basename(filename) );
 
-    m_play_button.set_sensitive(true);
+    m_play_button.set_sensitive();
     display_label_progress(0, 0);
   }
 }
 
-bool PlayerWindow::update_stream_progress()
+bool PlayerWindow::on_timeout()
 {
   Gst::Format fmt = Gst::FORMAT_TIME;
   gint64 pos = 0;
@@ -308,7 +308,7 @@ bool PlayerWindow::update_stream_progress()
     display_label_progress(pos, m_duration);
   }
 
-   return true;
+  return true;
 }
 
 void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
