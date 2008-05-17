@@ -41,13 +41,13 @@ protected:
 
   //Signal handlers:
   bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
-  void on_play();
-  void on_pause();
-  void on_stop();
+  void on_button_play();
+  void on_button_pause();
+  void on_button_stop();
   bool on_scale_value_changed(Gtk::ScrollType type, double value);
-  void on_rewind();
-  void on_forward();
-  void on_open();
+  void on_button_rewind();
+  void on_button_forward();
+  void on_button_open();
 
   bool update_stream_progress();
   void display_label_progress(gint64 pos, gint64 len);

@@ -36,7 +36,7 @@
 #include <iomanip>
 #include "player_window.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& videoSink)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& video_sink)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button(Gtk::Stock::MEDIA_PLAY),
@@ -69,28 +69,28 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Gli
   m_button_box.pack_start(m_open_button);
 
   m_play_button.signal_clicked().connect(sigc::mem_fun(*this,
-                      &PlayerWindow::on_play));
+                      &PlayerWindow::on_button_play));
   m_pause_button.signal_clicked().connect(sigc::mem_fun(*this,
-                      &PlayerWindow::on_pause));
+                      &PlayerWindow::on_button_pause));
   m_stop_button.signal_clicked().connect(sigc::mem_fun(*this,
-                      &PlayerWindow::on_stop));
+                      &PlayerWindow::on_button_stop));
   m_rewind_button.signal_clicked().connect(sigc::mem_fun(*this,
-                      &PlayerWindow::on_rewind));
+                      &PlayerWindow::on_button_rewind));
   m_forward_button.signal_clicked().connect(sigc::mem_fun(*this,
-                      &PlayerWindow::on_forward));
+                      &PlayerWindow::on_button_forward));
   m_open_button.signal_clicked().connect(sigc::mem_fun(*this,
-                      &PlayerWindow::on_open));
+                      &PlayerWindow::on_button_open));
 
-  // get the bus from the pipeline
+  // Get the bus from the pipeline:
   Glib::RefPtr<Gst::Bus> bus = playbin->get_bus();
 
-  // Add a sync handler to receive synchronous messages from pipeline's
+  // Add a sync handler to receive synchronous messages from the pipeline's
   // bus (this is done so that m_video_area can be set up for drawing at an
-  // exact appropriate time
+  // exact appropriate time):
   bus->set_sync_handler(
     sigc::mem_fun(*this, &PlayerWindow::on_bus_message_sync));
 
-  // Add a bus watch to receive messages from pipeline's bus
+  // Add a bus watch to receive messages from the pipeline's bus:
   m_watch_id = bus->add_watch(
     sigc::mem_fun(*this, &PlayerWindow::on_bus_message) );
 
@@ -102,7 +102,7 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Gli
   m_forward_button.set_sensitive(false);
 
   m_play_bin = playbin;
-  m_video_sink = videoSink;
+  m_video_sink = video_sink;
 
   show_all_children();
   m_pause_button.hide();
@@ -143,7 +143,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
   {
     case Gst::MESSAGE_EOS:
     {
-      on_stop();
+      on_button_stop();
       break;
     }
     case Gst::MESSAGE_ERROR:
@@ -159,7 +159,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
       else
         std::cerr << "Error." << std::endl;
 
-      on_stop();
+      on_button_stop();
       break;
     }
     default:
@@ -195,14 +195,15 @@ bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
   return true; // Keep buffer in pipeline (do not throw away)
 }
 
-void PlayerWindow::on_play()
+void PlayerWindow::on_button_play()
 {
-  m_progress_scale.set_sensitive(true);
+  //Change the UI appropriately:
+  m_progress_scale.set_sensitive();
   m_play_button.set_sensitive(false);
-  m_pause_button.set_sensitive(true);
-  m_stop_button.set_sensitive(true);
-  m_rewind_button.set_sensitive(true);
-  m_forward_button.set_sensitive(true);
+  m_pause_button.set_sensitive();
+  m_stop_button.set_sensitive();
+  m_rewind_button.set_sensitive();
+  m_forward_button.set_sensitive();
   m_open_button.set_sensitive(false);
 
   m_play_button.hide();
@@ -210,48 +211,48 @@ void PlayerWindow::on_play()
 
   // Call update_stream_progress function at a 200ms
   // interval to regularly update the position of the stream
-  m_progress_connection = Glib::signal_timeout().connect(
+  m_timeout_connection = Glib::signal_timeout().connect(
     sigc::mem_fun(*this, &PlayerWindow::update_stream_progress), 200);
 
-  // set Gstmm pipeline to play mode
+  // set the pipeline to play mode:
   m_play_bin->set_state(Gst::STATE_PLAYING);
 }
  
-void PlayerWindow::on_pause()
+void PlayerWindow::on_button_pause()
 {
-  m_play_button.set_sensitive(true);
+  m_play_button.set_sensitive();
   m_pause_button.set_sensitive(false);
 
   m_pause_button.hide();
   m_play_button.show();
 
-  // disconnect progress callback
-  m_progress_connection.disconnect();
+  // Disconnect the progress callback:
+  m_timeout_connection.disconnect();
   
-  // set Gstmm pipeline to pause mode
+  // Set the pipeline to pause mode:
   m_play_bin->set_state(Gst::STATE_PAUSED);
 }
  
-void PlayerWindow::on_stop()
+void PlayerWindow::on_button_stop()
 {
+  //Change the UI appropriately:
   m_progress_scale.set_sensitive(false);
-  m_play_button.set_sensitive(true);
+  m_play_button.set_sensitive();
   m_pause_button.set_sensitive(false);
   m_stop_button.set_sensitive(false);
   m_rewind_button.set_sensitive(false);
   m_forward_button.set_sensitive(false);
-  m_open_button.set_sensitive(true);
-
+  m_open_button.set_sensitive();
   m_pause_button.hide();
   m_play_button.show();
 
-  // disconnect progress callback
-  m_progress_connection.disconnect();
+  // Disconnect the progress signal handler:
+  m_timeout_connection.disconnect();
 
-  // set Gstmm pipeline to inactive mode
+  // Set the pipeline to inactive mode:
   m_play_bin->set_state(Gst::STATE_NULL);
 
-  // reset display
+  // Reset the display:
   display_label_progress(0, m_duration);
   m_progress_scale.set_value(0);
 
@@ -281,7 +282,7 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
   }
 }
 
-void PlayerWindow::on_rewind()
+void PlayerWindow::on_button_rewind()
 {
   static const gint64 skipAmount = GST_SECOND * 2;
 
@@ -301,7 +302,7 @@ void PlayerWindow::on_rewind()
   }
 }
 
-void PlayerWindow::on_forward()
+void PlayerWindow::on_button_forward()
 {
   static const gint64 skipAmount = GST_SECOND * 3;
 
@@ -337,26 +338,25 @@ void PlayerWindow::on_forward()
   }
 }
 
-void PlayerWindow::on_open()
+void PlayerWindow::on_button_open()
 {
-  static Glib::ustring workingDir = Glib::get_home_dir();
+  static Glib::ustring working_dir = Glib::get_home_dir();
   
   Gtk::FileChooserDialog chooser(*this,
-            "Select a media file", Gtk::FILE_CHOOSER_ACTION_OPEN);
-
+    "Select a media file", Gtk::FILE_CHOOSER_ACTION_OPEN);
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
   
-  chooser.set_current_folder(workingDir);
+  chooser.set_current_folder(working_dir);
   
-  int response = chooser.run();
-  
-  if(response == Gtk::RESPONSE_OK) {
-    workingDir = chooser.get_current_folder();
+  const int response = chooser.run();
+  if(response == Gtk::RESPONSE_OK)
+  {
+    working_dir = chooser.get_current_folder();
 
     // Set uri property on the playbin.
-    Glib::RefPtr<Gst::Element>::cast_dynamic(m_play_bin)->
-        set_property("uri", chooser.get_uri());
+    // TODO: Create a PlayBin class that we can dynamic_cast<> to, so we can use property_uri()?
+    m_play_bin->set_property("uri", chooser.get_uri());
 
     // Resize m_video_area and window to minimum when opening a file
     m_video_area.set_size_request(0, 0);
@@ -366,13 +366,13 @@ void PlayerWindow::on_open()
     // be removed after first buffer is received in on_video_pad_got_buffer
     // method (if there's video).  When first buffer arrives, video
     // size can be extracted.  If there's no video, probe will be
-    // removed when media stops in on_stop method
+    // removed when media stops in on_button_stop method
     m_pad_probe_id = m_video_sink->get_pad("sink")->add_buffer_probe(
       sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
 
-    set_title(Glib::filename_display_basename(chooser.get_filename()));
+    set_title( Glib::filename_display_basename(chooser.get_filename()) );
 
-    m_play_button.set_sensitive(true);
+    m_play_button.set_sensitive();
     display_label_progress(0, 0);
   }
 }

@@ -173,6 +173,7 @@ int main(int argc, char* argv[])
 
 
   // Set the filename property on the file source.
+  // TODO: Create a FileSrc class that we can dynamic_cast<> to, so we can use property_location()?
   source->set_property("location", filename);
 
   // Get the bus from the pipeline, 

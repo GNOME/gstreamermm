@@ -63,17 +63,17 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Element>& source_element, con
   m_button_box.pack_start(m_open_button);
 
   m_play_button.signal_clicked().connect(
-    sigc::mem_fun(*this, &PlayerWindow::on_play ));
+    sigc::mem_fun(*this, &PlayerWindow::on_button_play ));
   m_pause_button.signal_clicked().connect(
-    sigc::mem_fun(*this, &PlayerWindow::on_pause) );
+    sigc::mem_fun(*this, &PlayerWindow::on_button_pause) );
   m_stop_button.signal_clicked().connect(
-    sigc::mem_fun(*this, &PlayerWindow::on_stop) );
+    sigc::mem_fun(*this, &PlayerWindow::on_button_stop) );
   m_rewind_button.signal_clicked().connect(
-    sigc::mem_fun(*this, &PlayerWindow::on_rewind) );
+    sigc::mem_fun(*this, &PlayerWindow::on_button_rewind) );
   m_forward_button.signal_clicked().connect(
-    sigc::mem_fun(*this,  &PlayerWindow::on_forward) );
+    sigc::mem_fun(*this,  &PlayerWindow::on_button_forward) );
   m_open_button.signal_clicked().connect(
-    sigc::mem_fun(*this, &PlayerWindow::on_open) );
+    sigc::mem_fun(*this, &PlayerWindow::on_button_open) );
 
   // get the bus from the pipeline
   Glib::RefPtr<Gst::Bus> bus = main_pipeline->get_bus();
@@ -102,7 +102,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const
   switch (message->get_message_type())
   {
     case Gst::MESSAGE_EOS:
-      on_stop();
+      on_button_stop();
       break;
     case Gst::MESSAGE_ERROR:
     {
@@ -118,7 +118,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const
       else
         std::cerr << "Error." << std::endl;
 
-      on_stop();
+      on_button_stop();
       break;
     }
     default:
@@ -131,7 +131,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const
   return true;
 }
 
-void PlayerWindow::on_play()
+void PlayerWindow::on_button_play()
 {
   m_progress_scale.set_sensitive(true);
   m_play_button.set_sensitive(false);
@@ -153,7 +153,7 @@ void PlayerWindow::on_play()
   m_main_pipeline->set_state(Gst::STATE_PLAYING);
 }
  
-void PlayerWindow::on_pause()
+void PlayerWindow::on_button_pause()
 {
   m_play_button.set_sensitive(true);
   m_pause_button.set_sensitive(false);
@@ -168,7 +168,7 @@ void PlayerWindow::on_pause()
   m_main_pipeline->set_state(Gst::STATE_PAUSED);
 }
  
-void PlayerWindow::on_stop()
+void PlayerWindow::on_button_stop()
 {
   m_progress_scale.set_sensitive(false);
   m_play_button.set_sensitive(true);
@@ -206,7 +206,7 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
   }
 }
 
-void PlayerWindow::on_rewind()
+void PlayerWindow::on_button_rewind()
 {
   static const gint64 skipAmount = GST_SECOND * 2;
 
@@ -227,7 +227,7 @@ void PlayerWindow::on_rewind()
   }
 }
 
-void PlayerWindow::on_forward()
+void PlayerWindow::on_button_forward()
 {
   static const gint64 skipAmount = GST_SECOND * 3;
 
@@ -263,9 +263,9 @@ void PlayerWindow::on_forward()
   }
 }
 
-void PlayerWindow::on_open()
+void PlayerWindow::on_button_open()
 {
-  static Glib::ustring workingDir = Glib::get_home_dir();
+  Glib::ustring workingDir = Glib::get_home_dir();
   
   Gtk::FileChooserDialog chooser(*this,
             "Select ogg file", Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -286,9 +286,10 @@ void PlayerWindow::on_open()
   {
     workingDir = chooser.get_current_folder();
 
-    // Set filename property on the file source. Also add a message handler:
+    // Set filename property on the file source. 
+    // TODO: Create a FileSrc class that we can dynamic_cast<> to, so we can use property_location()?
     m_source_element->set_property("location", chooser.get_filename());
-    set_title(Glib::filename_display_basename(chooser.get_filename()));
+    set_title( Glib::filename_display_basename(chooser.get_filename()) );
 
     m_play_button.set_sensitive(true);
     display_label_progress(0, 0);

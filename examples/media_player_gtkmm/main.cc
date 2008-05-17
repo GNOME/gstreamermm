@@ -34,31 +34,40 @@ main (int argc, char *argv[])
   Gtk::Main kit(argc, argv);
   Gst::init(argc, argv);
 
-  // Create the elements
+  // Create the elements:
 
-  // Autoplays any media type.  Implements GstBase::XOverlay so accepts
-  // a window id in which to draw video
+  // playbin plays any media type, choosing an appropriate set of elements
+  // and linking them together.
+  // playbin implements GstBase::XOverlay so it accepts a window id in which 
+  // to draw video.
   Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create_element("playbin");
-  Glib::RefPtr<Gst::Pipeline> playbinPipeline = Glib::RefPtr<Gst::Pipeline>::cast_dynamic(playbin);
 
-  // Video sink where video (if any) will be drawn
-  Glib::RefPtr<Gst::Element> videoSink = Gst::ElementFactory::create_element("ximagesink");
-
-  if (!playbinPipeline || !videoSink)
+  //The playbin element is actually a pipeline:
+  Glib::RefPtr<Gst::Pipeline> pipeline = Glib::RefPtr<Gst::Pipeline>::cast_dynamic(playbin);
+  if(!pipeline)
   {
-    std::cerr << "One of the elements for media player could not be created." << std::endl;
+    std::cerr << "The playbin could not be created." << std::endl;
     return -1;
   }
 
-  // set the playbin's video-sink property so that videoSink is used for video display
-  playbinPipeline->set_property("video-sink", videoSink);
+  // Create a video sink where video (if any) will be drawn:
+  Glib::RefPtr<Gst::Element> video_sink = Gst::ElementFactory::create_element("ximagesink");
+  if (!video_sink)
+  {
+    std::cerr << "The ximagesink could not be created." << std::endl;
+    return -1;
+  }
 
-  PlayerWindow mainWindow(playbinPipeline, videoSink);
+  // Set the playbin's video-sink property so that our video sink is used for video display:
+  // TODO: Create a PlayBin class that we can dynamic_cast<> to, so we can use property_video_sink()?
+  pipeline->set_property("video-sink", video_sink);
 
+  //Create our player window and give it the pipeline and video sink:
+  PlayerWindow mainWindow(pipeline, video_sink);
   kit.run(mainWindow);
 
   // Clean up nicely:
-  playbinPipeline->set_state(Gst::STATE_NULL);
+  pipeline->set_state(Gst::STATE_NULL);
 
   return 0;
 }

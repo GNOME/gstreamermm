@@ -35,7 +35,11 @@
 class PlayerWindow : public Gtk::Window
 {
 public:
-  PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& videoSink);
+  /**
+   * @param playbin The pipeline that can play media files.
+   * @param video_sink
+   */
+  PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& video_sink);
   virtual ~PlayerWindow();
 
 protected:
@@ -44,13 +48,15 @@ protected:
   Gst::BusSyncReply on_bus_message_sync(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
   bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
   bool on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad, const Glib::RefPtr<Gst::MiniObject>& buffer);
-  void on_play();
-  void on_pause();
-  void on_stop();
+
+  void on_button_play();
+  void on_button_pause();
+  void on_button_stop();
+  void on_button_rewind();
+  void on_button_forward();
+  void on_button_open();
   bool on_scale_value_changed(Gtk::ScrollType type, double value);
-  void on_rewind();
-  void on_forward();
-  void on_open();
+
 
   bool update_stream_progress();
   void display_label_progress(gint64 pos, gint64 len);
@@ -70,7 +76,7 @@ protected:
 
   Glib::RefPtr<Gst::Pipeline> m_play_bin;
   Glib::RefPtr<Gst::Element> m_video_sink;
-  sigc::connection m_progress_connection;
+  sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;
   gulong m_pad_probe_id;
