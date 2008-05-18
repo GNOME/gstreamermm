@@ -119,6 +119,7 @@ _CONVERSION(`Structure&',`GstStructure*',`(($3).gobj())')
 _CONVERSION(`const TagList&',`const GstTagList*',`(($3).gobj())')
 _CONVERSION(`GstTagList*',`TagList',`Glib::wrap($3)')
 _CONVERSION(`TagList&',`GstTagList*',`(($3).gobj())')
+_CONVERSION(`const TagList&',`GstTagList*',`const_cast<GstTagList*>(($3).gobj())')
 
 #URIHandler
 _CONVERSION(`const Glib::RefPtr<URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')

@@ -200,9 +200,11 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventTag::create(TagList& taglist)
+Glib::RefPtr<Event> EventTag::create(const TagList& taglist)
 {
-  GstEvent* event = gst_event_new_tag(taglist.gobj());
+  //We create a copy because gst_event_new_tag() takes ownership:
+  GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
+  GstEvent* event = gst_event_new_tag(c_taglist);
   return Gst::Event::wrap(event, false);
 }
 
@@ -211,6 +213,8 @@ void EventTag::parse(TagList& taglist)
   GstTagList* gst_taglist = gst_tag_list_new();
   gst_event_parse_tag(gobj(), &gst_taglist);
   TagList parsed_taglist(gst_taglist);
+
+  //TODO: What generates the swap() method?
   taglist.swap(parsed_taglist);
 }
 

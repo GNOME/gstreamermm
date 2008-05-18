@@ -29,17 +29,16 @@ namespace Gst
 _WRAP_ENUM(TagMergeMode, GstTagMergeMode)
 _WRAP_ENUM(TagFlag, GstTagFlag)
 
-/** Gst::TagList — List of tags and values used to describe media metadata.
+//TODO: Suggest how you might get a TagList.
+/** A List of tags and values used to describe media metadata.
  */
 class TagList
 {
-  _CLASS_BOXEDTYPE_NCOPY_EXTRA(TagList, GstTagList, gst_tag_list_new, gst_tag_list_copy, gst_tag_list_free)
+  _CLASS_BOXEDTYPE(TagList, GstTagList, gst_tag_list_new, gst_tag_list_copy, gst_tag_list_free)
 
 public:
-  /** For example,
-   * void on_foreach(const Gst::TagList& taglist, const Glib::Ustring& tag);
-   */
-  typedef sigc::slot<void, const TagList&, const Glib::ustring&> SlotForeach;
+
+  //TODO: Add operator bool() to handle when C functions return NULL TagList*?
 
   _WRAP_METHOD(static bool exists(const Glib::ustring& tag), gst_tag_exists)
   _WRAP_METHOD(static GType get_type(const Glib::ustring& tag), gst_tag_get_type)
@@ -47,9 +46,16 @@ public:
   _WRAP_METHOD(static Glib::ustring get_description(const Glib::ustring& tag), gst_tag_get_description)
   _WRAP_METHOD(static TagFlag get_flag(const Glib::ustring& tag), gst_tag_get_flag)
   _WRAP_METHOD(static bool is_fixed(const Glib::ustring& tag), gst_tag_is_fixed)
-  _WRAP_METHOD(bool empty(), gst_tag_list_is_empty)
+  _WRAP_METHOD(bool empty() const, gst_tag_list_is_empty)
+
+  //TODO: Add a suitable default value for mode?
   _WRAP_METHOD(void insert(const TagList& other, TagMergeMode mode), gst_tag_list_insert)
   _WRAP_METHOD(TagList merge(const TagList& other, TagMergeMode mode), gst_tag_list_merge)
+
+  /** For example,
+   * void on_foreach(const Glib::ustring& tag);
+   */
+  typedef sigc::slot<void, Glib::ustring&> SlotForeach;
 
   /** Calls the given slot for each tag inside the tag list. Note that if there
    * is no tag, the slot won't be called at all.

@@ -21,27 +21,25 @@
 
 #include <gst/gstenumtypes.h>
 
-/*
+
 static gboolean
-TagList_Foreach_gstreamermm_callback(const GstTagList* list, const gchar *tag, void* data)
+TagList_foreach_gstreamermm_callback(const GstTagList* list, const gchar *tag, void* data)
 {
   Gst::TagList::SlotForeach* slot = static_cast<Gst::TagList::SlotForeach*>(data);
-  bool result = (*slot)(Glib::wrap(list), Glib::ustring(value));
-  delete slot;
-  return result;
+
+  const Glib::ustring tag_str = Glib::convert_const_gchar_ptr_to_ustring(tag);
+  return (*slot)(tag_str);
 }
-*/
 
 namespace Gst
 {
 
-/*
 void
 TagList::foreach(const SlotForeach& slot)
 {
   SlotForeach* slot_copy = new SlotForeach(slot);
-  gst_taglist_foreach(gobj(), &TagList_Foreach_gstreamermm_callback, slot_copy);
+  gst_taglist_foreach(gobj(), &TagList_foreach_gstreamermm_callback, slot_copy);
+  delete slot_copy;
 }
-*/
 
 } //namespace Gst

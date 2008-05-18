@@ -280,9 +280,11 @@ MessageTag::MessageTag(GstMessage* castitem)
 {
 }
 
-Glib::RefPtr<Message> MessageTag::create(const Glib::RefPtr<Object>& src, TagList& taglist)
+Glib::RefPtr<Message> MessageTag::create(const Glib::RefPtr<Object>& src, const TagList& taglist)
 {
-  GstMessage* message = gst_message_new_tag(src->gobj(), taglist.gobj());
+  //We create a copy because gst_message_new_tag() takes ownership:
+  GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
+  GstMessage* message = gst_message_new_tag(src->gobj(), c_taglist);
   return Gst::Message::wrap(message, false);
 }
 
