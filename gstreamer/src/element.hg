@@ -126,37 +126,53 @@ protected:
   _CTOR_DEFAULT
 
 public:
-  /** TODO: Documentation
+
+  /** Links this source element to the @dest element.
+   * The link must be from source to destination - the other direction will not be tried. 
+   * The function looks for existing pads that aren't linked yet. It will request new pads
+   * if necessary. Such pads need to be released manually when unlinking. 
+   * If multiple links are possible, only one is established.
    *
-   * @throws std::runtime_error
+   * Make sure you have added your elements to a bin or pipeline with Gst::Bin::add() before 
+   * trying to link them.
+   *
+   * @throws std::runtime_error If the elements could not be linked.
    */
-  Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& other_element);
+  Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& dest);
 
   _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
 
   //TODO: Remove this (and make sure it is really deprecated in the C API),
   //because the C API says it should not be used because it has unclear refcounting:
+  //I asked for that in http://bugzilla.gnome.org/show_bug.cgi?id=533865
   _WRAP_METHOD(Glib::RefPtr<Pad> get_pad(const Glib::ustring& name), gst_element_get_pad)
 
   _WRAP_METHOD(void create_all_pads(), gst_element_create_all_pads)
 
   //TODO: If these get* functions are creators, then maybe rename to create*()? murrayc
+  //TODO: Can these be const?
   Glib::RefPtr<Pad> get_compatible_pad(const Glib::RefPtr<Pad>& pad, const Glib::RefPtr<Caps>& caps);
   Glib::RefPtr<PadTemplate> get_compatible_pad_template(const Glib::RefPtr<PadTemplate>& padtemplate);
 
+  //TODO: The documentation says "The pad should be released with gst_element_release_request_pad().", which is odd. murrayc
   _WRAP_METHOD(Glib::RefPtr<Pad> get_request_pad(const Glib::ustring& name), gst_element_get_request_pad)
   _WRAP_METHOD(Glib::RefPtr<Pad> get_static_pad(const Glib::ustring& name), gst_element_get_static_pad)
+
   _WRAP_METHOD(void no_more_pads(), gst_element_no_more_pads)
   _WRAP_METHOD(void release_request_pad(const Glib::RefPtr<Pad>& pad), gst_element_release_request_pad)
   _WRAP_METHOD(bool remove_pad(const Glib::RefPtr<Pad>& pad), gst_element_remove_pad)
  
   _WRAP_METHOD(void unlink(const Glib::RefPtr<Element>& other_element), gst_element_unlink)
 
+  //TODO: Make this like link()?
   _WRAP_METHOD(bool link_pads(const Glib::ustring& padname, const Glib::RefPtr<Element>& other_element, const Glib::ustring& others_padname), gst_element_link_pads)
 
   _WRAP_METHOD(void unlink_pads(const Glib::ustring& padname, const Glib::RefPtr<Element>& other_element, const Glib::ustring& other_padname), gst_element_unlink_pads)
 
+  //TODO: Make this like link()?
   _WRAP_METHOD(bool link_pads_filtered(const Glib::ustring& padname, const Glib::RefPtr<Element>& other_element, const Glib::ustring& others_padname, const Glib::RefPtr<Caps>& filter), gst_element_link_pads_filtered)
+
+  //TODO: Make this like link()?
 
   _WRAP_METHOD(bool link_filtered(const Glib::RefPtr<Element>& other_element, const Glib::RefPtr<Caps>& filter), gst_element_link_filtered)
   _WRAP_METHOD(void set_base_time(ClockTime time), gst_element_set_base_time)

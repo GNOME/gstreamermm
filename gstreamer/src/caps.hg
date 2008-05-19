@@ -46,7 +46,15 @@ struct Structure;
  *
  * A Gst::Caps can be constructed with the following code fragment:
  *
- * TODO: Insert C++ translated code fragment from C API docs
+ * @code
+ * Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw-yuv");
+ * //TODO: Add method overloads so we don't need to specify the type, and so we don't need to use Glib::Value:
+ * caps->set_simple("format", GST_TYPE_FOURCC, GST_MAKE_FOURCC ('I', '4', '2', '0'));
+ * caps->set_simple("framerate", GST_TYPE_FRACTION, 25, 1,
+ * caps->set_simple("pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1,
+ * caps->set_simple("width", G_TYPE_INT, 320,
+ * caps->set_simple("height", G_TYPE_INT, 240)
+ * @endcode
  */
 class Caps 
 {
@@ -129,7 +137,7 @@ public:
   _WRAP_METHOD(bool is_always_compatible(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_is_always_compatible)
   _WRAP_METHOD(bool is_subset(const Glib::RefPtr<Caps>& superset_caps) const, gst_caps_is_subset)
 
-  //TODO: Rename as create_*()?
+  //TODO: get_*() is not very nice for these, but create_*() is for static create_*() by convention:
   //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Caps> get_intersect(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_intersect)
 
@@ -137,18 +145,17 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Caps> get_union(const Glib::RefPtr<Caps>& other_caps) const, gst_caps_union)
 
   //This is const (returns a non const) because it always creates a new instance:
-  _WRAP_METHOD(Glib::RefPtr<Caps> normalize() const, gst_caps_normalize)
+  _WRAP_METHOD(Glib::RefPtr<Caps> get_normalize() const, gst_caps_normalize)
 
   _WRAP_METHOD(bool simplify(), gst_caps_do_simplify)
 
   //TODO: Add overloads (and dependency) for libxml++?
-  _WRAP_METHOD(xmlNodePtr save(const xmlNodePtr& parent) const, gst_caps_save_thyself)
-  _WRAP_METHOD(static Glib::RefPtr<Caps> load(xmlNodePtr parent), gst_caps_load_thyself)
+  _WRAP_METHOD(xmlNodePtr save(xmlNodePtr parent) const, gst_caps_save_thyself)
+  _WRAP_METHOD(static Glib::RefPtr<Caps> load(const xmlNodePtr parent), gst_caps_load_thyself)
 
   _WRAP_METHOD(Glib::ustring to_string() const, gst_caps_to_string)
 
- //TODO: Rename as create_*()?
-  _WRAP_METHOD(Glib::RefPtr<Caps> subtract(const Glib::RefPtr<const Caps>& subtrahend_caps), gst_caps_subtract)
+  _WRAP_METHOD(Glib::RefPtr<Caps> get_subtract(const Glib::RefPtr<const Caps>& subtrahend_caps) const, gst_caps_subtract)
   _WRAP_METHOD(Glib::RefPtr<Caps> make_writable(), gst_caps_make_writable)
   _WRAP_METHOD(void truncate(), gst_caps_truncate)
   

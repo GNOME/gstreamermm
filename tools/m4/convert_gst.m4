@@ -166,7 +166,7 @@ _CONVERSION(`gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 _CONVERSION(`const gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 
 #Other Conversions
-_CONVERSION(`const xmlNodePtr&',`xmlNodePtr',`$3')
+_CONVERSION(`const xmlNodePtr',`xmlNodePtr',`const_cast<xmlNodePtr>($3)')
 
 #############################Enums####################################
 

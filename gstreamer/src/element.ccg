@@ -38,8 +38,7 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace Gst
 {
 
-void ElementInterfaced_WeakNotify_gstreamermm_callback(void* data,
-GObject* where_the_object_was)
+void ElementInterfaced_WeakNotify_gstreamermm_callback(void* data, GObject* where_the_object_was)
 {
   delete (Gst::Element*) data;
 }
@@ -54,14 +53,14 @@ Glib::ustring get_name(StateChangeReturn s)
   return gst_element_state_change_return_get_name(GstStateChangeReturn(s));
 }
 
-Glib::RefPtr<Element> Element::link(const Glib::RefPtr<Element>& other_element)
+Glib::RefPtr<Element> Element::link(const Glib::RefPtr<Element>& dest)
 {
-  bool result = gst_element_link(gobj(), other_element->gobj());
+  const bool result = gst_element_link(gobj(), dest->gobj());
 
   if(result)
-    return other_element;
+    return dest;
   else
-    throw std::runtime_error("failed to link: " + get_name() + "->" + other_element->get_name());
+    throw std::runtime_error("failed to link: " + get_name() + "->" + dest->get_name());
 }
 
 Glib::RefPtr<Pad> Element::get_compatible_pad(const Glib::RefPtr<Pad>& pad, const Glib::RefPtr<Caps>& caps)
