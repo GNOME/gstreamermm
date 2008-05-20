@@ -39,7 +39,8 @@ bool on_timeout()
   if (pipeline->query(query)
     && pipeline->query_duration(fmt, len))
   {
-    //TODO: Document why we do this cast:
+    // Cast query's RefPtr to RefPtr<Gst::QueryPosition> to parse the
+    // pipeline's position query with the Gst::QueryPosition::parse() method
     Glib::RefPtr<Gst::QueryPosition> query_pos =
       Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
     if(query_pos)

@@ -76,13 +76,12 @@ MiniObject::unreference() const
 }
 
 // TODO: Investigate how this works:
-
-// TODO: As far as I can tell, derived types must implement a
-// TODO: GstMiniObjectCopyFunction in a class structure.
-// TODO: gst_mini_object_class_init() sets the (*GstMiniObjectCopyFunction)(...)
-// TODO: to gst_mini_object_copy_default() which does nothing, but derived
-// TODO: types (like GstQuery, etc) have their own functions (like
-// TODO: gst_query_copy()) which do work. Jose
+// As far as I can tell, derived types must implement a
+// GstMiniObjectCopyFunction in a class structure.
+// gst_mini_object_class_init() sets the (*GstMiniObjectCopyFunction)(...)
+// to gst_mini_object_copy_default() which does nothing, but derived
+// types (like GstQuery, etc) have their own functions (like
+// gst_query_copy()) which do work. Jose
 /*
 Glib::RefPtr<Gst::MiniObject>
 MiniObject::copy()

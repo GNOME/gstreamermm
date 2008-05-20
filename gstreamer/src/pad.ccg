@@ -84,9 +84,11 @@ static void Pad_Data_gstreamermm_callback_disconnect(void* data)
 namespace Gst
 {
 
-Glib::RefPtr<Caps> Pad::get_pad_template_caps()
+// This is handcoded because the documentation tells us that we need to copy
+// the Caps
+Glib::RefPtr<const Caps> Pad::get_pad_template_caps() const
 {
-  const GstCaps* caps = gst_pad_get_pad_template_caps(gobj());
+  const GstCaps* caps = gst_pad_get_pad_template_caps(const_cast<GstPad*>(gobj()));
   GstCaps* copy_caps = gst_caps_copy(caps);
   return Glib::wrap(copy_caps, false);
 }

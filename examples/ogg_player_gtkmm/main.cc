@@ -98,12 +98,11 @@ main (int argc, char *argv[])
 
 
   // Put all elements in a pipeline:
-  // TODO: Bin::add() does not actually throw an exception. It probably should.
   try
   {
     pipeline->add(source)->add(parser)->add(decoder)->add(conv)->add(sink);
   }
-  catch(const Glib::Error& ex)
+  catch(const std::runtime_error& ex)
   {
     std::cerr << "Error while adding elements to the pipeline: " << ex.what() << std::endl;
     return -1;
