@@ -29,56 +29,36 @@ int main (int argc, char* argv[])
 
   Gst::Structure structure("my_structure");
 
-  Glib::Value<Glib::ustring> stringValue;
-  stringValue.init(Glib::Value<Glib::ustring>::value_type());
-  stringValue.set("Hello; This is a ustring.");
-
-  Glib::Value<int> intValue;
-  intValue.init(Glib::Value<int>::value_type());
-  intValue.set(100);
-
-  Glib::Value<Gst::Fraction> fractValue;
-  fractValue.init(Glib::Value<Gst::Fraction>::value_type());
-  fractValue.set(Gst::Fraction(1,2));
-
-  Glib::Value<Gst::FractionRange> rangeValue;
-  rangeValue.init(Glib::Value<Gst::FractionRange>::value_type());
-  rangeValue.set(Gst::FractionRange(Gst::Fraction(1,2), Gst::Fraction(3,4)));
-
+  structure.set_field(Glib::Quark("string"), "Hello; This is a ustring.");
+  structure.set_field("integer", 100);
+  structure.set_field("fraction", Gst::Fraction(1,2));
+  structure.set_field("range", Gst::FractionRange(Gst::Fraction(1,2), Gst::Fraction(3,4)));
   Glib::Date date;
   date.set_time_current();
-  Glib::Value<Glib::Date> dateValue;
-  dateValue.init(Glib::Value<Glib::Date>::value_type());
-  dateValue.set(date);
+  structure.set_field("date", date);
 
-  structure.set_field(Glib::Quark("string"), stringValue).set_field("integer", intValue).set_field("fraction", fractValue).set_field("range", rangeValue).set_field("date", dateValue);
-
-  Glib::Value<Glib::ustring> value1;
+  Glib::ustring value1;
   structure.get_field("string", value1);
-  std::cout << "string value = '" << value1.get() << "'" << std::endl;
+  std::cout << "string value = '" << value1 << "'" << std::endl;
 
-  Glib::Value<int> value2;
+  int value2;
   structure.get_field("integer", value2);
-  std::cout << "integer value = '" << value2.get() << "'" << std::endl;
+  std::cout << "integer value = '" << value2 << "'" << std::endl;
 
-  Glib::ValueBase value3;
+  Gst::Fraction value3;
   structure.get_field("fraction", value3);
-  Gst::Fraction fract(value3);
-  std::cout << "fraction value = '" << fract.num << "/" <<
-      fract.denom << "'" << std::endl;
+  std::cout << "fraction value = '" << value3.num << "/" <<
+    value3.denom << "'" << std::endl;
 
-  Glib::ValueBase value4;
+  Gst::FractionRange value4;
   structure.get_field("range", value4);
-  Gst::FractionRange range(value4);
-  std::cout << "fractional range value = '[(" << range.min.num << "/" <<
-      range.min.denom << "), (" << range.max.num << "/" << range.max.denom <<
-          ")]'" << std::endl;
+  std::cout << "fractional range value = '[(" << value4.min.num << "/" <<
+    value4.min.denom << "), (" << value4.max.num << "/" << value4.max.denom << ")]'" << std::endl;
 
-  Glib::ValueBase value5;
+  Glib::Date value5;
   structure.get_field("date", value5);
-  Glib::Date date_copy(*gst_value_get_date(value5.gobj()));
-  std::cout << "date value = " <<  date_copy.get_month() << "/" <<
-      (int) date_copy.get_day() << "/" << date_copy.get_year() << std::endl;
+  std::cout << "date value = " <<  value5.get_month() << "/" <<
+    (int) value5.get_day() << "/" << value5.get_year() << std::endl;
 
   return 0;
 }

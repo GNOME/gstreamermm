@@ -22,8 +22,19 @@
 namespace Gst
 {
 
-Fourcc::Fourcc() : first(0), second(0), third(0), fourth(0)
+Fourcc::Fourcc()
+: first(0), second(0), third(0), fourth(0)
 {}
+
+Fourcc& Fourcc::operator=(const Fourcc& src)
+{
+  first = src.first;
+  second = src.second;
+  third = src.third;
+  fourth = src.fourth;
+
+  return *this;
+}
 
 Fourcc::Fourcc(char first, char second, char third, char fourth)
 : first(first), second(second), third(third), fourth(fourth)
@@ -70,16 +81,21 @@ void Fourcc::get_ccs(guint32 fourcc)
   fourth = (fourcc >> 24) & 0xff;
 }
 
-Fraction::Fraction() : num(0), denom(1)
+
+Fraction::Fraction()
+: num(0), denom(1)
 {}
 
-Fraction::Fraction(int num, int denom) : num(num), denom(denom)
+Fraction::Fraction(int num, int denom)
+: num(num), denom(denom)
 {}
 
-Fraction::Fraction(const Fraction& f) : num(f.num), denom(f.denom)
+Fraction::Fraction(const Fraction& src)
+: num(src.num), denom(src.denom)
 {}
 
-Fraction::Fraction(const Glib::ValueBase& value) : num(0), denom(1)
+Fraction::Fraction(const Glib::ValueBase& value)
+: num(0), denom(1)
 {
   if(G_VALUE_TYPE(value.gobj()) == GST_TYPE_FRACTION)
   {
@@ -88,16 +104,29 @@ Fraction::Fraction(const Glib::ValueBase& value) : num(0), denom(1)
   }
 }
 
-IntRange::IntRange() : min(0), max(0)
+Fraction& Fraction::operator=(const Fraction& src)
+{
+  num = src.num;
+  denom = src.denom;
+
+  return *this;
+}
+
+
+IntRange::IntRange()
+: min(0), max(0)
 {}
 
-IntRange::IntRange(int min, int max) : min(min), max(max)
+IntRange::IntRange(int min, int max)
+: min(min), max(max)
 {}
 
-IntRange::IntRange(const IntRange& r) : min(r.min), max(r.max)
+IntRange::IntRange(const IntRange& src)
+: min(src.min), max(src.max)
 {}
 
-IntRange::IntRange(const Glib::ValueBase& value) : min(0), max(0)
+IntRange::IntRange(const Glib::ValueBase& value)
+: min(0), max(0)
 {
   if(G_VALUE_TYPE(value.gobj()) == GST_TYPE_INT_RANGE)
   {
@@ -106,16 +135,29 @@ IntRange::IntRange(const Glib::ValueBase& value) : min(0), max(0)
   }
 }
 
-DoubleRange::DoubleRange() : min(0), max(0)
+IntRange& IntRange::operator=(const IntRange& src)
+{
+  min = src.min;
+  max = src.max;
+
+  return *this;
+}
+
+
+DoubleRange::DoubleRange()
+: min(0), max(0)
 {}
 
-DoubleRange::DoubleRange(double min, double max) : min(min), max(max)
+DoubleRange::DoubleRange(double min, double max)
+: min(min), max(max)
 {}
 
-DoubleRange::DoubleRange(const DoubleRange& r) : min(r.min), max(r.max)
+DoubleRange::DoubleRange(const DoubleRange& r)
+: min(r.min), max(r.max)
 {}
 
-DoubleRange::DoubleRange(const Glib::ValueBase& value) : min(0), max(0)
+DoubleRange::DoubleRange(const Glib::ValueBase& value)
+: min(0), max(0)
 {
   if(G_VALUE_TYPE(value.gobj()) == GST_TYPE_DOUBLE_RANGE)
   {
@@ -124,16 +166,36 @@ DoubleRange::DoubleRange(const Glib::ValueBase& value) : min(0), max(0)
   }
 }
 
-FractionRange::FractionRange() : min(), max()
+DoubleRange& DoubleRange::operator=(const DoubleRange& src)
+{
+  min = src.min;
+  max = src.max;
+
+  return *this;
+}
+
+FractionRange::FractionRange()
+: min(), max()
 {}
 
-FractionRange::FractionRange(const Fraction& min, const Fraction& max) : min(min), max(max)
+FractionRange::FractionRange(const Fraction& min, const Fraction& max)
+: min(min), max(max)
 {}
 
-FractionRange::FractionRange(const FractionRange& r) : min(r.min), max(r.max)
+FractionRange::FractionRange(const FractionRange& src)
+: min(src.min), max(src.max)
 {}
 
-FractionRange::FractionRange(const Glib::ValueBase& value) : min(), max()
+FractionRange& FractionRange::operator=(const FractionRange& src)
+{
+  min = src.min;
+  max = src.max;
+
+  return *this;
+}
+
+FractionRange::FractionRange(const Glib::ValueBase& value)
+: min(), max()
 {
   if(G_VALUE_TYPE(value.gobj()) == GST_TYPE_FRACTION_RANGE)
   {

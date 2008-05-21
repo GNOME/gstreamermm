@@ -63,19 +63,119 @@ Structure::operator bool() const
   return gobject_ != 0;
 }
 
-void
-Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
+void Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
 {
   value.init(gst_structure_get_value(gobj(), name.c_str()));
 }
 
-Structure&
-Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value)
+void Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value)
 {
   _set_gstructure_field(gobj(), fieldname, value);
-
-  return *this;
 }
+
+void Structure::set_field(const Glib::ustring& fieldname, bool value)
+{
+   Glib::Value<bool> val;
+   val.init( Glib::Value<bool>::value_type() );
+   val.set(value);
+
+   set_field(fieldname, val);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, int value)
+{
+  Glib::Value<int> val;
+  val.init( Glib::Value<int>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, guint value)
+{
+  Glib::Value<guint> val;
+  val.init( Glib::Value<guint>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, const Fourcc& value)
+{
+  //TODO: Or should this be a uint32?
+  Glib::Value<Fourcc> val;
+  val.init( Glib::Value<Fourcc>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, double value)
+{
+  Glib::Value<double> val;
+  val.init( Glib::Value<double>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+};
+
+//We use std::string, because the encoding is unknown. murrayc
+void Structure::set_field(const Glib::ustring& fieldname, const std::string& value)
+{
+  Glib::Value<std::string> val;
+  val.init( Glib::Value<std::string>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
+ 
+void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& value)
+{
+  //TODO: Or should this be a GDate?
+  Glib::Value<Glib::Date> val;
+  val.init( Glib::Value<Glib::Date>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, const ClockTime& value)
+{
+  //TODO: Or should this be a GstClockTime?
+  Glib::Value<ClockTime> val;
+  val.init( Glib::Value<ClockTime>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, GType enumtype, const Glib::ValueBase& value)
+{
+  //TODO: We must need to do something more. murrayc
+  set_field(fieldname, value);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, const Gst::Fraction& value)
+{
+  //TODO: Or should we use two ints somehow?
+  Glib::Value<Gst::Fraction> val;
+  val.init( Glib::Value<Gst::Fraction>::value_type() );
+  val.set(value);
+
+   set_field(fieldname, val);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, const Gst::FractionRange& value)
+{
+  //TODO: Or should we use two Fractions somehow?
+  Glib::Value<Gst::FractionRange> val;
+  val.init( Glib::Value<Gst::FractionRange>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
+
+
 
 void Structure::_set_gstructure_field(GstStructure* cstructure, const Glib::ustring& fieldname, const Glib::ValueBase& value)
 {
@@ -161,96 +261,94 @@ Structure::remove_field(const Glib::ustring& fieldname)
 }
 
 bool
-Structure::get_boolean(const Glib::ustring& name, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, bool& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_BOOLEAN);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
-
+  gboolean cvalue = FALSE;
+  const bool result = gst_structure_get_boolean(gobj(), name.c_str(), &cvalue);
+  value = cvalue;
   return result;
 }
 
 bool
-Structure::get_int(const Glib::ustring& name, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, int& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_INT);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
-
-  return result;
+  return gst_structure_get_int(gobj(), name.c_str(), &value);
 }
 
 bool
-Structure::get_uint(const Glib::ustring& name, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, guint& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_UINT);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
-
-  return result;
+  return gst_structure_get_uint(gobj(), name.c_str(), &value);
 }
 
 bool
-Structure::get_fourcc(const Glib::ustring& name, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, Fourcc& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_UINT);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
+  guint32 cvalue = 0;
+  const bool result = gst_structure_get_fourcc(gobj(), name.c_str(), &cvalue);
+  if(result)
+    value = Fourcc(cvalue);
 
   return result;
 }
 
 
 bool
-Structure::get_double(const Glib::ustring& name, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, double& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_DOUBLE);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
-
-  return result;
+  return gst_structure_get_double(gobj(), name.c_str(), &value);
 }
 
 bool
-Structure::get_string(const Glib::ustring& name, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, Glib::ustring& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_STRING);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
-
-  return result;
+  const gchar* cvalue = gst_structure_get_string(gobj(), name.c_str());
+  if(cvalue)
+  {
+    value = Glib::convert_const_gchar_ptr_to_stdstring(cvalue);
+    return true;
+  }
+  else
+    return false;
 }
 
 bool
-Structure::get_date (const Glib::ustring& name, Glib::Date& date) const
+Structure::get_field(const Glib::ustring& name, std::string& value) const
+{
+  const gchar* cvalue = gst_structure_get_string(gobj(), name.c_str());
+  if(cvalue)
+  {
+    value = Glib::convert_const_gchar_ptr_to_stdstring(cvalue);
+    return true;
+  }
+  else
+    return false;
+}
+
+bool
+Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
 {
   GDate *gdate = 0;
   const bool has = gst_structure_get_date(gobj(), name.c_str(), &gdate);
-  date.set_julian(g_date_get_julian(gdate));
+  if(has)
+    date.set_julian(g_date_get_julian(gdate)); //TODO: Don't we have a wrap()/constructor for this? If not, we should.
+
   return has;
 }
 
 
 bool
-Structure::get_clock_time(const Glib::ustring& name, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, ClockTime& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), G_TYPE_UINT64);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
-
+  GstClockTime cvalue = 0;
+  const bool result = gst_structure_get_clock_time(gobj(), name.c_str(), &cvalue);
+  value = cvalue;
   return result;
 }
 
 
 bool
-Structure::get_enum(const Glib::ustring& name, GType enum_type, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, GType enum_type, Glib::ValueBase& value) const
 {
   bool result = gst_structure_has_field_typed(gobj(), name.c_str(), enum_type);
 
@@ -262,9 +360,23 @@ Structure::get_enum(const Glib::ustring& name, GType enum_type, Glib::ValueBase&
 
 
 bool
-Structure::get_fraction(const Glib::ustring& name, Gst::Fraction& f) const
+Structure::get_field(const Glib::ustring& name, Gst::Fraction& f) const
 {
-  return gst_structure_get_fraction(gobj(), name.c_str(), &f.num, &f.denom);
+  int value_numerator = 0;
+  int value_denominator = 0;
+  const bool result = gst_structure_get_fraction(gobj(), name.c_str(), &value_numerator, &value_denominator);
+  if(result)
+    f = Gst::Fraction(value_numerator, value_denominator);
+  
+  return result;
+}
+
+bool
+Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) const
+{
+  //TODO
+  
+  return false;
 }
 
 bool
@@ -287,4 +399,4 @@ Structure::create_from_string(const Glib::ustring& the_string)
   return Structure(gst_structure_from_string(the_string.c_str(), NULL)); 
 }
 
-} //namespace Gst
+} //namespace GstG

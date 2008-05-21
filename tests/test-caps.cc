@@ -28,24 +28,17 @@
 int link_elements_with_filter (const Glib::RefPtr<Gst::Element> e1,
   const Glib::RefPtr<Gst::Element> e2)
 {
-  Glib::Value<int> widthValue;
-  widthValue.init(Glib::Value<int>::value_type());
-  widthValue.set(384);
-
-  Glib::Value<int> heightValue;
-  heightValue.init(Glib::Value<int>::value_type());
-  heightValue.set(288);
-
-  Glib::Value<Gst::Fraction> rateValue;
-  rateValue.init(Glib::Value<Gst::Fraction>::value_type());
-  rateValue.set(Gst::Fraction(25, 1));
-
-  Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create(
-    Gst::Structure("video/x-raw-yuv").set_field("width", widthValue).set_field("height", heightValue).set_field("framerate", rateValue));
-
-  caps->append_structure(
-    Gst::Structure("video/x-raw-rgb").set_field("width", widthValue)
-      .set_field("height", heightValue).set_field("framerate", rateValue));
+  Gst::Structure structure("video/x-raw-yuv") ;
+  structure.set_field("width", 384);
+  structure.set_field("height", 288);
+  structure.set_field("framerate", Gst::Fraction(25, 1));
+  Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create(structure);
+    
+  Gst::Structure structure2("video/x-raw-rgb");
+  structure2.set_field("width", 384);
+  structure2.set_field("height", 288);
+  structure2.set_field("framerate", Gst::Fraction(25, 1));
+  caps->append_structure(structure2);
 
   return e1->link_filtered(e2, caps);
 }
