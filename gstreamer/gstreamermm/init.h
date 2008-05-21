@@ -43,15 +43,15 @@ namespace Gst
  * functions in other glib-style libraries, such as gtk_init(). In particular,
  * unknown command line options cause this function to abort program execution.
  *
- * @param argc pointer to application's argc
- * @param argv pointer to application's argv
+ * @param argc Pointer to application's argc
+ * @param argv Pointer to application's argv
  */
 void init(int& argc, char**& argv);
 
 /** Initializes the GStreamer library, setting up internal path lists,
  * registering built-in elements, and loading standard plugins.
  *
- * This function will return FALSE if GStreamer could not be initialized for
+ * This function will return false if GStreamer could not be initialized for
  * some reason. If you want your program to fail fatally, use Gst::init()
  * instead.
  *
@@ -59,9 +59,9 @@ void init(int& argc, char**& argv);
  * this is not an option, your program must initialise the GLib thread system
  * using g_thread_init() before any other GLib functions are called.
  *
- * @param argc pointer to application's argc
- * @param argv pointer to application's argv
- * @return TRUE if GStreamer could be initialized.
+ * @param argc Pointer to application's argc
+ * @param argv Pointer to application's argv
+ * @return true if GStreamer could be initialized.
  * @throw Glib::Error
  */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -81,7 +81,7 @@ void init(int& argc, char**& argv);
  * If you use this function, you should make sure you initialise the GLib
  * threading system as one of the very first things in your program.
  *
- * @return a pointer to GStreamer's option group.
+ * @return A pointer to GStreamer's option group.
  */
 Glib::OptionGroup get_option_group();
   
