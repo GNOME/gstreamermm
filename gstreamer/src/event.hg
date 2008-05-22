@@ -63,15 +63,15 @@ class TagList;
 
 /** Get a printable name for the given event type.
  *
- * @param type the event type
- * @return a reference to the static name of the event.
+ * @param type The event type.
+ * @return A reference to the static name of the event.
  */
 Glib::ustring get_name(EventType t);
 
 /** Get the unique quark for the given event type.
  *
- * @param type the event type
- * @return the quark associated with the event type 
+ * @param type The event type.
+ * @return The quark associated with the event type.
  */
 Glib::QueryQuark get_quark(EventType t);
 
@@ -167,20 +167,20 @@ public:
    *
    * When the async flag is set, a thread boundary is prefered.
    *
-   * @param format buffer format
-   * @param minsize minimum buffer size
-   * @param maxsize maximum buffer size
-   * @param async thread behavior
-   * @return a new Gst::EventBufferSize
+   * @param format Buffer format.
+   * @param minsize Minimum buffer size.
+   * @param maxsize Maximum buffer size.
+   * @param async Thread behavior.
+   * @return A new Gst::EventBufferSize.
    */
   static Glib::RefPtr<Event> create(Format format, gint64 minsize, gint64 maxsize, bool async);
 
   /** Get the format, minsize, maxsize and async-flag in the buffersize event.
    *
-   * @param format A pointer to store the format in
-   * @param minsize A pointer to store the minsize in
-   * @param maxsize A pointer to store the maxsize in
-   * @param async A pointer to store the async-flag in 
+   * @param format A pointer to store the format in.
+   * @param minsize A pointer to store the minsize in.
+   * @param maxsize A pointer to store the maxsize in.
+   * @param async A pointer to store the async-flag in.
    */
   void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async);
 };
@@ -273,8 +273,8 @@ public:
    * The latency is mostly used in live sinks and is always expressed in the
    * time format.
    *
-   * @param latency the new latency value
-   * @return a new Gst::EventLatency
+   * @param latency The new latency value.
+   * @return A new Gst::EventLatency.
    *
    * Since 0.10.12 
    */
@@ -296,8 +296,8 @@ public:
 
   /** Create a new navigation event from the given description.
    *
-   * @param structure description of the event
-   * @return a new Gst::EventNavigation
+   * @param structure Description of the event.
+   * @return A new Gst::EventNavigation.
    */
   static Glib::RefPtr<Event> create(Structure& structure);
 };
@@ -338,13 +338,13 @@ public:
    *
    * position + (TIMESTAMP(buf) - start) * ABS (rate * applied_rate)
    *
-   * @param update is this segment an update to a previous one
-   * @param rate a new rate for playback
-   * @param format The format of the segment values
-   * @param start the start value of the segment
-   * @param stop the stop value of the segment
-   * @param position stream position
-   * @param applied_rate The rate factor which has already been applied
+   * @param update Is this segment an update to a previous one.
+   * @param rate A new rate for playback.
+   * @param format The format of the segment values.
+   * @param start The start value of the segment.
+   * @param stop The stop value of the segment.
+   * @param position Stream position.
+   * @param applied_rate The rate factor which has already been applied.
    * @return A new newsegment event.
    *
    * Since 0.10.6
@@ -354,12 +354,12 @@ public:
   /** Get the update flag, rate, format, start, stop and position in the
    * newsegment event.
    *
-   * @param update A pointer to the update flag of the segment
-   * @param rate A pointer to the rate of the segment
-   * @param format A pointer to the format of the newsegment values
-   * @param start A pointer to store the start value in
-   * @param stop A pointer to store the stop value in
-   * @param position A pointer to store the stream time in
+   * @param update A pointer to the update flag of the segment.
+   * @param rate A pointer to the rate of the segment.
+   * @param format A pointer to the format of the newsegment values.
+   * @param start A pointer to store the start value in.
+   * @param stop A pointer to store the stop value in.
+   * @param position A pointer to store the stream time in.
    */
   void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position);
 
@@ -367,13 +367,13 @@ public:
    * the newsegment event. See create() for a full description of the
    * newsegment event.
    *
-   * @param update A pointer to the update flag of the segment
-   * @param rate A pointer to the rate of the segment
-   * @param format A pointer to the format of the newsegment values
-   * @param start A pointer to store the start value in
-   * @param stop A pointer to store the stop value in
-   * @param position A pointer to store the stream time in
-   * @param applied_rate A pointer to the applied_rate of the segment
+   * @param update A pointer to the update flag of the segment.
+   * @param rate A pointer to the rate of the segment.
+   * @param format A pointer to the format of the newsegment values.
+   * @param start A pointer to store the start value in.
+   * @param stop A pointer to store the stop value in.
+   * @param position A pointer to store the stream time in.
+   * @param applied_rate A pointer to the applied_rate of the segment.
    *
    * Since 0.10.6 
    */
@@ -419,9 +419,9 @@ public:
    * The application can use general event probes to intercept the QoS event
    * and implement custom application specific QoS handling.
    *
-   * @param proportion the proportion of the qos message
-   * @param diff The time difference of the last clock sync
-   * @param timestamp The timestamp of the buffer
+   * @param proportion The proportion of the qos message.
+   * @param diff The time difference of the last clock sync.
+   * @param timestamp The timestamp of the buffer.
    * @return A new QOS event.
    */
   static Glib::RefPtr<Event> create(double proportion, ClockTimeDiff diff, ClockTime timestamp);
@@ -429,9 +429,9 @@ public:
   /** Get the proportion, diff and timestamp in the qos event. See create() for
    * more information about the different QoS values.
    *
-   * @param proportion A pointer to store the proportion in
-   * @param diff A pointer to store the diff in
-   * @param timestamp A pointer to store the timestamp in
+   * @param proportion A pointer to store the proportion in.
+   * @param diff A pointer to store the diff in.
+   * @param timestamp A pointer to store the timestamp in.
    */
   void parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp);
 };
@@ -474,27 +474,28 @@ public:
    * Gst::QUERY_POSITION and update the playback segment current position with
    * a Gst::SEEK_TYPE_SET to the desired position.
    *
-   * @param rate The new playback rate
-   * @param format The format of the seek values
-   * @param flags The optional seek flags
-   * @param start_type The type and flags for the new start position
-   * @param start The value of the new start position
-   * @param stop_type The type and flags for the new stop position
-   * @param stop The value of the new stop position
+   * @param rate The new playback rate.
+   * @param format The format of the seek values.
+   * @param flags The optional seek flags.
+   * @param start_type The type and flags for the new start position.
+   * @param start The value of the new start position.
+   * @param stop_type The type and flags for the new stop position.
+   * @param stop The value of the new stop position.
    * @return A new seek event.
    */
   static Glib::RefPtr<Event> create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop);
 
   /** Parses a seek event and stores the results in the given result locations.
    *
-   * @param rate result location for the rate
-   * @param format result location for the stream format
-   * @param flags result location for the Gst::SeekFlags
-   * @param start_type result location for the Gst::SeekType of the start
-   * position
-   * @param start result location for the start postion expressed in format
-   * @param stop_type result location for the Gst::SeekType of the stop position
-   * @param stop result location for the stop postion expressed in format
+   * @param rate Result location for the rate.
+   * @param format Result location for the stream format.
+   * @param flags Result location for the Gst::SeekFlags.
+   * @param start_type Result location for the Gst::SeekType of the start
+   * position.
+   * @param start Result location for the start postion expressed in format.
+   * @param stop_type Result location for the Gst::SeekType of the stop
+   * position.
+   * @param stop Result location for the stop postion expressed in format.
    */
   void parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop);
 };
@@ -507,14 +508,14 @@ public:
   explicit EventTag(GstEvent* event);
 
   /** Generates a metadata tag event from the given taglist.
-   * @param taglist metadata list
-   * @return a new Gst::Event
+   * @param taglist Metadata list.
+   * @return A new Gst::Event.
    */
   static Glib::RefPtr<Event> create(const TagList& taglist);
 
   //TODO: Use return value:
   /** Parses a tag event and stores the results in the given taglist location.
-   * @param taglist pointer to metadata list 
+   * @param taglist Pointer to metadata list.
    */
   void parse(TagList& taglist);
 };

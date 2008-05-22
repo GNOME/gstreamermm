@@ -36,6 +36,7 @@ int main (int argc, char* argv[])
   Glib::Date date;
   date.set_time_current();
   structure.set_field("date", date);
+  structure.set_field("state", Glib::Value<Gst::State>::value_type(), Gst::STATE_PAUSED);
 
   Glib::ustring value1;
   structure.get_field("string", value1);
@@ -59,6 +60,11 @@ int main (int argc, char* argv[])
   structure.get_field("date", value5);
   std::cout << "date value = " <<  value5.get_month() << "/" <<
     (int) value5.get_day() << "/" << value5.get_year() << std::endl;
+
+  int state;
+  structure.get_field("state", Glib::Value<Gst::State>::value_type(), state);
+  if (state = Gst::STATE_PAUSED)
+    std::cout << "state value = Gst::STATE_PAUSED" << std::endl;
 
   return 0;
 }

@@ -43,8 +43,8 @@ namespace Gst
  * functions in other glib-style libraries, such as gtk_init(). In particular,
  * unknown command line options cause this function to abort program execution.
  *
- * @param argc Pointer to application's argc
- * @param argv Pointer to application's argv
+ * @param argc Pointer to application's argc.
+ * @param argv Pointer to application's argv.
  */
 void init(int& argc, char**& argv);
 
@@ -59,8 +59,8 @@ void init(int& argc, char**& argv);
  * this is not an option, your program must initialise the GLib thread system
  * using g_thread_init() before any other GLib functions are called.
  *
- * @param argc Pointer to application's argc
- * @param argv Pointer to application's argv
+ * @param argc Pointer to application's argc.
+ * @param argv Pointer to application's argv.
  * @return true if GStreamer could be initialized.
  * @throw Glib::Error
  */

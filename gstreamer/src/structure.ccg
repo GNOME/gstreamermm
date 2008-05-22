@@ -102,7 +102,8 @@ void Structure::set_field(const Glib::ustring& fieldname, guint value)
 
 void Structure::set_field(const Glib::ustring& fieldname, const Fourcc& value)
 {
-  //TODO: Or should this be a uint32?
+  //Using a Fourcc is fine because _set_gstructure_field() makes appropriate
+  //conversion to GStreamer GType
   Glib::Value<Fourcc> val;
   val.init( Glib::Value<Fourcc>::value_type() );
   val.set(value);
@@ -128,10 +129,21 @@ void Structure::set_field(const Glib::ustring& fieldname, const std::string& val
 
   set_field(fieldname, val);
 }
+
+//We use std::string, because the encoding is unknown. murrayc
+void Structure::set_field(const Glib::ustring& fieldname, const char* value)
+{
+  Glib::Value<std::string> val;
+  val.init( Glib::Value<std::string>::value_type() );
+  val.set(value);
+
+  set_field(fieldname, val);
+}
  
 void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& value)
 {
-  //TODO: Or should this be a GDate?
+  //Using a Glib::Date is fine because _set_gstructure_field() makes
+  //appropriate conversion to GStreamer GType
   Glib::Value<Glib::Date> val;
   val.init( Glib::Value<Glib::Date>::value_type() );
   val.set(value);
@@ -141,7 +153,8 @@ void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& valu
 
 void Structure::set_field(const Glib::ustring& fieldname, const ClockTime& value)
 {
-  //TODO: Or should this be a GstClockTime?
+  //Using a ClockTime is fine because a ClockTime is a GstClockTime which is a
+  //guint64 which GStreamer will interpret correctly
   Glib::Value<ClockTime> val;
   val.init( Glib::Value<ClockTime>::value_type() );
   val.set(value);
@@ -149,15 +162,15 @@ void Structure::set_field(const Glib::ustring& fieldname, const ClockTime& value
   set_field(fieldname, val);
 }
 
-void Structure::set_field(const Glib::ustring& fieldname, GType enumtype, const Glib::ValueBase& value)
+void Structure::set_field(const Glib::ustring& fieldname, GType enumtype, int value)
 {
-  //TODO: We must need to do something more. murrayc
-  set_field(fieldname, value);
+  gst_structure_set(gobj(), fieldname.c_str(), enumtype, value, NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::Fraction& value)
 {
-  //TODO: Or should we use two ints somehow?
+  //Using a Gst::Fraction is fine because _set_gstructure_field() makes
+  //appropriate conversion to GStreamer GType
   Glib::Value<Gst::Fraction> val;
   val.init( Glib::Value<Gst::Fraction>::value_type() );
   val.set(value);
@@ -167,7 +180,8 @@ void Structure::set_field(const Glib::ustring& fieldname, const Gst::Fraction& v
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::FractionRange& value)
 {
-  //TODO: Or should we use two Fractions somehow?
+  //Using a Gst::FractionRange is fine because _set_gstructure_field() makes
+  //appropriate conversion to GStreamer GType
   Glib::Value<Gst::FractionRange> val;
   val.init( Glib::Value<Gst::FractionRange>::value_type() );
   val.set(value);
@@ -348,14 +362,9 @@ Structure::get_field(const Glib::ustring& name, ClockTime& value) const
 
 
 bool
-Structure::get_field(const Glib::ustring& name, GType enum_type, Glib::ValueBase& value) const
+Structure::get_field(const Glib::ustring& name, GType enum_type, int& value) const
 {
-  bool result = gst_structure_has_field_typed(gobj(), name.c_str(), enum_type);
-
-  if (result)
-    value.init(gst_structure_get_value(gobj(), name.c_str()));
-
-  return result;
+  return gst_structure_get_enum(gobj(), name.c_str(), enum_type, &value);
 }
 
 
@@ -374,8 +383,16 @@ Structure::get_field(const Glib::ustring& name, Gst::Fraction& f) const
 bool
 Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) const
 {
-  //TODO
-  
+  const GValue* gst_fraction_range_val = gst_structure_get_value(gobj(), name.c_str());
+
+  if (gst_structure_get_field_type(gobj(), name.c_str()) == GST_TYPE_FRACTION_RANGE)
+  {
+    Glib::ValueBase fraction_range_val;
+    fraction_range_val.init(gst_fraction_range_val);
+    range = Gst::FractionRange(fraction_range_val);
+    return true;
+  }
+
   return false;
 }
 

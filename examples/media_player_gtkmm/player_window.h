@@ -37,7 +37,7 @@ class PlayerWindow : public Gtk::Window
 public:
   /**
    * @param playbin The pipeline that can play media files.
-   * @param video_sink The video sink to use to display stream video (if any)
+   * @param video_sink The video sink to use to display stream video (if any).
    */
   PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& video_sink);
   virtual ~PlayerWindow();
