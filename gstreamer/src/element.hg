@@ -214,6 +214,7 @@ public:
   _WRAP_METHOD(void post_message(MessageType message_type, const Glib::QueryQuark& domain, int code, const Glib::ustring& message, const Glib::ustring& debug, const Glib::ustring& filename, const Glib::ustring& function_name, int line_number), gst_element_message_full)
   _WRAP_METHOD(bool post_message(const Glib::RefPtr<Message>& message), gst_element_post_message)
 
+#m4 _CONVERSION(`const GstQueryType*',`Glib::ArrayHandle<QueryType>',`Glib::ArrayHandle<QueryType>((QueryType*)($3), Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(Glib::ArrayHandle<QueryType> get_query_types() const, gst_element_get_query_types)
 
   _WRAP_METHOD(bool query(const Glib::RefPtr<Query>& query), gst_element_query)
@@ -315,13 +316,14 @@ public:
   _WRAP_VFUNC(bool send_event(const Glib::RefPtr<Event>& event), "send_event")
 
   //TODO: This vfunc can't be wrapped without getting a compile error in the
-  //TODO: generated code.  The compile error comes about because the code
-  //TODO: assumes that Glib::ArrayHandle<> has a default constructor but it
-  //TODO: does not.  The way the code is generated will have to be tweaked.
-  //TODO:
-  //TODO: /** get the supported GstQueryType of this element
-  //TODO: */
-  //TODO: _WRAP_VFUNC(Glib::ArrayHandle<QueryType> get_query_types(), "get_query_types")
+  //generated code.  The compile error comes about because the code assumes
+  //that Glib::ArrayHandle<> has a default constructor but it does not.  The
+  //way the code is generated will have to be tweaked.
+  //
+//#m4 _CONVERSION(`Glib::ArrayHandle<QueryType>',`const GstQueryType*',`(GstQueryType*)(($3).data())')
+  // /** get the supported GstQueryType of this element
+  // */
+  // _WRAP_VFUNC(Glib::ArrayHandle<QueryType> get_query_types(), "get_query_types")
 
   /** perform a Gst::Query on the element 
    */

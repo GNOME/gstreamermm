@@ -56,8 +56,6 @@ Glib::ListHandle< Glib::RefPtr<Glib::Object> >
 Filter::run(const Glib::ListHandle<Glib::RefPtr<Glib::Object> >& list, const SlotFilter& slot, bool first)
 {
   SlotFilter* slot_copy = new SlotFilter(slot);
-  // TODO: we don't know the ownership of the items, I filed bug #518627 for GStreamer. Siavash
-  // TODO: For now, we'll use OWNERSHIP_SHALLOW (delete the list but not the items) until things clear up. Jose
   return Glib::ListHandle< Glib::RefPtr<Glib::Object> >(gst_filter_run(list.data(), &Filter_Filter_gstreamermm_callback, first, slot_copy), Glib::OWNERSHIP_SHALLOW);
 }
 

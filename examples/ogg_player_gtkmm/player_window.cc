@@ -232,8 +232,7 @@ void PlayerWindow::on_button_rewind()
 
 void PlayerWindow::on_button_forward()
 {
-  //TODO: Wrap GST_SECOND:
-  static const gint64 skip_amount = GST_SECOND * 3;
+  static const gint64 skip_amount = Gst::SECOND * 3;
 
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;

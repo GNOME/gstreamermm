@@ -23,7 +23,6 @@ _CONVERSION(`const Glib::RefPtr<const Buffer>&',`GstBuffer*', `const_cast<GstBuf
 _CONVERSION(`const Glib::RefPtr<Buffer>&',`const GstBuffer*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Buffer>',`GstBuffer*', `Glib::unwrap($3)')
 
-
 #Bus
 _CONVERSION(`const Glib::RefPtr<Bus>&',`GstBus*', `Glib::unwrap($3)')
 _CONVERSION(`GstBus*',`Glib::RefPtr<Bus>',`Glib::wrap($3)')
@@ -98,12 +97,10 @@ _CONVERSION(`GstPadTemplate*',`const Glib::RefPtr<PadTemplate>&', `Glib::wrap($3
 #Plugin
 _CONVERSION(`const Glib::RefPtr<Plugin>&',`GstPlugin*',`Glib::unwrap($3)')
 _CONVERSION(`GstPlugin*',`Glib::RefPtr<Plugin>',`Glib::wrap($3)')
-_CONVERSION(`GstPlugin*',`const Glib::RefPtr<Plugin>&',`Glib::wrap($3)')
 
 #PluginFeature
 _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<PluginFeature>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<PluginFeature>&',`GstPluginFeature*',`Glib::unwrap($3)')
-_CONVERSION(`GstPluginFeature*',`const Glib::RefPtr<PluginFeature>&',`Glib::wrap($3)')
 
 #Query
 _CONVERSION(`const Glib::RefPtr<Query>&',`GstQuery*', `Gst::unwrap($3)')
@@ -151,14 +148,6 @@ _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
 _CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`($3).gobj()')
-
-#List Conversions
-_CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
-_CONVERSION(`Glib::ListHandle< Glib::RefPtr<PluginFeature> >',`GList*',`($3).data()')
-_CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3)')
-_CONVERSION(`const GstQueryType*',`Glib::ArrayHandle<QueryType>',`Glib::ArrayHandle<QueryType>((QueryType*)($3), Glib::OWNERSHIP_SHALLOW)')
-_CONVERSION(`const Glib::ArrayHandle<QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
-_CONVERSION(`Glib::ArrayHandle<QueryType>',`const GstQueryType*',`(GstQueryType*)(($3).data())')
 
 #String Conversions
 _CONVERSION(`const std::string&',`const guchar*',`(const guchar*) ($3.c_str())')

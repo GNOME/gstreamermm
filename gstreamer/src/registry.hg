@@ -99,8 +99,6 @@ public:
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<PluginFeature> > get_feature_list(const Glib::ustring& name), gst_registry_get_feature_list_by_plugin)
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::ustring >',`$2($3, Glib::OWNERSHIP_DEEP)')
-
-  //TODO: Make sure returned list is valid.  gst_registry_get_path_list actually returns a GList* of gchar*
   _WRAP_METHOD(Glib::ListHandle< Glib::ustring > get_path_list(), gst_registry_get_path_list)
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Plugin> >',`$2($3, Glib::OWNERSHIP_DEEP)')
@@ -175,10 +173,15 @@ public:
   _WRAP_METHOD(void add_feature(const Glib::RefPtr<PluginFeature>& feature), gst_registry_add_feature)
   _WRAP_METHOD(static bool check_feature_version(const Glib::ustring& feature_name, guint min_major, guint min_minor, guint min_micro), gst_default_registry_check_feature_version)
 
+#m4 _CONVERSION(`GstPluginFeature*',`const Glib::RefPtr<PluginFeature>&',`Glib::wrap($3, true)')
+
   /** Signals that a feature has been added to the registry (possibly replacing
    * a previously-added one by the same name)
    */
   _WRAP_SIGNAL(void feature_added(const Glib::RefPtr<PluginFeature>& feature), "feature-added")
+
+
+#m4 _CONVERSION(`GstPlugin*',`const Glib::RefPtr<Plugin>&',`Glib::wrap($3, true)')
 
   /** Signals that a plugin has been added to the registry (possibly replacing
    * a previously-added one by the same name)
