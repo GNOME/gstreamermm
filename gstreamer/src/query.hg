@@ -32,8 +32,21 @@ namespace Gst
 
 _WRAP_ENUM(QueryType, GstQueryType)
 
+/** Get a printable name for the given query type.
+ *
+ * @param query The query type.
+ * @return The name of the query.
+ */
 Glib::ustring get_name(QueryType t);
+_IGNORE(gst_query_type_get_name)
+
+/** Get the unique quark for the given query type.
+ *
+ * @param query The query type.
+ * @return The quark associated with the query type.
+ */
 Glib::QueryQuark get_quark(QueryType t);
+_IGNORE(gst_query_type_to_quark)
 
 struct QueryTypeDefinition
 {
@@ -56,6 +69,8 @@ public:
   Structure get_structure() const;
 
 public:
+  /** Get the Gst::QueryType of the query.
+   */
   _MEMBER_GET(query_type, type, QueryType, GstQueryType)
 
   /** Wrap a GstQuery* in a C++ instance, creating an instance of a derived
@@ -71,7 +86,14 @@ public:
 #m4 _CONVERSION(`const Glib::ArrayHandle<QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
   _WRAP_METHOD(static bool query_types_contains(const Glib::ArrayHandle<QueryType>& types, QueryType type), gst_query_types_contains)
 
+  /** Get details about the given Gst::QueryType.
+   *
+   * @param type A Gst::QueryType.
+   * @param def A Gst::QueryTypeDefinition in which to store the details.
+   * @return true if successful, false otherwise.
+   */
   bool get_details(QueryType type, QueryTypeDefinition& def);
+  _IGNORE(gst_query_type_get_details)
 };
 
 //TODO: Modify create methods of derived Query classes to return
