@@ -84,10 +84,13 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Gli
   // Get the bus from the pipeline:
   Glib::RefPtr<Gst::Bus> bus = playbin->get_bus();
 
-  // Add a sync handler to receive synchronous messages from the pipeline's
-  // bus (this is done so that m_video_area can be set up for drawing at an
-  // exact appropriate time):
-  bus->set_sync_handler(
+  // Enable synchronous message emission to set up video (if any) at the
+  // exact appropriate time
+  bus->enable_sync_message_emission();
+
+  // Connect to bus's synchronous message signal (this is done so that
+  // m_video_area can be set up for drawing at the exact appropriate time):
+  bus->signal_sync_message().connect(
     sigc::mem_fun(*this, &PlayerWindow::on_bus_message_sync));
 
   // Add a bus watch to receive messages from the pipeline's bus:
@@ -109,16 +112,15 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Gli
 }
 
 // This function is used to receive asynchronous messages from mainPipeline's bus
-Gst::BusSyncReply PlayerWindow::on_bus_message_sync(
-    const Glib::RefPtr<Gst::Bus>& /* bus */,
+void PlayerWindow::on_bus_message_sync(
     const Glib::RefPtr<Gst::Message>& message)
 {
   // ignore anything but 'prepare-xwindow-id' element messages
   if(message->get_message_type() != Gst::MESSAGE_ELEMENT)
-    return Gst::BUS_PASS;
+    return;
 
   if(!message->get_structure().has_name("prepare-xwindow-id"))
-     return Gst::BUS_PASS;
+     return;
 
   Glib::RefPtr<Gst::Element> element =
       Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source());
@@ -131,8 +133,6 @@ Gst::BusSyncReply PlayerWindow::on_bus_message_sync(
     const gulong xWindowId = GDK_WINDOW_XID(m_video_area.get_window()->gobj());
     xoverlay->set_xwindow_id(xWindowId);
   }
-
-  return Gst::BUS_DROP;
 }
 
 // This function is used to receive asynchronous messages from play_bin's bus

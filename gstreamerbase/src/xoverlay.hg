@@ -54,7 +54,48 @@ namespace GstBase
  * posted on the bus to inform the application that it should set the Window
  * identifier immediately. Here is an example on how to do that correctly:
  *
- * TODO: Insert translated example code from C API
+ * @code
+ * #include <gdk/gdkx.h>
+ * ...
+ * void PlayerWindow::on_bus_message_sync(
+ *     const Glib::RefPtr<Gst::Message>& message)
+ * {
+ *   // ignore anything but 'prepare-xwindow-id' element messages
+ *   if(message->get_message_type() != Gst::MESSAGE_ELEMENT)
+ *    return;
+ *
+ *   if(!message->get_structure().has_name("prepare-xwindow-id"))
+ *      return;
+ *
+ *   Glib::RefPtr<Gst::Element> element =
+ *       Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source());
+ *
+ *   Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
+ *       Gst::Interface::cast <GstBase::XOverlay>(element);
+ *
+ *   if(xoverlay)
+ *   {
+ *     const gulong xWindowId =
+ *     GDK_WINDOW_XID(widget->get_window()->gobj());
+ *     xoverlay->set_xwindow_id(xWindowId);
+ *   }
+ * }
+ * ...
+ * int main (int argc, char *argv[])
+ * {
+ *   ...
+ *   // Get the bus from the pipeline:
+ *   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
+ * 
+ *  // Enable synchronous message emission:
+ *  bus->enable_sync_message_emission();
+ *
+ *  // Connect to bus's synchronous message signal:
+ *  bus->signal_sync_message().connect(
+ *    sigc::mem_fun(*this, &PlayerWindow::on_bus_message_sync));
+ *   ...
+ * }
+ * @endcode
  */
 class XOverlay : public Glib::Interface
 {

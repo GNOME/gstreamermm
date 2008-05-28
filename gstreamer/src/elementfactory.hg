@@ -35,12 +35,41 @@ class Plugin;
 /** Gst::ElementFactory — Create Gst::Element from a factory.
  * Gst::ElementFactory is used to create instances of elements. A
  * Gst::ElementFactory can be added to a Gst::Plugin as it is also a
- * Gst::PluginFeature.  Use the find() and create() functions to create element
- * instances. or use the static create() as a convenient shortcut.
+ * Gst::PluginFeature. Use find() to get a particular element factory. Use
+ * create_named_element() and the create_element() functions to create element
+ * instances.
  *
- * The following code example shows you how to create a GstFileSrc element.
+ * The following code example shows you how to create a 'filesrc' element.
  *
- * TODO: Add code example from GStreamer docs
+ * @code
+ *  #include <gstreamermm.h>
+ *  #include <iostream>
+
+ *  int main (int argc, char *argc[])
+ *  {
+ *    Glib::RefPtr<Gst::Element> src;
+ *    Glib::RefPtr<Gst::ElementFactory> srcfactory;
+ *
+ *    Gst::init(&argc,&argv);
+ *
+ *    srcfactory = Gst::ElementFactory::find("filesrc");
+ *
+ *    if (!srcfactory)
+ *    {
+ *      std::cout << "Could not find factory 'filesrc'" << std::endl;
+ *      exit(1);
+ *    }
+ *
+ *    src = srcfactory->create_named_element("src");
+ *
+ *    if (!src)
+ *    {
+ *      std::cout << "Could not create element 'src'" << std::endl;
+ *      exit(1);
+ *    }
+ *    ...
+ *  }
+ * @endcode
  *
  */
 class ElementFactory : public PluginFeature
