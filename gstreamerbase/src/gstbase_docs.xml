@@ -76,8 +76,8 @@ Since: 0.10.2
 
 <function name="gst_tuner_list_channels">
 <description>
-Retrieve a list of channels (e.g. &apos;composite&apos;, &apos;s-video&apos;, ...)
-from the given tuner object.
+Retrieve a #GList of #GstTunerChannels available
+(e.g. &apos;composite&apos;, &apos;s-video&apos;, ...) from the given tuner object.
 
 
 </description>
@@ -87,7 +87,8 @@ from the given tuner object.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a list of channels available on this tuner.
+<return> A list of channels available on this tuner. The list is
+owned by the GstTuner and must not be freed.
 </return>
 </function>
 
@@ -464,6 +465,22 @@ is invalid.
 </return>
 </function>
 
+<function name="gst_tuner_get_channel">
+<description>
+Retrieve the current channel from the tuner.
+
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> the #GstTuner (a #GstElement) to get the current channel from.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current channel of the tuner object.
+</return>
+</function>
+
 <function name="gst_missing_decoder_message_new">
 <description>
 Creates a missing-plugin message for @element to notify the application
@@ -751,18 +768,23 @@ requires the given channel to be a &quot;tuning&quot; channel, which can be
 checked using GST_TUNER_CHANNEL_HAS_FLAG (), with the proper flag
 being GST_TUNER_CHANNEL_FREQUENCY.
 
+The frequency is in Hz, with minimum steps indicated by the 
+frequency_multiplicator provided in the #GstTunerChannel. The
+valid range is provided in the min_frequency and max_frequency properties
+of the #GstTunerChannel.
+
 </description>
 <parameters>
 <parameter name="tuner">
-<parameter_description> the #Gsttuner (a #GstElement) that owns the given channel.
+<parameter_description> The #Gsttuner (a #GstElement) that owns the given channel.
 </parameter_description>
 </parameter>
 <parameter name="channel">
-<parameter_description> the #GstTunerChannel to set the frequency on.
+<parameter_description> The #GstTunerChannel to set the frequency on.
 </parameter_description>
 </parameter>
 <parameter name="frequency">
-<parameter_description> the frequency to tune in to.
+<parameter_description> The frequency to tune in to.
 </parameter_description>
 </parameter>
 </parameters>
@@ -851,6 +873,8 @@ MT safe.
 
 <function name="gst_video_format_is_rgb">
 <description>
+Determine whether the video format is an RGB format.
+
 Since: 0.10.16
 
 
@@ -930,19 +954,29 @@ Set the payload type of the RTP packet in @buffer to @payload_type.
 <return></return>
 </function>
 
-<function name="gst_sdp_message_phones_len">
+<function name="gst_audio_clock_new">
 <description>
-Get the number of phones in @msg.
+Create a new #GstAudioClock instance. Whenever the clock time should be
+calculated it will call @func with @user_data. When @func returns
+#GST_CLOCK_TIME_NONE, the clock will return the last reported time.
 
 
 </description>
 <parameters>
-<parameter name="msg">
-<parameter_description> a #GstSDPMessage
+<parameter name="name">
+<parameter_description> the name of the clock
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a function
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data
 </parameter_description>
 </parameter>
 </parameters>
-<return> the number of phones in @msg.
+<return> a new #GstAudioClock casted to a #GstClock.
 </return>
 </function>
 
@@ -1128,6 +1162,33 @@ Since: 0.10.16
 </return>
 </function>
 
+<function name="gst_color_balance_set_value">
+<description>
+Sets the current value of the channel to the passed value, which must
+be between min_value and max_value.
+
+See Also: The #GstColorBalanceChannel::min_value and
+#GstColorBalanceChannel::max_value members of the
+#GstColorBalanceChannel object.
+
+</description>
+<parameters>
+<parameter name="balance">
+<parameter_description> A #GstColorBalance instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> A #GstColorBalanceChannel instance
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The new value for the channel.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtp_buffer_new_take_data">
 <description>
 Create a new buffer and set the data and size of the buffer to @data and @len
@@ -1248,23 +1309,25 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_sdp_message_get_zone">
+<function name="gst_tuner_get_frequency">
 <description>
-Get time zone information with index @idx from @msg.
+Retrieve the current frequency from the given channel. As for
+gst_tuner_set_frequency(), the #GstTunerChannel must support frequency
+operations, as indicated by the GST_TUNER_CHANNEL_FREQUENCY flag.
 
 
 </description>
 <parameters>
-<parameter name="msg">
-<parameter_description> a #GstSDPMessage
+<parameter name="tuner">
+<parameter_description> The #GstTuner (a #GstElement) that owns the given channel.
 </parameter_description>
 </parameter>
-<parameter name="idx">
-<parameter_description> the zone index
+<parameter name="channel">
+<parameter_description> The #GstTunerChannel to retrieve the frequency from.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstSDPZone.
+<return> The current frequency, or 0 on error.
 </return>
 </function>
 
@@ -1344,6 +1407,34 @@ Convert @method to a #GstRTSPMethod.
 <return> a #GstRTSPMethod for @method or #GST_RTSP_INVALID if the
 method is unknown.
 </return>
+</function>
+
+<function name="gst_rtsp_connection_set_auth_param">
+<description>
+Setup @conn with authentication directives. This is not necesary for
+methods #GST_RTSP_AUTH_NONE and #GST_RTSP_AUTH_BASIC. For
+#GST_RTSP_AUTH_DIGEST, directives should be taken from the digest challenge
+in the WWW-Authenticate response header and can include realm, domain,
+nonce, opaque, stale, algorithm, qop as per RFC2617.
+
+Since: 0.10.20
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="param">
+<parameter_description> authentication directive
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_base_audio_sink_set_slave_method">
@@ -1455,20 +1546,23 @@ null-terminated copy of the data instead. use g_free() after usage.
 </return>
 </function>
 
-<function name="gst_missing_plugin_message_get_description">
+<function name="gst_tuner_channel_changed">
 <description>
-Returns: a newly-allocated description string, or NULL on error. Free
+Called by elements implementing the #GstTuner interface when the
+current channel changes. Fires the #GstTuner::channel-changed signal.
 
 </description>
 <parameters>
-<parameter name="msg">
-<parameter_description> a missing-plugin #GstMessage of type #GST_MESSAGE_ELEMENT
+<parameter name="tuner">
+<parameter_description> A #GstTuner instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> A #GstTunerChannel instance
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated description string, or NULL on error. Free
-string with g_free() when not needed any longer.
-</return>
+<return></return>
 </function>
 
 <function name="gst_sdp_message_add_email">
@@ -1589,22 +1683,6 @@ parsed data.
 </return>
 </function>
 
-<function name="gst_Tuner_get_channel">
-<description>
-Retrieve the current channel from the tuner.
-
-
-</description>
-<parameters>
-<parameter name="tuner">
-<parameter_description> the #GstTuner (a #GstElement) to get the current channel from.
-</parameter_description>
-</parameter>
-</parameters>
-<return> the current channel of the tuner object.
-</return>
-</function>
-
 <function name="gst_sdp_message_get_connection">
 <description>
 Get the connection of @msg.
@@ -1696,6 +1774,27 @@ Set the version of the RTP packet in @buffer to @version.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_tuner_find_norm_by_name">
+<description>
+Look up a #GstTunerNorm by name.
+
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> A #GstTuner instance
+</parameter_description>
+</parameter>
+<parameter name="norm">
+<parameter_description> A string containing the name of a #GstTunerNorm
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GstTunerNorm, or NULL if no norm with the provided name
+is available.
+</return>
 </function>
 
 <function name="gst_rtsp_base64_decode_ip">
@@ -1797,6 +1896,31 @@ MT safe.
 <return></return>
 </function>
 
+<function name="gst_tuner_signal_changed">
+<description>
+Called by elements implementing the #GstTuner interface when the
+incoming signal strength changes. Fires the #GstTuner::signal-changed
+signal on the tuner and the #GstTunerChannel::signal-changed signal on 
+the channel.
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> A #GstTuner instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The current #GstTunerChannel
+</parameter_description>
+</parameter>
+<parameter name="signal">
+<parameter_description> The new signal strength
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_video_orientation_get_vcenter">
 <description>
 Get the vertical centering offset from the given object.
@@ -1834,6 +1958,27 @@ added packets.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_tuner_find_channel_by_name">
+<description>
+Look up a #GstTunerChannel by name.
+
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> A #GstTuner instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> A string containing the name of a #GstTunerChannel
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GstTunerChannel, or NULL if no channel with the provided name
+is available.
+</return>
 </function>
 
 <function name="gst_install_plugins_context_new">
@@ -2060,6 +2205,24 @@ Set the reason string to @reason in @packet.
 </return>
 </function>
 
+<function name="gst_color_balance_list_channels">
+<description>
+Retrieve a list of the available channels.
+
+
+</description>
+<parameters>
+<parameter name="balance">
+<parameter_description> A #GstColorBalance instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> A GList containing pointers to #GstColorBalanceChannel objects.
+The list is owned by the #GstColorBalance instance and must not
+be freed.
+</return>
+</function>
+
 <function name="gst_rtp_buffer_get_csrc_count">
 <description>
 Get the CSRC count of the RTP packet in @buffer.
@@ -2211,33 +2374,6 @@ of a #GST_TAG_EXTENDED_COMMENT (since 0.10.10 at least).
 <return></return>
 </function>
 
-<function name="gst_video_format_from_rgb32_masks">
-<description>
-Converts red, green, blue bit masks into the corresponding
-#GstVideoFormat.  
-
-Since: 0.10.16
-
-
-</description>
-<parameters>
-<parameter name="red_mask">
-<parameter_description> red bit mask
-</parameter_description>
-</parameter>
-<parameter name="green_mask">
-<parameter_description> green bit mask
-</parameter_description>
-</parameter>
-<parameter name="blue_mask">
-<parameter_description> blue bit mask
-</parameter_description>
-</parameter>
-</parameters>
-<return> the #GstVideoFormat corresponding to the bit masks
-</return>
-</function>
-
 <function name="gst_missing_encoder_message_new">
 <description>
 Creates a missing-plugin message for @element to notify the application
@@ -2337,24 +2473,24 @@ Since: 0.10.18
 </return>
 </function>
 
-<function name="gst_rtsp_transport_parse">
+<function name="GstTunerChannel">
 <description>
-Parse the RTSP transport string @str into @transport.
+Reports that the signal strength has changed.
 
+See Also: gst_tuner_signal_strength()
 
 </description>
 <parameters>
-<parameter name="str">
-<parameter_description> a transport string
+<parameter name="tunerchannel">
+<parameter_description> The #GstTunerChannel
 </parameter_description>
 </parameter>
-<parameter name="transport">
-<parameter_description> a #GstRTSPTransport
+<parameter name="signal">
+<parameter_description> The new signal strength (an integer)
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstRTSPResult.
-</return>
+<return></return>
 </function>
 
 <function name="gst_video_format_to_fourcc">
@@ -2438,6 +2574,33 @@ Since: 0.10.12
 <return></return>
 </function>
 
+<function name="gst_tuner_signal_strength">
+<description>
+Get the strength of the signal on this channel. Note that this
+requires the current channel to be a &quot;tuning&quot; channel, i.e. a
+channel on which frequency can be set. This can be checked using
+GST_TUNER_CHANNEL_HAS_FLAG (), and the appropriate flag to check
+for is GST_TUNER_CHANNEL_FREQUENCY.
+
+The valid range of the signal strength is indicated in the 
+min_signal and max_signal properties of the #GstTunerChannel.
+
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> the #GstTuner (a #GstElement) that owns the given channel.
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> the #GstTunerChannel to get the signal strength from.
+</parameter_description>
+</parameter>
+</parameters>
+<return> Signal strength, or 0 on error.
+</return>
+</function>
+
 <function name="gst_sdp_media_add_bandwidth">
 <description>
 Add the bandwidth information with @bwtype and @bandwidth to @media.
@@ -2507,6 +2670,8 @@ Since: 0.10.11
 
 <function name="gst_video_format_is_yuv">
 <description>
+Determine whether the video format is a YUV format.
+
 Since: 0.10.16
 
 
@@ -2565,6 +2730,31 @@ needed/available for @trans.
 </parameter>
 </parameters>
 <return> #GST_RTSP_OK. 
+</return>
+</function>
+
+<function name="gst_color_balance_get_value">
+<description>
+Retrieve the current value of the indicated channel, between min_value
+and max_value.
+
+See Also: The #GstColorBalanceChannel::min_value and
+#GstColorBalanceChannel::max_value members of the
+#GstColorBalanceChannel object.
+
+
+</description>
+<parameters>
+<parameter name="balance">
+<parameter_description> A #GstColorBalance instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> A #GstColorBalanceChannel instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current value of the channel.
 </return>
 </function>
 
@@ -2772,6 +2962,26 @@ Get the number of attributes in @msg.
 </return>
 </function>
 
+<function name="gst_tuner_norm_changed">
+<description>
+Called by elements implementing the #GstTuner interface when the
+current norm changes. Fires the #GstTuner::norm-changed signal.
+
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> A #GstTuner instance
+</parameter_description>
+</parameter>
+<parameter name="norm">
+<parameter_description> A #GstTunerNorm instance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_pb_utils_add_codec_description_to_tag_list">
 <description>
 Adds a codec tag describing the format specified by @caps to @taglist.
@@ -2865,43 +3075,6 @@ Add the given connection parameters to @media.
 </return>
 </function>
 
-<function name="gst_riff_create_video_caps_with_data">
-<description>
-
-</description>
-<parameters>
-<parameter name="codec_fcc">
-<parameter_description> fourCC codec for this codec.
-</parameter_description>
-</parameter>
-<parameter name="strh">
-<parameter_description> pointer to the strh stream header structure.
-</parameter_description>
-</parameter>
-<parameter name="strf">
-<parameter_description> pointer to the strf stream header structure, including any
-data that is within the range of strf.size, but excluding any
-additional data withint this chunk but outside strf.size.
-</parameter_description>
-</parameter>
-<parameter name="strf_data">
-<parameter_description> a #GstBuffer containing the additional data in the strf
-chunk outside reach of strf.size. Ususally a palette.
-</parameter_description>
-</parameter>
-<parameter name="strd_data">
-<parameter_description> a #GstBuffer containing the data in the strd stream header
-chunk. Usually codec initialization data.
-</parameter_description>
-</parameter>
-<parameter name="codec_name">
-<parameter_description> if given, will be filled with a human-readable codec name.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gst_sdp_media_new">
 <description>
 Allocate a new GstSDPMedia and store the result in @media.
@@ -2932,6 +3105,24 @@ Dump the contents of @msg to stdout.
 </parameters>
 <return> #GST_RTSP_OK.
 </return>
+</function>
+
+<function name="GstColorBalanceChannel">
+<description>
+Fired when the value of the indicated channel has changed.
+
+</description>
+<parameters>
+<parameter name="channel">
+<parameter_description> The #GstColorBalanceChannel
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The new value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_sdp_message_parse_buffer">
@@ -3391,6 +3582,26 @@ videosink and videofilter base classes.
 <return></return>
 </function>
 
+<function name="str_case_equal">
+<description>
+Compares @v1 and @v2 in a case-insensitive manner
+
+
+</description>
+<parameters>
+<parameter name="v1">
+<parameter_description> an ASCII string
+</parameter_description>
+</parameter>
+<parameter name="v2">
+<parameter_description> another ASCII string
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if they are equal (modulo case)
+</return>
+</function>
+
 <function name="gst_sdp_message_set_version">
 <description>
 Set the version in @msg.
@@ -3584,24 +3795,6 @@ gst_fft_next_fast_length().
 </parameter>
 </parameters>
 <return> a new #GstFFTS32 instance.
-</return>
-</function>
-
-<function name="gst_tuner_get_norms_list">
-<description>
-Retrieve a list of available norms on the currently tuned channel
-from the given tuner object.
-
-
-</description>
-<parameters>
-<parameter name="tuner">
-<parameter_description> the #GstTuner (*a #GstElement) to get the list of norms from.
-</parameter_description>
-</parameter>
-</parameters>
-<return> A list of norms available on the current channel for this
-tuner object.
 </return>
 </function>
 
@@ -4125,15 +4318,15 @@ Since: 0.10.16
 </description>
 <parameters>
 <parameter name="caps">
-<parameter_description>
+<parameter_description> pointer to a #GstCaps instance
 </parameter_description>
 </parameter>
 <parameter name="fps_n">
-<parameter_description> pointer to numerator of frame rate (output)
+<parameter_description> pointer to integer to hold numerator of frame rate (output)
 </parameter_description>
 </parameter>
 <parameter name="fps_d">
-<parameter_description> pointer to denominator of frame rate (output)
+<parameter_description> pointer to integer to hold denominator of frame rate (output)
 </parameter_description>
 </parameter>
 </parameters>
@@ -4263,6 +4456,43 @@ Get the packet type of the packet pointed to by @packet.
 </parameters>
 <return> The packet type.
 </return>
+</function>
+
+<function name="gst_riff_create_video_caps">
+<description>
+
+</description>
+<parameters>
+<parameter name="codec_fcc">
+<parameter_description> fourCC codec for this codec.
+</parameter_description>
+</parameter>
+<parameter name="strh">
+<parameter_description> pointer to the strh stream header structure.
+</parameter_description>
+</parameter>
+<parameter name="strf">
+<parameter_description> pointer to the strf stream header structure, including any
+data that is within the range of strf.size, but excluding any
+additional data withint this chunk but outside strf.size.
+</parameter_description>
+</parameter>
+<parameter name="strf_data">
+<parameter_description> a #GstBuffer containing the additional data in the strf
+chunk outside reach of strf.size. Ususally a palette.
+</parameter_description>
+</parameter>
+<parameter name="strd_data">
+<parameter_description> a #GstBuffer containing the data in the strd stream header
+chunk. Usually codec initialization data.
+</parameter_description>
+</parameter>
+<parameter name="codec_name">
+<parameter_description> if given, will be filled with a human-readable codec name.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_video_calculate_display_ratio">
@@ -4639,6 +4869,25 @@ Gets the internal adapter used by the depayloader.
 <return> a #GstAdapter.
 
 Since: 0.10.13
+</return>
+</function>
+
+<function name="gst_tuner_list_norms">
+<description>
+Retrieve a GList of available #GstTunerNorm settings for the currently
+tuned channel on the given tuner object.
+
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> the #GstTuner (*a #GstElement) to get the list of norms from.
+</parameter_description>
+</parameter>
+</parameters>
+<return> A list of norms available on the current channel for this
+tuner object. The list is owned by the GstTuner and must not
+be freed.
 </return>
 </function>
 
@@ -5118,6 +5367,26 @@ Set the timestamp of the RTP packet in @buffer to @timestamp.
 <return></return>
 </function>
 
+<function name="gst_rtsp_transport_parse">
+<description>
+Parse the RTSP transport string @str into @transport.
+
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a transport string
+</parameter_description>
+</parameter>
+<parameter name="transport">
+<parameter_description> a #GstRTSPTransport
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstRTSPResult.
+</return>
+</function>
+
 <function name="gst_audio_structure_set_int">
 <description>
 Do not use anymore.
@@ -5186,6 +5455,34 @@ Adds @len SSRCs in @ssrc to BYE @packet.
 <return> %TRUE if the all the SSRCs were added. This function can return %FALSE if
 the max MTU is exceeded or the number of sources blocks is greater than
 #GST_RTCP_MAX_BYE_SSRC_COUNT.
+</return>
+</function>
+
+<function name="gst_video_get_size">
+<description>
+Inspect the caps of the provided pad and retrieve the width and height of
+the video frames it is configured for.
+
+The pad needs to have negotiated caps containing width and height properties.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> pointer to a #GstPad
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> pointer to integer to hold pixel width of the video frames (output)
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> pointer to integer to hold pixel height of the video frames (output)
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the width and height could be retrieved.
+
 </return>
 </function>
 
@@ -5579,6 +5876,27 @@ Check if the buffer size is a whole multiple of the frame size.
 </return>
 </function>
 
+<function name="gst_video_frame_rate">
+<description>
+A convenience function to retrieve a GValue holding the framerate
+from the caps on a pad.
+
+The pad needs to have negotiated caps containing a framerate property.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> pointer to a #GstPad
+</parameter_description>
+</parameter>
+</parameters>
+<return> NULL if the pad has no configured caps or the configured caps
+do not contain a framerate.
+
+</return>
+</function>
+
 <function name="gst_rtsp_url_set_port">
 <description>
 Set the port number in @url to @port.
@@ -5693,6 +6011,28 @@ Since: 0.10.14
 </return>
 </function>
 
+<function name="GstColorBalance">
+<description>
+Fired when the value of the indicated channel has changed.
+
+</description>
+<parameters>
+<parameter name="colorbalance">
+<parameter_description> The GstColorBalance instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The #GstColorBalanceChannel
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The new value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_sdp_message_get_information">
 <description>
 Get the information in @msg.
@@ -5750,29 +6090,19 @@ Set the port information in @media.
 </return>
 </function>
 
-<function name="gst_audio_clock_new">
+<function name="gst_sdp_message_phones_len">
 <description>
-Create a new #GstAudioClock instance. Whenever the clock time should be
-calculated it will call @func with @user_data. When @func returns
-#GST_CLOCK_TIME_NONE, the clock will return the last reported time.
+Get the number of phones in @msg.
 
 
 </description>
 <parameters>
-<parameter name="name">
-<parameter_description> the name of the clock
-</parameter_description>
-</parameter>
-<parameter name="func">
-<parameter_description> a function
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data
+<parameter name="msg">
+<parameter_description> a #GstSDPMessage
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GstAudioClock casted to a #GstClock.
+<return> the number of phones in @msg.
 </return>
 </function>
 
@@ -6218,8 +6548,7 @@ Get the sequence number of the RTP packet in @buffer.
 
 <function name="gst_video_format_has_alpha">
 <description>
-Since: 0.10.16
-
+Returns: TRUE if @format has an alpha channel
 
 </description>
 <parameters>
@@ -6232,28 +6561,48 @@ Since: 0.10.16
 </return>
 </function>
 
-<function name="gst_tuner_get_signal_strength">
+<function name="gst_rtsp_connection_clear_auth_params">
 <description>
-get the strength of the signal on this channel. Note that this
-requires the current channel to be a &quot;tuning&quot; channel, e.g. a
-channel on which frequency can be set. This can be checked using
-GST_TUNER_CHANNEL_HAS_FLAG (), and the appropriate flag to check
-for is GST_TUNER_CHANNEL_FREQUENCY.
+Clear the list of authentication directives stored in @conn.
 
+Since: 0.10.20
 
 </description>
 <parameters>
-<parameter name="tuner">
-<parameter_description> the #GstTuner (a #GstElement) that owns the given channel.
-</parameter_description>
-</parameter>
-<parameter name="channel">
-<parameter_description> the #GstTunerChannel to get the signal strength from.
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
 </parameter_description>
 </parameter>
 </parameters>
-<return> signal strength, or 0 on error.
-</return>
+<return></return>
+</function>
+
+<function name="gst_mixer_set_volume">
+<description>
+Sets the volume on each channel in a track. Short note about
+naming: a track is defined as one separate stream owned by
+the mixer/element, such as &apos;Line-in&apos; or &apos;Microphone&apos;. A
+channel is said to be a mono-stream inside this track. A
+stereo track thus contains two channels.
+
+</description>
+<parameters>
+<parameter name="mixer">
+<parameter_description> The #GstMixer (a #GstElement) that owns the track.
+</parameter_description>
+</parameter>
+<parameter name="track">
+<parameter_description> The #GstMixerTrack to set the volume on.
+</parameter_description>
+</parameter>
+<parameter name="volumes">
+<parameter_description> an array of integers (of size track-&amp;gt;num_channels)
+that gives the wanted volume for each channel in
+this track.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_rtsp_status_as_text">
@@ -6749,7 +7098,7 @@ Since: 0.10.16
 </description>
 <parameters>
 <parameter name="caps">
-<parameter_description>
+<parameter_description> pointer to a #GstCaps instance
 </parameter_description>
 </parameter>
 <parameter name="par_n">
@@ -6769,8 +7118,9 @@ Since: 0.10.16
 <description>
 This function is for X11-based applications (such as most Gtk/Qt
 applications on linux/unix) only. You can use it to tell the external
-the XID of your main application window, so the installer can make its
-own window transient to your application windonw during the installation.
+installer the XID of your main application window. That way the installer
+can make its own window transient to your application window during the
+installation.
 
 If set, the XID will be passed to the installer via a --transient-for=XID
 command line option.
@@ -7342,8 +7692,8 @@ Get the number of formats in @media.
 
 <function name="gst_rtp_buffer_compare_seqnum">
 <description>
-Compare two sequence numbers, taking care of wraparounds.
-
+Compare two sequence numbers, taking care of wraparounds. This function
+Returns: a negative value if @seqnum1 is bigger than @seqnum2, 0 if they
 
 </description>
 <parameters>
@@ -7356,8 +7706,8 @@ Compare two sequence numbers, taking care of wraparounds.
 </parameter_description>
 </parameter>
 </parameters>
-<return> -1 if @seqnum1 is before @seqnum2, 0 if they are equal or 1 if
-@seqnum1 is bigger than @segnum2.
+<return> a negative value if @seqnum1 is bigger than @seqnum2, 0 if they
+are equal or a positive value if @seqnum1 is smaller than @segnum2.
 
 Since: 0.10.15
 </return>
@@ -7497,6 +7847,27 @@ Get the version in @msg.
 </parameters>
 <return> a #GstSDPResult.
 </return>
+</function>
+
+<function name="gst_audio_clock_reset">
+<description>
+Inform @clock that future calls to #GstAudioClockGetTimeFunc will return values
+starting from @time. The clock will update an internal offset to make sure that
+future calls to internal_time will return an increasing result as required by
+the #GstClock object.
+
+</description>
+<parameters>
+<parameter name="clock">
+<parameter_description> a #GstAudioClock
+</parameter_description>
+</parameter>
+<parameter name="time">
+<parameter_description> a #GstClockTime
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_fft_next_fast_length">
@@ -7868,24 +8239,23 @@ Since: 0.10.18
 <return></return>
 </function>
 
-<function name="gst_tuner_get_frequency">
+<function name="gst_sdp_message_get_zone">
 <description>
-Retrieve the current frequency from the given channel. The same
-applies as for set_frequency (): check the flag.
+Get time zone information with index @idx from @msg.
 
 
 </description>
 <parameters>
-<parameter name="tuner">
-<parameter_description> the #GstTuner (a #GstElement) that owns the given channel.
+<parameter name="msg">
+<parameter_description> a #GstSDPMessage
 </parameter_description>
 </parameter>
-<parameter name="channel">
-<parameter_description> the #GstTunerChannel to retrieve the frequency from.
+<parameter name="idx">
+<parameter_description> the zone index
 </parameter_description>
 </parameter>
 </parameters>
-<return> the current frequency, or 0 on error.
+<return> a #GstSDPZone.
 </return>
 </function>
 
@@ -8002,29 +8372,29 @@ any timestamp on the outgoing buffer.
 </return>
 </function>
 
-<function name="gst_fft_f32_new">
+<function name="gst_color_balance_value_changed">
 <description>
-This returns a new #GstFFTF32 instance with the given parameters. It makes
-sense to keep one instance for several calls for speed reasons.
-
-@len must be even and to get the best performance a product of
-2, 3 and 5. To get the next number with this characteristics use
-gst_fft_next_fast_length().
-
+A helper function called by implementations of the GstColorBalance
+interface. It fires the #GstColorBalance::value-changed signal on the
+instance, and the #GstColorBalanceChannel::value-changed signal on the
+channel object.
 
 </description>
 <parameters>
-<parameter name="len">
-<parameter_description> Length of the FFT in the time domain
+<parameter name="balance">
+<parameter_description> A #GstColorBalance instance
 </parameter_description>
 </parameter>
-<parameter name="inverse">
-<parameter_description> %TRUE if the #GstFFTF32 instance should be used for the inverse FFT
+<parameter name="channel">
+<parameter_description> A #GstColorBalanceChannel whose value has changed
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The new value of the channel
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GstFFTF32 instance.
-</return>
+<return></return>
 </function>
 
 <function name="gst_pb_utils_get_sink_description">
@@ -8279,6 +8649,31 @@ function.
 </return>
 </function>
 
+<function name="gst_fft_f32_new">
+<description>
+This returns a new #GstFFTF32 instance with the given parameters. It makes
+sense to keep one instance for several calls for speed reasons.
+
+@len must be even and to get the best performance a product of
+2, 3 and 5. To get the next number with this characteristics use
+gst_fft_next_fast_length().
+
+
+</description>
+<parameters>
+<parameter name="len">
+<parameter_description> Length of the FFT in the time domain
+</parameter_description>
+</parameter>
+<parameter name="inverse">
+<parameter_description> %TRUE if the #GstFFTF32 instance should be used for the inverse FFT
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstFFTF32 instance.
+</return>
+</function>
+
 <function name="gst_netaddress_set_ip6_address">
 <description>
 Set @naddr with the IPv6 @address and @port pair.
@@ -8401,6 +8796,24 @@ in the drawable even if the pipeline is PAUSED.
 <return></return>
 </function>
 
+<function name="gst_base_audio_src_get_slave_method">
+<description>
+Get the current slave method used by @src.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> a #GstBaseAudioSrc
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current slave method used by @src.
+
+Since: 0.10.20
+</return>
+</function>
+
 <function name="gst_tag_parse_extended_comment">
 <description>
 Convenience function to parse a GST_TAG_EXTENDED_COMMENT string and
@@ -8510,6 +8923,22 @@ Get the current value of a name/value option in the mixer.
 </parameter>
 </parameters>
 <return> current value of the name/value option.
+</return>
+</function>
+
+<function name="str_case_hash">
+<description>
+Hashes @key in a case-insensitive manner.
+
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> ASCII string to hash
+</parameter_description>
+</parameter>
+</parameters>
+<return> the hash code.
 </return>
 </function>
 
@@ -8633,34 +9062,6 @@ Get a newly allocated string describing the request URI for @url.
 </return>
 </function>
 
-<function name="gst_mixer_set_volume">
-<description>
-Sets the volume on each channel in a track. Short note about
-naming: a track is defined as one separate stream owned by
-the mixer/element, such as &apos;Line-in&apos; or &apos;Microphone&apos;. A
-channel is said to be a mono-stream inside this track. A
-stereo track thus contains two channels.
-
-</description>
-<parameters>
-<parameter name="mixer">
-<parameter_description> The #GstMixer (a #GstElement) that owns the track.
-</parameter_description>
-</parameter>
-<parameter name="track">
-<parameter_description> The #GstMixerTrack to set the volume on.
-</parameter_description>
-</parameter>
-<parameter name="volumes">
-<parameter_description> an array of integers (of size track-&amp;gt;num_channels)
-that gives the wanted volume for each channel in
-this track.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gst_sdp_media_get_media">
 <description>
 Get the media description of @media.
@@ -8765,6 +9166,31 @@ Allocate a new GstSDPMessage and store the result in @msg.
 </return>
 </function>
 
+<function name="gst_tuner_frequency_changed">
+<description>
+Called by elements implementing the #GstTuner interface when the
+configured frequency changes. Fires the #GstTuner::frequency-changed
+signal on the tuner, and the #GstTunerChannel::frequency-changed signal
+on the channel.
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> A #GstTuner instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The current #GstTunerChannel
+</parameter_description>
+</parameter>
+<parameter name="frequency">
+<parameter_description> The new frequency setting
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtcp_packet_bye_add_ssrc">
 <description>
 Add @ssrc to the BYE @packet.
@@ -8803,6 +9229,22 @@ Tunes the object to the given channel.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_missing_plugin_message_get_description">
+<description>
+Returns: a newly-allocated description string, or NULL on error. Free
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> a missing-plugin #GstMessage of type #GST_MESSAGE_ELEMENT
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated description string, or NULL on error. Free
+string with g_free() when not needed any longer.
+</return>
 </function>
 
 <function name="gst_rtcp_packet_bye_get_reason_len">
@@ -9245,6 +9687,30 @@ Get the packet padding of the packet pointed to by @packet.
 </return>
 </function>
 
+<function name="GstTuner">
+<description>
+Reports that the signal strength has changed.
+
+See Also: gst_tuner_signal_strength()
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> The element providing the GstTuner interface
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The current #GstTunerChannel
+</parameter_description>
+</parameter>
+<parameter name="signal">
+<parameter_description> The new signal strength (an integer)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_sdp_media_add_format">
 <description>
 Add the format information to @media.
@@ -9326,6 +9792,26 @@ strh structure. Caller should free it.
 <return> TRUE if parsing succeeded, otherwise FALSE. The stream
 should be skipped on error, but it is not fatal.
 </return>
+</function>
+
+<function name="gst_base_audio_src_set_slave_method">
+<description>
+Controls how clock slaving will be performed in @src. 
+
+Since: 0.10.20
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> a #GstBaseAudioSrc
+</parameter_description>
+</parameter>
+<parameter name="method">
+<parameter_description> the new slave method
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_ring_buffer_commit_full">
