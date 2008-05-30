@@ -211,7 +211,7 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
 
 void PlayerWindow::on_button_rewind()
 {
-  static const gint64 skip_amount = GST_SECOND * 2;
+  static const gint64 skip_amount = Gst::SECOND * 2;
 
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;

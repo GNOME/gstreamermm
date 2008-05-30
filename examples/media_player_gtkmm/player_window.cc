@@ -177,8 +177,8 @@ bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
   Glib::RefPtr<Gst::Buffer> buffer = Glib::RefPtr<Gst::Buffer>::cast_dynamic(data);
 
   if(buffer) {
-    Glib::Value<int> width_value;
-    Glib::Value<int> height_value;
+    int width_value;
+    int height_value;
 
     Glib::RefPtr<Gst::Caps> caps = buffer->get_caps();
 
@@ -189,7 +189,7 @@ bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
       structure.get_field("height", height_value);
     }
 
-    m_video_area.set_size_request(width_value.get(), height_value.get());
+    m_video_area.set_size_request(width_value, height_value);
 
     // Resize to minimum when first playing by making size 
     // smallest then resizing according to video new size:
@@ -292,7 +292,7 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
 
 void PlayerWindow::on_button_rewind()
 {
-  static const gint64 skipAmount = GST_SECOND * 2;
+  static const gint64 skipAmount = Gst::SECOND * 2;
 
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;
@@ -312,7 +312,7 @@ void PlayerWindow::on_button_rewind()
 
 void PlayerWindow::on_button_forward()
 {
-  static const gint64 skipAmount = GST_SECOND * 3;
+  static const gint64 skipAmount = Gst::SECOND * 3;
 
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;
