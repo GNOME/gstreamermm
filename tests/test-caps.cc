@@ -43,12 +43,40 @@ int link_elements_with_filter (const Glib::RefPtr<Gst::Element> e1,
   return e1->link_filtered(e2, caps);
 }
 
+void test_simple()
+{
+  int width;
+  Gst::Fraction rate;
+
+  Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw-yuv");
+  caps->set_simple("width", 500);
+  caps->set_simple("framerate", Gst::Fraction(25, 1));
+
+  if (caps->get_structure(0).get_field("width", width))
+  {
+    std::cout << "Simple caps width after setting = " << width << "." <<
+      std::endl;
+  }
+  else
+    std::cout << "Getting of simple caps width field failed." << std::endl;
+
+  if (caps->get_structure(0).get_field("framerate", rate))
+  {
+    std::cout << "Simple caps rate after setting = " << rate.num << "/" <<
+      rate.denom << "." << std::endl;
+  }
+  else
+    std::cout << "Getting of simple caps framerate field failed." << std::endl;
+}
+
 int main (int argc, char* argv[])
 {
   Glib::RefPtr<Gst::Pipeline> pipeline;
   Glib::RefPtr<Gst::Element> e1, e2;
 
   Gst::init(argc, argv);
+
+  test_simple();
 
   pipeline = Gst::Pipeline::create("pipeline");
 

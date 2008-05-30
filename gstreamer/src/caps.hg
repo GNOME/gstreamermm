@@ -21,6 +21,7 @@
 
 #include <gst/gstcaps.h>
 #include <gstreamermm/structure.h>
+#include <gstreamermm/structurevalue.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -48,12 +49,11 @@ struct Structure;
  *
  * @code
  * Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw-yuv");
- * //TODO: Add method overloads so we don't need to specify the type, and so we don't need to use Glib::Value:
- * caps->set_simple("format", GST_TYPE_FOURCC, GST_MAKE_FOURCC ('I', '4', '2', '0'));
- * caps->set_simple("framerate", GST_TYPE_FRACTION, 25, 1,
- * caps->set_simple("pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1,
- * caps->set_simple("width", G_TYPE_INT, 320,
- * caps->set_simple("height", G_TYPE_INT, 240)
+ * caps->set_simple("format", Gst::Fourcc('I', '4', '2', '0'));
+ * caps->set_simple("framerate", Gst::Fraction(25, 1));
+ * caps->set_simple("pixel-aspect-ratio", Gst::Fraction(1, 1));
+ * caps->set_simple("width", 320);
+ * caps->set_simple("height", 240);
  * @endcode
  */
 class Caps 
@@ -115,15 +115,28 @@ public:
   _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
   _WRAP_METHOD(guint size() const, gst_caps_get_size)
 
-  //TODO: Avoid forcing applications to use Glib::Value<>. See what TreeModel does.
-
   /** Sets fields in a simple Gst::Caps. A simple Gst::Caps is one that only
-   * has one structure.
+   * has one structure. This method, like the Gst::Structure::set_field()
+   * methods, translates certain GTypes to GStreamer specific GTypes for
+   * functional compatibility.
    *
-   * @param field Field to set.
+   * @param name Field to set.
    * @param value The value which the field should be set to.
    */
   void set_simple(const Glib::ustring& name, const Glib::ValueBase& value);
+
+  /** Sets fields in a simple Gst::Caps. A simple Gst::Caps is one that only
+   * has one structure. This method, like the Gst::Structure::set_field()
+   * methods, translates certain GTypes to GStreamer specific GTypes for
+   * functional compatibility.
+   *
+   * @param name Field to set.
+   * @param data A value which the field should be set to (this can be any C++
+   * type).
+   */
+  template <class DataType>
+  void set_simple(const Glib::ustring& name, const DataType& data);
+
   _IGNORE(gst_caps_set_simple)
 
   //This does not seem useful: _WRAP_METHOD(void set_simple_valist(char* field, const va_list& varargs), gst_caps_set_simple_valist)
@@ -161,5 +174,23 @@ public:
   
   _IGNORE(gst_caps_copy, gst_caps_set_simple, gst_caps_make_writable, gst_caps_append_structure, gst_caps_merge_structure, gst_caps_get_structure)
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+/******************************* Gst::Caps *******************************/
+
+template <class DataType>
+void Caps::set_simple(const Glib::ustring& name, const DataType& data)
+{
+  typedef typename Gst::StructureValue<DataType> type_cppdata;
+  typedef typename type_cppdata::ValueType ValueType;
+
+  ValueType value;
+  value.init(ValueType::value_type());
+  value.set(data);
+  this->set_simple(name, (Glib::ValueBase)(value));
+}
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } //namespace Gst
