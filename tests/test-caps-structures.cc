@@ -28,16 +28,13 @@ void add_structures(const Glib::RefPtr<Gst::Caps>& caps)
   Gst::Structure struct2("Structure 2");
   Gst::Structure struct3("Structure 3");
 
-  Glib::Value<Glib::ustring> message;
-  message.init(Glib::Value<Glib::ustring>::value_type());
-
-  message.set("Message 1");
+  Glib::ustring message = "Message 1";
   struct1.set_field("message", message);
 
-  message.set("Message 2");
+  message = "Message 2";
   struct2.set_field("message", message);
 
-  message.set("Message 3");
+  message = "Message 3";
   struct3.set_field("message", message);
 
   caps->append_structure(struct1);
@@ -53,12 +50,12 @@ int main (int argc, char* argv[])
   add_structures(caps);
 
   for (int i = 0; i < 2; i++) {
-    Glib::Value<Glib::ustring> v;
+    Glib::ustring str;
     const Gst::Structure s = caps->get_structure(i);
     if(s)
     {
-      s.get_field("message", v);
-      std::cout << s.get_name() << ": " << v.get() << std::endl;
+      s.get_field("message", str);
+      std::cout << s.get_name() << ": " << str << std::endl;
     }
   }
 

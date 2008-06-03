@@ -210,6 +210,32 @@ public:
    */
   void set_field(const Glib::ustring& fieldname, const Gst::Fraction& value);
 
+  /** Sets the field with name @a fieldname field to the Gst::IntRange @a
+   * value. If the field does not exist, it is created. If the field exists,
+   * the previous value is replaced and freed. Please note that when setting
+   * fields to special types such as Gst::Fourcc and Gst::Fraction and
+   * Glib::Date they are converted to the GStreamer GTypes and thus when
+   * attempting to get these fields back as GValues, they will have the
+   * GStreamer GType.
+   *
+   * @param fieldname The name of the field to set.
+   * @param value The value to set the field to.
+   */
+  void set_field(const Glib::ustring& fieldname, const Gst::IntRange& value);
+
+  /** Sets the field with name @a fieldname field to the Gst::DoubleRange @a
+   * value. If the field does not exist, it is created. If the field exists,
+   * the previous value is replaced and freed. Please note that when setting
+   * fields to special types such as Gst::Fourcc and Gst::Fraction and
+   * Glib::Date they are converted to the GStreamer GTypes and thus when
+   * attempting to get these fields back as GValues, they will have the
+   * GStreamer GType.
+   *
+   * @param fieldname The name of the field to set.
+   * @param value The value to set the field to.
+   */
+  void set_field(const Glib::ustring& fieldname, const Gst::DoubleRange& value);
+
   /** Sets the field with name @a fieldname field to the Gst::FractionRange @a
    * value. If the field does not exist, it is created. If the field exists,
    * the previous value is replaced and freed. Please note that when setting
@@ -406,27 +432,49 @@ public:
    * correct type.
    *
    * @param fieldname The name of a field.
-   * @param fraction The Gst::Fraction to set.
+   * @param value The Gst::Fraction to set.
    * @return true if @a value could be set correctly. If there was no field
    * with @a fieldname or the existing field did not contain a Gst::Fraction,
    * this function returns false.
    */
-  bool get_field(const Glib::ustring& fieldname, Gst::Fraction& fraction) const;
+  bool get_field(const Glib::ustring& fieldname, Gst::Fraction& value) const;
   _IGNORE(gst_structure_get_fraction)
+
+  /** Gets the value of field @a fieldname into Gst::IntRange @a value.
+   * The caller is responsible for making sure the field exists and has the
+   * correct type.
+   *
+   * @param fieldname The name of a field.
+   * @param value The Gst::IntRange to set.
+   * @return true if @a value could be set correctly. If there was no field
+   * with @a fieldname or the existing field did not contain a Gst::IntRange,
+   * this function returns false.
+   */
+  bool get_field(const Glib::ustring& fieldname, Gst::IntRange& value) const;
+
+  /** Gets the value of field @a fieldname into Gst::DoubleRange @a value.
+   * The caller is responsible for making sure the field exists and has the
+   * correct type.
+   *
+   * @param fieldname The name of a field.
+   * @param value The Gst::DoubleRange to set.
+   * @return true if @a value could be set correctly. If there was no field
+   * with @a fieldname or the existing field did not contain a
+   * Gst::DoubleRange, this function returns false.
+   */
+  bool get_field(const Glib::ustring& fieldname, Gst::DoubleRange& value) const;
 
   /** Gets the value of field @a fieldname into Gst::FractionRange @a value.
    * The caller is responsible for making sure the field exists and has the
    * correct type.
    *
    * @param fieldname The name of a field.
-   * @param fraction The Gst::FractionRange to set.
+   * @param value The Gst::FractionRange to set.
    * @return true if @a value could be set correctly. If there was no field
    * with @a fieldname or the existing field did not contain a
    * Gst::FractionRange, this function returns false.
    */
-  bool get_field(const Glib::ustring& fieldname, Gst::FractionRange& fraction) const;
-
-  //TODO: Add Set/Get for the other *Range classes?
+  bool get_field(const Glib::ustring& fieldname, Gst::FractionRange& value) const;
 
   /** For example,
    * bool on_map(const Glib::QueryQuark& id, Glib::ValueBase& value);

@@ -75,91 +75,51 @@ void Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase&
 
 void Structure::set_field(const Glib::ustring& fieldname, bool value)
 {
-   Glib::Value<bool> val;
-   val.init( Glib::Value<bool>::value_type() );
-   val.set(value);
-
-   set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_BOOLEAN, value, NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, int value)
 {
-  Glib::Value<int> val;
-  val.init( Glib::Value<int>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_INT, value, NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, guint value)
 {
-  Glib::Value<guint> val;
-  val.init( Glib::Value<guint>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_UINT, value, NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Fourcc& value)
 {
-  //Using a Fourcc is fine because _set_gstructure_field() makes appropriate
-  //conversion to GStreamer GType
-  Glib::Value<Fourcc> val;
-  val.init( Glib::Value<Fourcc>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FOURCC,
+    value.get_fourcc(), NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, double value)
 {
-  Glib::Value<double> val;
-  val.init( Glib::Value<double>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DOUBLE, value, NULL);
 };
 
 //We use std::string, because the encoding is unknown. murrayc
 void Structure::set_field(const Glib::ustring& fieldname, const std::string& value)
 {
-  Glib::Value<std::string> val;
-  val.init( Glib::Value<std::string>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_STRING, value.c_str(), NULL);
 }
 
 //We use std::string, because the encoding is unknown. murrayc
 void Structure::set_field(const Glib::ustring& fieldname, const char* value)
 {
-  Glib::Value<std::string> val;
-  val.init( Glib::Value<std::string>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_STRING, value, NULL);
 }
  
 void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& value)
 {
-  //Using a Glib::Date is fine because _set_gstructure_field() makes
-  //appropriate conversion to GStreamer GType
-  Glib::Value<Glib::Date> val;
-  val.init( Glib::Value<Glib::Date>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DATE, value.gobj(), NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const ClockTime& value)
 {
-  //Using a ClockTime is fine because a ClockTime is a GstClockTime which is a
-  //guint64 which GStreamer will interpret correctly
-  Glib::Value<ClockTime> val;
-  val.init( Glib::Value<ClockTime>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_CLOCK_TIME,
+    (GstClockTime) value, NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, GType enumtype, int value)
@@ -169,24 +129,26 @@ void Structure::set_field(const Glib::ustring& fieldname, GType enumtype, int va
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::Fraction& value)
 {
-  //Using a Gst::Fraction is fine because _set_gstructure_field() makes
-  //appropriate conversion to GStreamer GType
-  Glib::Value<Gst::Fraction> val;
-  val.init( Glib::Value<Gst::Fraction>::value_type() );
-  val.set(value);
+  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION, value.num,
+    value.denom, NULL);
+}
 
-   set_field(fieldname, val);
+void Structure::set_field(const Glib::ustring& fieldname, const Gst::IntRange& value)
+{
+  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_INT_RANGE, value.min,
+    value.max, NULL);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, const Gst::DoubleRange& value)
+{
+  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DOUBLE_RANGE,
+    value.min, value.max, NULL);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::FractionRange& value)
 {
-  //Using a Gst::FractionRange is fine because _set_gstructure_field() makes
-  //appropriate conversion to GStreamer GType
-  Glib::Value<Gst::FractionRange> val;
-  val.init( Glib::Value<Gst::FractionRange>::value_type() );
-  val.set(value);
-
-  set_field(fieldname, val);
+  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION_RANGE,
+    value.min.num, value.min.denom, value.max.num, value.max.denom, NULL);
 }
 
 
@@ -194,6 +156,11 @@ void Structure::set_field(const Glib::ustring& fieldname, const Gst::FractionRan
 void Structure::_set_gstructure_field(GstStructure* cstructure, const Glib::ustring& fieldname, const Glib::ValueBase& value)
 {
   const GType type = G_VALUE_TYPE(value.gobj());
+
+  //The series of if statements below is designed to convert the GTypes of
+  //Glib::Value<> enclosing gstreamermm types (such as Gst::Fourcc) to
+  //GStreamer GTypes (e.g. a Glib::Value<Gst::Fourcc> is converted to the
+  //GST_TYPE_FOURCC GType).
 
   if (type == Glib::Value<Fourcc>::value_type())
   {
@@ -262,7 +229,6 @@ void Structure::_set_gstructure_field(GstStructure* cstructure, const Glib::ustr
   }
   else
   {
-    //TODO: Why not just use this instead of all the if/else stuff above? murrayc
     gst_structure_set_value(cstructure, fieldname.c_str(), value.gobj());
   }
 }
@@ -381,15 +347,55 @@ Structure::get_field(const Glib::ustring& name, Gst::Fraction& f) const
 }
 
 bool
+Structure::get_field(const Glib::ustring& name, Gst::IntRange& range) const
+{
+  const GValue* gst_range_val = gst_structure_get_value(gobj(), name.c_str());
+
+  if (G_VALUE_TYPE(gst_range_val) == GST_TYPE_INT_RANGE)
+  {
+    const gint min = gst_value_get_int_range_min(gst_range_val);
+    const gint max = gst_value_get_int_range_max(gst_range_val);
+    range = Gst::IntRange(min, max);
+    return true;
+  }
+
+  return false;
+}
+
+bool
+Structure::get_field(const Glib::ustring& name, Gst::DoubleRange& range) const
+{
+  const GValue* gst_range_val = gst_structure_get_value(gobj(), name.c_str());
+
+  if (G_VALUE_TYPE(gst_range_val) == GST_TYPE_DOUBLE_RANGE)
+  {
+    const gdouble min = gst_value_get_double_range_min(gst_range_val);
+    const gdouble max = gst_value_get_double_range_max(gst_range_val);
+    range = Gst::DoubleRange(min, max);
+    return true;
+  }
+
+  return false;
+}
+
+bool
 Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) const
 {
-  const GValue* gst_fraction_range_val = gst_structure_get_value(gobj(), name.c_str());
+  const GValue* gst_range_val = gst_structure_get_value(gobj(), name.c_str());
 
-  if (gst_structure_get_field_type(gobj(), name.c_str()) == GST_TYPE_FRACTION_RANGE)
+  if (G_VALUE_TYPE(gst_range_val) == GST_TYPE_FRACTION_RANGE)
   {
-    Glib::ValueBase fraction_range_val;
-    fraction_range_val.init(gst_fraction_range_val);
-    range = Gst::FractionRange(fraction_range_val);
+    const GValue* gst_min_val = gst_value_get_fraction_range_min(gst_range_val);
+    const gint min_num = gst_value_get_fraction_numerator(gst_min_val);
+    const gint min_denom = gst_value_get_fraction_denominator(gst_min_val);
+
+    const GValue* gst_max_val = gst_value_get_fraction_range_max(gst_range_val);
+    const gint max_num = gst_value_get_fraction_numerator(gst_max_val);
+    const gint max_denom = gst_value_get_fraction_denominator(gst_max_val);
+
+    range = Gst::FractionRange(Gst::Fraction(min_num, max_num),
+      Gst::Fraction(max_num, max_denom));
+
     return true;
   }
 
