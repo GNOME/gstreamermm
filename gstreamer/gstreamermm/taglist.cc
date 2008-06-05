@@ -27,28 +27,191 @@
 
 #include <gst/gstenumtypes.h>
 
-/*
-static gboolean
-TagList_Foreach_gstreamermm_callback(const GstTagList* list, const gchar *tag, void* data)
+static void TagList_foreach_gstreamermm_callback(const GstTagList* list, const gchar *tag, void* data)
 {
   Gst::TagList::SlotForeach* slot = static_cast<Gst::TagList::SlotForeach*>(data);
-  bool result = (*slot)(Glib::wrap(list), Glib::ustring(value));
-  delete slot;
-  return result;
+
+  const Glib::ustring tag_str = Glib::convert_const_gchar_ptr_to_ustring(tag);
+  (*slot)(tag_str);
 }
-*/
 
 namespace Gst
 {
 
-/*
-void
-TagList::foreach(const SlotForeach& slot)
+void TagList::add(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode)
+{
+  gst_tag_list_add_values(gobj(), (GstTagMergeMode) mode, tag.c_str(), value.gobj(), NULL);
+}
+
+void TagList::add(const Glib::ustring& tag, const char* data, TagMergeMode mode)
+{
+  gst_tag_list_add(gobj(), (GstTagMergeMode) mode, tag.c_str(), data, NULL);
+}
+
+void TagList::foreach(const SlotForeach& slot)
 {
   SlotForeach* slot_copy = new SlotForeach(slot);
-  gst_taglist_foreach(gobj(), &TagList_Foreach_gstreamermm_callback, slot_copy);
+  gst_tag_list_foreach(gobj(), &TagList_foreach_gstreamermm_callback, slot_copy);
+  delete slot_copy;
 }
-*/
+
+bool TagList::get(const Glib::ustring& tag, guint index, Glib::ValueBase& value)
+{
+  const GValue* gst_value = gst_tag_list_get_value_index(gobj(), tag.c_str(), index);
+  if (gst_value)
+  {
+    value.init(gst_value);
+    return true;
+  }
+  return false;
+}
+
+bool TagList::get(const Glib::ustring& tag, char& value)
+{
+  return gst_tag_list_get_char(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, char& value)
+{
+  return gst_tag_list_get_char_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guchar& value)
+{
+  return gst_tag_list_get_uchar(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, guchar& value)
+{
+  return gst_tag_list_get_uchar_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, bool& value)
+{
+  gboolean gst_value = false;
+  bool result = gst_tag_list_get_boolean(gobj(), tag.c_str(), &gst_value);
+  value = gst_value;
+  return result;
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, bool& value)
+{
+  gboolean gst_value = false;
+  bool result = gst_tag_list_get_boolean_index(gobj(), tag.c_str(), index, &gst_value);
+  value = gst_value;
+  return result;
+}
+
+bool TagList::get(const Glib::ustring& tag, int& value)
+{
+  return gst_tag_list_get_int(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, int& value)
+{
+  return gst_tag_list_get_int_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint& value)
+{
+  return gst_tag_list_get_uint(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, guint& value)
+{
+  return gst_tag_list_get_uint_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, long& value)
+{
+  return gst_tag_list_get_long(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, long& value)
+{
+  return gst_tag_list_get_long_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, gulong& value)
+{
+  return gst_tag_list_get_ulong(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, gulong& value)
+{
+  return gst_tag_list_get_ulong_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, float& value)
+{
+  return gst_tag_list_get_float(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, float& value)
+{
+  return gst_tag_list_get_float_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, double& value)
+{
+  return gst_tag_list_get_double(gobj(), tag.c_str(), &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, double& value)
+{
+  return gst_tag_list_get_double_index(gobj(), tag.c_str(), index, &value);
+}
+
+bool TagList::get(const Glib::ustring& tag, Glib::ustring& value)
+{
+  gchar *gst_value = 0; 
+  bool result = gst_tag_list_get_string(gobj(), tag.c_str(), &gst_value);
+
+  if (result)
+  {
+    value = gst_value;
+    g_free(gst_value);
+  }
+
+  return result;
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, Glib::ustring& value)
+{
+  gchar *gst_value = 0; 
+  bool result = gst_tag_list_get_string_index(gobj(), tag.c_str(), index, &gst_value);
+
+  if (result)
+  {
+    value = gst_value;
+    g_free(gst_value);
+  }
+
+  return result;
+}
+
+bool TagList::get(const Glib::ustring& tag, Glib::Date& value)
+{
+  GDate* gst_value = 0;
+  bool result = gst_tag_list_get_date(gobj(), tag.c_str(), &gst_value);
+
+  //TODO: Use Glib::Date constructor if possible.
+  if (result)
+    value.set_julian(g_date_julian(gst_value));
+
+  return result;
+}
+
+bool TagList::get(const Glib::ustring& tag, guint index, Glib::Date& value)
+{
+  GDate* gst_value = 0;
+  bool result = gst_tag_list_get_date_index(gobj(), tag.c_str(), index, &gst_value);
+
+  if (result)
+    value.set_julian(g_date_julian(gst_value));
+
+  return result;
+}
 
 } //namespace Gst
 
@@ -72,9 +235,9 @@ GType Glib::Value<Gst::TagFlag>::value_type()
 namespace Glib
 {
 
-Gst::TagList wrap(GstTagList* object, bool take_copy, bool destroy, bool dummy)
+Gst::TagList wrap(GstTagList* object, bool take_copy, bool dummy)
 {
-  return Gst::TagList(object, take_copy, destroy);
+  return Gst::TagList(object, take_copy);
 }
 
 } // namespace Glib
@@ -97,30 +260,27 @@ TagList::TagList()
 
 TagList::TagList(const TagList& other)
 :
-  gobject_ (other.gobject_),  // Always use original object
-  destroy(false)  // Do not delete gobject when wrapper is destroyed (let
-                  // original wrapper do that)
+  gobject_ ((other.gobject_) ? gst_tag_list_copy(other.gobject_) : 0)
 {}
 
-TagList::TagList(GstTagList* gobject, bool make_a_copy, bool destroy)
+TagList::TagList(GstTagList* gobject, bool make_a_copy)
 :
-  // For this ncopy extra BoxedType wrapper, make_a_copy is false by default
-  // and destroy is true.
-  gobject_ ((make_a_copy && gobject) ? gst_tag_list_copy(gobject) : gobject),
-  destroy(destroy) // Should wrapper destroy gobject when deleted?
+  // For BoxedType wrappers, make_a_copy is true by default.  The static
+  // BoxedType wrappers must always take a copy, thus make_a_copy = true
+  // ensures identical behaviour if the default argument is used.
+  gobject_ ((make_a_copy && gobject) ? gst_tag_list_copy(gobject) : gobject)
 {}
 
-// operator=() DOES make copies of gobject.
 TagList& TagList::operator=(const TagList& other)
 {
-  TagList temp (gobject_, true);
+  TagList temp (other);
   swap(temp);
   return *this;
 }
 
 TagList::~TagList()
 {
-  if(destroy && gobject_)
+  if(gobject_)
     gst_tag_list_free(gobject_);
 }
 
@@ -129,21 +289,11 @@ void TagList::swap(TagList& other)
   GstTagList *const temp = gobject_;
   gobject_ = other.gobject_;
   other.gobject_ = temp;
-
-  bool const destroy_temp = destroy;
-  destroy = other.destroy;
-  other.destroy = destroy_temp;
 }
 
 GstTagList* TagList::gobj_copy() const
 {
   return gst_tag_list_copy(gobject_);
-}
-
-//
-void TagList::set_destroy(bool destroy)
-{
-  this->destroy = destroy;
 }
 
 
@@ -183,9 +333,9 @@ bool TagList::is_fixed(const Glib::ustring& tag)
 }
 
 
-bool TagList::empty()
+bool TagList::is_empty() const
 {
-  return gst_tag_list_is_empty(gobj());
+  return gst_tag_list_is_empty(const_cast<GstTagList*>(gobj()));
 }
 
 void TagList::insert(const TagList& other, TagMergeMode mode)
@@ -195,7 +345,17 @@ gst_tag_list_insert(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode)));
 
 TagList TagList::merge(const TagList& other, TagMergeMode mode)
 {
-  return Glib::wrap(gst_tag_list_merge(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode))));
+  return Glib::wrap(gst_tag_list_merge(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode))), false, false);
+}
+
+guint TagList::get_tag_size(const Glib::ustring& tag) const
+{
+  return gst_tag_list_get_tag_size(const_cast<GstTagList*>(gobj()), tag.c_str());
+}
+
+void TagList::remove_tag(const Glib::ustring& tag)
+{
+gst_tag_list_remove_tag(gobj(), tag.c_str()); 
 }
 
 

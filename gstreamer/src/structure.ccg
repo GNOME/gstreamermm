@@ -233,15 +233,12 @@ void Structure::_set_gstructure_field(GstStructure* cstructure, const Glib::ustr
   }
 }
 
-Structure&
-Structure::remove_field(const Glib::ustring& fieldname)
+void Structure::remove_field(const Glib::ustring& fieldname)
 {
   gst_structure_remove_field(gobj(), fieldname.c_str());
-  return *this;
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, bool& value) const
+bool Structure::get_field(const Glib::ustring& name, bool& value) const
 {
   gboolean cvalue = FALSE;
   const bool result = gst_structure_get_boolean(gobj(), name.c_str(), &cvalue);
@@ -249,20 +246,17 @@ Structure::get_field(const Glib::ustring& name, bool& value) const
   return result;
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, int& value) const
+bool Structure::get_field(const Glib::ustring& name, int& value) const
 {
   return gst_structure_get_int(gobj(), name.c_str(), &value);
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, guint& value) const
+bool Structure::get_field(const Glib::ustring& name, guint& value) const
 {
   return gst_structure_get_uint(gobj(), name.c_str(), &value);
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, Fourcc& value) const
+bool Structure::get_field(const Glib::ustring& name, Fourcc& value) const
 {
   guint32 cvalue = 0;
   const bool result = gst_structure_get_fourcc(gobj(), name.c_str(), &cvalue);
@@ -273,14 +267,12 @@ Structure::get_field(const Glib::ustring& name, Fourcc& value) const
 }
 
 
-bool
-Structure::get_field(const Glib::ustring& name, double& value) const
+bool Structure::get_field(const Glib::ustring& name, double& value) const
 {
   return gst_structure_get_double(gobj(), name.c_str(), &value);
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, Glib::ustring& value) const
+bool Structure::get_field(const Glib::ustring& name, Glib::ustring& value) const
 {
   const gchar* cvalue = gst_structure_get_string(gobj(), name.c_str());
   if(cvalue)
@@ -292,8 +284,7 @@ Structure::get_field(const Glib::ustring& name, Glib::ustring& value) const
     return false;
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, std::string& value) const
+bool Structure::get_field(const Glib::ustring& name, std::string& value) const
 {
   const gchar* cvalue = gst_structure_get_string(gobj(), name.c_str());
   if(cvalue)
@@ -305,8 +296,7 @@ Structure::get_field(const Glib::ustring& name, std::string& value) const
     return false;
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
+bool Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
 {
   GDate *gdate = 0;
   const bool has = gst_structure_get_date(gobj(), name.c_str(), &gdate);
@@ -316,9 +306,7 @@ Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
   return has;
 }
 
-
-bool
-Structure::get_field(const Glib::ustring& name, ClockTime& value) const
+bool Structure::get_field(const Glib::ustring& name, ClockTime& value) const
 {
   GstClockTime cvalue = 0;
   const bool result = gst_structure_get_clock_time(gobj(), name.c_str(), &cvalue);
@@ -327,15 +315,13 @@ Structure::get_field(const Glib::ustring& name, ClockTime& value) const
 }
 
 
-bool
-Structure::get_field(const Glib::ustring& name, GType enum_type, int& value) const
+bool Structure::get_field(const Glib::ustring& name, GType enum_type, int& value) const
 {
   return gst_structure_get_enum(gobj(), name.c_str(), enum_type, &value);
 }
 
 
-bool
-Structure::get_field(const Glib::ustring& name, Gst::Fraction& f) const
+bool Structure::get_field(const Glib::ustring& name, Gst::Fraction& f) const
 {
   int value_numerator = 0;
   int value_denominator = 0;
@@ -346,8 +332,7 @@ Structure::get_field(const Glib::ustring& name, Gst::Fraction& f) const
   return result;
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, Gst::IntRange& range) const
+bool Structure::get_field(const Glib::ustring& name, Gst::IntRange& range) const
 {
   const GValue* gst_range_val = gst_structure_get_value(gobj(), name.c_str());
 
@@ -362,8 +347,7 @@ Structure::get_field(const Glib::ustring& name, Gst::IntRange& range) const
   return false;
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, Gst::DoubleRange& range) const
+bool Structure::get_field(const Glib::ustring& name, Gst::DoubleRange& range) const
 {
   const GValue* gst_range_val = gst_structure_get_value(gobj(), name.c_str());
 
@@ -378,8 +362,7 @@ Structure::get_field(const Glib::ustring& name, Gst::DoubleRange& range) const
   return false;
 }
 
-bool
-Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) const
+bool Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) const
 {
   const GValue* gst_range_val = gst_structure_get_value(gobj(), name.c_str());
 
@@ -402,22 +385,19 @@ Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) const
   return false;
 }
 
-bool
-Structure::foreach(const SlotForeach& slot)
+bool Structure::foreach(const SlotForeach& slot)
 {
   SlotForeach* slot_copy = new SlotForeach(slot);
   return gst_structure_foreach(gobj(), &Structure_Foreach_gstreamermm_callback, slot_copy);
 }
 
-bool
-Structure::map_in_place(const SlotMap& slot)
+bool Structure::map_in_place(const SlotMap& slot)
 {
   SlotMap* slot_copy = new SlotMap(slot);
   return gst_structure_map_in_place(gobj(), &Structure_Map_gstreamermm_callback, slot_copy);
 }
 
-Structure
-Structure::create_from_string(const Glib::ustring& the_string)
+Structure Structure::create_from_string(const Glib::ustring& the_string)
 {
   return Structure(gst_structure_from_string(the_string.c_str(), NULL)); 
 }

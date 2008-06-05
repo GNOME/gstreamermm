@@ -1,3 +1,36 @@
+2008-06-04  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/src/taglist.ccg:
+	* gstreamer/src/taglist.hg: Wrapped various GST_TAG_* names; Expounded
+	the class docs; Added add/get methods to insert and get tag values
+	into TagLists; Wrapped remove_tag() and get_tag_size().
+
+	* tools/m4/Makefile_list_of_sources.am_fragment:
+	* tools/m4/class_boxedtype_extra.m4:
+	* tools/m4/convert.m4:
+	* tools/m4/convert_gst.m4: Had to add CLASS_BOXEDTYPE_EXTRA because
+	Gst::TagList::wrap(GstTagList*,bool) ambiguates Gst::Structure::wrap()
+	since a GstTagList is a GstStructure.
+
+	* gstreamer/gstreamermm/taglist.cc:
+	* gstreamer/gstreamermm/taglist.h: Regenerated these files by
+	temporarily adding taglist.hg to
+	gstreamer/src/Makefile_list_of_hg.am_fragment, removing the extern "C"
+	section in taglist.h and proceeding with build process; taglist.hg
+	cannot be left in Makefile_list_of_hg.am_fragment because a compile
+	error results when gmmproc generates taglist.h from taglist.hg (see
+	report #518934).
+
+	* tests/Makefile.am:
+	* tests/test-taglist.cc: Added test to verify Gst::TagList
+	functionality.
+
+	* gstreamer/src/structure.ccg:
+	* gstreamer/src/structure.hg: Made remove_field() void (not return
+	this structure).
+	* gstreamer/src/caps.ccg:
+	* gstreamer/src/caps.hg: Typos
+
 2008-06-02  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/structure.ccg:
