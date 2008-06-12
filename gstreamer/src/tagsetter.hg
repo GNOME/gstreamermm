@@ -23,6 +23,7 @@
 #include <glibmm/interface.h>
 #include <gstreamermm/enums.h>
 #include <gstreamermm/taglist.h>
+#include <gstreamermm/structurevalue.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -42,22 +43,53 @@ namespace Gst
  * application, find tagsetter elements and set tags using e.g. merge_tags() or
  * add_tags(). The application should do that before the element goes to
  * Gst::STATE_PAUSED.
- *
- * Elements implementing the Gst::TagSetter interface often have to merge any
- * tags received from upstream and the tags set by the application via the
- * interface. This can be done like this:
- *
- * TODO: Add code example from C API docs
  */
 class TagSetter : public Glib::Interface
 {
   _CLASS_INTERFACE(TagSetter, GstTagSetter, GST_TAG_SETTER, GstTagSetterIFace)
 
 public:
-  //TODO: Add suitable default value for mode?
-  _WRAP_METHOD(void merge_tags(const TagList& list, TagMergeMode mode=TAG_MERGE_APPEND), gst_tag_setter_merge_tags)
-  //TODO: Wrap rest of GstTagStetter methods
+  _WRAP_METHOD(void merge_tags(const TagList& list, TagMergeMode mode=TAG_MERGE_PREPEND), gst_tag_setter_merge_tags)
+
+  /** Adds the given Glib::ValueBase on the setter using the given merge mode. 
+   *
+   * @param tag The tag to set.
+   * @param value The value to set the tag to.
+   * @param mode The mode to use.
+   */
+   void add_tag(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_PREPEND);
+
+  /** Adds the given value on the setter using the given merge mode. 
+   *
+   * @param tag The tag to set.
+   * @param data The value to set the tag to.
+   * @param mode The mode to use.
+   */
+   template <class DataType>
+   void add_tag(const Glib::ustring& tag, const DataType& data, TagMergeMode mode=TAG_MERGE_PREPEND);
+
+   _WRAP_METHOD(TagList get_tag_list(), gst_tag_setter_get_tag_list)
+   _WRAP_METHOD(void set_tag_merge_mode(TagMergeMode mode), gst_tag_setter_set_tag_merge_mode)
+   _WRAP_METHOD(TagMergeMode qet_tag_merge_mode(), gst_tag_setter_get_tag_merge_mode)
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+/************************** Gst::TagSetter ***************************/
+
+template <class DataType>
+void TagSetter::add_tag(const Glib::ustring& tag, const DataType& data, TagMergeMode mode)
+{
+  typedef typename Gst::StructureValue<DataType> type_cppdata;
+  typedef typename type_cppdata::ValueType ValueType;
+
+  ValueType value;
+  value.init(ValueType::value_type());
+  value.set(data);
+  this->add_tag(tag, (Glib::ValueBase)(value), mode);
+}
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Gst
 

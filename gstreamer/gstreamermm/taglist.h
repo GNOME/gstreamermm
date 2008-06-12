@@ -374,8 +374,6 @@ private:
 
 
 public:
-  //TODO: Add operator bool() to handle when C functions return NULL TagList*?
-
   
   /** Checks if the given type is already registered.
    * @param tag Name of the tag.
@@ -425,7 +423,7 @@ public:
    * @param from List to merge from.
    * @param mode The mode to use.
    */
-  void insert(const TagList& other, TagMergeMode mode=TAG_MERGE_APPEND);
+  void insert(const TagList& other, TagMergeMode mode=TAG_MERGE_PREPEND);
   
   /** Merges the two given lists into a new list. If one of the lists is <tt>0</tt>, a
    * copy of the other is returned. If both lists are <tt>0</tt>, <tt>0</tt> is returned.
@@ -447,7 +445,7 @@ public:
    * @param mode The mode to use.
    * @param value The GValue to set.
    */
-  void add(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_APPEND);
+  void add(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_PREPEND);
 
   /** Sets the value for the given tag to string @a data using the specified
    * mode.
@@ -456,7 +454,7 @@ public:
    * @param data A string to which the tag should be set to.
    * @param mode The merge mode to use.
    */
-  void add(const Glib::ustring& tag, const char* data, TagMergeMode mode=TAG_MERGE_APPEND);
+  void add(const Glib::ustring& tag, const char* data, TagMergeMode mode=TAG_MERGE_PREPEND);
 
   /** Sets the value for the given tag using the specified mode.
    *
@@ -466,7 +464,7 @@ public:
    * @param mode The merge mode to use.
    */
   template <class DataType>
-  void add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode=TAG_MERGE_APPEND);
+  void add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode=TAG_MERGE_PREPEND);
 
   
   /** Removes the given tag from the taglist.

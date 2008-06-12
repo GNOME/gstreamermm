@@ -267,8 +267,6 @@ class TagList : public Structure
   _CLASS_BOXEDTYPE_EXTRA(TagList, GstTagList, gst_tag_list_new, gst_tag_list_copy, gst_tag_list_free)
 
 public:
-  //TODO: Add operator bool() to handle when C functions return NULL TagList*?
-
   _WRAP_METHOD(static bool exists(const Glib::ustring& tag), gst_tag_exists)
   _WRAP_METHOD(static GType get_type(const Glib::ustring& tag), gst_tag_get_type)
   _WRAP_METHOD(static Glib::ustring get_nick(const Glib::ustring& tag), gst_tag_get_nick)
@@ -276,7 +274,7 @@ public:
   _WRAP_METHOD(static TagFlag get_flag(const Glib::ustring& tag), gst_tag_get_flag)
   _WRAP_METHOD(static bool is_fixed(const Glib::ustring& tag), gst_tag_is_fixed)
   _WRAP_METHOD(bool is_empty() const, gst_tag_list_is_empty)
-  _WRAP_METHOD(void insert(const TagList& other, TagMergeMode mode=TAG_MERGE_APPEND), gst_tag_list_insert)
+  _WRAP_METHOD(void insert(const TagList& other, TagMergeMode mode=TAG_MERGE_PREPEND), gst_tag_list_insert)
   _WRAP_METHOD(TagList merge(const TagList& other, TagMergeMode mode=TAG_MERGE_PREPEND), gst_tag_list_merge)
   _WRAP_METHOD(guint get_tag_size(const Glib::ustring& tag) const, gst_tag_list_get_tag_size)
 
@@ -286,7 +284,7 @@ public:
    * @param mode The mode to use.
    * @param value The GValue to set.
    */
-  void add(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_APPEND);
+  void add(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_PREPEND);
 
   /** Sets the value for the given tag to string @a data using the specified
    * mode.
@@ -295,7 +293,7 @@ public:
    * @param data A string to which the tag should be set to.
    * @param mode The merge mode to use.
    */
-  void add(const Glib::ustring& tag, const char* data, TagMergeMode mode=TAG_MERGE_APPEND);
+  void add(const Glib::ustring& tag, const char* data, TagMergeMode mode=TAG_MERGE_PREPEND);
 
   /** Sets the value for the given tag using the specified mode.
    *
@@ -305,7 +303,7 @@ public:
    * @param mode The merge mode to use.
    */
   template <class DataType>
-  void add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode=TAG_MERGE_APPEND);
+  void add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode=TAG_MERGE_PREPEND);
 
   _WRAP_METHOD(void remove_tag(const Glib::ustring& tag), gst_tag_list_remove_tag)
 

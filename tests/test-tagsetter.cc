@@ -19,12 +19,36 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-namespace Gst
-{
+#include <gstreamermm.h>
+#include <iostream>
 
-void TagSetter::add_tag(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode)
+int main (int argc, char* argv[])
 {
-  gst_tag_setter_add_tag_values(gobj(), (GstTagMergeMode) mode, tag.c_str(), value.gobj(), NULL);
+  Gst::init(argc, argv);
+  
+  Glib::RefPtr<Gst::Element> vorbisenc = Gst::ElementFactory::create_element("vorbisenc");
+
+  if (!vorbisenc)
+  {
+    std::cout << "Failed to create vorbisenc element." << std::endl;
+    exit(1);
+  }
+
+  Glib::RefPtr< Gst::ElementInterfaced<Gst::TagSetter> > setter =
+    Gst::Interface::cast<Gst::TagSetter>(vorbisenc);
+
+  if (!setter)
+  {
+    std::cout << "Failed to cast vorbisenc element to Gst::TagSetter." <<
+      std::endl;
+    exit(1);
+  }
+
+  setter->add_tag("bitrate", 192);
+
+  int bitrate = 0;
+  setter->get_tag_list().get("bitrate", bitrate);
+  std::cout << "bitrate = " << bitrate << "." << std::endl;
+
+  return 0;
 }
-
-} //namespace Gst

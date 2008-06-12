@@ -298,10 +298,10 @@ bool Structure::get_field(const Glib::ustring& name, std::string& value) const
 
 bool Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
 {
-  GDate *gdate = 0;
+  GDate* gdate = 0;
   const bool has = gst_structure_get_date(gobj(), name.c_str(), &gdate);
   if(has)
-    date.set_julian(g_date_get_julian(gdate)); //TODO: Don't we have a wrap()/constructor for this? If not, we should.
+    date.set_julian(Glib::Date(*gdate).get_julian());
 
   return has;
 }
@@ -402,4 +402,4 @@ Structure Structure::create_from_string(const Glib::ustring& the_string)
   return Structure(gst_structure_from_string(the_string.c_str(), NULL)); 
 }
 
-} //namespace GstG
+} //namespace Gst

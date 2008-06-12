@@ -195,9 +195,8 @@ bool TagList::get(const Glib::ustring& tag, Glib::Date& value)
   GDate* gst_value = 0;
   bool result = gst_tag_list_get_date(gobj(), tag.c_str(), &gst_value);
 
-  //TODO: Use Glib::Date constructor if possible.
   if (result)
-    value.set_julian(g_date_julian(gst_value));
+    value.set_julian(Glib::Date(*gst_value).get_julian());
 
   return result;
 }
