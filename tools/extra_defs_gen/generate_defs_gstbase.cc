@@ -21,13 +21,16 @@
 
 #include <glib.h>
 #include <gst/gst.h>
+#include <gst/interfaces/colorbalance.h>
+#include <gst/interfaces/colorbalancechannel.h>
+#include <gst/interfaces/xoverlay.h>
 
 int main (int argc, char *argv[])
 {
   gst_init (&argc, &argv);
-  /*std::cout << get_defs(GST_TYPE_BUS)
-            << get_defs(GST_TYPE_BIN)
-            << get_defs(GST_TYPE_BUFFER);*/
+  std::cout << get_defs(GST_TYPE_COLOR_BALANCE)
+            << get_defs(GST_TYPE_COLOR_BALANCE_CHANNEL)
+            << get_defs(GST_TYPE_X_OVERLAY);
 
   return 0;
 }

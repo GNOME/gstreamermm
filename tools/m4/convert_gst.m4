@@ -1,12 +1,31 @@
-dnl 
-dnl Glib C names have prefix 'G' but C++ namespace Glib
-dnl 
-define(`_CONV_GST_ENUM',`dnl
-_CONVERSION(`GST$1', `$1', (($1)(__ARG3__)))
-_CONVERSION(`GST$1', `$1', ((Glib::$1)(__ARG3__)))
-_CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
-_CONVERSION(`$1', `GST$1', ((GST$1)(__ARG3__)))
-')dnl
+#Enums
+_CONV_ENUM(Gst,AssocFlags)
+_CONV_ENUM(Gst,BufferCopyFlags)
+_CONV_ENUM(Gst,BufferFlag)
+_CONV_ENUM(Gst,ClockEntryType)
+_CONV_ENUM(Gst,ClockReturn)
+_CONV_ENUM(Gst,ClockTime)
+_CONV_ENUM(Gst,EventType)
+_CONV_ENUM(Gst,FlowReturn)
+_CONV_ENUM(Gst,Format)
+_CONV_ENUM(Gst,IndexCertainty)
+_CONV_ENUM(Gst,IndexEntryType)
+_CONV_ENUM(Gst,IndexFlags)
+_CONV_ENUM(Gst,IndexLookupMethod)
+_CONV_ENUM(Gst,IndexResolverMethod)
+_CONV_ENUM(Gst,MessageType)
+_CONV_ENUM(Gst,PadDirection)
+_CONV_ENUM(Gst,PadLinkReturn)
+_CONV_ENUM(Gst,PadPresence)
+_CONV_ENUM(Gst,QueryType)
+_CONV_ENUM(Gst,SeekFlags)
+_CONV_ENUM(Gst,SeekType)
+_CONV_ENUM(Gst,State)
+_CONV_ENUM(Gst,StateChange)
+_CONV_ENUM(Gst,StateChangeReturn)
+_CONV_ENUM(Gst,TagMergeMode)
+_CONV_ENUM(Gst,TaskState)
+_CONV_ENUM(Gst,URIType)
 
 ###############Gstreamermm Class Conversions######################
 
@@ -157,33 +176,3 @@ _CONVERSION(`const gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 
 #Other Conversions
 _CONVERSION(`const xmlNodePtr',`xmlNodePtr',`const_cast<xmlNodePtr>($3)')
-
-#############################Enums####################################
-
-_CONV_ENUM(Gst,AssocFlags)
-_CONV_ENUM(Gst,BufferCopyFlags)
-_CONV_ENUM(Gst,BufferFlag)
-_CONV_ENUM(Gst,ClockEntryType)
-_CONV_ENUM(Gst,ClockReturn)
-_CONV_ENUM(Gst,ClockTime)
-_CONV_ENUM(Gst,EventType)
-_CONV_ENUM(Gst,FlowReturn)
-_CONV_ENUM(Gst,Format)
-_CONV_ENUM(Gst,IndexCertainty)
-_CONV_ENUM(Gst,IndexEntryType)
-_CONV_ENUM(Gst,IndexFlags)
-_CONV_ENUM(Gst,IndexLookupMethod)
-_CONV_ENUM(Gst,IndexResolverMethod)
-_CONV_ENUM(Gst,MessageType)
-_CONV_ENUM(Gst,PadDirection)
-_CONV_ENUM(Gst,PadLinkReturn)
-_CONV_ENUM(Gst,PadPresence)
-_CONV_ENUM(Gst,QueryType)
-_CONV_ENUM(Gst,SeekFlags)
-_CONV_ENUM(Gst,SeekType)
-_CONV_ENUM(Gst,State)
-_CONV_ENUM(Gst,StateChange)
-_CONV_ENUM(Gst,StateChangeReturn)
-_CONV_ENUM(Gst,TagMergeMode)
-_CONV_ENUM(Gst,TaskState)
-_CONV_ENUM(Gst,URIType)

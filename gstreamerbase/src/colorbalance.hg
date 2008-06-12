@@ -1,0 +1,51 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/interfaces/colorbalance.h>
+#include <glibmm/interface.h>
+
+_DEFS(gstreamerbasemm,gstbase)
+
+namespace GstBase
+{
+
+_WRAP_ENUM(ColorBalanceType, GstColorBalanceType)
+
+class ColorBalanceChannel;
+
+/** GstBase::ColorBalance — Interface for adjusting color balance settings.
+ */
+class ColorBalance : public Glib::Interface
+{
+  _CLASS_INTERFACE(ColorBalance, GstColorBalance, GST_COLOR_BALANCE, GstColorBalanceClass)
+
+public:
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> > list_channels(), gst_color_balance_list_channels)
+
+_WRAP_METHOD(int get_value(const Glib::RefPtr<ColorBalanceChannel>& channel), gst_color_balance_get_value)
+_WRAP_METHOD(void set_value(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), gst_color_balance_set_value)
+_WRAP_METHOD(void value_changed(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), gst_color_balance_value_changed)
+};
+
+
+} // namespace GstBase
+

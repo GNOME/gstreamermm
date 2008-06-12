@@ -25,7 +25,7 @@
 namespace GstBase
 {
 
-/** Initialize gstreamerbasemm
+/** Initialize gstreamerbasemm.
  */
 void init();
   
