@@ -34,26 +34,10 @@ Glib::QueryQuark get_quark(Format f)
   return Glib::QueryQuark(gst_format_to_quark(GstFormat(f)));
 }
 
-//TODO: should gst_format_register() be wrapped?  It seems like it would be
-//extending GStreamer which may be best done with C API directly
-Format register_format(const Glib::ustring& nick, const Glib::ustring& description)
-{
-  return Format(gst_format_register(nick.c_str(), description.c_str()));
-}
-
 Format get_format(const Glib::ustring& nick)
 {
   return Format(gst_format_get_by_nick(nick.c_str()));
 }
-
-//TODO: first arg is an array of Formats
-/*
-bool formats_contain_format(const Format& formats, Format format)
-{
-  GstFormat gstformats = GstFormat(formats);
-  return gst_formats_contains(&gstformats, GstFormat(format));
-}
-*/
 
 bool get_details(Format format, FormatDefinition &def)
 {
