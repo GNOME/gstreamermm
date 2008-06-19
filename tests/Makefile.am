@@ -7,7 +7,7 @@ noinst_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \
                   test-message-wrap test-event-wrap test-query-wrap \
 		  test-structure test-caps-structures test-interface \
-		  test-create-bus test-taglist test-tagsetter
+		  test-create-bus test-taglist test-tagsetter test-pad
 
 test_caps_SOURCES=test-caps.cc
 test_caps_LDFLAGS=@GSTREAMERMM_LIBS@
@@ -53,6 +53,9 @@ test_taglist_LDFLAGS=@GSTREAMERMM_LIBS@
 
 test_tagsetter_SOURCES=test-tagsetter.cc
 test_tagsetter_LDFLAGS=@GSTREAMERMM_LIBS@
+
+test_pad_SOURCES=test-pad.cc
+test_pad_LDFLAGS=@GSTREAMERMM_LIBS@
 
 #runtestbasic runtestlangs \
 #runtestsearch runtestmimetypes \
