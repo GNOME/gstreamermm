@@ -1,5 +1,23 @@
 2008-06-19  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	* gstreamer/gstreamermm/init.cc: Modified init_check() to initialize
+	wrapping system in same manner as init() does.
+	* gstreamer/src/ghostpad.hg:
+	* gstreamer/src/pad.hg: Modified constructors that have a PadDirection
+	to use the name "direction" which is the right name of the
+	construction property (see bug #539055, filed in last commit).  Once
+	the other constructor's construction properties are well known the
+	construction properties warning should be fixed.
+	* tests/Makefile.am:
+	* tests/test-ghost-pad.cc:
+	* tests/test-init-check.cc: Added tests for Gst::GhostPad and
+	init_check().  Found that there are errors when running
+	ghost pad test related to destruction (unreferencing). If the pad
+	is given an extra reference, the errors disappear so it will probably
+	be necessary to debug referencing in (some) Gst::*Pad* constructors.
+
+2008-06-19  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	* tests/Makefile.am:
 	* tests/test-pad.cc: Added simple pad test to confirm warning reported
 	in bug #539063 which in fact does produce the warning. Filed gstreamer

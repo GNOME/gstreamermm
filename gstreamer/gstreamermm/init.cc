@@ -56,7 +56,11 @@ bool init_check(int& argc, char**& argv)
 bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
-  Glib::init();
+  static bool s_init = false;
+
+  if(!s_init)
+    Glib::init();
+
   GError* gerror = 0;
   bool result = gst_init_check(&argc, &argv, &gerror);
 
@@ -68,7 +72,20 @@ bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
     error = ::Glib::Error::throw_exception(gerror);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  Gst::wrap_init();
+  if(!s_init)
+  {
+    Gst::wrap_init();
+
+    //For Gst::wrap(), for Gst::MiniObject-derived classes.
+    Gst::wrap_register_init();
+    Gst::gst_wrap_init();
+
+    //Initialize wraping for gstreamerbasemm co-library
+    GstBase::wrap_init();
+
+    s_init = true;
+  }
+
   return result;
 }
 
