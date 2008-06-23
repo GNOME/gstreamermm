@@ -26,15 +26,23 @@ int main (int argc, char* argv[])
 {
   Gst::init(argc, argv);
 
-  Glib::RefPtr<Gst::Pad> pad;
+  Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw-yuv");
+  caps->set_simple("width", 500);
+  caps->set_simple("framerate", Gst::Fraction(25, 1));
 
-  pad = Gst::Pad::create("test", Gst::PAD_SRC);
+  Glib::RefPtr<Gst::PadTemplate> templ =
+    Gst::PadTemplate::create("source-template", Gst::PAD_SRC, Gst::PAD_ALWAYS,
+      caps);
 
-  if (pad)
-  {
-    std::cout << "Successfully created pad '" << pad->get_name() << "'." <<
+  if (templ)
+    std::cout << "Successfully created pad template '" << templ->get_name() <<
+      "'; direction = " <<  templ->get_direction() << "." << std::endl;
+
+  Glib::RefPtr<Gst::Pad> pad1 = Gst::Pad::create("test", Gst::PAD_SRC);
+
+  if (pad1)
+    std::cout << "Successfully created pad '" << pad1->get_name() << "'." <<
       std::endl;
-  }
 
   return 0;
 }

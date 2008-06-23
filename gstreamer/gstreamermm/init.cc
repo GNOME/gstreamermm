@@ -74,6 +74,7 @@ bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
 
   if(!s_init)
   {
+    //For Glib::wrap(), for Glib::Object-derived classes.
     Gst::wrap_init();
 
     //For Gst::wrap(), for Gst::MiniObject-derived classes.

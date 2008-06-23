@@ -64,21 +64,31 @@ class PadTemplate  : public Object
   _CLASS_GOBJECT(PadTemplate, GstPadTemplate, GST_PAD_TEMPLATE, Object, GstObject)
 
 protected:
-  _WRAP_CTOR(PadTemplate(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps), gst_pad_template_new)
+  /** Creates a new pad template with a name according to the given template
+   * and with the given arguments. This functions takes ownership of the
+   * provided caps, so be sure to not use them afterwards.
+   * @param name The name template.
+   * @param direction The Gst::PadDirection of the template.
+   * @param presence The Gst::PadPresence of the pad.
+   * @param caps A Gst::Caps set for the template. The caps are taken ownership
+   * of. 
+   * @return A new Gst::PadTemplate.
+   */
+  PadTemplate(const Glib::ustring& name, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps);
 
 public:
   /** Creates a new pad template with a name according to the given template
    * and with the given arguments. This functions takes ownership of the
    * provided caps, so be sure to not use them afterwards.
    *
-   * @param name_template The name template.
+   * @param name The name template.
    * @param direction The Gst::PadDirection of the template.
    * @param presence The Gst::PadPresence of the pad.
    * @param caps A Gst::Caps set for the template. The caps are taken ownership
    * of.
    * @return A new Gst::PadTemplate.
    */
-  _WRAP_CREATE(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps)
+  _WRAP_CREATE(const Glib::ustring& name, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps)
 
   _WRAP_METHOD(Glib::RefPtr<Caps> get_caps(), gst_pad_template_get_caps)
   _WRAP_METHOD(Glib::RefPtr<const Caps> get_caps() const, gst_pad_template_get_caps, constversion)

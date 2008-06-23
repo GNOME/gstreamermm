@@ -1,3 +1,20 @@
+2008-06-23  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/gstreamermm/init.cc: Added comment about Gst::wrap_init()
+	in Gst::init_check();
+	* gstreamer/src/bin.ccg: Removed extra referencing code in
+	Gst::Bin::add() because warning by running tests/gst-test-bin (which
+	is not issued with extra ref. code) is caused by GStreamer putting
+	private code in gst_bin_new() instead of putting it in a class _init()
+	function. Filed bug #539805 about this.
+	* gstreamer/src/padtemplate.ccg:
+	* gstreamer/src/padtemplate.hg: Used custom constructor with
+	_CONSTRUCT for Gst::PadTemplate because gst_pad_template_new() has
+	different construction parameters than those of the call to
+	g_object_new().  It also has extra code that should probably be in a
+	class _init() method. Filed bug #539772 about this.
+	* tests/test-pad.cc: Began writing general pad test.
+
 2008-06-19  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/gstreamermm/init.cc: Modified init_check() to initialize
