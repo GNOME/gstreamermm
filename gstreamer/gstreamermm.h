@@ -1,6 +1,7 @@
 #ifndef _GSTREAMERMM_H_
 #define _GSTREAMERMM_H_
 
+#include <gstreamermm/basesrc.h>
 #include <gstreamermm/bin.h>
 #include <gstreamermm/buffer.h>
 #include <gstreamermm/bus.h>

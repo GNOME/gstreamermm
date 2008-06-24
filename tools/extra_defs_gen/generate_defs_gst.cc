@@ -21,11 +21,13 @@
 
 #include <glib.h>
 #include <gst/gst.h>
+#include <gst/base/gstbasesrc.h>
 
 int main (int argc, char *argv[])
 {
   gst_init (&argc, &argv);
-  std::cout << get_defs(GST_TYPE_BUS)
+  std::cout << get_defs(GST_TYPE_BASE_SRC)
+            << get_defs(GST_TYPE_BUS)
             << get_defs(GST_TYPE_BIN)
             << get_defs(GST_TYPE_BUFFER)
             << get_defs(GST_TYPE_CAPS)

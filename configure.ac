@@ -129,7 +129,7 @@ gstreamermm_min_glibmm_version=2.8.0
 gstreamermm_min_gtkmm_version=2.10
 gstreamermm_min_gst_version=0.10
 
-PKG_CHECK_MODULES(GSTREAMERMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-0.10 >= ${gstreamermm_min_gst_version})
+PKG_CHECK_MODULES(GSTREAMERMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-0.10 >= ${gstreamermm_min_gst_version} gstreamer-base-0.10 >= ${gstreamermm_min_gst_version})
 AC_SUBST(GSTREAMERMM_CFLAGS)
 AC_SUBST(GSTREAMERMM_LIBS)
 

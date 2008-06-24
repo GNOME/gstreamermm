@@ -63,25 +63,3 @@ test_ghost_pad_LDFLAGS=@GSTREAMERMM_LIBS@
 
 test_init_check_SOURCES=test-init-check.cc
 test_init_check_LDFLAGS=@GSTREAMERMM_LIBS@
-
-#runtestbasic runtestlangs \
-#runtestsearch runtestmimetypes \
-#runtestgetbuffer
-
-#runtestbasic_SOURCES=test-basic.cc
-#runtestbasic_LDFLAGS=@GSTREAMERMM_LIBS@
-
-#runtestlangs_SOURCES=test-langs.cc
-#runtestlangs_LDFLAGS=@GSTREAMERMM_LIBS@
-
-#runtestsearch_SOURCES=test-search.cc
-#runtestsearch_LDFLAGS=@GSTREAMERMM_LIBS@
-
-#runtestmimetypes_SOURCES=test-mime-types.cc
-#runtestmimetypes_LDFLAGS=@GSTREAMERMM_LIBS@
-
-#runtestgetbuffer_SOURCES=test-get-buffer.cc
-#runtestgetbuffer_LDFLAGS=@GSTREAMERMM_LIBS@
-
-
-
