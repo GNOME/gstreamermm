@@ -30,4 +30,6 @@ int main (int argc, char* argv[])
 
   if(bus)
     std::cout << "Successfully created gst bus." << std::endl;
+
+  return 0;
 }

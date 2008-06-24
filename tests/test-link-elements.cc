@@ -41,4 +41,6 @@ int main (int argc, char* argv[])
   std::cout << "Successfully linked elements '" << source->get_name() <<
     "', '" << filter->get_name() << "' and '" << sink->get_name() <<
       "'." << std::endl;
+
+  return 0;
 }

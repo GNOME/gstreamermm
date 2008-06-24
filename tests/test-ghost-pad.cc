@@ -25,9 +25,13 @@
 int main (int argc, char* argv[])
 {
   Gst::init (argc, argv);
+
   Glib::RefPtr<Gst::GhostPad> gpad
     = Gst::GhostPad::create ("gpad", Gst::PAD_SINK);
+
   std::cout << "direction " << gpad->get_direction() << std::endl;
+
   // gpad->reference();
+
   return 0;
 }

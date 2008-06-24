@@ -31,4 +31,6 @@ int main (int argc, char* argv[])
   if(element)
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
+
+  return 0;
 }

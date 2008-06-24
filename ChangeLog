@@ -1,3 +1,35 @@
+2008-06-24  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/src/bin.ccg: Had to re-add the extra referencing code when
+	adding Gst::Bin's to a Gst::Bin.  I thought that this referencing
+	problem was caused by bug #539805 but that report was rejected so the
+	extra reference is necessary to avoid error when child bin is
+	destroyed before parent bin is.
+
+	* gstreamer/src/padtemplate.ccg:
+	* gstreamer/src/padtemplate.hg: Used _WRAP_CTOR to wrap constructor
+	with construction properties "name-template", "direction", "presence"
+	and "caps".  According to bug #539772 it looks like the GStreamer
+	developers will be making gst_pad_template_new() work with these
+	construction properties. Creating Gst::PadTemplates will still provide
+	missing construction properties warnings, but when GStreamer patch is
+	applied warnings will be gone and Gst::PadTemplate creation will work
+	correctly.
+	* tests/test-pad.cc: Modified test to use
+	Gst::PadTemplate::get_template_name() instead of
+	Gst::PadTemplate::get_name() and print pad directions (to ensure pad
+	was created correctly).
+
+	* tests/test-create-bus.cc:
+	* tests/test-create-element.cc:
+	* tests/test-ghost-pad.cc:
+	* tests/test-interface.cc:
+	* tests/test-link-elements.cc:
+	* tests/test-pipeline-add-element.cc: Added missing main() return
+	statements and corrected w/s.
+
+	* gstreamer/src/basesrc.ccg: Removed unused namespace definition.
+
 2008-06-23  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* configure.ac:

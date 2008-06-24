@@ -36,4 +36,6 @@ int main (int argc, char* argv[])
   if (sourceCopy)
     std::cout << "Successfully added element '" << sourceCopy->get_name() <<
      "' to pipeline '" << pipeline->get_name() << "'." << std::endl;
+
+  return 0;
 }

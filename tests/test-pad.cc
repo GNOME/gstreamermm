@@ -35,14 +35,15 @@ int main (int argc, char* argv[])
       caps);
 
   if (templ)
-    std::cout << "Successfully created pad template '" << templ->get_name() <<
-      "'; direction = " <<  templ->get_direction() << "." << std::endl;
+    std::cout << "Successfully created pad template '" <<
+      templ->get_name_template() << "'; direction = " << 
+        templ->get_direction() << "." << std::endl;
 
-  Glib::RefPtr<Gst::Pad> pad1 = Gst::Pad::create("test", Gst::PAD_SRC);
+  Glib::RefPtr<Gst::Pad> pad1 = Gst::Pad::create("pad1", Gst::PAD_SINK);
 
   if (pad1)
-    std::cout << "Successfully created pad '" << pad1->get_name() << "'." <<
-      std::endl;
+    std::cout << "Successfully created pad '" << pad1->get_name() <<
+      "'; direction = " << pad1->get_direction() << "." << std::endl;
 
   return 0;
 }

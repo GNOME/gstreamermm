@@ -70,4 +70,6 @@ int main (int argc, char* argv[])
     // Use interface methods
     xoverlay->handle_events(false);
   }
+
+  return 0;
 }

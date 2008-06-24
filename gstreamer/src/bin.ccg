@@ -37,7 +37,15 @@ Glib::RefPtr<Bin> Bin::add(const Glib::RefPtr<Element>& element)
   // If addition successful, return RefPtr<..> to this bin, otherwise return
   // NULL RefPtr<...>
   if(result)
-    return Glib::wrap(gobj(), true);
+   {
+     // When adding bins to a bin/pipeline (yes this is possible), an extra ref
+     // is needed because parent bin takes ownership of element and wants to
+     // unref the child bin itself when the parent bin is destroyed.
+     if (GST_IS_BIN(element->gobj()))
+       element->reference();
+
+      return Glib::wrap(gobj(), true);
+   }
   else
     throw std::runtime_error("Failed to add " + element->get_name() + " element");
 }
