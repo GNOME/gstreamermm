@@ -18,7 +18,7 @@ pushdef([GSTREAMERMM_MINOR_VERSION],     [9])
 pushdef([GSTREAMERMM_MICRO_VERSION],     [5])
 pushdef([GSTREAMERMM_EXTRA_VERSION],     [])
 pushdef([GSTREAMERMM_VERSION], GSTREAMERMM_MAJOR_VERSION.GSTREAMERMM_MINOR_VERSION.GSTREAMERMM_MICRO_VERSION[]GSTREAMERMM_EXTRA_VERSION)
-AC_INIT([gstreamermm], GSTREAMERMM_VERSION, [Milosz Derezynski <internalerror@gmail.com>, Rob Page <page.rob@gmail.com>, Dodji Seketeli <dodji@gnome.org>])
+AC_INIT([gstreamermm], GSTREAMERMM_VERSION, [gtkmm-list@gnome.org])
 AC_CONFIG_SRCDIR([gstreamer/gstreamermmconfig.h.in])
 AC_PREREQ(2.59)
 

@@ -15,7 +15,7 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/filter.h>
 #include <gstreamermm/format.h>
-#include <gstreamermm/ghostpad.h>
+//TODO: #include <gstreamermm/ghostpad.h> (when bug #539108 is fixed)
 #include <gstreamermm/index.h>
 #include <gstreamermm/indexfactory.h>
 #include <gstreamermm/interface.h>
@@ -29,6 +29,7 @@
 #include <gstreamermm/plugin.h>
 #include <gstreamermm/pluginfeature.h>
 #include <gstreamermm/query.h>
+#include <gstreamermm/segment.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
 #include <gstreamermm/taglist.h>
