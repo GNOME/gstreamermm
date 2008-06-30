@@ -27,7 +27,7 @@ int main (int argc, char* argv[])
 {
   try
   {
-    bool success = Gst::init_check(argc, argv);
+    bool success = Gst::init_check();
 
     if (!success)
     {
@@ -35,10 +35,6 @@ int main (int argc, char* argv[])
       return -1;
     }
 
-    success = Gst::init_check(argc, argv);
-
-    std::cout << "Second call to Gst::init_check() success = " << success <<
-      "." << std::endl;
   }
   catch (const Glib::Error& error)
   {

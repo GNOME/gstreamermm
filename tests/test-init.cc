@@ -25,26 +25,7 @@
 
 int main (int argc, char* argv[])
 {
-  try
-  {
-    bool success = Gst::init_check(argc, argv);
-
-    if (!success)
-    {
-      std::cout << "Error initializing gstreamermm." << std::endl;
-      return -1;
-    }
-
-    success = Gst::init_check(argc, argv);
-
-    std::cout << "Second call to Gst::init_check() success = " << success <<
-      "." << std::endl;
-  }
-  catch (const Glib::Error& error)
-  {
-    std::cout << "Error initializing gstreamermm." << std::endl;
-    return -1;
-  }
+  Gst::init(argc, argv);
 
   Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("ximagesink", "videosink");
 

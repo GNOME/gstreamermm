@@ -28,14 +28,11 @@
 namespace Gst
 {
 
-void init(int& argc, char**& argv)
+void initialize_wrap_system()
 {
   static bool s_init = false;
   if(!s_init)
   {
-    Glib::init();
-    gst_init(&argc, &argv);
-
     //For Glib::wrap(), for Glib::Object-derived classes.
     Gst::wrap_init(); 
 
@@ -45,6 +42,32 @@ void init(int& argc, char**& argv)
 
     //Initialize wraping for gstreamerbasemm co-library
     GstBase::wrap_init();
+
+    s_init = true;
+  }
+}
+
+void init(int& argc, char**& argv)
+{
+  static bool s_init = false;
+  if(!s_init)
+  {
+    Glib::init();
+    gst_init(&argc, &argv);
+    initialize_wrap_system();
+
+    s_init = true;
+  }
+}
+
+void init()
+{
+  static bool s_init = false;
+  if(!s_init)
+  {
+    Glib::init();
+    gst_init(NULL, NULL);
+    initialize_wrap_system();
 
     s_init = true;
   }
@@ -74,16 +97,38 @@ bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
 
   if(!s_init)
   {
-    //For Glib::wrap(), for Glib::Object-derived classes.
-    Gst::wrap_init();
+    initialize_wrap_system();
+    s_init = true;
+  }
 
-    //For Gst::wrap(), for Gst::MiniObject-derived classes.
-    Gst::wrap_register_init();
-    Gst::gst_wrap_init();
+  return result;
+}
 
-    //Initialize wraping for gstreamerbasemm co-library
-    GstBase::wrap_init();
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool init_check()
+#else
+bool init_check(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  static bool s_init = false;
 
+  if(!s_init)
+    Glib::init();
+
+  GError* gerror = 0;
+  bool result = gst_init_check(NULL, NULL, &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(!s_init)
+  {
+    initialize_wrap_system();
     s_init = true;
   }
 

@@ -8,7 +8,8 @@ noinst_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
                   test-message-wrap test-event-wrap test-query-wrap \
 		  test-structure test-caps-structures test-interface \
 		  test-create-bus test-taglist test-tagsetter \
-		  test-init-check
+		  test-init-check test-init test-init-check-noargs \
+		  test-init-noargs
 
 #TODO: Add test-pad to tests when bug #539108 is fixed.
 
@@ -62,3 +63,12 @@ test_tagsetter_LDFLAGS=@GSTREAMERMM_LIBS@
 
 test_init_check_SOURCES=test-init-check.cc
 test_init_check_LDFLAGS=@GSTREAMERMM_LIBS@
+
+test_init_SOURCES=test-init.cc
+test_init_LDFLAGS=@GSTREAMERMM_LIBS@
+
+test_init_check_noargs_SOURCES=test-init-check-noargs.cc
+test_init_check_noargs_LDFLAGS=@GSTREAMERMM_LIBS@
+
+test_init_noargs_SOURCES=test-init-noargs.cc
+test_init_noargs_LDFLAGS=@GSTREAMERMM_LIBS@

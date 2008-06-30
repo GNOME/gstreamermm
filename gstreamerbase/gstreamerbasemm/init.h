@@ -25,11 +25,13 @@
 namespace GstBase
 {
 
-/** Initialize gstreamerbasemm.
+/** Initialize gstreamerbasemm.  Gst::init() and Gst::init_check() functions
+ * already initialize gstreamerbasemm so there's no need to use this function
+ * directly.
  */
 void init();
   
-}//end namespace GstBase
+} //namespace GstBase
 
 #endif //_GSTREAMERBASEMM_INIT_H
 

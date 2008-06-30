@@ -28,12 +28,22 @@
 namespace Gst
 {
 
-/** Initializes the GStreamer library, setting up internal path lists,
- * registering built-in elements, and loading standard plugins.
+/** Initializes gstreamermm parsing command line arguments.
  *
- * This function should be called before calling any other GLib functions. If
- * this is not an option, your program must initialise the GLib thread system
- * using g_thread_init() before any other GLib functions are called.
+ * Either this function or Gst::init_check() with command line parsing should
+ * be called to initialize gstreamermm before calling any other GLib functions.
+ * If this is not an option, your program must initialize the GLib thread
+ * system using Glib::thread_init() before any other GLib functions are called
+ * and use either Gst::init() or Gst::init_check() with no arguments before
+ * calling any gstreamermm functions.  GLib thread initialization can be done
+ * as follows:
+ *
+ * @code
+ * if (!Glib::thread_supported ())
+ *   Glib::thread_init ();
+ * ...
+ * @endcode
+ * 
  *
  * Note: This function will terminate your program if it was unable to
  * initialize GStreamer for some reason. If you want your program to fall back,
@@ -48,26 +58,86 @@ namespace Gst
  */
 void init(int& argc, char**& argv);
 
-/** Initializes the GStreamer library, setting up internal path lists,
- * registering built-in elements, and loading standard plugins.
+/** Initializes gstreamermm without parsing command line options.
  *
- * This function will return false if GStreamer could not be initialized for
+ * Either the Gst::init() or Gst::init_check() functions with command line
+ * parsing should be called to initalize gstreamermm before calling any other
+ * GLib functions. If this is not an option, your program must initialize the
+ * GLib thread system using Glib::thread_init() before any other GLib functions
+ * are called and use either this function or Gst::init_check() with no
+ * arguments before calling any gstreamermm functions.  GLib thread
+ * initialization can be done as follows:
+ *
+ * @code
+ * if (!Glib::thread_supported ())
+ *   Glib::thread_init ();
+ * ...
+ * @endcode
+ *
+ * Note: This function will terminate your program if it was unable to
+ * initialize gstreamermm for some reason. If you want your program to fall
+ * back, use Gst::init_check() instead.
+ */
+void init();
+
+/** Initializes gstreamermm gracefully parsing command line arguments.
+ *
+ * Either this function or Gst::init() with command line parsing should be
+ * called to initialize gstreamermm before calling any other GLib functions.
+ * If this is not an option, your program must initialize the GLib thread
+ * system using Glib::thread_init() before any other GLib functions are called
+ * and use either Gst::init() or Gst::init_check() with no arguments before
+ * calling any gstreamermm functions.  GLib thread initialization can be done
+ * as follows:
+ *
+ * @code
+ * if (!Glib::thread_supported ())
+ *   Glib::thread_init ();
+ * ...
+ * @endcode
+ * 
+ * This function will return false if gstreamermm could not be initialized for
  * some reason. If you want your program to fail fatally, use Gst::init()
  * instead.
  *
- * This function should be called before calling any other GLib functions. If
- * this is not an option, your program must initialise the GLib thread system
- * using g_thread_init() before any other GLib functions are called.
- *
  * @param argc Pointer to application's argc.
  * @param argv Pointer to application's argv.
- * @return true if GStreamer could be initialized.
+ * @return true if gstreamermm could be initialized.
  * @throw Glib::Error
  */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool init_check(int& argc, char**& argv);
 #else
   bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+/** Initializes gstreamermm gracefully without parsing command line arguments.
+ *
+ * Either the Gst::init() or Gst::init_check() functions with command line
+ * parsing should be called to initalize gstreamermm before calling any other
+ * GLib functions. If this is not an option, your program must initialize the
+ * GLib thread system using Glib::thread_init() before any other GLib functions
+ * are called and use either this function or Gst::init() with no arguments
+ * before calling any gstreamermm functions.  GLib thread initialization can be
+ * done as follows:
+ *
+ * @code
+ * if (!Glib::thread_supported ())
+ *   Glib::thread_init ();
+ * ...
+ * @endcode
+ * 
+ * This function will return false if gstreamermm could not be initialized for
+ * some reason. If you want your program to fail fatally, use Gst::init()
+ * instead.
+ *
+ * @return true if gstreamermm could be initialized.
+ * @throw Glib::Error
+ */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool init_check();
+#else
+  bool init_check(std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
 /** Returns a Glib::OptionGroup with GStreamer's argument specifications. The
