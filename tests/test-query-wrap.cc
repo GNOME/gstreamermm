@@ -34,7 +34,7 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::QueryPosition> query_position = Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
   std::cout << "query is a Gst::QueryPosition: " << (bool)query_position  << std::endl;
-  std::cout << "query type name: '" << Gst::get_name(query->get_query_type()) << "'" << std::endl;
+  std::cout << "query type name: '" << Gst::Enums::get_name(query->get_query_type()) << "'" << std::endl;
 
   const Gst::Structure structure = query->get_structure();
   if(structure)

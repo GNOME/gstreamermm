@@ -38,7 +38,7 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::MessageWarning> message_warning = Glib::RefPtr<Gst::MessageWarning>::cast_dynamic(message);
   std::cout << "message is a Gst::MessageWarning: " << (bool)message_warning  << std::endl;
-  std::cout << "message type name: '" << Gst::get_name(message->get_message_type()) << "'"  << std::endl;
+  std::cout << "message type name: '" << Gst::Enums::get_name(message->get_message_type()) << "'"  << std::endl;
 
   const Gst::Structure structure = message->get_structure();
   if(structure)
