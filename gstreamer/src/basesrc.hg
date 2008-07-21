@@ -77,7 +77,7 @@ namespace Gst
  * publish this rate. Use set_live() to activate the live source mode.
  *
  * A live source does not produce data in the PAUSED state. This means that the
- * Gst::BaseSrc::create method will not be called in PAUSED but only in
+ * Gst::BaseSrc::create_vfunc() method will not be called in PAUSED but only in
  * PLAYING. To signal the pipeline that the element will not produce data, the
  * return value from the READY to PAUSED state will be
  * Gst::STATE_CHANGE_NO_PREROLL.
@@ -88,22 +88,22 @@ namespace Gst
  * and running.
  *
  * Live sources that synchronize and block on the clock (an audio source, for
- * example) can since GStreamer 0.10.12 use wait_playing() when the ::create
- * function was interrupted by a state change to PAUSED.
+ * example) can since GStreamer 0.10.12 use wait_playing() when the
+ * create_vfunc() function was interrupted by a state change to PAUSED.
  *
- * The Gst::BaseSrc::get_times method can be used to implement pseudo-live
- * sources. It only makes sense to implement the ::get_times function if the
- * source is a live source. The ::get_times function should return timestamps
- * starting from 0, as if it were a non-live source. The base class will make
- * sure that the timestamps are transformed into the current running_time. The
- * base source will then wait for the calculated running_time before pushing
- * out the buffer.
+ * The Gst::BaseSrc::get_times_vfunc() method can be used to implement
+ * pseudo-live sources. It only makes sense to implement the get_times_vfunc()
+ * function if the source is a live source. The get_times_vfunc() function
+ * should return timestamps starting from 0, as if it were a non-live source.
+ * The base class will make sure that the timestamps are transformed into the
+ * current running_time. The base source will then wait for the calculated
+ * running_time before pushing out the buffer.
  *
  * For live sources, the base class will by default report a latency of 0. For
  * pseudo live sources, the base class will by default measure the difference
- * between the first buffer timestamp and the start time of get_times and will
- * report this value as the latency. Subclasses should override the query
- * function when this behaviour is not acceptable.
+ * between the first buffer timestamp and the start time of get_times_vfunc()
+ * and will report this value as the latency. Subclasses should override the
+ * query_vfunc() function when this behaviour is not acceptable.
  *
  * TODO: Edit below paragraph for C++ and include C++ example from C API (if
  * necessary):
@@ -230,7 +230,7 @@ public:
    * be opened now. This vfunc is optional, but should be implemented if
    * possible to avoid unnecessary start/stop cycles. The default
    * implementation will open and close the resource to find out whether
-   * get_range is supported, and that is usually undesirable.
+   * get_range() is supported, and that is usually undesirable.
    */
   _WRAP_VFUNC(bool check_get_range(), "check_get_range")
 
@@ -240,15 +240,15 @@ public:
   _WRAP_VFUNC(void fixate(const Glib::RefPtr<Caps>& caps), "fixate")
 
   /** Clear the previous unlock request. Subclasses should clear any state they
-   * set during unlock(), such as clearing command queues.
+   * set during unlock_vfunc(), such as clearing command queues.
    */
   _WRAP_VFUNC(bool unlock_stop(), "unlock_stop")
 
-  /** Prepare the GstSegment that will be passed to the do_seek vmethod for
-   * executing a seek request. Sub-classes should override this if they support
-   * seeking in formats other than the configured native format. By default, it
-   * tries to convert the seek arguments to the configured native format and
-   * prepare a segment in that format.
+  /** Prepare the GstSegment that will be passed to the do_seek_vfunc() vmethod
+   * for executing a seek request. Sub-classes should override this if they
+   * support seeking in formats other than the configured native format. By
+   * default, it tries to convert the seek arguments to the configured native
+   * format and prepare a segment in that format.
    */
   _WRAP_VFUNC(bool prepare_seek_segment(const Glib::RefPtr<Event>& seek, Segment segment), "prepare_seek_segment")
 };
