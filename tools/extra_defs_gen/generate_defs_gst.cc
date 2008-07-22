@@ -32,6 +32,8 @@
 int main (int argc, char *argv[])
 {
   gst_init (&argc, &argv);
+
+  // GStreamer core types:
   std::cout << get_defs(GST_TYPE_BUS)
             << get_defs(GST_TYPE_BIN)
             << get_defs(GST_TYPE_BUFFER)
@@ -67,6 +69,8 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_TYPE_FIND_FACTORY)
             << get_defs(GST_TYPE_URI_HANDLER)
             << get_defs(GST_TYPE_XML)
+
+  // GStreamer library base types:
             << get_defs(GST_TYPE_BASE_SRC)
             << get_defs(GST_TYPE_BASE_SINK)
             << get_defs(GST_TYPE_BASE_TRANSFORM)

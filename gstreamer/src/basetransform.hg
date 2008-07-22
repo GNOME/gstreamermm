@@ -1,0 +1,239 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/base/gstbasetransform.h>
+#include <gstreamermm/element.h>
+#include <gstreamermm/pad.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+/** The name of the templates for the sink pad ("sink").
+ */
+const Glib::ustring BASE_TRANSFORM_SINK_NAME = GST_BASE_TRANSFORM_SINK_NAME;
+
+/** The name of the templates for the source pad ("src").
+ */
+const Glib::ustring BASE_TRANSFORM_SRC_NAME = GST_BASE_TRANSFORM_SRC_NAME;
+
+/** Gst::BaseTransform — Base class for simple transform filters.
+ * This base class is for filter elements that process data.
+ *
+ * It provides for:
+ *     - one sinkpad and one srcpad
+ *     - Possible formats on sink and source pad implemented with custom
+ *     transform_caps_vfunc() function. By default uses same format on sink and
+ *     source.
+ *     - Handles state changes.
+ *     - Does flushing.
+ *     - Push mode.
+ *     - Pull mode if the sub-class transform_vfunc() can operate on arbitrary
+ *     data.
+ * 
+ * <H3>Use Cases:</H3>
+ *    -   <B>1. Passthrough mode</B>
+ *           - Element has no interest in modifying the buffer. It may want to
+ *           inspect it, in which case the element should have a
+ *           transform_ip_vfunc() function. If there is no transform_ip_vfunc()
+ *           function in passthrough mode, the buffer is pushed intact.
+ *           - TODO: Investigate the following and fix for c++ (file bug if
+ *           necessary): On the GstBaseTransformClass is the
+ *           passthrough_on_same_caps variable which will automatically
+ *           set/unset passthrough based on whether the element negotiates the
+ *           same caps on both pads.
+ *           - passthrough_on_same_caps on an element that doesn't implement a
+ *           transform_caps_vfunc() function is useful for elements that only
+ *           inspect data (such as level).
+ *           .
+ *       <B>Example elements</B>
+ *           - Level
+ *           - Videoscale, audioconvert, ffmpegcolorspace, audioresample in
+ *           certain modes.
+ *       .
+ *    -   <B>2. Modifications in-place - input buffer and output buffer are the
+ *    same thing.</B>
+ *           - The element must implement a transform_ip_vfunc() function.
+ *           - Output buffer size must <= input buffer size.
+ *           - If the always_in_place flag is set, non-writable buffers will be
+ *           copied and passed to the transform_ip_vfunc() function, otherwise
+ *           a new buffer will be created and the transform_vfunc() function
+ *           called.
+ *           - Incoming writable buffers will be passed to the
+ *           transform_ip_vfunc() function immediately.
+ *           - only implementing transform_ip_vfunc() and not transform_vfunc()
+ *           implies always_in_place = TRUE.
+ *           .
+ *       <B>Example elements</B>
+ *           - Volume.
+ *           - Audioconvert in certain modes (signed/unsigned conversion).
+ *           - ffmpegcolorspace in certain modes (endianness swapping).
+ *
+ *    -  <B>3. Modifications only to the caps/metadata of a buffer</B>
+ *           - The element does not require writable data, but non-writable
+ *           buffers should be subbuffered so that the meta-information can be
+ *           replaced.
+ *           - Elements wishing to operate in this mode should replace the
+ *           prepare_output_buffer_vfunc() method to create subbuffers of the
+ *           input buffer and set always_in_place to TRUE.
+ *           .
+ *       <B>Example elements</B>
+ *           - Capsfilter when setting caps on outgoing buffers that have none.
+ *           - identity when it is going to re-timestamp buffers by datarate.
+ *
+ *    -  <B>4. Normal mode</B>
+ *           - always_in_place flag is not set, or there is no
+ *           transform_ip_vfunc() function.
+ *           - Element will receive an input buffer and output buffer to
+ *           operate on.
+ *           - Output buffer is allocated by calling the
+ *           prepare_output_buffer_vfunc() function.
+ *           .
+ *       <B>Example elements</B>
+ *           - Videoscale, ffmpegcolorspace, audioconvert when doing
+ *           scaling/conversions.
+ *
+ *    -  <B>5. Special output buffer allocations</B>
+ *           - Elements which need to do special allocation of their output
+ *           buffers other than what Gst::Pad::alloc_buffer() allows should
+ *           implement a prepare_output_buffer_vfunc() method, which calls the
+ *           parent implementation and passes the newly allocated buffer. 
+ *           .
+ *       <B>Example elements</B>
+ *           - efence.
+ * 
+ * <B>Sub-class settable flags on Gst::BaseTransform</B>
+ * 
+ *     - <B>passthrough</B>
+ *           - Implies that in the current configuration, the sub-class is not
+ *           interested in modifying the buffers.
+ *           - Elements which are always in passthrough mode whenever the same
+ *           caps has been negotiated on both pads can set the class variable
+ *           passthrough_on_same_caps to have this behaviour automatically.
+ *           .
+ *     - <B>always_in_place</B>
+ *           - Determines whether a non-writable buffer will be copied before
+ *           passing to the transform_ip function.
+ *           - Implied TRUE if no transform function is implemented.
+ *           - Implied FALSE if ONLY transform function is implemented.
+**/
+class BaseTransform
+: public Element
+{
+  _CLASS_GOBJECT(BaseTransform, GstBaseTransform, GST_BASE_TRANSFORM, Element, GstElement)
+
+public:
+  _WRAP_METHOD(bool is_passthrough(), gst_base_transform_is_passthrough)
+  _WRAP_METHOD(void set_passthrough(bool passthrough), gst_base_transform_set_passthrough)
+  _WRAP_METHOD(bool is_in_place(), gst_base_transform_is_in_place)
+  _WRAP_METHOD(void set_in_place(bool in_place), gst_base_transform_set_in_place)
+  _WRAP_METHOD(bool is_qos_enabled(), gst_base_transform_is_qos_enabled)
+  _WRAP_METHOD(void set_qos_enabled(bool enabled), gst_base_transform_set_qos_enabled)
+  _WRAP_METHOD(void update_qos(double proportion, ClockTimeDiff diff, ClockTime timestamp), gst_base_transform_update_qos)
+  _WRAP_METHOD(void set_gap_aware(bool gap_aware), gst_base_transform_set_gap_aware)
+
+  /** Obtain a lock to protect the transform function from concurrent access.
+   */
+  void lock();
+
+  /** Release the lock that protects the transform function from concurrent
+   * access.
+   */
+  void unlock();
+
+  /** Gives the refptr to the sink Gst::Pad object of the element.
+   */
+  _MEMBER_GET(sink_pad, sinkpad, Glib::RefPtr<Pad>, GstPad*)
+
+  /** Gives the refptr to the source Gst::Pad object of the element.
+   */
+  _MEMBER_GET(src_pad, srcpad, Glib::RefPtr<Pad>, GstPad*)
+
+  _WRAP_PROPERTY("qos", bool)
+
+#m4 _CONVERSION(`Glib::RefPtr<Caps>', `GstCaps*', `($3)->gobj()')
+#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Caps>&', `Glib::wrap($3)')
+  /** Optional. Given the pad in this direction and the given caps, what caps
+   * are allowed on the other pad in this element ?
+   */
+  _WRAP_VFUNC(Glib::RefPtr<Caps> transform_caps(PadDirection direction, const Glib::RefPtr<Caps>& caps), "transform_caps")
+
+  /** Optional. Given the pad in this direction and the given caps, fixate the
+   * caps on the other pad.
+   */
+  _WRAP_VFUNC(void fixate_caps(PadDirection direction, const Glib::RefPtr<Caps>& caps, const Glib::RefPtr<Caps>& othercaps), "fixate_caps")
+
+  /** Optional. Given the size of a buffer in the given direction with the
+   * given caps, calculate the size in bytes of a buffer on the other pad with
+   * the given other caps. The default implementation uses
+   * get_unit_size_vfunc() and keeps the number of units the same.
+   */
+  _WRAP_VFUNC(bool transform_size(PadDirection direction, const Glib::RefPtr<Caps>& caps, guint size, const Glib::RefPtr<Caps>& othercaps, guint* othersize), "transform_size")
+
+  /** Required if the transform is not in-place. Get the size in bytes of one
+   * unit for the given caps.
+   */
+  _WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Caps>& caps, guint* size), "get_unit_size")
+
+  /** Allows the subclass to be notified of the actual caps set.
+   */
+  _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& incaps, const Glib::RefPtr<Caps>& outcaps), "set_caps")
+
+  /** Optional. Called when the element starts processing. Allows opening
+   * external resources.
+   */
+  _WRAP_VFUNC(bool start(), "start")
+
+  /** Optional. Called when the element stops processing. Allows closing
+   * external resources.
+   */
+  _WRAP_VFUNC(bool stop(), "stop")
+
+  /** Optional. Event handler on the sink pad. This function should return TRUE
+   * if the base class should forward the event.
+   */
+  _WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
+
+#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Buffer>&', `Gst::wrap($3)')
+  /** Required if the element does not operate in-place. Transforms one
+   * incoming buffer to one outgoing buffer. The function is allowed to change
+   * size/timestamp/duration of the outgoing buffer.
+   */
+  _WRAP_VFUNC(FlowReturn transform(const Glib::RefPtr<Buffer>& inbuf, const Glib::RefPtr<Buffer>& outbuf), "transform")
+
+  /** Required if the element operates in-place. Transform the incoming buffer
+   * in-place.
+   */
+  _WRAP_VFUNC(FlowReturn transform_ip(const Glib::RefPtr<Buffer>& buf), "transform_ip")
+
+  //TODO: Should "passthrough_on_same_caps" variable in GstBaseTransformClass
+  //be wrapped?
+
+//TODO: #m4 _CONVERSION(`Glib::RefPtr<Buffer>&', `GstBuffer**', `&(($3)->gobj())')
+//#m4 _CONVERSION(`GstBuffer**', `Glib::RefPtr<Buffer>&', `Gst::wrap(*($3))')
+  //_WRAP_VFUNC(FlowReturn prepare_output_buffer(const Glib::RefPtr<Buffer>& input, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>&), "prepare_output_buffer")
+
+  /** Optional. Event handler on the source pad.
+   */
+  _WRAP_VFUNC(bool src_event(const Glib::RefPtr<Event>& event), "src_event")
+};
+
+} //namespace Gst

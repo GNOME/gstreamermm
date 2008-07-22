@@ -1,7 +1,7 @@
 #ifndef _GSTREAMERMM_H_
 #define _GSTREAMERMM_H_
 
-#include <gstreamermm/basesrc.h>
+// Core includes
 #include <gstreamermm/bin.h>
 #include <gstreamermm/buffer.h>
 #include <gstreamermm/bus.h>
@@ -19,7 +19,7 @@
 #include <gstreamermm/index.h>
 #include <gstreamermm/indexfactory.h>
 #include <gstreamermm/interface.h>
-#include <gstreamermm/iterator.h>
+//TODO: #include <gstreamermm/iterator.h> (when wrapping of GstIterator is done)
 #include <gstreamermm/message.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/pad.h>
@@ -38,6 +38,11 @@
 #include <gstreamermm/urihandler.h>
 #include <gstreamermm/value.h>
 #include <gstreamermm/xml.h>
+
+// Library base includes
+#include <gstreamermm/basesrc.h>
+#include <gstreamermm/basesink.h>
+#include <gstreamermm/basetransform.h>
 
 #include <gstreamermm/init.h>
 #include <gstreamermm/version.h>
