@@ -43,6 +43,7 @@
 #include <gstreamermm/basesrc.h>
 #include <gstreamermm/basesink.h>
 #include <gstreamermm/basetransform.h>
+#include <gstreamermm/pushsrc.h>
 
 #include <gstreamermm/init.h>
 #include <gstreamermm/version.h>
