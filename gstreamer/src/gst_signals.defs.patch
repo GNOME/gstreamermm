@@ -1,0 +1,98 @@
+Index: gst_signals.defs
+===================================================================
+--- gst_signals.defs	(revision 1646)
++++ gst_signals.defs	(working copy)
+@@ -1,3 +1,5 @@
++;; Apply gst_signals.defs.patch after regenerating.
++
+ ;; From GstBus
+ 
+ (define-signal sync-message
+@@ -5,7 +7,7 @@
+   (return-type "void")
+   (when "last")
+   (parameters
+-    '("GstMessage" "p0")
++    '("GstMessage*" "p0")
+   )
+ )
+ 
+@@ -14,7 +16,7 @@
+   (return-type "void")
+   (when "last")
+   (parameters
+-    '("GstMessage" "p0")
++    '("GstMessage*" "p0")
+   )
+ )
+ 
+@@ -76,7 +78,7 @@
+   (return-type "void")
+   (when "first")
+   (parameters
+-    '("GObject*" "p0")
++    '("GstObject*" "p0")
+   )
+ )
+ 
+@@ -85,7 +87,7 @@
+   (return-type "void")
+   (when "first")
+   (parameters
+-    '("GObject*" "p0")
++    '("GstObject*" "p0")
+   )
+ )
+ 
+@@ -351,7 +353,7 @@
+   (return-type "gboolean")
+   (when "last")
+   (parameters
+-    '("GstMiniObject" "p0")
++    '("GstMiniObject*" "p0")
+   )
+ )
+ 
+@@ -480,7 +482,7 @@
+   (return-type "void")
+   (when "last")
+   (parameters
+-    '("gpointer" "p0")
++    '("GstPlugin*" "p0")
+   )
+ )
+ 
+@@ -489,7 +491,7 @@
+   (return-type "void")
+   (when "last")
+   (parameters
+-    '("gpointer" "p0")
++    '("GstPluginFeature*" "p0")
+   )
+ )
+ 
+@@ -583,6 +585,15 @@
+ 
+ ;; From GstURIHandler
+ 
++(define-signal new-uri
++  (of-object "GstURIHandler")
++  (return-type "void")
++  (when "last")
++  (parameters
++    '("const-gchar*" "p0")
++  )
++)
++
+ ;; From GstXML
+ 
+ (define-signal object-loaded
+@@ -591,7 +602,7 @@
+   (when "last")
+   (parameters
+     '("GstObject*" "p0")
+-    '("gpointer" "p1")
++    '("xmlNode*" "p1")
+   )
+ )
+ 

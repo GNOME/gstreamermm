@@ -1,3 +1,5 @@
+;; Apply gst_enums.defs.patch after regenerating.
+
 ;; From /opt/usr-jhbuild/include/gstreamer-0.10/gst/gstbin.h
 
 (define-enum-extended BinFlags
@@ -13,7 +15,13 @@
   (in-module "Gst")
   (c-name "GstBufferFlag")
   (values
-    '("y" "GST_BUFFER_FLAG_READONLY" "#error")
+    '("readonly" "GST_BUFFER_FLAG_READONLY" "GST_MINI_OBJECT_FLAG_READONLY")
+    '("preroll" "GST_BUFFER_FLAG_PREROLL" "GST_MINI_OBJECT_FLAG_READONLY << 0")
+    '("discont" "GST_BUFFER_FLAG_DISCONT" "GST_MINI_OBJECT_FLAG_READONLY << 1")
+    '("in-caps" "GST_BUFFER_FLAG_IN_CAPS" "GST_MINI_OBJECT_FLAG_READONLY << 2")
+    '("gap" "GST_BUFFER_FLAG_GAP" "GST_MINI_OBJECT_FLAG_READONLY << 3")
+    '("delta-unit" "GST_BUFFER_FLAG_DELTA_UNIT" "GST_MINI_OBJECT_FLAG_READONLY << 4")
+    '("last" "GST_BUFFER_FLAG_LAST" "GST_MINI_OBJECT_FLAG_READONLY << 8")
   )
 )
 
@@ -33,6 +41,8 @@
   (in-module "Gst")
   (c-name "GstBusFlags")
   (values
+    '("flushing" "GST_BUS_FLUSHING" "GST_OBJECT_FLAG_LAST << 0")
+    '("last" "GST_BUS_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 1")
   )
 )
 
@@ -85,6 +95,13 @@
   (in-module "Gst")
   (c-name "GstClockFlags")
   (values
+    '("can-do-single-sync" "GST_CLOCK_FLAG_CAN_DO_SINGLE_SYNC" "GST_OBJECT_FLAG_LAST << 0")
+    '("can-do-single-async" "GST_CLOCK_FLAG_CAN_DO_SINGLE_ASYNC" "GST_OBJECT_FLAG_LAST << 1")
+    '("can-do-periodic-sync" "GST_CLOCK_FLAG_CAN_DO_PERIODIC_SYNC" "GST_OBJECT_FLAG_LAST << 2")
+    '("can-do-periodic-async" "GST_CLOCK_FLAG_CAN_DO_PERIODIC_ASYNC" "GST_OBJECT_FLAG_LAST << 3")
+    '("can-set-resolution" "GST_CLOCK_FLAG_CAN_SET_RESOLUTION" "GST_OBJECT_FLAG_LAST << 4")
+    '("can-set-master" "GST_CLOCK_FLAG_CAN_SET_MASTER" "GST_OBJECT_FLAG_LAST << 5")
+    '("last" "GST_CLOCK_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 8")
   )
 )
 
@@ -126,10 +143,18 @@
   )
 )
 
+;; TODO: See why gmmproc reports errors when values of following enum are
+;; commented in.
 (define-enum-extended StateChange
   (in-module "Gst")
   (c-name "GstStateChange")
   (values
+;;    '("null-to-ready" "GST_STATE_CHANGE_NULL_TO_READY" "(GST_STATE_NULL<<3) | GST_STATE_READY")
+;;    '("ready-to-paused" "GST_STATE_CHANGE_READY_TO_PAUSED" "(GST_STATE_READY<<3) | GST_STATE_PAUSED")
+;;    '("paused-to-playing" "GST_STATE_CHANGE_PAUSED_TO_PLAYING" "(GST_STATE_PAUSED<<3) | GST_STATE_PLAYING")
+;;    '("playing-to-paused" "GST_STATE_CHANGE_PLAYING_TO_PAUSED" "(GST_STATE_PLAYING<<3) | GST_STATE_PAUSED")
+;;    '("paused-to-ready" "GST_STATE_CHANGE_PAUSED_TO_READY" "(GST_STATE_PAUSED<<3) | GST_STATE_READY")
+;;    '("ready-to-null" "GST_STATE_CHANGE_READY_TO_NULL" "(GST_STATE_READY<<3) | GST_STATE_NULL")
   )
 )
 
@@ -137,6 +162,10 @@
   (in-module "Gst")
   (c-name "GstElementFlags")
   (values
+    '("locked-state" "GST_ELEMENT_LOCKED_STATE" "GST_OBJECT_FLAG_LAST << 0")
+    '("is-sink" "GST_ELEMENT_IS_SINK" "GST_OBJECT_FLAG_LAST << 1")
+    '("unparenting" "GST_ELEMENT_UNPARENTING" "GST_OBJECT_FLAG_LAST << 2")
+    '("flag-set" "GST_ELEMENT_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 16")
   )
 )
 
@@ -230,38 +259,6 @@
     '("upstream" "GST_EVENT_TYPE_UPSTREAM" "1 << 0")
     '("downstream" "GST_EVENT_TYPE_DOWNSTREAM" "1 << 1")
     '("serialized" "GST_EVENT_TYPE_SERIALIZED" "1 << 2")
-  )
-)
-
-(define-enum-extended EventType
-  (in-module "Gst")
-  (c-name "GstEventType")
-  (values
-    '("gst-event-unknown" "GST_EVENT_UNKNOWN" "#error")
-    '("0)" "0)" "1")
-    '("gst-event-flush-start" "GST_EVENT_FLUSH_START" "2")
-    '("flag(both))" "FLAG(BOTH))" "3")
-    '("gst-event-flush-stop" "GST_EVENT_FLUSH_STOP" "4")
-    '("gst-event-eos" "GST_EVENT_EOS" "6")
-    '("gst-event-newsegment" "GST_EVENT_NEWSEGMENT" "8")
-    '("gst-event-tag" "GST_EVENT_TAG" "10")
-    '("gst-event-buffersize" "GST_EVENT_BUFFERSIZE" "12")
-    '("gst-event-qos" "GST_EVENT_QOS" "14")
-    '("flag(upstream))" "FLAG(UPSTREAM))" "15")
-    '("gst-event-seek" "GST_EVENT_SEEK" "16")
-    '("flag(upstream))" "FLAG(UPSTREAM))" "17")
-    '("gst-event-navigation" "GST_EVENT_NAVIGATION" "18")
-    '("flag(upstream))" "FLAG(UPSTREAM))" "19")
-    '("gst-event-latency" "GST_EVENT_LATENCY" "20")
-    '("flag(upstream))" "FLAG(UPSTREAM))" "21")
-    '("gst-event-custom-upstream" "GST_EVENT_CUSTOM_UPSTREAM" "22")
-    '("flag(upstream))" "FLAG(UPSTREAM))" "23")
-    '("gst-event-custom-downstream" "GST_EVENT_CUSTOM_DOWNSTREAM" "24")
-    '("gst-event-custom-downstream-oob" "GST_EVENT_CUSTOM_DOWNSTREAM_OOB" "26")
-    '("flag(downstream))" "FLAG(DOWNSTREAM))" "27")
-    '("gst-event-custom-both" "GST_EVENT_CUSTOM_BOTH" "28")
-    '("gst-event-custom-both-oob" "GST_EVENT_CUSTOM_BOTH_OOB" "30")
-    '("flag(both))" "FLAG(BOTH))" "31")
   )
 )
 
@@ -361,6 +358,9 @@
   (in-module "Gst")
   (c-name "GstIndexFlags")
   (values
+    '("writable" "GST_INDEX_WRITABLE" "GST_OBJECT_FLAG_LAST << 0")
+    '("readable" "GST_INDEX_READABLE" "GST_OBJECT_FLAG_LAST << 1")
+    '("last" "GST_INDEX_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 8")
   )
 )
 
@@ -457,7 +457,7 @@
     '("latency" "GST_MESSAGE_LATENCY" "1 << 19")
     '("async-start" "GST_MESSAGE_ASYNC_START" "1 << 20")
     '("async-done" "GST_MESSAGE_ASYNC_DONE" "1 << 21")
-    '("any" "GST_MESSAGE_ANY" "0xFFFFFFFFFFFFFFFF")
+    '("any" "GST_MESSAGE_ANY" "~0")
   )
 )
 
@@ -541,6 +541,12 @@
   (in-module "Gst")
   (c-name "GstPadFlags")
   (values
+    '("blocked" "GST_PAD_BLOCKED" "GST_OBJECT_FLAG_LAST << 0")
+    '("flushing" "GST_PAD_FLUSHING" "GST_OBJECT_FLAG_LAST << 1")
+    '("in-getcaps" "GST_PAD_IN_GETCAPS" "GST_OBJECT_FLAG_LAST << 2")
+    '("in_setcaps" "GST_PAD_IN_SETCAPS" "GST_OBJECT_FLAG_LAST << 3")
+    '("blocking" "GST_PAD_BLOCKING" "GST_OBJECT_FLAG_LAST << 4")
+    '("last" "GST_PAD_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 8")
   )
 )
 
@@ -560,6 +566,8 @@
   (in-module "Gst")
   (c-name "GstPadTemplateFlags")
   (values
+    '("fixed" "GST_PAD_TEMPLATE_FIXED" "GST_OBJECT_FLAG_LAST << 0")
+    '("last" "GST_PAD_TEMPLATE_LAST" "GST_OBJECT_FLAG_LAST << 4")
   )
 )
 
