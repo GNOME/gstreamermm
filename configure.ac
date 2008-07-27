@@ -127,13 +127,23 @@ Please install GNU make.]))
 #########################################################################
 gstreamermm_min_glibmm_version=2.8.0
 gstreamermm_min_gtkmm_version=2.10
-gstreamermm_min_gst_version=0.10
+gstreamermm_min_gst_version=0.10.20
+gstreamermm_min_libxmlpp_version=2.14.0
 
-PKG_CHECK_MODULES(GSTREAMERMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-0.10 >= ${gstreamermm_min_gst_version} gstreamer-base-0.10 >= ${gstreamermm_min_gst_version})
+PKG_CHECK_MODULES(GSTREAMERMM, \
+        glibmm-2.4 >= ${gstreamermm_min_glibmm_version} \
+        gstreamer-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-base-0.10 >= ${gstreamermm_min_gst_version} \
+        libxml++-2.6 >= ${gstreamermm_min_libxmlpp_version} \
+        )
 AC_SUBST(GSTREAMERMM_CFLAGS)
 AC_SUBST(GSTREAMERMM_LIBS)
 
-PKG_CHECK_MODULES(GSTREAMERBASEMM, glibmm-2.4 >= ${gstreamermm_min_glibmm_version} gstreamer-plugins-base-0.10 >= ${gstreamermm_min_gst_version} gstreamer-interfaces-0.10 >= ${gstreamermm_min_gst_version})
+PKG_CHECK_MODULES(GSTREAMERBASEMM, \
+        glibmm-2.4 >= ${gstreamermm_min_glibmm_version} \
+        gstreamer-plugins-base-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-interfaces-0.10 >= ${gstreamermm_min_gst_version} \
+        )
 AC_SUBST(GSTREAMERBASEMM_CFLAGS)
 AC_SUBST(GSTREAMERBASEMM_LIBS)
 
@@ -280,7 +290,7 @@ gstmm_srcdir=`cd "$srcdir" && pwd`
 gstmm_builddir=`pwd`
 for sublib in gstreamer gstreamerbase
 do
-  if [ "x$gstmm_builddir"  = "x$gstmm_srcdir" ]; then
+  if test "x$gstmm_builddir"  = "x$gstmm_srcdir" ; then
     GSTREAMERMM_DOXYGEN_INPUT="$GSTREAMERMM_DOXYGEN_INPUT $gstmm_builddir/$sublib/$sublib""mm/"
   else
     GSTREAMERMM_DOXYGEN_INPUT="$GSTREAMERMM_DOXYGEN_INPUT $gstmm_srcdir/$sublib/$sublib""mm/"

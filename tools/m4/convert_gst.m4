@@ -175,5 +175,5 @@ _CONVERSION(`const std::string&',`const guchar*',`(const guchar*) ($3.c_str())')
 _CONVERSION(`gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 _CONVERSION(`const gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 
-#Other Conversions
-_CONVERSION(`const xmlNodePtr',`xmlNodePtr',`const_cast<xmlNodePtr>($3)')
+#libxml++ Conversions
+_CONVERSION(`xmlpp::Node*',`xmlNodePtr',`($3)->cobj()')

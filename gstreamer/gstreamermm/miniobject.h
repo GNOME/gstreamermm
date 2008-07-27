@@ -63,8 +63,26 @@ public:
 public:
   //Glib::RefPtr<Gst::MiniObject> copy();
 
+  /** Checks if a mini-object is writable. A mini-object is writable if the
+   * reference count is one and the Gst::MINI_OBJECT_FLAG_READONLY flag is not
+   * set. Modification of a mini-object should only be done after verifying
+   * that it is writable.
+   * 
+   * MT safe
+   *
+   * @return true if the object is writable.
+   */
   bool is_writable() const;
-  void make_writable();
+
+  /** Checks if a mini-object is writable. If not, a writable copy is made and
+   * returned. This gives away the reference to the original mini object, and
+   * returns a reference to the new object.
+   *
+   * MT safe
+   *
+   * @return A mini-object (possibly the same pointer) that is writable. 
+   */
+  Glib::RefPtr<Gst::MiniObject> create_writable();
 
   void reference() const;
   void unreference() const;

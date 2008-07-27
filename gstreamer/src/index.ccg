@@ -59,6 +59,11 @@ static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *
   return result;
 }
 
+static void Index_Resolver_gstreamermm_callback_destroy(void* data)
+{
+  delete static_cast<Index::SlotResolver*>(data);
+}
+
 void Index::set_filter(const SlotFilter& slot)
 {
   SlotFilter* slot_copy = new SlotFilter(slot); //Deleted in Index_Filter_gstreamermm_callback_destroy
@@ -67,9 +72,8 @@ void Index::set_filter(const SlotFilter& slot)
 
 void Index::set_resolver(const SlotResolver& slot)
 {
-  //TODO: We need a destroy callback to destroy the slot_copy.
   SlotResolver* slot_copy = new SlotResolver(slot); 
-  gst_index_set_resolver(gobj(), &Index_Resolver_gstreamermm_callback, slot_copy);
+  gst_index_set_resolver_full(gobj(), &Index_Resolver_gstreamermm_callback, slot_copy, &Index_Resolver_gstreamermm_callback_destroy);
 }
 
 }//namespace Gst

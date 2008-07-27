@@ -19,6 +19,7 @@
 
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/private/miniobject_p.h>
+#include <gstreamermm/wrap.h>
 
 namespace Gst
 {
@@ -97,10 +98,9 @@ MiniObject::is_writable() const
   return gst_mini_object_is_writable(gobject_);
 }
 
-void
-MiniObject::make_writable()
+Glib::RefPtr<Gst::MiniObject> MiniObject::create_writable()
 {
-  gst_mini_object_make_writable(gobject_);
+  return Gst::wrap(gst_mini_object_make_writable(gobject_));
 }
 
 } //namespace Gst

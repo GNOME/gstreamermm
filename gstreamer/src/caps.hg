@@ -22,6 +22,7 @@
 #include <gst/gstcaps.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/structurevalue.h>
+#include <libxml++/nodes/node.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -161,9 +162,14 @@ public:
 
   _WRAP_METHOD(bool simplify(), gst_caps_do_simplify)
 
-  //TODO: Add overloads (and dependency) for libxml++?
-  _WRAP_METHOD(xmlNodePtr save(xmlNodePtr parent) const, gst_caps_save_thyself)
-  _WRAP_METHOD(static Glib::RefPtr<Caps> load(const xmlNodePtr parent), gst_caps_load_thyself)
+  /** Serializes a Gst::Caps to XML and adds it as a child node of @a parent.
+   * @param parent A XML parent node.
+   * @return The parent XML Node.
+   */
+  xmlpp::Node* save(xmlpp::Node* parent) const;
+  _IGNORE(gst_caps_save_thyself)
+
+  _WRAP_METHOD(static Glib::RefPtr<Caps> load(xmlpp::Node* parent), gst_caps_load_thyself)
 
   _WRAP_METHOD(Glib::ustring to_string() const, gst_caps_to_string)
 
