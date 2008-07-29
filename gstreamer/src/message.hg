@@ -23,7 +23,7 @@
 #include <gstreamermm/wrap.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/clock.h>
-#include <gstreamermm/enums.h>
+#include <gstreamermm/query.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -89,204 +89,746 @@ public:
 //Glib::RefPtrs references the objects which causes problems when GStreamer API
 //tries to modify the GstStructures of the objects.
 
-class MessageApplication : public Message
-{
-public:
-  explicit MessageApplication(GstMessage *message);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
-};
-
-class MessageClockProvide : public Message
-{
-public:
-  explicit MessageClockProvide(GstMessage *message);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock, bool ready);
-
-  //TODO: Use clock as return type?
-  void parse(Glib::RefPtr<Clock>& clock, bool& ready);
-};
-
-class MessageClockLost : public Message
-{
-public:
-  explicit MessageClockLost(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
-
-  //TODO: Use clock as return type?
-  void parse(Glib::RefPtr<Clock>& clock);
-};
-
-class MessageCustom : public Message
-{
-public:
-  explicit MessageCustom(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(MessageType type, const Glib::RefPtr<Object>& src, Structure& structure);
-};
-
-class MessageElement : public Message
-{
-public:
-  explicit MessageElement(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
-};
-
+/** An end of stream message.
+ * See create() for more details.
+ */
 class MessageEos : public Message
 {
 public:
   explicit MessageEos(GstMessage* castitem);
 
+  /** Create a new eos message. This message is generated and posted in the
+   * sink elements of a Gst::Bin. The bin will only forward the EOS message to
+   * the application if all sinks have posted an EOS message.
+   * 
+   * @param src The object originating the message.
+   * @return The new eos message. MT safe. 
+   */
   static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
 };
 
+/** An error message.
+ * See create() for more details.
+ */
 class MessageError : public Message
 {
 public:
   explicit MessageError(GstMessage* castitem);
 
+  /** Create a new error message. The message will copy error and debug. This
+   * message is posted by elements when a fatal event occured. The pipeline
+   * will probably (partially) stop. The application receiving this message
+   * should stop the pipeline.
+   *
+   * @param src The object originating the message.
+   * @param error The Glib::Error for this message.
+   * @param debug A debugging string for something or other.
+   * @return The new error message. MT safe. 
+   */
   static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
 
-  //TODO: Use error as return type?
+  /** Extracts the Glib::Error and debug string from the Gst::MessageError.
+   *
+   * MT safe.
+   *
+   * @param error Location for the Glib::Error.
+   * @param debug Location for the debug message.
+   */
   void parse(Glib::Error& error, std::string& debug);
-  void parse(Glib::Error& error);
+
+  /** Extracts and returns the Glib::Error from the Gst::MessageError.
+   *
+   * MT safe.
+   *
+   * @return The Glib::Error.
+   */
+  Glib::Error parse();
+
+  /** Extracts and returns the debug message from the Gst::MessageError.
+   *
+   * MT safe.
+   *
+   * @return The debug message.
+   */
+  std::string parse_debug();
 };
 
-class MessageInfo : public Message
-{
-public:
-  explicit MessageInfo(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
-
-  //TODO: Use error as return type?
-  void parse(Glib::Error& error, std::string& debug);
-  void parse(Glib::Error& error);
-};
-
-class MessageNewClock: public Message
-{
-public:
-  explicit MessageNewClock(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
-
-  //TODO: Use clock as return type?
-  void parse(Glib::RefPtr<Clock>& clock);
-};
-
-class MessageSegmentDone : public Message
-{
-public:
-  explicit MessageSegmentDone(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
-
-  //TODO: Use something as return type?
-  void parse(Format& format, gint64& position);
-};
-
-class MessageSegmentStart : public Message
-{
-public:
-  explicit MessageSegmentStart(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
-
-  //TODO: Use something as return type?
-  void parse(Format& format, gint64& position);
-};
-
-class MessageStateChanged : public Message
-{
-public:
-  explicit MessageStateChanged(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, State oldstate, State newstate, State pending);
-
-  //TODO: Use something as return type?
-  void parse(State& oldstate, State& newstate, State& pending);
-};
-
-class MessageTag : public Message
-{
-public:
-  explicit MessageTag(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const TagList& taglist);
-
-  //TODO: Use something as return type?
-  void parse(TagList& taglist);
-};
-
-class MessageBuffering : public Message
-{
-public:
-  explicit MessageBuffering(GstMessage* castitem);
-
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, int percent);
-
-  //TODO: Use percent as return type?
-  void parse(int& percent);
-};
-
+/** A warning message.
+ * See create() for more details.
+ */
 class MessageWarning : public Message
 {
 public:
   explicit MessageWarning(GstMessage* castitem);
 
+  /** Create a new warning message. The message will make copies of error and
+   * debug.
+   *
+   * @param src The object originating the message.
+   * @param error The Glib::Error for this message.
+   * @param debug A debugging string for something or other.
+   * @return The new warning message. MT safe. 
+   */
   static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
 
-  //TODO: Use error as return type?
+  /** Extracts the Glib::Error and debug string from the Gst::MessageWarning.
+   *
+   * MT safe.
+   *
+   * @param error Location for the Glib::Error.
+   * @param debug Location for the debug message.
+   */
   void parse(Glib::Error& error, std::string& debug);
+
+  /** Extracts and returns the Glib::Error from the Gst::MessageWarning.
+   *
+   * MT safe.
+   *
+   * @return The Glib::Error.
+   */
+  Glib::Error parse();
+
+  /** Extracts and returns the debug message from the Gst::MessageWarning.
+   *
+   * MT safe.
+   *
+   * @return The debug message.
+   */
+  std::string parse_debug();
 };
 
-class MessageDuration : public Message
+/** An informational message.
+ * See create() for more details.
+ */
+class MessageInfo : public Message
 {
 public:
-  explicit MessageDuration(GstMessage* castitem);
+  explicit MessageInfo(GstMessage* castitem);
 
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+  /** Create a new info message.
+   *
+   * @param src The object originating the message.
+   * @param error The Glib::Error for this message.
+   * @param debug A debugging string for something or other.
+   * @return The new info message.
+   *
+   * Since 0.10.12 MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
 
-  //TODO: Use something as return type?
-  void parse(Format& format, gint64& position);
+  /** Extracts the Glib::Error and debug string from the Gst::MessageInfo.
+   *
+   * MT safe.
+   *
+   * @param error Location for the Glib::Error.
+   * @param debug Location for the debug message.
+   */
+  void parse(Glib::Error& error, std::string& debug);
+
+  /** Extracts and returns the Glib::Error from the Gst::MessageInfo.
+   *
+   * MT safe.
+   *
+   * @return The Glib::Error.
+   */
+  Glib::Error parse();
+
+  /** Extracts and returns the debug message from the Gst::MessageInfo.
+   *
+   * MT safe.
+   *
+   * @return The debug message.
+   */
+  std::string parse_debug();
 };
 
+/** A tag message.
+ * See create() for more details.
+ */
+class MessageTag : public Message
+{
+public:
+  explicit MessageTag(GstMessage* castitem);
+
+  /** Create a new tag message. The taglist will be copied.  The message is
+   * posted by elements that discovered a new taglist.
+   *
+   * @param src The object originating the message.
+   * @param tag_list The tag list for the message.
+   * @return The new tag message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const TagList& taglist);
+
+  /** Extracts and returns the Gst::TagList from the Gst::MessageTag.
+   *
+   * MT safe.
+   *
+   * @return A copy of the Gst::TagList.
+   */
+  TagList parse();
+};
+
+/** A buffering message.
+ * See create() for more details.
+ */
+class MessageBuffering : public Message
+{
+public:
+  explicit MessageBuffering(GstMessage* castitem);
+
+  /** Create a new buffering message. This message can be posted by an element
+   * that needs to buffer data before it can continue processing. @a percent
+   * should be a value between 0 and 100. A value of 100 means that the
+   * buffering completed.
+   *
+   * When @a percent is < 100 the application should PAUSE a PLAYING pipeline.
+   * When @a percent is 100, the application can set the pipeline (back) to
+   * PLAYING. The application must be prepared to receive BUFFERING messages in
+   * the PREROLLING state and may only set the pipeline to PLAYING after
+   * receiving a message with @a percent set to 100, which can happen after the
+   * pipeline completed prerolling.
+   *
+   * @param src The object originating the message.  
+   * @param percent The buffering percent.
+   * @return The new buffering message.
+   *
+   * Since 0.10.11 MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, int percent);
+
+  /** Extracts and returns the buffering percent from the
+   * Gst::MessageBuffering.
+   * @return The percent as an integer.
+   */
+  int parse();
+
+  /** Configures the buffering stats values in message.
+   *
+   * @param mode A buffering mode.
+   * @param avg_in The average input rate.
+   * @param avg_out The average output rate.
+   * @param buffering_left Amount of buffering time left in milliseconds.
+   *
+   * Since 0.10.20.
+   */
+  void set_stats(BufferingMode mode, int avg_in, int avg_out, gint64 buffering_left);
+
+  /** Extracts the buffering stats values from message.
+   *
+   * @param mode Location for the buffering mode.
+   * @param avg_in Location for the average input rate.
+   * @param avg_out Location for the average output rate.
+   * @param buffering_left Location for the amount of buffering time left.
+   *
+   * Since 0.10.20.
+   */
+  void get_stats(BufferingMode& mode, int& avg_in, int& avg_out, gint64& buffering_left);
+
+  /** Extracts and returns the buffering mode from message.
+   *
+   * @return The buffering mode.
+   */
+  BufferingMode get_stats_buffering_mode();
+
+  /** Extracts and returns the average input rate from message.
+   *
+   * @return The average input rate.
+   */
+  int get_stats_avg_in();
+
+  /** Extracts and returns the average output rate from message.
+   *
+   * @return The average output rate.
+   */
+  int get_stats_avg_out();
+
+  /** Extracts and returns the buffering time in milliseconds remaining from
+   * message.
+   *
+   * @return The buffering time remaining.
+   */
+  gint64 get_stats_buffering_left();
+};
+
+/** A state change message.
+ * See create() for more details.
+ */
+class MessageStateChanged : public Message
+{
+public:
+  explicit MessageStateChanged(GstMessage* castitem);
+
+  /** Create a state change message. This message is posted whenever an element
+   * changed its state.
+   *
+   * @param src The object originating the message.
+   * @param oldstate The previous state.
+   * @param newstate The new (current) state.
+   * @param pending The pending (target) state.
+   * @return The new state change message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, State oldstate, State newstate, State pending);
+
+  /** Extracts the old, new and pending states from the
+   * Gst::MessageStateChanged.
+   *
+   * MT safe.
+   *
+   * @param oldstate The previous state.
+   * @param newstate The new (current) state.
+   * @param pending The pending (target) state.
+   */
+  void parse(State& oldstate, State& newstate, State& pending);
+
+  /** Extracts and returns the new state from the Gst::MessageStateChanged.
+   *
+   * MT safe.
+   *
+   * @return The new (current) state.
+   */
+  State parse();
+
+  /** Extracts and returns the old state from the Gst::MessageStateChanged.
+   *
+   * MT safe.
+   *
+   * @return The old state.
+   */
+  State parse_old();
+
+  /** Extracts and returns the pending state from the Gst::MessageStateChanged.
+   *
+   * MT safe.
+   *
+   * @return The pending state.
+   */
+  State parse_pending();
+};
+
+/** A state dirty message.
+ * See create() for more details.
+ */
 class MessageStateDirty : public Message
 {
 public:
   explicit MessageStateDirty(GstMessage* castitem);
 
+  /** Create a state dirty message. This message is posted whenever an element
+   * changed its state asynchronously and is used internally to update the
+   * states of container objects.
+   *
+   * @param src The object originating the message.
+   * @return The new state dirty message. MT safe.
+   */
   static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
 };
 
-class MessageAsyncStart : public Message
+/** A clock provide message.
+ * See create() for more details.
+ */
+class MessageClockProvide : public Message
 {
 public:
-  explicit MessageAsyncStart(GstMessage* castitem);
+  explicit MessageClockProvide(GstMessage *message);
 
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, bool new_base_time);
+  /** Create a clock provide message. This message is posted whenever an
+   * element is ready to provide a clock or lost its ability to provide a clock
+   * (maybe because it paused or became EOS).
+   *
+   * This message is mainly used internally to manage the clock selection.
+   *
+   * @param src The object originating the message.
+   * @param clock The clock it provides.
+   * @param ready true if the sender can provide a clock.
+   * @return The new provide clock message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock, bool ready);
 
-  //TODO: Use new_base_time as return type?
-  void parse(bool& new_base_time);
+  /** Extracts the clock and ready flag from the Gst::MessageClockProvide. The
+   * clock object returned remains valid until the message is freed.
+   *
+   * MT safe.
+   *
+   * @param clock Location in which to hold a clock object.
+   * @param ready Location in which to hold the ready flag.
+   */
+  void parse(Glib::RefPtr<Clock>& clock, bool& ready);
+
+  /** Extracts and returns the clock from the Gst::MessageClockProvide. The
+   * clock object returned remains valid until the message is freed.
+   *
+   * MT safe.
+   *
+   * @return The clock object of the message.
+   */
+  Glib::RefPtr<Clock> parse();
+
+  /** Extracts and returns the ready flag from the Gst::MessageClockProvide.
+   *
+   * MT safe.
+   *
+   * @return The ready flag of the message.
+   */
+  bool parse_ready();
 };
 
-class MessageAsyncDone : public Message
+/** A clock lost message.
+ * See create() for more details.
+ */
+class MessageClockLost : public Message
 {
 public:
-  explicit MessageAsyncDone(GstMessage* castitem);
+  explicit MessageClockLost(GstMessage* castitem);
 
+  /** Create a clock lost message. This message is posted whenever the clock is
+   * not valid anymore.  If this message is posted by the pipeline, the
+   * pipeline will select a new clock again when it goes to PLAYING. It might
+   * therefore be needed to set the pipeline to PAUSED and PLAYING again.
+   *
+   * @param src The object originating the message.
+   * @param clock The clock that was lost.
+   * @return The new clock lost message. MT safe. 
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
+
+  /** Extracts and returns the lost clock from the Gst::MessageClockLost. The
+   * clock object returned remains valid until the message is freed.
+   *
+   * MT safe.
+   * @return The lost clock.
+   */
+  Glib::RefPtr<Clock> parse();
+};
+
+/** A new clock message.
+ * See create() for more details.
+ */
+class MessageNewClock: public Message
+{
+public:
+  explicit MessageNewClock(GstMessage* castitem);
+
+  /** Create a new clock message. This message is posted whenever the pipeline
+   * selectes a new clock for the pipeline.
+   *
+   * @param src The object originating the message.
+   * @param clock The new selected clock.
+   * @return The new new clock message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
+
+  /** Extracts and returns the new clock from the Gst::MessageNewClock. The
+   * clock object returned remains valid until the message is freed.
+   *
+   * MT safe.
+   *
+   * @return The selected new clock.
+   */
+  Glib::RefPtr<Clock> parse();
+};
+
+/** An application message.
+ * See create() for more details.
+ */
+class MessageApplication : public Message
+{
+public:
+  explicit MessageApplication(GstMessage *message);
+
+  /** Create a new application-typed message. GStreamer will never create these
+   * messages; they are a gift from us to you. Enjoy.
+   *
+   * @param src The object originating the message.
+   * @param structure The structure for the message.  The structure will be
+   * copied.
+   * @return The new application message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
+
+  /** Create a new application-typed message (no Gst::Structure is needed).
+   * GStreamer will never create these messages; they are a gift from us to
+   * you. Enjoy.
+   *
+   * @param src The object originating the message.
+   * @return The new application message. MT safe.
+   */
   static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
 };
 
+/** An element specific message.
+ * See create() for more details.
+ */
+class MessageElement : public Message
+{
+public:
+  explicit MessageElement(GstMessage* castitem);
+
+  /** Create a new element-specific message. This is meant as a generic way of
+   * allowing one-way communication from an element to an application, for
+   * example "the firewire cable was unplugged". The format of the message
+   * should be documented in the element's documentation.
+   *
+   * @param src The object originating the message.
+   * @param structure The structure for the message. The message will take a
+   * copy of the structure.
+   * @return The new element message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
+
+  /** Create a new element-specific message. This is meant as a generic way of
+   * allowing one-way communication from an element to an application, for
+   * example "the firewire cable was unplugged". The format of the message
+   * should be documented in the element's documentation. No Gst::Structure is
+   * needed.
+   *
+   * @param src The object originating the message.
+   * @return The new element message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+};
+
+/** A custom message.
+ * See create() for more details.
+ */
+class MessageCustom : public Message
+{
+public:
+  explicit MessageCustom(GstMessage* castitem);
+
+  /** Create a new custom-typed message. This can be used for anything not
+   * handled by other message-specific functions to pass a message to the app.
+   *
+   * @param type The Gst::MessageType to distinguish messages.
+   * @param src The object originating the message.
+   * @param structure The Gst::Structure for the message. The message will take
+   * a copy of the structure.
+   * @return The new message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(MessageType type, const Glib::RefPtr<Object>& src, Structure& structure);
+
+  /** Create a new custom-typed message. This can be used for anything not
+   * handled by other message-specific functions to pass a message to the app.
+   * No Gst::Structure is needed.
+   *
+   * @param type The Gst::MessageType to distinguish messages.
+   * @param src The object originating the message.
+   * @return The new message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(MessageType type, const Glib::RefPtr<Object>& src);
+};
+
+/** A segment start message.
+ * See create() for more details.
+ */
+class MessageSegmentStart : public Message
+{
+public:
+  explicit MessageSegmentStart(GstMessage* castitem);
+
+  /** Create a new segment message. This message is posted by elements that
+   * start playback of a segment as a result of a segment seek. This message is
+   * not received by the application but is used for maintenance reasons in
+   * container elements.
+   *
+   * @param src The object originating the message.
+   * @param format The format of the position being played.
+   * @param position The position of the segment being played.
+   * @return The new segment start message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+
+  /** Extracts the position and format from the segment start message.
+   *
+   * MT safe.
+   *
+   * @param format Result location for the format.
+   * @param position Result location for the position.
+   */
+  void parse(Format& format, gint64& position);
+
+  /** Extracts and returns the position from the segment start message.
+   *
+   * MT safe.
+   *
+   * @return The position.
+   */
+  gint64 parse();
+
+  /** Extracts and returns the format from the segment start message.
+   *
+   * MT safe.
+   *
+   * @return The format.
+   */
+  Format parse_format();
+};
+
+/** A segment done message.
+ * See create() for more details.
+ */
+class MessageSegmentDone : public Message
+{
+public:
+  explicit MessageSegmentDone(GstMessage* castitem);
+
+  /** Create a new segment done message. This message is posted by elements
+   * that finish playback of a segment as a result of a segment seek. This
+   * message is received by the application after all elements that posted a
+   * Gst::MessageSegmentStart have posted the Gst::MessageSegmentDone.
+   *
+   * @param src The object originating the message.  
+   * @param format The format of the position being done.
+   * @param position The position of the segment being done.
+   * @return The new segment done message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+
+  /** Extracts the position and format from the segment done message.
+   *
+   * MT safe.
+   *
+   * @param format Result location for the format.
+   * @param position Result location for the position.
+   */
+  void parse(Format& format, gint64& position);
+
+  /** Extracts and returns the position from the segment done message.
+   *
+   * MT safe.
+   *
+   * @return The position.
+   */
+  gint64 parse();
+
+  /** Extracts and returns the format from the segment done message.
+   *
+   * MT safe.
+   *
+   * @return The format.
+   */
+  Format parse_format();
+};
+
+/** A duration message.
+ * See create() for more details.
+ */
+class MessageDuration : public Message
+{
+public:
+  explicit MessageDuration(GstMessage* castitem);
+
+  /** Create a new duration message. This message is posted by elements that
+   * know the duration of a stream in a specific format. This message is
+   * received by bins and is used to calculate the total duration of a
+   * pipeline. Elements may post a duration message with a duration of
+   * Gst::CLOCK_TIME_NONE to indicate that the duration has changed and the
+   * cached duration should be discarded. The new duration can then be
+   * retrieved via a query.
+   *
+   * @param src The object originating the message.
+   * @param format The format of the duration.  
+   * @param duration The new duration.  
+   * @return The new duration message. MT safe.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+
+  /** Extracts the duration and format from the duration message. The duration
+   * might be Gst::CLOCK_TIME_NONE, which indicates that the duration has
+   * changed. Applications should always use a query to retrieve the duration
+   * of a pipeline.
+   *
+   * MT safe.
+   *
+   * @param format Result location for the format.
+   * @param position Result location for the position.
+   */
+  void parse(Format& format, gint64& position);
+
+  /** Extracts and returns the duration from the duration message. The duration
+   * might be Gst::CLOCK_TIME_NONE, which indicates that the duration has
+   * changed. Applications should always use a query to retrieve the duration
+   * of a pipeline.
+   *
+   * MT safe.
+   *
+   * @return The position.
+   */
+  gint64 parse();
+
+  /** Extracts and returns the format from the duration message. Applications
+   * should always use a query to retrieve the duration
+   * of a pipeline.
+   *
+   * MT safe.
+   *
+   * @return The format.
+   */
+  Format parse_format();
+};
+
+/** A latency message.
+ * See create() for more details.
+ */
 class MessageLatency : public Message
 {
 public:
   explicit MessageLatency(GstMessage* castitem);
 
+  /** Creates a new latency message.  This message can be posted by elements
+   * when their latency requirements have changed.
+   *
+   * @param src The object originating the message.
+   * @return The new latency message. MT safe.
+   *
+   * Since 0.10.12.
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+};
+
+/** An asynchronous start message.
+ * See create() for more details.
+ */
+class MessageAsyncStart : public Message
+{
+public:
+  explicit MessageAsyncStart(GstMessage* castitem);
+
+  /** Creates a new async message.  This message is posted by elements when they start an ASYNC state change. new_base_time is set to true when the element lost its state when it was PLAYING.
+   *
+   * @param src The object originating the message.
+   * @param new_base_time If a new base_time should be set on the element.
+   * @return The new async_start message. MT safe.
+   *
+   * Since 0.10.13 
+   */
+  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, bool new_base_time);
+
+  /** Extract and return the boolean new_base_time from the async_start
+   * message.
+   *
+   * MT safe.
+   *
+   * @return The new_base_time boolean.
+   *
+   * Since 0.10.13.
+   */
+  bool parse();
+};
+
+/** An asynchronous done message.
+ * See create() for more details.
+ */
+class MessageAsyncDone : public Message
+{
+public:
+  explicit MessageAsyncDone(GstMessage* castitem);
+
+  /** Create an async done message. The message is posted when elements
+   * completed an ASYNC state change.
+   *
+   * @param src The object originating the message.  
+   * @return The new async_done message. MT safe.
+   */
   static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
 };
 

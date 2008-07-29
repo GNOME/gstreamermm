@@ -152,8 +152,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
       if(msgError)
       {
         Glib::Error err;
-        std::string debug; //TODO: Maybe this should be an optional parameter.
-        msgError->parse(err, debug);
+        err = msgError->parse();
         std::cerr << "Error: " << err.what() << std::endl;
       }
       else
