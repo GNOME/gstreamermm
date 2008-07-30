@@ -32,6 +32,13 @@ namespace Gst
 class Message;
 
 _WRAP_ENUM(BusFlags, GstBusFlags)
+
+/** The result values for a Gst::Bus::SlotMessageSync.
+ * - Gst::BUS_DROP - Drop the message.
+ * - Gst::BUS_PASS - Pass the message to the async queue.
+ * - Gst::BUS_ASYNC - Pass message to async queue, continue if message is
+ * handled.
+ */
 _WRAP_ENUM(BusSyncReply, GstBusSyncReply)
 
 //TODO: Correct C API reference in class docs below:
@@ -86,7 +93,7 @@ protected:
 public:
   /** For example,
    * bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const
-   * Glib::RefPtr<Gst::Message>& message);
+   * Glib::RefPtr<Gst::Message>& message);.
    * The message function should return true if it wants to continue to receive
    * messages, or false otherwise.
    */
@@ -94,7 +101,7 @@ public:
 
   /** For example,
    * BusSyncReply on_bus_sync_message(const Glib::RefPtr<Gst::Bus>& bus, const
-   * Glib::RefPtr<Gst::Message>& message);
+   * Glib::RefPtr<Gst::Message>& message);.
    */
   typedef sigc::slot< BusSyncReply, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessageSync;
 
