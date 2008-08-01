@@ -65,6 +65,13 @@ class Plugin : public Object
 
 public:
   /** For example,
+   * bool on_plugin_init(const Glib::RefPtr<Gst::Plugin>& plugin);.
+   * The init function should return true if plugin was initialized
+   * successfully, false otherwise.
+   */
+  typedef sigc::slot< bool, const Glib::RefPtr<Plugin>& > SlotInit;
+
+  /** For example,
    * bool on_plugin_filter(const Glib::RefPtr<Gst::Plugin>& plugin);.
    * The filter function should return true if plugin is a match, false
    * otherwise.
@@ -95,6 +102,15 @@ public:
 
 #m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
   _WRAP_METHOD(static void free(Glib::ListHandle< Glib::RefPtr<Plugin> >), gst_plugin_list_free)
+
+//TODO: Include if bug #545787 is accepted; remove if not.
+/*
+  bool register_static(int major_version, int minor_version,
+    const Glib::ustring& name, const Glib::ustring& description,
+    const SlotInit& init_slot, const Glib::ustring& version,
+    const Glib::ustring& license, const Glib::ustring& source,
+    const Glib::ustring& package, const Glib::ustring& origin);
+*/
 
   _IGNORE(gst_plugin_name_filter)
 };

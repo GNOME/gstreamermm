@@ -142,6 +142,7 @@ AC_SUBST(GSTREAMERMM_LIBS)
 PKG_CHECK_MODULES(GSTREAMERBASEMM, \
         glibmm-2.4 >= ${gstreamermm_min_glibmm_version} \
         gstreamer-plugins-base-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-audio-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-interfaces-0.10 >= ${gstreamermm_min_gst_version} \
         )
 AC_SUBST(GSTREAMERBASEMM_CFLAGS)
