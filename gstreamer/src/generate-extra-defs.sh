@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Note that script assumes it is run in gstreamermm/gstreamer/src directory.
+# Note that script assumes it resides in the gstreamermm/gstreamer/src
+# directory.
 
 DIR=`dirname "$0"`
 

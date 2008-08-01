@@ -4,6 +4,11 @@
 # JHBUILD_SOURCES should be defined to contain the path to the root of the
 # jhbuild sources.
 
+if [ -z "$JHBUILD_SOURCES" -o ! -x "`which docextract_to_xml.py`" ]; then
+  echo "JHBUILD_SOURCES must contain path to jhbuild sources and docextract_to_xml.py needs to be executable and in PATH."
+  exit 1;
+fi
+
 PREFIX=$JHBUILD_SOURCES 
 
 PARAMS="-s $PREFIX/gstreamer/gst/ -s $PREFIX/gstreamer/docs/gst/tmpl -s $PREFIX/gstreamer/docs/libs/tmpl"
