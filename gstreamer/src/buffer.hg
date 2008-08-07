@@ -80,13 +80,9 @@ public:
   //This is const because it always returns a new buffer:
   _WRAP_METHOD(Glib::RefPtr<Buffer> span(const guint32& offset, const Glib::RefPtr<Buffer>& other_buffer, const guint32& len) const, gst_buffer_span)
 
-  //Hand-code this because the C function unrefs the input parameters? Can it be const?
-  //I asked in http://bugzilla.gnome.org/show_bug.cgi?id=533856
-  //Glib::RefPtr<Buffer> join(const Glib::RefPtr<Buffer>& other_buffer);
-  //_IGNORE(gst_buffer_join)
-
-  //This is const because it always returns a new buffer:
-  _WRAP_METHOD(Glib::RefPtr<Buffer> join(const Glib::RefPtr<Buffer>& other_buffer) const, gst_buffer_join)
+  //We ignore gst_buffer_join() because it is just a C convenience function.
+  //It is gst_buffer_merge() with unrefs.
+  _IGNORE(gst_buffer_join)
 
   //This is const because it always returns a new buffer:
   _WRAP_METHOD(Glib::RefPtr<Buffer> merge(const Glib::RefPtr<const Buffer>& other_buffer) const, gst_buffer_merge)
