@@ -336,28 +336,29 @@ public:
  * underlying gobject implements.
  * Gst::ElementInterfaced is a templated class which, in conjunction with
  * Gst::Interface::cast(), is used to cast a Gst::Element obtained by
- * Gst::ElementFactory::create() into underlying GStreamer interfaces that the
- * element may implement.  A 'filesrc' element, for example, implements the
- * Gst::URIHandler interface (which is not reflected in a Gst::Element obtained
- * from a Gst::ElementFactory).  To use the Gst::URIHandler methods with a
- * 'filesrc' element obtained from a Gst::ElementFactory, one would do the
- * following:
+ * Gst::ElementFactory::create_element() into underlying GStreamer interfaces
+ * that the element may implement.  A 'filesrc' element, for example,
+ * implements the Gst::URIHandler interface (which is not reflected in a
+ * Gst::Element obtained from a Gst::ElementFactory).  To use the
+ * Gst::URIHandler methods with a 'filesrc' element obtained from a
+ * Gst::ElementFactory, one would do the following:
  * @code
  * ...
- * Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create("filesrc",
- * "source");
+ * Glib::RefPtr<Gst::Element> element =
+ * Gst::ElementFactory::create_element("filesrc", "source");
  *
  * Glib::RefPtr< Gst::ElementInterfaced<Gst::URIHandler> > handler =
  *   Gst::Interface::cast<Gst::URIHandler>(element);
  *
- * if(handler)
+ * if (handler)
  * {
  *   std::cout << "element '" << element->get_name() <<
  *     "' implements URIHandler interface." << std::endl;
  *
+ *   // Use uri handler interface methods:
+ *
  *   handler->set_uri("file:///tmp/media.file");
  *
- *   // Use uri handler interface method
  *   std::cout << handler->get_name() << " uri = '" << handler->get_uri() <<
  *     "'." << std::endl;
  * }

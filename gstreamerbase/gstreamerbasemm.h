@@ -5,6 +5,7 @@
 
 #include <gstreamerbasemm/init.h>
 #include <gstreamerbasemm/wrap_init.h>
+#include <gstreamerbasemm/audioclock.h>
 #include <gstreamerbasemm/colorbalance.h>
 #include <gstreamerbasemm/colorbalancechannel.h>
 #include <gstreamerbasemm/xoverlay.h>

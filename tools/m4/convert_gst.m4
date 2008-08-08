@@ -95,6 +95,9 @@ _CONVERSION(`const IndexEntry&',`GstIndexEntry*',`const_cast<GstIndexEntry*>(($3
 
 #IndexFactory
 _CONVERSION(`GstIndexFactory*',`Glib::RefPtr<IndexFactory>',`Glib::wrap($3)')
+#
+#Iterator
+_CONVERSION(`GstIterator*',`Iterator<Element>',`Iterator<Element>::Iterator($3)')
 
 #Message
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Message>',`Gst::Message::wrap($3)')

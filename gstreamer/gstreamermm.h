@@ -19,7 +19,7 @@
 #include <gstreamermm/index.h>
 #include <gstreamermm/indexfactory.h>
 #include <gstreamermm/interface.h>
-//TODO: #include <gstreamermm/iterator.h> (when wrapping of GstIterator is done)
+#include <gstreamermm/iterator.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/pad.h>

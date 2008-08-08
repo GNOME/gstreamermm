@@ -20,6 +20,7 @@
  */
 
 #include <gst/gstiterator.h>
+#include <stdexcept>
 
 _DEFS(gstreamermm,gst)
 
@@ -29,19 +30,289 @@ namespace Gst
 _WRAP_ENUM(IteratorItem, GstIteratorItem)
 _WRAP_ENUM(IteratorResult, GstIteratorResult)
 
-class Iterator
+/** Exception thrown by Gst::IteratorBase<> increment operators when the
+ * elements are updated after element processing is underway by the iterator.
+ */
+class ConcurrentUpdateException : std::runtime_error
 {
 public:
+  ConcurrentUpdateException();
+  virtual const char* what() const throw();
+};
 
-  _CLASS_GENERIC(Iterator, GstIterator)
+/**  Gst::IteratorBase — Base class for classes that retrieve multiple elements
+ * in a thread safe way.
+ *
+ * Classes derived from Gst::IteratorBase are used to retrieve multiple objects
+ * from another object in a thread safe way.
+ *
+ * Various GStreamer objects provide access to their internal structures using
+ * an iterator.
+ */
+template <class CppType>
+class IteratorBase
+{
+public:
+  /** Frees the underlying C instance if a destroy value of true was used to
+   * wrap it.
+   */
+  virtual ~IteratorBase();
 
-  GstIterator* cobj();
-  Iterator(GstIterator*);
+  /** Move to the next iterator item.
+   *
+   * @return The result of the iteration. Please note that a return of
+   * Gst::ITERATOR_DONE means that the iterator is on the last item.  MT safe. 
+   */
+  IteratorResult next();
+
+  /** Resync the iterator. This function is mostly called after next() returns
+   * Gst::ITERATOR_RESYNC.  In essence, the iterator is reset to the first item
+   * because a concurrent update of the iterator's list of element occurred
+   * while element processing was underway which means a call to this method is
+   * necessary.
+   */
+  void resync();
+
+  /** Tells if iterator is at start of list (not on first item, but just
+   * before it).
+   *
+   * @return true if iterator is at start of list, false otherwise.
+   */
+  bool is_start() const;
+
+  /** Tells if iterator is on the last element.
+   *
+   * @return true if iterator is at end of list, false otherwise.
+   */
+  bool is_last() const;
+
+  /** Tells whether the iterator is valid and can be dereferenced.
+   */
+  operator bool() const;
+
+  ///Provides access to the underlying C GObject.
+  GstIterator*          cobj()          { return cobject_; };
+
+  ///Provides access to the underlying C GObject.
+  const GstIterator*    cobj() const    { return cobject_; };
+
+protected:
+  /// Default constructor.
+  IteratorBase();
+
+  /** Copy constructor.  Please note that copying and assigning merely shares
+   * the underlying C object.  Operations on the copy are also performed in the
+   * underlying C object of the original and if the original is destroyed, the
+   * copy is invalid.
+   */
+  IteratorBase(const IteratorBase<CppType>&);
+
+  /** Construct an IteratorBase from an underlying C object.
+   * @param castitem The underlying C object.
+   * @param destroy Whether to destroy underlying C object along with the
+   * wrapper.
+   */
+  IteratorBase(GstIterator* castitem, bool destroy=true);
+
+  /** Assignment operator.  It replaces the contents of this iterator with the
+   * contents of the new one freeing the underlying C object if a destroy value
+   * of true was used when wrapping it.  Please note that copying and assigning
+   * merely shares the underlying C object.  Operations on the copy are also
+   * performed in the underlying C object of the original and if the original
+   * is destroyed, the copy is invalid.
+   */
+  IteratorBase<CppType>& operator=(const IteratorBase<CppType>& other);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  gpointer current;         // The current element the iterator is referencing.
+  IteratorResult current_result; // The current result of a next() call.
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 private:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GstIterator* cobject_;    // The underlying  C object.
+  bool destroy;             // Whether to destroy C object with the wrapper.
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
-  GstIterator* cobj_;
-
+private:
+  void swap(IteratorBase<CppType>& other);
 };
+
+/**  Gst::Iterator — Class that retrieve multiple elements in a thread safe way.
+ * Gst::Iterator iterates specifically through elements that are reference
+ * counted and therefore dereferencing the elements of the iterator yields a
+ * Glib::RefPtr<> to the C++ element type.
+ */
+template <class CppType>
+class Iterator : public IteratorBase<CppType>
+{
+public:
+  /** Creates a Gst::Iterator wrapper for a GstIterator object.  The underlying
+   * @a castitem will be freed with the Gst::Iterator destruction.
+   *
+   * @param castitem The C instance to wrap.
+   * @param destroy Whether to destroy the underlying C object with the
+   * wrapper.
+   */
+  Iterator(GstIterator* castitem, bool destroy=true);
+
+  /** Dereference this iterator and obtain the underlying Glib::RefPtr<>.
+   */
+  Glib::RefPtr<CppType> operator*() const;
+
+  /** Prefix auto-increment operator.  It advances to the next item in the
+   * iterator.  It is faster than the postfix operator.
+   * @throw Gst::ConcurrentUpdateException.
+   * @throw std::runtime_error (when Gst::ITERATOR_ERROR is encountered).
+   */
+  Iterator<CppType>& operator++();
+
+  /** Postfix auto-increment operator.  It advances to the next item in the
+   * iterator.
+   * @throw Gst::ConcurrentUpdateException.
+   * @throw std::runtime_error (when Gst::ITERATOR_ERROR is encountered).
+   */
+  Iterator<CppType> operator++(int);
+};
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+/***************** Gst::IteratorBase<CppType> ************************/
+
+template<class CppType>
+IteratorResult IteratorBase<CppType>::next()
+{
+  current_result = (Gst::IteratorResult) gst_iterator_next(cobj(), &current);
+  return current_result;
+}
+
+template<class CppType>
+void IteratorBase<CppType>::resync()
+{
+  gst_iterator_resync(cobj());
+  current = 0;
+  current_result = Gst::ITERATOR_OK;
+}
+
+template<class CppType>
+bool IteratorBase<CppType>::is_start() const
+{
+  return (current == 0 && current_result == Gst::ITERATOR_OK);
+}
+
+template<class CppType>
+bool IteratorBase<CppType>::is_last() const
+{
+  return (current != 0 && current_result == Gst::ITERATOR_DONE);
+}
+
+template<class CppType>
+IteratorBase<CppType>::operator bool() const
+{
+  return (current != 0);
+}
+template<class CppType>
+IteratorBase<CppType>::IteratorBase()
+: cobject_(0),
+  destroy(true),
+  current(0),
+  current_result(Gst::ITERATOR_OK)
+{}
+
+template<class CppType>
+IteratorBase<CppType>::IteratorBase(const IteratorBase<CppType>& other)
+  : cobject_(const_cast<GstIterator*>(other.cobj())),
+    destroy((other.cobj()) ? false : true),
+    current(other.current),
+    current_result(other.current_result)
+{}
+
+template<class CppType>
+IteratorBase<CppType>::IteratorBase(GstIterator* castitem, bool destroy)
+: cobject_(castitem),
+  destroy(destroy),
+  current(0),
+  current_result(Gst::ITERATOR_OK)
+{}
+
+template<class CppType>
+IteratorBase<CppType>& IteratorBase<CppType>::operator=(const IteratorBase<CppType>& other)
+{
+  IteratorBase temp(other);
+  swap(temp);
+  return *this;
+}
+
+template<class CppType>
+void IteratorBase<CppType>::swap(IteratorBase<CppType>& other)
+{
+  GstIterator *const temp_obj = cobject_;
+  cobject_ = other.cobject_;
+  other.cobject_ = temp_obj;
+
+  const bool temp_destroy = destroy;
+  destroy = other.destroy;
+  other.destroy = temp_destroy;
+
+  gpointer const temp_current = current;
+  current = other.current;
+  other.current = temp_current;
+
+  const IteratorResult temp_result = current_result;
+  current_result = other.current_result;
+  other.current_result = temp_result;
+}
+
+//virtual
+template<class CppType>
+IteratorBase<CppType>::~IteratorBase()
+{
+  if (destroy && cobject_)
+  {
+    gst_iterator_free(cobject_);
+    cobject_ = 0;
+  }
+}
+
+/******************* Gst::Iterator<CppType> **************************/
+
+template <class CppType>
+Iterator<CppType>::Iterator(GstIterator* castitem, bool destroy)
+  : IteratorBase<CppType>(castitem, destroy)
+{}
+
+template <class CppType>
+Glib::RefPtr<CppType> Iterator<CppType>::operator*() const
+{
+  typedef typename CppType::BaseObjectType CType;
+
+  if (this->current)
+    return Glib::wrap((CType*)(this->current));
+  else
+    return Glib::RefPtr<CppType>(0);
+}
+
+template<class CppType>
+Iterator<CppType>& Iterator<CppType>::operator++()
+{
+  const IteratorResult result = this->next();
+
+  if (result == Gst::ITERATOR_RESYNC)
+    throw ConcurrentUpdateException();
+  else if (result == Gst::ITERATOR_ERROR)
+    throw std::runtime_error("Iterator increment error.");
+
+  return *this;
+}
+
+template<class CppType>
+Iterator<CppType> Iterator<CppType>::operator++(int)
+{
+  Iterator<CppType> original = *this;
+  ++(*this);
+  return original;
+}
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } //namespace Gst

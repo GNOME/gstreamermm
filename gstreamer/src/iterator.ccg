@@ -24,10 +24,13 @@
 namespace Gst
 {
 
-GstIterator*
-Iterator::cobj()
+ConcurrentUpdateException::ConcurrentUpdateException()
+: std::runtime_error(what())
+{}
+
+const char* ConcurrentUpdateException::what() const throw()
 {
-  return cobj_;
+  return "Concurrent update of iterator elements.  Please resync iterator.";
 }
 
 } //namespace Gst
