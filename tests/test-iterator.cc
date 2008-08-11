@@ -28,44 +28,53 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::Pipeline> pipeline;
   Glib::RefPtr<Gst::Bin> bin;
-  Glib::RefPtr<Gst::Element> source, sink;
+  Glib::RefPtr<Gst::Element> e1, e2, e3, e4;
 
   pipeline = Gst::Pipeline::create("my-pipeline");
   bin = Gst::Bin::create("my-bin");
 
-  source = Gst::ElementFactory::create_element("fakesrc", "source");
-  sink = Gst::ElementFactory::create_element("fakesink", "sink");
+  e1 = Gst::ElementFactory::create_element("fakesrc", "element1");
+  e2 = Gst::ElementFactory::create_element("fakesrc", "element2");
+  e3 = Gst::ElementFactory::create_element("fakesrc", "element3");
+  e4 = Gst::ElementFactory::create_element("fakesink", "element4");
 
-  bin->add(source)->add(sink);
+  bin->add(e1)->add(e2)->add(e3)->add(e4);
 
   pipeline->add(bin);
-  source->link(sink);
 
   std::cout << "The following elements have been added to bin '" <<
     bin->get_name() << "'." << std::endl;
 
   int iterations = 0;
   Gst::Iterator<Gst::Element> elements = bin->iterate_elements();
+  Gst::Iterator<Gst::Element> firstIter;
 
   try
   {
-    for ( ; !elements.is_last(); ++elements)
+    for (elements.begin(); !elements.is_end(); ++elements, ++iterations)
     {
-      if (elements)
-        std::cout << (*elements)->get_name() << std::endl;
+      if (!firstIter)
+        firstIter = elements;
 
-      iterations++;
+      std::cout << elements->get_name() << std::endl;
     }
-    ++elements;
+
+    if (firstIter)
+      std::cout << "The first element iterator processed is '" << 
+        firstIter->get_name() << "'." << std::endl;
+
+    if (elements)
+      std::cout << "elements.is_end() == true && (elements) is valid." <<
+        std::endl;
   }
   catch (std::runtime_error& e)
   {
     std::cout << "Runtime error while iterating through \"" <<
-      bin->get_name() << "'s\" elements." << std::endl;
+      bin->get_name() << "'s\" elements:" << std::endl << e.what() << std::endl;
   }
 
-  std::cout << "The loop iterated " << iterations << " to print bin '" <<
-  bin->get_name() << "' elements." << std::endl;
+  std::cout << "The loop iterated " << iterations <<
+    " time(s) to print bin '" << bin->get_name() << "' elements." << std::endl;
 
   return 0;
 }

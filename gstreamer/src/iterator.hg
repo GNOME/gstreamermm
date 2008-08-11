@@ -30,21 +30,14 @@ namespace Gst
 _WRAP_ENUM(IteratorItem, GstIteratorItem)
 _WRAP_ENUM(IteratorResult, GstIteratorResult)
 
-/** Exception thrown by Gst::IteratorBase<> increment operators when the
- * elements are updated after element processing is underway by the iterator.
- */
-class ConcurrentUpdateException : std::runtime_error
-{
-public:
-  ConcurrentUpdateException();
-  virtual const char* what() const throw();
-};
-
 /**  Gst::IteratorBase — Base class for classes that retrieve multiple elements
  * in a thread safe way.
  *
  * Classes derived from Gst::IteratorBase are used to retrieve multiple objects
- * from another object in a thread safe way.
+ * from another object in a thread safe way.  They are implemented as C++ like
+ * input iterators so they do not support multi-passing, but they are usable
+ * enough for iterating through a list of items and referencing them in a
+ * single pass.
  *
  * Various GStreamer objects provide access to their internal structures using
  * an iterator.
@@ -53,38 +46,34 @@ template <class CppType>
 class IteratorBase
 {
 public:
-  /** Frees the underlying C instance if a destroy value of true was used to
-   * wrap it.
-   */
-  virtual ~IteratorBase();
-
-  /** Move to the next iterator item.
+  /** Moves to the next iterator item.
    *
-   * @return The result of the iteration. Please note that a return of
-   * Gst::ITERATOR_DONE means that the iterator is on the last item.  MT safe. 
+   * @return The result of the iteration. MT safe. 
    */
-  IteratorResult next();
+  virtual IteratorResult next();
 
-  /** Resync the iterator. This function is mostly called after next() returns
-   * Gst::ITERATOR_RESYNC.  In essence, the iterator is reset to the first item
-   * because a concurrent update of the iterator's list of element occurred
-   * while element processing was underway which means a call to this method is
-   * necessary.
+  /** Resynchronize the iterator. This function is mostly called after next()
+   * returns Gst::ITERATOR_RESYNC.  A result of Gst::ITERATOR_RESYNC from
+   * next() means that a concurrent update was made to the iterator list during
+   * iteration and the iterator needs to be resynchronized before continuing.
+   * Use this function to resynchronize.
    */
   void resync();
 
-  /** Tells if iterator is at start of list (not on first item, but just
-   * before it).
+  /** Tells if the iterator is at the start of the list (not on the first item,
+   * but just before it).  Increment the iterator or use
+   * Gst::IteratorBasic::begin() to go to the first item.
    *
-   * @return true if iterator is at start of list, false otherwise.
+   * @return true if the iterator is at the start of the list, false otherwise.
    */
   bool is_start() const;
 
-  /** Tells if iterator is on the last element.
+  /** Tells if the iterator is at the end of the list (just after the last
+   * element).
    *
-   * @return true if iterator is at end of list, false otherwise.
+   * @return true if the iterator is at the end of the list, false otherwise.
    */
-  bool is_last() const;
+  bool is_end() const;
 
   /** Tells whether the iterator is valid and can be dereferenced.
    */
@@ -95,6 +84,11 @@ public:
 
   ///Provides access to the underlying C GObject.
   const GstIterator*    cobj() const    { return cobject_; };
+
+  /** Frees the underlying C instance if a destroy value of true was used to
+   * wrap it.
+   */
+  virtual ~IteratorBase();
 
 protected:
   /// Default constructor.
@@ -107,14 +101,14 @@ protected:
    */
   IteratorBase(const IteratorBase<CppType>&);
 
-  /** Construct an IteratorBase from an underlying C object.
+  /** Constructs an IteratorBase from an underlying C object.
    * @param castitem The underlying C object.
-   * @param destroy Whether to destroy underlying C object along with the
+   * @param destroy Whether to destroy the underlying C object along with the
    * wrapper.
    */
   IteratorBase(GstIterator* castitem, bool destroy=true);
 
-  /** Assignment operator.  It replaces the contents of this iterator with the
+  /** Assignment operator.  It replaces the contents of the iterator with the
    * contents of the new one freeing the underlying C object if a destroy value
    * of true was used when wrapping it.  Please note that copying and assigning
    * merely shares the underlying C object.  Operations on the copy are also
@@ -138,17 +132,74 @@ private:
   void swap(IteratorBase<CppType>& other);
 };
 
-/**  Gst::Iterator — Class that retrieve multiple elements in a thread safe way.
+/**  Gst::IteratorBasic — Class that retrieves multiple elements in a thread
+ * safe way.
+ * Gst::IteratorBasic iterates specifically through elements that are not
+ * reference counted.  Though it is mostly not used, it is included for
+ * completeness.  Gst::Iterator, which iterates through reference counted
+ * objects is mostly used for iterating through objects because the ones that
+ * are iterated in GStreamer are mostly reference counted.
+ */
+template <class CppType>
+class IteratorBasic : public IteratorBase<CppType>
+{
+public:
+  ///Default constructor.
+  IteratorBasic();
+
+  /** Creates a Gst::IteratorBasic wrapper for a GstIterator object.  The
+   * underlying @a castitem will be freed with the Gst::IteratorBasic
+   * destruction if a destroy value of true is given.
+   *
+   * @param castitem The C instance to wrap.
+   * @param destroy Whether to destroy the underlying C object with the
+   * wrapper.
+   */
+  IteratorBasic(GstIterator* castitem, bool destroy=true);
+
+  /** Resynchronizes the iterator and moves the iterator to the first item.
+   *
+   * @throw std::runtime_error (if a Gst::ITERATOR_ERROR is encountered or if a
+   * concurrent update to the iterator occurs while it is advanced to the first
+   * element).
+   */
+  void begin();
+
+  /** Dereferences the iterator and obtains the underlying object.
+   */
+  CppType operator*() const;
+
+  /** Prefix auto-increment operator.  It advances to the next item in the
+   * iterator.  It is faster than the postfix operator.
+   * @throw std::runtime_error (if a Gst::ITERATOR_ERROR is encountered or if a
+   * concurrent update to the iterator occurs while it iterates).
+   */
+  IteratorBasic<CppType>& operator++();
+
+  /** Postfix auto-increment operator.  It advances to the next item in the
+   * iterator.
+   * @throw std::runtime_error (if a Gst::ITERATOR_ERROR is encountered or if a
+   * concurrent update to the iterator occurs while it iterates).
+   */
+  IteratorBasic<CppType> operator++(int);
+};
+
+/**  Gst::Iterator — Class that retrieve multiple reference counted elements in
+ * a thread safe way.
  * Gst::Iterator iterates specifically through elements that are reference
  * counted and therefore dereferencing the elements of the iterator yields a
  * Glib::RefPtr<> to the C++ element type.
  */
 template <class CppType>
-class Iterator : public IteratorBase<CppType>
+class Iterator : public IteratorBasic<CppType>
 {
 public:
+  ///Default constructor.
+  Iterator();
+
   /** Creates a Gst::Iterator wrapper for a GstIterator object.  The underlying
-   * @a castitem will be freed with the Gst::Iterator destruction.
+   * @a castitem will be freed with the Gst::Iterator destruction if a destroy
+   * value of true is given.
    *
    * @param castitem The C instance to wrap.
    * @param destroy Whether to destroy the underlying C object with the
@@ -156,21 +207,32 @@ public:
    */
   Iterator(GstIterator* castitem, bool destroy=true);
 
-  /** Dereference this iterator and obtain the underlying Glib::RefPtr<>.
+  /** Moves to the next iterator item.
+   *
+   * @return The result of the iteration. MT safe. 
+   */
+  IteratorResult next();
+
+  /** Dereferences the iterator and obtains the underlying Glib::RefPtr<>.
    */
   Glib::RefPtr<CppType> operator*() const;
 
+  //TODO: Should this operator be included?
+  /** Accesses underlying object member through the RefPtr<>.
+   */
+  CppType* operator->() const;
+
   /** Prefix auto-increment operator.  It advances to the next item in the
    * iterator.  It is faster than the postfix operator.
-   * @throw Gst::ConcurrentUpdateException.
-   * @throw std::runtime_error (when Gst::ITERATOR_ERROR is encountered).
+   * @throw std::runtime_error (if a Gst::ITERATOR_ERROR is encountered or if a
+   * concurrent update to the iterator occurs while it iterates).
    */
   Iterator<CppType>& operator++();
 
   /** Postfix auto-increment operator.  It advances to the next item in the
    * iterator.
-   * @throw Gst::ConcurrentUpdateException.
-   * @throw std::runtime_error (when Gst::ITERATOR_ERROR is encountered).
+   * @throw std::runtime_error (if a Gst::ITERATOR_ERROR is encountered or if a
+   * concurrent update to the iterator occurs while it iterates).
    */
   Iterator<CppType> operator++(int);
 };
@@ -183,6 +245,11 @@ template<class CppType>
 IteratorResult IteratorBase<CppType>::next()
 {
   current_result = (Gst::IteratorResult) gst_iterator_next(cobj(), &current);
+
+  // Set current to NULL if iterator is done:
+  if (current_result == Gst::ITERATOR_DONE)
+    current = 0;
+
   return current_result;
 }
 
@@ -201,9 +268,9 @@ bool IteratorBase<CppType>::is_start() const
 }
 
 template<class CppType>
-bool IteratorBase<CppType>::is_last() const
+bool IteratorBase<CppType>::is_end() const
 {
-  return (current != 0 && current_result == Gst::ITERATOR_DONE);
+  return (current_result == Gst::ITERATOR_DONE);
 }
 
 template<class CppType>
@@ -274,12 +341,82 @@ IteratorBase<CppType>::~IteratorBase()
   }
 }
 
+/***************** Gst::IteratorBasic<CppType> ***********************/
+
+template <class CppType>
+IteratorBasic<CppType>::IteratorBasic()
+  : IteratorBase<CppType>()
+{}
+
+template <class CppType>
+IteratorBasic<CppType>::IteratorBasic(GstIterator* castitem, bool destroy)
+  : IteratorBase<CppType>(castitem, destroy)
+{}
+
+template<class CppType>
+void IteratorBasic<CppType>::begin()
+{
+  this->resync();
+  ++(*this);
+}
+
+template <class CppType>
+CppType IteratorBasic<CppType>::operator*() const
+{
+  typedef typename CppType::BaseObjectType CType;
+
+  if (this->current)
+    return Glib::wrap((CType*)(this->current));
+  else
+    return CppType();
+}
+
+template<class CppType>
+IteratorBasic<CppType>& IteratorBasic<CppType>::operator++()
+{
+  const IteratorResult result = this->next();
+
+  if (result == Gst::ITERATOR_RESYNC)
+    throw std::runtime_error("Concurrent update of iterator elements.  Please resync.");
+  else if (result == Gst::ITERATOR_ERROR)
+    throw std::runtime_error("Iterator error while incrementing.");
+
+  return *this;
+}
+
+template<class CppType>
+IteratorBasic<CppType> IteratorBasic<CppType>::operator++(int)
+{
+  IteratorBasic<CppType> original = *this;
+  ++(*this);
+  return original;
+}
+
 /******************* Gst::Iterator<CppType> **************************/
 
 template <class CppType>
-Iterator<CppType>::Iterator(GstIterator* castitem, bool destroy)
-  : IteratorBase<CppType>(castitem, destroy)
+Iterator<CppType>::Iterator()
+  : IteratorBasic<CppType>()
 {}
+
+template <class CppType>
+Iterator<CppType>::Iterator(GstIterator* castitem, bool destroy)
+  : IteratorBasic<CppType>(castitem, destroy)
+{}
+
+template <class CppType>
+IteratorResult Iterator<CppType>::next()
+{
+  const IteratorResult result = IteratorBasic<CppType>::next();
+
+  // Remove extra reference that gst_iterator_next() takes because references
+  // are taken when using Gst::Iterator<CppType> dereferencing operators (* and
+  // ->).
+  if (this->current)
+    g_object_unref(this->current);
+
+  return result;
+}
 
 template <class CppType>
 Glib::RefPtr<CppType> Iterator<CppType>::operator*() const
@@ -287,21 +424,33 @@ Glib::RefPtr<CppType> Iterator<CppType>::operator*() const
   typedef typename CppType::BaseObjectType CType;
 
   if (this->current)
-    return Glib::wrap((CType*)(this->current));
+  {
+    //Take extra reference when dereferencing.  The reference will disappear
+    //when Glib::RefPtr<> is destroyed.
+    return Glib::wrap((CType*)(this->current), true);
+  }
   else
     return Glib::RefPtr<CppType>(0);
 }
 
+template <class CppType>
+CppType* Iterator<CppType>::operator->() const
+{
+  typedef typename CppType::BaseObjectType CType;
+
+  if (this->current)
+  {
+    //Take extra reference when dereferencing.  The reference will disappear
+    //when Glib::RefPtr<> is destroyed.
+    return Glib::wrap((CType*)(this->current), true).operator->();
+  }
+  else
+    return (CppType*) 0;
+}
 template<class CppType>
 Iterator<CppType>& Iterator<CppType>::operator++()
 {
-  const IteratorResult result = this->next();
-
-  if (result == Gst::ITERATOR_RESYNC)
-    throw ConcurrentUpdateException();
-  else if (result == Gst::ITERATOR_ERROR)
-    throw std::runtime_error("Iterator increment error.");
-
+  IteratorBasic<CppType>::operator++();
   return *this;
 }
 
