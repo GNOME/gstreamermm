@@ -46,6 +46,10 @@ class PadTemplate;
 class Query;
 class TagList;
 
+//Gst::Iterator<> forward declaration.
+template <class CppType>
+class Iterator;
+
 _WRAP_ENUM(ElementFlags, GstElementFlags)
 
 //TODO: Fix gmmproc so that definition in gst_enums.defs does not cause errors
@@ -96,7 +100,7 @@ Glib::ustring get_name(StateChangeReturn s);
  * add_pad() and remove_pad().
  *
  * A pad of an element can be retrieved by name with get_pad(). An iterator of
- * all pads can be retrieved with gst_element_iterate_pads().
+ * all pads can be retrieved with iterate_pads().
  *
  * Gst::Elements can be linked through their pads. Use the link() function to
  * link elements. Use link_filtered() to link two elements constrained by a
@@ -162,7 +166,9 @@ public:
   _WRAP_METHOD(void no_more_pads(), gst_element_no_more_pads)
   _WRAP_METHOD(void release_request_pad(const Glib::RefPtr<Pad>& pad), gst_element_release_request_pad)
   _WRAP_METHOD(bool remove_pad(const Glib::RefPtr<Pad>& pad), gst_element_remove_pad)
- 
+  _WRAP_METHOD(Iterator<Pad> iterate_pads(), gst_element_iterate_pads)
+  _WRAP_METHOD(Iterator<Pad> iterate_sink_pads(), gst_element_iterate_sink_pads)
+  _WRAP_METHOD(Iterator<Pad> iterate_src_pads(), gst_element_iterate_src_pads)
   _WRAP_METHOD(void unlink(const Glib::RefPtr<Element>& other_element), gst_element_unlink)
 
   //TODO: Make this like link()?
