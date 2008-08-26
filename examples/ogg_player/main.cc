@@ -100,7 +100,7 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 {
   // We can now link this pad with the audio decoder
   std::cout << "Dynamic pad created. Linking parser/decoder." << std::endl;
-  Glib::RefPtr<Gst::Pad> sinkPad = decoder->get_pad("sink");
+  Glib::RefPtr<Gst::Pad> sinkPad = decoder->get_static_pad("sink");
 
   try
   {
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  Glib::RefPtr<Gst::Pad> pad = sink->get_pad("sink");
+  Glib::RefPtr<Gst::Pad> pad = sink->get_static_pad("sink");
   if(pad)
     data_probe_id = pad->add_data_probe( sigc::ptr_fun(&on_sink_pad_have_data) );
   //std::cout << "sink data probe id = " << data_probe_id << std::endl;

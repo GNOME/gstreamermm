@@ -34,7 +34,7 @@ Glib::RefPtr<Gst::Element> decoder;
 void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 {
   // We can now link this pad with the audio decoder.
-  Glib::RefPtr<Gst::Pad> sinkPad = decoder->get_pad("sink");
+  Glib::RefPtr<Gst::Pad> sinkPad = decoder->get_static_pad("sink");
 
   try
   {

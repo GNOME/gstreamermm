@@ -268,7 +268,7 @@ void PlayerWindow::on_button_stop()
   // video_pad_got_buffer method never got a chance to remove probe)
   if(m_pad_probe_id != 0)
   {
-    m_video_sink->get_pad("sink")->remove_buffer_probe(m_pad_probe_id);
+    m_video_sink->get_static_pad("sink")->remove_buffer_probe(m_pad_probe_id);
     m_pad_probe_id  = 0;
   }
 }
@@ -374,7 +374,7 @@ void PlayerWindow::on_button_open()
     // method (if there's video).  When first buffer arrives, video
     // size can be extracted.  If there's no video, probe will be
     // removed when media stops in on_button_stop method
-    m_pad_probe_id = m_video_sink->get_pad("sink")->add_buffer_probe(
+    m_pad_probe_id = m_video_sink->get_static_pad("sink")->add_buffer_probe(
       sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
 
     set_title( Glib::filename_display_basename(chooser.get_filename()) );
