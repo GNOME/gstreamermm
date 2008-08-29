@@ -26,13 +26,29 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+//Gst::IteratorBasic<> forward declaration.
+template <class CppType>
+class IteratorBasic;
+
 _WRAP_ENUM(Format, GstFormat)
 
 /** A format definition is used to get details of a Gst::Format by
  * Gst::get_details().
  */
-struct FormatDefinition
+class FormatDefinition
 {
+  _CLASS_GENERIC(FormatDefinition, GstFormatDefinition)
+
+public:
+  /// Default constructor.
+  FormatDefinition();
+
+  /** Constructs a Gst::FormatDefinition from a C GstFormatDefinition type.
+   * The @a castitem is left unaffected; its contents are simply copied.
+   * @param castitem The GstFormatDefinition to copy contents from.
+   */
+  FormatDefinition(GstFormatDefinition* castitem);
+
   /// The unique id of this format.
   Gst::Format         value;
 
@@ -65,6 +81,17 @@ Glib::QueryQuark get_quark(Format f);
 
 } //namespace Enums
 
+/** Create a new Gst::Format based on the nick or return an already registered
+ * format with that nick.
+ *
+ * @param nick The nick of the new format.
+ * @param description The description of the new format.
+ * @return A new Gst::Format or an already registered format with the same
+ * nick. MT safe.
+ */
+Format register_format(const Glib::ustring& nick, const Glib::ustring&
+description);
+
 /** Return the format registered with the given nick.
  *
  * @param nick The nick of the format.
@@ -73,12 +100,26 @@ Glib::QueryQuark get_quark(Format f);
  */
 Format get_format(const Glib::ustring& nick);
 
+/** See if the given format is inside the array of formats.
+ *
+ * @param formats The array of formats to search.
+ * @param format The format to find.
+ * @return true If the format is found inside the array.
+ */
+bool formats_contain(const Glib::ArrayHandle<Format>& formats, Format format);
+
 /** Get details about the given format.
  *
  * @param format The format to get details of.
- * @param def The Gst::FormatDefinition in which to store details of format.
+ * @param def The Gst::FormatDefinition in which to store the details of
+ * the format.
  * @return true if successful, false otherwise. MT safe.
  */
-bool get_details(Format format, FormatDefinition& def);
+bool get_format_details(Format format, FormatDefinition& def);
+
+/** Iterate all the registered formats.  The format definitions are read only.
+ * @return a Gst::IteratorBasic of Gst::FormatDefinition.
+ */
+IteratorBasic<const FormatDefinition> iterate_format_definitions();
 
 } //namespace Gst

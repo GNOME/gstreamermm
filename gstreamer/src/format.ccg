@@ -20,9 +20,27 @@
  */
 
 #include <gst/gstenumtypes.h>
+#include <gstreamermm/iterator.h>
 
 namespace Gst
 {
+
+FormatDefinition::FormatDefinition()
+: value(Gst::FORMAT_UNDEFINED),
+  quark((GQuark)(0))
+{}
+
+FormatDefinition::FormatDefinition(GstFormatDefinition* castitem)
+: value(Gst::FORMAT_UNDEFINED),
+  quark((castitem) ? castitem->quark : 0)
+{
+  if (castitem)
+  {
+    value = (Format)(castitem->value);
+    nick = castitem->nick;
+    description = castitem->description;
+  }
+}
 
 namespace Enums
 {
@@ -41,10 +59,21 @@ Glib::QueryQuark get_quark(Format f)
 
 Format get_format(const Glib::ustring& nick)
 {
-  return Format(gst_format_get_by_nick(nick.c_str()));
+  return (Format)(gst_format_get_by_nick(nick.c_str()));
 }
 
-bool get_details(Format format, FormatDefinition &def)
+Format register_format(const Glib::ustring& nick, const Glib::ustring&
+description)
+{
+  return (Format)(gst_format_register(nick.c_str(), description.c_str()));
+}
+
+bool formats_contain(const Glib::ArrayHandle<Format>& formats, Format format)
+{
+  return gst_formats_contains((GstFormat*)((formats).data()), (GstFormat)(format));
+}
+
+bool get_format_details(Format format, FormatDefinition &def)
 {
   const GstFormatDefinition* gstdef = gst_format_get_details(GstFormat(format));
 
@@ -56,6 +85,11 @@ bool get_details(Format format, FormatDefinition &def)
   def.quark = gstdef->quark;
 
   return true;
+}
+
+IteratorBasic<const FormatDefinition> iterate_format_definitions()
+{
+  return IteratorBasic<const FormatDefinition>::IteratorBasic(gst_format_iterate_definitions());
 }
 
 } //namespace Gst

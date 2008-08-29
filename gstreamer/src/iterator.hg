@@ -135,10 +135,8 @@ private:
 /**  Gst::IteratorBasic — Class that retrieves multiple elements in a thread
  * safe way.
  * Gst::IteratorBasic iterates specifically through elements that are not
- * reference counted.  Though it is mostly not used, it is included for
- * completeness.  Gst::Iterator, which iterates through reference counted
- * objects is mostly used for iterating through objects because the ones that
- * are iterated in GStreamer are mostly reference counted.
+ * reference counted.  Gst::Iterator is used for iterating through reference
+ * counted objects.
  */
 template <class CppType>
 class IteratorBasic : public IteratorBase<CppType>
@@ -168,6 +166,10 @@ public:
   /** Dereferences the iterator and obtains the underlying object.
    */
   CppType operator*() const;
+
+  /** Accesses underlying object member through the iterator.
+   */
+  CppType* operator->() const;
 
   /** Prefix auto-increment operator.  It advances to the next item in the
    * iterator.  It is faster than the postfix operator.
@@ -217,7 +219,6 @@ public:
    */
   Glib::RefPtr<CppType> operator*() const;
 
-  //TODO: Should this operator be included?
   /** Accesses underlying object member through the RefPtr<>.
    */
   CppType* operator->() const;
@@ -366,9 +367,23 @@ CppType IteratorBasic<CppType>::operator*() const
   typedef typename CppType::BaseObjectType CType;
 
   if (this->current)
-    return Glib::wrap((CType*)(this->current));
+    return CppType((CType*)(this->current));
   else
     return CppType();
+}
+
+template <class CppType>
+CppType* IteratorBasic<CppType>::operator->() const
+{
+  static typename CppType::CppObjectType result;
+
+  if (this->current)
+  {
+    result = this->operator*();
+    return &result;
+  }
+  else
+    return (CppType*) 0;
 }
 
 template<class CppType>

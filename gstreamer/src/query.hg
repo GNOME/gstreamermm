@@ -30,8 +30,42 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+//Gst::IteratorBasic<> forward declaration.
+template <class CppType>
+class IteratorBasic;
+
 _WRAP_ENUM(QueryType, GstQueryType)
 _WRAP_ENUM(BufferingMode, GstBufferingMode)
+
+/** A query type definition is used to get details of a Gst::Query by
+ * Gst::Query::get_details().
+ */
+class QueryTypeDefinition
+{
+  _CLASS_GENERIC(QueryTypeDefinition, GstQueryTypeDefinition)
+
+public:
+  /// Default constructor.
+  QueryTypeDefinition();
+
+  /** Constructs a Gst::QueryTypeDefinition from a C GstQueryTypeDefinition
+   * type.  The @a castitem is left unaffected; its contents are simply copied.
+   * @param castitem The GstQueryTypeDefinition to copy contents from.
+   */
+  QueryTypeDefinition(GstQueryTypeDefinition* castitem);
+
+  /// The unique id of the Query type.
+  QueryType             value;
+
+  /// A short nickname for the query type.
+  Glib::ustring         nick;
+
+  /// A longer description of the query type.
+  Glib::ustring         description;
+
+  /// The quark for the nick.
+  Glib::QueryQuark      quark;
+};
 
 namespace Enums
 {
@@ -54,14 +88,26 @@ _IGNORE(gst_query_type_to_quark)
 
 } //namespace Enums
 
-struct QueryTypeDefinition
-{
-  QueryType             value;
-  Glib::ustring         nick;
-  Glib::ustring         description;
-  Glib::QueryQuark      quark;
-};
+/** Gst::Query — Provide functions to create queries, and to set and parse
+ * values in them.  Dynamically register new query types. 
+ * Gst::Query methods are used to register new query types to the GStreamer
+ * core. Query types can be used to perform queries on pads and elements.
+ *
+ * Queries can be created using the derived Gst::Query classes create()
+ * methods. Query values can be set using derived classes set() methods, and
+ * parsed using derived classes parse() methods.
+ *
+ * The following example shows how to query the duration of a pipeline:
+ *
+ * TODO: Correct following to include duration query example:
 
+Glib::RefPtr<Gst::Query> query = Gst::QueryDuration::create(Gst::FORMAT_TIME);
+bool res = pipeline->query(query);
+if (res)
+{
+  gint64 duration;
+}
+ */
 class Query : public MiniObject
 {
 protected:
@@ -90,7 +136,7 @@ public:
   _WRAP_METHOD(static QueryType get_query_type(const Glib::ustring& nick), gst_query_type_get_by_nick)
 
 #m4 _CONVERSION(`const Glib::ArrayHandle<QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
-  _WRAP_METHOD(static bool query_types_contains(const Glib::ArrayHandle<QueryType>& types, QueryType type), gst_query_types_contains)
+  _WRAP_METHOD(static bool query_types_contain(const Glib::ArrayHandle<QueryType>& types, QueryType type), gst_query_types_contains)
 
   /** Get details about the given Gst::QueryType.
    *
@@ -100,6 +146,8 @@ public:
    */
   bool get_details(QueryType type, QueryTypeDefinition& def);
   _IGNORE(gst_query_type_get_details)
+
+  _WRAP_METHOD(static IteratorBasic<const QueryTypeDefinition> iterate_definitions(), gst_query_type_iterate_definitions)
 };
 
 //TODO: Modify create methods of derived Query classes to return

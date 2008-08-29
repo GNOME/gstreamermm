@@ -76,5 +76,43 @@ int main (int argc, char* argv[])
   std::cout << "The loop iterated " << iterations <<
     " time(s) to print bin '" << bin->get_name() << "' elements." << std::endl;
 
+  std::cout << std::endl <<
+    "The following are standard GStreamer query types:" << std::endl;
+
+  Gst::IteratorBasic<const Gst::QueryTypeDefinition> queryTypes =
+    Gst::Query::iterate_definitions();
+  try
+  {
+    for(++queryTypes; !queryTypes.is_end(); ++queryTypes)
+    {
+      std::cout << queryTypes->nick << " -- " << queryTypes->description <<
+        "." << std::endl;
+    }
+  }
+  catch (std::runtime_error& e)
+  {
+    std::cout << "Runtime error while iterating through query types." <<
+      std::endl << e.what() << std::endl;
+  }
+
+  std::cout << std::endl <<
+    "The following are standard GStreamer formats:" << std::endl;
+
+  Gst::IteratorBasic<const Gst::FormatDefinition> formats =
+    Gst::iterate_format_definitions();
+  try
+  {
+    for(++formats; !formats.is_end(); ++formats)
+    {
+      std::cout << formats->nick << " -- " << formats->description <<
+        "." << std::endl;
+    }
+  }
+  catch (std::runtime_error& e)
+  {
+    std::cout << "Runtime error while iterating through formats." <<
+      std::endl << e.what() << std::endl;
+  }
+
   return 0;
 }

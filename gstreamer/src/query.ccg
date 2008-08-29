@@ -20,10 +20,29 @@
  */
 
 #include <gst/gstenumtypes.h>
+#include <gstreamermm/iterator.h>
+
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
 
 namespace Gst
 {
+
+QueryTypeDefinition::QueryTypeDefinition()
+: value(Gst::QUERY_NONE),
+  quark((GQuark)(0))
+{}
+
+QueryTypeDefinition::QueryTypeDefinition(GstQueryTypeDefinition* castitem)
+: value(Gst::QUERY_NONE),
+  quark((castitem) ? castitem->quark : 0)
+{
+  if (castitem)
+  {
+    value = (QueryType)(castitem->value);
+    nick = castitem->nick;
+    description = castitem->description;
+  }
+}
 
 namespace Enums
 {

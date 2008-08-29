@@ -1,3 +1,32 @@
+2008-08-29  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/src/format.ccg:
+	* gstreamer/src/format.hg: Added register_format(), formats_contain()
+	and iterate_format_definitions().  Renamed get_details(Format f, ...)
+	to get_format_details().  Made FormatDefinition a _CLASS_GENERIC to
+	make it usable with Gst::IteratorBasic<> for return of
+	iterate_format_definitions().
+
+	* gstreamer/src/query.ccg:
+	* gstreamer/src/query.hg: Added Gst;:Query class doc.  Renamed
+	query_types_constains() to query_types_contain().  Added
+	Gst::Query::iterate_definitions().  Made QueryTypeDefinition a
+	_CLASS_GENERIC so that it can be used with Gst::IteratorBasic<> for
+	return of Gst::Query::iterate_definitions().
+	* tools/m4/convert_gst.m4: Added conversion from GstIterator* to
+	Gst::IteratorBasic<const QueryTypeDefinition>.
+
+	* gstreamer/src/iterator.hg: Added Gst::IteratorBasic<>::operator->().
+	Used CppType() constructor in the Gst::IteratorBasic<>::operator*()
+	return instead of Glib::wrap() which makes it usable with classes that
+	don't have a Glib::wrap() method (like FormatDefinition and
+	QueryTypeDefinition).
+
+	* tests/test-iterator.cc: Modified to test
+	iterate_format_definitions() and Gst::Query::iterate_definitions().
+
+	* gstreamer/src/caps.ccg: Clarified TODO.
+
 2008-08-25  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/element.hg: Removed get_pad() (was a TODO).
