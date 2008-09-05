@@ -44,7 +44,7 @@ bool on_timeout()
     Glib::RefPtr<Gst::QueryPosition> query_pos =
       Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
     if(query_pos)
-      query_pos->parse(fmt, pos);
+      pos = query_pos->parse();
 
     std::cout << std::right << "Time: " << std::setfill('0') <<
       std::setw(3) << Gst::get_hours(pos) << ":" <<

@@ -88,25 +88,26 @@ _IGNORE(gst_query_type_to_quark)
 
 } //namespace Enums
 
-/** Gst::Query — Provide functions to create queries, and to set and parse
- * values in them.  Dynamically register new query types. 
- * Gst::Query methods are used to register new query types to the GStreamer
- * core. Query types can be used to perform queries on pads and elements.
- *
+/** Gst::Query — Classes used to perform queries on pads and elements.
+*
  * Queries can be created using the derived Gst::Query classes create()
  * methods. Query values can be set using derived classes set() methods, and
  * parsed using derived classes parse() methods.
  *
+ * New query types may also be registered to the GStreamer core using
+ * register_query_type().
+ *
  * The following example shows how to query the duration of a pipeline:
  *
- * TODO: Correct following to include duration query example:
-
-Glib::RefPtr<Gst::Query> query = Gst::QueryDuration::create(Gst::FORMAT_TIME);
-bool res = pipeline->query(query);
-if (res)
-{
-  gint64 duration;
-}
+ * @code
+ * Glib::RefPtr<Gst::Query> query = Gst::QueryDuration::create(Gst::FORMAT_TIME);
+ * bool res = pipeline->query(query);
+ * if (res)
+ * {
+ *  gint64 duration = query.parse();
+ *  ...
+ * }
+ * @endcode
  */
 class Query : public MiniObject
 {
@@ -156,77 +157,497 @@ public:
 //Glib::RefPtrs references the objects which causes problems when GStreamer API
 //tries to modify the GstStructures of the objects.
 
+/** A custom application query object.  See create() for more details.
+ */
+class QueryApplication : public Query
+{
+public:
+  explicit QueryApplication(GstQuery* query);
+
+  /** Constructs a new custom application query object.  The Gst::Query may be
+   * used by applications in their own way.  Please note that a custom
+   * Gst::QueryType must be used in order for the returned Gst::Query to
+   * actually be a Gst::QueryApplication type.
+   * @param type The query type.
+   * @param structure A structure for the query.
+   * @return The new Gst::QueryApplication.
+   */
+  static Glib::RefPtr<Query> create(QueryType type, Structure& structure);
+};
+
+/** A convert query object.  See create() for more details.
+ */
 class QueryConvert : public Query
 {
 public:
   explicit QueryConvert(GstQuery* query);
 
+  /** Constructs a new convert query object.  A convert query is used to ask
+   * for a conversion between one format and another.
+   * @param src_format The source Gst::Format for the new query.
+   * @param value The value to convert.
+   * @param dest_format The target Gst::Format.
+   * @return The new Gst::QueryConvert.
+   */
   static Glib::RefPtr<Query> create(Format src_format, gint64 value, Format dest_format);
+
+  /** Answer a convert query by setting the requested values.
+   * @param src_format The source Gst::Format.
+   * @param src_value The source value.
+   * @param dest_format The destination Gst::Format.
+   * @param dest_value The destination value.
+   */
   void set(Format src_format, gint64 src_value, Format dest_format, gint64 dest_value);
-  void parse(Format& dest_format, gint64& dest_value);
+
+  /** Parse a convert query answer.  Use the other parse() methods for parsing
+   * individual values.
+   * @param src_format The storage for the Gst::Format of the source value.
+   * @param src_value The storage for the source value.
+   * @param dest_format The storage for the Gst::Format of the destination.
+   * value.
+   * @param dest_value The storage for the destination value.
+   */
   void parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value);
+
+  /** Parse the destination format and value of a convert query answer.
+   * @param dest_format The storage for the Gst::Format of the destination
+   * value.
+   * @param dest_value The storage for the destination value.
+   */
+  void parse(Format& dest_format, gint64& dest_value);
+
+  /** Parse the source format of a convert query answer, returning the format.
+   * @return The Gst::Format of the source value.
+   */
+  Format parse_src_format();
+
+  /** Parse the source value of a convert query answer returning, the value.
+   * @return The source value.
+   */
+  gint64 parse_src_value();
+
+  /** Parse the destination format of a convert query answer, returning the
+   * format.
+   * @return The Gst::Format of the destination value.
+   */
+  Format parse_dest_format();
+
+  /** Parse the destination value of a convert query answer, returning the
+   * value.
+   * @return The destination value.
+   */
+  gint64 parse_dest_value();
 };
 
+/** A stream position query object.  See create() for more details.
+ */
 class QueryPosition : public Query
 {
 public:
   explicit QueryPosition(GstQuery* query);
 
+  /** Constructs a new query stream position query object. A position query is
+   * used to query the current position of playback in the streams, in some
+   * format.
+   * @param format The default Gst::Format for the new query.
+   * @return The new Gst::QueryPosition.
+   */
   static Glib::RefPtr<Query> create(Format format);
+
+  /** Answer a position query by setting the requested value in the given
+   * format.
+  * @param format The requested Gst::Format.
+  * @param position The position to set.
+   */
   void set(Format format, gint64 position);
+
+  /** Parse a position query, writing the format into format, and the position
+   * into @a position.  Use the other parse() methods for parsing individual
+   * values.
+   * @param format The storage for the Gst::Format of the position values.
+   * @param position The storage for the current position.
+   */
   void parse(Format& format, gint64& position);
+
+  /** Parse the position of a position query, returning the position.
+   * @return The current position of the position query.
+   */
+  gint64 parse();
+
+  /** Parse the format of a position query, returning the format.
+   * @return The the Gst::Format of the position values.
+   */
+  Format parse_format();
 };
 
+/** A stream duration query object.  See create() for more details.
+ */
 class QueryDuration : public Query
 {
 public:
   explicit QueryDuration(GstQuery* query);
 
+  /** Constructs a new stream duration query object to query in the given
+   * format. A duration query will give the total length of the stream.
+   * @param format The Gst::Format for this duration query.
+   * @return The new Gst::QueryDuration.
+   */
   static Glib::RefPtr<Query> create(Format format);
+
+  /** Answer a duration query by setting the requested value in the given
+   * format.
+   * @param format The Gst::Format for the duration.
+   * @param duration The duration of the stream.
+   */
   void set(Format format, gint64 duration);
+
+  /** Parse a duration query answer. Write the format of the duration into
+   * @a format, and the value into @a duration.  Use the other parse() methods
+   * for parsing individual values.
+   * @param format The storage for the Gst::Format of the duration value.
+   * @param duration The storage for the total duration.
+   */
   void parse(Format& format, gint64& duration);
+
+  /** Parse a duration query answer, returning the duration.  
+   * @return The total duration.
+   */
+  gint64 parse();
+
+  /** Parse a duration query answer, returning the format of the duration. 
+   * @return The Gst::Format of the duration value.
+   */
+  Format parse_format();
 };
 
+/** A latency query object.  See create() for more details.
+ */
 class QueryLatency : public Query
 {
 public:
   explicit QueryLatency(GstQuery* query);
 
+  /** Constructs a new latency query object. A latency query is usually
+   * performed by sinks to compensate for additional latency introduced by
+   * elements in the pipeline.
+   * @return The new Gst::QueryLatency.
+   */
   static Glib::RefPtr<Query> create();
+
+  /** Answer a latency query by setting the requested values in the given
+   * format.
+   * @param live If there is a live element upstream.
+   * @param min_latency The minimal latency of the live element.
+   * @param max_latency The maximal latency of the live element.
+   */
   void set(bool live, ClockTime min_latency, ClockTime max_latency);
+
+  /** Parse a latency query answer.  Use the other parse() methods for parsing
+   * individual values.
+   * @param live Storage for live.
+   * @param min_latency The storage for the min latency.
+   * @param max_latency The storage for the max latency.
+   */
   void parse(bool& live, ClockTime& min_latency, ClockTime& max_latency);
+
+  /** Parse a latency query answer, returning the live status.
+   * @return the live satus.
+   */
+  bool parse_live();
+
+  /** Parse a latency query answer, returning the minimum latency.
+   * @return The minimum latency.
+   */
+  ClockTime parse_min();
+
+  /** Parse a latency query answer, returning the maximum latency.
+   * @return The maximum latency.
+   */
+  ClockTime parse_max();
 };
 
+/** A seeking query object.  See create() for more details.
+ */
 class QuerySeeking : public Query
 {
 public:
   explicit QuerySeeking(GstQuery* query);
 
+  /** Constructs a new query object for querying seeking properties of the
+   * stream.
+   * @param format The default Gst::Format for the new query.
+   * @return The new Gst::QuerySeeking.
+   */
   static Glib::RefPtr<Query> create(Format format);
+
+  /** Set the seeking query result fields in query.
+   * @param format The format to set for @a the segment_start and
+   * @a segment_end values.
+   * @param seekable The seekable flag to set.
+   * @param segment_start The segment_start to set.
+   * @param segment_end The segment_end to set.
+   */
   void set(Format format, bool seeakable, gint64 segment_start, gint64 segment_end);
+
+  /** Parse a seeking query, writing the format into format, and other results
+   * into the passed parameters.  Use the other parse() methods for parsing
+   * individual values.
+   * @param format The storage location for the foramt.
+   * @param seekable The storage location for the seekable flag.
+   * @param segment_start The storage location for the segment start value.
+   * @param segment_end The storage location for the segment end.
+   */
   void parse(Format& format, bool& seekable, gint64& segment_start, gint64& segment_end);
+
+  /** Parse a seeking query, returning the format.
+   * @return The format.
+   */
+  Format parse_format();
+
+  /** Parse a seeking query, returning the seekable status.
+   * @return The seekable flag.
+   */
+  bool parse_seekable();
+
+  /** Parse a seeking query, returning the segment start value.
+   * @return The segment start.
+   */
+  gint64 parse_start();
+
+  /** Parse a seeking query, returning the segment end value.
+   * @return The segment end.
+   */
+  gint64 parse_end();
 };
 
+/** A formats query object.  See create() for more details.
+ */
 class QueryFormats : public Query
 {
 public:
   explicit QueryFormats(GstQuery* query);
 
+  /** Constructs a new query object for querying formats of the stream.
+   * @return The new Gst::QueryFormats.
+   */
   static Glib::RefPtr<Query> create();
-  void set(int n_formats, const va_list& varargs);
-  //TODO: set(int n_formats, const std::vector<const Format>& formats);
-  void parse(guint& n_formats);
-  void parse(guint nth, Format& format);
+
+  /** Set the formats query result fields. All the formats in the array are
+   * used.
+   * @param formats An array containing Gst::Format values. 
+   */
+  void set(const Glib::ArrayHandle<Format>& formats);
+
+  /** Set the formats query result fields using only @a n_formats from @a
+   * formats. The number of formats passed in the formats array must be
+   * greater than or equal to @a n_formats.
+   * @param n_formats The number of formats to set.
+   * @param formats An array containing at least @a n_formats Gst::Format
+   * values. 
+   */
+  void set(int n_formats, const Glib::ArrayHandle<Format>& formats);
+
+  /** Parse and return the number of formats in the formats query.
+   * @return The number of formats in this query.
+   */
+  guint parse_length();
+
+  /** Parse the format query and return the @a nth format from it. If the list
+   * contains less elements than @a nth, Gst::FORMAT_UNDEFINED will be
+   * returned.
+   * @param nth The index of the format to return.
+   * @return the @a nth format or Gst::FORMAT_UNDEFINED.
+   */
+  Format parse(guint nth);
 };
 
+/** A new segment query object.  See create() for more details.
+ */
 class QuerySegment : public Query
 {
 public:
   explicit QuerySegment(GstQuery* query);
 
+  /** Constructs a new segment query object. A segment query is used to
+   * discover information about the currently configured segment for playback.
+   * @param format The Gst::Format for the new query.
+   * @return The new Gst::QuerySegment.
+   */
   static Glib::RefPtr<Query> create(Format format);
+
+  /** Answer a segment query by setting the requested values. The normal
+   * playback segment of a pipeline is 0 to duration at the default rate of
+   * 1.0. If a seek was performed on the pipeline to play a different segment,
+   * this query will return the range specified in the last seek.
+   *
+   * @a start_value and @a stop_value will respectively contain the configured
+   * playback range start and stop values expressed in @a format. The values
+   * are always between 0 and the duration of the media and @a start_value <=
+   * @a stop_value. @a rate will contain the playback rate. For negative
+   * rates, playback will actually happen from @a stop_value to @a start_value.
+   *
+   * @param rate The rate of the segment.
+   * @param format The Gst::Format of the segment values (@a start_value and
+   * @a stop_value).
+   * @param start_value The start value.
+   * @param stop_value The stop value.
+   */
   void set(double rate, Format format, gint64 start_value, gint64 stop_value);
+
+  /** Parse a segment query answer.  See set() for an explanation of the
+   * function arguments.  Use the other parse() methods to parse individual
+   * values.
+   *
+   * @param rate The storage for the rate of the segment.
+   * @param format The storage for the Gst::Format of the values.
+   * @param start_value The storage for the start value.
+   * @param stop_value The storage for the stop value.
+   */
   void parse(double& rate, Format& format, gint64& start_value, gint64& stop_value);
+
+  /** Parse a segment query answer, returning the rate.  See set() for an
+   * explanation of the function arguments.  
+   * @return The rate of the segment.
+   */
+  double parse_rate();
+
+  /** Parse a segment query answer, returning the format.  See set() for an
+   * explanation of the function arguments.
+   * @return The Gst::Format of the start and stop values.
+   */
+  Format parse_format();
+
+  /** Parse a segment query answer, returning the start value.  See set() for
+   * an explanation of the function arguments.
+   * @return The start value.
+   */
+  gint64 parse_start();
+
+  /** Parse a segment query answer, returning the stop value.  See set() for
+   * an explanation of the function arguments.
+   * @return The stop value.
+   */
+  gint64 parse_stop();
+};
+
+/** A new buffering query object.  See create() for more details.
+ */
+class QueryBuffering : public Query
+{
+public:
+  explicit QueryBuffering(GstQuery* query);
+
+  /** Constructs a new query object for querying the buffering status of a
+   * stream.
+   * @param format The default Gst::Format for the new query.
+   * @return The new Gst::QueryBuffering.
+   */
+  static Glib::RefPtr<Query> create(Format format);
+
+  /** Set the percentage of buffered data. This is a value between 0 and 100.
+   * The @a busy indicator is true when the buffering is in progress.
+   * @param busy If buffering is busy.
+   * @param percent A buffering percent.
+   */
+  void set(bool busy, int percent);
+
+  /** Get the busy flag and percentage of the buffered data. The percent is a
+   * value between 0 and 100.  The busy indicator is true when the buffering
+   * is in progress.  Use the other parse() methods to parse individual
+   * values.
+   * @param busy The location to store the buffering busy flag.
+   * @param percent The location to store the buffering percent.
+   */
+  void parse(bool& busy, int& percent);
+
+  /** Get the busy flag of the buffered data. The busy indicator is true when
+   * the buffering is in progress.
+   * @return The buffering busy flag.
+   */
+  bool parse_busy();
+
+  /** Get the percentage of the buffered data. The percent is a value between
+   * 0 and 100.
+   * @return The buffering percent.
+   */
+  int parse_percent();
+
+  /** Configures the buffering stats values in query.
+   * @param mode A buffering mode.
+   * @param avg_in The average input rate.
+   * @param avg_out The average output rate.
+   * @param buffering_left Amount of buffering time left.
+   */
+  void set(BufferingMode mode, int avg_in, int avg_out, gint64 buffering_left);
+
+  /** Extracts the buffering stats values from the query.  Use the other
+   * parse() methods to parse individual values.
+   * @param mode The location to store the buffering mode.
+   * @param avg_in The location to store the average input rate.
+   * @param avg_out The location to store the average output rate.
+   * @param buffering_left The location to store the amount of buffering time
+   * left.
+   */
+  void parse(BufferingMode& mode, int& avg_in, int& avg_out, gint64 buffering_left);
+
+  /** Extracts the buffering mode from the query.
+   * @return The the buffering mode.
+   */
+  BufferingMode parse_mode();
+
+  /** Extracts the average input rate from the query.
+   * @return The average input rate.
+   */
+  int parse_input_rate();
+
+  /** Extracts the average output rate from the query.
+   * @return The average output rate.
+   */
+  int parse_output_rate();
+
+  /** Extracts the buffering time left from the query.
+   * @return The the amount of buffering time left.
+   */
+  gint64 parse_time_left();
+
+  /** Set the available query result fields in query.
+   * @param format The format to set for the start and stop values.
+   * @param start The start to set.
+   * @param stop The stop to set.
+   * @param estimated_total Estimated total amount of download time.
+   */
+  void set(Format format, gint64 start, gint64 stop, gint64 estimated_total);
+
+  /** Parse the query, writing the format into format, and other
+   * results into the passed parameters.  Use the other parse() methods to
+   * parse individual values.
+   * @param format The location to store the format.
+   * @param start The location to store the start.
+   * @param stop The location to store the stop.
+   * @param estimated_total The location to store the estimated total amount
+   * of download time.
+   */
+  void parse(Format& format, gint64& start, gint64& stop, gint64& estimated_total);
+
+  /** Parse the query, returning the format.
+   * @return The format.
+   */
+  Format parse_format();
+
+  /** Parse the query, returning the start range value.
+   * @return The start value.
+   */
+  gint64 parse_start();
+
+  /** Parse the query, returning the stop range value.
+   * @return The stop value.
+   */
+  gint64 parse_stop();
+
+  /** Parse the query, returning the estimated total amount of download time.
+   * @return The estimated total amount of download time.
+   */
+  gint64 parse_total_time();
 };
 
 } //namespace Gst

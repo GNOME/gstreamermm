@@ -234,7 +234,6 @@ void PlayerWindow::on_button_forward()
 {
   static const gint64 skip_amount = Gst::SECOND * 3;
 
-  gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;
 
   Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
@@ -244,7 +243,7 @@ void PlayerWindow::on_button_forward()
     Glib::RefPtr<Gst::QueryPosition> posQuery =
       Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
 
-    posQuery->parse(fmt, pos);
+    gint64 pos = posQuery->parse();
 
     const gint64 new_pos =
       ((pos + skip_amount) < m_duration) ? (pos + skip_amount) : m_duration;

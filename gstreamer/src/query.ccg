@@ -79,6 +79,18 @@ bool get_details(QueryType type, QueryTypeDefinition &def)
   return true;
 }
 
+QueryApplication::QueryApplication(GstQuery* castitem) :
+Query(castitem)
+{
+}
+
+Glib::RefPtr<Query> QueryApplication::create(QueryType type, Structure& structure)
+{
+  GstQuery* query = gst_query_new_application(GstQueryType(type),
+    structure.gobj()); 
+  return Gst::Query::wrap(query);
+}
+
 QueryConvert::QueryConvert(GstQuery* castitem) :
 Query(castitem)
 {
@@ -96,14 +108,42 @@ void QueryConvert::set(Format src_format, gint64 src_value, Format dest_format, 
   gst_query_set_convert(gobj(), GstFormat(src_format), src_value, GstFormat(dest_format), dest_value);
 }
 
+void QueryConvert::parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value)
+{
+  gst_query_parse_convert(gobj(), (GstFormat*)(&src_format), &src_value, (GstFormat*)(&dest_format), &dest_value);
+}
+
 void QueryConvert::parse(Format& dest_format, gint64& dest_value)
 {
   gst_query_parse_convert(gobj(), NULL, NULL, (GstFormat*)(&dest_format), &dest_value);
 }
 
-void QueryConvert::parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value)
+Format QueryConvert::parse_src_format()
 {
-  gst_query_parse_convert(gobj(), (GstFormat*)(&src_format), &src_value, (GstFormat*)(&dest_format), &dest_value);
+  Format src_format;
+  gst_query_parse_convert(gobj(), (GstFormat*)(&src_format), NULL, NULL, NULL);
+  return src_format;
+}
+
+gint64 QueryConvert::parse_src_value()
+{
+  gint64 src_value;
+  gst_query_parse_convert(gobj(), NULL, &src_value, NULL, NULL);
+  return src_value;
+}
+
+Format QueryConvert::parse_dest_format()
+{
+  Format dest_format;
+  gst_query_parse_convert(gobj(), NULL, NULL, (GstFormat*)(&dest_format), NULL);
+  return dest_format;
+}
+
+gint64 QueryConvert::parse_dest_value()
+{
+  gint64 dest_value;
+  gst_query_parse_convert(gobj(), NULL, NULL, NULL, &dest_value);
+  return dest_value;
 }
 
 QueryPosition::QueryPosition(GstQuery* castitem) :
@@ -127,6 +167,20 @@ void QueryPosition::parse(Format& format, gint64& position)
   gst_query_parse_position(gobj(), (GstFormat*)(&format), &position);
 }
 
+gint64 QueryPosition::parse()
+{
+  gint64 position;
+  gst_query_parse_position(gobj(), NULL, &position);
+  return position;
+}
+
+Format QueryPosition::parse_format()
+{
+  Format format;
+  gst_query_parse_position(gobj(), (GstFormat*)(&format), NULL);
+  return format;
+}
+
 QueryDuration::QueryDuration(GstQuery* castitem) :
 Query(castitem)
 {
@@ -146,6 +200,20 @@ void QueryDuration::set(Format format, gint64 duration)
 void QueryDuration::parse(Format& format, gint64& duration)
 {
   gst_query_parse_duration(gobj(), (GstFormat*)(&format), &duration);
+}
+
+gint64 QueryDuration::parse()
+{
+  gint64 duration;
+  gst_query_parse_duration(gobj(), NULL, &duration);
+  return duration;
+}
+
+Format QueryDuration::parse_format()
+{
+  Format format;
+  gst_query_parse_duration(gobj(), (GstFormat*)(&format), NULL);
+  return format;
 }
 
 QueryLatency::QueryLatency(GstQuery* castitem) :
@@ -171,6 +239,27 @@ void QueryLatency::parse(bool& live, ClockTime& min_latency, ClockTime& max_late
   live = glive;
 }
 
+bool QueryLatency::parse_live()
+{
+  gboolean glive;
+  gst_query_parse_latency(gobj(), &glive, NULL, NULL);
+  return glive;
+}
+
+ClockTime QueryLatency::parse_min()
+{
+  ClockTime min;
+  gst_query_parse_latency(gobj(), NULL, (ClockTime*)(&min), NULL);
+  return min;
+}
+
+ClockTime QueryLatency::parse_max()
+{
+  ClockTime max;
+  gst_query_parse_latency(gobj(), NULL, NULL, (ClockTime*)(&max));
+  return max;
+}
+
 QuerySeeking::QuerySeeking(GstQuery* castitem) :
 Query(castitem)
 {
@@ -194,6 +283,34 @@ void QuerySeeking::parse(Format& format, bool& seekable, gint64& segment_start, 
   seekable = gseekable;
 }
 
+Format QuerySeeking::parse_format()
+{
+  Format format;
+  gst_query_parse_seeking(gobj(), (GstFormat*)(&format), NULL, NULL, NULL);
+  return format;
+}
+
+bool QuerySeeking::parse_seekable()
+{
+  gboolean gseekable;
+  gst_query_parse_seeking(gobj(), NULL, &gseekable, NULL, NULL);
+  return gseekable;
+}
+
+gint64 QuerySeeking::parse_start()
+{
+  gint64 start;
+  gst_query_parse_seeking(gobj(), NULL, NULL, &start, NULL);
+  return start;
+}
+
+gint64 QuerySeeking::parse_end()
+{
+  gint64 end;
+  gst_query_parse_seeking(gobj(), NULL, NULL,NULL, &end);
+  return end;
+}
+
 QueryFormats::QueryFormats(GstQuery* castitem) :
 Query(castitem)
 {
@@ -205,19 +322,28 @@ Glib::RefPtr<Query> QueryFormats::create()
   return Gst::Query::wrap(query);
 }
 
-void QueryFormats::set(int n_formats, const va_list& varargs)
+void QueryFormats::set(const Glib::ArrayHandle<Format>& formats)
 {
-  gst_query_set_formats(gobj(), n_formats, const_cast<va_list&>(varargs));
+  gst_query_set_formatsv(gobj(), formats.size(), (GstFormat*)(formats.data()));
 }
 
-void QueryFormats::parse(guint& n_formats)
+void QueryFormats::set(int n_formats, const Glib::ArrayHandle<Format>& formats)
 {
+  gst_query_set_formatsv(gobj(), n_formats, (GstFormat*)(formats.data()));
+}
+
+guint QueryFormats::parse_length()
+{
+  guint n_formats;
   gst_query_parse_formats_length(gobj(), &n_formats);
+  return n_formats;
 }
 
-void QueryFormats::parse(guint nth, Format& format)
+Format QueryFormats::parse(guint nth)
 {
+  Format format;
   gst_query_parse_formats_nth(gobj(), nth, (GstFormat*)(&format));
+  return format;
 }
 
 QuerySegment::QuerySegment(GstQuery* castitem) :
@@ -239,6 +365,153 @@ void QuerySegment::set(double rate, Format format, gint64 start_value, gint64 st
 void QuerySegment::parse(double& rate, Format& format, gint64& start_value, gint64& stop_value)
 {
   gst_query_parse_segment(gobj(), &rate, (GstFormat*)(&format), &start_value, &stop_value);
+}
+
+double QuerySegment::parse_rate()
+{
+  double rate;
+  gst_query_parse_segment(gobj(), &rate, NULL, NULL, NULL);
+  return rate;
+}
+
+Format QuerySegment::parse_format()
+{
+  Format format;
+  gst_query_parse_segment(gobj(), NULL, (GstFormat*)(&format), NULL, NULL);
+  return format;
+}
+
+gint64 QuerySegment::parse_start()
+{
+  gint64 start;
+  gst_query_parse_segment(gobj(), NULL, NULL, &start, NULL);
+  return start;
+}
+
+gint64 QuerySegment::parse_stop()
+{
+  gint64 stop;
+  gst_query_parse_segment(gobj(), NULL, NULL,NULL, &stop);
+  return stop;
+}
+
+QueryBuffering::QueryBuffering(GstQuery* castitem) :
+Query(castitem)
+{
+}
+
+Glib::RefPtr<Query> QueryBuffering::create(Format format)
+{
+  GstQuery* query = gst_query_new_buffering(GstFormat(format));
+  return Gst::Query::wrap(query);
+}
+
+void QueryBuffering::set(bool busy, int percent)
+{
+  gst_query_set_buffering_percent(gobj(), busy, percent);
+}
+
+void QueryBuffering::parse(bool& busy, int& percent)
+{
+  gboolean gbusy;
+  gst_query_parse_buffering_percent(gobj(), &gbusy, &percent);
+  busy = gbusy;
+}
+
+bool QueryBuffering::parse_busy()
+{
+  gboolean gbusy;
+  gst_query_parse_buffering_percent(gobj(), &gbusy, NULL);
+  return gbusy;
+}
+
+int QueryBuffering::parse_percent()
+{
+  int percent;
+  gst_query_parse_buffering_percent(gobj(), NULL, &percent);
+  return percent;
+}
+
+void QueryBuffering::set(BufferingMode mode, int avg_in, int avg_out, gint64 buffering_left)
+{
+  gst_query_set_buffering_stats(gobj(), (GstBufferingMode)(mode), avg_in,
+    avg_out, buffering_left);
+}
+
+void QueryBuffering::parse(BufferingMode& mode, int& avg_in, int& avg_out, gint64 buffering_left)
+{
+  gst_query_parse_buffering_stats(gobj(), (GstBufferingMode*)(&mode), &avg_in,
+    &avg_out, &buffering_left);
+}
+
+BufferingMode QueryBuffering::parse_mode()
+{
+  BufferingMode mode;
+  gst_query_parse_buffering_stats(gobj(), (GstBufferingMode*)(&mode), NULL,
+    NULL, NULL);
+  return mode;
+}
+
+int QueryBuffering::parse_input_rate()
+{
+  int avg_in;
+  gst_query_parse_buffering_stats(gobj(), NULL, &avg_in, NULL, NULL);
+  return avg_in;
+}
+
+int QueryBuffering::parse_output_rate()
+{
+  int avg_out;
+  gst_query_parse_buffering_stats(gobj(), NULL, NULL, &avg_out, NULL);
+  return avg_out;
+}
+
+gint64 QueryBuffering::parse_time_left()
+{
+  gint64 buffering_left;
+  gst_query_parse_buffering_stats(gobj(), NULL, NULL, NULL, &buffering_left);
+  return buffering_left;
+}
+
+void QueryBuffering::set(Format format, gint64 start, gint64 stop, gint64 estimated_total)
+{
+  gst_query_set_buffering_range(gobj(), (GstFormat)(format), start, stop,
+    estimated_total);
+}
+
+void QueryBuffering::parse(Format& format, gint64& start, gint64& stop, gint64& estimated_total)
+{
+  gst_query_parse_buffering_range(gobj(), (GstFormat*)(&format), &start,
+    &stop, &estimated_total);
+}
+
+Format QueryBuffering::parse_format()
+{
+  Format format;
+  gst_query_parse_buffering_range(gobj(), (GstFormat*)(&format), NULL, NULL,
+    NULL);
+  return format;
+}
+
+gint64 QueryBuffering::parse_start()
+{
+  gint64 start;
+  gst_query_parse_buffering_range(gobj(), NULL, &start, NULL, NULL);
+  return start;
+}
+
+gint64 QueryBuffering::parse_stop()
+{
+  gint64 stop;
+  gst_query_parse_buffering_range(gobj(), NULL, NULL, &stop, NULL);
+  return stop;
+}
+
+gint64 QueryBuffering::parse_total_time()
+{
+  gint64 estimated_total;
+  gst_query_parse_buffering_range(gobj(), NULL, NULL, NULL, &estimated_total);
+  return estimated_total;
 }
 
 Glib::RefPtr<Query> Query::wrap(GstQuery* query, bool take_copy) {
@@ -270,8 +543,16 @@ Glib::RefPtr<Query> Query::wrap(GstQuery* query, bool take_copy) {
     case GST_QUERY_FORMATS:
       result = Glib::RefPtr<Query>( new Gst::QueryFormats(query) );
       break;
-    default:
+    case GST_QUERY_BUFFERING:
+      result = Glib::RefPtr<Query>( new Gst::QueryBuffering(query) );
+      break;
+    case GST_QUERY_NONE:
+    case GST_QUERY_JITTER:
       result = Gst::wrap(query, false);
+      break;
+	/* The rest of the query types are custom ones */
+    default:
+      result = Glib::RefPtr<Query>( new Gst::QueryApplication(query) );
   }
 
   if(result && take_copy)
