@@ -176,9 +176,11 @@ _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
 _CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`($3).gobj()')
 
 #String Conversions
-_CONVERSION(`const std::string&',`const guchar*',`(const guchar*) ($3.c_str())')
+_CONVERSION(`const std::string&',`const guchar*',`(($2)($3).c_str())')
 _CONVERSION(`gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 _CONVERSION(`const gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+_CONVERSION(`Glib::ustring&',`const guchar*', (($2)($3).c_str()))
 
 #libxml++ Conversions
 _CONVERSION(`xmlpp::Node*',`xmlNodePtr',`($3)->cobj()')
+_CONVERSION(`xmlpp::Document*',`xmlDocPtr',`($3)->cobj()')

@@ -21,6 +21,7 @@
 
 #include <gst/gstxml.h>
 #include <gstreamermm/object.h>
+#include <libxml++/document.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -29,6 +30,15 @@ namespace Gst
 
 class Element;
 
+/** Gst::XML — XML save/restore operations of pipelines.
+ * GStreamer pipelines can be saved to xml files using write_to_stream(). They
+ * can be loaded back using parse_doc() / parse_file() / parse_memory().
+ * Additionally one can load saved pipelines into the gst-editor to inspect
+ * the graph.
+ *
+ * Gst::Element implementations need to override Gst::Object::save_thyself()
+ * and Gst::Object::restore_thyself().
+ */
 class XML : public Object
 {
   _CLASS_GOBJECT(XML, GstXML, GST_XML, Object, GstObject)
@@ -39,8 +49,22 @@ protected:
 public:
   _WRAP_CREATE()
 
-  _WRAP_METHOD(bool parse_doc(xmlDocPtr doc, const std::string& root), gst_xml_parse_doc)
-  _WRAP_METHOD(bool parse_file(const std::string& filename, const std::string& root), gst_xml_parse_file)
+  /** Converts the given element into an XML presentation.
+   * @param element The element to write out.
+   * @return A pointer to an XML document.
+   */
+  static xmlDocPtr write(const Glib::RefPtr<Element>& element);
+
+  /** Converts the given element into XML and writes the formatted XML to an
+   * open output stream.
+   *
+   * @param element The element to write out.
+   * @param out an open std::ostream, like std::cout.
+   */
+  static void write_to_stream(const Glib::RefPtr<Element>& element, std::ostream& out);
+
+  _WRAP_METHOD(bool parse_doc(xmlpp::Document* doc, Glib::ustring& root), gst_xml_parse_doc)
+  _WRAP_METHOD(bool parse_file(const std::string& filename, const Glib::ustring& root), gst_xml_parse_file)
 
   /** Fills the Gst::XML object with the corresponding elements from an in
    * memory XML buffer.
@@ -49,11 +73,11 @@ public:
    * @param root The name of the root objects to build.
    * @return true on success.
    */
-  bool parse_memory(const std::string& buffer, const std::string& root);
+  bool parse_memory(const std::string& buffer, const Glib::ustring& root);
 
-  //Note: gst_xml_get_element() returns a reference.
-  _WRAP_METHOD(Glib::RefPtr<Element> get_element(const std::string& name), gst_xml_get_element)
-  _WRAP_METHOD(Glib::RefPtr<const Element> get_element(const std::string& name) const, gst_xml_get_element, constversion)
+  //Note: gst_xml_get_element() returns a reference (GstElement*).
+  _WRAP_METHOD(Glib::RefPtr<Element> get_element(const Glib::ustring& name), gst_xml_get_element)
+  _WRAP_METHOD(Glib::RefPtr<const Element> get_element(const Glib::ustring& name) const, gst_xml_get_element, constversion)
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Element> >',`$2($3, Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Element> > get_topelements(), gst_xml_get_topelements)
@@ -61,14 +85,13 @@ public:
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Element> >',`$2($3, Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Element> > get_topelements() const, gst_xml_get_topelements)
 
+  _WRAP_METHOD(static Glib::RefPtr<Element> make_element(xmlpp::Node* curr, const Glib::RefPtr<Gst::Object>& parent), gst_xml_make_element)
+
   _IGNORE(gst_xml_parse_memory)
 
 #m4 _CONVERSION(`GstObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void object_loaded(const Glib::RefPtr<Gst::Object>& object, xmlNode* xml_node), "object-loaded")
 };
 
-xmlDocPtr write_xml(const Glib::RefPtr<Element>& element);
-int write_xml_file(const Glib::RefPtr<Element>& element, const std::string& filename);
-Glib::RefPtr<Element> make_element(const xmlNodePtr& xml_node, const Glib::RefPtr<Object>& parent);
 
 } //namespace Gst

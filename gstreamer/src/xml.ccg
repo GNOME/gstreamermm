@@ -19,10 +19,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <gst/gstxml.h>
 #include <gstreamermm/element.h>
 
@@ -32,31 +28,26 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace Gst
 {
 
-bool XML::parse_memory(const std::string& buffer, const std::string& root)
+bool XML::parse_memory(const std::string& buffer, const Glib::ustring& root)
 {
   return gst_xml_parse_memory(this->gobj(),(guchar*)(buffer.c_str()), buffer.size(), root.c_str());
 }
 
-xmlDocPtr write_xml(const Glib::RefPtr<Element>& element)
+xmlDocPtr XML::write(const Glib::RefPtr<Element>& element)
 {
   return gst_xml_write(element->gobj());
 }
 
-int write_xml_file(const Glib::RefPtr<Element>& element, const std::string& filename)
+void XML::write_to_stream(const Glib::RefPtr<Element>& element, std::ostream& out)
 {
-  int file = creat(filename.c_str(), O_EXCL);
-  int result = gst_xml_write_file(element->gobj(),(FILE*) file);
-  int errsv = errno;
-  close(file);
-  if(result == -1)
-    throw Glib::FileError(Glib::FileError::Code(errsv), "failed to write xml file: '" + filename + "'");
-  else
-    return result;
-}
+  xmlDocPtr xmlDoc = write(element);
+  xmlpp::Node rootNode(xmlDocGetRootElement(xmlDoc));
 
-Glib::RefPtr<Element> make_element(const xmlNodePtr& xml_node, const Glib::RefPtr<Object>& parent)
-{
-  return Glib::wrap(gst_xml_make_element(xml_node, parent->gobj()));
+  xmlpp::Document doc;
+  doc.create_root_node_by_import(&rootNode);
+  doc.write_to_stream_formatted(out);
+
+  xmlFreeDoc(xmlDoc);
 }
 
 } //namespace Gst

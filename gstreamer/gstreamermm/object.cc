@@ -128,6 +128,11 @@ bool Object::set_name(const Glib::ustring& name)
   return gst_object_set_name(gobj(), name.c_str());
 }
 
+bool Object::set_name()
+{
+  return gst_object_set_name(gobj(), NULL);
+}
+
 Glib::ustring Object::get_name() const
 {
   return Glib::convert_return_gchar_ptr_to_ustring(gst_object_get_name(const_cast<GstObject*>(gobj())));
@@ -161,6 +166,19 @@ Glib::ustring Object::get_name_prefix() const
 void Object::set_name_prefix(const Glib::ustring& prefix)
 {
   gst_object_set_name_prefix(gobj(), prefix.c_str()); 
+}
+
+xmlpp::Node* Object::save_thyself(xmlpp::Node* parent) const
+{
+  gst_object_save_thyself(const_cast<GstObject*>(gobj()), parent->cobj());
+
+  // gst_object_save_thyself() returns parent node so do so here also.
+  return parent;
+}
+
+void Object::restore_thyself(xmlpp::Node* self)
+{
+  gst_object_restore_thyself(gobj(), self->cobj());
 }
 
 #ifdef GLIBMM_PROPERTIES_ENABLED
