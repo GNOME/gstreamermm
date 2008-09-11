@@ -42,12 +42,23 @@ Glib::QueryQuark get_quark(EventType t)
 
 } //namespace Enums
 
+Glib::RefPtr<Event> Event::copy() const
+{
+  return Gst::wrap(gst_event_copy(gobj()));
+}
+
 Structure Event::get_structure() const
 {
   static Structure structure;
 
   GstStructure* gst_structure = const_cast<GstStructure*>(gst_event_get_structure(const_cast<GstEvent*>(gobj())));
   return Structure(gst_structure, true /* take_copy */);
+}
+
+Glib::RefPtr<Event> Event::create_writable()
+{
+  return
+   Gst::wrap(GST_EVENT(gst_mini_object_make_writable(GST_MINI_OBJECT(gobj()))));
 }
 
 bool Event::is_downstream() const

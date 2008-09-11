@@ -64,11 +64,21 @@ protected:
  _CLASS_GSTMINIOBJECT(Message, GstMessage, GST_MESSAGE, Gst::MiniObject, GstMiniObject)
  _IGNORE(gst_message_ref, gst_message_unref)
 public:
+  /** Creates a copy of the message.  MT safe.
+   * @return A copy of the message.
+   */
+   Glib::RefPtr<Message> copy() const;
 
   /** Get the structure of a message.
    * @return The Gst::Structure of the message.
    */
   Structure get_structure() const;
+
+  /** Checks if a message is writable. If not, a writable copy is made and
+   * returned.
+   * @return A Gst::Message (possibly the same pointer) that is writable.
+   */
+   Glib::RefPtr<Message> create_writable();
 
 public:
   /** Wrap a GstMessage* in a C++ instance, creating an instance of a
@@ -78,8 +88,17 @@ public:
    */
   static Glib::RefPtr<Message> wrap(GstMessage* message, bool take_copy=false);
 
+  /** Get the GstMessageType of message.
+   */
   _MEMBER_GET(message_type, type, MessageType, GstMessageType)
+
+  /** Get the timestamp of message. This is the timestamp when the message was
+   * created.
+   */
   _MEMBER_GET(timestamp, timestamp, ClockTime, guint64)
+
+  /** Get the object that posted the message.
+   */
   _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
 };
 

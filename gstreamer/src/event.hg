@@ -123,10 +123,21 @@ public:
    */
   static Glib::RefPtr<Event> wrap(GstEvent* event, bool take_copy=false);
 
+  /** Copy the event using the event specific copy function.
+   * @return The Gst::Event copy.
+   */
+  Glib::RefPtr<Event> copy() const;
+
   /** Get the structure of an event.
    * @return The Gst::Structure of the event.
    */
   Structure get_structure() const;
+
+  /** Checks if an event is writable.  If not, a writable copy is made and
+   * returned.
+   * @return A Gst::Event (possibly the same pointer) that is writable. 
+   */
+  Glib::RefPtr<Event> create_writable();
 
   /** Check if an event can travel downstream.
    */

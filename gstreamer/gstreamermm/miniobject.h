@@ -55,13 +55,57 @@ public:
   //because it's just an equivalent for g_object_new(), 
   //which is just an equivalent for C++'s new(). 
 
-//private:
+//protected:
   // noncopyable
+  /** A copy constructor.  Please note that copying is actually only supported
+   * in sub-classes that define their own custom copy function in the C API
+   * such as Gst::Event, Gst::Buffer, etc. otherwise the copy is not
+   * successful and a warning is issued.
+   */
   MiniObject(const MiniObject&);
+
+  /** Assignment operator.  Please note that copying is actually only
+   * supported in sub-classes that define their own custom copy function in
+   * the C API such as Gst::Event, Gst::Buffer, etc. otherwise the copy
+   * is not successful and a warning is issued.
+   */
   MiniObject& operator=(const MiniObject&);
 
 public:
-  //Glib::RefPtr<Gst::MiniObject> copy();
+  /** Returns the entire set of flags for the mini-object.
+   * @return The Gst::MiniObject flags.
+   */
+  guint get_flags() const;
+
+  /** Checks to see if the given flag is set.
+
+   * @param flag The flag to check for.
+   */
+  bool flag_is_set(guint flag) const;
+
+  /** Sets the given bits.
+   * @param flag The flag to set, can by any number of bits in guint32. 
+   */
+  void flag_set(guint flag);
+
+  /** Unsets the given bits.
+   * @param flag The flag to unset, must be a single bit in guint32. 
+   */
+  void flag_unset(guint flag);
+
+  /** Creates a copy of the mini-object.  Please note that copying is
+   * supported only by sub-classes of Gst::MiniObject such as Gst::Event,
+   * Gst::Buffer, etc. that define their own custom copy function in the C API
+   * and not directly by Gst::MiniObject, a base class.  If used from only a
+   * Gst::MiniObject instance and not a sub-class instance the copy is not
+   * successful and a warning is issued.
+   *
+   * MT safe.
+   *
+   * @return A copy of the mini-object or warn if this object is only a
+   * Gst::MiniObject and not a sub-class that defines its own copy function.
+   */
+  Glib::RefPtr<Gst::MiniObject> copy() const;
 
   /** Checks if a mini-object is writable. A mini-object is writable if the
    * reference count is one and the Gst::MINI_OBJECT_FLAG_READONLY flag is not

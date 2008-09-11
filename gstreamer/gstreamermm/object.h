@@ -206,7 +206,7 @@ public:
 
   /** Saves object into the parent XML node.
    * @param parent The parent XML node to save object into.
-   * @return The new xmlpp::Node pointer with the saved object
+   * @return The new xmlpp::Node pointer with the saved object.
    */
   xmlpp::Node* save_thyself(xmlpp::Node* parent) const;
 

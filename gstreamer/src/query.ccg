@@ -59,6 +59,16 @@ Glib::QueryQuark get_quark(QueryType t)
 
 } //namespace Enums
 
+Glib::RefPtr<Query> Query::copy() const
+{
+  return Gst::wrap(gst_query_copy(gobj()));
+}
+
+Glib::RefPtr<Query> Query::create_writable()
+{
+  return Gst::wrap(gst_query_make_writable(gobj()));
+}
+
 Structure Query::get_structure() const
 {
   GstStructure* gst_structure = const_cast<GstStructure*>(gst_query_get_structure(const_cast<GstQuery*>(gobj())));

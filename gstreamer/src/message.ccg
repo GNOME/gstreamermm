@@ -42,12 +42,22 @@ Glib::QueryQuark get_quark(MessageType t)
 
 } //namespace Enums
 
+Glib::RefPtr<Message> Message::copy() const
+{
+  return Gst::wrap(gst_message_copy(gobj()));
+}
+
 Structure Message::get_structure() const
 {
   static Structure structure;
 
   GstStructure* gst_structure = const_cast<GstStructure*>(gst_message_get_structure(const_cast<GstMessage*>(gobj())));
   return Structure(gst_structure, true /* take_copy */);
+}
+
+Glib::RefPtr<Message> Message::create_writable()
+{
+  return Gst::wrap(gst_message_make_writable(gobj()));
 }
 
 MessageEos::MessageEos(GstMessage* castitem)

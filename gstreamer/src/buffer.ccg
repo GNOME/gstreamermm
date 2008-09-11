@@ -24,3 +24,18 @@
 #include <gst/gstenumtypes.h>
 
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
+
+namespace Gst
+{
+
+Glib::RefPtr<Buffer> Buffer::copy() const
+{
+  return Gst::wrap(gst_buffer_copy(gobj()));
+}
+
+Glib::RefPtr<Buffer> Buffer::create_writable()
+{
+  return Gst::wrap(gst_buffer_make_writable(gobj()));
+}
+
+} // namespace Gst
