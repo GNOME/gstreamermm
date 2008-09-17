@@ -85,8 +85,8 @@ public:
   ///Provides access to the underlying C GObject.
   const GstIterator*    cobj() const    { return cobject_; };
 
-  /** Frees the underlying C instance if a destroy value of true was used to
-   * wrap it.
+  /** Frees the underlying C instance if a take_ownership value of true was
+   * used to wrap it.
    */
   virtual ~IteratorBase();
 
@@ -103,17 +103,17 @@ protected:
 
   /** Constructs an IteratorBase from an underlying C object.
    * @param castitem The underlying C object.
-   * @param destroy Whether to destroy the underlying C object along with the
-   * wrapper.
+   * @param take_ownership Whether to take over the underlying C object.  If
+   * true, C object is freed when wrapper is destroyed.
    */
-  IteratorBase(GstIterator* castitem, bool destroy=true);
+  IteratorBase(GstIterator* castitem, bool take_ownership=true);
 
   /** Assignment operator.  It replaces the contents of the iterator with the
-   * contents of the new one freeing the underlying C object if a destroy value
-   * of true was used when wrapping it.  Please note that copying and assigning
-   * merely shares the underlying C object.  Operations on the copy are also
-   * performed in the underlying C object of the original and if the original
-   * is destroyed, the copy is invalid.
+   * contents of the new one freeing the underlying C object if a
+   * take_ownership value of true was used when wrapping it.  Please note that
+   * copying and assigning merely shares the underlying C object.  Operations
+   * on the copy are also performed in the underlying C object of the original
+   * and if the original is destroyed, the copy is invalid.
    */
   IteratorBase<CppType>& operator=(const IteratorBase<CppType>& other);
 
@@ -125,7 +125,7 @@ protected:
 private:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GstIterator* cobject_;    // The underlying  C object.
-  bool destroy;             // Whether to destroy C object with the wrapper.
+  bool take_ownership;      // Whether to destroy C object with the wrapper.
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 private:
@@ -147,13 +147,13 @@ public:
 
   /** Creates a Gst::IteratorBasic wrapper for a GstIterator object.  The
    * underlying @a castitem will be freed with the Gst::IteratorBasic
-   * destruction if a destroy value of true is given.
+   * destruction if a take_ownership value of true is given.
    *
    * @param castitem The C instance to wrap.
-   * @param destroy Whether to destroy the underlying C object with the
-   * wrapper.
+   * @param take_ownership Whether to take over the underlying C object.  If
+   * true, C object is freed when wrapper is destroyed.
    */
-  IteratorBasic(GstIterator* castitem, bool destroy=true);
+  IteratorBasic(GstIterator* castitem, bool take_ownership=true);
 
   /** Resynchronizes the iterator and moves the iterator to the first item.
    *
@@ -200,14 +200,14 @@ public:
   Iterator();
 
   /** Creates a Gst::Iterator wrapper for a GstIterator object.  The underlying
-   * @a castitem will be freed with the Gst::Iterator destruction if a destroy
-   * value of true is given.
+   * @a castitem will be freed with the Gst::Iterator destruction if a
+   * take_ownership value of true is given.
    *
    * @param castitem The C instance to wrap.
-   * @param destroy Whether to destroy the underlying C object with the
-   * wrapper.
+   * @param take_ownership Whether to take over the underlying C object.  If
+   * true, C object is freed when wrapper is destroyed.
    */
-  Iterator(GstIterator* castitem, bool destroy=true);
+  Iterator(GstIterator* castitem, bool take_ownership=true);
 
   /** Moves to the next iterator item.
    *
@@ -282,7 +282,7 @@ IteratorBase<CppType>::operator bool() const
 template<class CppType>
 IteratorBase<CppType>::IteratorBase()
 : cobject_(0),
-  destroy(true),
+  take_ownership(true),
   current(0),
   current_result(Gst::ITERATOR_OK)
 {}
@@ -290,15 +290,15 @@ IteratorBase<CppType>::IteratorBase()
 template<class CppType>
 IteratorBase<CppType>::IteratorBase(const IteratorBase<CppType>& other)
   : cobject_(const_cast<GstIterator*>(other.cobj())),
-    destroy((other.cobj()) ? false : true),
+    take_ownership((other.cobj()) ? false : true),
     current(other.current),
     current_result(other.current_result)
 {}
 
 template<class CppType>
-IteratorBase<CppType>::IteratorBase(GstIterator* castitem, bool destroy)
+IteratorBase<CppType>::IteratorBase(GstIterator* castitem, bool take_ownership)
 : cobject_(castitem),
-  destroy(destroy),
+  take_ownership(take_ownership),
   current(0),
   current_result(Gst::ITERATOR_OK)
 {}
@@ -318,9 +318,9 @@ void IteratorBase<CppType>::swap(IteratorBase<CppType>& other)
   cobject_ = other.cobject_;
   other.cobject_ = temp_obj;
 
-  const bool temp_destroy = destroy;
-  destroy = other.destroy;
-  other.destroy = temp_destroy;
+  const bool temp_take_ownership = take_ownership;
+  take_ownership = other.take_ownership;
+  other.take_ownership = temp_take_ownership;
 
   gpointer const temp_current = current;
   current = other.current;
@@ -335,7 +335,7 @@ void IteratorBase<CppType>::swap(IteratorBase<CppType>& other)
 template<class CppType>
 IteratorBase<CppType>::~IteratorBase()
 {
-  if (destroy && cobject_)
+  if (take_ownership && cobject_)
   {
     gst_iterator_free(cobject_);
     cobject_ = 0;
@@ -350,8 +350,8 @@ IteratorBasic<CppType>::IteratorBasic()
 {}
 
 template <class CppType>
-IteratorBasic<CppType>::IteratorBasic(GstIterator* castitem, bool destroy)
-  : IteratorBase<CppType>(castitem, destroy)
+IteratorBasic<CppType>::IteratorBasic(GstIterator* castitem, bool take_ownership)
+  : IteratorBase<CppType>(castitem, take_ownership)
 {}
 
 template<class CppType>
@@ -415,8 +415,8 @@ Iterator<CppType>::Iterator()
 {}
 
 template <class CppType>
-Iterator<CppType>::Iterator(GstIterator* castitem, bool destroy)
-  : IteratorBasic<CppType>(castitem, destroy)
+Iterator<CppType>::Iterator(GstIterator* castitem, bool take_ownership)
+  : IteratorBasic<CppType>(castitem, take_ownership)
 {}
 
 template <class CppType>
