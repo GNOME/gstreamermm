@@ -17,11 +17,21 @@ main(int argc, char* argv[])
     return -1;
   }
 
-  Glib::RefPtr<Gst::Caps> caps =
-          Gst::Caps::create_from_string("image/jpeg,framerate=2/1");
- 
-  // Verify that setting "caps" property compiles:
-  source->set_property("caps", caps);
+  Glib::RefPtr<Gst::Caps> caps;
+
+  source->get_property("caps", caps);
+
+  if (!caps)
+    std::cout << "`caps' property is null before setting property." <<
+      std::endl;
+
+  source->set_property("caps", Gst::Caps::create_from_string("image/jpeg,framerate=2/1"));
+
+  source->get_property("caps", caps);
+
+  if (caps)
+    std::cout << "`caps' property after setting and getting is '" <<
+      caps->to_string() << "'." << std::endl;
 
   return 0;
 }

@@ -205,10 +205,12 @@ namespace Glib
 {
 
 template <>
-class Value< Glib::RefPtr<Gst::Caps> > : public Value_Boxed<Gst::Caps>
+class Value< Glib::RefPtr<Gst::Caps> > : public ValueBase_Boxed
 {
 public:
-  void set(const Glib::RefPtr<Gst::Caps>& caps);
+  static GType value_type() { return Gst::Caps::get_type(); }
+  void set(const Glib::RefPtr<Gst::Caps>& caps) { set_boxed(caps->gobj()); }
+  Glib::RefPtr<Gst::Caps> get()                 { return Glib::RefPtr<Gst::Caps>(reinterpret_cast<Gst::Caps*>(get_boxed())); }
 };
 
 }
