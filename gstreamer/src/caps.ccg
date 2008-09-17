@@ -25,6 +25,11 @@
 namespace Gst
 {
 
+GType Caps::get_type()
+{
+  return gst_caps_get_type();
+}
+
 Glib::RefPtr<Caps> Caps::create_any()
 {
   return Glib::wrap(gst_caps_new_any());
@@ -113,3 +118,13 @@ xmlpp::Node* Caps::save_thyself(xmlpp::Node* parent) const
 }
 
 } //namespace Gst
+
+namespace Glib
+{
+
+void Value< Glib::RefPtr<Gst::Caps> >::set(const Glib::RefPtr<Gst::Caps>& caps)
+{
+  Value_Boxed<Gst::Caps>::set(*(caps.operator->()));
+}
+
+}

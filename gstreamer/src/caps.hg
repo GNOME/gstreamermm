@@ -63,7 +63,11 @@ class Caps
   _IGNORE(gst_caps_ref, gst_caps_unref)
 
 public:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  static GType get_type() G_GNUC_CONST;
+#endif
 
+public:
   /** Creates a new Gst::Caps that indicates that it is compatible with any
    * media format.
    *
@@ -87,7 +91,6 @@ public:
   static Glib::RefPtr<Caps> create(const Structure& first_struct);
 
   _WRAP_METHOD(static Glib::RefPtr<Caps> create_from_string(const Glib::ustring& string), gst_caps_from_string)
-
 
   _WRAP_METHOD(Glib::RefPtr<Caps> copy() const, gst_caps_copy)
   _WRAP_METHOD(Glib::RefPtr<Caps> copy_nth(guint nth) const, gst_caps_copy_nth)
@@ -138,10 +141,7 @@ public:
   template <class DataType>
   void set_simple(const Glib::ustring& name, const DataType& data);
 
-  _IGNORE(gst_caps_set_simple)
-
-  //This does not seem useful: _WRAP_METHOD(void set_simple_valist(char* field, const va_list& varargs), gst_caps_set_simple_valist)
-  _IGNORE(gst_caps_set_simple_valist)
+  _IGNORE(gst_caps_set_simple, gst_caps_set_simple_valist)
 
   _WRAP_METHOD(bool is_any() const, gst_caps_is_any)
   _WRAP_METHOD(bool empty() const, gst_caps_is_empty)
@@ -199,3 +199,17 @@ void Caps::set_simple(const Glib::ustring& name, const DataType& data)
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } //namespace Gst
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+namespace Glib
+{
+
+template <>
+class Value< Glib::RefPtr<Gst::Caps> > : public Value_Boxed<Gst::Caps>
+{
+public:
+  void set(const Glib::RefPtr<Gst::Caps>& caps);
+};
+
+}
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
