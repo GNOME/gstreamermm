@@ -47,14 +47,6 @@ Glib::RefPtr<Message> Message::copy() const
   return Gst::wrap(gst_message_copy(gobj()));
 }
 
-Structure Message::get_structure() const
-{
-  static Structure structure;
-
-  GstStructure* gst_structure = const_cast<GstStructure*>(gst_message_get_structure(const_cast<GstMessage*>(gobj())));
-  return Structure(gst_structure, true /* take_copy */);
-}
-
 Glib::RefPtr<Message> Message::create_writable()
 {
   return Gst::wrap(gst_message_make_writable(gobj()));
@@ -249,14 +241,14 @@ gint64 buffering_left)
     avg_out, buffering_left);
 }
 
-void MessageBuffering::get_stats(BufferingMode& mode, int& avg_in, int& avg_out,
-gint64& buffering_left)
+void MessageBuffering::parse_stats(BufferingMode& mode, int& avg_in,
+int& avg_out, gint64& buffering_left)
 {
   gst_message_parse_buffering_stats(gobj(), (GstBufferingMode*)(&mode),
     &avg_in, &avg_out, &buffering_left);
 }
 
-BufferingMode MessageBuffering::get_stats_buffering_mode()
+BufferingMode MessageBuffering::parse_stats_buffering_mode()
 {
   GstBufferingMode mode;
 
@@ -265,7 +257,7 @@ BufferingMode MessageBuffering::get_stats_buffering_mode()
   return (BufferingMode)(mode);
 }
 
-int MessageBuffering::get_stats_avg_in()
+int MessageBuffering::parse_stats_avg_in()
 {
   int avg_in;
 
@@ -273,7 +265,7 @@ int MessageBuffering::get_stats_avg_in()
   return avg_in;
 }
 
-int MessageBuffering::get_stats_avg_out()
+int MessageBuffering::parse_stats_avg_out()
 {
   int avg_out;
 
@@ -281,7 +273,7 @@ int MessageBuffering::get_stats_avg_out()
   return avg_out;
 }
 
-gint64 MessageBuffering::get_stats_buffering_left()
+gint64 MessageBuffering::parse_stats_buffering_left()
 {
   gint64 buffering_left;
 

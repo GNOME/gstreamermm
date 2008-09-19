@@ -115,6 +115,13 @@ protected:
   _CLASS_GSTMINIOBJECT(Query, GstQuery, GST_QUERY, Gst::MiniObject, GstMiniObject)
 
 public:
+  /** Wrap a GstQuery* in a C++ instance, creating an instance of a derived
+   * Gst::Query. Gst::wrap() would just create a Gst::Query (rather than a
+   * derived one) because the derived Gst::Query classes do not correspond
+   * to GType types in the GStreamer API.
+   */
+  static Glib::RefPtr<Query> wrap(GstQuery* query, bool take_copy=false);
+
   /** Copies the given query using the query copy function.
    * @return The Gst::Query copy.
    */
@@ -126,22 +133,11 @@ public:
     */
    Glib::RefPtr<Query> create_writable();
 
-  /** Get the structure of a query.
-   * @return The Structure of the query.
-   */
-  Structure get_structure() const;
+  _WRAP_METHOD(const Structure get_structure() const, gst_query_get_structure)
 
-public:
   /** Get the Gst::QueryType of the query.
    */
   _MEMBER_GET(query_type, type, QueryType, GstQueryType)
-
-  /** Wrap a GstQuery* in a C++ instance, creating an instance of a derived
-   * Gst::Query. Gst::wrap() would just create a Gst::Query (rather than a
-   * derived one) because the derived Gst::Query classes do not correspond
-   * to GType types in the GStreamer API.
-   */
-  static Glib::RefPtr<Query> wrap(GstQuery* query, bool take_copy=false);
 
   _WRAP_METHOD(static QueryType register_query_type(const Glib::ustring& nick, const Glib::ustring& description), gst_query_type_register)
   _WRAP_METHOD(static QueryType get_query_type(const Glib::ustring& nick), gst_query_type_get_by_nick)

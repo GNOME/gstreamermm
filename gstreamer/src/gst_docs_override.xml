@@ -51,4 +51,42 @@ iterated over are read only.
 </return>
 </function>
 
+<function name="gst_clock_id_wait">
+<description>
+Perform a blocking wait on the Gst::ClockID. 
+The Gst::ClockID should have been created with
+Gst::Clock::create_single_shot_id() or Gst::Clock::create_periodic_id()
+and should not have been unscheduled with a call to unschedule(). 
+
+If this function returns #GST_CLOCK_OK or #GST_CLOCK_EARLY,
+the @jitter argument will contain the difference
+against the clock and the time of the Gst::ClockID when this method was
+called.
+Positive values indicate how late the Gst::ClockID was relative to the clock
+(in which case this function will return #GST_CLOCK_EARLY). 
+Negative values indicate how much time was spent waiting on the clock 
+before this function returned.
+
+
+</description>
+<parameters>
+<parameter name="id">
+<parameter_description> The #GstClockID to wait on
+</parameter_description>
+</parameter>
+<parameter name="jitter">
+<parameter_description> A pointer that will contain the jitter.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the result of the blocking wait. #GST_CLOCK_EARLY will be returned
+if the current clock time is past the time of the Gst::ClockID, #GST_CLOCK_OK
+if Gst::ClockID was scheduled in time. #GST_CLOCK_UNSCHEDULED if Gst::ClockID
+was unscheduled with unschedule().
+
+MT safe.
+</return>
+</function>
+
+
 </root>

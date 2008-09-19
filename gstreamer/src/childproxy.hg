@@ -62,9 +62,7 @@ public:
    * needed.
    */
   Glib::RefPtr<ChildProxy> get_proxy_property(const Glib::ustring& name, Glib::ValueBase& value);
-
-  //This doesn't seem useful: void get_proxy_valist(const Glib::ustring& first_prop_name, va_list& var_args);
-  _IGNORE(gst_child_proxy_get_proxy_valist)
+  _IGNORE(gst_child_proxy_get_property, gst_child_proxy_get, gst_child_proxy_get_valist)
 
   /** Sets a single property using the Gst::ChildProxy mechanism.
    * @param name The property to get.
@@ -72,19 +70,19 @@ public:
    * @return This Gst::ChildProxy so more properties can be set.
    */
   Glib::RefPtr<ChildProxy> set_proxy_property(const Glib::ustring& name, const Glib::ValueBase& value);
-
-  //This doesn't seem useful: void set_proxy_valist(const Glib::ustring& first_prop_name, const va_list& var_args);
-  _IGNORE(gst_child_proxy_set_proxy_valist)
+  _IGNORE(gst_child_proxy_set_property, gst_child_proxy_set, gst_child_proxy_set_valist)
 
   /** Emits the "child-added" signal.
    * @param child The newly added child.
    */
   void child_added(const Glib::RefPtr<Gst::Object>& child);
+  _IGNORE(gst_child_proxy_child_added)
 
   /** Emits the "child-removed" signal.
    * @param child The newly added child.
    */
   void child_removed(const Glib::RefPtr<Gst::Object>& child);
+  _IGNORE(gst_child_proxy_child_removed)
 
 #m4 _CONVERSION(`GstObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap($3, true)')
 
@@ -103,9 +101,6 @@ public:
   /** virtual method to get the children count
    */
   _WRAP_VFUNC(guint get_children_count() const, "get_children_count")
-
-  _IGNORE(gst_child_proxy_get, gst_child_proxy_set)
 };
 
 } // namespace Gst
-

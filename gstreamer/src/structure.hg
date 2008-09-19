@@ -46,8 +46,9 @@ namespace Gst
 class Structure
 {
  _CLASS_BOXEDTYPE(Structure, GstStructure, NONE, gst_structure_copy, gst_structure_free)
-public:
+  _IGNORE(gst_structure_copy, gst_structure_free, gst_structure_set_parent_refcount)
 
+public:
   /** Creates a Structure with the given @a name.
    * You should then use set_field() to set field values.
    */
@@ -60,6 +61,7 @@ public:
    * could not be parsed.
    */
   static Structure create_from_string(const Glib::ustring& the_string);
+  _IGNORE(gst_structure_from_string)
 
   /** Use this to discover if the Structure is a valid object.
    */
@@ -76,6 +78,7 @@ public:
    * @param value The Value class in which to store the value.
    */
   void get_field(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
+  _IGNORE(gst_structure_id_get_value, gst_structure_get_value)
 
   /** Sets the field with name @a fieldname to value. If the field does not
    * exist, it is created. If the field exists, the previous value is replaced
@@ -90,6 +93,7 @@ public:
    * @param value The value to set the field to.
    */
   void set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value);
+  _IGNORE(gst_structure_id_set_value, gst_structure_set_value, gst_structure_id_set_valist, gst_structure_set_valist)
 
   /** Sets the field with name @a fieldname to the boolean @a value. If the
    * field does not exist, it is created. If the field exists, the previous
@@ -261,6 +265,7 @@ public:
    * @param fieldname The name of the field to remove.
    */
   void remove_field(const Glib::ustring& fieldname);
+  _IGNORE(gst_structure_remove_field, gst_structure_remove_fields, gst_structure_remove_fields_valist)
 
   _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
   _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
@@ -282,6 +287,7 @@ public:
    * false otherwise.
    */
   bool foreach(const SlotForeach& slot);
+  _IGNORE(gst_structure_foreach)
 
   _WRAP_METHOD(int size() const, gst_structure_n_fields)
   _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname) const, gst_structure_has_field)
@@ -490,39 +496,27 @@ public:
    * false otherwise.
    */
   bool map_in_place(const SlotMap& slot);
+  _IGNORE(gst_structure_map_in_place)
 
   _WRAP_METHOD(Glib::ustring get_nth_field_name(guint index) const, gst_structure_nth_field_name)
   _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
+  _WRAP_METHOD(bool fixate_field_nearest_int(const Glib::ustring& name, int target), gst_structure_fixate_field_nearest_int)
+  _WRAP_METHOD(bool fixate_field_nearest_double(const Glib::ustring& name, double target), gst_structure_fixate_field_nearest_double)
 
+  /** Fixates a Gst::Structure by changing the given field to the nearest
+   * fraction to given Gst::Fraction that is a subset of the existing field.
+   *
+   * @param field_name A field in structure.
+   * @param target The target value of the fixation.
+   * @return true If the structure could be fixated.
+   */
+  bool fixate_nearest_fraction(const Glib::ustring& name, const Gst::Fraction& target);
+  _IGNORE(gst_structure_fixate_field_nearest_fraction)
 
-  _IGNORE(
-      gst_structure_get_date,
-      gst_structure_id_set,
-      gst_structure_id_get_value,
-      gst_structure_remove_fields_valist,
-      gst_structure_fixate_field_boolean,
-      gst_structure_id_set_value,
-      gst_structure_remove_all_fields,
-      gst_structure_remove_field,
-      gst_structure_has_field_typed,
-      gst_structure_fixate_field_nearest_int,
-      gst_structure_fixate_field_nearest_double,
-      gst_structure_remove_fields,
-      gst_structure_copy,
-      gst_structure_id_set_valist,
-      gst_structure_get_field_type,
-      gst_structure_map_in_place,
-      gst_structure_get_value,
-      gst_structure_free,
-      gst_structure_n_fields,
-      gst_structure_has_field,
-      gst_structure_set,
-      gst_structure_set_value,
-      gst_structure_foreach,
-      gst_structure_fixate_field_nearest_fraction,
-      gst_structure_set_valist,
-      gst_structure_set_parent_refcount)
+  _WRAP_METHOD(bool fixate_field_boolean(const Glib::ustring& name, bool target), gst_structure_fixate_field_boolean)
 
+  //Variable argument functions are ignored.
+  _IGNORE(gst_structure_set, gst_structure_id_set)
 };
 
 } //namespace Gst

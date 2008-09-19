@@ -78,8 +78,17 @@ public:
   typedef sigc::slot< bool, const Glib::RefPtr<Clock>&, ClockTime, const Glib::RefPtr<ClockID>& > SlotClock;
 
   _WRAP_METHOD(ClockTime get_time() const, gst_clock_id_get_time)
-
   _WRAP_METHOD(ClockReturn wait(ClockTimeDiff& jitter), gst_clock_id_wait)
+
+  /** Perform a blocking wait without requiring a jitter argument.
+   * Gst::ClockID should have been created with
+   * Gst::Clock::create_single_shot_id() or Gst::Clock::create_periodic_id()
+   * and should not have been unscheduled with a call to unschedule().
+   * @return The result of the blocking wait. Gst::CLOCK_EARLY will be returned
+   * if the current clock time is past the time of Gst::ClockID, Gst::CLOCK_OK
+   * if Gst::ClockID was scheduled in time. Gst::CLOCK_UNSCHEDULED if
+   * Gst::ClockID was unscheduled with unschedule().
+   */
   ClockReturn wait();
 
   /** Register a slot on the given Gst::ClockID id with the given slot. When
@@ -91,6 +100,7 @@ public:
    * @return The result of the non blocking wait. MT safe. 
    */
   ClockReturn wait_async(const SlotClock& slot);
+  _IGNORE(gst_clock_id_wait_async)
 
   _WRAP_METHOD(void unschedule(), gst_clock_id_unschedule)
 };
@@ -169,7 +179,8 @@ guint get_fractional_seconds(ClockTime time);
  * until it is unscheduled. To schedule a sync periodic callback,
  * Gst::ClockID::wait() should be called repeadedly.
  *
- * The async callbacks can happen from any thread, either provided by the core or from a streaming thread. The application should be prepared for this.
+ * The async callbacks can happen from any thread, either provided by the core
+ * or from a streaming thread. The application should be prepared for this.
  *
  * A Gst::ClockID that has been unscheduled cannot be used again for any wait
  * operation, a new Gst::ClockID should be created.
@@ -230,7 +241,6 @@ public:
   _WRAP_METHOD(void get_calibration(ClockTime& internal, ClockTime& external, ClockTime& rate_num, ClockTime& rate_denom), gst_clock_get_calibration)
   _WRAP_METHOD(void set_calibration(ClockTime internal, ClockTime external, ClockTime rate_num, ClockTime rate_denom), gst_clock_set_calibration)
   
-
   _WRAP_PROPERTY("stats", bool)
   _WRAP_PROPERTY("timeout", guint64)
   _WRAP_PROPERTY("window-size", int)

@@ -128,10 +128,8 @@ public:
    */
   Glib::RefPtr<Event> copy() const;
 
-  /** Get the structure of an event.
-   * @return The Gst::Structure of the event.
-   */
-  Structure get_structure() const;
+  _WRAP_METHOD(const Structure get_structure() const, gst_event_get_structure)
+  _WRAP_METHOD(bool has_name(const Glib::ustring& name), gst_event_has_name)
 
   /** Checks if an event is writable.  If not, a writable copy is made and
    * returned.
@@ -199,6 +197,7 @@ public:
    * @param async A pointer to store the async-flag in.
    */
   void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async);
+  _IGNORE(gst_event_parse_buffer_size)
 };
 
 /** An end of stream event. See create() for more details.
@@ -301,6 +300,7 @@ public:
    * @param latency A pointer to store the latency in. 
    */
   void parse(ClockTime& latency);
+  _IGNORE(gst_event_parse_latency)
 };
 
 /** A Navigation event.  See create() for more details.
@@ -394,6 +394,7 @@ public:
    * Since 0.10.6 
    */
   void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate);
+  _IGNORE(gst_event_parse_new_segment, gst_event_parse_new_segment_full)
 };
 
 /** A QOS event.  See create() for more details.
@@ -450,6 +451,7 @@ public:
    * @param timestamp A pointer to store the timestamp in.
    */
   void parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp);
+  _IGNORE(gst_event_parse_qos)
 };
 
 /** A seek event.  See create() for more details.
@@ -514,6 +516,7 @@ public:
    * @param stop Result location for the stop postion expressed in format.
    */
   void parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop);
+  _IGNORE(gst_event_parse_seek)
 };
 
 /** A tag event.
@@ -533,6 +536,7 @@ public:
    * @return Metadata list.
    */
   TagList parse();
+  _IGNORE(gst_event_parse_tag)
 };
 
 } //namespace Gst

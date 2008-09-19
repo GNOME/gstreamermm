@@ -69,12 +69,6 @@ Glib::RefPtr<Query> Query::create_writable()
   return Gst::wrap(gst_query_make_writable(gobj()));
 }
 
-Structure Query::get_structure() const
-{
-  GstStructure* gst_structure = const_cast<GstStructure*>(gst_query_get_structure(const_cast<GstQuery*>(gobj())));
-  return Structure(gst_structure, true /* take_copy */);
-}
-
 bool get_details(QueryType type, QueryTypeDefinition &def)
 {
   const GstQueryTypeDefinition* gstdef = gst_query_type_get_details(GstQueryType(type));

@@ -119,6 +119,7 @@ public:
    * @return The Gst::Caps of this pad template.
    */
   Glib::RefPtr<const Caps> get_pad_template_caps() const;
+  _IGNORE(gst_pad_get_pad_template_caps)
 
   _WRAP_METHOD(bool set_caps (const Glib::RefPtr<Caps>& caps), gst_pad_set_caps)
   _WRAP_METHOD(Glib::RefPtr<Pad> get_peer(), gst_pad_get_peer)
@@ -145,6 +146,7 @@ public:
    * pad was already in the requested state. MT safe.
    */
   bool set_blocked_async(const SlotBlock& slot, bool blocked = true);
+  _IGNORE(gst_pad_set_blocked_async)
 
   _WRAP_METHOD(bool is_blocked() const, gst_pad_is_blocked)
   _WRAP_METHOD(bool is_blocking() const, gst_pad_is_blocking)
@@ -172,6 +174,7 @@ public:
    * @return The handler id which may be used to remove the connection later.
    */
   gulong add_data_probe(const SlotData& slot);
+  _IGNORE(gst_pad_add_data_probe, gst_pad_add_data_probe_full)
 
   /** Adds a probe that will be called for all buffers passing through a pad.
    * See add_data_probe() for more information.
@@ -180,6 +183,7 @@ public:
    * @return The handler id.
    */
   gulong add_buffer_probe(const SlotData& slot);
+  _IGNORE(gst_pad_add_buffer_probe, gst_pad_add_buffer_probe_full)
 
   /** Adds a probe that will be called for all events passing through a pad.
    * See add_data_probe() for more information.
@@ -188,63 +192,75 @@ public:
    * @return The handler id.
    */
   gulong add_event_probe(const SlotData& slot);
-
-  _IGNORE(gst_pad_add_data_probe,
-          gst_pad_add_event_probe,
-          gst_pad_add_buffer_probe,
-          gst_pad_add_data_probe_full,
-          gst_pad_add_event_probe_full,
-          gst_pad_add_buffer_probe_full)
-
-  _IGNORE_SIGNAL(have_data)
+  _IGNORE(gst_pad_add_event_probe, gst_pad_add_event_probe_full)
 
   _WRAP_METHOD(void remove_data_probe(guint handler_id), gst_pad_remove_data_probe)
   _WRAP_METHOD(void remove_buffer_probe(guint handler_id), gst_pad_remove_buffer_probe)
   _WRAP_METHOD(void remove_event_probe(guint handler_id), gst_pad_remove_event_probe)
 
+  //This is handwritten because conversion from Glib::RefPtr<Buffer>& to
+  //GstBuffer** is difficult.
   FlowReturn alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buf);
-  FlowReturn alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buf);
+  _IGNORE(gst_pad_alloc_buffer)
 
+  //This is handwritten because conversion from Glib::RefPtr<Buffer>& to
+  //GstBuffer** is difficult.
+  FlowReturn alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buf);
+  _IGNORE(gst_pad_alloc_buffer_and_set_caps)
+
+  //This is handwritten because conversion from Glib::RefPtr<Buffer>& to
+  //GstBuffer** is difficult.
   FlowReturn get_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer);
+  _IGNORE(gst_pad_get_range)
 
   _WRAP_METHOD(bool accept_caps(const Glib::RefPtr<Caps>& caps), gst_pad_accept_caps)
-
   _WRAP_METHOD(Glib::RefPtr<Caps> proxy_getcaps(), gst_pad_proxy_getcaps)
   _WRAP_METHOD(Glib::RefPtr<const Caps > proxy_getcaps() const, gst_pad_proxy_getcaps, constversion)
-
   _WRAP_METHOD(bool proxy_setcaps(const Glib::RefPtr<Caps>& caps), gst_pad_proxy_setcaps)
-
   _WRAP_METHOD(void fixate_caps(const Glib::RefPtr<Caps>& caps), gst_pad_fixate_caps)
-
   _WRAP_METHOD(bool peer_accept_caps(const Glib::RefPtr<Caps>& caps), gst_pad_peer_accept_caps)
 
   // This method is written manually because an extra ref is necessary
   FlowReturn push(const Glib::RefPtr<Buffer>& buffer);
+  _IGNORE(gst_pad_push)
 
   // This method is written manually because an extra ref is necessary
   bool push_event(const Glib::RefPtr<Event>& event);
-
+  _IGNORE(gst_pad_push_event)
 
   _WRAP_METHOD(bool check_pull_range() const, gst_pad_check_pull_range)
+
   FlowReturn pull_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer);
+  _IGNORE(gst_pad_pull_range)
+
   _WRAP_METHOD(bool activate_pull(bool active = true), gst_pad_activate_pull)
   _WRAP_METHOD(bool activate_push(bool active = true), gst_pad_activate_push)
 
   // This method is written manually because an extra ref is necessary
   bool send_event(const Glib::RefPtr<Event>& event);
+  _IGNORE(gst_pad_send_event)
+
   _WRAP_METHOD(bool event_default(const Glib::RefPtr<Event>& event), gst_pad_event_default)
   _WRAP_METHOD(bool query(const Glib::RefPtr<Query>& query), gst_pad_query)
   _WRAP_METHOD(bool peer_query(const Glib::RefPtr<Query>& query), gst_pad_peer_query)
   _WRAP_METHOD(bool query_default(const Glib::RefPtr<Query>& query), gst_pad_query_default)
-  bool query_position(Format& format) const;
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_pad_query_position)
-  bool query_duration(Format& format) const;
+
+  bool query_position(Format& format) const;
+
   _WRAP_METHOD(bool query_duration(Format& format, gint64& duration) const, gst_pad_query_duration)
-  bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const;
-  bool query_peer_position(Format& format) const;
+
+  bool query_duration(Format& format) const;
+
+  _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_pad_query_convert)
   _WRAP_METHOD(bool query_peer_position(Format& format, gint64& position) const, gst_pad_query_peer_position)
-  bool query_peer_duration(Format& format) const;
+
+  bool query_peer_position(Format& format) const;
+
    _WRAP_METHOD(bool query_peer_duration(Format& format, gint64& duration) const, gst_pad_query_peer_duration)
+
+  bool query_peer_duration(Format& format) const;
+
    _WRAP_METHOD(bool query_peer_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_pad_query_peer_convert)
 
 #m4 _CONVERSION(`const GstQueryType*',`Glib::ArrayHandle<QueryType>',`Glib::ArrayHandle<QueryType>((QueryType*)($3), Glib::OWNERSHIP_SHALLOW)')
@@ -257,29 +273,37 @@ public:
 
   // This method is written manually because an extra ref is necessary
   FlowReturn chain(const Glib::RefPtr<Buffer>& buffer);
+  _IGNORE(gst_pad_chain)
 
   _WRAP_METHOD(bool pause_task() , gst_pad_pause_task)
   _WRAP_METHOD(bool stop_task() , gst_pad_stop_task)
   _WRAP_METHOD(bool set_active(bool active = true), gst_pad_set_active)
 
-  _IGNORE(gst_pad_set_blocked_async, gst_pad_send_event,
-          gst_pad_query_position, gst_pad_query_duration,
-          gst_pad_query_convert, gst_pad_query_peer_position,
-          gst_pad_query_peer_duration, gst_pad_query_peer_convert,
-          gst_pad_push, gst_pad_push_event, gst_pad_chain,
-          gst_pad_alloc_buffer, gst_pad_alloc_buffer_and_set_caps,
-          gst_pad_get_range, gst_pad_pull_range,
-	  gst_pad_set_bufferalloc_function, gst_pad_set_activatepush_function,
-	  gst_pad_set_acceptcaps_function, gst_pad_set_event_function,
-	  gst_pad_set_getrange_function, gst_pad_set_unlink_function,
-	  gst_pad_set_activate_function, gst_pad_set_getcaps_function,
-	  gst_pad_set_setcaps_function, gst_pad_set_activatepull_function,
-	  gst_pad_set_query_type_function, gst_pad_set_checkgetrange_function,
-	  gst_pad_set_link_function, gst_pad_set_query_function,
-	  gst_pad_set_fixatecaps_function,gst_pad_set_chain_function,
-	  gst_pad_set_internal_link_function, gst_pad_get_pad_template_caps,
-          gst_pad_get_fixed_caps_func)
+    //C API specific pad callback setting functions are ignored.
+    _IGNORE(gst_pad_set_bufferalloc_function,
+            gst_pad_set_activatepush_function,
+	    gst_pad_set_acceptcaps_function,
+            gst_pad_set_event_function,
+	    gst_pad_set_getrange_function,
+            gst_pad_set_unlink_function,
+	    gst_pad_set_activate_function,
+            gst_pad_set_getcaps_function,
+	    gst_pad_set_setcaps_function,
+            gst_pad_set_activatepull_function,
+	    gst_pad_set_query_type_function,
+            gst_pad_set_checkgetrange_function,
+	    gst_pad_set_link_function,
+            gst_pad_set_query_function,
+	    gst_pad_set_fixatecaps_function,
+            gst_pad_set_chain_function,
+	    gst_pad_set_internal_link_function)
 
+  //C API helper function gst_pad_get_fixed_caps_func ignored.
+  _IGNORE(gst_pad_get_fixed_caps_func)
+
+  //The "have-data" signal never really emits so ignore it.  Adding data, event
+  //and buffer probes do emit.
+  _IGNORE_SIGNAL(have_data)
 
 #m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void linked(const Glib::RefPtr<Pad>& peer_pad), "linked")
@@ -292,4 +316,3 @@ public:
 };
 
 } // namespace Gst
-

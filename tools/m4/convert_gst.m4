@@ -134,12 +134,12 @@ _CONVERSION(`GstQuery*',`const Glib::RefPtr<Query>&', `Gst::wrap($3)')
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Registry>', `Glib::wrap($3)')
 
 #Structure
-_CONVERSION(`Structure&',`GstStructure*',`(($3).gobj())')
+_CONVERSION(`const GstStructure*',`const Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
+_CONVERSION(`GstStructure*',`const Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
 
 #TagList
 _CONVERSION(`const TagList&',`const GstTagList*',`(($3).gobj())')
-_CONVERSION(`GstTagList*',`TagList',`Glib::wrap($3, false, false)')
-_CONVERSION(`TagList&',`GstTagList*',`(($3).gobj())')
+_CONVERSION(`GstTagList*',`TagList',`Glib::wrap($3, 0)')
 _CONVERSION(`const TagList&',`GstTagList*',`const_cast<GstTagList*>(($3).gobj())')
 _CONVERSION(`const GstTagList*',`TagList',`Glib::wrap(const_cast<GstTagList*>($3), true, false)')
 

@@ -134,6 +134,7 @@ public:
    * @return The event source id. MT safe.
    */
   guint add_watch(const SlotMessage& slot, int priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(gst_bus_add_watch, gst_bus_add_watch_full)
 
   /** Removes bus watch with event source id from main context.
    *
@@ -153,15 +154,15 @@ public:
    * @param slot The handler slot to install.
    */
   void set_sync_handler(const SlotMessageSync& slot);
-
-  _IGNORE(gst_bus_set_sync_handler,
-         gst_bus_sync_handler,
-         gst_bus_sync_signal_handler,
-         gst_bus_async_signal_func)
+  _IGNORE(gst_bus_set_sync_handler, gst_bus_sync_signal_handler)
+  _IGNORE(gst_bus_async_signal_func)
 
   _WRAP_METHOD(void disable_sync_message_emission(), gst_bus_disable_sync_message_emission)
   _WRAP_METHOD(void enable_sync_message_emission(), gst_bus_enable_sync_message_emission)
+
   _WRAP_METHOD(void add_signal_watch(int priority = Glib::PRIORITY_DEFAULT), gst_bus_add_signal_watch_full)
+  _IGNORE(gst_bus_add_signal_watch)
+
   _WRAP_METHOD(void remove_signal_watch(), gst_bus_remove_signal_watch)
   _WRAP_METHOD(Glib::RefPtr<Message> poll(MessageType message_type, ClockTimeDiff timeout), gst_bus_poll)
 
@@ -181,10 +182,6 @@ public:
    *
    */
   _WRAP_SIGNAL(void sync_message(const Glib::RefPtr<Message>& message), "sync-message")
-
-  _IGNORE(gst_bus_add_watch,
-          gst_bus_add_watch_full,
-          gst_bus_add_signal_watch)
 };
 
 } //namespace Gst

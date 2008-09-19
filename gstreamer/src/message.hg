@@ -64,29 +64,25 @@ protected:
  _CLASS_GSTMINIOBJECT(Message, GstMessage, GST_MESSAGE, Gst::MiniObject, GstMiniObject)
  _IGNORE(gst_message_ref, gst_message_unref)
 public:
-  /** Creates a copy of the message.  MT safe.
-   * @return A copy of the message.
-   */
-   Glib::RefPtr<Message> copy() const;
-
-  /** Get the structure of a message.
-   * @return The Gst::Structure of the message.
-   */
-  Structure get_structure() const;
-
-  /** Checks if a message is writable. If not, a writable copy is made and
-   * returned.
-   * @return A Gst::Message (possibly the same pointer) that is writable.
-   */
-   Glib::RefPtr<Message> create_writable();
-
-public:
   /** Wrap a GstMessage* in a C++ instance, creating an instance of a
    *  derived Gst::Message.  Gst::wrap() would just create a Gst::Message
    *  (rather than a derived one) because the derived Gst::Message classes
    *  do not correspond to GType types in the GStreamer API.
    */
   static Glib::RefPtr<Message> wrap(GstMessage* message, bool take_copy=false);
+
+  /** Creates a copy of the message.  MT safe.
+   * @return A copy of the message.
+   */
+   Glib::RefPtr<Message> copy() const;
+
+  _WRAP_METHOD(const Structure get_structure() const, gst_message_get_structure)
+
+  /** Checks if a message is writable. If not, a writable copy is made and
+   * returned.
+   * @return A Gst::Message (possibly the same pointer) that is writable.
+   */
+   Glib::RefPtr<Message> create_writable();
 
   /** Get the GstMessageType of message.
    */
@@ -154,6 +150,7 @@ public:
    * @param debug Location for the debug message.
    */
   void parse(Glib::Error& error, std::string& debug);
+  _IGNORE(gst_message_parse_error)
 
   /** Extracts and returns the Glib::Error from the Gst::MessageError.
    *
@@ -198,6 +195,7 @@ public:
    * @param debug Location for the debug message.
    */
   void parse(Glib::Error& error, std::string& debug);
+  _IGNORE(gst_message_parse_warning)
 
   /** Extracts and returns the Glib::Error from the Gst::MessageWarning.
    *
@@ -243,6 +241,7 @@ public:
    * @param debug Location for the debug message.
    */
   void parse(Glib::Error& error, std::string& debug);
+  _IGNORE(gst_message_parse_info)
 
   /** Extracts and returns the Glib::Error from the Gst::MessageInfo.
    *
@@ -285,6 +284,7 @@ public:
    * @return A copy of the Gst::TagList.
    */
   TagList parse();
+  _IGNORE(gst_message_parse_tag)
 };
 
 /** A buffering message.
@@ -320,6 +320,7 @@ public:
    * @return The percent as an integer.
    */
   int parse();
+  _IGNORE(gst_message_parse_buffering)
 
   /** Configures the buffering stats values in message.
    *
@@ -331,6 +332,7 @@ public:
    * Since 0.10.20.
    */
   void set_stats(BufferingMode mode, int avg_in, int avg_out, gint64 buffering_left);
+  _IGNORE(gst_message_set_buffering_stats)
 
   /** Extracts the buffering stats values from message.
    *
@@ -341,32 +343,33 @@ public:
    *
    * Since 0.10.20.
    */
-  void get_stats(BufferingMode& mode, int& avg_in, int& avg_out, gint64& buffering_left);
+  void parse_stats(BufferingMode& mode, int& avg_in, int& avg_out, gint64& buffering_left);
+  _IGNORE(gst_message_parse_buffering_stats)
 
   /** Extracts and returns the buffering mode from message.
    *
    * @return The buffering mode.
    */
-  BufferingMode get_stats_buffering_mode();
+  BufferingMode parse_stats_buffering_mode();
 
   /** Extracts and returns the average input rate from message.
    *
    * @return The average input rate.
    */
-  int get_stats_avg_in();
+  int parse_stats_avg_in();
 
   /** Extracts and returns the average output rate from message.
    *
    * @return The average output rate.
    */
-  int get_stats_avg_out();
+  int parse_stats_avg_out();
 
   /** Extracts and returns the buffering time in milliseconds remaining from
    * message.
    *
    * @return The buffering time remaining.
    */
-  gint64 get_stats_buffering_left();
+  gint64 parse_stats_buffering_left();
 };
 
 /** A state change message.
@@ -398,6 +401,7 @@ public:
    * @param pending The pending (target) state.
    */
   void parse(State& oldstate, State& newstate, State& pending);
+  _IGNORE(gst_message_parse_state_changed)
 
   /** Extracts and returns the new state from the Gst::MessageStateChanged.
    *
@@ -472,6 +476,7 @@ public:
    * @param ready Location in which to hold the ready flag.
    */
   void parse(Glib::RefPtr<Clock>& clock, bool& ready);
+  _IGNORE(gst_message_parse_clock_provide)
 
   /** Extracts and returns the clock from the Gst::MessageClockProvide. The
    * clock object returned remains valid until the message is freed.
@@ -517,6 +522,7 @@ public:
    * @return The lost clock.
    */
   Glib::RefPtr<Clock> parse();
+  _IGNORE(gst_message_parse_clock_lost)
 };
 
 /** A new clock message.
@@ -544,6 +550,7 @@ public:
    * @return The selected new clock.
    */
   Glib::RefPtr<Clock> parse();
+  _IGNORE(gst_message_parse_new_clock)
 };
 
 /** An application message.
@@ -664,6 +671,7 @@ public:
    * @param position Result location for the position.
    */
   void parse(Format& format, gint64& position);
+  _IGNORE(gst_message_parse_segment_start)
 
   /** Extracts and returns the position from the segment start message.
    *
@@ -710,6 +718,7 @@ public:
    * @param position Result location for the position.
    */
   void parse(Format& format, gint64& position);
+  _IGNORE(gst_message_parse_segment_done)
 
   /** Extracts and returns the position from the segment done message.
    *
@@ -762,6 +771,7 @@ public:
    * @param position Result location for the position.
    */
   void parse(Format& format, gint64& position);
+  _IGNORE(gst_message_parse_duration)
 
   /** Extracts and returns the duration from the duration message. The duration
    * might be Gst::CLOCK_TIME_NONE, which indicates that the duration has
@@ -812,7 +822,9 @@ class MessageAsyncStart : public Message
 public:
   explicit MessageAsyncStart(GstMessage* castitem);
 
-  /** Creates a new async message.  This message is posted by elements when they start an ASYNC state change. new_base_time is set to true when the element lost its state when it was PLAYING.
+  /** Creates a new async message.  This message is posted by elements when
+   * they start an ASYNC state change. new_base_time is set to true when the
+   * element lost its state when it was PLAYING.
    *
    * @param src The object originating the message.
    * @param new_base_time If a new base_time should be set on the element.
@@ -832,6 +844,7 @@ public:
    * Since 0.10.13.
    */
   bool parse();
+  _IGNORE(gst_message_parse_async_start)
 };
 
 /** An asynchronous done message.

@@ -65,16 +65,16 @@ namespace Glib
 ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl else
 
-/** A Glib::wrap() method for this object. The dummy boolean parameter is added to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap() (GstTagList is in fact a GstStructure so wrap method becomes ambiguous).
+/** A Glib::wrap() method for this object. The dummy int parameter is added to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap() (GstTagList is in fact a GstStructure so wrap method becomes ambiguous).
  * 
  * @param object The C instance.
+ * @param dummy An unused parameter to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap().  The value of this parameter is irrelevant.
  * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
- * @param dummy An unused parameter to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap().
  * @result A C++ instance that wraps this C instance.
  *
  * @relates __NAMESPACE__::__CPPNAME__
  */
-__NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, bool take_copy = false, bool dummy = false);
+__NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, int dummy, bool take_copy = false);
 ')dnl endif __BOOL_NO_WRAP_FUNCTION__
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -92,7 +92,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 namespace Glib
 {
 
-__NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, bool take_copy, bool dummy)
+__NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, int dummy, bool take_copy)
 {
   return __NAMESPACE__::__CPPNAME__`'(object, take_copy);
 }

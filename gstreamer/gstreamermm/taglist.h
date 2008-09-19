@@ -372,7 +372,7 @@ protected:
 
 private:
 
-
+  
 public:
   
   /** Checks if the given type is already registered.
@@ -465,15 +465,15 @@ public:
    */
   template <class DataType>
   void add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode=TAG_MERGE_PREPEND);
-
   
+
   /** Removes the given tag from the taglist.
    * @param tag Tag to remove.
    */
   void remove_tag(const Glib::ustring& tag);
 
   /** For example,
-   * void on_foreach(const Glib::ustring& tag);
+   * void on_foreach(const Glib::ustring& tag);.
    */
   typedef sigc::slot<void, const Glib::ustring&> SlotForeach;
 
@@ -483,6 +483,7 @@ public:
    * @param slot Slot to be called for each tag.
    */
   void foreach(const SlotForeach& slot);
+  
 
   /** Gets the value that is at the given index for the given tag.
 
@@ -493,6 +494,7 @@ public:
    * otherwise.
    */
   bool get(const Glib::ustring& tag, guint index, Glib::ValueBase& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -502,6 +504,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, char& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -511,6 +514,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, char& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -520,6 +524,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guchar& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -529,6 +534,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, guchar& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -538,6 +544,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, bool& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -547,6 +554,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, bool& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -556,6 +564,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, int& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -565,6 +574,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, int& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -574,6 +584,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -583,6 +594,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, guint& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -592,6 +604,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, long& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -601,6 +614,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, long& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -610,6 +624,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, gulong& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -619,6 +634,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, gulong& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -628,6 +644,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, float& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -637,6 +654,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, float& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -646,6 +664,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, double& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -655,6 +674,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, double& value);
+  
 
   /** Copies the contents for the given tag into the value, possibly merging
    * multiple values into one if multiple values are associated with the tag.
@@ -670,6 +690,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, Glib::ustring& value);
+  
 
   /** Gets the value that is at the given index for the given tag in the given
    * list.
@@ -683,6 +704,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, Glib::ustring& value);
+  
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
@@ -692,6 +714,7 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, Glib::Date& value);
+  
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
@@ -701,7 +724,10 @@ public:
    * given list.
    */
   bool get(const Glib::ustring& tag, guint index, Glib::Date& value);
+  
 
+  //Variable argument functions are ignored.
+  
 
 };
 
@@ -742,16 +768,16 @@ inline void swap(TagList& lhs, TagList& rhs)
 namespace Glib
 {
 
-/** A Glib::wrap() method for this object. The dummy boolean parameter is added to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap() (GstTagList is in fact a GstStructure so wrap method becomes ambiguous).
+/** A Glib::wrap() method for this object. The dummy int parameter is added to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap() (GstTagList is in fact a GstStructure so wrap method becomes ambiguous).
  * 
  * @param object The C instance.
+ * @param dummy An unused parameter to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap().  The value of this parameter is irrelevant.
  * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
- * @param dummy An unused parameter to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap().
  * @result A C++ instance that wraps this C instance.
  *
  * @relates Gst::TagList
  */
-Gst::TagList wrap(GstTagList* object, bool take_copy = false, bool dummy = false);
+Gst::TagList wrap(GstTagList* object, int dummy, bool take_copy = false);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template <>

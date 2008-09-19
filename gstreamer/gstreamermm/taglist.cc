@@ -234,7 +234,7 @@ GType Glib::Value<Gst::TagFlag>::value_type()
 namespace Glib
 {
 
-Gst::TagList wrap(GstTagList* object, bool take_copy, bool dummy)
+Gst::TagList wrap(GstTagList* object, int dummy, bool take_copy)
 {
   return Gst::TagList(object, take_copy);
 }
@@ -344,7 +344,7 @@ gst_tag_list_insert(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode)));
 
 TagList TagList::merge(const TagList& other, TagMergeMode mode)
 {
-  return Glib::wrap(gst_tag_list_merge(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode))), false, false);
+  return Glib::wrap(gst_tag_list_merge(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode))), 0);
 }
 
 guint TagList::get_tag_size(const Glib::ustring& tag) const

@@ -146,8 +146,8 @@ public:
    * This sets the element's parent, and thus takes ownership of the element.
    * An element can only be added to one bin.
    *
-   * If the element's pads are linked to other pads then the pads will be unlinked
-   * before the element is added to the bin.
+   * If the element's pads are linked to other pads then the pads will be
+   * unlinked before the element is added to the bin.
    *
    * MT safe.
    *
@@ -157,6 +157,7 @@ public:
    * @throws std::runtime_error if the Bin does not want to accept the Element.
    */
   Glib::RefPtr<Bin> add(const Glib::RefPtr<Element>& element);
+  _IGNORE(gst_bin_add, gst_bin_add_many)
 
   /** Removes the element from the bin, unparenting it as well. Unparenting the
    * element means that the element will be dereferenced, so if the bin holds
@@ -173,6 +174,7 @@ public:
    * otherwise
    */
   Glib::RefPtr<Bin> remove(const Glib::RefPtr<Element>& element);
+  _IGNORE(gst_bin_remove, gst_bin_remove_many)
 
   //We could add a bool recurse_up = false parameter, 
   //but get_element() and get_element_recurse_up() seem different enough to be separate.
@@ -205,8 +207,6 @@ public:
   /** Gets the number of children in the bin.
    */
   _MEMBER_GET(num_children, numchildren, int, int)
-
-  _IGNORE(gst_bin_add, gst_bin_remove, gst_bin_add_many, gst_bin_remove_many)
 
 #m4 _CONVERSION(`GstElement*',`const Glib::RefPtr<Element>&', `Glib::wrap($3, true)')
 

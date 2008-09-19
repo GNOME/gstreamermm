@@ -134,7 +134,6 @@ protected:
   _CTOR_DEFAULT
 
 public:
-
   /** Links this source element to the @dest element.
    * The link must be from source to destination - the other direction will not be tried. 
    * The function looks for existing pads that aren't linked yet. It will request new pads
@@ -147,13 +146,18 @@ public:
    * @throws std::runtime_error If the elements could not be linked.
    */
   Glib::RefPtr<Element> link(const Glib::RefPtr<Element>& dest);
+  _IGNORE(gst_element_link, gst_element_link_many)
 
   _WRAP_METHOD(bool add_pad(const Glib::RefPtr<Pad>& pad), gst_element_add_pad)
   _WRAP_METHOD(void create_all_pads(), gst_element_create_all_pads)
 
-  //TODO: Can these be const?
+  //TODO: Can this be const?
   Glib::RefPtr<Pad> create_compatible_pad(const Glib::RefPtr<Pad>& pad, const Glib::RefPtr<Caps>& caps);
+  _IGNORE(gst_element_get_compatible_pad)
+
+  //TODO: Can this be const?
   Glib::RefPtr<PadTemplate> get_compatible_pad_template(const Glib::RefPtr<PadTemplate>& padtemplate);
+  _IGNORE(gst_element_get_compatible_pad_template)
 
   //TODO: The documentation says "The pad should be released with gst_element_release_request_pad().", which is odd. murrayc
   _WRAP_METHOD(Glib::RefPtr<Pad> get_request_pad(const Glib::ustring& name), gst_element_get_request_pad)
@@ -167,6 +171,7 @@ public:
   _WRAP_METHOD(Iterator<Pad> iterate_sink_pads(), gst_element_iterate_sink_pads)
   _WRAP_METHOD(Iterator<Pad> iterate_src_pads(), gst_element_iterate_src_pads)
   _WRAP_METHOD(void unlink(const Glib::RefPtr<Element>& other_element), gst_element_unlink)
+  _IGNORE(gst_element_unlink_many)
 
   //TODO: Make this like link()?
   _WRAP_METHOD(bool link_pads(const Glib::ustring& padname, const Glib::RefPtr<Element>& other_element, const Glib::ustring& others_padname), gst_element_link_pads)
@@ -177,8 +182,8 @@ public:
   _WRAP_METHOD(bool link_pads_filtered(const Glib::ustring& padname, const Glib::RefPtr<Element>& other_element, const Glib::ustring& others_padname, const Glib::RefPtr<Caps>& filter), gst_element_link_pads_filtered)
 
   //TODO: Make this like link()?
-
   _WRAP_METHOD(bool link_filtered(const Glib::RefPtr<Element>& other_element, const Glib::RefPtr<Caps>& filter), gst_element_link_filtered)
+
   _WRAP_METHOD(void set_base_time(ClockTime time), gst_element_set_base_time)
   _WRAP_METHOD(ClockTime get_base_time() const, gst_element_get_base_time)
   _WRAP_METHOD(void set_bus(const Glib::RefPtr<Bus>& bus), gst_element_set_bus)
@@ -189,7 +194,6 @@ public:
   //Note: gst_element_get_index provides a reference.
   _WRAP_METHOD(Glib::RefPtr<Index> get_index(), gst_element_get_index)
   _WRAP_METHOD(Glib::RefPtr<const Index > get_index() const, gst_element_get_index, constversion)
-
 
   _WRAP_METHOD(Glib::RefPtr<ElementFactory> get_factory(), gst_element_get_factory, refresult)
   _WRAP_METHOD(Glib::RefPtr<const ElementFactory> get_factory() const, gst_element_get_factory, refresult, constversion)
@@ -256,10 +260,9 @@ public:
    * @return true if the event was handled. MT safe. 
    */
   bool send_event(const Glib::RefPtr<Event>& event);
+  _IGNORE(gst_element_send_event)
 
   _WRAP_METHOD(bool implements_interface(GType iface_type), gst_element_implements_interface)
-
-  _IGNORE(gst_element_link, gst_element_unlink_many, gst_element_get_compatible_pad, gst_element_get_compatible_pad_template, gst_element_link_many, gst_element_send_event)
 
   /** This signals that the element will not generate more dynamic pads.
    */
@@ -436,4 +439,3 @@ ElementInterfaced<T_Interface>::~ElementInterfaced()
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Gst
-
