@@ -68,35 +68,6 @@ bool Event::is_serialized() const
   return GST_EVENT_IS_SERIALIZED(gobj());
 }
 
-EventBufferSize::EventBufferSize(GstEvent* castitem) :
-Event(castitem)
-{
-}
-
-Glib::RefPtr<Event> EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize, bool async)
-{
-  GstEvent* event = gst_event_new_buffer_size(GstFormat(format), minsize, maxsize, async);
-  return Gst::Event::wrap(event, false);
-}
-
-void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize, bool& async)
-{
-  gboolean result;
-  gst_event_parse_buffer_size(gobj(), (GstFormat*)&format, &minsize, &maxsize, &result);
-  async = result;
-}
-
-EventEos::EventEos(GstEvent* castitem) :
-Event(castitem)
-{
-}
-
-Glib::RefPtr<Event> EventEos::create()
-{
-  GstEvent* event = gst_event_new_eos();
-  return Gst::Event::wrap(event, false);
-}
-
 EventFlushStart::EventFlushStart(GstEvent* castitem) :
 Event(castitem)
 {
@@ -119,30 +90,14 @@ Glib::RefPtr<Event> EventFlushStop::create()
   return Gst::Event::wrap(event, false);
 }
 
-EventLatency::EventLatency(GstEvent* castitem) :
+EventEos::EventEos(GstEvent* castitem) :
 Event(castitem)
 {
 }
 
-void EventLatency::parse(ClockTime& latency)
+Glib::RefPtr<Event> EventEos::create()
 {
-  gst_event_parse_latency(gobj(), &latency);
-}
-
-Glib::RefPtr<Event> EventLatency::create(ClockTime time)
-{
-  GstEvent* event = gst_event_new_latency(GstClockTime(time));
-  return Gst::Event::wrap(event, false);
-}
-
-EventNavigation::EventNavigation(GstEvent* castitem) :
-Event(castitem)
-{
-}
-
-Glib::RefPtr<Event> EventNavigation::create(Structure& structure)
-{
-  GstEvent* event = gst_event_new_navigation(structure.gobj());
+  GstEvent* event = gst_event_new_eos();
   return Gst::Event::wrap(event, false);
 }
 
@@ -169,6 +124,44 @@ void EventNewSegment::parse(bool& update, double& rate, Format& format, gint64& 
   gboolean result;
   gst_event_parse_new_segment_full(gobj(), &result, &rate, &applied_rate, (GstFormat*)&format, &start, &stop, &position);
   update = result;
+}
+
+EventTag::EventTag(GstEvent* castitem) :
+Event(castitem)
+{
+}
+
+Glib::RefPtr<Event> EventTag::create(const TagList& taglist)
+{
+  //We create a copy because gst_event_new_tag() takes ownership:
+  GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
+  GstEvent* event = gst_event_new_tag(c_taglist);
+  return Gst::Event::wrap(event, false);
+}
+
+TagList EventTag::parse()
+{
+  GstTagList* gst_taglist = gst_tag_list_new();
+  gst_event_parse_tag(gobj(), &gst_taglist);
+  return TagList(gst_taglist);
+}
+
+EventBufferSize::EventBufferSize(GstEvent* castitem) :
+Event(castitem)
+{
+}
+
+Glib::RefPtr<Event> EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize, bool async)
+{
+  GstEvent* event = gst_event_new_buffer_size(GstFormat(format), minsize, maxsize, async);
+  return Gst::Event::wrap(event, false);
+}
+
+void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize, bool& async)
+{
+  gboolean result;
+  gst_event_parse_buffer_size(gobj(), (GstFormat*)&format, &minsize, &maxsize, &result);
+  async = result;
 }
 
 EventQos::EventQos(GstEvent* castitem) :
@@ -203,24 +196,31 @@ void EventSeek::parse(double& rate, Format& format, SeekFlags& flags, SeekType& 
   gst_event_parse_seek(gobj(), &rate, (GstFormat*)&format, (GstSeekFlags*)&flags, (GstSeekType*)&start_type, &start, (GstSeekType*)&stop_type, &stop);
 }
 
-EventTag::EventTag(GstEvent* castitem) :
+EventNavigation::EventNavigation(GstEvent* castitem) :
 Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventTag::create(const TagList& taglist)
+Glib::RefPtr<Event> EventNavigation::create(Structure& structure)
 {
-  //We create a copy because gst_event_new_tag() takes ownership:
-  GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
-  GstEvent* event = gst_event_new_tag(c_taglist);
+  GstEvent* event = gst_event_new_navigation(structure.gobj());
   return Gst::Event::wrap(event, false);
 }
 
-TagList EventTag::parse()
+EventLatency::EventLatency(GstEvent* castitem) :
+Event(castitem)
 {
-  GstTagList* gst_taglist = gst_tag_list_new();
-  gst_event_parse_tag(gobj(), &gst_taglist);
-  return TagList(gst_taglist);
+}
+
+void EventLatency::parse(ClockTime& latency)
+{
+  gst_event_parse_latency(gobj(), &latency);
+}
+
+Glib::RefPtr<Event> EventLatency::create(ClockTime time)
+{
+  GstEvent* event = gst_event_new_latency(GstClockTime(time));
+  return Gst::Event::wrap(event, false);
 }
 
 Glib::RefPtr<Event> Event::wrap(GstEvent* event, bool take_copy) {

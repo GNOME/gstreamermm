@@ -652,8 +652,13 @@ Glib::RefPtr<Message> Message::wrap(GstMessage* message, bool take_copy)
     case GST_MESSAGE_ASYNC_DONE:
       result = Glib::RefPtr<Message>( new Gst::MessageAsyncDone(message) );
       break;
-    default:
+    case GST_MESSAGE_UNKNOWN:
+    case GST_MESSAGE_ANY:
       result = Gst::wrap(message, false);
+      break;
+      /* The rest of the message types are custom ones */
+    default:
+      result = Glib::RefPtr<Message>( new Gst::MessageCustom(message) );
   }
 
   if(result && take_copy)

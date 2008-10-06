@@ -169,61 +169,6 @@ public:
 //Glib::RefPtrs references the objects which causes problems when GStreamer API
 //tries to modify the GstStructures of the objects.
 
-/** A buffer size event.  See create() for more details.
- */
-class EventBufferSize : public Event
-{
-public:
-  explicit EventBufferSize(GstEvent* event);
-
-  /** Create a new buffersize event. The event is sent downstream and notifies
-   * elements that they should provide a buffer of the specified dimensions.
-   *
-   * When the async flag is set, a thread boundary is prefered.
-   *
-   * @param format Buffer format.
-   * @param minsize Minimum buffer size.
-   * @param maxsize Maximum buffer size.
-   * @param async Thread behavior.
-   * @return A new Gst::EventBufferSize.
-   */
-  static Glib::RefPtr<Event> create(Format format, gint64 minsize, gint64 maxsize, bool async);
-
-  /** Get the format, minsize, maxsize and async-flag in the buffersize event.
-   *
-   * @param format A pointer to store the format in.
-   * @param minsize A pointer to store the minsize in.
-   * @param maxsize A pointer to store the maxsize in.
-   * @param async A pointer to store the async-flag in.
-   */
-  void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async);
-  _IGNORE(gst_event_parse_buffer_size)
-};
-
-/** An end of stream event. See create() for more details.
- */
-class EventEos : public Event
-{
-public:
-  explicit EventEos(GstEvent* event);
-
-  /** Create a new EOS event. The eos event can only travel downstream
-   * synchronized with the buffer flow. Elements that receive the EOS event on
-   * a pad can return Gst::FLOW_UNEXPECTED as a Gst::FlowReturn when data after
-   * the EOS event arrives.
-   *
-   * The EOS event will travel down to the sink elements in the pipeline which
-   * will then post the Gst::MESSAGE_EOS on the bus after they have finished
-   * playing any buffered data.
-   *
-   * When all sinks have posted an EOS message, an EOS message is forwarded to
-   * the application.
-   *
-   * @return The new EOS event. 
-   */
-  static Glib::RefPtr<Event> create();
-};
-
 /** A flush start event.  See create() for more details.
  */
 class EventFlushStart : public Event
@@ -274,48 +219,28 @@ public:
   static Glib::RefPtr<Event> create();
 };
 
-/** A latency event.  See create() for more details.
+/** An end of stream event. See create() for more details.
  */
-class EventLatency : public Event
+class EventEos : public Event
 {
 public:
-  explicit EventLatency(GstEvent* event);
+  explicit EventEos(GstEvent* event);
 
-  /** Create a new latency event. The event is sent upstream from the sinks and
-   * notifies elements that they should add an additional latency to the
-   * timestamps before synchronising against the clock.
+  /** Create a new EOS event. The eos event can only travel downstream
+   * synchronized with the buffer flow. Elements that receive the EOS event on
+   * a pad can return Gst::FLOW_UNEXPECTED as a Gst::FlowReturn when data after
+   * the EOS event arrives.
    *
-   * The latency is mostly used in live sinks and is always expressed in the
-   * time format.
+   * The EOS event will travel down to the sink elements in the pipeline which
+   * will then post the Gst::MESSAGE_EOS on the bus after they have finished
+   * playing any buffered data.
    *
-   * @param latency The new latency value.
-   * @return A new Gst::EventLatency.
+   * When all sinks have posted an EOS message, an EOS message is forwarded to
+   * the application.
    *
-   * Since 0.10.12 
+   * @return The new EOS event. 
    */
-  static Glib::RefPtr<Event> create(ClockTime latency);
-
-  /** Get the latency in the latency event.
-   *
-   * @param latency A pointer to store the latency in. 
-   */
-  void parse(ClockTime& latency);
-  _IGNORE(gst_event_parse_latency)
-};
-
-/** A Navigation event.  See create() for more details.
- */
-class EventNavigation : public Event
-{
-public:
-  explicit EventNavigation(GstEvent* event);
-
-  /** Create a new navigation event from the given description.
-   *
-   * @param structure Description of the event.
-   * @return A new Gst::EventNavigation.
-   */
-  static Glib::RefPtr<Event> create(Structure& structure);
+  static Glib::RefPtr<Event> create();
 };
 
 /** A new segment event.  See create() for more details.
@@ -395,6 +320,57 @@ public:
    */
   void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate);
   _IGNORE(gst_event_parse_new_segment, gst_event_parse_new_segment_full)
+};
+
+/** A tag event.
+ */
+class EventTag : public Event
+{
+public:
+  explicit EventTag(GstEvent* event);
+
+  /** Generates a metadata tag event from the given taglist.
+   * @param taglist Metadata list.
+   * @return A new Gst::Event.
+   */
+  static Glib::RefPtr<Event> create(const TagList& taglist);
+
+  /** Parses a tag event and stores the results in the given taglist location.
+   * @return Metadata list.
+   */
+  TagList parse();
+  _IGNORE(gst_event_parse_tag)
+};
+
+/** A buffer size event.  See create() for more details.
+ */
+class EventBufferSize : public Event
+{
+public:
+  explicit EventBufferSize(GstEvent* event);
+
+  /** Create a new buffersize event. The event is sent downstream and notifies
+   * elements that they should provide a buffer of the specified dimensions.
+   *
+   * When the async flag is set, a thread boundary is prefered.
+   *
+   * @param format Buffer format.
+   * @param minsize Minimum buffer size.
+   * @param maxsize Maximum buffer size.
+   * @param async Thread behavior.
+   * @return A new Gst::EventBufferSize.
+   */
+  static Glib::RefPtr<Event> create(Format format, gint64 minsize, gint64 maxsize, bool async);
+
+  /** Get the format, minsize, maxsize and async-flag in the buffersize event.
+   *
+   * @param format A pointer to store the format in.
+   * @param minsize A pointer to store the minsize in.
+   * @param maxsize A pointer to store the maxsize in.
+   * @param async A pointer to store the async-flag in.
+   */
+  void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async);
+  _IGNORE(gst_event_parse_buffer_size)
 };
 
 /** A QOS event.  See create() for more details.
@@ -519,24 +495,48 @@ public:
   _IGNORE(gst_event_parse_seek)
 };
 
-/** A tag event.
+/** A Navigation event.  See create() for more details.
  */
-class EventTag : public Event
+class EventNavigation : public Event
 {
 public:
-  explicit EventTag(GstEvent* event);
+  explicit EventNavigation(GstEvent* event);
 
-  /** Generates a metadata tag event from the given taglist.
-   * @param taglist Metadata list.
-   * @return A new Gst::Event.
+  /** Create a new navigation event from the given description.
+   *
+   * @param structure Description of the event.
+   * @return A new Gst::EventNavigation.
    */
-  static Glib::RefPtr<Event> create(const TagList& taglist);
+  static Glib::RefPtr<Event> create(Structure& structure);
+};
 
-  /** Parses a tag event and stores the results in the given taglist location.
-   * @return Metadata list.
+/** A latency event.  See create() for more details.
+ */
+class EventLatency : public Event
+{
+public:
+  explicit EventLatency(GstEvent* event);
+
+  /** Create a new latency event. The event is sent upstream from the sinks and
+   * notifies elements that they should add an additional latency to the
+   * timestamps before synchronising against the clock.
+   *
+   * The latency is mostly used in live sinks and is always expressed in the
+   * time format.
+   *
+   * @param latency The new latency value.
+   * @return A new Gst::EventLatency.
+   *
+   * Since 0.10.12 
    */
-  TagList parse();
-  _IGNORE(gst_event_parse_tag)
+  static Glib::RefPtr<Event> create(ClockTime latency);
+
+  /** Get the latency in the latency event.
+   *
+   * @param latency A pointer to store the latency in. 
+   */
+  void parse(ClockTime& latency);
+  _IGNORE(gst_event_parse_latency)
 };
 
 } //namespace Gst
