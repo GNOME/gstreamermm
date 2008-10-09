@@ -86,12 +86,12 @@ public:
   /** Sets the given bits.
    * @param flag The flag to set, can by any number of bits in guint32. 
    */
-  void flag_set(guint flag);
+  void set_flag(guint flag);
 
   /** Unsets the given bits.
    * @param flag The flag to unset, must be a single bit in guint32. 
    */
-  void flag_unset(guint flag);
+  void unset_flag(guint flag);
 
   /** Creates a copy of the mini-object.  Please note that copying is
    * supported only by sub-classes of Gst::MiniObject such as Gst::Event,

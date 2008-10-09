@@ -168,7 +168,7 @@ void Object::set_name_prefix(const Glib::ustring& prefix)
   gst_object_set_name_prefix(gobj(), prefix.c_str()); 
 }
 
-xmlpp::Node* Object::save_thyself(xmlpp::Node* parent) const
+xmlpp::Node* Object::save(xmlpp::Node* parent) const
 {
   gst_object_save_thyself(const_cast<GstObject*>(gobj()), parent->cobj());
 
@@ -176,7 +176,7 @@ xmlpp::Node* Object::save_thyself(xmlpp::Node* parent) const
   return parent;
 }
 
-void Object::restore_thyself(xmlpp::Node* self)
+void Object::restore(xmlpp::Node* self)
 {
   gst_object_restore_thyself(gobj(), self->cobj());
 }

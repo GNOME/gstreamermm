@@ -208,12 +208,12 @@ public:
    * @param parent The parent XML node to save object into.
    * @return The new xmlpp::Node pointer with the saved object.
    */
-  xmlpp::Node* save_thyself(xmlpp::Node* parent) const;
+  xmlpp::Node* save(xmlpp::Node* parent) const;
 
   /** Restores the Gst::Object with the data from the parent XML node.
    * @param self The XML node to load object from.
    */
-  void restore_thyself(xmlpp::Node* self);
+  void restore(xmlpp::Node* self);
 
   #ifdef GLIBMM_PROPERTIES_ENABLED
   /** The name of the object.
@@ -235,6 +235,7 @@ public:
   Glib::PropertyProxy_ReadOnly<Glib::ustring> property_name() const;
 #endif //#GLIBMM_PROPERTIES_ENABLED
 
+  //TODO: Wrap vfuncs. This is quite easy when using gmmproc. murrayc.
 };
 
 } // namespace Gst

@@ -29,7 +29,7 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("filesrc", "source");
 
-  if (element)
+  if(element)
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 

@@ -86,12 +86,12 @@ bool MiniObject::flag_is_set(guint flag) const
   return GST_MINI_OBJECT_FLAG_IS_SET(gobj(), flag);
 }
 
-void MiniObject::flag_set(guint flag)
+void MiniObject::set_flag(guint flag)
 {
   GST_MINI_OBJECT_FLAG_SET(gobj(), flag);
 }
 
-void MiniObject::flag_unset(guint flag)
+void MiniObject::unset_flag(guint flag)
 {
   GST_MINI_OBJECT_FLAG_UNSET(gobj(), flag);
 }
