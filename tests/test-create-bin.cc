@@ -30,8 +30,8 @@ int main (int argc, char* argv[])
   Glib::RefPtr<Gst::Bin> bin;
   Glib::RefPtr<Gst::Element> source, sink;
 
-  pipeline = Gst::Pipeline::create("my-pipeline");
-  bin = Gst::Bin::create("my-bin");
+  pipeline = Gst::Pipeline::create();
+  bin = Gst::Bin::create();
 
   source = Gst::ElementFactory::create_element("fakesrc", "source");
   sink = Gst::ElementFactory::create_element("fakesink", "sink");
