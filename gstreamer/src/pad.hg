@@ -79,7 +79,9 @@ class Pad : public Object
 
 protected:
   _WRAP_CTOR(Pad(const Glib::ustring& name, PadDirection direction), gst_pad_new)
+  Pad(PadDirection dir);
   Pad(const Glib::RefPtr<PadTemplate>& templ, const Glib::ustring& name);
+  Pad(const Glib::RefPtr<PadTemplate>& templ);
 
 public:
   /** For example,
@@ -95,7 +97,36 @@ public:
    */
   typedef sigc::slot< bool, const Glib::RefPtr<Pad>&, const Glib::RefPtr<MiniObject>& > SlotData;
 
+  /** Creates a new pad with the given name in the given direction.
+   *
+   * @param name The name of the new pad.
+   * @param direction The GstPadDirection of the pad.
+   * @return A new Gst::Pad, or NULL in case of an error. MT safe.
+   */
   _WRAP_CREATE(const Glib::ustring& name, PadDirection dir)
+
+  /** Creates a new pad with a guaranteed unique name (across all pads) in the
+   * given direction.
+   *
+   * @param direction The GstPadDirection of the pad.
+   * @return A new Gst::Pad, or NULL in case of an error. MT safe.
+   */
+  _WRAP_CREATE(PadDirection dir)
+
+  /** Creates a new pad with the given name from the given template.
+   *
+   * @param templ The pad template to use.
+   * @param name The name of the element.
+   * @return A new Gst::Pad, or NULL in case of an error.
+   */
+  _WRAP_CREATE(const Glib::RefPtr<PadTemplate>& pad_template)
+
+  /** Creates a new pad with a guaranteed unique name (across all pads) from
+   * the given template.
+   *
+   * @param templ The pad template to use.
+   * @return A new Gst::Pad, or NULL in case of an error.
+   */
   _WRAP_CREATE(const Glib::RefPtr<PadTemplate>& pad_template, const Glib::ustring& name)
 
   _WRAP_METHOD(PadDirection get_direction() const, gst_pad_get_direction)
@@ -200,11 +231,40 @@ public:
 
   //This is handwritten because conversion from Glib::RefPtr<Buffer>& to
   //GstBuffer** is difficult.
+  /** Allocates a new, empty buffer optimized to push to pad pad. This function
+   * only works if pad is a source pad and has a peer.
+   *
+   * A new, empty Gst::Buffer will be put in the buf argument. You need to
+   * check the caps of the buffer after performing this function and
+   * renegotiate to the format if needed.
+   *
+   * @param offset The offset of the new buffer in the stream.
+   * @param size The size of the new buffer.
+   * @param caps The caps of the new buffer.
+   * @param buf A newly allocated buffer.
+   * @return A result code indicating success of the operation. Any result code
+   * other than Gst::FLOW_OK is an error and buf should not be used. An error
+   * can occur if the pad is not connected or when the downstream peer elements
+   * cannot provide an acceptable buffer. MT safe.
+   */
   FlowReturn alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buf);
   _IGNORE(gst_pad_alloc_buffer)
 
   //This is handwritten because conversion from Glib::RefPtr<Buffer>& to
   //GstBuffer** is difficult.
+  /** In addition to the function alloc_buffer(), this function automatically
+   * calls set_caps() when the caps of the newly allocated buffer are different
+   * from the pad caps.  Again, the pad must be a source pad.
+   *
+   * @param offset The offset of the new buffer in the stream.
+   * @param size The size of the new buffer.
+   * @param caps The caps of the new buffer.
+   * @param buf A newly allocated buffer.
+   * @return A result code indicating success of the operation. Any result code
+   * other than Gst::FLOW_OK is an error and buf should not be used. An error
+   * can occur if the pad is not connected or when the downstream peer elements
+   * cannot provide an acceptable buffer. MT safe.
+   */
   FlowReturn alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buf);
   _IGNORE(gst_pad_alloc_buffer_and_set_caps)
 
@@ -221,10 +281,35 @@ public:
   _WRAP_METHOD(bool peer_accept_caps(const Glib::RefPtr<Caps>& caps), gst_pad_peer_accept_caps)
 
   // This method is written manually because an extra ref is necessary
+  /** Pushes a buffer to the peer of the pad. The pad must be a source pad,
+   * otherwise this method returns Gst::FLOW_ERROR.
+   *
+   * This function will call an installed pad block before triggering any
+   * installed pad probes.
+   *
+   * If the caps on buffer are different from the currently configured caps on
+   * pad, this function will call any installed setcaps function on pad (see
+   * the C API gst_pad_set_setcaps_function()). In case of failure to
+   * renegotiate the new format, this function returns
+   * Gst::FLOW_NOT_NEGOTIATED.
+   *
+   * The function proceeds calling chain() on the peer pad and returns the
+   * value from that function. If pad has no peer, Gst::FLOW_NOT_LINKED will
+   * be returned.
+   *
+   * @param buffer The Gst::Buffer to push.
+   * @return A Gst::FlowReturn from the peer pad. MT safe.
+   */
   FlowReturn push(const Glib::RefPtr<Buffer>& buffer);
   _IGNORE(gst_pad_push)
 
   // This method is written manually because an extra ref is necessary
+  /** Sends the event to the peer of the pad. This function is mainly used by
+   * elements to send events to their peer elements.
+   *
+   * @param event The GstEvent to send to the pad.
+   * @return true if the event was handled. MT safe.
+   */
   bool push_event(const Glib::RefPtr<Event>& event);
   _IGNORE(gst_pad_push_event)
 
@@ -237,6 +322,28 @@ public:
   _WRAP_METHOD(bool activate_push(bool active = true), gst_pad_activate_push)
 
   // This method is written manually because an extra ref is necessary
+  /** Sends the event to the pad. This function can be used by applications to
+   * send events in the pipeline.
+   *
+   * If the pad is a source pad, event should be an upstream event. If the pad
+   * is a sink pad, the event should be a downstream event. For example, you
+   * would not send a Gst::EVENT_EOS on a src pad; EOS events only propagate
+   * downstream.  Furthermore, some downstream events have to be serialized
+   * with data flow, like EOS, while some can travel out-of-band, like
+   * Gst::EVENT_FLUSH_START.  If the event needs to be serialized with data
+   * flow, this function will take the pad's stream lock while calling its
+   * event function.
+   *
+   * To find out whether an event type is upstream, downstream, or downstream
+   * and serialized, see Gst::EventTypeFlags, Gst::Enums::get_flags(),
+   * is_upstream(), Gst::Event::is_downstream(), and
+   * Gst::Event::is_serialized(). Note that in practice that an application or
+   * plugin doesn't need to bother itself with this information; the core
+   * handles all necessary locks and checks.
+   *
+   * @param event The Gst::Event to send to the pad.
+   * @return true if the event was handled. 
+   */
   bool send_event(const Glib::RefPtr<Event>& event);
   _IGNORE(gst_pad_send_event)
 
@@ -246,19 +353,40 @@ public:
   _WRAP_METHOD(bool query_default(const Glib::RefPtr<Query>& query), gst_pad_query_default)
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_pad_query_position)
 
+  /** Queries a pad for the stream position parsing only the format.
+   * @param format A reference to the Gst::Format asked for. On return contains
+   * the Gst::Format used.
+   * @return true if the query could be performed.
+   */
   bool query_position(Format& format) const;
 
   _WRAP_METHOD(bool query_duration(Format& format, gint64& duration) const, gst_pad_query_duration)
 
+  /** Queries a pad for the total stream duration parsing only the format.
+   * @param format A reference to the Gst::Format asked for. On return contains
+   * the GstFormat used.
+   * @return true if the query could be performed.
+   */
   bool query_duration(Format& format) const;
 
   _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_pad_query_convert)
   _WRAP_METHOD(bool query_peer_position(Format& format, gint64& position) const, gst_pad_query_peer_position)
 
+  /** Queries the peer of a given sink pad for the stream position parsing only
+   * the format.
+   * @param format A reference to the Gst::Format asked for. On return contains
+   * the Gst::Format used.
+   * @return true if the query could be performed.
+   */
   bool query_peer_position(Format& format) const;
 
    _WRAP_METHOD(bool query_peer_duration(Format& format, gint64& duration) const, gst_pad_query_peer_duration)
 
+  /** Queries the peer pad of a given sink pad for the total stream duration.
+   * @param format A reference to the Gst::Format asked for. On return contains
+   * the Gst::Format used.
+   * @return true if the query could be performed.
+   */
   bool query_peer_duration(Format& format) const;
 
    _WRAP_METHOD(bool query_peer_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_pad_query_peer_convert)
@@ -306,8 +434,16 @@ public:
   _IGNORE_SIGNAL(have_data)
 
 #m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
+  /** Signals that a pad has been linked to the peer pad.
+   */
   _WRAP_SIGNAL(void linked(const Glib::RefPtr<Pad>& peer_pad), "linked")
+
+  /** Signals that a pad connection has been requested.
+   */
   _WRAP_SIGNAL(void request_link(), "request-link")
+
+  /** Signals that a pad has been unlinked from the peer pad.
+   */
   _WRAP_SIGNAL(void unlinked(const Glib::RefPtr<Pad>& peer_pad), "unlinked")
 
   _WRAP_PROPERTY("caps", Glib::RefPtr<Caps>)

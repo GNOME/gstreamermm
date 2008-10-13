@@ -39,29 +39,47 @@ int main (int argc, char* argv[])
       templ->get_name_template() << "'; direction = " << 
         templ->get_direction() << "." << std::endl;
 
-  Glib::RefPtr<Gst::Pad> pad1 = Gst::Pad::create("pad1", Gst::PAD_SINK);
-
+  Glib::RefPtr<Gst::Pad> pad1 = Gst::Pad::create(Gst::PAD_SINK);
   if (pad1)
     std::cout << "Successfully created pad '" << pad1->get_name() <<
       "'; direction = " << pad1->get_direction() << "." << std::endl;
 
-  Glib::RefPtr<Gst::Pad> pad2 = Gst::Pad::create(Gst::PAD_SINK);
+  Glib::RefPtr<Gst::Pad> pad2 = Gst::Pad::create(templ);
 
   if (pad2)
     std::cout << "Successfully created pad '" << pad2->get_name() <<
       "'; direction = " << pad2->get_direction() << "." << std::endl;
 
-  Glib::RefPtr<Gst::Pad> pad3 = Gst::Pad::create(templ, "pad3");
+//Uuncomment the following lines to produce an error while creating the ghost
+//pad.
+/*
+  Glib::RefPtr<Gst::GhostPad> gpad1 = Gst::GhostPad::create("gpad1", pad1);
+  if (gpad1)
+    std::cout << "Successfully created pad '" << gpad1->get_name() <<
+      "'; direction = " << gpad1->get_direction() << "." << std::endl;
+*/
 
-  if (pad3)
-    std::cout << "Successfully created pad '" << pad3->get_name() <<
-      "'; direction = " << pad3->get_direction() << "." << std::endl;
+  Glib::RefPtr<Gst::GhostPad> gpad2 =
+    Gst::GhostPad::create("gpad2", Gst::PAD_SRC);
+  if (gpad2)
+    std::cout << "Successfully created pad '" << gpad2->get_name() <<
+      "'; direction = " << gpad2->get_direction() << "." << std::endl;
 
-  Glib::RefPtr<Gst::Pad> pad4 = Gst::Pad::create(templ);
+//Uuncomment the following lines to produce an error while creating the ghost
+//pad.
+/*
+  Glib::RefPtr<Gst::GhostPad> gpad3 =
+    Gst::GhostPad::create("gpad3", pad1, templ);
+  if (gpad3)
+    std::cout << "Successfully created pad '" << gpad3->get_name() <<
+      "'; direction = " << gpad3->get_direction() << "." << std::endl;
+*/
 
-  if (pad4)
-    std::cout << "Successfully created pad '" << pad4->get_name() <<
-      "'; direction = " << pad4->get_direction() << "." << std::endl;
+  Glib::RefPtr<Gst::GhostPad> gpad4 =
+    Gst::GhostPad::create("gpad4", templ);
+  if (gpad4)
+    std::cout << "Successfully created pad '" << gpad4->get_name() <<
+      "'; direction = " << gpad4->get_direction() << "." << std::endl;
 
   return 0;
 }

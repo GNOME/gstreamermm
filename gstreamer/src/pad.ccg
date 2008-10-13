@@ -84,9 +84,18 @@ static void Pad_Data_gstreamermm_callback_disconnect(void* data)
 namespace Gst
 {
 
+Pad::Pad(PadDirection dir)
+  : _CONSTRUCT("name", NULL, "direction", dir)
+{}
+
 Pad::Pad(const Glib::RefPtr<PadTemplate>& templ, const Glib::ustring& name)
   : _CONSTRUCT("name", name.c_str(), "direction", templ->get_direction(),
       "template", templ->gobj())
+{}
+
+Pad::Pad(const Glib::RefPtr<PadTemplate>& templ)
+  : _CONSTRUCT("name", NULL, "direction", templ->get_direction(), "template",
+      templ->gobj())
 {}
 
 // This is handcoded because the documentation tells us that we need to copy
