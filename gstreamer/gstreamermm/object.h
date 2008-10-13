@@ -64,7 +64,6 @@ namespace Gst
  * object.
  *
  * Last reviewed on 2005-11-09 (0.9.4)
- *
  */
 class Object : public Glib::Object 
 {

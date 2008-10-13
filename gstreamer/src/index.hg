@@ -70,8 +70,16 @@ protected:
   _CTOR_DEFAULT
 
 public:
-  _WRAP_METHOD(bool is_readable() const, GST_INDEX_IS_READABLE)
-  _WRAP_METHOD(bool is_writable() const, GST_INDEX_IS_WRITABLE)
+  /** Check if the index can be read from.
+   * @return true if index is readable, false otherwise.
+   */
+  bool is_readable() const;
+
+  /** Check if the index can be written to.
+   * @return true if index is writable, false otherwise.
+   */
+  bool is_writable() const;
+
   _WRAP_METHOD(void commit(int id), gst_index_commit)
   _WRAP_METHOD(gint get_group() const, gst_index_get_group)
   _WRAP_METHOD(gint new_group(), gst_index_new_group)
@@ -93,6 +101,11 @@ public:
    */ 
   typedef sigc::slot<bool, const Glib::RefPtr<Index>&, IndexEntry> SlotFilter;
 
+  /** Lets the app register a custom filter slot so that it can select what
+   * entries should be stored in the index.
+   *
+   * @param slot The filter slot to register.
+   */
   void set_filter(const SlotFilter& slot);
 
   /** For example,
@@ -103,8 +116,14 @@ public:
    */ 
   typedef sigc::slot<bool, const Glib::RefPtr<Index>&, const Glib::RefPtr<Gst::Object>&, Glib::ustring&> SlotResolver;
 
+  /** Lets the app register a custom slot to map index ids to writer
+   * descriptions.
+   * @param slot The resolver slot to register.
+   */
   void set_resolver(const SlotResolver& slot);
 
+  /** Emitted when a new entry is added to the index.
+   */
   _WRAP_SIGNAL(void entry_added(const IndexEntry& entry), "entry-added")
 
   _WRAP_PROPERTY("resolver", Gst::Index::SlotResolver)
