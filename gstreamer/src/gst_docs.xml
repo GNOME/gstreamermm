@@ -455,6 +455,23 @@ value of 1.0 for applied_rate
 </return>
 </function>
 
+<function name="gst_bit_reader_get_pos">
+<description>
+Returns: The current position of @reader in bits.
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current position of @reader in bits.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_format_iterate_definitions">
 <description>
 Iterate all the registered formats. The format definition is read
@@ -575,6 +592,29 @@ Since: 0.10.4
 </return>
 </function>
 
+<function name="gst_byte_reader_get_float64_le">
+<description>
+Read a 64 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gdouble to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_segment_set_duration">
 <description>
 Set the duration of the segment to @duration. This function is mainly
@@ -684,6 +724,11 @@ buffers, and unrefs the original source buffers.
 
 If the buffers point to contiguous areas of memory, the buffer
 is created without copying the data.
+
+This is a convenience function for C programmers. See also 
+gst_buffer_merge(), which does the same thing without 
+unreffing the input parameters. Language bindings without 
+explicit reference counting should not wrap this function.
 
 
 </description>
@@ -1112,6 +1157,28 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_int8">
+<description>
+Read a signed 8 bit integer into @val and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint8 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_segtrap_set_enabled">
 <description>
 Applications might want to disable/enable the SIGSEGV handling of
@@ -1229,6 +1296,42 @@ Since: 0.10.20
 </return>
 </function>
 
+<function name="gst_message_new_structure_change">
+<description>
+Create a new structure change message. This message is posted when the
+structure of a pipeline is in the process of being changed, for example
+when pads are linked or unlinked.
+
+@src should be the srcpad that unlinked or linked.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> The object originating the message.
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> The change type.
+</parameter_description>
+</parameter>
+<parameter name="owner">
+<parameter_description> The owner element of @src.
+</parameter_description>
+</parameter>
+<parameter name="busy">
+<parameter_description> Whether the structure change is busy.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new structure change message.
+
+MT safe.
+
+Since: 0.10.22.
+</return>
+</function>
+
 <function name="gst_element_send_event">
 <description>
 Sends an event to an element. If the element doesn&apos;t implement an
@@ -1342,43 +1445,69 @@ currently configured segment for playback.
 </return>
 </function>
 
-<function name="gst_interpolation_control_source_set">
+<function name="gst_byte_reader_peek_float32_be">
 <description>
-Set the value of given controller-handled property at a certain time.
+Read a 32 bit big endian integer into @val
+but keep the current position.
 
 
 </description>
 <parameters>
-<parameter name="self">
-<parameter_description> the #GstInterpolationControlSource object
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
 </parameter_description>
 </parameter>
-<parameter name="timestamp">
-<parameter_description> the time the control-change is scheduled for
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> the control-value
+<parameter name="val">
+<parameter_description> Pointer to a #gfloat to store the result
 </parameter_description>
 </parameter>
 </parameters>
-<return> FALSE if the values couldn&apos;t be set, TRUE otherwise.
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
-<function name="gst_static_pad_template_get">
+<function name="gst_pad_set_iterate_internal_links_function">
 <description>
-Converts a #GstStaticPadTemplate into a #GstPadTemplate.
+Sets the given internal link iterator function for the pad.
+
+Since: 0.10.21
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GstPad of either direction.
+</parameter_description>
+</parameter>
+<parameter name="iterintlink">
+<parameter_description> the #GstPadIterIntLinkFunction to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_byte_reader_peek_int64_be">
+<description>
+Read a signed 64 bit big endian integer into @val
+but keep the current position.
 
 
 </description>
 <parameters>
-<parameter name="pad_template">
-<parameter_description> the static pad template
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint64 to store the result
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GstPadTemplate.
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -1541,6 +1670,29 @@ ranges) value.
 </return>
 </function>
 
+<function name="gst_byte_reader_peek_uint32_le">
+<description>
+Read a signed 32 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_tag_merge_use_first">
 <description>
 This is a convenience function for the func argument of gst_tag_register().
@@ -1554,6 +1706,23 @@ It creates a copy of the first value from the list.
 </parameter>
 <parameter name="src">
 <parameter_description> GValue to copy from
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_bit_reader_free">
+<description>
+Frees a #GstBitReader instance, which was previously allocated by
+gst_bit_reader_new() or gst_bit_reader_new_from_buffer().
+
+Since: 0.10.22
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
 </parameter_description>
 </parameter>
 </parameters>
@@ -1764,6 +1933,29 @@ Queries an element to convert @src_val in @src_format to @dest_format.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_int24_be">
+<description>
+Read a signed 24 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_check_drop_buffers">
 <description>
 Unref and remove all buffers that are in the global @buffers GList,
@@ -1777,26 +1969,50 @@ Since: 0.10.18
 <return></return>
 </function>
 
-<function name="gst_tag_list_insert">
+<function name="gst_pad_iterate_internal_links">
 <description>
-Inserts the tags of the second list into the first list using the given mode.
+Gets an iterator for the pads to which the given pad is linked to inside
+of the parent element.
+
+Each #GstPad element yielded by the iterator will have its refcount increased,
+so unref after use.
+
 
 </description>
 <parameters>
-<parameter name="into">
-<parameter_description> list to merge into
-</parameter_description>
-</parameter>
-<parameter name="from">
-<parameter_description> list to merge from
-</parameter_description>
-</parameter>
-<parameter name="mode">
-<parameter_description> the mode to use
+<parameter name="pad">
+<parameter_description> the GstPad to get the internal links of.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a new #GstIterator of #GstPad or %NULL when the pad does not have an
+iterator function configured. Use gst_iterator_free() after usage.
+
+Since: 0.10.21
+</return>
+</function>
+
+<function name="gst_byte_reader_peek_uint24_be">
+<description>
+Read a signed 24 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_registry_add_path">
@@ -1853,27 +2069,26 @@ Deprecated: use a #GstDPPacketizer
 </return>
 </function>
 
-<function name="gst_dp_validate_packet">
+<function name="gst_byte_reader_peek_float64_le">
 <description>
-Validates the given packet by checking version information and checksums.
+Read a 64 bit little endian integer into @val
+but keep the current position.
 
 
 </description>
 <parameters>
-<parameter name="header_length">
-<parameter_description> the length of the packet header
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
 </parameter_description>
 </parameter>
-<parameter name="header">
-<parameter_description> the byte array of the packet header
-</parameter_description>
-</parameter>
-<parameter name="payload">
-<parameter_description> the byte array of the packet payload
+<parameter name="val">
+<parameter_description> Pointer to a #gdouble to store the result
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the packet validates.
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -1934,6 +2149,27 @@ Gets the current clock used by @pipeline.
 </parameters>
 <return> a #GstClock, unref after usage.
 </return>
+</function>
+
+<function name="gst_byte_reader_init">
+<description>
+Initializes a #GstByteReader instance to read from @buffer. This function
+can be called on already initialized instances.
+
+Since: 0.10.22
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> Buffer from which the #GstByteReader should read
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_base_sink_is_qos_enabled">
@@ -2292,6 +2528,32 @@ Get the length of the payload described by @header.
 </return>
 </function>
 
+<function name="gst_bit_reader_peek_bits_uint16">
+<description>
+Read @nbits bits into @val but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint16 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_uri_handler_set_uri">
 <description>
 Tries to set the URI of the given handler.
@@ -2383,6 +2645,28 @@ Checks if the given pointer is a taglist.
 </parameter>
 </parameters>
 <return> TRUE, if the given pointer is a taglist
+</return>
+</function>
+
+<function name="gst_byte_reader_peek_uint8">
+<description>
+Read a signed 8 bit integer into @val but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint8 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -2788,6 +3072,28 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_bit_reader_new">
+<description>
+Create a new #GstBitReader instance, which will read from @data.
+
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> Data from which the #GstBitReader should read
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Size of @data in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstBitReader instance
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_controller_get_value_array">
 <description>
 Function to be able to get an array of values for one element property.
@@ -3109,9 +3415,21 @@ Creates an element for handling the given URI.
 
 <function name="gst_iterator_next">
 <description>
-Get the next item from the iterator. For iterators that return
-refcounted objects, the returned object will have its refcount
-increased and should therefore be unreffed after usage.
+Get the next item from the iterator in @elem. 
+
+Only when this function returns %GST_ITERATOR_OK, @elem will contain a valid
+value. For iterators that return refcounted objects, the returned object
+will have its refcount increased and should therefore be unreffed after
+usage.
+
+When this function returns %GST_ITERATOR_DONE, no more elements can be
+retrieved from @it.
+
+A return value of %GST_ITERATOR_RESYNC indicates that the element list was
+concurrently updated. The user of @it should call gst_iterator_resync() to
+get the newly updated list. 
+
+A return value of %GST_ITERATOR_ERROR indicates an unrecoverable fatal error.
 
 
 </description>
@@ -3125,8 +3443,8 @@ increased and should therefore be unreffed after usage.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The result of the iteration. Unref after usage if this is
-a refcounted object.
+<return> The result of the iteration. Unref @elem after usage if this
+is a refcounted object.
 
 MT safe.
 </return>
@@ -3190,6 +3508,28 @@ Checks if the given taglist is empty.
 <return> TRUE if the taglist is empty, otherwise FALSE.
 
 Since: 0.10.11
+</return>
+</function>
+
+<function name="gst_byte_reader_peek_int8">
+<description>
+Read a signed 8 bit integer into @val but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint8 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -4013,27 +4353,23 @@ with the same nick.
 </return>
 </function>
 
-<function name="gst_data_queue_pop">
+<function name="gst_caps_merge_structure">
 <description>
-Retrieves the first @item available on the @queue. If the queue is currently
-empty, the call will block until at least one item is available, OR the
-@queue is set to the flushing state.
-MT safe.
-
+Appends @structure to @caps if its not already expressed by @caps.  The
+structure is not copied; @caps becomes the owner of @structure.
 
 </description>
 <parameters>
-<parameter name="queue">
-<parameter_description> a #GstDataQueue.
+<parameter name="caps">
+<parameter_description> the #GstCaps that will the the new structure
 </parameter_description>
 </parameter>
-<parameter name="item">
-<parameter_description> pointer to store the returned #GstDataQueueItem.
+<parameter name="structure">
+<parameter_description> the #GstStructure to merge
 </parameter_description>
 </parameter>
 </parameters>
-<return> #TRUE if an @item was successfully retrieved from the @queue.
-</return>
+<return></return>
 </function>
 
 <function name="gst_pad_proxy_setcaps">
@@ -4619,6 +4955,24 @@ this, PAUSE the pipeline, query the current playback position with
 </return>
 </function>
 
+<function name="gst_bit_reader_skip_to_byte">
+<description>
+Skips until the next byte.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_util_set_value_from_string">
 <description>
 Converts the string to the type of the value and
@@ -4636,6 +4990,34 @@ sets the value with it.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_net_time_packet_receive">
+<description>
+Receives a #GstNetTimePacket over a socket. Handles interrupted system calls,
+but otherwise returns NULL on error. See recvfrom(2) for more information on
+how to interpret @sockaddr.
+
+MT safe. Caller owns return value (g_free to free).
+
+
+</description>
+<parameters>
+<parameter name="fd">
+<parameter_description> a file descriptor created by socket(2)
+</parameter_description>
+</parameter>
+<parameter name="addr">
+<parameter_description> a pointer to a sockaddr to hold the address of the sender
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> a pointer to the size of the data pointed to by @addr
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new #GstNetTimePacket.
+</return>
 </function>
 
 <function name="gst_tag_list_foreach">
@@ -4719,8 +5101,8 @@ Since: 0.10.15
 
 <function name="gst_iterator_fold">
 <description>
-Folds @func over the elements of @iter. That is to say, @proc will be called
-as @proc (object, @ret, @user_data) for each object in @iter. The normal use
+Folds @func over the elements of @iter. That is to say, @func will be called
+as @func (object, @ret, @user_data) for each object in @it. The normal use
 of this procedure is to accumulate the results of operating on the objects in
 @ret.
 
@@ -4759,6 +5141,15 @@ The iterator will not be freed.
 
 MT safe.
 </return>
+</function>
+
+<function name="scan">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_system_clock_obtain">
@@ -4833,6 +5224,29 @@ this might deadlock the dispose function.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_get_uint32_le">
+<description>
+Read an unsigned 32 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_tag_list_add_values">
@@ -4985,6 +5399,28 @@ Get the format, minsize, maxsize and async-flag in the buffersize event.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_skip">
+<description>
+Skips @nbytes bytes of the #GstByteReader instance.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="nbytes">
+<parameter_description> the number of bytes to skip
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @nbytes bytes could be skipped, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_registry_lookup">
@@ -5244,6 +5680,29 @@ Returns: the #GstElement with the given name, or NULL
 </return>
 </function>
 
+<function name="gst_byte_reader_get_float32_be">
+<description>
+Read a 32 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gfloat to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_pad_get_query_types_default">
 <description>
 Invoke the default dispatcher for the query types on
@@ -5399,6 +5858,29 @@ va_list form of gst_structure_remove_fields().
 <return></return>
 </function>
 
+<function name="gst_byte_reader_peek_float64_be">
+<description>
+Read a 64 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gdouble to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_index_factory_find">
 <description>
 Search for an indexfactory of the given name.
@@ -5552,6 +6034,32 @@ Sets @value to the range specified by @start and @end.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_bit_reader_peek_bits_uint64">
+<description>
+Read @nbits bits into @val but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint64 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_pad_accept_caps">
@@ -5825,6 +6333,29 @@ Read the contents of the binary cache file at @location into @registry.
 </return>
 </function>
 
+<function name="gst_byte_reader_peek_int16_be">
+<description>
+Read a signed 16 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_message_new_custom">
 <description>
 Create a new custom-typed message. This can be used for anything not
@@ -5979,6 +6510,25 @@ and @numerator_end/@denominator_end.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_new_from_buffer">
+<description>
+Create a new #GstByteReader instance, which will read from the
+#GstBuffer @buffer.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> Buffer from which the #GstByteReader should read
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstByteReader instance
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_registry_find_plugin">
@@ -6469,6 +7019,23 @@ the MT Refcounting section of the design documents.
 <return></return>
 </function>
 
+<function name="gst_bit_reader_get_remaining">
+<description>
+Returns: The remaining number of bits of @reader instance.
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> The remaining number of bits of @reader instance.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_base_sink_wait_eos">
 <description>
 This function will block until @time is reached. It is usually called by
@@ -6717,6 +7284,29 @@ one format and another.
 </return>
 </function>
 
+<function name="gst_ghost_pad_construct">
+<description>
+Finish initialization of a newly allocated ghost pad.
+
+This function is most useful in language bindings and when subclassing
+#GstGhostPad; plugin and application developers normally will not call this
+function. Call this function directly after a call to g_object_new
+(GST_TYPE_GHOST_PAD, &quot;direction&quot;, @dir, ..., NULL).
+
+
+</description>
+<parameters>
+<parameter name="gpad">
+<parameter_description> the newly allocated ghost pad
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the construction succeeds, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_element_no_more_pads">
 <description>
 Use this function to signal that the element does not expect any more pads
@@ -6781,29 +7371,27 @@ Either @newdata and the value pointed to by @olddata may be NULL.
 <return></return>
 </function>
 
-<function name="gst_structure_get_string">
+<function name="gst_pad_iterate_internal_links_default">
 <description>
-Finds the field corresponding to @fieldname, and returns the string
-contained in the field&apos;s value.  Caller is responsible for making
-sure the field exists and has the correct type.
+Iterate the list of pads to which the given pad is linked to inside of
+the parent element.
+This is the default handler, and thus returns an iterator of all of the
+pads inside the parent element with opposite direction.
 
-The string should not be modified, and remains valid until the next
-call to a gst_structure_*() function with the given structure.
+The caller must free this iterator after use with gst_iterator_free().
 
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> a #GstStructure
-</parameter_description>
-</parameter>
-<parameter name="fieldname">
-<parameter_description> the name of a field
+<parameter name="pad">
+<parameter_description> the #GstPad to get the internal links of.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the string or NULL when the field did not exist
-or did not contain a string.
+<return> a #GstIterator of #GstPad, or NULL if @pad has no parent. Unref each
+returned pad with gst_object_unref().
+
+Since: 0.10.21
 </return>
 </function>
 
@@ -6843,9 +7431,9 @@ Since: 0.10.20
 <description>
 Enable or disable QoS handling in the transform.
 
-Since: 0.10.5
-
 MT safe.
+
+Since: 0.10.5
 
 </description>
 <parameters>
@@ -6919,6 +7507,10 @@ to calling gst_bin_remove() with each member of the list.
 In addition to the function gst_pad_alloc_buffer(), this function
 automatically calls gst_pad_set_caps() when the caps of the
 newly allocated buffer are different from the @pad caps.
+
+After a renegotiation, the size of the new buffer returned in @buf could
+be of the wrong size for the new format and must be unreffed an reallocated
+in that case.
 
 
 </description>
@@ -7436,6 +8028,29 @@ if the query was not registered.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_int24_le">
+<description>
+Read a signed 24 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_event_has_name">
 <description>
 Checks if @event has the given @name. This function is usually used to
@@ -7609,7 +8224,8 @@ Gets a list of pads to which the given pad is linked to
 inside of the parent element.
 This is the default handler, and thus returns a list of all of the
 pads inside the parent element with opposite direction.
-The caller must free this list after use.
+
+The caller must free this list after use with g_list_free().
 
 
 </description>
@@ -7622,6 +8238,12 @@ The caller must free this list after use.
 <return> a newly allocated #GList of pads, or NULL if the pad has no parent.
 
 Not MT safe.
+
+Deprecated: This function does not ref the pads in the list so that they
+could become invalid by the time the application accesses them. It&apos;s also
+possible that the list changes while handling the pads, which the caller of
+this function is unable to know. Use the thread-safe 
+gst_pad_iterate_internal_links_default() instead.
 </return>
 </function>
 
@@ -7708,6 +8330,29 @@ fixating. @caps must be writable.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_get_int32_be">
+<description>
+Read a signed 32 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_parse_launch">
@@ -8621,6 +9266,29 @@ Since: 0.10.20
 </return>
 </function>
 
+<function name="gst_byte_reader_peek_float32_le">
+<description>
+Read a 32 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gfloat to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_preset_get_preset_names">
 <description>
 Get a copy of preset names as a NULL terminated string array.
@@ -8686,6 +9354,29 @@ handler.
 should unref the buffer after usage.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_byte_reader_peek_int24_be">
+<description>
+Read a signed 24 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -8939,6 +9630,32 @@ default debugging information, or %NULL
 <return></return>
 </function>
 
+<function name="gst_bit_reader_get_bits_uint32">
+<description>
+Read @nbits bits into @val and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_object_get_control_rate">
 <description>
 Obtain the control-rate for this @object. Audio processing #GstElement
@@ -9119,6 +9836,34 @@ flushed.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_tag_list_copy_value">
+<description>
+Copies the contents for the given tag into the value,
+merging multiple values into one if multiple values are associated
+with the tag.
+You must g_value_unset() the value after use.
+
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> uninitialized #GValue to copy into
+</parameter_description>
+</parameter>
+<parameter name="list">
+<parameter_description> list to get the tag from
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> tag to read out
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE, if a value was copied, FALSE if the tag didn&apos;t exist in the
+given list.
+</return>
 </function>
 
 <function name="gst_static_caps_get">
@@ -9305,6 +10050,32 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_bit_reader_peek_bits_uint32">
+<description>
+Read @nbits bits into @val but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_index_factory_new">
 <description>
 Create a new indexfactory with the given parameters
@@ -9406,6 +10177,29 @@ Since: 0.10.20
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_peek_uint24_le">
+<description>
+Read a signed 24 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_structure_get_clock_time">
@@ -9978,6 +10772,29 @@ found. gst_object_unref() after usage.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_int32_le">
+<description>
+Read a signed 32 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_message_parse_buffering">
 <description>
 Extracts the buffering percent from the GstMessage. see also
@@ -10076,6 +10893,30 @@ This function is the reverse of gst_clock_unadjust_unlocked().
 </return>
 </function>
 
+<function name="gst_dp_validate_packet">
+<description>
+Validates the given packet by checking version information and checksums.
+
+
+</description>
+<parameters>
+<parameter name="header_length">
+<parameter_description> the length of the packet header
+</parameter_description>
+</parameter>
+<parameter name="header">
+<parameter_description> the byte array of the packet header
+</parameter_description>
+</parameter>
+<parameter name="payload">
+<parameter_description> the byte array of the packet payload
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the packet validates.
+</return>
+</function>
+
 <function name="gst_element_set_state">
 <description>
 Sets the state of the element. This function will try to set the
@@ -10103,6 +10944,29 @@ of the state change or it can wait for a state change message on the bus.
 <return> Result of the state change using #GstStateChangeReturn.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_byte_reader_get_float32_le">
+<description>
+Read a 32 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gfloat to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -10323,6 +11187,23 @@ Free the given packetizer.
 <return></return>
 </function>
 
+<function name="gst_byte_reader_get_remaining">
+<description>
+Returns: The remaining number of bytes of @reader instance.
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> The remaining number of bytes of @reader instance.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_message_new_element">
 <description>
 Create a new element-specific message. This is meant as a generic way of
@@ -10490,6 +11371,29 @@ has been changed but not the playback position.
 <return></return>
 </function>
 
+<function name="gst_byte_reader_peek_uint64_be">
+<description>
+Read a signed 64 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint64 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_message_new_buffering">
 <description>
 Create a new buffering message. This message can be posted by an element that
@@ -10642,7 +11546,8 @@ held. The @free function is called when the iterator is freed.
 </parameter_description>
 </parameter>
 <parameter name="master_cookie">
-<parameter_description> pointer to a guint32 to protect the iterated object.
+<parameter_description> pointer to a guint32 that is changed when the items in the
+iterator changed.
 </parameter_description>
 </parameter>
 <parameter name="next">
@@ -11142,6 +12047,29 @@ function returns FALSE.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_uint16_le">
+<description>
+Read an unsigned 16 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_xml_get_element">
 <description>
 This function is used to get a pointer to the GstElement corresponding
@@ -11419,23 +12347,26 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_controller_new">
+<function name="gst_byte_reader_get_int64_be">
 <description>
-Creates a new GstController for the given object&apos;s properties
+Read a signed 64 bit big endian integer into @val
+and update the current position.
 
 
 </description>
 <parameters>
-<parameter name="object">
-<parameter_description> the object of which some properties should be controlled
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
 </parameter_description>
 </parameter>
-<parameter name="Varargs">
-<parameter_description> %NULL terminated list of property names that should be controlled
+<parameter name="val">
+<parameter_description> Pointer to a #gint64 to store the result
 </parameter_description>
 </parameter>
 </parameters>
-<return> the new controller.
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -11498,6 +12429,28 @@ Since: 0.10.4
 <parameters>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_new">
+<description>
+Create a new #GstByteReader instance, which will read from @data.
+
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> Data from which the #GstByteReader should read
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Size of @data in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstByteReader instance
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_debug_get_default_threshold">
@@ -11880,16 +12833,13 @@ was given.
 </return>
 </function>
 
-<function name="gst_lfo_control_source_new">
+<function name="the">
 <description>
-This returns a new, unbound #GstLFOControlSource.
-
 
 </description>
 <parameters>
 </parameters>
-<return> a new, unbound #GstLFOControlSource.
-</return>
+<return></return>
 </function>
 
 <function name="gst_bus_pop">
@@ -12337,6 +13287,27 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_bit_reader_init">
+<description>
+Initializes a #GstBitReader instance to read from @buffer. This function
+can be called on already initialized instances.
+
+Since: 0.10.22
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> Buffer from which the #GstBitReader should read
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_value_fraction_multiply">
 <description>
 Multiplies the two GValues containing a GstFraction and sets @product
@@ -12498,6 +13469,28 @@ compare function and user_data.
 <return> the entry associated with the value or NULL if the
 value was not found.
 </return>
+</function>
+
+<function name="gst_tag_list_insert">
+<description>
+Inserts the tags of the second list into the first list using the given mode.
+
+</description>
+<parameters>
+<parameter name="into">
+<parameter_description> list to merge into
+</parameter_description>
+</parameter>
+<parameter name="from">
+<parameter_description> list to merge from
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> the mode to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_tag_setter_add_tag_values">
@@ -12753,18 +13746,12 @@ MT safe.
 
 <function name="GstPadTemplate">
 <description>
-This signal is fired when an element creates a pad from this template.
+The capabilities of the pad described by the pad template.
+
+Since: 0.10.21
 
 </description>
 <parameters>
-<parameter name="pad_template">
-<parameter_description> the object which received the signal.
-</parameter_description>
-</parameter>
-<parameter name="pad">
-<parameter_description> the pad that was created.
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -12914,6 +13901,29 @@ Since: 0.10.16
 </return>
 </function>
 
+<function name="gst_byte_reader_peek_int32_be">
+<description>
+Read a signed 32 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_pad_get_internal_links">
 <description>
 Gets a list of pads to which the given pad is linked to
@@ -12928,9 +13938,15 @@ The caller must free this list after use.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GList of pads.
+<return> a newly allocated #GList of pads, free with g_list_free().
 
 Not MT safe.
+
+Deprecated: This function does not ref the pads in the list so that they
+could become invalid by the time the application accesses them. It&apos;s also
+possible that the list changes while handling the pads, which the caller of
+this function is unable to know. Use the thread-safe 
+gst_pad_iterate_internal_links() instead.
 </return>
 </function>
 
@@ -13052,6 +14068,29 @@ properties.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_get_float64_be">
+<description>
+Read a 64 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gdouble to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_query_new_seeking">
@@ -13272,6 +14311,25 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_bit_reader_new_from_buffer">
+<description>
+Create a new #GstBitReader instance, which will read from the
+#GstBuffer @buffer.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> Buffer from which the #GstBitReader should read
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstBitReader instance
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_tag_setter_add_tags">
 <description>
 Adds the given tag / value pairs on the setter using the given merge mode.
@@ -13384,6 +14442,9 @@ string must not be modified or freed.
 <description>
 Resync the iterator. this function is mostly called
 after gst_iterator_next() returned %GST_ITERATOR_RESYNC.
+
+When an iterator was pushed on @it, it will automatically be popped again
+with this function.
 
 MT safe.
 
@@ -13545,9 +14606,9 @@ Queries if the transform will handle QoS.
 </parameters>
 <return> TRUE if QoS is enabled.
 
-Since: 0.10.5
-
 MT safe.
+
+Since: 0.10.5
 </return>
 </function>
 
@@ -13739,6 +14800,29 @@ data @tag names can be something like e.g. &quot;comment&quot;. Supplying %NULL 
 <return> %TRUE for success, %FALSE if e.g. there is no preset with that @name
 
 Since: 0.10.20
+</return>
+</function>
+
+<function name="gst_byte_reader_set_pos">
+<description>
+Sets the new position of a #GstByteReader instance to @pos in bytes.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="pos">
+<parameter_description> The new position in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the position could be set successfully, %FALSE
+otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -14238,6 +15322,31 @@ Saves the element as part of the given XML structure.
 </return>
 </function>
 
+<function name="gst_base_transform_suggest">
+<description>
+Instructs @trans to suggest new @caps upstream. A copy of @caps will be
+taken.
+
+Since: 0.10.21
+
+</description>
+<parameters>
+<parameter name="trans">
+<parameter_description> a #GstBaseTransform
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> caps to suggest
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> buffer size to suggest
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_controller_new_list">
 <description>
 Creates a new GstController for the given object&apos;s properties
@@ -14298,7 +15407,9 @@ function only works if @pad is a source pad and has a peer.
 
 A new, empty #GstBuffer will be put in the @buf argument.
 You need to check the caps of the buffer after performing this
-function and renegotiate to the format if needed.
+function and renegotiate to the format if needed. If the caps changed, it is
+possible that the buffer returned in @buf is not of the right size for the
+new format, @buf needs to be unreffed and reallocated if this is the case.
 
 
 </description>
@@ -14533,6 +15644,29 @@ MT safe
 </return>
 </function>
 
+<function name="gst_byte_reader_get_uint64_be">
+<description>
+Read an unsigned 64 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint64 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_data_queue_new">
 <description>
 
@@ -14549,6 +15683,23 @@ or not.
 </parameter>
 </parameters>
 <return> a new #GstDataQueue.
+</return>
+</function>
+
+<function name="gst_byte_reader_get_pos">
+<description>
+Returns: The current position of @reader in bytes.
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current position of @reader in bytes.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -14645,10 +15796,6 @@ Calls the getrange function of @pad, see #GstPadGetRangeFunction for a
 description of a getrange function. If @pad has no getrange function
 installed (see gst_pad_set_getrange_function()) this function returns
 #GST_FLOW_NOT_SUPPORTED.
-
-@buffer&apos;s caps must either be unset or the same as what is already
-configured on @pad. Renegotiation within a running pull-mode pipeline is not
-supported.
 
 This is a lowlevel function. Usualy gst_pad_pull_range() is used.
 
@@ -14758,6 +15905,24 @@ Returns: the #GstDebugLevel that is used as threshold.
 <description>
 Create a new iterator designed for iterating @list.
 
+The list you iterate is usually part of a data structure @owner and is
+protected with @lock. 
+
+The iterator will use @lock to retrieve the next item of the list and it
+will then call the @item function before releasing @lock again.
+
+The @item function usualy makes sure that the item remains alive while
+@lock is released and the application is using the item. The application is
+responsible for freeing/unreffing the item after usage as explained in
+gst_iterator_next().
+
+When a concurrent update to the list is performed, usually by @owner while
+holding @lock, @master_cookie will be updated. The iterator implementation
+will notice the update of the cookie and will return #GST_ITERATOR_RESYNC to
+the user of the iterator in the next call to gst_iterator_next().
+
+@owner will be passed to the @free function when the iterator is freed.
+
 
 </description>
 <parameters>
@@ -14770,7 +15935,8 @@ Create a new iterator designed for iterating @list.
 </parameter_description>
 </parameter>
 <parameter name="master_cookie">
-<parameter_description> pointer to a guint32 to protect the list.
+<parameter_description> pointer to a guint32 that is incremented when the list
+is changed.
 </parameter_description>
 </parameter>
 <parameter name="list">
@@ -15245,11 +16411,13 @@ any caps that matches the caps from gst_pad_get_caps.
 
 <function name="gst_base_transform_update_qos">
 <description>
-Set the QoS parameters in the transform.
-
-Since: 0.10.5
+Set the QoS parameters in the transform. This function is called internally
+when a QOS event is received but subclasses can provide custom information
+when needed.
 
 MT safe.
+
+Since: 0.10.5
 
 </description>
 <parameters>
@@ -15266,7 +16434,8 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="timestamp">
-<parameter_description> the timestamp of the buffer generating the QoS
+<parameter_description> the timestamp of the buffer generating the QoS expressed in
+running_time.
 </parameter_description>
 </parameter>
 </parameters>
@@ -15462,6 +16631,22 @@ list using gst_plugin_feature_list_free.
 <parameters>
 </parameters>
 <return> the list of all registered #GstTypeFindFactory.
+</return>
+</function>
+
+<function name="gst_static_pad_template_get">
+<description>
+Converts a #GstStaticPadTemplate into a #GstPadTemplate.
+
+
+</description>
+<parameters>
+<parameter name="pad_template">
+<parameter_description> the static pad template
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstPadTemplate.
 </return>
 </function>
 
@@ -15841,6 +17026,29 @@ part-activation.txt for details.
 <return></return>
 </function>
 
+<function name="gst_data_queue_pop">
+<description>
+Retrieves the first @item available on the @queue. If the queue is currently
+empty, the call will block until at least one item is available, OR the
+@queue is set to the flushing state.
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GstDataQueue.
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> pointer to store the returned #GstDataQueueItem.
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if an @item was successfully retrieved from the @queue.
+</return>
+</function>
+
 <function name="gst_bin_add_many">
 <description>
 Adds a NULL-terminated list of elements to a bin.  This function is
@@ -16037,6 +17245,28 @@ Get the value of the field with name @fieldname.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_uint8">
+<description>
+Read an unsigned 8 bit integer into @val and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint8 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_net_time_provider_new">
 <description>
 Allows network clients to get the current time of @clock.
@@ -16199,6 +17429,8 @@ merged are also merged.
 <description>
 Sets the given internal link function for the pad.
 
+Deprecated: Use the thread-safe gst_pad_set_iterate_internal_links_function()
+
 </description>
 <parameters>
 <parameter name="pad">
@@ -16226,6 +17458,29 @@ Check if an element is in live mode.
 </parameter>
 </parameters>
 <return> %TRUE if element is in live mode.
+</return>
+</function>
+
+<function name="gst_byte_reader_peek_int32_le">
+<description>
+Read a signed 32 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -16314,6 +17569,29 @@ Both @srcpad and @sinkpad must be unlinked.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_int16_be">
+<description>
+Read a signed 16 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_preset_get_meta">
 <description>
 Gets the @value for an existing meta data @tag. Meta data @tag names can be
@@ -16397,6 +17675,30 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_interpolation_control_source_set">
+<description>
+Set the value of given controller-handled property at a certain time.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the #GstInterpolationControlSource object
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> the time the control-change is scheduled for
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the control-value
+</parameter_description>
+</parameter>
+</parameters>
+<return> FALSE if the values couldn&apos;t be set, TRUE otherwise.
+</return>
+</function>
+
 <function name="gst_task_cleanup_all">
 <description>
 Wait for all tasks to be stopped. This is mainly used internally
@@ -16424,19 +17726,31 @@ Resets all categories with the given name back to the default level.
 <return></return>
 </function>
 
-<function name="gst_caps_merge_structure">
+<function name="gst_message_parse_structure_change">
 <description>
-Appends @structure to @caps if its not already expressed by @caps.  The
-structure is not copied; @caps becomes the owner of @structure.
+Extracts the change type and completion status from the GstMessage.
+
+MT safe.
+
+Since: 0.10.22
 
 </description>
 <parameters>
-<parameter name="caps">
-<parameter_description> the #GstCaps that will the the new structure
+<parameter name="message">
+<parameter_description> A valid #GstMessage of type GST_MESSAGE_STRUCTURE_CHANGE.
 </parameter_description>
 </parameter>
-<parameter name="structure">
-<parameter_description> the #GstStructure to merge
+<parameter name="type">
+<parameter_description> A pointer to hold the change type
+</parameter_description>
+</parameter>
+<parameter name="owner">
+<parameter_description> The owner element of the message source
+</parameter_description>
+</parameter>
+<parameter name="busy">
+<parameter_description> A pointer to hold whether the change is in progress or has been
+completed
 </parameter_description>
 </parameter>
 </parameters>
@@ -16766,31 +18080,29 @@ you might want to use a gint64 cast to be sure.
 </return>
 </function>
 
-<function name="gst_tag_list_copy_value">
+<function name="gst_structure_get_string">
 <description>
-Copies the contents for the given tag into the value,
-merging multiple values into one if multiple values are associated
-with the tag.
-You must g_value_unset() the value after use.
+Finds the field corresponding to @fieldname, and returns the string
+contained in the field&apos;s value.  Caller is responsible for making
+sure the field exists and has the correct type.
+
+The string should not be modified, and remains valid until the next
+call to a gst_structure_*() function with the given structure.
 
 
 </description>
 <parameters>
-<parameter name="dest">
-<parameter_description> uninitialized #GValue to copy into
+<parameter name="structure">
+<parameter_description> a #GstStructure
 </parameter_description>
 </parameter>
-<parameter name="list">
-<parameter_description> list to get the tag from
-</parameter_description>
-</parameter>
-<parameter name="tag">
-<parameter_description> tag to read out
+<parameter name="fieldname">
+<parameter_description> the name of a field
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE, if a value was copied, FALSE if the tag didn&apos;t exist in the
-given list.
+<return> a pointer to the string or NULL when the field did not exist
+or did not contain a string.
 </return>
 </function>
 
@@ -17192,6 +18504,28 @@ On return contains the #GstFormat used.
 </return>
 </function>
 
+<function name="gst_bit_reader_skip">
+<description>
+Skips @nbits bits of the #GstBitReader instance.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> the number of bits to skip
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @nbits bits could be skipped, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_uri_protocol_is_supported">
 <description>
 Checks if an element exists that supports the given URI protocol. Note
@@ -17297,6 +18631,29 @@ Since: 0.10.14
 </return>
 </function>
 
+<function name="gst_byte_reader_peek_int64_le">
+<description>
+Read a signed 64 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint64 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_value_set_caps">
 <description>
 Sets the contents of @value to @caps.  The actual
@@ -17394,6 +18751,29 @@ returned (as a list with a single object).
 </parameter>
 </parameters>
 <return> a GList of features, g_list_free after use.
+</return>
+</function>
+
+<function name="gst_bit_reader_set_pos">
+<description>
+Sets the new position of a #GstBitReader instance to @pos in bits.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="pos">
+<parameter_description> The new position in bits
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the position could be set successfully, %FALSE
+otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -18070,6 +19450,24 @@ Answer a duration query by setting the requested value in the given format.
 <return></return>
 </function>
 
+<function name="gst_base_transform_reconfigure">
+<description>
+Instructs @trans to renegotiate a new downstream transform on the next
+buffer. This function is typically called after properties on the transform
+were set that influence the output format.
+
+Since: 0.10.21
+
+</description>
+<parameters>
+<parameter name="trans">
+<parameter_description> a #GstBaseTransform
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="GstLFOControlSource">
 <description>
 Specifies the offset for the waveform of this #GstLFOControlSource.
@@ -18212,6 +19610,32 @@ A return of NULL signals that the pad is end-of-stream.
 Unref the buffer after use.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_bit_reader_get_bits_uint64">
+<description>
+Read @nbits bits into @val and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint64 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -18502,6 +19926,29 @@ Set the certainty of the given index.
 <return></return>
 </function>
 
+<function name="gst_byte_reader_get_int16_le">
+<description>
+Read a signed 16 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_object_set_name">
 <description>
 Sets the name of @object, or gives @object a guaranteed unique
@@ -18697,32 +20144,13 @@ cannot be used at the same time as gst_value_subtract().
 <return></return>
 </function>
 
-<function name="gst_net_time_packet_receive">
+<function name="input">
 <description>
-Receives a #GstNetTimePacket over a socket. Handles interrupted system calls,
-but otherwise returns NULL on error. See recvfrom(2) for more information on
-how to interpret @sockaddr.
-
-MT safe. Caller owns return value (g_free to free).
-
 
 </description>
 <parameters>
-<parameter name="fd">
-<parameter_description> a file descriptor created by socket(2)
-</parameter_description>
-</parameter>
-<parameter name="addr">
-<parameter_description> a pointer to a sockaddr to hold the address of the sender
-</parameter_description>
-</parameter>
-<parameter name="len">
-<parameter_description> a pointer to the size of the data pointed to by @addr
-</parameter_description>
-</parameter>
 </parameters>
-<return> The new #GstNetTimePacket.
-</return>
+<return></return>
 </function>
 
 <function name="gst_registry_add_plugin">
@@ -18798,6 +20226,29 @@ FALSE argument.
 <return> #TRUE if the operation was successful.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_byte_reader_peek_int24_le">
+<description>
+Read a signed 24 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -19250,6 +20701,29 @@ already-existing (i.e. &apos;static&apos;) pads.
 usage.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_byte_reader_get_uint24_be">
+<description>
+Read an unsigned 24 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -20023,6 +21497,32 @@ Since: 0.10.6
 <return></return>
 </function>
 
+<function name="gst_bit_reader_get_bits_uint8">
+<description>
+Read @nbits bits into @val and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint8 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_base_sink_set_max_lateness">
 <description>
 Sets the new max lateness value to @max_lateness. This value is
@@ -20172,6 +21672,29 @@ the given GString.
 <return></return>
 </function>
 
+<function name="gst_byte_reader_peek_int16_le">
+<description>
+Read a signed 16 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_bus_add_signal_watch">
 <description>
 Adds a bus signal watch to the default main context with the default
@@ -20257,11 +21780,9 @@ MT safe.
 
 <function name="GstBaseSink">
 <description>
-The last buffer that arrived in the sink and was used for preroll or for
-rendering. This property can be used to generate thumbnails. This property
-can be NULL when the sink has not yet received a bufer.
+The amount of bytes to pull when operating in pull mode.
 
-Since: 0.10.15
+Since: 0.10.22
 
 </description>
 <parameters>
@@ -20679,6 +22200,25 @@ Returns: the #GstElement with the given name, or NULL
 </return>
 </function>
 
+<function name="gst_base_sink_get_blocksize">
+<description>
+Get the number of bytes that the sink will pull when it is operating in pull
+mode.
+
+
+</description>
+<parameters>
+<parameter name="sink">
+<parameter_description> a #GstBaseSink
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of bytes @sink will pull in pull mode.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_index_set_filter_full">
 <description>
 Lets the app register a custom filter function so that
@@ -20958,6 +22498,32 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_bit_reader_get_bits_uint16">
+<description>
+Read @nbits bits into @val and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint16 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_alloc_trace_available">
 <description>
 Check if alloc tracing was compiled into the core
@@ -21018,6 +22584,24 @@ or NULL if the packet could not be converted.
 </return>
 </function>
 
+<function name="gst_base_src_get_blocksize">
+<description>
+Get the number of bytes that @src will push out with each buffer.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> the source
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of bytes pushed with each buffer.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_xml_get_topelements">
 <description>
 Retrieve a list of toplevel elements.
@@ -21034,6 +22618,29 @@ Retrieve a list of toplevel elements.
 of the list and must not free or modify the list. The caller also does not
 own a reference to any of the elements in the list and should obtain its own
 reference using gst_object_ref() if necessary.
+</return>
+</function>
+
+<function name="gst_byte_reader_get_uint24_le">
+<description>
+Read an unsigned 24 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -21097,6 +22704,29 @@ file.
 </parameter>
 </parameters>
 <return> number of bytes written on success, -1 otherwise.
+</return>
+</function>
+
+<function name="gst_byte_reader_get_uint64_le">
+<description>
+Read an unsigned 64 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint64 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -21211,6 +22841,15 @@ Saves the ghost pad into an xml representation.
 </parameters>
 <return> the #xmlNodePtr representation of the pad.
 </return>
+</function>
+
+<function name="The">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_element_set_bus">
@@ -21512,6 +23151,26 @@ directly.
 </return>
 </function>
 
+<function name="gst_base_src_set_blocksize">
+<description>
+Set the number of bytes that @src will push out with each buffer.
+
+Since: 0.10.22
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> the source
+</parameter_description>
+</parameter>
+<parameter name="blocksize">
+<parameter_description> the new blocksize in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_element_seek_simple">
 <description>
 Simple API to perform a seek on the given element, meaning it just seeks
@@ -21573,6 +23232,26 @@ Load the named plugin. Refs the plugin.
 </parameter>
 </parameters>
 <return> A reference to a loaded plugin, or NULL on error.
+</return>
+</function>
+
+<function name="gst_controller_new">
+<description>
+Creates a new GstController for the given object&apos;s properties
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> the object of which some properties should be controlled
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> %NULL terminated list of property names that should be controlled
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new controller.
 </return>
 </function>
 
@@ -21729,14 +23408,29 @@ Since: 0.10.11
 </return>
 </function>
 
+<function name="gst_lfo_control_source_new">
+<description>
+This returns a new, unbound #GstLFOControlSource.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new, unbound #GstLFOControlSource.
+</return>
+</function>
+
 <function name="gst_iterator_push">
 <description>
 Pushes @other iterator onto @it. All calls performed on @it are
-forwarded tot @other. If @other returns #GST_ITERATOR_DONE, it is
+forwarded to @other. If @other returns #GST_ITERATOR_DONE, it is
 popped again and calls are handled by @it again.
 
 This function is mainly used by objects implementing the iterator
 next function to recurse into substructures.
+
+When gst_iterator_resync() is called on @it, @other will automatically be
+popped.
 
 MT safe.
 
@@ -22018,6 +23712,29 @@ unreferencing is necessary.
 </return>
 </function>
 
+<function name="gst_byte_reader_get_uint32_be">
+<description>
+Read an unsigned 32 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="_gst_alloc_trace_register">
 <description>
 Register an get a handle to a GstAllocTrace object that
@@ -22126,6 +23843,32 @@ An error does not mean that the pipeline could not be constructed.
 </return>
 </function>
 
+<function name="gst_bit_reader_peek_bits_uint8">
+<description>
+Read @nbits bits into @val but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint8 to store the result
+</parameter_description>
+</parameter>
+<parameter name="nbits">
+<parameter_description> number of bits to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_bus_remove_signal_watch">
 <description>
 Removes a signal watch previously added with gst_bus_add_signal_watch().
@@ -22140,6 +23883,29 @@ MT safe.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_get_int64_le">
+<description>
+Read a signed 64 bit little endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #gint64 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_controller_get_control_source">
@@ -22248,10 +24014,33 @@ element.
 <return></return>
 </function>
 
+<function name="gst_byte_reader_peek_uint16_be">
+<description>
+Read a signed 16 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_uri_is_valid">
 <description>
 Tests if the given string is a valid URI identifier. URIs start with a valid
-protocol followed by &quot;://&quot; and maybe a string identifying the location.
+scheme followed by &quot;:&quot; and maybe a string identifying the location.
 
 
 </description>
@@ -22445,6 +24234,29 @@ again.
 or bad parameters were provided to this function.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_byte_reader_get_uint16_be">
+<description>
+Read an unsigned 16 bit big endian integer into @val
+and update the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -22921,6 +24733,29 @@ When you are finished with the caps, call gst_caps_unref() on it.
 </return>
 </function>
 
+<function name="gst_byte_reader_peek_uint64_le">
+<description>
+Read a signed 64 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint64 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_object_get_control_source">
 <description>
 Gets the corresponding #GstControlSource for the property. This should be unreferenced
@@ -23083,6 +24918,29 @@ ids to writer descriptions.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_reader_peek_uint16_le">
+<description>
+Read a signed 16 bit little endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint16 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
 </function>
 
 <function name="gst_implements_interface_cast">
@@ -23415,6 +25273,29 @@ given list.
 </return>
 </function>
 
+<function name="gst_byte_reader_peek_uint32_be">
+<description>
+Read a signed 32 bit big endian integer into @val
+but keep the current position.
+
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Pointer to a #guint32 to store the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, %FALSE otherwise.
+
+Since: 0.10.22
+</return>
+</function>
+
 <function name="gst_controller_sync_values">
 <description>
 Sets the properties of the element, according to the controller that (maybe)
@@ -23435,6 +25316,44 @@ handles them and for the given timestamp.
 <return> %TRUE if the controller values could be applied to the object
 properties, %FALSE otherwise
 </return>
+</function>
+
+<function name="gst_byte_reader_free">
+<description>
+Frees a #GstByteReader instance, which was previously allocated by
+gst_byte_reader_new() or gst_byte_reader_new_from_buffer().
+
+Since: 0.10.22
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_base_sink_set_blocksize">
+<description>
+Set the number of bytes that the sink will pull when it is operating in pull
+mode.
+
+Since: 0.10.22
+
+</description>
+<parameters>
+<parameter name="sink">
+<parameter_description> a #GstBaseSink
+</parameter_description>
+</parameter>
+<parameter name="blocksize">
+<parameter_description> the blocksize in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_poll_add_fd">
@@ -23840,9 +25759,9 @@ If set to %TRUE, the element must handle output buffers with this flag set
 correctly, i.e. it can assume that the buffer contains neutral data but must
 unset the flag if the output is no neutral data.
 
-Since: 0.10.16
-
 MT safe.
+
+Since: 0.10.16
 
 </description>
 <parameters>

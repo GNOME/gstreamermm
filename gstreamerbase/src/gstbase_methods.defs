@@ -212,6 +212,18 @@
   )
 )
 
+(define-enum BaseAudioSrcSlaveMethod
+  (in-module "Gst")
+  (c-name "GstBaseAudioSrcSlaveMethod")
+  (gtype-id "GST_TYPE_BASE_AUDIO_SRC_SLAVE_METHOD")
+  (values
+    '("resample" "GST_BASE_AUDIO_SRC_SLAVE_RESAMPLE")
+    '("retimestamp" "GST_BASE_AUDIO_SRC_SLAVE_RETIMESTAMP")
+    '("skew" "GST_BASE_AUDIO_SRC_SLAVE_SKEW")
+    '("none" "GST_BASE_AUDIO_SRC_SLAVE_NONE")
+  )
+)
+
 (define-enum RingBufferState
   (in-module "Gst")
   (c-name "GstRingBufferState")
@@ -807,6 +819,7 @@
   (c-name "GstTagImageType")
   (gtype-id "GST_TYPE_TAG_IMAGE_TYPE")
   (values
+    '("none" "GST_TAG_IMAGE_TYPE_NONE")
     '("undefined" "GST_TAG_IMAGE_TYPE_UNDEFINED")
     '("front-cover" "GST_TAG_IMAGE_TYPE_FRONT_COVER")
     '("back-cover" "GST_TAG_IMAGE_TYPE_BACK_COVER")
@@ -952,6 +965,15 @@
   )
 )
 
+(define-method reset
+  (of-object "GstAudioClock")
+  (c-name "gst_audio_clock_reset")
+  (return-type "none")
+  (parameters
+    '("GstClockTime" "time")
+  )
+)
+
 
 
 ;; From gstaudiofilter.h
@@ -1061,6 +1083,21 @@
   (of-object "GstBaseAudioSrc")
   (c-name "gst_base_audio_src_get_provide_clock")
   (return-type "gboolean")
+)
+
+(define-method set_slave_method
+  (of-object "GstBaseAudioSrc")
+  (c-name "gst_base_audio_src_set_slave_method")
+  (return-type "none")
+  (parameters
+    '("GstBaseAudioSrcSlaveMethod" "method")
+  )
+)
+
+(define-method get_slave_method
+  (of-object "GstBaseAudioSrc")
+  (c-name "gst_base_audio_src_get_slave_method")
+  (return-type "GstBaseAudioSrcSlaveMethod")
 )
 
 
@@ -1342,6 +1379,15 @@
   (return-type "GstAudioChannelPosition*")
   (parameters
     '("GstStructure*" "str")
+  )
+)
+
+(define-function gst_audio_check_channel_positions
+  (c-name "gst_audio_check_channel_positions")
+  (return-type "gboolean")
+  (parameters
+    '("const-GstAudioChannelPosition*" "pos")
+    '("guint" "channels")
   )
 )
 
@@ -3576,6 +3622,37 @@
   )
 )
 
+(define-method set_auth_param
+  (of-object "GstRTSPConnection")
+  (c-name "gst_rtsp_connection_set_auth_param")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "param")
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method clear_auth_params
+  (of-object "GstRTSPConnection")
+  (c-name "gst_rtsp_connection_clear_auth_params")
+  (return-type "none")
+)
+
+(define-method set_qos_dscp
+  (of-object "GstRTSPConnection")
+  (c-name "gst_rtsp_connection_set_qos_dscp")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("guint" "qos_dscp")
+  )
+)
+
+(define-method get_ip
+  (of-object "GstRTSPConnection")
+  (c-name "gst_rtsp_connection_get_ip")
+  (return-type "const-gchar*")
+)
+
 
 
 ;; From gstrtspdefs.h
@@ -4109,6 +4186,10 @@
     '("guint16*" "port")
   )
 )
+
+
+
+;; From md5.h
 
 
 
@@ -4830,6 +4911,17 @@
   )
 )
 
+(define-method add_id3_image
+  (of-object "GstTagList")
+  (c-name "gst_tag_list_add_id3_image")
+  (return-type "gboolean")
+  (parameters
+    '("const-guint8*" "image_data")
+    '("guint" "image_data_len")
+    '("guint" "id3_picture_type")
+  )
+)
+
 (define-function gst_tag_parse_extended_comment
   (c-name "gst_tag_parse_extended_comment")
   (return-type "gboolean")
@@ -4849,6 +4941,16 @@
     '("const-gchar*" "data")
     '("gint" "size")
     '("const-gchar**" "env_vars")
+  )
+)
+
+(define-function gst_tag_image_data_to_image_buffer
+  (c-name "gst_tag_image_data_to_image_buffer")
+  (return-type "GstBuffer*")
+  (parameters
+    '("const-guint8*" "image_data")
+    '("guint" "image_data_len")
+    '("GstTagImageType" "image_type")
   )
 )
 

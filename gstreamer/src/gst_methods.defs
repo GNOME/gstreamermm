@@ -198,6 +198,20 @@
   (gtype-id "GST_TYPE_ELEMENT_FACTORY")
 )
 
+(define-object ProxyPad
+  (in-module "Gst")
+  (parent "GstPad")
+  (c-name "GstProxyPad")
+  (gtype-id "GST_TYPE_PROXY_PAD")
+)
+
+(define-object GhostPad
+  (in-module "Gst")
+  (parent "GstProxyPad")
+  (c-name "GstGhostPad")
+  (gtype-id "GST_TYPE_GHOST_PAD")
+)
+
 (define-object PushSrc
   (in-module "Gst")
   (parent "GstBaseSrc")
@@ -719,6 +733,16 @@
     '("async-start" "GST_MESSAGE_ASYNC_START")
     '("async-done" "GST_MESSAGE_ASYNC_DONE")
     '("any" "GST_MESSAGE_ANY")
+  )
+)
+
+(define-enum StructureChangeType
+  (in-module "Gst")
+  (c-name "GstStructureChangeType")
+  (gtype-id "GST_TYPE_STRUCTURE_CHANGE_TYPE")
+  (values
+    '("link" "GST_STRUCTURE_CHANGE_TYPE_PAD_LINK")
+    '("unlink" "GST_STRUCTURE_CHANGE_TYPE_PAD_UNLINK")
   )
 )
 
@@ -2713,6 +2737,11 @@
   (return-type "GType")
 )
 
+(define-function gst_structure_change_type_get_type
+  (c-name "gst_structure_change_type_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_mini_object_flags_get_type
   (c-name "gst_mini_object_flags_get_type")
   (return-type "GType")
@@ -3161,6 +3190,11 @@
 
 ;; From gstghostpad.h
 
+(define-function gst_proxy_pad_get_type
+  (c-name "gst_proxy_pad_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_ghost_pad_get_type
   (c-name "gst_ghost_pad_get_type")
   (return-type "GType")
@@ -3217,6 +3251,12 @@
   (parameters
     '("GstPad*" "newtarget")
   )
+)
+
+(define-method construct
+  (of-object "GstGhostPad")
+  (c-name "gst_ghost_pad_construct")
+  (return-type "gboolean")
 )
 
 
@@ -4290,6 +4330,28 @@
   )
 )
 
+(define-function gst_message_new_structure_change
+  (c-name "gst_message_new_structure_change")
+  (return-type "GstMessage*")
+  (parameters
+    '("GstObject*" "src")
+    '("GstStructureChangeType" "type")
+    '("GstElement*" "owner")
+    '("gboolean" "busy")
+  )
+)
+
+(define-method parse_structure_change
+  (of-object "GstMessage")
+  (c-name "gst_message_parse_structure_change")
+  (return-type "none")
+  (parameters
+    '("GstStructureChangeType*" "type")
+    '("GstElement**" "owner")
+    '("gboolean*" "busy")
+  )
+)
+
 (define-function gst_message_new_custom
   (c-name "gst_message_new_custom")
   (return-type "GstMessage*")
@@ -5086,6 +5148,27 @@
   (of-object "GstPad")
   (c-name "gst_pad_get_internal_links_default")
   (return-type "GList*")
+)
+
+(define-method set_iterate_internal_links_function
+  (of-object "GstPad")
+  (c-name "gst_pad_set_iterate_internal_links_function")
+  (return-type "none")
+  (parameters
+    '("GstPadIterIntLinkFunction" "iterintlink")
+  )
+)
+
+(define-method iterate_internal_links
+  (of-object "GstPad")
+  (c-name "gst_pad_iterate_internal_links")
+  (return-type "GstIterator*")
+)
+
+(define-method iterate_internal_links_default
+  (of-object "GstPad")
+  (c-name "gst_pad_iterate_internal_links_default")
+  (return-type "GstIterator*")
 )
 
 (define-method set_query_type_function
@@ -9371,6 +9454,21 @@
   (return-type "GstClockTime")
 )
 
+(define-method set_blocksize
+  (of-object "GstBaseSink")
+  (c-name "gst_base_sink_set_blocksize")
+  (return-type "none")
+  (parameters
+    '("guint" "blocksize")
+  )
+)
+
+(define-method get_blocksize
+  (of-object "GstBaseSink")
+  (c-name "gst_base_sink_get_blocksize")
+  (return-type "guint")
+)
+
 (define-method wait_clock
   (of-object "GstBaseSink")
   (c-name "gst_base_sink_wait_clock")
@@ -9439,6 +9537,21 @@
     '("GstClockTime*" "min_latency")
     '("GstClockTime*" "max_latency")
   )
+)
+
+(define-method set_blocksize
+  (of-object "GstBaseSrc")
+  (c-name "gst_base_src_set_blocksize")
+  (return-type "none")
+  (parameters
+    '("gulong" "blocksize")
+  )
+)
+
+(define-method get_blocksize
+  (of-object "GstBaseSrc")
+  (c-name "gst_base_src_get_blocksize")
+  (return-type "gulong")
 )
 
 (define-method set_do_timestamp
@@ -9527,6 +9640,658 @@
   (return-type "none")
   (parameters
     '("gboolean" "gap_aware")
+  )
+)
+
+(define-method suggest
+  (of-object "GstBaseTransform")
+  (c-name "gst_base_transform_suggest")
+  (return-type "none")
+  (parameters
+    '("GstCaps*" "caps")
+    '("guint" "size")
+  )
+)
+
+(define-method reconfigure
+  (of-object "GstBaseTransform")
+  (c-name "gst_base_transform_reconfigure")
+  (return-type "none")
+)
+
+
+
+;; From gstbitreader.h
+
+(define-function gst_bit_reader_new
+  (c-name "gst_bit_reader_new")
+  (is-constructor-of "GstBitReader")
+  (return-type "GstBitReader*")
+  (parameters
+    '("const-guint8*" "data")
+    '("guint" "size")
+  )
+)
+
+(define-function gst_bit_reader_new_from_buffer
+  (c-name "gst_bit_reader_new_from_buffer")
+  (return-type "GstBitReader*")
+  (parameters
+    '("const-GstBuffer*" "buffer")
+  )
+)
+
+(define-method free
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_free")
+  (return-type "none")
+)
+
+(define-method init
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_init")
+  (return-type "none")
+  (parameters
+    '("const-guint8*" "data")
+    '("guint" "size")
+  )
+)
+
+(define-method init_from_buffer
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_init_from_buffer")
+  (return-type "none")
+  (parameters
+    '("const-GstBuffer*" "buffer")
+  )
+)
+
+(define-method set_pos
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_set_pos")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "pos")
+  )
+)
+
+(define-method get_pos
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_get_pos")
+  (return-type "guint")
+)
+
+(define-method get_remaining
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_get_remaining")
+  (return-type "guint")
+)
+
+(define-method skip
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_skip")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "nbits")
+  )
+)
+
+(define-method skip_to_byte
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_skip_to_byte")
+  (return-type "gboolean")
+)
+
+(define-method get_bits_uint8
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_get_bits_uint8")
+  (return-type "gboolean")
+  (parameters
+    '("guint8*" "val")
+    '("guint" "nbits")
+  )
+)
+
+(define-method get_bits_uint16
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_get_bits_uint16")
+  (return-type "gboolean")
+  (parameters
+    '("guint16*" "val")
+    '("guint" "nbits")
+  )
+)
+
+(define-method get_bits_uint32
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_get_bits_uint32")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+    '("guint" "nbits")
+  )
+)
+
+(define-method get_bits_uint64
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_get_bits_uint64")
+  (return-type "gboolean")
+  (parameters
+    '("guint64*" "val")
+    '("guint" "nbits")
+  )
+)
+
+(define-method peek_bits_uint8
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_peek_bits_uint8")
+  (return-type "gboolean")
+  (parameters
+    '("guint8*" "val")
+    '("guint" "nbits")
+  )
+)
+
+(define-method peek_bits_uint16
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_peek_bits_uint16")
+  (return-type "gboolean")
+  (parameters
+    '("guint16*" "val")
+    '("guint" "nbits")
+  )
+)
+
+(define-method peek_bits_uint32
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_peek_bits_uint32")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+    '("guint" "nbits")
+  )
+)
+
+(define-method peek_bits_uint64
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_peek_bits_uint64")
+  (return-type "gboolean")
+  (parameters
+    '("guint64*" "val")
+    '("guint" "nbits")
+  )
+)
+
+
+
+;; From gstbytereader.h
+
+(define-function gst_byte_reader_new
+  (c-name "gst_byte_reader_new")
+  (is-constructor-of "GstByteReader")
+  (return-type "GstByteReader*")
+  (parameters
+    '("const-guint8*" "data")
+    '("guint" "size")
+  )
+)
+
+(define-function gst_byte_reader_new_from_buffer
+  (c-name "gst_byte_reader_new_from_buffer")
+  (return-type "GstByteReader*")
+  (parameters
+    '("const-GstBuffer*" "buffer")
+  )
+)
+
+(define-method free
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_free")
+  (return-type "none")
+)
+
+(define-method init
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_init")
+  (return-type "none")
+  (parameters
+    '("const-guint8*" "data")
+    '("guint" "size")
+  )
+)
+
+(define-method init_from_buffer
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_init_from_buffer")
+  (return-type "none")
+  (parameters
+    '("const-GstBuffer*" "buffer")
+  )
+)
+
+(define-method set_pos
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_set_pos")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "pos")
+  )
+)
+
+(define-method get_pos
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_pos")
+  (return-type "guint")
+)
+
+(define-method get_remaining
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_remaining")
+  (return-type "guint")
+)
+
+(define-method skip
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_skip")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "nbytes")
+  )
+)
+
+(define-method get_uint8
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint8")
+  (return-type "gboolean")
+  (parameters
+    '("guint8*" "val")
+  )
+)
+
+(define-method get_int8
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int8")
+  (return-type "gboolean")
+  (parameters
+    '("gint8*" "val")
+  )
+)
+
+(define-method get_uint16_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint16_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint16*" "val")
+  )
+)
+
+(define-method get_int16_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int16_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint16*" "val")
+  )
+)
+
+(define-method get_uint16_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint16_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint16*" "val")
+  )
+)
+
+(define-method get_int16_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int16_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint16*" "val")
+  )
+)
+
+(define-method get_uint24_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint24_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method get_int24_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int24_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method get_uint24_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint24_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method get_int24_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int24_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method get_uint32_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint32_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method get_int32_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int32_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method get_uint32_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint32_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method get_int32_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int32_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method get_uint64_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint64_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint64*" "val")
+  )
+)
+
+(define-method get_int64_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int64_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint64*" "val")
+  )
+)
+
+(define-method get_uint64_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_uint64_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint64*" "val")
+  )
+)
+
+(define-method get_int64_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_int64_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint64*" "val")
+  )
+)
+
+(define-method peek_uint8
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint8")
+  (return-type "gboolean")
+  (parameters
+    '("guint8*" "val")
+  )
+)
+
+(define-method peek_int8
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int8")
+  (return-type "gboolean")
+  (parameters
+    '("gint8*" "val")
+  )
+)
+
+(define-method peek_uint16_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint16_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint16*" "val")
+  )
+)
+
+(define-method peek_int16_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int16_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint16*" "val")
+  )
+)
+
+(define-method peek_uint16_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint16_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint16*" "val")
+  )
+)
+
+(define-method peek_int16_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int16_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint16*" "val")
+  )
+)
+
+(define-method peek_uint24_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint24_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method peek_int24_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int24_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method peek_uint24_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint24_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method peek_int24_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int24_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method peek_uint32_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint32_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method peek_int32_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int32_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method peek_uint32_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint32_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint32*" "val")
+  )
+)
+
+(define-method peek_int32_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int32_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint32*" "val")
+  )
+)
+
+(define-method peek_uint64_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint64_le")
+  (return-type "gboolean")
+  (parameters
+    '("guint64*" "val")
+  )
+)
+
+(define-method peek_int64_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int64_le")
+  (return-type "gboolean")
+  (parameters
+    '("gint64*" "val")
+  )
+)
+
+(define-method peek_uint64_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_uint64_be")
+  (return-type "gboolean")
+  (parameters
+    '("guint64*" "val")
+  )
+)
+
+(define-method peek_int64_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_int64_be")
+  (return-type "gboolean")
+  (parameters
+    '("gint64*" "val")
+  )
+)
+
+(define-method get_float32_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_float32_le")
+  (return-type "gboolean")
+  (parameters
+    '("gfloat*" "val")
+  )
+)
+
+(define-method get_float32_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_float32_be")
+  (return-type "gboolean")
+  (parameters
+    '("gfloat*" "val")
+  )
+)
+
+(define-method get_float64_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_float64_le")
+  (return-type "gboolean")
+  (parameters
+    '("gdouble*" "val")
+  )
+)
+
+(define-method get_float64_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_float64_be")
+  (return-type "gboolean")
+  (parameters
+    '("gdouble*" "val")
+  )
+)
+
+(define-method peek_float32_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_float32_le")
+  (return-type "gboolean")
+  (parameters
+    '("gfloat*" "val")
+  )
+)
+
+(define-method peek_float32_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_float32_be")
+  (return-type "gboolean")
+  (parameters
+    '("gfloat*" "val")
+  )
+)
+
+(define-method peek_float64_le
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_float64_le")
+  (return-type "gboolean")
+  (parameters
+    '("gdouble*" "val")
+  )
+)
+
+(define-method peek_float64_be
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_float64_be")
+  (return-type "gboolean")
+  (parameters
+    '("gdouble*" "val")
   )
 )
 

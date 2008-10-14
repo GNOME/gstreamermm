@@ -465,6 +465,24 @@ is invalid.
 </return>
 </function>
 
+<function name="gst_rtsp_connection_get_ip">
+<description>
+Retrieve the IP address of the other end of @conn.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The IP address as a string.
+
+Since: 0.10.20
+</return>
+</function>
+
 <function name="gst_tuner_get_channel">
 <description>
 Retrieve the current channel from the tuner.
@@ -1832,6 +1850,26 @@ Free the memory used by @transport.
 </return>
 </function>
 
+<function name="gst_property_probe_get_property">
+<description>
+Get #GParamSpec for a property for which probing is supported.
+
+
+</description>
+<parameters>
+<parameter name="probe">
+<parameter_description> the #GstPropertyProbe to get the properties for.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> name of the property.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GParamSpec of %NULL.
+</return>
+</function>
+
 <function name="gst_property_probe_probe_and_get_values_name">
 <description>
 Same as gst_property_probe_probe_and_get_values ().
@@ -2202,24 +2240,6 @@ Set the reason string to @reason in @packet.
 </parameter>
 </parameters>
 <return> TRUE if the string could be set.
-</return>
-</function>
-
-<function name="gst_color_balance_list_channels">
-<description>
-Retrieve a list of the available channels.
-
-
-</description>
-<parameters>
-<parameter name="balance">
-<parameter_description> A #GstColorBalance instance
-</parameter_description>
-</parameter>
-</parameters>
-<return> A GList containing pointers to #GstColorBalanceChannel objects.
-The list is owned by the #GstColorBalance instance and must not
-be freed.
 </return>
 </function>
 
@@ -2733,6 +2753,39 @@ needed/available for @trans.
 </return>
 </function>
 
+<function name="gst_tag_list_add_id3_image">
+<description>
+Adds an image from an ID3 APIC frame (or similar, such as used in FLAC)
+to the given tag list. Also see gst_tag_image_data_to_image_buffer() for
+more information on image tags in GStreamer.
+
+
+</description>
+<parameters>
+<parameter name="tag_list">
+<parameter_description> a tag list
+</parameter_description>
+</parameter>
+<parameter name="image_data">
+<parameter_description> the (encoded) image
+</parameter_description>
+</parameter>
+<parameter name="image_data_len">
+<parameter_description> the length of the encoded image data at @image_data
+</parameter_description>
+</parameter>
+<parameter name="id3_picture_type">
+<parameter_description> picture type as per the ID3 (v2.4.0) specification for
+the APIC frame (0 = unknown/other)
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the image was processed, otherwise %FALSE
+
+Since: 0.10.20
+</return>
+</function>
+
 <function name="gst_color_balance_get_value">
 <description>
 Retrieve the current value of the indicated channel, between min_value
@@ -3150,19 +3203,72 @@ Parse the contents of @size bytes pointed to by @data and store the result in
 </return>
 </function>
 
-<function name="gst_sdp_message_emails_len">
+<function name="gst_rtcp_packet_bye_get_nth_ssrc">
 <description>
-Get the number of emails in @msg.
+Get the @nth SSRC of the BYE @packet.
 
 
 </description>
 <parameters>
-<parameter name="msg">
-<parameter_description> a #GstSDPMessage
+<parameter name="packet">
+<parameter_description> a valid BYE #GstRTCPPacket
+</parameter_description>
+</parameter>
+<parameter name="nth">
+<parameter_description> the nth SSRC to get
 </parameter_description>
 </parameter>
 </parameters>
-<return> the number of emails in @msg.
+<return> The @nth SSRC of @packet.
+</return>
+</function>
+
+<function name="gst_tag_image_data_to_image_buffer">
+<description>
+Helper function for tag-reading plugins to create a #GstBuffer suitable to
+add to a #GstTagList as an image tag (such as #GST_TAG_IMAGE or
+#GST_TAG_PREVIEW_IMAGE) from the encoded image data and an (optional) image
+type.
+
+Background: cover art and other images in tags are usually stored as a
+blob of binary image data, often accompanied by a MIME type or some other
+content type string (e.g. &apos;png&apos;, &apos;jpeg&apos;, &apos;jpg&apos;). Sometimes there is also an
+&apos;image type&apos; to indicate what kind of image this is (e.g. front cover,
+back cover, artist, etc.). The image data may also be an URI to the image
+rather than the image itself.
+
+In GStreamer, image tags are #GstBuffer&amp;lt;!-- --&amp;gt;s containing the raw image
+data, with the buffer caps describing the content type of the image
+(e.g. image/jpeg, image/png, text/uri-list). The buffer caps may contain
+an additional &apos;image-type&apos; field of #GST_TYPE_TAG_IMAGE_TYPE to describe
+the type of image (front cover, back cover etc.). #GST_TAG_PREVIEW_IMAGE
+tags should not carry an image type, their type is already indicated via
+the special tag name.
+
+This function will do various checks and typefind the encoded image
+data (we can&apos;t trust the declared mime type).
+
+
+</description>
+<parameters>
+<parameter name="image_data">
+<parameter_description> the (encoded) image
+</parameter_description>
+</parameter>
+<parameter name="image_data_len">
+<parameter_description> the length of the encoded image data at @image_data
+</parameter_description>
+</parameter>
+<parameter name="image_type">
+<parameter_description> type of the image, or #GST_TAG_IMAGE_TYPE_UNDEFINED. Pass
+#GST_TAG_IMAGE_TYPE_NONE if no image type should be set at all (e.g.
+for preview images)
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated image buffer for use in tag lists, or NULL
+
+Since: 0.10.20
 </return>
 </function>
 
@@ -3669,6 +3775,24 @@ GstMixer interface, and the element needs to have been provided a bus.
 <return></return>
 </function>
 
+<function name="gst_property_probe_probe_property">
+<description>
+Runs a probe on the property specified by %pspec
+
+</description>
+<parameters>
+<parameter name="probe">
+<parameter_description> the #GstPropertyProbe to check.
+</parameter_description>
+</parameter>
+<parameter name="pspec">
+<parameter_description> #GParamSpec of the property.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_audio_set_channel_positions">
 <description>
 Adds a &quot;channel-positions&quot; field to the given #GstStructure,
@@ -3731,13 +3855,11 @@ Add @phone to the list of phones in @msg.
 
 <function name="GstMixerTrack">
 <description>
-The untranslated label of the mixer track, if available. Mixer track
-implementations must set this at construct time. Applications may find
-this useful to determine icons for various kind of tracks. However,
-applications mustn&apos;t make any assumptions about the naming of tracks,
-the untranslated labels are purely informational and may change.
+Index of the mixer track, if available. Mixer track implementations
+must set this at construct time. This can be used to discern between
+multiple tracks with identical labels.
 
-Since: 0.10.13
+Since: 0.10.21
 
 </description>
 <parameters>
@@ -5486,6 +5608,15 @@ The pad needs to have negotiated caps containing width and height properties.
 </return>
 </function>
 
+<function name="GstPropertyProbe">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtcp_packet_set_rb">
 <description>
 Set the @nth new report block in @packet with the given values.
@@ -6280,7 +6411,6 @@ Print debug info about the parsed caps in @spec to the debug log.
 Calculate length in nanoseconds of audio buffer @buf based on capabilities of
 @pad.
 
-Return: the length.
 
 </description>
 <parameters>
@@ -6293,7 +6423,8 @@ Return: the length.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the length.
+</return>
 </function>
 
 <function name="gst_fft_f64_window">
@@ -6385,6 +6516,16 @@ domain samples.
 <return></return>
 </function>
 
+<function name="gst_riff_init">
+<description>
+Initialize riff library.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtsp_range_parse">
 <description>
 Parse @rangestr to a #GstRTSPTimeRange.
@@ -6436,7 +6577,7 @@ timestamp to a valid GStreamer clock time.
 
 <function name="gst_property_probe_probe_property_name">
 <description>
-Runs a probe on the given property.
+Runs a probe on the property specified by %name.
 
 </description>
 <parameters>
@@ -6445,7 +6586,7 @@ Runs a probe on the given property.
 </parameter_description>
 </parameter>
 <parameter name="name">
-<parameter_description> name of the property to return.
+<parameter_description> name of the property.
 </parameter_description>
 </parameter>
 </parameters>
@@ -6932,6 +7073,28 @@ Get the phone with number @idx from @msg.
 </parameter>
 </parameters>
 <return> the phone at position @idx.
+</return>
+</function>
+
+<function name="gst_rtsp_connection_set_qos_dscp">
+<description>
+Configure @conn to use the specified DSCP value.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="qos_dscp">
+<parameter_description> DSCP value
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_RTSP_OK on success.
+
+Since: 0.10.20
 </return>
 </function>
 
@@ -8286,6 +8449,38 @@ Variable arguments should be in the form field name, field type
 </return>
 </function>
 
+<function name="gst_audio_check_channel_positions">
+<description>
+This functions checks if the given channel positions are valid. Channel
+positions are valid if:
+&amp;lt;itemizedlist&amp;gt;
+&amp;lt;listitem&amp;gt;&amp;lt;para&amp;gt;No channel positions appears twice or all positions are %GST_AUDIO_CHANNEL_POSITION_NONE.
+&amp;lt;/para&amp;gt;&amp;lt;/listitem&amp;gt;
+&amp;lt;listitem&amp;gt;&amp;lt;para&amp;gt;Either all or none of the channel positions are %GST_AUDIO_CHANNEL_POSITION_NONE.
+&amp;lt;/para&amp;gt;&amp;lt;/listitem&amp;gt;
+&amp;lt;listitem&amp;gt;&amp;lt;para&amp;gt;%GST_AUDIO_CHANNEL_POSITION_FRONT_MONO and %GST_AUDIO_CHANNEL_POSITION_LEFT or %GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT don&apos;t appear together in the given positions.
+&amp;lt;/para&amp;gt;&amp;lt;/listitem&amp;gt;
+&amp;lt;/itemizedlist&amp;gt;
+
+Since: 0.10.20
+
+
+</description>
+<parameters>
+<parameter name="pos">
+<parameter_description> An array of #GstAudioChannelPosition.
+</parameter_description>
+</parameter>
+<parameter name="channels">
+<parameter_description> The number of elements in @pos.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the given channel positions are valid
+and %FALSE otherwise.
+</return>
+</function>
+
 <function name="gst_tag_from_id3_tag">
 <description>
 Looks up the GStreamer tag for a ID3v2 tag.
@@ -8876,11 +9071,11 @@ Since: 0.10.16
 </parameter_description>
 </parameter>
 <parameter name="width">
-<parameter_description> the width of the video represented by @caps (output)
+<parameter_description> the width of the video represented by @caps, may be NULL (output)
 </parameter_description>
 </parameter>
 <parameter name="height">
-<parameter_description> the height of the video represented by @caps (output)
+<parameter_description> the height of the video represented by @caps, may be NULL (output)
 </parameter_description>
 </parameter>
 </parameters>
@@ -8940,6 +9135,18 @@ Hashes @key in a case-insensitive manner.
 </parameters>
 <return> the hash code.
 </return>
+</function>
+
+<function name="GstBaseAudioSrc">
+<description>
+Actual configured audio latency in microseconds.
+
+Since: 0.10.20
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_is_missing_plugin_message">
@@ -9888,6 +10095,22 @@ Get the number of time zone information entries in @msg.
 </return>
 </function>
 
+<function name="gst_sdp_message_emails_len">
+<description>
+Get the number of emails in @msg.
+
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> a #GstSDPMessage
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of emails in @msg.
+</return>
+</function>
+
 <function name="gst_rtsp_connection_read_internal">
 <description>
 Attempt to read @size bytes into @data from the connected @conn, blocking up to
@@ -9959,23 +10182,21 @@ Get the transport protocol of @media
 </return>
 </function>
 
-<function name="gst_rtcp_packet_bye_get_nth_ssrc">
+<function name="gst_color_balance_list_channels">
 <description>
-Get the @nth SSRC of the BYE @packet.
+Retrieve a list of the available channels.
 
 
 </description>
 <parameters>
-<parameter name="packet">
-<parameter_description> a valid BYE #GstRTCPPacket
-</parameter_description>
-</parameter>
-<parameter name="nth">
-<parameter_description> the nth SSRC to get
+<parameter name="balance">
+<parameter_description> A #GstColorBalance instance
 </parameter_description>
 </parameter>
 </parameters>
-<return> The @nth SSRC of @packet.
+<return> A GList containing pointers to #GstColorBalanceChannel objects.
+The list is owned by the #GstColorBalance instance and must not
+be freed.
 </return>
 </function>
 

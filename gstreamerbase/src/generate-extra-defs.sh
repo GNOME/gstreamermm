@@ -5,5 +5,4 @@
 
 DIR=`dirname "$0"`
 
-$DIR/../../tools/extra_defs_gen/generate_defs_gstbase > gstbase_signals.defs
-
+"$DIR"/../../tools/extra_defs_gen/generate_defs_gstbase > "$DIR/gstbase_signals.defs"
