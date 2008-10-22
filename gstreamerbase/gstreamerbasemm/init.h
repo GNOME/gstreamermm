@@ -25,9 +25,9 @@
 namespace GstBase
 {
 
-/** Initialize gstreamerbasemm.  Gst::init() and Gst::init_check() functions
- * already initialize gstreamerbasemm so there's no need to use this function
- * directly.
+/** Initialize gstreamerbasemm.  This function may be called more than once.
+ * There's no no need to use this function if Gst::init() or Gst::init_check()
+ * is used because they already call this function.
  */
 void init();
   

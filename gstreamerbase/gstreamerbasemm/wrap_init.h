@@ -27,8 +27,8 @@
 namespace GstBase
 {
   /** Initializes the main gstreamerbasemm wrapping system.
-   * There's no need to use this function directly; instead use Gst::init() or
-   * Gst::init_check(). 
+   * There's no need to use this function directly; instead use
+   * GstBase::init().
    */
   void wrap_init();
 }

@@ -27,8 +27,8 @@
 namespace GstBase
 {
   /** Initializes wrapping system of Gst::MiniObject derrived classes.
-   * There is no need to use this function directly; instead use Gst::init() or
-   * Gst::init_check(). 
+   * There is no need to use this function directly; instead use
+   * GstBase::init(). 
    */
   void gst_wrap_init();
 }
