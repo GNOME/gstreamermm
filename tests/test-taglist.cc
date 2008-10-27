@@ -34,20 +34,20 @@ int main (int argc, char* argv[])
     exit(1);
   }
 
-  taglist.add(Gst::TAG_TITLE, "My Song");
-  taglist.add(Gst::TAG_ARTIST, "Artist");
-  taglist.add(Gst::TAG_BITRATE, (guint) 192);
+  taglist.add(Gst::Tag::TITLE, "My Song");
+  taglist.add(Gst::Tag::ARTIST, "Artist");
+  taglist.add(Gst::Tag::BITRATE, (guint) 192);
 
   Glib::ustring title;
-  if (taglist.get(Gst::TAG_TITLE, title))
+  if (taglist.get(Gst::Tag::TITLE, title))
     std::cout << "Tag title is '" << title << "'." << std::endl;
 
   Glib::ustring artist;
-  if (taglist.get(Gst::TAG_ARTIST, artist))
+  if (taglist.get(Gst::Tag::ARTIST, artist))
     std::cout << "Tag artist is '" << artist << "'." << std::endl;
 
   guint rate;
-  if (taglist.get(Gst::TAG_BITRATE, rate))
+  if (taglist.get(Gst::Tag::BITRATE, rate))
     std::cout << "Tag bit-rate is " << rate << "." << std::endl;
 
   return 0;
