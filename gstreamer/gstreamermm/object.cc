@@ -78,10 +78,13 @@ Object::Object(GstObject* castitem)
 :
   Glib::Object((GObject*)(castitem))
 {
-  //The floating reference is convenience for C,
-  //but is useless and difficult for us:
-  gst_object_ref(gobj());
-  gst_object_sink(gobj());
+  if(GST_OBJECT_IS_FLOATING(castitem))
+  {
+    //The floating reference is convenience for C,
+    //but is useless and difficult for us:
+    gst_object_ref(gobj());
+    gst_object_sink(gobj());
+  }
 }
 
 Object::~Object()
