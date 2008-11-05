@@ -41,14 +41,20 @@ int main (int argc, char* argv[])
   Glib::ustring title;
   if (taglist.get(Gst::Tag::TITLE, title))
     std::cout << "Tag title is '" << title << "'." << std::endl;
+  else
+    std::cout << "Could not get tag `" << Gst::Tag::TITLE << "'." << std::endl;
 
   Glib::ustring artist;
   if (taglist.get(Gst::Tag::ARTIST, artist))
     std::cout << "Tag artist is '" << artist << "'." << std::endl;
+  else
+    std::cout << "Could not get tag `" << Gst::Tag::ARTIST << "'." << std::endl;
 
   guint rate;
   if (taglist.get(Gst::Tag::BITRATE, rate))
     std::cout << "Tag bit-rate is " << rate << "." << std::endl;
+  else
+    std::cout << "Could not get tag `" << Gst::Tag::BITRATE << "'." << std::endl;
 
   return 0;
 }

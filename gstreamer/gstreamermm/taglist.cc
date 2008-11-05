@@ -344,7 +344,7 @@ gst_tag_list_insert(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode)));
 
 TagList TagList::merge(const TagList& other, TagMergeMode mode)
 {
-  return Glib::wrap(gst_tag_list_merge(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode))), 0);
+  return Glib::wrap(gst_tag_list_merge(gobj(), ((other).gobj()), ((GstTagMergeMode)(mode))), 0, true);
 }
 
 guint TagList::get_tag_size(const Glib::ustring& tag) const

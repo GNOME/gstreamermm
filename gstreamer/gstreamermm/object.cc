@@ -78,7 +78,7 @@ Object::Object(GstObject* castitem)
 :
   Glib::Object((GObject*)(castitem))
 {
-  if(GST_OBJECT_IS_FLOATING(castitem))
+  if(G_LIKELY(GST_OBJECT_IS_FLOATING(castitem)))
   {
     //The floating reference is convenience for C,
     //but is useless and difficult for us:

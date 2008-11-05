@@ -47,8 +47,11 @@ int main (int argc, char* argv[])
   setter->add_tag("bitrate", 192);
 
   int bitrate = 0;
-  setter->get_tag_list().get("bitrate", bitrate);
-  std::cout << "bitrate = " << bitrate << "." << std::endl;
+
+  if(setter->get_tag_list().get("bitrate", bitrate))
+    std::cout << "bitrate = " << bitrate << "." << std::endl;
+  else
+    std::cout << "Could not get tag `bitrate' from tagsetter." << std::endl;
 
   return 0;
 }
