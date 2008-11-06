@@ -21,7 +21,6 @@
 
 #include <gst/gsttaglist.h>
 #include <gstreamermm/structure.h>
-#include <gstreamermm/structurevalue.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -282,7 +281,7 @@ public:
   _WRAP_METHOD(bool is_empty() const, gst_tag_list_is_empty)
   _WRAP_METHOD(void insert(const TagList& other, TagMergeMode mode=TAG_MERGE_PREPEND), gst_tag_list_insert)
   _WRAP_METHOD(TagList merge(const TagList& other, TagMergeMode mode=TAG_MERGE_PREPEND), gst_tag_list_merge)
-  _WRAP_METHOD(guint get_tag_size(const Glib::ustring& tag) const, gst_tag_list_get_tag_size)
+  _WRAP_METHOD(guint size(const Glib::ustring& tag) const, gst_tag_list_get_tag_size)
 
   /** Sets a GValue for the given @a tag using the specified mode.
    *
@@ -304,8 +303,8 @@ public:
   /** Sets the value for the given tag using the specified mode.
    *
    * @param tag The tag name.
-   * @param data A value which the tag should be set to (this can be any C++
-   * class).
+   * @param data A value which the tag should be set to (this can be any
+   * supported C++ type).
    * @param mode The merge mode to use.
    */
   template <class DataType>
@@ -327,6 +326,17 @@ public:
   void foreach(const SlotForeach& slot);
   _IGNORE(gst_tag_list_foreach)
 
+  /** Copies the contents for the given tag into the value, merging multiple
+   * values into one if multiple values are associated with the tag.
+   *
+   * @param dest An uninitialized Glib::ValueBase to copy into.
+   * @param tag The tag to read out.
+   * @return true, if a value was copied, false if the tag didn't exist in the
+   * list.
+   */
+  bool get(const Glib::ustring& tag, Glib::ValueBase& dest);
+  _IGNORE(gst_tag_list_copy_value)
+
   /** Gets the value that is at the given index for the given tag.
 
    * @param tag The tag to read out.
@@ -335,238 +345,48 @@ public:
    * @return true if tag was available and had right number of entries, false
    * otherwise.
    */
-  bool get(const Glib::ustring& tag, guint index, Glib::ValueBase& value);
+  bool get(const Glib::ustring& tag, guint index, Glib::ValueBase& dest);
   _IGNORE(gst_tag_list_get_value_index)
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
    * @param tag The tag to read out.
-   * @param value Location for the result.
+   * @param value Location for the result (this can be any supported C++ type).
    * @return true, if a value was copied, false if the tag didn't exist in the
    * given list.
    */
-  bool get(const Glib::ustring& tag, char& value);
-  _IGNORE(gst_tag_list_get_char)
+  template<class DataType> bool get(const Glib::ustring& tag, DataType& value);
+  _IGNORE(gst_tag_list_get_char,
+          gst_tag_list_get_uchar,
+          gst_tag_list_get_boolean,
+          gst_tag_list_get_int,
+          gst_tag_list_get_uint,
+          gst_tag_list_get_long, gst_tag_list_get_int64,
+          gst_tag_list_get_ulong, gst_tag_list_get_uint64,
+          gst_tag_list_get_float,
+          gst_tag_list_get_double,
+          gst_tag_list_get_string,
+          gst_tag_list_get_date)
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
    * @param index Number of entry to read out.
-   * @param value Location for the result.
+   * @param value Location for the result (this can be any supported C++ type).
    * @return true, if a value was copied, false if the tag didn't exist in the
    * given list.
    */
-  bool get(const Glib::ustring& tag, guint index, char& value);
-  _IGNORE(gst_tag_list_get_char_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guchar& value);
-  _IGNORE(gst_tag_list_get_uchar)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, guchar& value);
-  _IGNORE(gst_tag_list_get_uchar_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, bool& value);
-  _IGNORE(gst_tag_list_get_boolean)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, bool& value);
-  _IGNORE(gst_tag_list_get_boolean_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, int& value);
-  _IGNORE(gst_tag_list_get_int)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, int& value);
-  _IGNORE(gst_tag_list_get_int_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint& value);
-  _IGNORE(gst_tag_list_get_uint)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, guint& value);
-  _IGNORE(gst_tag_list_get_uint_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, long& value);
-  _IGNORE(gst_tag_list_get_long, gst_tag_list_get_int64)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, long& value);
-  _IGNORE(gst_tag_list_get_long_index, gst_tag_list_get_int64_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, gulong& value);
-  _IGNORE(gst_tag_list_get_ulong, gst_tag_list_get_uint64)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, gulong& value);
-  _IGNORE(gst_tag_list_get_ulong_index, gst_tag_list_get_uint64_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, float& value);
-  _IGNORE(gst_tag_list_get_float)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, float& value);
-  _IGNORE(gst_tag_list_get_float_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, double& value);
-  _IGNORE(gst_tag_list_get_double)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, double& value);
-  _IGNORE(gst_tag_list_get_double_index)
-
-  /** Copies the contents for the given tag into the value, possibly merging
-   * multiple values into one if multiple values are associated with the tag.
-   *
-   * Use the index version of this method if you want to retrieve the first
-   * string associated with this tag unmodified.
-   *
-   * The resulting string in value will be in UTF-8 encoding.
-   *
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, Glib::ustring& value);
-  _IGNORE(gst_tag_list_get_string)
-
-  /** Gets the value that is at the given index for the given tag in the given
-   * list.
-   *
-   * The resulting string in value will be in UTF-8 encoding.
-   * 
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, Glib::ustring& value);
-  _IGNORE(gst_tag_list_get_string_index)
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, Glib::Date& value);
-  _IGNORE(gst_tag_list_get_date)
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, Glib::Date& value);
-  _IGNORE(gst_tag_list_get_date_index)
+  template<class DataType> bool get(const Glib::ustring& tag, guint index, DataType& value);
+  _IGNORE(gst_tag_list_get_char_index,
+          gst_tag_list_get_uchar_index,
+          gst_tag_list_get_boolean_index,
+          gst_tag_list_get_int_index,
+          gst_tag_list_get_uint_index,
+          gst_tag_list_get_long_index, gst_tag_list_get_int64_index,
+          gst_tag_list_get_ulong_index, gst_tag_list_get_uint64_index,
+          gst_tag_list_get_float_index,
+          gst_tag_list_get_double_index,
+          gst_tag_list_get_string_index,
+          gst_tag_list_get_date_index)
 
   //Variable argument functions are ignored.
   _IGNORE(gst_tag_list_add, gst_tag_list_add_values)
@@ -574,18 +394,41 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-/******************************* Gst::Caps *******************************/
+/***************************** Gst::TagList *****************************/
 
 template <class DataType>
 void TagList::add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode)
 {
-  typedef typename Gst::StructureValue<DataType> type_cppdata;
-  typedef typename type_cppdata::ValueType ValueType;
+  typedef Glib::Value<DataType> ValueType;
 
   ValueType value;
   value.init(ValueType::value_type());
   value.set(data);
   this->add(tag, (Glib::ValueBase) value, mode);
+}
+
+template<class DataType>
+bool TagList::get(const Glib::ustring& tag, DataType& data)
+{
+  Glib::Value<DataType> value;
+  bool result = this->get(tag, (Glib::ValueBase&) value);
+
+  if (result)
+    data = value.get();
+
+  return result;
+}
+
+template<class DataType>
+bool TagList::get(const Glib::ustring& tag, guint index, DataType& data)
+{
+  Glib::Value<DataType> value;
+  bool result = this->get(tag, index, (Glib::ValueBase&) value);
+
+  if (result)
+    data = value.get();
+
+  return result;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

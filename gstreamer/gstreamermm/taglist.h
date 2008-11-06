@@ -29,7 +29,6 @@
 
 #include <gst/gsttaglist.h>
 #include <gstreamermm/structure.h>
-#include <gstreamermm/structurevalue.h>
 
 namespace Gst
 {
@@ -442,7 +441,7 @@ public:
    * @param tag The tag to query.
    * @return The number of tags stored.
    */
-  guint get_tag_size(const Glib::ustring& tag) const;
+  guint size(const Glib::ustring& tag) const;
 
   /** Sets a GValue for the given @a tag using the specified mode.
    *
@@ -464,8 +463,8 @@ public:
   /** Sets the value for the given tag using the specified mode.
    *
    * @param tag The tag name.
-   * @param data A value which the tag should be set to (this can be any C++
-   * class).
+   * @param data A value which the tag should be set to (this can be any
+   * supported C++ type).
    * @param mode The merge mode to use.
    */
   template <class DataType>
@@ -490,6 +489,17 @@ public:
   void foreach(const SlotForeach& slot);
   
 
+  /** Copies the contents for the given tag into the value, merging multiple
+   * values into one if multiple values are associated with the tag.
+   *
+   * @param dest An uninitialized Glib::ValueBase to copy into.
+   * @param tag The tag to read out.
+   * @return true, if a value was copied, false if the tag didn't exist in the
+   * list.
+   */
+  bool get(const Glib::ustring& tag, Glib::ValueBase& dest);
+  
+
   /** Gets the value that is at the given index for the given tag.
 
    * @param tag The tag to read out.
@@ -498,237 +508,27 @@ public:
    * @return true if tag was available and had right number of entries, false
    * otherwise.
    */
-  bool get(const Glib::ustring& tag, guint index, Glib::ValueBase& value);
+  bool get(const Glib::ustring& tag, guint index, Glib::ValueBase& dest);
   
 
   /** Copies the contents for the given tag into the value, merging multiple
    * values into one if multiple values are associated with the tag.
    * @param tag The tag to read out.
-   * @param value Location for the result.
+   * @param value Location for the result (this can be any supported C++ type).
    * @return true, if a value was copied, false if the tag didn't exist in the
    * given list.
    */
-  bool get(const Glib::ustring& tag, char& value);
+  template<class DataType> bool get(const Glib::ustring& tag, DataType& value);
   
 
   /** Gets the value that is at the given index for the given tag.
    * @param tag The tag to read out.
    * @param index Number of entry to read out.
-   * @param value Location for the result.
+   * @param value Location for the result (this can be any supported C++ type).
    * @return true, if a value was copied, false if the tag didn't exist in the
    * given list.
    */
-  bool get(const Glib::ustring& tag, guint index, char& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guchar& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, guchar& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, bool& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, bool& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, int& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, int& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, guint& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, long& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, long& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, gulong& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, gulong& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, float& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, float& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, double& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, double& value);
-  
-
-  /** Copies the contents for the given tag into the value, possibly merging
-   * multiple values into one if multiple values are associated with the tag.
-   *
-   * Use the index version of this method if you want to retrieve the first
-   * string associated with this tag unmodified.
-   *
-   * The resulting string in value will be in UTF-8 encoding.
-   *
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, Glib::ustring& value);
-  
-
-  /** Gets the value that is at the given index for the given tag in the given
-   * list.
-   *
-   * The resulting string in value will be in UTF-8 encoding.
-   * 
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, Glib::ustring& value);
-  
-
-  /** Copies the contents for the given tag into the value, merging multiple
-   * values into one if multiple values are associated with the tag.
-   * @param tag The tag to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, Glib::Date& value);
-  
-
-  /** Gets the value that is at the given index for the given tag.
-   * @param tag The tag to read out.
-   * @param index Number of entry to read out.
-   * @param value Location for the result.
-   * @return true, if a value was copied, false if the tag didn't exist in the
-   * given list.
-   */
-  bool get(const Glib::ustring& tag, guint index, Glib::Date& value);
+  template<class DataType> bool get(const Glib::ustring& tag, guint index, DataType& value);
   
 
   //Variable argument functions are ignored.
@@ -738,18 +538,41 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-/******************************* Gst::Caps *******************************/
+/***************************** Gst::TagList *****************************/
 
 template <class DataType>
 void TagList::add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode)
 {
-  typedef typename Gst::StructureValue<DataType> type_cppdata;
-  typedef typename type_cppdata::ValueType ValueType;
+  typedef Glib::Value<DataType> ValueType;
 
   ValueType value;
   value.init(ValueType::value_type());
   value.set(data);
   this->add(tag, (Glib::ValueBase) value, mode);
+}
+
+template<class DataType>
+bool TagList::get(const Glib::ustring& tag, DataType& data)
+{
+  Glib::Value<DataType> value;
+  bool result = this->get(tag, (Glib::ValueBase&) value);
+
+  if (result)
+    data = value.get();
+
+  return result;
+}
+
+template<class DataType>
+bool TagList::get(const Glib::ustring& tag, guint index, DataType& data)
+{
+  Glib::Value<DataType> value;
+  bool result = this->get(tag, index, (Glib::ValueBase&) value);
+
+  if (result)
+    data = value.get();
+
+  return result;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

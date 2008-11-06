@@ -23,7 +23,6 @@
 #include <glibmm/interface.h>
 #include <gstreamermm/enums.h>
 #include <gstreamermm/taglist.h>
-#include <gstreamermm/structurevalue.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -63,7 +62,8 @@ public:
   /** Adds the given value on the setter using the given merge mode. 
    *
    * @param tag The tag to set.
-   * @param data The value to set the tag to.
+   * @param data The value to set the tag to (this may be any supported C++
+   * type).
    * @param mode The mode to use.
    */
    template <class DataType>
@@ -84,8 +84,7 @@ public:
 template <class DataType>
 void TagSetter::add_tag(const Glib::ustring& tag, const DataType& data, TagMergeMode mode)
 {
-  typedef typename Gst::StructureValue<DataType> type_cppdata;
-  typedef typename type_cppdata::ValueType ValueType;
+  typedef Glib::Value<DataType> ValueType;
 
   ValueType value;
   value.init(ValueType::value_type());

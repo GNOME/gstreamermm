@@ -21,7 +21,6 @@
 
 #include <gst/gstcaps.h>
 #include <gstreamermm/structure.h>
-#include <gstreamermm/structurevalue.h>
 #include <libxml++/nodes/node.h>
 
 _DEFS(gstreamermm,gst)
@@ -139,8 +138,8 @@ public:
    * functional compatibility.
    *
    * @param name Field to set.
-   * @param data A value which the field should be set to (this can be any C++
-   * class).
+   * @param data A value which the field should be set to (this can be any
+   * supported C++ type).
    */
   template <class DataType>
   void set_simple(const Glib::ustring& name, const DataType& data);
@@ -187,8 +186,7 @@ public:
 template <class DataType>
 void Caps::set_simple(const Glib::ustring& name, const DataType& data)
 {
-  typedef typename Gst::StructureValue<DataType> type_cppdata;
-  typedef typename type_cppdata::ValueType ValueType;
+  typedef Glib::Value<DataType> ValueType;
 
   ValueType value;
   value.init(ValueType::value_type());
