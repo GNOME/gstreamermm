@@ -47,10 +47,12 @@ void test_simple()
 {
   int width;
   Gst::Fraction rate;
+  std::string string;
 
   Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw-yuv");
   caps->set_simple("width", 500);
   caps->set_simple("framerate", Gst::Fraction(25, 1));
+  caps->set_simple("string", "A string");
 
   if (caps->get_structure(0).get_field("width", width))
   {
@@ -67,6 +69,14 @@ void test_simple()
   }
   else
     std::cout << "Getting of simple caps framerate field failed." << std::endl;
+
+  if (caps->get_structure(0).get_field("string", string))
+  {
+    std::cout << "Simple caps string after setting = " << string << "." <<
+      std::endl;
+  }
+  else
+    std::cout << "Getting of simple caps sting field failed." << std::endl;
 }
 
 int main (int argc, char* argv[])
