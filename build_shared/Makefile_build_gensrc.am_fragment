@@ -39,12 +39,15 @@ files_all_hg = \
 	$(files_posix_hg) \
 	$(files_win32_hg) \
 	$(files_general_hg) \
+	$(files_plugin_hg) \
 	$(files_general_deprecated_hg)
 
 if OS_WIN32
-files_hg = $(files_general_hg) $(files_win32_hg) $(files_general_deprecated_hg)
+files_hg = $(files_general_hg) $(files_win32_hg) $(files_plugin_hg) \
+	   $(files_general_deprecated_hg)
 else
-files_hg = $(files_general_hg) $(files_posix_hg) $(files_general_deprecated_hg)
+files_hg = $(files_general_hg) $(files_posix_hg) $(files_plugin_hg) \
+	   $(files_general_deprecated_hg)
 endif
 
 files_built_cc = $(files_hg:.hg=.cc) wrap_init.cc
@@ -52,6 +55,9 @@ files_built_h = $(files_hg:.hg=.h)
 
 files_all_built_cc = $(files_all_hg:.hg=.cc) wrap_init.cc
 files_all_built_h = $(files_all_hg:.hg=.h)
+
+files_plugin_built_cc = $(files_plugin_hg:.hg=.cc)
+files_plugin_built_h = $(files_plugin_hg:.hg=.h)
 
 # Extra files
 
@@ -84,4 +90,3 @@ files_extra_h = \
 	$(sublib_files_extra_general_h)
 endif
 files_extra_h += wrap_init.h
-

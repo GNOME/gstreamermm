@@ -19,7 +19,6 @@
 
 #include "glibmm_generate_extra_defs/generate_extra_defs.h"
 
-#include <glib.h>
 #include <gst/gst.h>
 #include <gst/base/gstbasesrc.h>
 #include <gst/base/gstbasesink.h>
