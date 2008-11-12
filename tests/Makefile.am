@@ -10,7 +10,8 @@ noinst_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
 		  test-structure test-caps-structures test-interface \
 		  test-create-bus test-taglist test-tagsetter test-pad \
 		  test-init-check test-init test-init-check-noargs \
-		  test-init-noargs test-iterator test-property-caps
+		  test-init-noargs test-iterator test-property-caps \
+		  test-plugin-gen
 
 #TODO: Add test-ghost-pad to tests when bug #539108 is fixed.
 
@@ -82,3 +83,6 @@ test_iterator_LDFLAGS=@GSTREAMERMM_LIBS@
 
 test_property_caps_SOURCES=test-property-caps.cc
 test_property_caps_LDFLAGS=@GSTREAMERMM_LIBS@
+
+test_plugin_gen_SOURCES=test-plugin-gen.cc
+test_plugin_gen_LDFLAGS=@GSTREAMERMM_LIBS@

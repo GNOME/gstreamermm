@@ -48,10 +48,10 @@ gen_gst_wrap_init_path = $(tools_dir)/generate_gst_wrap_init.pl
 gen_gst_wrap_init_args = --namespace=$(sublib_namespace) --parent_dir=$(sublib_parentdir)
 run_gen_gst_wrap_init = $(PERL_PATH) $(gen_gst_wrap_init_path) $(gen_gst_wrap_init_args)
 
-# The generate_plugin_hg_file utility
-generate_plugin_hg_file_path = $(tools_dir)/extra_defs_gen/generate_plugin_hg_file
-generate_plugin_hg_file_args = --namespace=$(sublib_namespace) --main-defs=$(main_defs) --target=$(sublib_parentdir)
-run_generate_plugin_hg_file = $(generate_plugin_hg_file_path) $(generate_plugin_hg_file_args)
+# The generate_plugin_gmmproc_file utility
+generate_plugin_gmmproc_file_path = $(tools_dir)/extra_defs_gen/generate_plugin_gmmproc_file
+generate_plugin_gmmproc_file_args = --namespace=$(sublib_namespace) --main-defs=$(main_defs) --target=$(sublib_parentdir)
+run_generate_plugin_gmmproc_file = $(generate_plugin_gmmproc_file_path) $(generate_plugin_gmmproc_file_args)
 
 
 EXTRA_DIST	= Makefile_list_of_hg.am_fragment \
@@ -62,9 +62,9 @@ BUILT_SOURCES = $(files_plugin_hg)
 CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) $(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc
 
 
-$(files_plugin_hg): $(generate_plugin_hg_file_path)
-	$(run_generate_plugin_hg_file) $(subst .hg,,$@) > $@
-	touch $(subst .hg,.ccg,$@)
+$(files_plugin_hg): $(generate_plugin_gmmproc_file_path)
+	$(run_generate_plugin_gmmproc_file) --hg $(subst .hg,,$@) > $@
+	$(run_generate_plugin_gmmproc_file) --ccg $(subst .hg,,$@) > $(subst .hg,.ccg,$@)
 
 
 $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
