@@ -76,7 +76,20 @@ void generate_hg_file()
   std::cout << "{" << std::endl;
   std::cout << "  _CLASS_GOBJECT(" << cppTypeName << ", " << cTypeName <<
     ", " << castMacro << ", " << cppParentTypeName <<
-    ", " << cParentTypeName << ")" << std::endl;
+    ", " << cParentTypeName << ")" << std::endl << std::endl;
+
+  std::cout << "protected:" << std::endl;
+  std::cout << "  " << cppTypeName << "();" << std::endl;
+  std::cout << "  " << cppTypeName << "(const Glib::ustring& name);" << std::endl << std::endl;
+
+  std::cout << "public:" << std::endl;
+  std::cout << "/** Creates a new " << pluginName << " plugin with a unique name." << std::endl;
+  std::cout << " */" << std::endl;
+  std::cout << "  _WRAP_CREATE()" << std::endl << std::endl;
+
+  std::cout << "/** Creates a new " << pluginName << " plugin with the given name." << std::endl;
+  std::cout << " */" << std::endl;
+  std::cout << "  _WRAP_CREATE(const Glib::ustring& name)" << std::endl;
   std::cout << "};" << std::endl;
 
   std::cout << std::endl << "} //namespace " << nmspace << std::endl;
@@ -114,7 +127,20 @@ void generate_ccg_file()
   std::cout << "  }" << std::endl << std::endl;
 
   std::cout << "  return type;" << std::endl;
-  std::cout << "}" << std::endl;
+  std::cout << "}" << std::endl << std::endl;
+
+  std::cout << "namespace " << nmspace << std::endl;
+  std::cout << "{" << std::endl << std::endl;
+
+  std::cout << cppTypeName << "::" << cppTypeName << "()" << std::endl;
+  std::cout << ": _CONSTRUCT(\"name\", NULL)" << std::endl;
+  std::cout << "{}" << std::endl << std::endl;
+
+  std::cout << cppTypeName << "::" << cppTypeName << "(const Glib::ustring& name)" << std::endl;
+  std::cout << ": _CONSTRUCT(\"name\", name.c_str())" << std::endl;
+  std::cout << "{}" << std::endl;
+
+  std::cout << std::endl << "}" << std::endl;
 }
 
 int main(int argc, char* argv[])

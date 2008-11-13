@@ -6,12 +6,11 @@ int main(int argc, char* argv[])
 {
   Gst::init(argc, argv);
 
-  Glib::RefPtr<Gst::Element> element =
-          Gst::ElementFactory::create_element("fakesrc");
+  Glib::RefPtr<Gst::FakeSrc> fakesrc = Gst::FakeSrc::create();
 
-  Glib::RefPtr<Gst::FakeSrc> fakesrc = Glib::RefPtr<Gst::FakeSrc>::cast_dynamic(element);
-
-  if (!fakesrc)
+  if (fakesrc)
+    std::cout << "fakesrc is valid." << std::endl;
+  else
     std::cout << "fakesrc is invalid." << std::endl;
 
   return 0;
