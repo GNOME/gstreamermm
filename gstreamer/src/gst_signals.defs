@@ -665,7 +665,7 @@
 (define-property blocksize
   (of-object "GstBaseSrc")
   (prop-type "GParamULong")
-  (docs "Size in bytes to read per buffer (0 = default)")
+  (docs "Size in bytes to read per buffer (-1 = default)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -674,7 +674,7 @@
 (define-property num-buffers
   (of-object "GstBaseSrc")
   (prop-type "GParamInt")
-  (docs "Number of buffers to output before sending EOS")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -815,7 +815,7 @@
 (define-property blocksize
   (of-object "GstPushSrc")
   (prop-type "GParamULong")
-  (docs "Size in bytes to read per buffer (0 = default)")
+  (docs "Size in bytes to read per buffer (-1 = default)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -824,7 +824,7 @@
 (define-property num-buffers
   (of-object "GstPushSrc")
   (prop-type "GParamInt")
-  (docs "Number of buffers to output before sending EOS")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -899,6 +899,216 @@
   (docs "Current amount of data in the queue (in ns)")
   (readable #t)
   (writable #f)
+  (construct-only #f)
+)
+
+;; From GstFakeSrc
+
+(define-signal handoff
+  (of-object "GstFakeSrc")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstBuffer" "p0")
+    '("GstPad*" "p1")
+  )
+)
+
+(define-property name
+  (of-object "GstFakeSrc")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstFakeSrc")
+  (prop-type "GParamULong")
+  (docs "Size in bytes to read per buffer (-1 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstFakeSrc")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property typefind
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Run typefind before negotiating")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property do-timestamp
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Apply current stream time to buffers")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property data
+  (of-object "GstFakeSrc")
+  (prop-type "GParamEnum")
+  (docs "Data allocation method")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sizetype
+  (of-object "GstFakeSrc")
+  (prop-type "GParamEnum")
+  (docs "How to determine buffer sizes")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sizemin
+  (of-object "GstFakeSrc")
+  (prop-type "GParamInt")
+  (docs "Minimum buffer size")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sizemax
+  (of-object "GstFakeSrc")
+  (prop-type "GParamInt")
+  (docs "Maximum buffer size")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property filltype
+  (of-object "GstFakeSrc")
+  (prop-type "GParamEnum")
+  (docs "How to fill the buffer, if at all")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property datarate
+  (of-object "GstFakeSrc")
+  (prop-type "GParamInt")
+  (docs "Timestamps buffers with number of bytes per second (0 = none)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Sync to the clock to the datarate")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property pattern
+  (of-object "GstFakeSrc")
+  (prop-type "GParamString")
+  (docs "pattern")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property signal-handoffs
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Send a signal before pushing the buffer")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property silent
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Don't produce last_message events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property dump
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Dump buffer contents to stdout")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property parentsize
+  (of-object "GstFakeSrc")
+  (prop-type "GParamInt")
+  (docs "Size of parent buffer for sub-buffered allocation")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-message
+  (of-object "GstFakeSrc")
+  (prop-type "GParamString")
+  (docs "The last status message")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property can-activate-pull
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Can activate in pull mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property can-activate-push
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "Can activate in push mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property is-live
+  (of-object "GstFakeSrc")
+  (prop-type "GParamBoolean")
+  (docs "True if the element cannot produce data in PAUSED")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property format
+  (of-object "GstFakeSrc")
+  (prop-type "GParamEnum")
+  (docs "The format of the segment events")
+  (readable #t)
+  (writable #t)
   (construct-only #f)
 )
 

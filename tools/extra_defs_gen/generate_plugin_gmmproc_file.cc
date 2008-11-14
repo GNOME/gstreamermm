@@ -20,10 +20,9 @@
  */
 
 
-#include "glibmm_generate_extra_defs/generate_extra_defs.h"
-
 #include <gst/gst.h>
 #include <glibmm.h>
+#include <iostream>
 
 static gchar* nmspace;
 static gchar* defsFile;

@@ -28,6 +28,29 @@
 #include <gst/base/gstcollectpads.h>
 #include <gst/base/gstdataqueue.h>
 
+std::string get_plugin_defs(const std::string& pluginName)
+{
+  GType type = 0;
+  GstElementFactory* factory = 0;
+  std::string result;
+
+  factory = gst_element_factory_find(pluginName.c_str());
+
+  // Make sure that the feature is actually loaded:
+  if (factory)
+  {
+    GstPluginFeature* loaded_feature =
+            gst_plugin_feature_load(GST_PLUGIN_FEATURE(factory));
+
+    g_object_unref(factory);
+    factory = GST_ELEMENT_FACTORY(loaded_feature);
+    type = gst_element_factory_get_element_type(factory);
+    result = get_defs(type);
+    g_object_unref(factory);
+  }
+  return result;
+}
+
 int main (int argc, char *argv[])
 {
   gst_init (&argc, &argv);
@@ -77,6 +100,9 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_ADAPTER)
             << get_defs(GST_TYPE_COLLECT_PADS)
             << get_defs(GST_TYPE_DATA_QUEUE)
+
+  // GStreamer core plugin types:
+            << get_plugin_defs("fakesrc")
             ;
   return 0;
 }

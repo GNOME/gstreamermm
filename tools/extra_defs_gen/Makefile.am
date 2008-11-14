@@ -10,4 +10,4 @@ noinst_PROGRAMS = generate_extra_defs generate_defs_gstbase \
 generate_extra_defs_SOURCES = generate_defs_gst.cc
 generate_defs_gstbase_SOURCES = generate_defs_gstbase.cc
 
-generate_plugin_hg_file_SOURCES = generate_plugin_gmmproc_file.cc
+generate_plugin_gmmproc_file_SOURCES = generate_plugin_gmmproc_file.cc
