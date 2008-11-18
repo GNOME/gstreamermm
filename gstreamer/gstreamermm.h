@@ -1,6 +1,10 @@
 #ifndef _GSTREAMERMM_H_
 #define _GSTREAMERMM_H_
 
+#include <gstreamermm/init.h>
+#include <gstreamermm/version.h>
+#include <gstreamermm/wrap_init.h>
+
 // Core includes
 #include <gstreamermm/bin.h>
 #include <gstreamermm/buffer.h>
@@ -15,7 +19,7 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/filter.h>
 #include <gstreamermm/format.h>
-//TODO: #include <gstreamermm/ghostpad.h> (when bug #539108 is fixed)
+#include <gstreamermm/ghostpad.h>
 #include <gstreamermm/index.h>
 #include <gstreamermm/indexfactory.h>
 #include <gstreamermm/interface.h>
@@ -45,9 +49,4 @@
 #include <gstreamermm/basetransform.h>
 #include <gstreamermm/pushsrc.h>
 
-#include <gstreamermm/init.h>
-#include <gstreamermm/version.h>
-#include <gstreamermm/wrap_init.h>
-
 #endif // _GSTREAMERMM_H
-

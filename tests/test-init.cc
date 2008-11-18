@@ -23,9 +23,23 @@
 #include <gstreamerbasemm.h>
 #include <iostream>
 
+Gst::ClockTime on_get_time(const Glib::RefPtr<Gst::Clock>& clock)
+{
+  return Gst::CLOCK_TIME_NONE;
+}
+
 int main (int argc, char* argv[])
 {
   Gst::init(argc, argv);
+
+  Glib::RefPtr<GstBase::AudioClock> clock = GstBase::AudioClock::create("my-clock", sigc::ptr_fun(on_get_time));
+
+  if (clock)
+  {
+    Gst::ClockTime resolution = clock->get_resolution();
+    std::cout << "GstBase::AudioClock resolution = " << resolution << "." <<
+       std::endl;
+  }
 
   Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("ximagesink", "videosink");
 
@@ -43,6 +57,7 @@ int main (int argc, char* argv[])
 
     xoverlay->handle_events(false);
   }
+
 
   return 0;
 }
