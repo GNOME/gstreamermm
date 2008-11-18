@@ -22,10 +22,11 @@
 #include <gstreamermm.h>
 #include <gstreamerbasemm.h>
 #include <iostream>
+#include <gst/audio/gstaudioclock.h>
 
 int main (int argc, char* argv[])
 {
-  Gst::init(argc, argv);
+  GstBase::init(argc, argv);
 
   Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("ximagesink", "videosink");
 
@@ -43,6 +44,14 @@ int main (int argc, char* argv[])
 
     xoverlay->handle_events(false);
   }
+
+  GstClock* gst_clock = gst_audio_clock_new("clock", NULL, NULL);
+  Glib::RefPtr<GstBase::AudioClock> clock = Glib::wrap(GST_AUDIO_CLOCK(gst_clock));
+
+  if (clock)
+    std::cout << "Successfully wrapped a GstAudioClock in a GStBase::AudioClock." << std::endl;
+  else
+    std::cout << "Did not successfully wrap a GstAudioClock in a GstBase::AudioClock." << std::endl;
 
   return 0;
 }

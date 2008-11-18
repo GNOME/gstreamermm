@@ -1,5 +1,27 @@
 2008-11-18  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	* gstreamer/gstreamermm-0.10.pc.in:
+	* gstreamer/gstreamermm/init.cc:
+	* gstreamer/gstreamermm/init.h: Removed gstreamermm dependency on
+	gstreamerbasemm by not using GstBase::wrap_init() in gstreamermm
+	initialization.  Modified init() and init_check() methods so that they
+	only call gst_init() or gst_init_check() only once regardless of how
+	many times the methods are used.
+	* gstreamerbase/gstreamerbasemm/init.cc:
+	* gstreamerbase/gstreamerbasemm/init.h: Added init() and init_check()
+	methods.  Modifed docs to explain that GstBase::init() and
+	GstBase::init_check() methods can be used to initialize gsteamermm.
+	* gstreamerbase/gstreamerbasemm/wrap_init.h:
+	* gstreamerbase/gstreamerbasemm/gst_wrap_init.h: Modified docs to
+	suggest to use GstBase::init() or GstBase::init_check() methods
+	instead of GstBase::wrap_init() or GstBase::gst_wrap_init().
+	* tests/test-init-check.cc:
+	* tests/test-init.cc: Modified two tests to ensure that
+	GstBase::init() and GstBase::init_check() initialize both gstreamermm
+	and gstreamerbasemm.
+
+2008-11-18  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	* gstreamer/src/task.ccg:
 	* gstreamer/src/task.hg: Used _WRAP_CREATE() to generate create()
 	method.

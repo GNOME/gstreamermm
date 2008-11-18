@@ -21,14 +21,13 @@
 #include <gstreamermm/wrap.h>
 #include <gstreamermm/wrap_init.h>
 #include <gstreamermm/gst_wrap_init.h>
-#include <gstreamerbasemm/wrap_init.h>
 #include <glibmm/init.h>
 #include <gst/gst.h>
 
 namespace Gst
 {
 
-void initialize_wrap_system()
+static void initialize_wrap_system()
 {
   static bool s_init = false;
   if(!s_init)
@@ -39,9 +38,6 @@ void initialize_wrap_system()
     //For Gst::wrap(), for Gst::MiniObject-derived classes.
     Gst::wrap_register_init();
     Gst::gst_wrap_init();
-
-    //Initialize wraping for gstreamerbasemm co-library
-    GstBase::wrap_init();
 
     s_init = true;
   }
@@ -80,23 +76,23 @@ bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   static bool s_init = false;
-
-  if(!s_init)
-    Glib::init();
-
-  GError* gerror = 0;
-  bool result = gst_init_check(&argc, &argv, &gerror);
-
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
+  static bool result = false;
 
   if(!s_init)
   {
+    Glib::init();
+
+    GError* gerror = 0;
+    result = gst_init_check(&argc, &argv, &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    if(gerror)
+      ::Glib::Error::throw_exception(gerror);
+#else
+    if(gerror)
+      error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
     initialize_wrap_system();
     s_init = true;
   }
@@ -111,23 +107,23 @@ bool init_check(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   static bool s_init = false;
-
-  if(!s_init)
-    Glib::init();
-
-  GError* gerror = 0;
-  bool result = gst_init_check(NULL, NULL, &gerror);
-
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
+  static bool result = false;
 
   if(!s_init)
   {
+    Glib::init();
+
+    GError* gerror = 0;
+    result = gst_init_check(NULL, NULL, &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    if(gerror)
+      ::Glib::Error::throw_exception(gerror);
+#else
+    if(gerror)
+      error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
     initialize_wrap_system();
     s_init = true;
   }
