@@ -44,22 +44,36 @@ static void Task_Task_gstreamermm_callback(void* data)
 namespace Gst
 {
 
-Glib::RefPtr<Task> Task::create(const SlotTask& slot)
+Task::Task(const SlotTask& task_slot)
+: _CONSTRUCT()
 {
   //Create a copy of the slot.  A pointer to this copy will be passed through
   //the call back's data parameter.  It will be destroyed in the Task's
   //destructor
-  SlotTask *slot_copy = new SlotTask(slot);
+  slot = new SlotTask(task_slot);
+  _slot_set(true);
 
-  Glib::RefPtr<Task> task = Glib::wrap(gst_task_create(&Task_Task_gstreamermm_callback, slot_copy));
-  task->slot = slot_copy;
-  return task;
+  // These lines are taken verbatim from gst_task_create() after calling
+  // g_object_new().
+  gobj()->func = &Task_Task_gstreamermm_callback;
+  gobj()->data = &slot;
+}
+
+bool Task::_slot_set(bool mark_set)
+{
+  static bool slot_set = false;
+
+  if (mark_set)
+    slot_set = true;
+
+  return slot_set;
 }
 
 Task::~Task()
 {
   // Delete task's slot upon destruction
-  delete this->slot;
+  if (_slot_set())
+    delete slot;
 }
 
 } //namespace Gst

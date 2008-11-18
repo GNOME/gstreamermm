@@ -50,6 +50,7 @@ AudioClock::AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot)
   : _CONSTRUCT("name", name.c_str())
 {
   slot = new SlotGetTime(time_slot);
+  _slot_set(true);
 
   //The following lines are taken verbatim from gst_audio_clock_new() after the
   //call to g_object_new() because it seems that bug #545782 will not be
@@ -58,10 +59,21 @@ AudioClock::AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot)
   gobj()->user_data = &slot;
 }
 
+bool AudioClock::_slot_set(bool mark_set)
+{
+  static bool slot_set = false;
+
+  if (mark_set)
+    slot_set = true;
+
+  return slot_set;
+}
+
+
 AudioClock::~AudioClock()
 {
-  delete slot;
+  if (_slot_set())
+    delete slot;
 }
 
 } //namespace GstBase
-

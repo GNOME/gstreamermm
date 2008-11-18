@@ -70,16 +70,20 @@ public:
    */
   typedef sigc::slot<void> SlotTask;
 
+protected:
+  Task(const SlotTask& task_slot);
+
+public:
   /** Create a new Gst::Task that will repeadedly call the provided slot as a
    * parameter. Typically the task will run in a new thread.
    *
    * The slot cannot be changed after the task has been created. You must
    * create a new Gst::Task to change the slot.
    *
-   * @param slot The Gst::Task::SlotTask to use.
+   * @param task_slot The Gst::Task::SlotTask to use.
    * @return A new Gst::Task. MT safe.
    */
-  static Glib::RefPtr<Task> create(const SlotTask& slot);
+  _WRAP_CREATE(const SlotTask& task_slot);
 
   _WRAP_METHOD(static void cleanup_all(), gst_task_cleanup_all)
   _WRAP_METHOD(TaskState get_state(), gst_task_get_state)
@@ -92,6 +96,7 @@ public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
   SlotTask* slot;
+  bool _slot_set(bool mark_set = false);
 #endif
 };
 
