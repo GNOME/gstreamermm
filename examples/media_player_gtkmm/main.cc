@@ -20,7 +20,7 @@
  */
 
 #include <gtkmm/main.h>
-#include <gstreamermm/init.h>
+#include <gstreamerbasemm/init.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/elementfactory.h>
 #include <gstreamermm/pad.h>
@@ -32,7 +32,10 @@ int
 main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
-  Gst::init(argc, argv);
+
+  // Use GstBase::init() instead of Gst::init() because some of its API
+  // (i.e. GstBase::XOverlay in player_window.cc) is used:
+  GstBase::init(argc, argv);
 
   // Create the elements:
 
