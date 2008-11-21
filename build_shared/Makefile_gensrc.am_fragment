@@ -27,6 +27,7 @@ files_all_ccg	= $(files_all_hg:%.hg=%.ccg)
 files_h		= $(files_all_hg:%.hg=$(gensrc_destdir)/%.h)
 files_cc	= $(files_all_hg:%.hg=$(gensrc_destdir)/%.cc)
 files_stamp	= $(files_all_hg:%.hg=$(stamp_dir)/stamp-%)
+files_stamp	+= $(files_plugin_hg:%.hg=$(stamp_dir)/stamp-%)
 
 #Installed gmmproc stuff, from glibmm:
 gmmproc_path = $(GMMPROC)
@@ -73,9 +74,14 @@ $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 
 sublib_srcdir		= $(srcdir)/../src
 files_hg_with_path	= $(patsubst %.hg,$(sublib_srcdir)/%.hg,$(files_all_hg))
+files_plugin_hg_with_path = $(patsubst %.hg,$(sublib_srcdir)/%.hg,$(files_plugin_hg))
 
-$(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_path) $(files_hg_with_path) Makefile
-	$(run_gen_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) >$@
+$(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_path) $(files_hg_with_path) \
+	$(files_plugin_hg_with_path) Makefile
+	$(run_gen_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) \
+	  $(filter %.hg,$(foreach plugin,$(subst .hg,,$(files_plugin_hg)), \
+	  ./$(shell $(run_generate_plugin_gmmproc_file) \
+	  --suggest-hg $(plugin)))) >$@
 
 $(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) $(files_hg_with_path) Makefile
 	$(run_gen_gst_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) >$@

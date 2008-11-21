@@ -1,3 +1,36 @@
+2008-11-20  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Modified
+	plug-in generation tool to prepend namespaces to parent types and use
+	correct include roots in cases where parent types are from
+	gstreamermm.  Added --sugest-hg option that outputs what the name of
+	the .hg file should if the plug-in exists (nothing otherwise) while
+	building gstreamermm.  Modified it to output a comment warning in the
+	.hg file if a plug-in is not available.
+
+	* build_shared/Makefile_build_gensrc.am_fragment:
+	* build_shared/Makefile_gensrc.am_fragment:
+	* gstreamer/gstreamermm/Makefile.am:
+	* gstreamer/gstreamermm/private/Makefile.am:
+	* gstreamerbase/gstreamerbasemm/Makefile.am:
+	* gstreamerbase/gstreamerbasemm/private/Makefile.am: Modified build
+	process so that all plug-ins are generated and compiled, but only
+	included in wrap_init() if they exist during the build.
+
+	* gstreamer/src/Makefile_list_of_hg.am_fragment: Added dvbsrc
+	plug-in[1] from gst-plugins-ugly to list of plug-ins to build (which
+	will not exist in jhbuild environment) to test compilation of a
+	plug-in that is not available.  Also added fakesink from the core
+	plugins[2].
+	* gstreamerbase/src/Makefile_list_of_hg.am_fragment: Added
+	audioconvert plug-in[3] from gst-plugins-base to list of plug-ins to
+	build for gstreamerbasemm.  These plug-in additions are just tests to
+	ensure build process works.
+
+	[1] http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-bad-plugins/html/gst-plugins-bad-plugins-dvbsrc.html
+	[2] http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-plugins/html/gstreamer-plugins-fakesink.html
+	[3] http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-base-plugins/html/gst-plugins-base-plugins-audioconvert.html
+
 2008-11-19  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* examples/media_player_gtkmm/main.cc: Modify example to use

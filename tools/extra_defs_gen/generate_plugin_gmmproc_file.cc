@@ -34,6 +34,8 @@ static Glib::ustring cParentTypeName;
 static Glib::ustring cppTypeName;
 static Glib::ustring cppParentTypeName;
 static Glib::ustring castMacro;
+static Glib::ustring includeRoot;
+static Glib::ustring parentNameSpace;
 
 Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 {
@@ -58,7 +60,7 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 
 void generate_hg_file()
 {
-  std::cout << "#include <" << target << "/" <<
+  std::cout << "#include <" << includeRoot << "/" <<
     cppParentTypeName.lowercase() << ".h>" << std::endl << std::endl;
 
   std::cout << "_DEFS(" << target << "," << defsFile << ")" << std::endl <<
@@ -71,11 +73,13 @@ void generate_hg_file()
   std::cout << " * Please include <" << target << "/" << cppTypeName.lowercase() << ".h> to use." << std::endl;
   std::cout << " */" << std::endl;
   std::cout << "class " << cppTypeName << std::endl;
-  std::cout << ": public " << cppParentTypeName << std::endl;
+  std::cout << ": public " << parentNameSpace << "::" << cppParentTypeName <<
+    std::endl;
   std::cout << "{" << std::endl;
   std::cout << "  _CLASS_GOBJECT(" << cppTypeName << ", " << cTypeName <<
-    ", " << castMacro << ", " << cppParentTypeName <<
-    ", " << cParentTypeName << ")" << std::endl << std::endl;
+    ", " << castMacro << ", " << parentNameSpace << "::" <<
+    cppParentTypeName << ", " << cParentTypeName << ")" << std::endl <<
+    std::endl;
 
   std::cout << "protected:" << std::endl;
   std::cout << "  " << cppTypeName << "();" << std::endl;
@@ -96,7 +100,7 @@ void generate_hg_file()
 
 void generate_ccg_file()
 {
-  std::cout << "_PINCLUDE(" << target << "/private/" <<
+  std::cout << "_PINCLUDE(" << includeRoot << "/private/" <<
     cppParentTypeName.lowercase() << "_p.h)" << std::endl;
   std::cout << "#include <glib/gprintf.h>" << std::endl << std::endl;
 
@@ -146,17 +150,19 @@ int main(int argc, char* argv[])
 {
   gboolean hgFile = false;
   gboolean ccgFile = false;
+  gboolean suggestHg = false;
 
   if (!g_thread_supported())
     g_thread_init(NULL);
 
   GOptionEntry optionEntries[] =
   {
-    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate .hg file", NULL },
-    {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file", NULL },
-    {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin", "namespace" },
-    {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main .defs file without .defs extension (used in _DEFS() directive)", "def" },
-    {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The target directory  of the generated .h and .cc files (used in _DEFS() directive)", "directory" },
+    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate .hg file.", NULL },
+    {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", NULL },
+    {"suggest-hg", 's', 0, G_OPTION_ARG_NONE, &suggestHg, "If the plugin exists, output the suggested .hg filename.", NULL },
+    {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin.", "namespace" },
+    {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main .defs file without .defs extension (used in _DEFS() directive).", "def" },
+    {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The target directory  of the generated .h and .cc files (used in _DEFS() directive).", "directory" },
     { NULL }
   };
 
@@ -215,12 +221,42 @@ int main(int argc, char* argv[])
     cppParentTypeName = cParentTypeName.substr(3);
     castMacro = get_cast_macro(cTypeName);
 
+    if (cppParentTypeName.compare("BaseSsrc") == 0 ||
+      cppParentTypeName.compare("BaseSink") == 0 ||
+      cppParentTypeName.compare("BaseTransform") == 0 ||
+      cppParentTypeName.compare("PushSrc") == 0 ||
+      cppParentTypeName.compare("Element") == 0)
+    {
+      includeRoot = "gstreamermm";
+      parentNameSpace = "Gst";
+    }
+    else
+    {
+      includeRoot = target;
+      parentNameSpace = nmspace;
+    }
+
     if (hgFile)
       generate_hg_file();
     else if (ccgFile)
       generate_ccg_file();
+    else if (suggestHg)
+      std::cout << pluginName << ".hg" << std::endl;
 
     g_object_unref(factory);
+  }
+  else
+  {
+    if (hgFile)
+    {
+      std::cout << "_DEFS(" << target << "," << defsFile << ")" <<
+        std::endl << std::endl;
+
+      std::cout << "// The build system does not have a plugin named " <<
+        argv[1] << "." << std::endl;
+      std::cout << "// A wrapper class for it was not generated." <<
+        std::endl;
+    }
   }
 
   return 0;
