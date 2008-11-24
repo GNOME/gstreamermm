@@ -1,3 +1,39 @@
+2008-11-23  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/gstreamermm/Makefile.am:
+	* gstreamer/gstreamermm/private/Makefile.am:
+	* gstreamerbase/gstreamerbasemm/Makefile.am:
+	* gstreamerbase/gstreamerbasemm/private/Makefile.am: Removed generated
+	plug-in sources from distribution because they should be generated on
+	the build system.
+
+	* docs/reference/Makefile.am: Modified so that the html/ directory is
+	not distributed because docs may differ depending on the plug-ins
+	available on the build system.  Made docs clean on `make clean' (for
+	distcheck).
+
+	* build_shared/Makefile_gensrc.am_fragment: Modified plug-in
+	generation to use a stamp directory (like the regular .hg files do) so
+	that the build system is aware of changes to them and knows how to
+	regenerate them if necessary.  Modified the BUILT_SOURCES to build the
+	stamp of the plug-ins which uses the plug-ins .hg and .ccg rules to
+	generate the .hg and .ccg files and then creates a stamp after running
+	gmmproc on the files.  Added the plug-in stamps to CLEANFILES so that
+	they are cleaned with `make clean'.  Removed unused `sublib_srcdir'
+	variable and unneeded (?) Makefile dependencies.  Used $(srcdir)
+	and $(builddir) where necessary (for distcheck).  Added
+	`stamp_plugin_dir' dependency to plug-in stamp generation because in
+	the distcheck, a stamp directory is not created by `all-local'.  The
+	distcheck now works to make it easier for future releases, but write
+	permission is necessary in the source directory because the plug-in
+	.hg and .ccg files must be generated there and gmmproc must also
+	generate the private headers, the .cc and the .h files in the source
+	directory structure so that wrap_init(), which includes stuff from the
+	plug-in header files, is built successfully.
+
+	* gstreamer/gstreamermm.h: Moved init includes to top (to keep logical
+	order of includes).
+
 2008-11-20  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Modified

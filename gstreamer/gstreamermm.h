@@ -1,6 +1,10 @@
 #ifndef _GSTREAMERMM_H_
 #define _GSTREAMERMM_H_
 
+#include <gstreamermm/init.h>
+#include <gstreamermm/version.h>
+#include <gstreamermm/wrap_init.h>
+
 // Core includes
 #include <gstreamermm/bin.h>
 #include <gstreamermm/buffer.h>
@@ -45,9 +49,4 @@
 #include <gstreamermm/basetransform.h>
 #include <gstreamermm/pushsrc.h>
 
-#include <gstreamermm/init.h>
-#include <gstreamermm/version.h>
-#include <gstreamermm/wrap_init.h>
-
 #endif // _GSTREAMERMM_H
-

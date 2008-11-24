@@ -6,7 +6,7 @@ beautify_docs = @GMMPROC_DIR@/beautify_docs.pl
 docdir = $(datadir)/doc/gstreamermm-0.10/docs
 referencedir=$(docdir)/reference/html
 
-EXTRA_DIST=$(doxygen_configfile) html reference-index.txt
+EXTRA_DIST=$(doxygen_configfile) reference-index.txt
 
 HTML_INDEX=html/index.html
 
@@ -43,6 +43,8 @@ install-data-local: install-reference
 uninstall-local: uninstall-reference
 
 maintainer-clean-local: doc-clean
+
+clean-local: doc-clean
 
 .PHONY: doc-clean install-reference uninstall-reference
 

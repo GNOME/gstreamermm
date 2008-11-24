@@ -14,9 +14,11 @@
 tools_dir	= $(top_srcdir)/tools
 tools_dir_m4= $(top_srcdir)/tools/m4
 tools_dir_pm= $(top_srcdir)/tools/pm
+extra_defs_dir = $(top_builddir)/tools/extra_defs_gen
 
 gensrc_destdir = $(srcdir)/../$(sublib_name)
 stamp_dir = $(srcdir)/.stamps
+stamp_plugin_dir = $(builddir)/.stamps
 
 include $(tools_dir)/Makefile_list_of_sources.am_fragment
 tools_m4	= $(files_tools_m4:%.m4=$(tools_dir_m4)/%.m4)
@@ -25,9 +27,8 @@ tools_m4	= $(files_tools_m4:%.m4=$(tools_dir_m4)/%.m4)
 include $(srcdir)/../src/Makefile_list_of_hg.am_fragment
 files_all_ccg	= $(files_all_hg:%.hg=%.ccg)
 files_h		= $(files_all_hg:%.hg=$(gensrc_destdir)/%.h)
-files_cc	= $(files_all_hg:%.hg=$(gensrc_destdir)/%.cc)
 files_stamp	= $(files_all_hg:%.hg=$(stamp_dir)/stamp-%)
-files_stamp	+= $(files_plugin_hg:%.hg=$(stamp_dir)/stamp-%)
+files_plugin_stamp = $(files_plugin_hg:%.hg=$(stamp_plugin_dir)/stamp-%-plugin)
 
 #Installed gmmproc stuff, from glibmm:
 gmmproc_path = $(GMMPROC)
@@ -50,48 +51,66 @@ gen_gst_wrap_init_args = --namespace=$(sublib_namespace) --parent_dir=$(sublib_p
 run_gen_gst_wrap_init = $(PERL_PATH) $(gen_gst_wrap_init_path) $(gen_gst_wrap_init_args)
 
 # The generate_plugin_gmmproc_file utility
-generate_plugin_gmmproc_file_path = $(tools_dir)/extra_defs_gen/generate_plugin_gmmproc_file
+generate_plugin_gmmproc_file_path = $(extra_defs_dir)/generate_plugin_gmmproc_file
 generate_plugin_gmmproc_file_args = --namespace=$(sublib_namespace) --main-defs=$(main_defs) --target=$(sublib_parentdir)
 run_generate_plugin_gmmproc_file = $(generate_plugin_gmmproc_file_path) $(generate_plugin_gmmproc_file_args)
+
+files_plugin_hg_with_path = $(patsubst %.hg,$(srcdir)/%.hg,$(files_plugin_hg))
 
 
 EXTRA_DIST	= Makefile_list_of_hg.am_fragment \
 		  $(files_defs) $(files_all_hg) $(files_all_ccg)
 
-BUILT_SOURCES = $(files_plugin_hg)
+BUILT_SOURCES = $(foreach plugin,$(files_plugin_hg:.hg=),\
+		$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
 
-CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) $(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc
+CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) \
+	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc \
+	$(foreach plugin,$(files_plugin_hg:.hg=), \
+	$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
 
 
-$(files_plugin_hg): $(generate_plugin_gmmproc_file_path)
-	$(run_generate_plugin_gmmproc_file) --hg $(subst .hg,,$@) > $@
-	$(run_generate_plugin_gmmproc_file) --ccg $(subst .hg,,$@) > $(subst .hg,.ccg,$@)
+$(files_plugin_hg_with_path): $(generate_plugin_gmmproc_file_path) \
+	$(tools_m4) $(files_defs)
+	$(run_generate_plugin_gmmproc_file) --hg \
+		$(notdir $(subst .hg,,$@)) >  $@
 
+$(files_plugin_hg_with_path:.hg=.ccg): $(subst .ccg,.hg,$@) \
+	$(generate_plugin_gmmproc_file_path) $(tools_m4) $(files_defs)
+	$(run_generate_plugin_gmmproc_file) --ccg \
+		$(notdir $(subst .ccg,,$@)) >  $@
 
 $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
 	@echo 'timestamp' > $@
 
-sublib_srcdir		= $(srcdir)/../src
-files_hg_with_path	= $(patsubst %.hg,$(sublib_srcdir)/%.hg,$(files_all_hg))
-files_plugin_hg_with_path = $(patsubst %.hg,$(sublib_srcdir)/%.hg,$(files_plugin_hg))
+$(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir) $(srcdir)/%.hg \
+	$(srcdir)/%.ccg $(tools_m4) $(files_defs)
+	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
+	@echo 'timestamp' > $@
+
+$(stamp_plugin_dir):
+	@(test -d $(stamp_plugin_dir) || mkdir $(stamp_plugin_dir))
+
+files_hg_with_path	= $(patsubst %.hg,$(srcdir)/%.hg,$(files_all_hg))
 
 $(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_path) $(files_hg_with_path) \
-	$(files_plugin_hg_with_path) Makefile
+	$(files_plugin_hg_with_path)
 	$(run_gen_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) \
 	  $(filter %.hg,$(foreach plugin,$(subst .hg,,$(files_plugin_hg)), \
-	  ./$(shell $(run_generate_plugin_gmmproc_file) \
+	  $(srcdir)/$(shell $(run_generate_plugin_gmmproc_file) \
 	  --suggest-hg $(plugin)))) >$@
 
-$(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) $(files_hg_with_path) Makefile
+$(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) $(files_hg_with_path)
 	$(run_gen_gst_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) >$@
 
-create-stamp-dir:
+create-stamp-dir: $(stamp_plugin_dir)
 	@(test -d $(stamp_dir) || mkdir $(stamp_dir))
 
 if MAINTAINER_MODE
-all-local: create-stamp-dir $(files_stamp) $(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc
+all-local: create-stamp-dir $(files_stamp) $(files_plugin_stamp) \
+	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc
 endif
 
 maintainer-clean-local:
-	rm -rf $(stamp_dir)
+	rm -rf $(stamp_dir) $(stamp_plugin_dir)
