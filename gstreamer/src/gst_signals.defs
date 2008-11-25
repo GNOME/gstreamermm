@@ -49,6 +49,12 @@
   )
 )
 
+(define-signal do-latency
+  (of-object "GstBin")
+  (return-type "gboolean")
+  (when "last")
+)
+
 (define-property name
   (of-object "GstBin")
   (prop-type "GParamString")
@@ -1107,6 +1113,107 @@
   (of-object "GstFakeSrc")
   (prop-type "GParamEnum")
   (docs "The format of the segment events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstFileSrc
+
+(define-property name
+  (of-object "GstFileSrc")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstFileSrc")
+  (prop-type "GParamULong")
+  (docs "Size in bytes to read per buffer (-1 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstFileSrc")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property typefind
+  (of-object "GstFileSrc")
+  (prop-type "GParamBoolean")
+  (docs "Run typefind before negotiating")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property do-timestamp
+  (of-object "GstFileSrc")
+  (prop-type "GParamBoolean")
+  (docs "Apply current stream time to buffers")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property location
+  (of-object "GstFileSrc")
+  (prop-type "GParamString")
+  (docs "Location of the file to read")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property fd
+  (of-object "GstFileSrc")
+  (prop-type "GParamInt")
+  (docs "File-descriptor for the file being mmap()d")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property mmapsize
+  (of-object "GstFileSrc")
+  (prop-type "GParamULong")
+  (docs "Size in bytes of mmap()d regions")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sequential
+  (of-object "GstFileSrc")
+  (prop-type "GParamBoolean")
+  (docs "Whether to use madvise to hint to the kernel that access to mmap pages will be sequential")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property touch
+  (of-object "GstFileSrc")
+  (prop-type "GParamBoolean")
+  (docs "Touch mmapped data regions to force them to be read from disk")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property use-mmap
+  (of-object "GstFileSrc")
+  (prop-type "GParamBoolean")
+  (docs "Whether to use mmap() instead of read()")
   (readable #t)
   (writable #t)
   (construct-only #f)

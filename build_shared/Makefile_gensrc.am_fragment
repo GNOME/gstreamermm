@@ -61,9 +61,6 @@ files_plugin_hg_with_path = $(patsubst %.hg,$(srcdir)/%.hg,$(files_plugin_hg))
 EXTRA_DIST	= Makefile_list_of_hg.am_fragment \
 		  $(files_defs) $(files_all_hg) $(files_all_ccg)
 
-BUILT_SOURCES = $(foreach plugin,$(files_plugin_hg:.hg=),\
-		$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
-
 CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) \
 	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc \
 	$(foreach plugin,$(files_plugin_hg:.hg=), \
@@ -110,6 +107,9 @@ create-stamp-dir: $(stamp_plugin_dir)
 if MAINTAINER_MODE
 all-local: create-stamp-dir $(files_stamp) $(files_plugin_stamp) \
 	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc
+else
+BUILT_SOURCES = $(foreach plugin,$(files_plugin_hg:.hg=),\
+		$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
 endif
 
 maintainer-clean-local:

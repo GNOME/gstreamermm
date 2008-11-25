@@ -37,6 +37,8 @@ static Glib::ustring castMacro;
 static Glib::ustring includeRoot;
 static Glib::ustring parentNameSpace;
 
+GType type = 0;
+
 Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 {
   Glib::ustring result;
@@ -58,8 +60,59 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
   return result;
 }
 
+void get_property_wrap_statements(Glib::ustring& wrapStatements,
+  Glib::ustring& enumDefinitions)
+{
+  std::string strResult;
+  std::string strObjectName = g_type_name(type);
+
+  //Get the list of properties:
+  GParamSpec** ppParamSpec = 0;
+  guint iCount = 0;
+  if(G_TYPE_IS_OBJECT(type))
+  {
+    GObjectClass* pGClass = G_OBJECT_CLASS(g_type_class_ref(type));
+    ppParamSpec = g_object_class_list_properties (pGClass, &iCount);
+    g_type_class_unref(pGClass);
+  }
+  else if (G_TYPE_IS_INTERFACE(type))
+  {
+    gpointer pGInterface = g_type_default_interface_ref(type);
+    if(pGInterface) //We check because this fails for G_TYPE_VOLUME, for some reason.
+    {
+      ppParamSpec = g_object_interface_list_properties(pGInterface, &iCount);
+      g_type_default_interface_unref(pGInterface);
+    }
+  }
+
+  //This extra check avoids an occasional crash, for instance for GVolume
+  if(!ppParamSpec)
+    iCount = 0;
+
+  for(guint i = 0; i < iCount; i++)
+  {
+    GParamSpec* pParamSpec = ppParamSpec[i];
+    if(pParamSpec)
+    {
+      //Name and type:
+      Glib::ustring propertyName = g_param_spec_get_name(pParamSpec);
+      Glib::ustring  propertyCType = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
+
+      wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
+        "_CTOCPP(" + propertyCType + ") )\n";
+    }
+  }
+
+  g_free(ppParamSpec);
+}
+
 void generate_hg_file()
 {
+  Glib::ustring propertyWrapStatements;
+  Glib::ustring enumDefinitions;
+
+  get_property_wrap_statements(propertyWrapStatements, enumDefinitions);
+
   std::cout << "#include <" << includeRoot << "/" <<
     cppParentTypeName.lowercase() << ".h>" << std::endl << std::endl;
 
@@ -92,7 +145,11 @@ void generate_hg_file()
 
   std::cout << "/** Creates a new " << pluginName << " plugin with the given name." << std::endl;
   std::cout << " */" << std::endl;
-  std::cout << "  _WRAP_CREATE(const Glib::ustring& name)" << std::endl;
+  std::cout << "  _WRAP_CREATE(const Glib::ustring& name)" << std::endl <<
+    std::endl;
+
+  std::cout << propertyWrapStatements;
+
   std::cout << "};" << std::endl;
 
   std::cout << std::endl << "} //namespace " << nmspace << std::endl;
@@ -199,7 +256,6 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  GType type = 0;
   GstElementFactory* factory = 0;
 
   factory = gst_element_factory_find(argv[1]);

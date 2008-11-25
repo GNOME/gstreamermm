@@ -1,6 +1,6 @@
-/* generate_defs_gst.cc
+/* get_plugin_defs.cc
  *
- * Copyright (C) 2001 The Free Software Foundation
+ * Copyright (C) 2008 The Free Software Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -21,23 +21,26 @@
 #include "get_plugin_defs.h"
 
 #include <gst/gst.h>
-#include <gst/interfaces/colorbalance.h>
-#include <gst/interfaces/colorbalancechannel.h>
-#include <gst/interfaces/xoverlay.h>
 
-int main (int argc, char *argv[])
+std::string get_plugin_defs(const std::string& pluginName)
 {
-  gst_init (&argc, &argv);
+  GType type = 0;
+  GstElementFactory* factory = 0;
+  std::string result;
 
-  // gst-plugins-base (GStreamer base) types
-  std::cout << get_defs(GST_TYPE_COLOR_BALANCE)
-            << get_defs(GST_TYPE_COLOR_BALANCE_CHANNEL)
-            << get_defs(GST_TYPE_X_OVERLAY)
+  factory = gst_element_factory_find(pluginName.c_str());
 
-  // gst-plugins-base (GStreamer base) plugin types
-            << get_plugin_defs("audioconvert")
-            << get_plugin_defs("oggmux")
-            ;
+  // Make sure that the feature is actually loaded:
+  if (factory)
+  {
+    GstPluginFeature* loaded_feature =
+            gst_plugin_feature_load(GST_PLUGIN_FEATURE(factory));
 
-  return 0;
+    g_object_unref(factory);
+    factory = GST_ELEMENT_FACTORY(loaded_feature);
+    type = gst_element_factory_get_element_type(factory);
+    result = get_defs(type);
+    g_object_unref(factory);
+  }
+  return result;
 }

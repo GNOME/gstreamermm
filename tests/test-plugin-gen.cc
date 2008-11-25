@@ -1,23 +1,26 @@
 #include <gstreamermm.h>
-#include <gstreamermm/fakesrc.h>
+#include <gstreamermm/filesrc.h>
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
   Gst::init(argc, argv);
 
-  Glib::RefPtr<Gst::FakeSrc> fakesrc = Gst::FakeSrc::create();
+  Glib::RefPtr<Gst::Element> element =
+          Gst::ElementFactory::create_element("filesrc");
 
-  if (fakesrc)
-    std::cout << "fakesrc is valid." << std::endl;
+  Glib::RefPtr<Gst::FileSrc> filesrc = Gst::FileSrc::create();
+
+  if (filesrc)
+    std::cout << "filesrc is valid." << std::endl;
   else
-    std::cout << "fakesrc is invalid." << std::endl;
+    std::cout << "filesrc is invalid." << std::endl;
 
-  int sizemax = 0;
-  GstFakeSrc* obj = fakesrc->gobj();
-  g_object_get(obj, "sizemax", &sizemax, NULL);
+  gulong mmapsize = 0;
+  GstFileSrc* obj = filesrc->gobj();
+  g_object_get(obj, "mmapsize", &mmapsize, NULL);
 
-  std::cout << "sizemax = "  << sizemax << std::endl;
+  std::cout << "mmapsize = "  << mmapsize << std::endl;
 
   return 0;
 }

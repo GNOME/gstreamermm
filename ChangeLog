@@ -1,3 +1,48 @@
+2008-11-25  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* build_shared/Makefile_gensrc.am_fragment: Use BUILT_SOURCES only
+	when not in maintainer mode (e.g. when running a distcheck) because
+	it is only needed when tarball is distributed and plug-ins need to be
+	generated on build machine.
+
+	* tools/m4/convert.m4:
+	* tools/m4/ctocpp_base.m4: Added _CPPTYPE() and _CTOCPP() macros for
+	defining ways to translate from a C type to a C++ type (both when
+	used as a parameter and as a return type) and then translating from a
+	C type to a C++ type.  If successful, the macros will include ways of
+	automatically including the correct header file if the include header
+	file is specified in the translation specification.
+
+	* tools/extra_defs_gen/Makefile.am:
+	* tools/extra_defs_gen/get_plugin_defs.cc:
+	* tools/extra_defs_gen/get_plugin_defs.h:
+	* gstreamer/src/generate-extra-defs.sh: Renamed generate_extra_defs to
+	generate_defs_gst (to complement generate_defs_gstbase).  Factored out
+	get_plugin_defs() so that generate_defs_gstbase can also generate
+	plug-in defs for gstreamerbase branch.
+	* tools/extra_defs_gen/generate_defs_gst.cc: Added `filesrc' to the
+	list of plug-ins to generate defs for.
+	* tools/extra_defs_gen/generate_defs_gstbase.cc:  Added `audioconvert'
+	and `oggmux' to the list of plug-ins to generate defs for.
+	* gstreamer/src/gst_signals.defs:
+	* gstreamerbase/src/gstbase_signals.defs: Regenerated to include
+	additional plug-in defs.
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Modified
+	plug-in generation tool to wrap plug-in properties using the _CTOCPP
+	marco described above (property iteration was adapted from glibmm's
+	extra defs generation utility).  Made the GType of the plug-in global
+	for easy access.
+
+	* gstreamer/src/Makefile_list_of_hg.am_fragment:
+	* tests/test-plugin-gen.cc:
+	* gstreamerbase/src/Makefile_list_of_hg.am_fragment: Used Gst::FileSrc
+	instead of Gst::FakeSrc in the gstreamer branch and GstBase::OggDemux
+	instead of GstBase::AudioConvert in the gstreamerbase branch to test
+	plug-in generation because property generation does not quite work
+	with the `fakesrc' and `audioconvert' plug-ins just yet because
+	special care must be used in dealing with enums and boxed types.
+
 2008-11-23  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/gstreamermm/Makefile.am:
