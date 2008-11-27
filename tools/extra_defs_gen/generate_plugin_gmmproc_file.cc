@@ -61,7 +61,7 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 }
 
 void get_property_wrap_statements(Glib::ustring& wrapStatements,
-  Glib::ustring& enumDefinitions)
+  Glib::ustring& includeMacroCalls, Glib::ustring& enumDefinitions)
 {
   std::string strResult;
   std::string strObjectName = g_type_name(type);
@@ -100,6 +100,8 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
 
       wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
         "_CTOCPP(" + propertyCType + ") )\n";
+
+      includeMacroCalls += "_CTOCPP_INCLUDE(" + propertyCType + ")\n";
     }
   }
 
@@ -109,12 +111,15 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
 void generate_hg_file()
 {
   Glib::ustring propertyWrapStatements;
+  Glib::ustring includeMacroCalls;
   Glib::ustring enumDefinitions;
 
-  get_property_wrap_statements(propertyWrapStatements, enumDefinitions);
+  get_property_wrap_statements(propertyWrapStatements, includeMacroCalls, enumDefinitions);
 
   std::cout << "#include <" << includeRoot << "/" <<
-    cppParentTypeName.lowercase() << ".h>" << std::endl << std::endl;
+    cppParentTypeName.lowercase() << ".h>" << std::endl;
+
+  std::cout << includeMacroCalls << std::endl;
 
   std::cout << "_DEFS(" << target << "," << defsFile << ")" << std::endl <<
     std::endl;
