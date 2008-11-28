@@ -20,6 +20,7 @@
  */
 
 #include <gstreamermm.h>
+#include <gstreamermm/filesrc.h>
 #include <iostream>
 #include <iomanip>
 
@@ -123,6 +124,9 @@ bool on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad,
 
 int main(int argc, char* argv[])
 {
+  // Initialize Gstreamermm:
+  Gst::init(argc, argv);
+
   // Check input arguments:
   if (argc < 2)
   {
@@ -132,9 +136,6 @@ int main(int argc, char* argv[])
 
   const std::string filename = argv[1];
 
-  // Initialize Gstreamermm:
-  Gst::init(argc, argv);
-
   mainloop = Glib::MainLoop::create();
 
   // Create the pipeline:
@@ -143,7 +144,7 @@ int main(int argc, char* argv[])
   // Create the elements:
 
   // filsrc reads the file from disk:
-  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("filesrc");
+  Glib::RefPtr<Gst::FileSrc> source = Gst::FileSrc::create();
   if(!source)
     std::cerr << "filesrc element could not be created." << std::endl;
 
@@ -179,10 +180,7 @@ int main(int argc, char* argv[])
     data_probe_id = pad->add_data_probe( sigc::ptr_fun(&on_sink_pad_have_data) );
   //std::cout << "sink data probe id = " << data_probe_id << std::endl;
 
-
-  // Set the filename property on the file source.
-  // TODO: Create a FileSrc class that we can dynamic_cast<> to, so we can use property_location()?
-  source->set_property("location", filename);
+  source->property_location() = filename;
 
   // Get the bus from the pipeline, 
   // and add a bus watch to the default main context with the default priority:

@@ -306,9 +306,25 @@ public:
    */
   _WRAP_VFUNC(Glib::RefPtr<Clock> provide_clock(), "provide_clock")
 
-  /** Set the Gst::Clock on the element.
-   */
-  _WRAP_VFUNC(bool set_clock(const Glib::RefPtr<Clock>& clock), "set_clock")
+  //TODO: Wrapping this vfunc causes problems for generated plug-ins because
+  //the underlying C base class (GstElement) does not have a default set_clock
+  //(gst_element_set_clock_func) implementation and when a pipeline tries to
+  //set a clock for our derived gtkmm wrapper (in gst_bin_set_clock_func by
+  //calling gst_element_set_clock on all its children),
+  //set_clock_vfunc_callback returns false because when it tries to call the
+  //(*base->set_clock)() function, there is none (for a GstElement) and the
+  //callback winds up typedefing RType to gboolean and returning RType() which
+  //is false thus triggering a failure when setting the clock for one of our
+  //gtkmm plug-in wrappers. I think the reason that there is no default
+  //set_clock() implementation in GStreamer is that it depends on if an element
+  //requires a clock (see gst_element_requires_clock) so a possible fix would
+  //be to add an optional parameter to _WRAP_VFUNC parameter specifying what to
+  //return in that last vfunc callback return statement.  This would also fix
+  //bug #530416 so I may submit a patch for this in hopes that it fixes both
+  //problems.
+  // /** Set the Gst::Clock on the element.
+  //  */
+  //_WRAP_VFUNC(bool set_clock(const Glib::RefPtr<Clock>& clock), "set_clock")
 
   /** Get a Gst::Index on the element.
    */
