@@ -4,6 +4,8 @@
 INCLUDES = $(GSTREAMERMM_CFLAGS) $(GSTREAMERBASEMM_CFLAGS)
 LIBS = $(GSTREAMERMM_LIBS) $(GSTREAMERBASEMM_LIBS) -lglibmm_generate_extra_defs-2.4
 
+EXTRA_DIST = get_plugin_defs.h get_plugin_defs.cc
+
 noinst_PROGRAMS = generate_defs_gst generate_defs_gstbase \
 		  generate_plugin_gmmproc_file
 
