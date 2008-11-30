@@ -13,12 +13,12 @@ sublib_win32_dlls_libs	=
 
 sublib_files_extra_posix_cc = 
 sublib_files_extra_win32_cc =
-sublib_files_extra_general_cc = init.cc miniobject.cc object.cc version.cc wrap.cc gst_wrap_init.cc taglist.cc
+sublib_files_extra_general_cc = init.cc miniobject.cc object.cc version.cc wrap.cc gst_wrap_init.cc
 sublib_files_extra_general_deprecated_cc = 
 
 sublib_files_extra_posix_h = 
 sublib_files_extra_win32_h =
-sublib_files_extra_general_h = init.h miniobject.h object.h version.h wrap.h gst_wrap_init.h taglist.h
+sublib_files_extra_general_h = init.h miniobject.h object.h version.h wrap.h gst_wrap_init.h
 sublib_files_extra_general_deprecated_h = 
 
 include $(top_srcdir)/build_shared/Makefile_build.am_fragment

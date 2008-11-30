@@ -19,6 +19,7 @@ extra_defs_dir = $(top_builddir)/tools/extra_defs_gen
 gensrc_destdir = $(srcdir)/../$(sublib_name)
 stamp_dir = $(srcdir)/.stamps
 stamp_plugin_dir = $(builddir)/.stamps
+destdir_stamp_dir = $(gensrc_destdir)/.stamps
 
 include $(tools_dir)/Makefile_list_of_sources.am_fragment
 tools_m4	= $(files_tools_m4:%.m4=$(tools_dir_m4)/%.m4)
@@ -29,6 +30,7 @@ files_all_ccg	= $(files_all_hg:%.hg=%.ccg)
 files_h		= $(files_all_hg:%.hg=$(gensrc_destdir)/%.h)
 files_stamp	= $(files_all_hg:%.hg=$(stamp_dir)/stamp-%)
 files_plugin_stamp = $(files_plugin_hg:%.hg=$(stamp_plugin_dir)/stamp-%-plugin)
+destdir_files_stamp = $(files_patched_hg:%.hg=$(destdir_stamp_dir)/stamp-%)
 
 #Installed gmmproc stuff, from glibmm:
 gmmproc_path = $(GMMPROC)
@@ -89,6 +91,11 @@ $(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir) $(srcdir)/%.hg \
 $(stamp_plugin_dir):
 	@(test -d $(stamp_plugin_dir) || mkdir $(stamp_plugin_dir))
 
+$(destdir_stamp_dir)/stamp-%: $(gensrc_destdir)/%.h
+	patch -Ns $(gensrc_destdir)/$*.h $(gensrc_destdir)/$*.h.patch || true
+	rm -f $(gensrc_destdir)/$*.h.rej
+	touch $@
+
 files_hg_with_path	= $(patsubst %.hg,$(srcdir)/%.hg,$(files_all_hg))
 
 $(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_path) $(files_hg_with_path) \
@@ -103,14 +110,16 @@ $(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) $(files_hg_with_path
 
 create-stamp-dir: $(stamp_plugin_dir)
 	@(test -d $(stamp_dir) || mkdir $(stamp_dir))
+	@(test -d $(destdir_stamp_dir) || mkdir $(destdir_stamp_dir))
 
 if MAINTAINER_MODE
 all-local: create-stamp-dir $(files_stamp) $(files_plugin_stamp) \
-	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc
+	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc \
+	$(destdir_files_stamp)
 else
 BUILT_SOURCES = $(foreach plugin,$(files_plugin_hg:.hg=),\
 		$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
 endif
 
 maintainer-clean-local:
-	rm -rf $(stamp_dir) $(stamp_plugin_dir)
+	rm -rf $(stamp_dir) $(stamp_plugin_dir) $(destdir_stamp_dir)
