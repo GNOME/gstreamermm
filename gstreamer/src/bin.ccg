@@ -38,20 +38,22 @@ Bin::Bin()
 
 Glib::RefPtr<Bin> Bin::add(const Glib::RefPtr<Element>& element)
 {
+  // The following is needed because when adding an element to a bin, the bin
+  // likes to have the last reference and then destroy it when the bin itself
+  // is destroyed.  Without the extra reference, when the last Glib::RefPtr<>
+  // to the element goes out of scope, the element may be destroyed before the
+  // bin and GStreamer complains about it.  The extra reference to the element
+  // is removed when the bin is destroyed or when the element is removed from
+  // the bin (see gst_bin_remove).
+  if (G_LIKELY(GST_OBJECT_IS_FLOATING(element->gobj())))
+    element->reference();
+
   const bool result = gst_bin_add(gobj(), element->gobj());
 
   // If addition successful, return RefPtr<..> to this bin, otherwise return
   // NULL RefPtr<...>
   if(result)
-   {
-     // When adding bins to a bin/pipeline (yes this is possible), an extra ref
-     // is needed because parent bin takes ownership of element and wants to
-     // unref the child bin itself when the parent bin is destroyed.
-     if (GST_IS_BIN(element->gobj()))
-       element->reference();
-
-      return Glib::wrap(gobj(), true);
-   }
+    return Glib::wrap(gobj(), true);
   else
     throw std::runtime_error("Failed to add " + element->get_name() + " element");
 }

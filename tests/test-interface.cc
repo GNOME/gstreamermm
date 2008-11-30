@@ -46,9 +46,9 @@ int main (int argc, char* argv[])
     // Test ambiguity of ElementInterfaced<>::gobj() methods
     GstElement* gstElement = handler->gobj();
     const GstElement* constGstElement = handler->gobj();
-    GstElement* gstElementCopy = handler->gobj_copy();
+    Glib::RefPtr<Gst::Element> element_copy = Glib::wrap(handler->gobj_copy());
 
-    if (!gstElement || !constGstElement || !gstElementCopy)
+    if (!gstElement || !constGstElement || !element_copy)
     {
       std::cout << "Underlying gobject methods of cast object didn't work." <<
         std::endl;

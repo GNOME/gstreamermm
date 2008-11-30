@@ -41,6 +41,9 @@ int main (int argc, char* argv[])
   pipeline->add(bin);
   source->link(sink);
 
+  pipeline->remove(bin);
+  pipeline->add(bin);
+
   std::cout << "Successfully added elements '" << source->get_name() <<
     "' and '" << sink->get_name() << "' to bin '" <<
       bin->get_name() << "'." << std::endl;

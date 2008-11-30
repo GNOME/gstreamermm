@@ -1,3 +1,15 @@
+2008-11-29  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamer/src/bin.ccg: Modified add() to take extra reference of
+	element if it is still floating.  This is necessary because bins like
+	to destroy the elements themselves so we can't let the Glib::RefPtr<>
+	to the element do this (see comments in add method).
+	* tests/test-create-bin.cc: Added lines to test removal and
+	re-addition of element to a bin.
+	* tests/test-interface.cc: Modified to use a Glib::RefPtr<> to hold
+	the copy of the element gobject so it is properly destroyed when
+	Glib::RefPtr<> goes out of scope.
+
 2008-11-28  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/element.hg: Commented out set_clock() vfunc wrap
