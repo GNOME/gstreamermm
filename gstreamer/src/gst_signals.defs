@@ -908,6 +908,35 @@
   (construct-only #f)
 )
 
+;; From GstCapsFilter
+
+(define-property name
+  (of-object "GstCapsFilter")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstCapsFilter")
+  (prop-type "GParamBoolean")
+  (docs "Handle Quality-of-Service events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property caps
+  (of-object "GstCapsFilter")
+  (prop-type "GParamBoxed")
+  (docs "Restrict the possible allowed capabilities (NULL means ANY). Setting this property takes a reference to the supplied GstCaps object.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstFakeSrc
 
 (define-signal handoff
@@ -1118,6 +1147,338 @@
   (construct-only #f)
 )
 
+;; From GstFakeSink
+
+(define-signal handoff
+  (of-object "GstFakeSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstBuffer" "p0")
+    '("GstPad*" "p1")
+  )
+)
+
+(define-signal preroll-handoff
+  (of-object "GstFakeSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstBuffer" "p0")
+    '("GstPad*" "p1")
+  )
+)
+
+(define-property name
+  (of-object "GstFakeSink")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property preroll-queue-len
+  (of-object "GstFakeSink")
+  (prop-type "GParamUInt")
+  (docs "Number of buffers to queue during preroll")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Sync on the clock")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-lateness
+  (of-object "GstFakeSink")
+  (prop-type "GParamInt64")
+  (docs "Maximum number of nanoseconds that a buffer can be late before it is dropped (-1 unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Generate Quality-of-Service events upstream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property async
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Go asynchronously to PAUSED")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property ts-offset
+  (of-object "GstFakeSink")
+  (prop-type "GParamInt64")
+  (docs "Timestamp offset in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-buffer
+  (of-object "GstFakeSink")
+  (prop-type "GParamSpecMiniObject")
+  (docs "The last buffer received in the sink")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstFakeSink")
+  (prop-type "GParamUInt")
+  (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property state-error
+  (of-object "GstFakeSink")
+  (prop-type "GParamEnum")
+  (docs "Generate a state change error")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property silent
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Don't produce last_message events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property dump
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Dump buffer contents to stdout")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property signal-handoffs
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Send a signal before unreffing the buffer")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-message
+  (of-object "GstFakeSink")
+  (prop-type "GParamString")
+  (docs "The message describing current status")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property can-activate-push
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Can activate in push mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property can-activate-pull
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Can activate in pull mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstFakeSink")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to accept going EOS")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstFdSink
+
+(define-property name
+  (of-object "GstFdSink")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property preroll-queue-len
+  (of-object "GstFdSink")
+  (prop-type "GParamUInt")
+  (docs "Number of buffers to queue during preroll")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstFdSink")
+  (prop-type "GParamBoolean")
+  (docs "Sync on the clock")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-lateness
+  (of-object "GstFdSink")
+  (prop-type "GParamInt64")
+  (docs "Maximum number of nanoseconds that a buffer can be late before it is dropped (-1 unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstFdSink")
+  (prop-type "GParamBoolean")
+  (docs "Generate Quality-of-Service events upstream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property async
+  (of-object "GstFdSink")
+  (prop-type "GParamBoolean")
+  (docs "Go asynchronously to PAUSED")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property ts-offset
+  (of-object "GstFdSink")
+  (prop-type "GParamInt64")
+  (docs "Timestamp offset in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-buffer
+  (of-object "GstFdSink")
+  (prop-type "GParamSpecMiniObject")
+  (docs "The last buffer received in the sink")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstFdSink")
+  (prop-type "GParamUInt")
+  (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property fd
+  (of-object "GstFdSink")
+  (prop-type "GParamInt")
+  (docs "An open file descriptor to write to")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstFdSrc
+
+(define-property name
+  (of-object "GstFdSrc")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstFdSrc")
+  (prop-type "GParamULong")
+  (docs "Size in bytes to read per buffer (-1 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstFdSrc")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property typefind
+  (of-object "GstFdSrc")
+  (prop-type "GParamBoolean")
+  (docs "Run typefind before negotiating")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property do-timestamp
+  (of-object "GstFdSrc")
+  (prop-type "GParamBoolean")
+  (docs "Apply current stream time to buffers")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property fd
+  (of-object "GstFdSrc")
+  (prop-type "GParamInt")
+  (docs "An open file descriptor to read from")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property timeout
+  (of-object "GstFdSrc")
+  (prop-type "GParamUInt64")
+  (docs "Post a message after timeout microseconds (0 = disabled)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstFileSrc
 
 (define-property name
@@ -1214,6 +1575,586 @@
   (of-object "GstFileSrc")
   (prop-type "GParamBoolean")
   (docs "Whether to use mmap() instead of read()")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstFileSink
+
+(define-property name
+  (of-object "GstFileSink")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property preroll-queue-len
+  (of-object "GstFileSink")
+  (prop-type "GParamUInt")
+  (docs "Number of buffers to queue during preroll")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstFileSink")
+  (prop-type "GParamBoolean")
+  (docs "Sync on the clock")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-lateness
+  (of-object "GstFileSink")
+  (prop-type "GParamInt64")
+  (docs "Maximum number of nanoseconds that a buffer can be late before it is dropped (-1 unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstFileSink")
+  (prop-type "GParamBoolean")
+  (docs "Generate Quality-of-Service events upstream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property async
+  (of-object "GstFileSink")
+  (prop-type "GParamBoolean")
+  (docs "Go asynchronously to PAUSED")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property ts-offset
+  (of-object "GstFileSink")
+  (prop-type "GParamInt64")
+  (docs "Timestamp offset in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-buffer
+  (of-object "GstFileSink")
+  (prop-type "GParamSpecMiniObject")
+  (docs "The last buffer received in the sink")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstFileSink")
+  (prop-type "GParamUInt")
+  (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property location
+  (of-object "GstFileSink")
+  (prop-type "GParamString")
+  (docs "Location of the file to write")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property buffer-mode
+  (of-object "GstFileSink")
+  (prop-type "GParamEnum")
+  (docs "The buffering mode to use")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property buffer-size
+  (of-object "GstFileSink")
+  (prop-type "GParamUInt")
+  (docs "Size of buffer in number of bytes for line or full buffer-mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstIdentity
+
+(define-signal handoff
+  (of-object "GstIdentity")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstBuffer" "p0")
+  )
+)
+
+(define-property name
+  (of-object "GstIdentity")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Handle Quality-of-Service events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sleep-time
+  (of-object "GstIdentity")
+  (prop-type "GParamUInt")
+  (docs "Microseconds to sleep between processing")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property error-after
+  (of-object "GstIdentity")
+  (prop-type "GParamInt")
+  (docs "Error after N buffers")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property drop-probability
+  (of-object "GstIdentity")
+  (prop-type "GParamFloat")
+  (docs "The Probability a buffer is dropped")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property datarate
+  (of-object "GstIdentity")
+  (prop-type "GParamInt")
+  (docs "(Re)timestamps buffers with number of bytes per second (0 = inactive)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property silent
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "silent")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property single-segment
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Timestamp buffers and eat newsegments so as to appear as one segment")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-message
+  (of-object "GstIdentity")
+  (prop-type "GParamString")
+  (docs "last-message")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property dump
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Dump buffer contents to stdout")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Synchronize to pipeline clock")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property check-perfect
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Verify that the stream is time- and data-contiguous. This only logs in the debug log.  This will be deprecated in favor of the check-imperfect-timestamp/offset properties.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property check-imperfect-timestamp
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Send element messages if timestamps and durations do not match up")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property check-imperfect-offset
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Send element messages if offset and offset_end do not match up")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property signal-handoffs
+  (of-object "GstIdentity")
+  (prop-type "GParamBoolean")
+  (docs "Send a signal before pushing the buffer")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstMultiQueue
+
+(define-signal underrun
+  (of-object "GstMultiQueue")
+  (return-type "void")
+  (when "first")
+)
+
+(define-signal overrun
+  (of-object "GstMultiQueue")
+  (return-type "void")
+  (when "first")
+)
+
+(define-property name
+  (of-object "GstMultiQueue")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property extra-size-bytes
+  (of-object "GstMultiQueue")
+  (prop-type "GParamUInt")
+  (docs "Amount of data the queues can grow if one of them is empty (bytes, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property extra-size-buffers
+  (of-object "GstMultiQueue")
+  (prop-type "GParamUInt")
+  (docs "Amount of buffers the queues can grow if one of them is empty (0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property extra-size-time
+  (of-object "GstMultiQueue")
+  (prop-type "GParamUInt64")
+  (docs "Amount of time the queues can grow if one of them is empty (in ns, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-size-bytes
+  (of-object "GstMultiQueue")
+  (prop-type "GParamUInt")
+  (docs "Max. amount of data in the queue (bytes, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-size-buffers
+  (of-object "GstMultiQueue")
+  (prop-type "GParamUInt")
+  (docs "Max. number of buffers in the queue (0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-size-time
+  (of-object "GstMultiQueue")
+  (prop-type "GParamUInt64")
+  (docs "Max. amount of data in the queue (in ns, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstQueue
+
+(define-signal underrun
+  (of-object "GstQueue")
+  (return-type "void")
+  (when "first")
+)
+
+(define-signal running
+  (of-object "GstQueue")
+  (return-type "void")
+  (when "first")
+)
+
+(define-signal overrun
+  (of-object "GstQueue")
+  (return-type "void")
+  (when "first")
+)
+
+(define-signal pushing
+  (of-object "GstQueue")
+  (return-type "void")
+  (when "first")
+)
+
+(define-property name
+  (of-object "GstQueue")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property current-level-buffers
+  (of-object "GstQueue")
+  (prop-type "GParamUInt")
+  (docs "Current number of buffers in the queue")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property current-level-bytes
+  (of-object "GstQueue")
+  (prop-type "GParamUInt")
+  (docs "Current amount of data in the queue (bytes)")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property current-level-time
+  (of-object "GstQueue")
+  (prop-type "GParamUInt64")
+  (docs "Current amount of data in the queue (in ns)")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property max-size-buffers
+  (of-object "GstQueue")
+  (prop-type "GParamUInt")
+  (docs "Max. number of buffers in the queue (0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-size-bytes
+  (of-object "GstQueue")
+  (prop-type "GParamUInt")
+  (docs "Max. amount of data in the queue (bytes, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-size-time
+  (of-object "GstQueue")
+  (prop-type "GParamUInt64")
+  (docs "Max. amount of data in the queue (in ns, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property min-threshold-buffers
+  (of-object "GstQueue")
+  (prop-type "GParamUInt")
+  (docs "Min. number of buffers in the queue to allow reading (0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property min-threshold-bytes
+  (of-object "GstQueue")
+  (prop-type "GParamUInt")
+  (docs "Min. amount of data in the queue to allow reading (bytes, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property min-threshold-time
+  (of-object "GstQueue")
+  (prop-type "GParamUInt64")
+  (docs "Min. amount of data in the queue to allow reading (in ns, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property leaky
+  (of-object "GstQueue")
+  (prop-type "GParamEnum")
+  (docs "Where the queue leaks, if at all")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstTee
+
+(define-property name
+  (of-object "GstTee")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-src-pads
+  (of-object "GstTee")
+  (prop-type "GParamInt")
+  (docs "The number of source pads")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property has-sink-loop
+  (of-object "GstTee")
+  (prop-type "GParamBoolean")
+  (docs "If the element should spawn a thread (unimplemented and deprecated)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property has-chain
+  (of-object "GstTee")
+  (prop-type "GParamBoolean")
+  (docs "If the element can operate in push mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property silent
+  (of-object "GstTee")
+  (prop-type "GParamBoolean")
+  (docs "Don't produce last_message events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-message
+  (of-object "GstTee")
+  (prop-type "GParamString")
+  (docs "The message describing current status")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property pull-mode
+  (of-object "GstTee")
+  (prop-type "GParamEnum")
+  (docs "Behavior of tee in pull mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstTypeFindElement
+
+(define-signal have-type
+  (of-object "GstTypeFindElement")
+  (return-type "void")
+  (when "first")
+  (parameters
+    '("guint" "p0")
+    '("GstCaps*" "p1")
+  )
+)
+
+(define-property name
+  (of-object "GstTypeFindElement")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property caps
+  (of-object "GstTypeFindElement")
+  (prop-type "GParamBoxed")
+  (docs "detected capabilities in stream")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property minimum
+  (of-object "GstTypeFindElement")
+  (prop-type "GParamUInt")
+  (docs "minimum probability required to accept caps")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property maximum
+  (of-object "GstTypeFindElement")
+  (prop-type "GParamUInt")
+  (docs "probability to stop typefinding (deprecated; non-functional)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property force-caps
+  (of-object "GstTypeFindElement")
+  (prop-type "GParamBoxed")
+  (docs "force caps without doing a typefind")
   (readable #t)
   (writable #t)
   (construct-only #f)

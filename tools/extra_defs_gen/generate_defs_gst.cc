@@ -80,8 +80,18 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_DATA_QUEUE)
 
   // GStreamer core plugin types:
+            << get_plugin_defs("capsfilter")
             << get_plugin_defs("fakesrc")
+            << get_plugin_defs("fakesink")
+            << get_plugin_defs("fdsink")
+            << get_plugin_defs("fdsrc")
             << get_plugin_defs("filesrc")
+            << get_plugin_defs("filesink")
+            << get_plugin_defs("identity")
+            << get_plugin_defs("multiqueue")
+            << get_plugin_defs("queue")
+            << get_plugin_defs("tee")
+            << get_plugin_defs("typefind")
             ;
   return 0;
 }

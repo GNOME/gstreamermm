@@ -1,5 +1,36 @@
 2008-11-30  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	* tools/m4/ctocpp_base.m4: Renamed macro to define translation from C
+	to C++ type from _CPPTYPE to _CCONVERSION.  Likewise, renamed the
+	include generation macro from _CTOCPP_INCLUDE to _CCONVERSION_INCLUDE
+	and the macro that does the translating from _CTOCPP to _CCONVERT.
+	Used the actual C type to define translations instead of the param
+	spec types.
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Modified to
+	get the actual C type name instead of the param spec name; also to
+	determine if a GType is a pointer.  Also modified so that the return
+	type C++ translation is used for the generated property type (by
+	adding a second parameter, `true', to the generated _CCONVERT macro
+	call).
+	* tools/extra_defs_gen/Makefile.am: 
+	* tools/extra_defs_gen/gst_type_is_a_pointer.cc:
+	* tools/extra_defs_gen/gst_type_is_a_pointer.h: Included to determine
+	if a GType is a pointer.
+
+	* tools/extra_defs_gen/generate_defs_gst.cc: Modified to generate
+	extra defs for all core plug-ins.
+	* gstreamer/src/gst_signals.defs: Regenerated so that the core plug-in
+	extra defs (signals and properties) are included.
+	* gstreamer/src/Makefile_list_of_hg.am_fragment: Added `capsfilter'
+	plug-in to list of plug-ins to be generated.
+	* tools/m4/Makefile_list_of_sources.am_fragment:
+	* tools/m4/convert.m4:
+	* tools/m4/ctocpp.m4: Added a file independent of ctopp_base.m4 to
+	include additional C to C++ translations (the basic ones will go in
+	ctocpp_base.m4).
+
+2008-11-30  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	* build_shared/Makefile_build_gensrc.am_fragment:
 	* build_shared/Makefile_gensrc.am_fragment: Add patches to .h files to
 	dist.

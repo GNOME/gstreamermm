@@ -20,6 +20,8 @@
  */
 
 
+#include "gst_type_is_a_pointer.h"
+
 #include <gst/gst.h>
 #include <glibmm.h>
 #include <iostream>
@@ -96,12 +98,15 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
     {
       //Name and type:
       Glib::ustring propertyName = g_param_spec_get_name(pParamSpec);
-      Glib::ustring  propertyCType = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
+
+      Glib::ustring  propertyCType = g_type_name(pParamSpec->value_type) +
+              (Glib::ustring) (gst_type_is_a_pointer(pParamSpec->value_type) ?
+                              "*" : "");
 
       wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
-        "_CTOCPP(" + propertyCType + ") )\n";
+        "_CCONVERT(" + propertyCType + ", true) )\n";
 
-      includeMacroCalls += "_CTOCPP_INCLUDE(" + propertyCType + ")\n";
+      includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")\n";
     }
   }
 
