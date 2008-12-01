@@ -30,17 +30,22 @@
 #include <gtkmm/scale.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/pipeline.h>
+#include <gstreamermm/filesrc.h>
 
 class PlayerWindow : public Gtk::Window
 {
 public:
-  PlayerWindow(const Glib::RefPtr<Gst::Element>& sourceElement, const Glib::RefPtr<Gst::Pipeline>& mainPipeline);
+  PlayerWindow(const Glib::RefPtr<Gst::FileSrc>& sourceElement,
+    const Glib::RefPtr<Gst::Pipeline>& mainPipeline);
+
   virtual ~PlayerWindow();
 
 protected:
 
   //Signal handlers:
-  bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
+  bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus,
+    const Glib::RefPtr<Gst::Message>& message);
+
   void on_button_play();
   void on_button_pause();
   void on_button_stop();
@@ -63,7 +68,7 @@ protected:
   Gtk::Button m_forward_button;
   Gtk::Button m_open_button;
 
-  Glib::RefPtr<Gst::Element> m_source_element;
+  Glib::RefPtr<Gst::FileSrc> m_source_element;
   Glib::RefPtr<Gst::Pipeline> m_main_pipeline;
   sigc::connection m_progress_connection;
   unsigned int m_watch_id;

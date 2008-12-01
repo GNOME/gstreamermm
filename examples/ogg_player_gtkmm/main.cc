@@ -25,6 +25,7 @@
 #include <gstreamermm/elementfactory.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
+#include <gstreamermm/filesrc.h>
 #include <iostream>
 #include "player_window.h"
 
@@ -57,7 +58,7 @@ main (int argc, char *argv[])
 
   // Create the elements
   // Reads file from disk
-  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("filesrc");
+  Glib::RefPtr<Gst::FileSrc> source = Gst::FileSrc::create();
   if(!source)
   {
     std::cerr << "filesrc element could not be created" << std::endl;

@@ -31,7 +31,8 @@
 #include <iomanip>
 #include "player_window.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Element>& source_element, const Glib::RefPtr<Gst::Pipeline>& main_pipeline)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::FileSrc>& source_element,
+  const Glib::RefPtr<Gst::Pipeline>& main_pipeline)
 : m_vbox(false, 5),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button(Gtk::Stock::MEDIA_PLAY),
@@ -288,9 +289,8 @@ void PlayerWindow::on_button_open()
     working_dir = chooser.get_current_folder();
 
     // Set filename property on the file source. 
-    // TODO: Create a FileSrc class that we can dynamic_cast<> to, so we can use property_location()?
     const std::string filename = chooser.get_filename(); //TODO: Can this use a URI?
-    m_source_element->set_property("location", filename);
+    m_source_element->property_location() = filename;
     set_title( Glib::filename_display_basename(filename) );
 
     m_play_button.set_sensitive();
