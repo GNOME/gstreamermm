@@ -1,16 +1,18 @@
 #!/bin/sh
 
 # Note that enum.pl should be in PATH for this script to work and
-# JHBUILD_PREFIX should be defined to contain the path to the prefix (install)
-# directory of jhbuild.  Also this script should reside in
+# JHBUILD_SOURCES should be defined to contain the path to the root of the
+# jhbuild sources.  Also this script should reside in
 # gstreamermm/gstrearmerbase/src.
 
-if [ -z "$JHBUILD_PREFIX" -o ! -x "`which enum.pl`" ]; then
-  echo "JHBUILD_PREFIX must contain path to jhbuild prefix and enum.pl needs to be executable and in PATH."
+if [ -z "$JHBUILD_SOURCES" -o ! -x "`which enum.pl`" ]; then
+  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources and \
+  enum.pl\nneeds to be executable and in PATH."
   exit 1;
 fi
 
-PREFIX="$JHBUILD_PREFIX"
+PREFIX="$JHBUILD_SOURCES/gst-plugins-base"
 DIR=`dirname "$0"`
 
-enum.pl "$PREFIX"/include/gstreamer-0.10/gst/{audio,cdda,fft,floatcast,interfaces,netbuffer,riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h > "$DIR/gstbase_enums.defs"
+enum.pl "$PREFIX"/gst-libs/gst/{audio,cdda,fft,floatcast,interfaces,netbuffer,\
+riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h > "$DIR/gstbase_enums.defs"

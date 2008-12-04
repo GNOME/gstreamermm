@@ -144,7 +144,7 @@ protected:
   void swap(MiniObject& other);
 
 protected:
-  GstMiniObject* gobject_; //TODO: Doesn't this shadow a member variable in Glib::ObjectBase?
+  GstMiniObject* _gobject;
 };
 
 } // namespace Gst
@@ -161,4 +161,3 @@ namespace Glib
 */
 
 #endif //#ifndef _GSTREAMERMM_MINIOBJECT_H
-

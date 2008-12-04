@@ -6,7 +6,8 @@
 # gstreamermm/gstrearmer/src.
 
 if [ -z "$JHBUILD_SOURCES" -o ! -x "`which docextract_to_xml.py`" ]; then
-  echo "JHBUILD_SOURCES must contain path to jhbuild sources and docextract_to_xml.py needs to be executable and in PATH."
+  echo -e "JHBUILD_SOURCES must contain path to jhbuild sources and \
+  docextract_to_xml.py\nneeds to be executable and in PATH."
   exit 1;
 fi
 
@@ -15,7 +16,8 @@ DIR=`dirname "$0"`
 
 PARAMS="-s $PREFIX/gstreamer/gst/ -s $PREFIX/gstreamer/docs/gst/tmpl -s $PREFIX/gstreamer/docs/libs/tmpl"
 
-for dir in "$PREFIX"/gstreamer/libs/gst/{base,controller,dataprotocol,net,check}/ ; do
+for dir in "$PREFIX"/gstreamer/libs/gst/{base,controller,dataprotocol,net,\
+check}; do
   PARAMS="$PARAMS -s $dir"
 done
 

@@ -1,6 +1,6 @@
-/* $Id: generate_extra_defs.cc 740 2008-10-15 15:58:17Z jaalburqu $ */
+/* $Id: generate_plugin_gmmproc_file.cc 740 2008-10-15 15:58:17Z jaalburqu $ */
 
-/* generate_extra_defs.cc
+/* generate_plugin_gmmproc_file.cc
  *
  * Copyright (C) 2001 The Free Software Foundation
  *
@@ -26,9 +26,9 @@
 #include <glibmm.h>
 #include <iostream>
 
-static gchar* nmspace;
-static gchar* defsFile;
-static gchar* target;
+static gchar* nmspace = 0;
+static gchar* defsFile = 0;
+static gchar* target = 0;
 
 static Glib::ustring pluginName;
 static Glib::ustring cTypeName;
@@ -40,6 +40,54 @@ static Glib::ustring includeRoot;
 static Glib::ustring parentNameSpace;
 
 GType type = 0;
+
+// To add an enum that is already wrapped to the list of wrapped enum, add
+// alphabetically below and increment WRAPPED_ENUMS_SIZE.
+static const int WRAPPED_ENUMS_SIZE = 41;
+static const char* wrappedEnums[WRAPPED_ENUMS_SIZE] =
+{
+  "GstActivateMode",
+  "GstAssocFlags",
+  "GstBufferCopyFlags",
+  "GstBufferFlag",
+  "GstBufferingMode",
+  "GstBusFlags",
+  "GstBusSyncReply",
+  "GstClockEntryType",
+  "GstClockFlags",
+  "GstClockReturn",
+  "GstColorBalanceType",
+  "GstElementFlags",
+  "GstEventType",
+  "GstEventTypeFlags",
+  "GstFlowReturn",
+  "GstFormat",
+  "GstIndexCertainty",
+  "GstIndexEntryType",
+  "GstIndexFlags",
+  "GstIndexLookupMethod",
+  "GstIndexResolverMethod",
+  "GstIteratorItem",
+  "GstIteratorResult",
+  "GstMessageType",
+  "GstMiniObjectFlags",
+  "GstPadDirection",
+  "GstPadFlags",
+  "GstPadLinkReturn",
+  "GstPadPresence",
+  "GstPadTemplateFlags",
+  "GstQueryType",
+  "GstRank",
+  "GstSeekFlags",
+  "GstSeekType",
+  "GstState",
+  "GstStateChange",
+  "GstStateChangeReturn",
+  "GstTagFlag",
+  "GstTagMergeMode",
+  "GstTaskState",
+  "GstURIType"
+};
 
 Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 {
@@ -62,12 +110,22 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
   return result;
 }
 
-void get_property_wrap_statements(Glib::ustring& wrapStatements,
-  Glib::ustring& includeMacroCalls, Glib::ustring& enumDefinitions)
+bool is_wrapped_enum(const Glib::ustring& cTypeName)
 {
-  std::string strResult;
-  std::string strObjectName = g_type_name(type);
+  for (int i = 0; i < WRAPPED_ENUMS_SIZE &&
+    cTypeName.compare(wrappedEnums[i]) >= 0; i++)
+  {
+    if (cTypeName.compare(wrappedEnums[i]) == 0)
+      return true;
+  }
 
+  return false;
+}
+
+void get_property_wrap_statements(Glib::ustring& wrapStatements,
+  Glib::ustring& includeMacroCalls, Glib::ustring& enumWrapStatements,
+  Glib::ustring& enumGTypeFunctionDefinitions)
+{
   //Get the list of properties:
   GParamSpec** ppParamSpec = 0;
   guint iCount = 0;
@@ -96,31 +154,53 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
     GParamSpec* pParamSpec = ppParamSpec[i];
     if(pParamSpec)
     {
-      //Name and type:
-      Glib::ustring propertyName = g_param_spec_get_name(pParamSpec);
+      GType propertyGType = pParamSpec->value_type;
+      GType ownerGType = pParamSpec->owner_type;
 
-      Glib::ustring  propertyCType = g_type_name(pParamSpec->value_type) +
-              (Glib::ustring) (gst_type_is_a_pointer(pParamSpec->value_type) ?
-                              "*" : "");
+      if (ownerGType == type)
+      {
+        //Name and type:
+        Glib::ustring propertyName = g_param_spec_get_name(pParamSpec);
 
-      wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
-        "_CCONVERT(" + propertyCType + ", true) )\n";
+        Glib::ustring  propertyCType = g_type_name(propertyGType) +
+          (Glib::ustring) (gst_type_is_a_pointer(propertyGType) ?  "*" : "");
 
-      includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")\n";
+        bool enumIsWrapped = false;
+
+        if (G_TYPE_IS_ENUM(propertyGType) &&
+          !(enumIsWrapped = is_wrapped_enum(propertyCType)))
+        {
+          enumWrapStatements += "_WRAP_ENUM(" + propertyCType.substr(3) + ", " +
+            propertyCType + ")\n";
+          enumWrapStatements += "_CCONVERSION(`" + propertyCType + "',`" +
+            propertyCType.substr(3) + "')\n\n";
+
+          Glib::ustring enumGetTypeFunctionName =
+            get_cast_macro(propertyCType).lowercase() + "_get_type";
+
+          enumGTypeFunctionDefinitions +=
+            "extern \"C\" GType " + enumGetTypeFunctionName + "()\n" +
+            "{\n" +
+            "  return g_type_from_name(\"" + propertyCType + "\");\n" +
+            "}\n\n";
+        }
+
+        wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
+          "_CCONVERT(" + propertyCType + ", true) )\n";
+
+        if (!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
+          includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")\n";
+      }
     }
   }
 
   g_free(ppParamSpec);
 }
 
-void generate_hg_file()
+void generate_hg_file(const Glib::ustring& propertyWrapStatements,
+  const Glib::ustring& includeMacroCalls,
+  const Glib::ustring& enumWrapStatements)
 {
-  Glib::ustring propertyWrapStatements;
-  Glib::ustring includeMacroCalls;
-  Glib::ustring enumDefinitions;
-
-  get_property_wrap_statements(propertyWrapStatements, includeMacroCalls, enumDefinitions);
-
   std::cout << "#include <" << includeRoot << "/" <<
     cppParentTypeName.lowercase() << ".h>" << std::endl;
 
@@ -132,8 +212,11 @@ void generate_hg_file()
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
 
+  std::cout << enumWrapStatements;
+
   std::cout << "/** " << nmspace << "::" << cppTypeName << " — " << pluginName << " plugin." << std::endl;
   std::cout << " * Please include <" << target << "/" << cppTypeName.lowercase() << ".h> to use." << std::endl;
+  std::cout << " * @ingroup " << nmspace << "Plugins" << std::endl;
   std::cout << " */" << std::endl;
   std::cout << "class " << cppTypeName << std::endl;
   std::cout << ": public " << parentNameSpace << "::" << cppParentTypeName <<
@@ -165,7 +248,7 @@ void generate_hg_file()
   std::cout << std::endl << "} //namespace " << nmspace << std::endl;
 }
 
-void generate_ccg_file()
+void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions)
 {
   std::cout << "_PINCLUDE(" << includeRoot << "/private/" <<
     cppParentTypeName.lowercase() << "_p.h)" << std::endl;
@@ -198,6 +281,8 @@ void generate_ccg_file()
 
   std::cout << "  return type;" << std::endl;
   std::cout << "}" << std::endl << std::endl;
+
+  std::cout << enumGTypeFunctionDefinitions;
 
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
@@ -266,6 +351,15 @@ int main(int argc, char* argv[])
     return -1;
   }
 
+  if (!nmspace || !defsFile || !target)
+  {
+    std::cout << "A namespace, a default defs file and a target directory "
+      "must be supplied" << std::endl << "with the --namespace, --main-defs "
+      "and --target options (run with -? option for " << std::endl <<
+      "details)." << std::endl;
+    return -1;
+  }
+
   GstElementFactory* factory = 0;
 
   factory = gst_element_factory_find(argv[1]);
@@ -302,10 +396,26 @@ int main(int argc, char* argv[])
       parentNameSpace = nmspace;
     }
 
+    Glib::ustring propertyWrapStatements;
+    Glib::ustring includeMacroCalls;
+    Glib::ustring enumWrapStatements;
+    Glib::ustring enumGTypeFunctionDeclarations;
+
+    if (hgFile || ccgFile)
+    {
+      get_property_wrap_statements(propertyWrapStatements, includeMacroCalls,
+        enumWrapStatements, enumGTypeFunctionDeclarations);
+    }
+
     if (hgFile)
-      generate_hg_file();
+    {
+      generate_hg_file(propertyWrapStatements, includeMacroCalls,
+        enumWrapStatements);
+    }
     else if (ccgFile)
-      generate_ccg_file();
+    {
+      generate_ccg_file(enumGTypeFunctionDeclarations);
+    }
     else if (suggestHg)
       std::cout << pluginName << ".hg" << std::endl;
 

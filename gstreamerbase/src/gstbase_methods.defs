@@ -1144,6 +1144,18 @@
   )
 )
 
+(define-method convert
+  (of-object "GstRingBuffer")
+  (c-name "gst_ring_buffer_convert")
+  (return-type "gboolean")
+  (parameters
+    '("GstFormat" "src_fmt")
+    '("gint64" "src_val")
+    '("GstFormat" "dest_fmt")
+    '("gint64*" "dest_val")
+  )
+)
+
 (define-method open_device
   (of-object "GstRingBuffer")
   (c-name "gst_ring_buffer_open_device")
@@ -1180,6 +1192,21 @@
 (define-method is_acquired
   (of-object "GstRingBuffer")
   (c-name "gst_ring_buffer_is_acquired")
+  (return-type "gboolean")
+)
+
+(define-method activate
+  (of-object "GstRingBuffer")
+  (c-name "gst_ring_buffer_activate")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "active")
+  )
+)
+
+(define-method is_active
+  (of-object "GstRingBuffer")
+  (c-name "gst_ring_buffer_is_active")
   (return-type "gboolean")
 )
 
@@ -1411,6 +1438,36 @@
 
 
 
+;; From sha1.h
+
+(define-function sha_init
+  (c-name "sha_init")
+  (return-type "none")
+  (parameters
+    '("SHA_INFO" "*")
+  )
+)
+
+(define-function sha_update
+  (c-name "sha_update")
+  (return-type "none")
+  (parameters
+    '("SHA_INFO" "*")
+    '("SHA_BYTE" "*")
+  )
+)
+
+(define-function sha_final
+  (c-name "sha_final")
+  (return-type "none")
+  (parameters
+    '("unsigned-char" "[20]")
+    '("SHA_INFO" "*")
+  )
+)
+
+
+
 ;; From gstfftf32.h
 
 (define-function gst_fft_f32_new
@@ -1623,6 +1680,358 @@
 
 
 
+;; From kiss_fft_f32.h
+
+(define-function kiss_fft_f32_alloc
+  (c-name "kiss_fft_f32_alloc")
+  (return-type "kiss_fft_f32_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fft_f32
+  (c-name "kiss_fft_f32")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_f32_cfg" "cfg")
+    '("const-kiss_fft_f32_cpx*" "fin")
+    '("kiss_fft_f32_cpx*" "fout")
+  )
+)
+
+(define-function kiss_fft_f32_stride
+  (c-name "kiss_fft_f32_stride")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_f32_cfg" "cfg")
+    '("const-kiss_fft_f32_cpx*" "fin")
+    '("kiss_fft_f32_cpx*" "fout")
+    '("int" "fin_stride")
+  )
+)
+
+(define-function kiss_fft_f32_cleanup
+  (c-name "kiss_fft_f32_cleanup")
+  (return-type "none")
+)
+
+(define-function kiss_fft_f32_next_fast_size
+  (c-name "kiss_fft_f32_next_fast_size")
+  (return-type "int")
+  (parameters
+    '("int" "n")
+  )
+)
+
+
+
+;; From kiss_fft_f64.h
+
+(define-function kiss_fft_f64_alloc
+  (c-name "kiss_fft_f64_alloc")
+  (return-type "kiss_fft_f64_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fft_f64
+  (c-name "kiss_fft_f64")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_f64_cfg" "cfg")
+    '("const-kiss_fft_f64_cpx*" "fin")
+    '("kiss_fft_f64_cpx*" "fout")
+  )
+)
+
+(define-function kiss_fft_f64_stride
+  (c-name "kiss_fft_f64_stride")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_f64_cfg" "cfg")
+    '("const-kiss_fft_f64_cpx*" "fin")
+    '("kiss_fft_f64_cpx*" "fout")
+    '("int" "fin_stride")
+  )
+)
+
+(define-function kiss_fft_f64_cleanup
+  (c-name "kiss_fft_f64_cleanup")
+  (return-type "none")
+)
+
+(define-function kiss_fft_f64_next_fast_size
+  (c-name "kiss_fft_f64_next_fast_size")
+  (return-type "int")
+  (parameters
+    '("int" "n")
+  )
+)
+
+
+
+;; From _kiss_fft_guts_f32.h
+
+
+
+;; From _kiss_fft_guts_f64.h
+
+
+
+;; From _kiss_fft_guts_s16.h
+
+
+
+;; From _kiss_fft_guts_s32.h
+
+
+
+;; From kiss_fftr_f32.h
+
+(define-function kiss_fftr_f32_alloc
+  (c-name "kiss_fftr_f32_alloc")
+  (return-type "kiss_fftr_f32_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fftr_f32
+  (c-name "kiss_fftr_f32")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_f32_cfg" "cfg")
+    '("const-kiss_fft_f32_scalar*" "timedata")
+    '("kiss_fft_f32_cpx*" "freqdata")
+  )
+)
+
+(define-function kiss_fftri_f32
+  (c-name "kiss_fftri_f32")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_f32_cfg" "cfg")
+    '("const-kiss_fft_f32_cpx*" "freqdata")
+    '("kiss_fft_f32_scalar*" "timedata")
+  )
+)
+
+
+
+;; From kiss_fftr_f64.h
+
+(define-function kiss_fftr_f64_alloc
+  (c-name "kiss_fftr_f64_alloc")
+  (return-type "kiss_fftr_f64_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fftr_f64
+  (c-name "kiss_fftr_f64")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_f64_cfg" "cfg")
+    '("const-kiss_fft_f64_scalar*" "timedata")
+    '("kiss_fft_f64_cpx*" "freqdata")
+  )
+)
+
+(define-function kiss_fftri_f64
+  (c-name "kiss_fftri_f64")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_f64_cfg" "cfg")
+    '("const-kiss_fft_f64_cpx*" "freqdata")
+    '("kiss_fft_f64_scalar*" "timedata")
+  )
+)
+
+
+
+;; From kiss_fftr_s16.h
+
+(define-function kiss_fftr_s16_alloc
+  (c-name "kiss_fftr_s16_alloc")
+  (return-type "kiss_fftr_s16_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fftr_s16
+  (c-name "kiss_fftr_s16")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_s16_cfg" "cfg")
+    '("const-kiss_fft_s16_scalar*" "timedata")
+    '("kiss_fft_s16_cpx*" "freqdata")
+  )
+)
+
+(define-function kiss_fftri_s16
+  (c-name "kiss_fftri_s16")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_s16_cfg" "cfg")
+    '("const-kiss_fft_s16_cpx*" "freqdata")
+    '("kiss_fft_s16_scalar*" "timedata")
+  )
+)
+
+
+
+;; From kiss_fftr_s32.h
+
+(define-function kiss_fftr_s32_alloc
+  (c-name "kiss_fftr_s32_alloc")
+  (return-type "kiss_fftr_s32_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fftr_s32
+  (c-name "kiss_fftr_s32")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_s32_cfg" "cfg")
+    '("const-kiss_fft_s32_scalar*" "timedata")
+    '("kiss_fft_s32_cpx*" "freqdata")
+  )
+)
+
+(define-function kiss_fftri_s32
+  (c-name "kiss_fftri_s32")
+  (return-type "none")
+  (parameters
+    '("kiss_fftr_s32_cfg" "cfg")
+    '("const-kiss_fft_s32_cpx*" "freqdata")
+    '("kiss_fft_s32_scalar*" "timedata")
+  )
+)
+
+
+
+;; From kiss_fft_s16.h
+
+(define-function kiss_fft_s16_alloc
+  (c-name "kiss_fft_s16_alloc")
+  (return-type "kiss_fft_s16_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fft_s16
+  (c-name "kiss_fft_s16")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_s16_cfg" "cfg")
+    '("const-kiss_fft_s16_cpx*" "fin")
+    '("kiss_fft_s16_cpx*" "fout")
+  )
+)
+
+(define-function kiss_fft_s16_stride
+  (c-name "kiss_fft_s16_stride")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_s16_cfg" "cfg")
+    '("const-kiss_fft_s16_cpx*" "fin")
+    '("kiss_fft_s16_cpx*" "fout")
+    '("int" "fin_stride")
+  )
+)
+
+(define-function kiss_fft_s16_cleanup
+  (c-name "kiss_fft_s16_cleanup")
+  (return-type "none")
+)
+
+(define-function kiss_fft_s16_next_fast_size
+  (c-name "kiss_fft_s16_next_fast_size")
+  (return-type "int")
+  (parameters
+    '("int" "n")
+  )
+)
+
+
+
+;; From kiss_fft_s32.h
+
+(define-function kiss_fft_s32_alloc
+  (c-name "kiss_fft_s32_alloc")
+  (return-type "kiss_fft_s32_cfg")
+  (parameters
+    '("int" "nfft")
+    '("int" "inverse_fft")
+    '("void*" "mem")
+    '("size_t*" "lenmem")
+  )
+)
+
+(define-function kiss_fft_s32
+  (c-name "kiss_fft_s32")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_s32_cfg" "cfg")
+    '("const-kiss_fft_s32_cpx*" "fin")
+    '("kiss_fft_s32_cpx*" "fout")
+  )
+)
+
+(define-function kiss_fft_s32_stride
+  (c-name "kiss_fft_s32_stride")
+  (return-type "none")
+  (parameters
+    '("kiss_fft_s32_cfg" "cfg")
+    '("const-kiss_fft_s32_cpx*" "fin")
+    '("kiss_fft_s32_cpx*" "fout")
+    '("int" "fin_stride")
+  )
+)
+
+(define-function kiss_fft_s32_cleanup
+  (c-name "kiss_fft_s32_cleanup")
+  (return-type "none")
+)
+
+(define-function kiss_fft_s32_next_fast_size
+  (c-name "kiss_fft_s32_next_fast_size")
+  (return-type "int")
+  (parameters
+    '("int" "n")
+  )
+)
+
+
+
 ;; From floatcast.h
 
 
@@ -1711,6 +2120,10 @@
   (c-name "gst_tuner_channel_flags_get_type")
   (return-type "GType")
 )
+
+
+
+;; From interfaces-marshal.h
 
 
 
@@ -3854,6 +4267,10 @@
 
 
 
+;; From gstrtsp.h
+
+
+
 ;; From gstrtspmessage.h
 
 (define-function gst_rtsp_message_new
@@ -4190,6 +4607,10 @@
 
 
 ;; From md5.h
+
+
+
+;; From rtsp-marshal.h
 
 
 
@@ -4796,6 +5217,15 @@
 
 (define-function gst_tag_demux_get_type
   (c-name "gst_tag_demux_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gsttageditingprivate.h
+
+(define-function gst_vorbis_tag_get_type
+  (c-name "gst_vorbis_tag_get_type")
   (return-type "GType")
 )
 

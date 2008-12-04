@@ -29,17 +29,17 @@ void MiniObject_Class::class_init_function(void*, void*)
 {}
 
 MiniObject::MiniObject()
-: gobject_(0)
+: _gobject(0)
 {
 }
 
 MiniObject::MiniObject(GstMiniObject* castitem, bool take_copy)
-: gobject_(take_copy ? gst_mini_object_copy(castitem) : castitem)
+: _gobject(take_copy ? gst_mini_object_copy(castitem) : castitem)
 {
 }
 
 MiniObject::MiniObject(const MiniObject& other)
-: gobject_(gst_mini_object_copy(other.gobject_))
+: _gobject(gst_mini_object_copy(other._gobject))
 {
 }
 
@@ -53,27 +53,27 @@ MiniObject::operator=(const MiniObject& other)
 
 MiniObject::~MiniObject()
 {
-  if(gobject_)
-    gst_mini_object_unref(gobject_);
+  if(_gobject)
+    gst_mini_object_unref(_gobject);
 }
 
 void MiniObject::swap(MiniObject& other)
 {
-  GstMiniObject *const temp = gobject_;
-  gobject_ = other.gobject_;
-  other.gobject_ = temp;
+  GstMiniObject *const temp = _gobject;
+  _gobject = other._gobject;
+  other._gobject = temp;
 }
 
 void 
 MiniObject::reference() const
 {
-  gst_mini_object_ref(gobject_);
+  gst_mini_object_ref(_gobject);
 }
 
 void
 MiniObject::unreference() const
 {
-  gst_mini_object_unref(gobject_);
+  gst_mini_object_unref(_gobject);
 }
 
 guint MiniObject::get_flags() const
@@ -99,19 +99,19 @@ void MiniObject::unset_flag(guint flag)
 Glib::RefPtr<Gst::MiniObject>
 MiniObject::copy() const
 {
-  GstMiniObject * copy = gst_mini_object_copy(gobject_);
+  GstMiniObject * copy = gst_mini_object_copy(_gobject);
   return Gst::wrap(copy, false);
 }
 
 bool
 MiniObject::is_writable() const
 {
-  return gst_mini_object_is_writable(gobject_);
+  return gst_mini_object_is_writable(_gobject);
 }
 
 Glib::RefPtr<Gst::MiniObject> MiniObject::create_writable()
 {
-  return Gst::wrap(gst_mini_object_make_writable(gobject_));
+  return Gst::wrap(gst_mini_object_make_writable(_gobject));
 }
 
 } //namespace Gst

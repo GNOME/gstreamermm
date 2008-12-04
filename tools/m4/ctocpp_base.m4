@@ -56,8 +56,14 @@ m4exit(1)`'dnl
 ')`'dnl
 ')dnl
 
+#Basic C to C++ translations
 _CCONVERSION(`gboolean',`bool')
 _CCONVERSION(`gint',`int')
+_CCONVERSION(`guint',`unsigned')
 _CCONVERSION(`gulong',`unsigned long')
+_CCONVERSION(`gint64',`gint64')
 _CCONVERSION(`guint64',`guint64')
+_CCONVERSION(`gfloat',`float')
+
+#String C to C++ translations
 _CCONVERSION(`gchararray',`const Glib::ustring&',`Glib::ustring')
