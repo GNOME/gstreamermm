@@ -23,6 +23,7 @@ destdir_stamp_dir = $(gensrc_destdir)/.stamps
 
 include $(tools_dir)/Makefile_list_of_sources.am_fragment
 tools_m4	= $(files_tools_m4:%.m4=$(tools_dir_m4)/%.m4)
+tools_plugin_m4	= $(files_tools_plugin_m4:%.m4=$(tools_dir_m4)/%.m4)
 # tools_pm	= $(files_tools_pm:%.pm=$(tools_dir_pm)/%.pm)
 
 include $(srcdir)/../src/Makefile_list_of_hg.am_fragment
@@ -70,13 +71,24 @@ CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) \
 	$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
 
 
+# This is to generate plugin .hg files.  A few variables are defined (in make
+# process), a temp file is used to generate preliminary .hg file which is then
+# run through m4 using the macros in tools/m4/ctocpp_base.m4 which then
+# produces the final .hg file.
 $(files_plugin_hg_with_path): $(generate_plugin_gmmproc_file_path) \
-	$(tools_m4) $(files_defs)
+	$(tools_plugin_m4) $(files_defs)
+	$(eval plugin_hg_without_path = $$(notdir $@))
+	$(eval plugin_mktemp_output = \
+		$$(shell mktemp -t $$(plugin_hg_without_path).XXXXX))
+	$(eval plugin_hg_tmp_file = $(plugin_mktemp_output))
 	$(run_generate_plugin_gmmproc_file) --hg \
-		$(notdir $(subst .hg,,$@)) >  $@
+		$(subst .hg,,$(plugin_hg_without_path)) >  $(plugin_hg_tmp_file)
+	$(M4) -I $(tools_dir_m4) $(plugin_hg_tmp_file) > $@
+	rm -f $(plugin_hg_tmp_file)
 
-$(files_plugin_hg_with_path:.hg=.ccg): $(subst .ccg,.hg,$@) \
-	$(generate_plugin_gmmproc_file_path) $(tools_m4) $(files_defs)
+# This is to generate plugin .ccg files.
+$(files_plugin_hg_with_path:.hg=.ccg): $(generate_plugin_gmmproc_file_path) \
+	$(files_defs)
 	$(run_generate_plugin_gmmproc_file) --ccg \
 		$(notdir $(subst .ccg,,$@)) >  $@
 
@@ -84,14 +96,18 @@ $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
 	@echo 'timestamp' > $@
 
+# This is to run generated plugin .hg and .ccg files through gmmproc.
 $(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir) $(srcdir)/%.hg \
 	$(srcdir)/%.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
 	@echo 'timestamp' > $@
 
+# This is to create the plugin .stamps directory (if builddir is different than
+# srcdir)
 $(stamp_plugin_dir):
 	@(test -d $(stamp_plugin_dir) || mkdir $(stamp_plugin_dir))
 
+# This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
 $(destdir_stamp_dir)/stamp-%: $(gensrc_destdir)/%.h
 	patch -Ns $(gensrc_destdir)/$*.h $(gensrc_destdir)/$*.h.patch || true
 	rm -f $(gensrc_destdir)/$*.h.rej
@@ -106,7 +122,8 @@ $(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_path) $(files_hg_with_path) \
 	  $(srcdir)/$(shell $(run_generate_plugin_gmmproc_file) \
 	  --suggest-hg $(plugin)))) >$@
 
-$(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) $(files_hg_with_path)
+$(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) \
+	$(files_hg_with_path)
 	$(run_gen_gst_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) >$@
 
 create-stamp-dir: $(stamp_plugin_dir)

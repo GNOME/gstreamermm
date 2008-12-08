@@ -36,6 +36,7 @@ int main (int argc, char *argv[])
 
   // gst-plugins-base (GStreamer base) plugin types
             << get_plugin_defs("audioconvert")
+            << get_plugin_defs("decodebin")
             << get_plugin_defs("oggmux")
             ;
 

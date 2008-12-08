@@ -173,7 +173,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
           enumWrapStatements += "_WRAP_ENUM(" + propertyCType.substr(3) + ", " +
             propertyCType + ")\n";
           enumWrapStatements += "_CCONVERSION(`" + propertyCType + "',`" +
-            propertyCType.substr(3) + "')\n\n";
+            propertyCType.substr(3) + "')dnl\n";
 
           Glib::ustring enumGetTypeFunctionName =
             get_cast_macro(propertyCType).lowercase() + "_get_type";
@@ -186,10 +186,10 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
         }
 
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
-          "_CCONVERT(" + propertyCType + ", true) )\n";
+          "_CCONVERT(" + propertyCType + ", true))\n";
 
         if (!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
-          includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")\n";
+          includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")dnl\n";
       }
     }
   }
@@ -197,14 +197,138 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
   g_free(ppParamSpec);
 }
 
-void generate_hg_file(const Glib::ustring& propertyWrapStatements,
-  const Glib::ustring& includeMacroCalls,
-  const Glib::ustring& enumWrapStatements)
+Glib::ustring get_method_name(const Glib::ustring& signalName)
 {
+  Glib::ustring result;
+
+  for (Glib::ustring::const_iterator iter = signalName.begin();
+    iter != signalName.end(); ++iter)
+  {
+    if ((*iter) == '-')
+    {
+      result.push_back('_');
+    }
+    else
+      result.push_back(*iter);
+  }
+
+  return result;
+}
+
+void get_signal_wrap_statements(Glib::ustring& wrapStatements,
+  Glib::ustring& includeMacroCalls, Glib::ustring& cClassSignalDeclarations)
+{
+  gpointer gclass_ref = 0;
+  gpointer ginterface_ref = 0;
+
+  if(G_TYPE_IS_OBJECT(type))
+    gclass_ref = g_type_class_ref(type); //Ensures that class_init() is called.
+  else if(G_TYPE_IS_INTERFACE(type))
+    ginterface_ref = g_type_default_interface_ref(type); //install signals.
+
+  //Get the list of signals:
+  guint iCount = 0;
+  guint* pIDs = g_signal_list_ids (type, &iCount);
+
+  //Loop through the list of signals:
+  if(pIDs)
+  {
+    for(guint i = 0; i < iCount; i++)
+    {
+      Glib::ustring convertMacros;
+      Glib::ustring wrapStatement;
+
+      guint signal_id = pIDs[i];
+
+      //Name:
+      Glib::ustring signalName = g_signal_name(signal_id);
+      Glib::ustring signalMethodName = get_method_name(signalName);
+
+      //Other information about the signal:
+      GSignalQuery signalQuery = { 0, 0, 0, GSignalFlags(0), 0, 0, 0, };
+      g_signal_query(signal_id, &signalQuery);
+
+      //Return type:
+      GType returnGType = signalQuery.return_type & ~G_SIGNAL_TYPE_STATIC_SCOPE;
+
+      Glib::ustring  returnCType = g_type_name(returnGType) +
+        (Glib::ustring) (gst_type_is_a_pointer(returnGType) ?  "*" : "");
+
+      includeMacroCalls += "_CCONVERSION_INCLUDE(" + returnCType + ")dnl\n";
+
+      wrapStatement = "  _WRAP_SIGNAL(_CCONVERT("  + returnCType +
+        ", true) " + signalMethodName + "(";
+
+      cClassSignalDeclarations += "  " + returnCType + " (*" +
+        signalMethodName + ") (" + cTypeName + "* element";
+
+      //Loop through the list of parameters:
+      const GType* pParameters = signalQuery.param_types;
+      if(pParameters)
+      {
+        for(unsigned i = 0; i < signalQuery.n_params; i++)
+        {
+          GType paramGType = pParameters[i] & ~G_SIGNAL_TYPE_STATIC_SCOPE;
+
+          //Parameter name:
+          //TODO: How can we get the real parameter name?
+          gchar* pchNum = g_strdup_printf("%d", i);
+          Glib::ustring paramName = "arg" + std::string(pchNum);
+          g_free(pchNum);
+          pchNum = 0;
+
+          Glib::ustring  paramCType = g_type_name(paramGType) +
+            (Glib::ustring) (gst_type_is_a_pointer(paramGType) ?  "*" : "");
+
+          includeMacroCalls += "_CCONVERSION_INCLUDE(" + paramCType + ")dnl\n";
+
+          if (gst_type_is_a_pointer(paramGType))
+          {
+            convertMacros += "#m4 _CONVERSION(``" + paramCType +
+              "'', _LQ()_CCONVERT(" + paramCType + ")_RQ(), ";
+            convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
+              "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
+
+            convertMacros += "#m4 _CONVERSION(_LQ()_CCONVERT(" + paramCType +
+              ")_RQ(), ``" + paramCType + "'', ";
+            convertMacros += "``($3)->gobj()'')\n";
+          }
+
+          wrapStatement += "_CCONVERT(" + paramCType + ") " + paramName;
+
+          cClassSignalDeclarations += ", " + paramCType + " " + paramName;
+
+          if (i < signalQuery.n_params - 1)
+            wrapStatement += ", ";
+        }
+      }
+      wrapStatement += "), \"" + signalName + "\")\n";
+
+      wrapStatements += convertMacros + wrapStatement;
+
+      cClassSignalDeclarations += ");\n";
+    }
+  }
+
+  g_free(pIDs);
+
+  if(gclass_ref)
+    g_type_class_unref(gclass_ref); //to match the g_type_class_ref() above.
+  else if(ginterface_ref)
+    g_type_default_interface_unref(ginterface_ref); // for interface ref above.
+}
+
+void generate_hg_file(const Glib::ustring& includeMacroCalls,
+  const Glib::ustring& enumWrapStatements,
+  const Glib::ustring& propertyWrapStatements,
+  const Glib::ustring& signalWrapStatements)
+{
+  std::cout << "include(ctocpp_base.m4)dnl" << std::endl;
+  std::cout << "changecom()dnl" << std::endl;
   std::cout << "#include <" << includeRoot << "/" <<
     cppParentTypeName.lowercase() << ".h>" << std::endl;
 
-  std::cout << includeMacroCalls << std::endl;
+  std::cout << includeMacroCalls;
 
   std::cout << "_DEFS(" << target << "," << defsFile << ")" << std::endl <<
     std::endl;
@@ -212,7 +336,7 @@ void generate_hg_file(const Glib::ustring& propertyWrapStatements,
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
 
-  std::cout << enumWrapStatements;
+  std::cout << enumWrapStatements << std::endl;
 
   std::cout << "/** " << nmspace << "::" << cppTypeName << " — " << pluginName << " plugin." << std::endl;
   std::cout << " * Please include <" << target << "/" << cppTypeName.lowercase() << ".h> to use." << std::endl;
@@ -243,16 +367,24 @@ void generate_hg_file(const Glib::ustring& propertyWrapStatements,
 
   std::cout << propertyWrapStatements;
 
+  std::cout << std::endl << signalWrapStatements;
+
   std::cout << "};" << std::endl;
 
   std::cout << std::endl << "} //namespace " << nmspace << std::endl;
 }
 
-void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions)
+void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
+  const Glib::ustring& cClassSignalDeclarations)
 {
   std::cout << "_PINCLUDE(" << includeRoot << "/private/" <<
-    cppParentTypeName.lowercase() << "_p.h)" << std::endl;
-  std::cout << "#include <glib/gprintf.h>" << std::endl << std::endl;
+    cppParentTypeName.lowercase() << "_p.h)" << std::endl << std::endl;
+
+  std::cout << "struct _" << cTypeName << "Class" << std::endl;
+  std::cout << "{" << std::endl;
+  std::cout << "  " << cParentTypeName << "Class parent_class;" << std::endl;
+  std::cout << cClassSignalDeclarations;
+  std::cout << "};" << std::endl << std::endl;
 
   Glib::ustring getTypeName = castMacro.lowercase() + "_get_type";
 
@@ -309,7 +441,7 @@ int main(int argc, char* argv[])
 
   GOptionEntry optionEntries[] =
   {
-    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate .hg file.", NULL },
+    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate a preliminary .hg file.  Run through m4 including macros in tools/m4 directory to get final .hg file", NULL },
     {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", NULL },
     {"suggest-hg", 's', 0, G_OPTION_ARG_NONE, &suggestHg, "If the plugin exists, output the suggested .hg filename.", NULL },
     {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin.", "namespace" },
@@ -385,6 +517,8 @@ int main(int argc, char* argv[])
       cppParentTypeName.compare("BaseSink") == 0 ||
       cppParentTypeName.compare("BaseTransform") == 0 ||
       cppParentTypeName.compare("PushSrc") == 0 ||
+      cppParentTypeName.compare("Pipeline") == 0 ||
+      cppParentTypeName.compare("Bin") == 0 ||
       cppParentTypeName.compare("Element") == 0)
     {
       includeRoot = "gstreamermm";
@@ -396,28 +530,34 @@ int main(int argc, char* argv[])
       parentNameSpace = nmspace;
     }
 
-    Glib::ustring propertyWrapStatements;
-    Glib::ustring includeMacroCalls;
-    Glib::ustring enumWrapStatements;
-    Glib::ustring enumGTypeFunctionDeclarations;
-
-    if (hgFile || ccgFile)
+    if (suggestHg)
+      std::cout << pluginName << ".hg" << std::endl;
+    else if (hgFile || ccgFile)
     {
+      Glib::ustring propertyWrapStatements;
+      Glib::ustring includeMacroCalls;
+      Glib::ustring enumWrapStatements;
+      Glib::ustring signalWrapStatements;
+      Glib::ustring enumGTypeFunctionDeclarations;
+      Glib::ustring cClassSignalDeclarations;
+
       get_property_wrap_statements(propertyWrapStatements, includeMacroCalls,
         enumWrapStatements, enumGTypeFunctionDeclarations);
-    }
 
-    if (hgFile)
-    {
-      generate_hg_file(propertyWrapStatements, includeMacroCalls,
-        enumWrapStatements);
+      get_signal_wrap_statements(signalWrapStatements, includeMacroCalls,
+        cClassSignalDeclarations);
+
+      if (hgFile)
+      {
+        generate_hg_file(includeMacroCalls, enumWrapStatements,
+          propertyWrapStatements, signalWrapStatements);
+      }
+      else
+      {
+        generate_ccg_file(enumGTypeFunctionDeclarations,
+          cClassSignalDeclarations);
+      }
     }
-    else if (ccgFile)
-    {
-      generate_ccg_file(enumGTypeFunctionDeclarations);
-    }
-    else if (suggestHg)
-      std::cout << pluginName << ".hg" << std::endl;
 
     g_object_unref(factory);
   }

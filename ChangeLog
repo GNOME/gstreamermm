@@ -1,3 +1,40 @@
+2008-12-08  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* tools/m4/Makefile_list_of_sources.am_fragment:
+	* tools/m4/convert.m4:
+	* tools/m4/ctocpp_base.m4:
+	* tools/m4/ctocpp.m4:
+	* build_shared/Makefile_gensrc.am_fragment:
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Modified
+	plug-in generation tool to generate preliminary .hg file (when
+	generating the .hg file) which would then be run through m4 with
+	macros in ctocpp_base.m4 and ctocpp.m4.  Modified the build process to
+	generate the preliminary .hg file with the tool and then run the file
+	through m4 before running gmmproc on the final .hg file.  Modified the
+	tool to generate signals.  Signals are wrapped; testing should be done
+	though.
+
+	* gstreamer/src/gst_signals.defs:
+	* gstreamer/src/gst_signals.defs.patch: Added `*' to GstBuffer pointer
+	type in definitions (it is GstMiniObject and the extra defs utility
+	does not know -- see bug #562810).  Modified patch to do this.
+
+	* gstreamerbase/src/Makefile_list_of_hg.am_fragment:
+	* gstreamerbase/src/gstbase_signals.defs:
+	* tools/extra_defs_gen/generate_defs_gstbase.cc: Added plug-in
+	`decodebin' to list of plug-ins to be generated for gstreamerbasemm to
+	test plug-in generation that uses API from gstreamermm (properties and
+	signals are wrapped).
+
+	* gstreamer/src/basesink.ccg:
+	* gstreamer/src/basesink.hg:
+	* gstreamer/src/basesrc.ccg:
+	* gstreamer/src/basesrc.hg:
+	* gstreamer/src/pushsrc.ccg:
+	* gstreamer/src/pushsrc.hg: Moved includes from .ccg to .hg files
+	because plug-ins relying on these base classes need Gst*Class
+	definitions from GStreamer header files.
+
 2008-12-03  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamer/src/generate-docs.sh:
