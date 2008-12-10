@@ -169,6 +169,14 @@ public:
 
   _WRAP_PROPERTY("qos", bool)
 
+  //TODO: bool vfuncs are a problem because if the base class does not
+  //implement one (which occurs often in GStreamer -- don't know why) the
+  //default generated callback returns false because of the "typedef RType;
+  //return RType()" statements (see discussion about bug #530416 in element.hg
+  //for more).  I've filed a patch for the bug which will allow a custom return
+  //to be specified for the callback, in which case the bool vfuncs can be made
+  //to return true which would then work.
+
 #m4 _CONVERSION(`Glib::RefPtr<Caps>', `GstCaps*', `($3)->gobj()')
 #m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Caps>&', `Glib::wrap($3)')
   /** Optional. Given the pad in this direction and the given caps, what caps
@@ -181,36 +189,36 @@ public:
    */
   _WRAP_VFUNC(void fixate_caps(PadDirection direction, const Glib::RefPtr<Caps>& caps, const Glib::RefPtr<Caps>& othercaps), "fixate_caps")
 
-  /** Optional. Given the size of a buffer in the given direction with the
-   * given caps, calculate the size in bytes of a buffer on the other pad with
-   * the given other caps. The default implementation uses
-   * get_unit_size_vfunc() and keeps the number of units the same.
-   */
-  _WRAP_VFUNC(bool transform_size(PadDirection direction, const Glib::RefPtr<Caps>& caps, guint size, const Glib::RefPtr<Caps>& othercaps, guint* othersize), "transform_size")
+  ///** Optional. Given the size of a buffer in the given direction with the
+   //* given caps, calculate the size in bytes of a buffer on the other pad with
+   //* the given other caps. The default implementation uses
+   //* get_unit_size_vfunc() and keeps the number of units the same.
+   //*/
+  //_WRAP_VFUNC(bool transform_size(PadDirection direction, const Glib::RefPtr<Caps>& caps, guint size, const Glib::RefPtr<Caps>& othercaps, guint* othersize), "transform_size")
 
-  /** Required if the transform is not in-place. Get the size in bytes of one
-   * unit for the given caps.
-   */
-  _WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Caps>& caps, guint* size), "get_unit_size")
+  ///** Required if the transform is not in-place. Get the size in bytes of one
+   //* unit for the given caps.
+   //*/
+  //_WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Caps>& caps, guint* size), "get_unit_size")
 
-  /** Allows the subclass to be notified of the actual caps set.
-   */
-  _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& incaps, const Glib::RefPtr<Caps>& outcaps), "set_caps")
+  ///** Allows the subclass to be notified of the actual caps set.
+   //*/
+  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& incaps, const Glib::RefPtr<Caps>& outcaps), "set_caps")
 
-  /** Optional. Called when the element starts processing. Allows opening
-   * external resources.
-   */
-  _WRAP_VFUNC(bool start(), "start")
+  ///** Optional. Called when the element starts processing. Allows opening
+   //* external resources.
+   //*/
+  //_WRAP_VFUNC(bool start(), "start")
 
-  /** Optional. Called when the element stops processing. Allows closing
-   * external resources.
-   */
-  _WRAP_VFUNC(bool stop(), "stop")
+  ///** Optional. Called when the element stops processing. Allows closing
+   //* external resources.
+   //*/
+  //_WRAP_VFUNC(bool stop(), "stop")
 
-  /** Optional. Event handler on the sink pad. This function should return TRUE
-   * if the base class should forward the event.
-   */
-  _WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
+  ///** Optional. Event handler on the sink pad. This function should return TRUE
+   //* if the base class should forward the event.
+   //*/
+  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
 
 #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Buffer>&', `Gst::wrap($3)')
   /** Required if the element does not operate in-place. Transforms one
@@ -231,9 +239,9 @@ public:
 //#m4 _CONVERSION(`GstBuffer**', `Glib::RefPtr<Buffer>&', `Gst::wrap(*($3))')
   //_WRAP_VFUNC(FlowReturn prepare_output_buffer(const Glib::RefPtr<Buffer>& input, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>&), "prepare_output_buffer")
 
-  /** Optional. Event handler on the source pad.
-   */
-  _WRAP_VFUNC(bool src_event(const Glib::RefPtr<Event>& event), "src_event")
+  ///** Optional. Event handler on the source pad.
+   //*/
+  //_WRAP_VFUNC(bool src_event(const Glib::RefPtr<Event>& event), "src_event")
 };
 
 } //namespace Gst

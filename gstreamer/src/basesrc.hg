@@ -161,32 +161,40 @@ public:
   _WRAP_PROPERTY("num-buffers", int)
   _WRAP_PROPERTY("typefind", bool)
 
+  //TODO: bool vfuncs are a problem because if the base class does not
+  //implement one (which occurs often in GStreamer -- don't know why) the
+  //default generated callback returns false because of the "typedef RType;
+  //return RType()" statements (see discussion about bug #530416 in element.hg
+  //for more).  I've filed a patch for the bug which will allow a custom return
+  //to be specified for the callback, in which case the bool vfuncs can be made
+  //to return true which would then work.
+
 #m4 _CONVERSION(`Glib::RefPtr<Caps>', `GstCaps*', `($3)->gobj()')
   /** Called to get the caps to report.
    */
   _WRAP_VFUNC(Glib::RefPtr<Caps> get_caps(), "get_caps")
 
 #m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Caps>&', `Glib::wrap($3)')
-  /** Notify subclass of changed output caps.
-   */
-  _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& caps), "set_caps")
+  ///** Notify subclass of changed output caps.
+   //*/
+  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& caps), "set_caps")
 
-  /** Negotiated the caps with the peer.
-   */
-  _WRAP_VFUNC(bool negotiate(), "negotiate")
+  ///** Negotiated the caps with the peer.
+   //*/
+  //_WRAP_VFUNC(bool negotiate(), "negotiate")
 
-  /** Generate and send a new_segment event (UNUSED).
-   */
-  _WRAP_VFUNC(bool new_segment(), "newsegment")
+  ///** Generate and send a new_segment event (UNUSED).
+   //*/
+  //_WRAP_VFUNC(bool new_segment(), "newsegment")
 
-  /** Start processing. Subclasses should open resources and prepare to produce
-   * data.
-   */
-  _WRAP_VFUNC(bool start(), "start")
+  ///** Start processing. Subclasses should open resources and prepare to produce
+   //* data.
+   //*/
+  //_WRAP_VFUNC(bool start(), "start")
 
-  /** Stop processing. Subclasses should use this to close resources.
-   */
-  _WRAP_VFUNC(bool stop(), "stop")
+  ///** Stop processing. Subclasses should use this to close resources.
+   //*/
+  //_WRAP_VFUNC(bool stop(), "stop")
 
 #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Buffer>&', `Gst::wrap($3)')
 #m4 _CONVERSION(`GstClockTime*', `ClockTime&', `*($3)')
@@ -197,61 +205,61 @@ public:
 
 #m4 _CONVERSION(`guint64&', `guint64*', `&($3)')
 #m4 _CONVERSION(`guint64*', `guint64&', `*($3)')
-  /** Return the total size of the resource, in the configured format.
-   */
-  _WRAP_VFUNC(bool get_size(guint64& size), "get_size")
+  ///** Return the total size of the resource, in the configured format.
+   //*/
+  //_WRAP_VFUNC(bool get_size(guint64& size), "get_size")
 
-  /** Check if the source can seek.
-   */
-  _WRAP_VFUNC(bool is_seekable(), "is_seekable")
+  ///** Check if the source can seek.
+   //*/
+  //_WRAP_VFUNC(bool is_seekable(), "is_seekable")
 
-  /** Unlock any pending access to the resource. Subclasses should unblock any
-   * blocked function ASAP.
-   */
-  _WRAP_VFUNC(bool unlock(), "unlock")
+  ///** Unlock any pending access to the resource. Subclasses should unblock any
+   //* blocked function ASAP.
+   //*/
+  //_WRAP_VFUNC(bool unlock(), "unlock")
 
-  /** Override this to implement custom event handling.
-   */
-  _WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
+  ///** Override this to implement custom event handling.
+   //*/
+  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
 
 //TODO: #m4 _CONVERSION(`Glib::RefPtr<Buffer>&', `GstBuffer**', `*($3)')
   //_WRAP_VFUNC(FlowReturn create(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer), "create")
 
 #m4 _CONVERSION(`Segment', `GstSegment*', `($3).gobj()')
 #m4 _CONVERSION(`GstSegment*', `Segment', `Glib::wrap($3)')
-  /** Perform seeking on the resource to the indicated segment.
-   */
-  _WRAP_VFUNC(bool do_seek(Segment segment), "do_seek")
+  ///** Perform seeking on the resource to the indicated segment.
+   //*/
+  //_WRAP_VFUNC(bool do_seek(Segment segment), "do_seek")
 
-  /** Handle a requested query.
-   */
-  _WRAP_VFUNC(bool query(const Glib::RefPtr<Query>& query), "query")
+  ///** Handle a requested query.
+   //*/
+  //_WRAP_VFUNC(bool query(const Glib::RefPtr<Query>& query), "query")
 
-  /** Check whether the source would support pull-based operation if it were to
-   * be opened now. This vfunc is optional, but should be implemented if
-   * possible to avoid unnecessary start/stop cycles. The default
-   * implementation will open and close the resource to find out whether
-   * get_range() is supported, and that is usually undesirable.
-   */
-  _WRAP_VFUNC(bool check_get_range(), "check_get_range")
+  ///** Check whether the source would support pull-based operation if it were to
+   //* be opened now. This vfunc is optional, but should be implemented if
+   //* possible to avoid unnecessary start/stop cycles. The default
+   //* implementation will open and close the resource to find out whether
+   //* get_range() is supported, and that is usually undesirable.
+   //*/
+  //_WRAP_VFUNC(bool check_get_range(), "check_get_range")
 
   /** Called during negotiation if caps need fixating. Implement instead of
    * setting a fixate function on the source pad.
    */
   _WRAP_VFUNC(void fixate(const Glib::RefPtr<Caps>& caps), "fixate")
 
-  /** Clear the previous unlock request. Subclasses should clear any state they
-   * set during unlock_vfunc(), such as clearing command queues.
-   */
-  _WRAP_VFUNC(bool unlock_stop(), "unlock_stop")
+  ///** Clear the previous unlock request. Subclasses should clear any state they
+   //* set during unlock_vfunc(), such as clearing command queues.
+   //*/
+  //_WRAP_VFUNC(bool unlock_stop(), "unlock_stop")
 
-  /** Prepare the GstSegment that will be passed to the do_seek_vfunc() vmethod
-   * for executing a seek request. Sub-classes should override this if they
-   * support seeking in formats other than the configured native format. By
-   * default, it tries to convert the seek arguments to the configured native
-   * format and prepare a segment in that format.
-   */
-  _WRAP_VFUNC(bool prepare_seek_segment(const Glib::RefPtr<Event>& seek, Segment segment), "prepare_seek_segment")
+  ///** Prepare the GstSegment that will be passed to the do_seek_vfunc() vmethod
+   //* for executing a seek request. Sub-classes should override this if they
+   //* support seeking in formats other than the configured native format. By
+   //* default, it tries to convert the seek arguments to the configured native
+   //* format and prepare a segment in that format.
+   //*/
+  //_WRAP_VFUNC(bool prepare_seek_segment(const Glib::RefPtr<Event>& seek, Segment segment), "prepare_seek_segment")
 };
 
 } //namespace Gst
