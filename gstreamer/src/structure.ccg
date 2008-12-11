@@ -32,9 +32,20 @@ Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, voi
 
   Gst::Structure::SlotForeach* slot = static_cast<Gst::Structure::SlotForeach*>(data);
 
-  bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
-  delete slot;
-  return result;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
+    delete slot;
+    return result;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static gboolean
@@ -45,9 +56,20 @@ Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, void* data)
 
   Gst::Structure::SlotMap* slot = static_cast<Gst::Structure::SlotMap*>(data);
 
-  bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
-  delete slot;
-  return result;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
+    delete slot;
+    return result;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 namespace Gst

@@ -26,7 +26,18 @@ static void TagList_foreach_gstreamermm_callback(const GstTagList* list, const g
   Gst::TagList::SlotForeach* slot = static_cast<Gst::TagList::SlotForeach*>(data);
 
   const Glib::ustring tag_str = Glib::convert_const_gchar_ptr_to_ustring(tag);
-  (*slot)(tag_str);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*slot)(tag_str);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 namespace Gst

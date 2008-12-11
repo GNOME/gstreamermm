@@ -29,10 +29,18 @@ static gboolean Index_Filter_gstreamermm_callback(GstIndex* index, GstIndexEntry
 {
   Index::SlotFilter * the_slot = static_cast<Index::SlotFilter*>(data);
 
-  Glib::RefPtr<Index> cpp_index = Glib::wrap(index, true);
-  IndexEntry cpp_entry = Glib::wrap(entry, true);
-  const gboolean result = (*the_slot)(cpp_index, cpp_entry);
-  return result;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return (*the_slot)(Glib::wrap(index, true), Glib::wrap(entry, true));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static void Index_Filter_gstreamermm_callback_destroy(void* data)
@@ -46,17 +54,28 @@ static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *
 {
   Index::SlotResolver * the_slot = static_cast<Index::SlotResolver*>(data);
 
-  Glib::RefPtr<Index> cpp_index = Glib::wrap(index, true);
-  Glib::RefPtr<Gst::Object> cpp_writer = Glib::wrap(writer, true);
-  Glib::ustring cpp_writer_string;
-  const gboolean result = (*the_slot)(cpp_index, cpp_writer, cpp_writer_string);
-  
-  if(writer_string)
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
   {
-    *writer_string = g_strdup(cpp_writer_string.c_str());
-  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    Glib::ustring cpp_writer_string;
 
-  return result;
+    const gboolean result =
+      (*the_slot)(Glib::wrap(index, true), Glib::wrap(writer, true),
+        cpp_writer_string);
+
+    if(writer_string)
+      *writer_string = g_strdup(cpp_writer_string.c_str());
+
+    return result;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
 }
 
 static void Index_Resolver_gstreamermm_callback_destroy(void* data)
