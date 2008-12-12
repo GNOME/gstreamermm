@@ -36,7 +36,7 @@ Bin::Bin()
 {}
 
 
-Glib::RefPtr<Bin> Bin::add(const Glib::RefPtr<Element>& element)
+Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
 {
   // The following is needed because when adding an element to a bin, the bin
   // likes to have the last reference and then destroy it when the bin itself
@@ -58,7 +58,7 @@ Glib::RefPtr<Bin> Bin::add(const Glib::RefPtr<Element>& element)
     throw std::runtime_error("Failed to add " + element->get_name() + " element");
 }
 
-Glib::RefPtr<Bin> Bin::remove(const Glib::RefPtr<Element>& element)
+Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
 {
   const bool result = gst_bin_remove(gobj(), element->gobj());
 
@@ -67,7 +67,7 @@ Glib::RefPtr<Bin> Bin::remove(const Glib::RefPtr<Element>& element)
   if(result)
     return Glib::wrap(gobj(), true);
   else
-    return Glib::RefPtr<Bin>(0);
+    return Glib::RefPtr<Gst::Bin>(0);
 }
 
 } //namespace Gst

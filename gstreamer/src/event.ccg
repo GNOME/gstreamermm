@@ -47,12 +47,12 @@ EventTypeFlags get_flags(EventType t)
 
 } //namespace Enums
 
-Glib::RefPtr<Event> Event::copy() const
+Glib::RefPtr<Gst::Event> Event::copy() const
 {
   return Gst::wrap(gst_event_copy(gobj()));
 }
 
-Glib::RefPtr<Event> Event::create_writable()
+Glib::RefPtr<Gst::Event> Event::create_writable()
 {
   return
    Gst::wrap(GST_EVENT(gst_mini_object_make_writable(GST_MINI_OBJECT(gobj()))));
@@ -78,7 +78,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventFlushStart::create()
+Glib::RefPtr<Gst::Event> EventFlushStart::create()
 {
   GstEvent* event = gst_event_new_flush_start();
   return Gst::Event::wrap(event, false);
@@ -89,7 +89,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventFlushStop::create()
+Glib::RefPtr<Gst::Event> EventFlushStop::create()
 {
   GstEvent* event = gst_event_new_flush_stop();
   return Gst::Event::wrap(event, false);
@@ -100,7 +100,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventEos::create()
+Glib::RefPtr<Gst::Event> EventEos::create()
 {
   GstEvent* event = gst_event_new_eos();
   return Gst::Event::wrap(event, false);
@@ -111,7 +111,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventNewSegment::create(bool update, double rate, Format format, gint64 start, gint64 stop, gint64 position, double applied_rate)
+Glib::RefPtr<Gst::Event> EventNewSegment::create(bool update, double rate, Format format, gint64 start, gint64 stop, gint64 position, double applied_rate)
 {
   GstEvent* event = gst_event_new_new_segment_full(update, rate, applied_rate, GstFormat(format), start, stop, position);
   return Gst::Event::wrap(event, false);
@@ -136,7 +136,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventTag::create(const TagList& taglist)
+Glib::RefPtr<Gst::Event> EventTag::create(const Gst::TagList& taglist)
 {
   //We create a copy because gst_event_new_tag() takes ownership:
   GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
@@ -144,11 +144,11 @@ Glib::RefPtr<Event> EventTag::create(const TagList& taglist)
   return Gst::Event::wrap(event, false);
 }
 
-TagList EventTag::parse()
+Gst::TagList EventTag::parse()
 {
   GstTagList* gst_taglist = gst_tag_list_new();
   gst_event_parse_tag(gobj(), &gst_taglist);
-  return TagList(gst_taglist);
+  return Gst::TagList(gst_taglist);
 }
 
 EventBufferSize::EventBufferSize(GstEvent* castitem) :
@@ -156,7 +156,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize, bool async)
+Glib::RefPtr<Gst::Event> EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize, bool async)
 {
   GstEvent* event = gst_event_new_buffer_size(GstFormat(format), minsize, maxsize, async);
   return Gst::Event::wrap(event, false);
@@ -174,7 +174,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventQos::create(double proportion, ClockTimeDiff diff, ClockTime timestamp)
+Glib::RefPtr<Gst::Event> EventQos::create(double proportion, ClockTimeDiff diff, ClockTime timestamp)
 {
   GstEvent* event = gst_event_new_qos(proportion, GstClockTimeDiff(diff), GstClockTime(timestamp));
   return Gst::Event::wrap(event, false);
@@ -190,7 +190,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventSeek::create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop)
+Glib::RefPtr<Gst::Event> EventSeek::create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop)
 {
   GstEvent* event = gst_event_new_seek(rate, GstFormat(format), GstSeekFlags(flags), GstSeekType(start_type), start, GstSeekType(stop_type), stop);
   return Gst::Event::wrap(event, false);
@@ -206,7 +206,7 @@ Event(castitem)
 {
 }
 
-Glib::RefPtr<Event> EventNavigation::create(Structure& structure)
+Glib::RefPtr<Gst::Event> EventNavigation::create(Gst::Structure& structure)
 {
   GstEvent* event = gst_event_new_navigation(structure.gobj());
   return Gst::Event::wrap(event, false);
@@ -222,49 +222,49 @@ void EventLatency::parse(ClockTime& latency)
   gst_event_parse_latency(gobj(), &latency);
 }
 
-Glib::RefPtr<Event> EventLatency::create(ClockTime time)
+Glib::RefPtr<Gst::Event> EventLatency::create(ClockTime time)
 {
   GstEvent* event = gst_event_new_latency(GstClockTime(time));
   return Gst::Event::wrap(event, false);
 }
 
-Glib::RefPtr<Event> Event::wrap(GstEvent* event, bool take_copy) {
+Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy) {
 
-  Glib::RefPtr<Event> result;
+  Glib::RefPtr<Gst::Event> result;
 
   if(!event)
     return result;
 
   switch (GST_EVENT_TYPE(event)) {
     case GST_EVENT_FLUSH_START:
-      result = Glib::RefPtr<Event>( new Gst::EventFlushStart(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventFlushStart(event) );
       break;
     case GST_EVENT_FLUSH_STOP:
-      result = Glib::RefPtr<Event>( new Gst::EventFlushStop(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventFlushStop(event) );
       break;
     case GST_EVENT_EOS:
-      result = Glib::RefPtr<Event>( new Gst::EventEos(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventEos(event) );
       break;
     case GST_EVENT_NEWSEGMENT:
-      result = Glib::RefPtr<Event>( new Gst::EventNewSegment(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventNewSegment(event) );
       break;
     case GST_EVENT_TAG:
-      result = Glib::RefPtr<Event>( new Gst::EventTag(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventTag(event) );
       break;
     case GST_EVENT_BUFFERSIZE:
-      result = Glib::RefPtr<Event>( new Gst::EventBufferSize(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventBufferSize(event) );
       break;
     case GST_EVENT_QOS:
-      result = Glib::RefPtr<Event>( new Gst::EventQos(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventQos(event) );
       break;
     case GST_EVENT_SEEK:
-      result = Glib::RefPtr<Event>( new Gst::EventSeek(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventSeek(event) );
       break;
     case GST_EVENT_NAVIGATION:
-      result = Glib::RefPtr<Event>( new Gst::EventNavigation(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventNavigation(event) );
       break;
     case GST_EVENT_LATENCY:
-      result = Glib::RefPtr<Event>( new Gst::EventLatency(event) );
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventLatency(event) );
       break;
     default:
       result = Gst::wrap(event, false);

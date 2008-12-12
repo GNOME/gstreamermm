@@ -1,0 +1,58 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gstreamerbasemm/baseaudiosink.h>
+
+_DEFS(gstreamerbasemm,gstbase)
+
+namespace GstBase
+{
+
+/** GstBase::AudioSink — Simple base class for audio sinks.
+ * This is the most simple base class for audio sinks that only requires
+ * subclasses to implement a set of simple virtual functions:
+ *
+ * - open_vfunc() - Open the device.
+ * - prepare_vfunc()  - Configure the device with the specified format.
+ * - write_vfunc() - Write samples to the device.
+ * - reset_vfunc() - Unblock writes and flush the device.
+ * - delay_vfunc() - Get the number of samples written but not yet played by
+ * the device.
+ * - unprepare_vfunc() - Undo operations done by prepare.
+ * - close_vfunc() - Close the device.
+ *
+ * All scheduling of samples and timestamps is done in this base class together
+ * with GstBase::BaseAudioSink using a default implementation of a
+ * GstBase::RingBuffer that uses threads.
+ *
+ * Last reviewed on 2006-09-27 (0.10.12)
+ *
+ * @ingroup GstBaseBaseClasses
+ */
+class AudioSink : public GstBase::BaseAudioSink
+{
+  _CLASS_GOBJECT(AudioSink, GstAudioSink, GST_AUDIO_SINK, GstBase::BaseAudioSink, GstBaseAudioSink)
+
+public:
+  //TODO: Wrap vfuncs.
+};
+
+} // namespace GstBase

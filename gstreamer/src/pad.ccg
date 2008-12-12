@@ -82,26 +82,26 @@ Pad::Pad(PadDirection dir)
   : _CONSTRUCT("name", NULL, "direction", dir)
 {}
 
-Pad::Pad(const Glib::RefPtr<PadTemplate>& templ, const Glib::ustring& name)
+Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>& templ, const Glib::ustring& name)
   : _CONSTRUCT("name", name.c_str(), "direction", templ->get_direction(),
       "template", templ->gobj())
 {}
 
-Pad::Pad(const Glib::RefPtr<PadTemplate>& templ)
+Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>& templ)
   : _CONSTRUCT("name", NULL, "direction", templ->get_direction(), "template",
       templ->gobj())
 {}
 
 // This is handcoded because the documentation tells us that we need to copy
 // the Caps
-Glib::RefPtr<const Caps> Pad::get_pad_template_caps() const
+Glib::RefPtr<const Gst::Caps> Pad::get_pad_template_caps() const
 {
   const GstCaps* caps = gst_pad_get_pad_template_caps(const_cast<GstPad*>(gobj()));
   GstCaps* copy_caps = gst_caps_copy(caps);
   return Glib::wrap(copy_caps, false);
 }
 
-FlowReturn Pad::alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buffer)
+FlowReturn Pad::alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   GstBuffer* c_buffer = 0;
   GstFlowReturn result = gst_pad_alloc_buffer(gobj(), offset, size, caps->gobj(), &c_buffer);
@@ -109,7 +109,7 @@ FlowReturn Pad::alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Caps>&
   return FlowReturn(result);
 }
 
-FlowReturn Pad::alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>& buffer)
+FlowReturn Pad::alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   GstBuffer* c_buffer = 0;
   GstFlowReturn result = gst_pad_alloc_buffer_and_set_caps(gobj(), offset, size, caps->gobj(), &c_buffer);
@@ -117,7 +117,7 @@ FlowReturn Pad::alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::
   return FlowReturn(result);
 }
 
-FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer)
+FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   GstBuffer* c_buffer = 0;
   GstFlowReturn result = gst_pad_get_range(gobj(), offset, size, &c_buffer);
@@ -125,19 +125,19 @@ FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buff
   return FlowReturn(result);
 }
 
-FlowReturn Pad::push(const Glib::RefPtr<Buffer>& buffer)
+FlowReturn Pad::push(const Glib::RefPtr<Gst::Buffer>& buffer)
 {
   buffer->reference();
   return FlowReturn(gst_pad_push(gobj(), buffer->gobj()));
 }
 
-bool Pad::push_event(const Glib::RefPtr<Event>& event)
+bool Pad::push_event(const Glib::RefPtr<Gst::Event>& event)
 {
   event->reference();
   return gst_pad_push_event(gobj(), event->gobj());
 }
 
-FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer)
+FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   GstBuffer* c_buffer = 0;
   GstFlowReturn result = gst_pad_pull_range(gobj(), offset, size, &c_buffer);
@@ -145,7 +145,7 @@ FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Buffer>& buf
   return FlowReturn(result);
 }
 
-bool Pad::send_event(const Glib::RefPtr<Event>& event)
+bool Pad::send_event(const Glib::RefPtr<Gst::Event>& event)
 {
   event->reference();
   return gst_pad_send_event(gobj(), event->gobj());
@@ -171,7 +171,7 @@ bool Pad::query_peer_duration(Format& format) const
   return gst_pad_query_peer_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
 }
 
-FlowReturn Pad::chain(const Glib::RefPtr<Buffer>& buffer)
+FlowReturn Pad::chain(const Glib::RefPtr<Gst::Buffer>& buffer)
 {
   buffer->reference();
   return FlowReturn(gst_pad_chain(gobj(), buffer->gobj()));

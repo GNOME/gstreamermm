@@ -163,7 +163,7 @@ public:
    *
    * @throws std::runtime_error if the Bin does not want to accept the Element.
    */
-  Glib::RefPtr<Bin> add(const Glib::RefPtr<Element>& element);
+  Glib::RefPtr<Gst::Bin> add(const Glib::RefPtr<Gst::Element>& element);
   _IGNORE(gst_bin_add, gst_bin_add_many)
 
   /** Removes the element from the bin, unparenting it as well. Unparenting the
@@ -180,64 +180,64 @@ public:
    * Returns this Gst::Bin if successful (for further removing if wanted), NULL
    * otherwise
    */
-  Glib::RefPtr<Bin> remove(const Glib::RefPtr<Element>& element);
+  Glib::RefPtr<Gst::Bin> remove(const Glib::RefPtr<Gst::Element>& element);
   _IGNORE(gst_bin_remove, gst_bin_remove_many)
 
   //We could add a bool recurse_up = false parameter, 
   //but get_element() and get_element_recurse_up() seem different enough to be separate.
   //One recurses down and the other recurses up, so it's not just additional behaviour. 
-  _WRAP_METHOD(Glib::RefPtr<Element> get_element(const Glib::ustring& name), gst_bin_get_by_name)
-  _WRAP_METHOD(Glib::RefPtr<const Element> get_element(const Glib::ustring& name) const, gst_bin_get_by_name)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Element> get_element(const Glib::ustring& name), gst_bin_get_by_name)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Element> get_element(const Glib::ustring& name) const, gst_bin_get_by_name)
 
-  _WRAP_METHOD(Glib::RefPtr<Element> get_element_recurse_up(const Glib::ustring& name), gst_bin_get_by_name_recurse_up)
-  _WRAP_METHOD(Glib::RefPtr<const Element> get_element_recurse_up(const Glib::ustring& name) const, gst_bin_get_by_name_recurse_up)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Element> get_element_recurse_up(const Glib::ustring& name), gst_bin_get_by_name_recurse_up)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Element> get_element_recurse_up(const Glib::ustring& name) const, gst_bin_get_by_name_recurse_up)
  
-  _WRAP_METHOD(Glib::RefPtr<Element> get_element(GType interface), gst_bin_get_by_interface)
-  _WRAP_METHOD(Glib::RefPtr<const Element> get_element(GType interface) const, gst_bin_get_by_interface)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Element> get_element(GType interface), gst_bin_get_by_interface)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Element> get_element(GType interface) const, gst_bin_get_by_interface)
 
-  _WRAP_METHOD(Glib::RefPtr<Pad> find_unlinked_pad(PadDirection dir), gst_bin_find_unlinked_pad)
-  _WRAP_METHOD(Glib::RefPtr<const Pad> find_unlinked_pad(PadDirection dir) const, gst_bin_find_unlinked_pad)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Pad> find_unlinked_pad(PadDirection dir), gst_bin_find_unlinked_pad)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Pad> find_unlinked_pad(PadDirection dir) const, gst_bin_find_unlinked_pad)
   _IGNORE(gst_bin_find_unconnected_pad)
 
-  _WRAP_METHOD(Iterator<Element> iterate_elements(), gst_bin_iterate_elements)
-  _WRAP_METHOD(Iterator<Element> iterate_recurse(), gst_bin_iterate_recurse)
-  _WRAP_METHOD(Iterator<Element> iterate_sorted(), gst_bin_iterate_sorted)
-  _WRAP_METHOD(Iterator<Element> iterate_sources(), gst_bin_iterate_sources)
-  _WRAP_METHOD(Iterator<Element> iterate_sinks(), gst_bin_iterate_sinks)
-  _WRAP_METHOD(Iterator<Element> iterate_by_interface(GType iface), gst_bin_iterate_all_by_interface)
+  _WRAP_METHOD(Gst::Iterator<Gst::Element> iterate_elements(), gst_bin_iterate_elements)
+  _WRAP_METHOD(Gst::Iterator<Gst::Element> iterate_recurse(), gst_bin_iterate_recurse)
+  _WRAP_METHOD(Gst::Iterator<Gst::Element> iterate_sorted(), gst_bin_iterate_sorted)
+  _WRAP_METHOD(Gst::Iterator<Gst::Element> iterate_sources(), gst_bin_iterate_sources)
+  _WRAP_METHOD(Gst::Iterator<Gst::Element> iterate_sinks(), gst_bin_iterate_sinks)
+  _WRAP_METHOD(Gst::Iterator<Gst::Element> iterate_by_interface(GType iface), gst_bin_iterate_all_by_interface)
 
-#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Element> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
+#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Gst::Element> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
   /** Gets the bin's list of children.
    */
-  _MEMBER_GET(children, children, Glib::ListHandle< Glib::RefPtr<Element> >, GList*)
+  _MEMBER_GET(children, children, Glib::ListHandle< Glib::RefPtr<Gst::Element> >, GList*)
 
   /** Gets the number of children in the bin.
    */
   _MEMBER_GET(num_children, numchildren, int, int)
 
-#m4 _CONVERSION(`GstElement*',`const Glib::RefPtr<Element>&', `Glib::wrap($3, true)')
+#m4 _CONVERSION(`GstElement*',`const Glib::RefPtr<Gst::Element>&', `Glib::wrap($3, true)')
 
   /** Will be emitted after the element was added to the bin.
    */
-  _WRAP_SIGNAL(void element_added(const Glib::RefPtr<Element>& element), "element-added")
+  _WRAP_SIGNAL(void element_added(const Glib::RefPtr<Gst::Element>& element), "element-added")
 
   /** Will be emitted after the element was removed from the bin.
    */
-  _WRAP_SIGNAL(void element_removed(const Glib::RefPtr<Element>& element), "element-removed")
+  _WRAP_SIGNAL(void element_removed(const Glib::RefPtr<Gst::Element>& element), "element-removed")
 
   _WRAP_PROPERTY("async-handling", bool)
 
   /** Method to add an element to a bin.
    */
-  _WRAP_VFUNC(bool add_element(const Glib::RefPtr<Element>& element), "add_element")
+  _WRAP_VFUNC(bool add_element(const Glib::RefPtr<Gst::Element>& element), "add_element")
 
   /** Method to remove an element from a bin.
    */
-  _WRAP_VFUNC(bool remove_element(const Glib::RefPtr<Element>& element), "remove_element")
+  _WRAP_VFUNC(bool remove_element(const Glib::RefPtr<Gst::Element>& element), "remove_element")
 
   /** Method to handle a message from the children.
    */
-  _WRAP_VFUNC(void handle_message(const Glib::RefPtr<Message>& message), "handle_message")
+  _WRAP_VFUNC(void handle_message(const Glib::RefPtr<Gst::Message>& message), "handle_message")
 };
 
 } //namespace Gst

@@ -67,14 +67,14 @@ public:
    * The init function should return true if plugin was initialized
    * successfully, false otherwise.
    */
-  typedef sigc::slot< bool, const Glib::RefPtr<Plugin>& > SlotInit;
+  typedef sigc::slot< bool, const Glib::RefPtr<Gst::Plugin>& > SlotInit;
 
   /** For example,
    * bool on_plugin_filter(const Glib::RefPtr<Gst::Plugin>& plugin);.
    * The filter function should return true if plugin is a match, false
    * otherwise.
    */
-  typedef sigc::slot< bool, const Glib::RefPtr<Plugin>& > SlotFilter;
+  typedef sigc::slot< bool, const Glib::RefPtr<Gst::Plugin>& > SlotFilter;
 
   _WRAP_METHOD(static Glib::QueryQuark error_quark(), gst_plugin_error_quark)
   _WRAP_METHOD(Glib::ustring get_name() const, gst_plugin_get_name)
@@ -92,14 +92,14 @@ public:
 
   /** @throw Gst::PluginError
    */
-  _WRAP_METHOD(static Glib::RefPtr<Plugin> load_file(const Glib::ustring& filename), gst_plugin_load_file, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Plugin> load_file(const Glib::ustring& filename), gst_plugin_load_file, errthrow)
 
-  _WRAP_METHOD(Glib::RefPtr<Plugin> load(), gst_plugin_load)
-  _WRAP_METHOD(static Glib::RefPtr<Plugin> load_by_name(const Glib::ustring& name), gst_plugin_load_by_name)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Plugin> load(), gst_plugin_load)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Plugin> load_by_name(const Glib::ustring& name), gst_plugin_load_by_name)
 
 
-#m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Plugin> >',`GList*',`($3).data()')
-  _WRAP_METHOD(static void free(Glib::ListHandle< Glib::RefPtr<Plugin> >), gst_plugin_list_free)
+#m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >',`GList*',`($3).data()')
+  _WRAP_METHOD(static void free(Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >), gst_plugin_list_free)
 
 //TODO: Include if bug #545787 is accepted; remove if not.
 /*

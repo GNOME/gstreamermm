@@ -50,16 +50,16 @@ protected:
   _CLASS_GSTMINIOBJECT(Buffer, GstBuffer, GST_BUFFER, Gst::MiniObject, GstMiniObject)
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<Buffer> create(), gst_buffer_new)
-  _WRAP_METHOD(static Glib::RefPtr<Buffer> create(guint size), gst_buffer_try_new_and_alloc)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Buffer> create(), gst_buffer_new)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Buffer> create(guint size), gst_buffer_try_new_and_alloc)
 
   /** Create a copy of the given buffer. This will also make a newly allocated
    * copy of the data the source buffer contains.
    * @return The Gst::Buffer copy.
    */
-  Glib::RefPtr<Buffer> copy() const;
+  Glib::RefPtr<Gst::Buffer> copy() const;
 
-  _WRAP_METHOD(void copy_metadata(const Glib::RefPtr<Buffer>& source_buffer, BufferCopyFlags flags), gst_buffer_copy_metadata)
+  _WRAP_METHOD(void copy_metadata(const Glib::RefPtr<Gst::Buffer>& source_buffer, BufferCopyFlags flags), gst_buffer_copy_metadata)
   _WRAP_METHOD(bool is_metadata_writable() const, gst_buffer_is_metadata_writable)
 
   /** Makes a writable buffer from the given buffer. If the source buffer is
@@ -67,27 +67,27 @@ public:
    * otherwise be made.
    * @return A buffer (possibly the same pointer) that is writable.
    */
-  Glib::RefPtr<Buffer> create_writable();
+  Glib::RefPtr<Gst::Buffer> create_writable();
 
   //This is const because it always returns a new buffer:
-  _WRAP_METHOD(Glib::RefPtr<Buffer> make_metadata_writable() const, gst_buffer_make_metadata_writable)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> make_metadata_writable() const, gst_buffer_make_metadata_writable)
 
-  _WRAP_METHOD(Glib::RefPtr<Caps> get_caps(), gst_buffer_get_caps)
-  _WRAP_METHOD(Glib::RefPtr<const Caps > get_caps() const, gst_buffer_get_caps, constversion)
-  _WRAP_METHOD(void set_caps(const Glib::RefPtr<Caps>& caps), gst_buffer_set_caps)
-  _WRAP_METHOD(Glib::RefPtr<Buffer> create_sub(const guint& offset, const guint& size), gst_buffer_create_sub)
-  _WRAP_METHOD(Glib::RefPtr<const Buffer > create_sub(const guint& offset, const guint& size) const, gst_buffer_create_sub, constversion)
-  _WRAP_METHOD(bool is_span_fast(const Glib::RefPtr<const Buffer>& other_buffer) const, gst_buffer_is_span_fast)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_buffer_get_caps)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Caps > get_caps() const, gst_buffer_get_caps, constversion)
+  _WRAP_METHOD(void set_caps(const Glib::RefPtr<Gst::Caps>& caps), gst_buffer_set_caps)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> create_sub(const guint& offset, const guint& size), gst_buffer_create_sub)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Buffer > create_sub(const guint& offset, const guint& size) const, gst_buffer_create_sub, constversion)
+  _WRAP_METHOD(bool is_span_fast(const Glib::RefPtr<const Gst::Buffer>& other_buffer) const, gst_buffer_is_span_fast)
 
   //This is const because it always returns a new buffer:
-  _WRAP_METHOD(Glib::RefPtr<Buffer> span(const guint32& offset, const Glib::RefPtr<Buffer>& other_buffer, const guint32& len) const, gst_buffer_span)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> span(const guint32& offset, const Glib::RefPtr<Gst::Buffer>& other_buffer, const guint32& len) const, gst_buffer_span)
 
   //We ignore gst_buffer_join() because it is just a C convenience function.
   //It is gst_buffer_merge() with unrefs.
   _IGNORE(gst_buffer_join)
 
   //This is const because it always returns a new buffer:
-  _WRAP_METHOD(Glib::RefPtr<Buffer> merge(const Glib::RefPtr<const Buffer>& other_buffer) const, gst_buffer_merge)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> merge(const Glib::RefPtr<const Gst::Buffer>& other_buffer) const, gst_buffer_merge)
 
   /** Get the data element of this buffer.
    * @returns A pointer to the data element of this buffer.

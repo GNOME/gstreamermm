@@ -78,20 +78,20 @@ public:
    *  (rather than a derived one) because the derived Gst::Message classes
    *  do not correspond to GType types in the GStreamer API.
    */
-  static Glib::RefPtr<Message> wrap(GstMessage* message, bool take_copy=false);
+  static Glib::RefPtr<Gst::Message> wrap(GstMessage* message, bool take_copy=false);
 
   /** Creates a copy of the message.  MT safe.
    * @return A copy of the message.
    */
-   Glib::RefPtr<Message> copy() const;
+   Glib::RefPtr<Gst::Message> copy() const;
 
-  _WRAP_METHOD(const Structure get_structure() const, gst_message_get_structure)
+  _WRAP_METHOD(const Gst::Structure get_structure() const, gst_message_get_structure)
 
   /** Checks if a message is writable. If not, a writable copy is made and
    * returned.
    * @return A Gst::Message (possibly the same pointer) that is writable.
    */
-   Glib::RefPtr<Message> create_writable();
+   Glib::RefPtr<Gst::Message> create_writable();
 
   /** Get the GstMessageType of message.
    */
@@ -128,7 +128,7 @@ public:
    * @param src The object originating the message.
    * @return The new eos message. MT safe. 
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
 };
 
 /** An error message.
@@ -149,7 +149,7 @@ public:
    * @param debug A debugging string for something or other.
    * @return The new error message. MT safe. 
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug);
 
   /** Extracts the Glib::Error and debug string from the Gst::MessageError.
    *
@@ -194,7 +194,7 @@ public:
    * @param debug A debugging string for something or other.
    * @return The new warning message. MT safe. 
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug);
 
   /** Extracts the Glib::Error and debug string from the Gst::MessageWarning.
    *
@@ -240,7 +240,7 @@ public:
    *
    * Since 0.10.12 MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Glib::Error& error, const std::string& debug);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug);
 
   /** Extracts the Glib::Error and debug string from the Gst::MessageInfo.
    *
@@ -284,7 +284,7 @@ public:
    * @param tag_list The tag list for the message.
    * @return The new tag message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const TagList& taglist);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist);
 
   /** Extracts and returns the Gst::TagList from the Gst::MessageTag.
    *
@@ -292,7 +292,7 @@ public:
    *
    * @return A copy of the Gst::TagList.
    */
-  TagList parse();
+  Gst::TagList parse();
   _IGNORE(gst_message_parse_tag)
 };
 
@@ -322,7 +322,7 @@ public:
    *
    * Since 0.10.11 MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, int percent);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, int percent);
 
   /** Extracts and returns the buffering percent from the
    * Gst::MessageBuffering.
@@ -398,7 +398,7 @@ public:
    * @param pending The pending (target) state.
    * @return The new state change message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, State oldstate, State newstate, State pending);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, State oldstate, State newstate, State pending);
 
   /** Extracts the old, new and pending states from the
    * Gst::MessageStateChanged.
@@ -452,7 +452,7 @@ public:
    * @param src The object originating the message.
    * @return The new state dirty message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
 };
 
 /** A clock provide message.
@@ -474,7 +474,7 @@ public:
    * @param ready true if the sender can provide a clock.
    * @return The new provide clock message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock, bool ready);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock, bool ready);
 
   /** Extracts the clock and ready flag from the Gst::MessageClockProvide. The
    * clock object returned remains valid until the message is freed.
@@ -484,7 +484,7 @@ public:
    * @param clock Location in which to hold a clock object.
    * @param ready Location in which to hold the ready flag.
    */
-  void parse(Glib::RefPtr<Clock>& clock, bool& ready);
+  void parse(Glib::RefPtr<Gst::Clock>& clock, bool& ready);
   _IGNORE(gst_message_parse_clock_provide)
 
   /** Extracts and returns the clock from the Gst::MessageClockProvide. The
@@ -494,7 +494,7 @@ public:
    *
    * @return The clock object of the message.
    */
-  Glib::RefPtr<Clock> parse();
+  Glib::RefPtr<Gst::Clock> parse();
 
   /** Extracts and returns the ready flag from the Gst::MessageClockProvide.
    *
@@ -522,7 +522,7 @@ public:
    * @param clock The clock that was lost.
    * @return The new clock lost message. MT safe. 
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock);
 
   /** Extracts and returns the lost clock from the Gst::MessageClockLost. The
    * clock object returned remains valid until the message is freed.
@@ -530,7 +530,7 @@ public:
    * MT safe.
    * @return The lost clock.
    */
-  Glib::RefPtr<Clock> parse();
+  Glib::RefPtr<Gst::Clock> parse();
   _IGNORE(gst_message_parse_clock_lost)
 };
 
@@ -549,7 +549,7 @@ public:
    * @param clock The new selected clock.
    * @return The new new clock message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, const Glib::RefPtr<Clock>& clock);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock);
 
   /** Extracts and returns the new clock from the Gst::MessageNewClock. The
    * clock object returned remains valid until the message is freed.
@@ -558,7 +558,7 @@ public:
    *
    * @return The selected new clock.
    */
-  Glib::RefPtr<Clock> parse();
+  Glib::RefPtr<Gst::Clock> parse();
   _IGNORE(gst_message_parse_new_clock)
 };
 
@@ -578,7 +578,7 @@ public:
    * copied.
    * @return The new application message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure);
 
   /** Create a new application-typed message (no Gst::Structure is needed).
    * GStreamer will never create these messages; they are a gift from us to
@@ -587,7 +587,7 @@ public:
    * @param src The object originating the message.
    * @return The new application message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
 };
 
 /** An element specific message.
@@ -608,7 +608,7 @@ public:
    * copy of the structure.
    * @return The new element message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Structure& structure);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure);
 
   /** Create a new element-specific message. This is meant as a generic way of
    * allowing one-way communication from an element to an application, for
@@ -619,7 +619,7 @@ public:
    * @param src The object originating the message.
    * @return The new element message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
 };
 
 /** A custom message.
@@ -639,7 +639,7 @@ public:
    * a copy of the structure.
    * @return The new message. MT safe.
    */
-  static Glib::RefPtr<Message> create(MessageType type, const Glib::RefPtr<Object>& src, Structure& structure);
+  static Glib::RefPtr<Gst::Message> create(MessageType type, const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure);
 
   /** Create a new custom-typed message. This can be used for anything not
    * handled by other message-specific functions to pass a message to the app.
@@ -649,7 +649,7 @@ public:
    * @param src The object originating the message.
    * @return The new message. MT safe.
    */
-  static Glib::RefPtr<Message> create(MessageType type, const Glib::RefPtr<Object>& src);
+  static Glib::RefPtr<Gst::Message> create(MessageType type, const Glib::RefPtr<Gst::Object>& src);
 };
 
 /** A segment start message.
@@ -670,7 +670,7 @@ public:
    * @param position The position of the segment being played.
    * @return The new segment start message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position);
 
   /** Extracts the position and format from the segment start message.
    *
@@ -717,7 +717,7 @@ public:
    * @param position The position of the segment being done.
    * @return The new segment done message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position);
 
   /** Extracts the position and format from the segment done message.
    *
@@ -767,7 +767,7 @@ public:
    * @param duration The new duration.  
    * @return The new duration message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, Format format, gint64 position);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position);
 
   /** Extracts the duration and format from the duration message. The duration
    * might be Gst::CLOCK_TIME_NONE, which indicates that the duration has
@@ -820,7 +820,7 @@ public:
    *
    * Since 0.10.12.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
 };
 
 /** An asynchronous start message.
@@ -841,7 +841,7 @@ public:
    *
    * Since 0.10.13 
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src, bool new_base_time);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, bool new_base_time);
 
   /** Extract and return the boolean new_base_time from the async_start
    * message.
@@ -870,7 +870,7 @@ public:
    * @param src The object originating the message.  
    * @return The new async_done message. MT safe.
    */
-  static Glib::RefPtr<Message> create(const Glib::RefPtr<Object>& src);
+  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
 };
 
 } //namespace Gst

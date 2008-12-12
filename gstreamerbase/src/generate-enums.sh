@@ -15,4 +15,8 @@ PREFIX="$JHBUILD_SOURCES/gst-plugins-base"
 DIR=`dirname "$0"`
 
 enum.pl "$PREFIX"/gst-libs/gst/{audio,cdda,fft,floatcast,interfaces,netbuffer,\
-riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h > "$DIR/gstbase_enums.defs"
+riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h "$PREFIX"/gst/*/*.h \
+"$PREFIX"/ext/*/*.h > "$DIR/gstbase_enums.defs"
+
+#Patch generated file.
+(cd "$DIR" && patch -p0 < gstbase_enums.defs.patch)

@@ -64,7 +64,7 @@ class PadTemplate  : public Object
   _CLASS_GOBJECT(PadTemplate, GstPadTemplate, GST_PAD_TEMPLATE, Object, GstObject)
 
 protected:
-  _WRAP_CTOR(PadTemplate(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps), gst_pad_template_new)
+  _WRAP_CTOR(PadTemplate(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Gst::Caps>& caps), gst_pad_template_new)
 
 public:
   /** Creates a new pad template with a name according to the given template
@@ -78,10 +78,10 @@ public:
    * of.
    * @return A new Gst::PadTemplate.
    */
-  _WRAP_CREATE(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Caps>& caps)
+  _WRAP_CREATE(const Glib::ustring& name_template, PadDirection direction, PadPresence presence, const Glib::RefPtr<Gst::Caps>& caps)
 
-  _WRAP_METHOD(Glib::RefPtr<Caps> get_caps(), gst_pad_template_get_caps)
-  _WRAP_METHOD(Glib::RefPtr<const Caps> get_caps() const, gst_pad_template_get_caps, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_pad_template_get_caps)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_caps() const, gst_pad_template_get_caps, constversion)
 
   /** Get the nametemplate of the padtemplate.
    */
@@ -95,11 +95,11 @@ public:
    */
   _MEMBER_GET(presence, presence, PadPresence, GstPadPresence)
 
-#m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Pad>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GstPad*',`const Glib::RefPtr<Gst::Pad>&',`Glib::wrap($3, true)')
 
   /** This signal is fired when an element creates a pad from this template.
    */
-  _WRAP_SIGNAL(void pad_created(const Glib::RefPtr<Pad>& pad), "pad-created")
+  _WRAP_SIGNAL(void pad_created(const Glib::RefPtr<Gst::Pad>& pad), "pad-created")
 
   //gst_pad_template_pad_created emits the "pad-created" signal.  It seems
   //internal to C API (it is not found in API docs) so ignore it.

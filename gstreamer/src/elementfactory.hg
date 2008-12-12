@@ -77,12 +77,12 @@ class ElementFactory : public PluginFeature
   _CLASS_GOBJECT(ElementFactory, GstElementFactory, GST_ELEMENT_FACTORY, PluginFeature, GstPluginFeature)
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<ElementFactory> find(const Glib::ustring& name), gst_element_factory_find)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::ElementFactory> find(const Glib::ustring& name), gst_element_factory_find)
 
   //Note that name can't be NULL here, though it seems like gstreamer should allow that as for gst_element_factory_make().
-  _WRAP_METHOD(Glib::RefPtr<Element> create_named_element(const Glib::ustring& name), gst_element_factory_create)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Element> create_named_element(const Glib::ustring& name), gst_element_factory_create)
 
-  _WRAP_METHOD(static Glib::RefPtr<Element> create_element(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Element> create_element(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
   
   /** Create a new element of the type defined by the given element factory, 
    * with a guaranteed unique name consisting of the element factory name and a
@@ -91,7 +91,7 @@ public:
    * @param name Name of new element.
    * @return New Gst::Element or an empty RefPtr if unable to create element.
    */
-  static Glib::RefPtr<Element> create_element(const Glib::ustring& factory_name);
+  static Glib::RefPtr<Gst::Element> create_element(const Glib::ustring& factory_name);
 
   _WRAP_METHOD(GType get_element_type() const, gst_element_factory_get_element_type)
   _WRAP_METHOD(Glib::ustring get_long_name() const, gst_element_factory_get_longname)
@@ -105,11 +105,11 @@ public:
   _WRAP_METHOD(Glib::StringArrayHandle get_uri_protocols() const, gst_element_factory_get_uri_protocols)
 
   _WRAP_METHOD(bool has_interface(const Glib::ustring& name) const, gst_element_factory_has_interface)
-  _WRAP_METHOD(bool can_sink_caps(const Glib::RefPtr<const Caps>& caps) const, gst_element_factory_can_sink_caps)
-  _WRAP_METHOD(bool can_src_caps(const Glib::RefPtr<const Caps>& caps) const, gst_element_factory_can_src_caps)
+  _WRAP_METHOD(bool can_sink_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_sink_caps)
+  _WRAP_METHOD(bool can_src_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_src_caps)
 
-#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const PadTemplate> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const PadTemplate> > get_static_pad_templates(), gst_element_factory_get_static_pad_templates)
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::PadTemplate> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::PadTemplate> > get_static_pad_templates(), gst_element_factory_get_static_pad_templates)
 };
 
 } // namespace Gst

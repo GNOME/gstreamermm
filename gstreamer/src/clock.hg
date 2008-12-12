@@ -75,7 +75,7 @@ public:
    * Glib::RefPtr<Gst::ClockID>& id);.
    * The clock function return value is currently unused (see GstClockCallback).
    */
-  typedef sigc::slot< bool, const Glib::RefPtr<Clock>&, ClockTime, const Glib::RefPtr<ClockID>& > SlotClock;
+  typedef sigc::slot< bool, const Glib::RefPtr<Gst::Clock>&, ClockTime, const Glib::RefPtr<Gst::ClockID>& > SlotClock;
 
   _WRAP_METHOD(ClockTime get_time() const, gst_clock_id_get_time)
   _WRAP_METHOD(ClockReturn wait(ClockTimeDiff& jitter), gst_clock_id_wait)
@@ -229,12 +229,12 @@ class Clock : public Object
 public:
   _WRAP_METHOD(bool add_observation(ClockTime slave_time, ClockTime master_time, gdouble* result), gst_clock_add_observation)
   _WRAP_METHOD(bool set_master(const Clock& master_clock), gst_clock_set_master)
-  _WRAP_METHOD(Glib::RefPtr<Clock> get_master(), gst_clock_get_master)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Clock> get_master(), gst_clock_get_master)
   _WRAP_METHOD(ClockTime set_resolution(ClockTime resolution), gst_clock_set_resolution)
   _WRAP_METHOD(ClockTime get_resolution() const, gst_clock_get_resolution)
   _WRAP_METHOD(ClockTime get_time() const, gst_clock_get_time)
-  _WRAP_METHOD(Glib::RefPtr<ClockID> create_single_shot_id(ClockTime time), gst_clock_new_single_shot_id)
-  _WRAP_METHOD(Glib::RefPtr<ClockID> create_periodic_id(ClockTime start_time, ClockTime intervals), gst_clock_new_periodic_id)
+  _WRAP_METHOD(Glib::RefPtr<Gst::ClockID> create_single_shot_id(ClockTime time), gst_clock_new_single_shot_id)
+  _WRAP_METHOD(Glib::RefPtr<Gst::ClockID> create_periodic_id(ClockTime start_time, ClockTime intervals), gst_clock_new_periodic_id)
   _WRAP_METHOD(ClockTime get_internal_time() const, gst_clock_get_internal_time)
   _WRAP_METHOD(ClockTime adjust_unlocked(ClockTime internal_time), gst_clock_adjust_unlocked)
   _WRAP_METHOD(ClockTime unadjust_unlocked(ClockTime external_time), gst_clock_unadjust_unlocked)
@@ -261,16 +261,16 @@ public:
 
   /** Perform an asynchronous wait for the given Gst::ClockID.
    */
-  _WRAP_VFUNC(ClockReturn wait_async(const Glib::RefPtr<ClockID>& id), "wait_async")
+  _WRAP_VFUNC(ClockReturn wait_async(const Glib::RefPtr<Gst::ClockID>& id), "wait_async")
 
   /** Unblock a blocking or async wait operation.
    */
-  _WRAP_VFUNC(void unschedule(const Glib::RefPtr<ClockID>& id), "unschedule")
+  _WRAP_VFUNC(void unschedule(const Glib::RefPtr<Gst::ClockID>& id), "unschedule")
 
   /** Perform a blocking wait on the given Gst::ClockID and return the jitter.
    * (Since: 0.10.10)
    */
-  _WRAP_VFUNC(ClockReturn wait_jitter(const Glib::RefPtr<ClockID>& id, ClockTimeDiff& jitter), "wait_jitter")
+  _WRAP_VFUNC(ClockReturn wait_jitter(const Glib::RefPtr<Gst::ClockID>& id, ClockTimeDiff& jitter), "wait_jitter")
 };
 
 } //namespace Gst

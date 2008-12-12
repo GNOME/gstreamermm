@@ -96,13 +96,13 @@ public:
    * The message function should return true if it wants to continue to receive
    * messages, or false otherwise.
    */
-  typedef sigc::slot< bool, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessage;
+  typedef sigc::slot< bool, const Glib::RefPtr<Gst::Bus>&, const Glib::RefPtr<Gst::Message>& > SlotMessage;
 
   /** For example,
    * BusSyncReply on_bus_sync_message(const Glib::RefPtr<Gst::Bus>& bus, const
    * Glib::RefPtr<Gst::Message>& message);.
    */
-  typedef sigc::slot< BusSyncReply, const Glib::RefPtr<Bus>&, const Glib::RefPtr<Message>& > SlotMessageSync;
+  typedef sigc::slot< BusSyncReply, const Glib::RefPtr<Gst::Bus>&, const Glib::RefPtr<Gst::Message>& > SlotMessageSync;
 
   /** Creates a new Gst::Bus instance.
    *
@@ -110,16 +110,16 @@ public:
    */
   _WRAP_CREATE()
 
-  _WRAP_METHOD(bool post(const Glib::RefPtr<Message>& message), gst_bus_post)
+  _WRAP_METHOD(bool post(const Glib::RefPtr<Gst::Message>& message), gst_bus_post)
   _WRAP_METHOD(bool have_pending() const, gst_bus_have_pending)
 
-  _WRAP_METHOD(Glib::RefPtr<Message> peek(), gst_bus_peek)
-  _WRAP_METHOD(Glib::RefPtr<const Message> peek() const, gst_bus_peek)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Message> peek(), gst_bus_peek)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Message> peek() const, gst_bus_peek)
 
-  _WRAP_METHOD(Glib::RefPtr<Message> pop(), gst_bus_pop)
-  _WRAP_METHOD(Glib::RefPtr<Message> pop(MessageType message_type), gst_bus_pop_filtered)
-  _WRAP_METHOD(Glib::RefPtr<Message> pop(ClockTime timeout), gst_bus_timed_pop)
-  _WRAP_METHOD(Glib::RefPtr<Message> pop(ClockTime timeout, MessageType message_type), gst_bus_timed_pop_filtered)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Message> pop(), gst_bus_pop)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Message> pop(MessageType message_type), gst_bus_pop_filtered)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Message> pop(ClockTime timeout), gst_bus_timed_pop)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Message> pop(ClockTime timeout, MessageType message_type), gst_bus_timed_pop_filtered)
 
   _WRAP_METHOD(void set_flushing(bool flushing = true), gst_bus_set_flushing)
 
@@ -164,15 +164,15 @@ public:
   _IGNORE(gst_bus_add_signal_watch)
 
   _WRAP_METHOD(void remove_signal_watch(), gst_bus_remove_signal_watch)
-  _WRAP_METHOD(Glib::RefPtr<Message> poll(MessageType message_type, ClockTimeDiff timeout), gst_bus_poll)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Message> poll(MessageType message_type, ClockTimeDiff timeout), gst_bus_poll)
 
-#m4 _CONVERSION(`GstMessage*',`const Glib::RefPtr<Message>&', `Gst::Message::wrap($3, true)')
+#m4 _CONVERSION(`GstMessage*',`const Glib::RefPtr<Gst::Message>&', `Gst::Message::wrap($3, true)')
 
   /** A message has been posted on the bus. This signal is emitted from a
    * GSource added to the mainloop. this signal will only be emitted when there
    * is a mainloop running.
    */
-  _WRAP_SIGNAL(void message(const Glib::RefPtr<Message>& message), "message")
+  _WRAP_SIGNAL(void message(const Glib::RefPtr<Gst::Message>& message), "message")
 
   /** A message has been posted on the bus. This signal is emitted from the
    * thread that posted the message so one has to be careful with locking.
@@ -181,7 +181,7 @@ public:
    * enable_sync_message_emission().
    *
    */
-  _WRAP_SIGNAL(void sync_message(const Glib::RefPtr<Message>& message), "sync-message")
+  _WRAP_SIGNAL(void sync_message(const Glib::RefPtr<Gst::Message>& message), "sync-message")
 };
 
 } //namespace Gst

@@ -167,7 +167,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
 
         bool enumIsWrapped = false;
 
-        if (G_TYPE_IS_ENUM(propertyGType) &&
+        if ((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)) &&
           !(enumIsWrapped = is_wrapped_enum(propertyCType)))
         {
           enumWrapStatements += "_WRAP_ENUM(" + propertyCType.substr(3) + ", " +
@@ -288,10 +288,6 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
               "'', _LQ()_CCONVERT(" + paramCType + ")_RQ(), ";
             convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
               "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
-
-            convertMacros += "#m4 _CONVERSION(_LQ()_CCONVERT(" + paramCType +
-              ")_RQ(), ``" + paramCType + "'', ";
-            convertMacros += "``($3)->gobj()'')\n";
           }
 
           wrapStatement += "_CCONVERT(" + paramCType + ") " + paramName;

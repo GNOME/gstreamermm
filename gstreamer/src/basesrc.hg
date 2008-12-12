@@ -156,7 +156,7 @@ public:
 
   /** Gets the source Gst::Pad object of the element.
    */
-  _MEMBER_GET(src_pad, srcpad, Glib::RefPtr<Pad>, GstPad*)
+  _MEMBER_GET(src_pad, srcpad, Glib::RefPtr<Gst::Pad>, GstPad*)
 
   _WRAP_PROPERTY("blocksize", gulong)
   _WRAP_PROPERTY("do-timestamp", bool)
@@ -171,15 +171,15 @@ public:
   //to be specified for the callback, in which case the bool vfuncs can be made
   //to return true which would then work.
 
-#m4 _CONVERSION(`Glib::RefPtr<Caps>', `GstCaps*', `($3)->gobj()')
+#m4 _CONVERSION(`Glib::RefPtr<Gst::Caps>', `GstCaps*', `($3)->gobj()')
   /** Called to get the caps to report.
    */
-  _WRAP_VFUNC(Glib::RefPtr<Caps> get_caps(), "get_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps(), "get_caps")
 
-#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Caps>&', `Glib::wrap($3)')
+#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3)')
   ///** Notify subclass of changed output caps.
    //*/
-  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& caps), "set_caps")
+  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& caps), "set_caps")
 
   ///** Negotiated the caps with the peer.
    //*/
@@ -198,12 +198,12 @@ public:
    //*/
   //_WRAP_VFUNC(bool stop(), "stop")
 
-#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Buffer>&', `Gst::wrap($3)')
+#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Gst::wrap($3)')
 #m4 _CONVERSION(`GstClockTime*', `ClockTime&', `*($3)')
   /** Given a buffer, return the start and stop time when it should be pushed
    * out. The base class will sync on the clock using these times.
    */
-  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Buffer>& buffer, ClockTime& start, ClockTime& end), "get_times")
+  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end), "get_times")
 
 #m4 _CONVERSION(`guint64&', `guint64*', `&($3)')
 #m4 _CONVERSION(`guint64*', `guint64&', `*($3)')
@@ -222,10 +222,10 @@ public:
 
   ///** Override this to implement custom event handling.
    //*/
-  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
+  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event")
 
-//TODO: #m4 _CONVERSION(`Glib::RefPtr<Buffer>&', `GstBuffer**', `*($3)')
-  //_WRAP_VFUNC(FlowReturn create(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer), "create")
+//TODO: #m4 _CONVERSION(`Glib::RefPtr<Gst::Buffer>&', `GstBuffer**', `*($3)')
+  //_WRAP_VFUNC(FlowReturn create(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer), "create")
 
 #m4 _CONVERSION(`Segment', `GstSegment*', `($3).gobj()')
 #m4 _CONVERSION(`GstSegment*', `Segment', `Glib::wrap($3)')
@@ -235,7 +235,7 @@ public:
 
   ///** Handle a requested query.
    //*/
-  //_WRAP_VFUNC(bool query(const Glib::RefPtr<Query>& query), "query")
+  //_WRAP_VFUNC(bool query(const Glib::RefPtr<Gst::Query>& query), "query")
 
   ///** Check whether the source would support pull-based operation if it were to
    //* be opened now. This vfunc is optional, but should be implemented if
@@ -248,7 +248,7 @@ public:
   /** Called during negotiation if caps need fixating. Implement instead of
    * setting a fixate function on the source pad.
    */
-  _WRAP_VFUNC(void fixate(const Glib::RefPtr<Caps>& caps), "fixate")
+  _WRAP_VFUNC(void fixate(const Glib::RefPtr<Gst::Caps>& caps), "fixate")
 
   ///** Clear the previous unlock request. Subclasses should clear any state they
    //* set during unlock_vfunc(), such as clearing command queues.
@@ -261,7 +261,7 @@ public:
    //* default, it tries to convert the seek arguments to the configured native
    //* format and prepare a segment in that format.
    //*/
-  //_WRAP_VFUNC(bool prepare_seek_segment(const Glib::RefPtr<Event>& seek, Segment segment), "prepare_seek_segment")
+  //_WRAP_VFUNC(bool prepare_seek_segment(const Glib::RefPtr<Gst::Event>& seek, Segment segment), "prepare_seek_segment")
 };
 
 } //namespace Gst

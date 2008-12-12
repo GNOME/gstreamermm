@@ -163,11 +163,11 @@ public:
 
   /** Gives the refptr to the sink Gst::Pad object of the element.
    */
-  _MEMBER_GET(sink_pad, sinkpad, Glib::RefPtr<Pad>, GstPad*)
+  _MEMBER_GET(sink_pad, sinkpad, Glib::RefPtr<Gst::Pad>, GstPad*)
 
   /** Gives the refptr to the source Gst::Pad object of the element.
    */
-  _MEMBER_GET(src_pad, srcpad, Glib::RefPtr<Pad>, GstPad*)
+  _MEMBER_GET(src_pad, srcpad, Glib::RefPtr<Gst::Pad>, GstPad*)
 
   _WRAP_PROPERTY("qos", bool)
 
@@ -179,33 +179,33 @@ public:
   //to be specified for the callback, in which case the bool vfuncs can be made
   //to return true which would then work.
 
-#m4 _CONVERSION(`Glib::RefPtr<Caps>', `GstCaps*', `($3)->gobj()')
-#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Caps>&', `Glib::wrap($3)')
+#m4 _CONVERSION(`Glib::RefPtr<Gst::Caps>', `GstCaps*', `($3)->gobj()')
+#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3)')
   /** Optional. Given the pad in this direction and the given caps, what caps
    * are allowed on the other pad in this element ?
    */
-  _WRAP_VFUNC(Glib::RefPtr<Caps> transform_caps(PadDirection direction, const Glib::RefPtr<Caps>& caps), "transform_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> transform_caps(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps), "transform_caps")
 
   /** Optional. Given the pad in this direction and the given caps, fixate the
    * caps on the other pad.
    */
-  _WRAP_VFUNC(void fixate_caps(PadDirection direction, const Glib::RefPtr<Caps>& caps, const Glib::RefPtr<Caps>& othercaps), "fixate_caps")
+  _WRAP_VFUNC(void fixate_caps(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, const Glib::RefPtr<Gst::Caps>& othercaps), "fixate_caps")
 
   ///** Optional. Given the size of a buffer in the given direction with the
    //* given caps, calculate the size in bytes of a buffer on the other pad with
    //* the given other caps. The default implementation uses
    //* get_unit_size_vfunc() and keeps the number of units the same.
    //*/
-  //_WRAP_VFUNC(bool transform_size(PadDirection direction, const Glib::RefPtr<Caps>& caps, guint size, const Glib::RefPtr<Caps>& othercaps, guint* othersize), "transform_size")
+  //_WRAP_VFUNC(bool transform_size(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, guint size, const Glib::RefPtr<Gst::Caps>& othercaps, guint* othersize), "transform_size")
 
   ///** Required if the transform is not in-place. Get the size in bytes of one
    //* unit for the given caps.
    //*/
-  //_WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Caps>& caps, guint* size), "get_unit_size")
+  //_WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Gst::Caps>& caps, guint* size), "get_unit_size")
 
   ///** Allows the subclass to be notified of the actual caps set.
    //*/
-  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& incaps, const Glib::RefPtr<Caps>& outcaps), "set_caps")
+  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps), "set_caps")
 
   ///** Optional. Called when the element starts processing. Allows opening
    //* external resources.
@@ -220,30 +220,30 @@ public:
   ///** Optional. Event handler on the sink pad. This function should return TRUE
    //* if the base class should forward the event.
    //*/
-  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
+  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event")
 
-#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Buffer>&', `Gst::wrap($3)')
+#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Gst::wrap($3)')
   /** Required if the element does not operate in-place. Transforms one
    * incoming buffer to one outgoing buffer. The function is allowed to change
    * size/timestamp/duration of the outgoing buffer.
    */
-  _WRAP_VFUNC(FlowReturn transform(const Glib::RefPtr<Buffer>& inbuf, const Glib::RefPtr<Buffer>& outbuf), "transform")
+  _WRAP_VFUNC(FlowReturn transform(const Glib::RefPtr<Gst::Buffer>& inbuf, const Glib::RefPtr<Gst::Buffer>& outbuf), "transform")
 
   /** Required if the element operates in-place. Transform the incoming buffer
    * in-place.
    */
-  _WRAP_VFUNC(FlowReturn transform_ip(const Glib::RefPtr<Buffer>& buf), "transform_ip")
+  _WRAP_VFUNC(FlowReturn transform_ip(const Glib::RefPtr<Gst::Buffer>& buf), "transform_ip")
 
   //TODO: Should "passthrough_on_same_caps" variable in GstBaseTransformClass
   //be wrapped?
 
-//TODO: #m4 _CONVERSION(`Glib::RefPtr<Buffer>&', `GstBuffer**', `&(($3)->gobj())')
-//#m4 _CONVERSION(`GstBuffer**', `Glib::RefPtr<Buffer>&', `Gst::wrap(*($3))')
-  //_WRAP_VFUNC(FlowReturn prepare_output_buffer(const Glib::RefPtr<Buffer>& input, int size, const Glib::RefPtr<Caps>& caps, Glib::RefPtr<Buffer>&), "prepare_output_buffer")
+//TODO: #m4 _CONVERSION(`Glib::RefPtr<Gst::Buffer>&', `GstBuffer**', `&(($3)->gobj())')
+//#m4 _CONVERSION(`GstBuffer**', `Glib::RefPtr<Gst::Buffer>&', `Gst::wrap(*($3))')
+  //_WRAP_VFUNC(FlowReturn prepare_output_buffer(const Glib::RefPtr<Gst::Buffer>& input, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>&), "prepare_output_buffer")
 
   ///** Optional. Event handler on the source pad.
    //*/
-  //_WRAP_VFUNC(bool src_event(const Glib::RefPtr<Event>& event), "src_event")
+  //_WRAP_VFUNC(bool src_event(const Glib::RefPtr<Gst::Event>& event), "src_event")
 };
 
 } //namespace Gst

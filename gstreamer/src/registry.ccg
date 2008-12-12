@@ -73,20 +73,20 @@ static gboolean Registry_PluginFeature_Filter_gstreamermm_callback(GstPluginFeat
 namespace Gst
 {
 
-Glib::ListHandle< Glib::RefPtr<Plugin> >
+Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >
 Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first)
 {
   Plugin::SlotFilter* slot_copy = new Plugin::SlotFilter(filter);
   GList* list = gst_registry_plugin_filter(gobj(), &Registry_Plugin_Filter_gstreamermm_callback, first, slot_copy);
-  return Glib::ListHandle< Glib::RefPtr<Plugin> >(list, Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >(list, Glib::OWNERSHIP_DEEP);
 }
 
-Glib::ListHandle< Glib::RefPtr<PluginFeature> >
+Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >
 Registry::get_feature_list(const PluginFeature::SlotFilter& filter, bool first)
 {
   PluginFeature::SlotFilter* slot_copy = new PluginFeature::SlotFilter(filter);
   GList* list = gst_registry_feature_filter(gobj(), &Registry_PluginFeature_Filter_gstreamermm_callback, first, slot_copy);
-  return Glib::ListHandle< Glib::RefPtr<PluginFeature> >(list, Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >(list, Glib::OWNERSHIP_DEEP);
 }
 
 #ifdef USE_BINARY_REGISTRY

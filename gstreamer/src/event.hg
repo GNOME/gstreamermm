@@ -127,21 +127,21 @@ public:
    * derived one) because the derived Gst::Event classes do not correspond
    * to GType types in the GStreamer API.
    */
-  static Glib::RefPtr<Event> wrap(GstEvent* event, bool take_copy=false);
+  static Glib::RefPtr<Gst::Event> wrap(GstEvent* event, bool take_copy=false);
 
   /** Copy the event using the event specific copy function.
    * @return The Gst::Event copy.
    */
-  Glib::RefPtr<Event> copy() const;
+  Glib::RefPtr<Gst::Event> copy() const;
 
-  _WRAP_METHOD(const Structure get_structure() const, gst_event_get_structure)
+  _WRAP_METHOD(const Gst::Structure get_structure() const, gst_event_get_structure)
   _WRAP_METHOD(bool has_name(const Glib::ustring& name), gst_event_has_name)
 
   /** Checks if an event is writable.  If not, a writable copy is made and
    * returned.
    * @return A Gst::Event (possibly the same pointer) that is writable. 
    */
-  Glib::RefPtr<Event> create_writable();
+  Glib::RefPtr<Gst::Event> create_writable();
 
   /** Check if an event can travel downstream.
    */
@@ -199,7 +199,7 @@ public:
    *
    * @return A new flush start event.
    */
-  static Glib::RefPtr<Event> create();
+  static Glib::RefPtr<Gst::Event> create();
 };
 
 /**  A flush stop event.  See create() for more details.
@@ -222,7 +222,7 @@ public:
    *
    * @return A new flush stop event.
    */
-  static Glib::RefPtr<Event> create();
+  static Glib::RefPtr<Gst::Event> create();
 };
 
 /** An end of stream event. See create() for more details.
@@ -246,7 +246,7 @@ public:
    *
    * @return The new EOS event. 
    */
-  static Glib::RefPtr<Event> create();
+  static Glib::RefPtr<Gst::Event> create();
 };
 
 /** A new segment event.  See create() for more details.
@@ -296,7 +296,7 @@ public:
    *
    * Since 0.10.6
    */
-  static Glib::RefPtr<Event> create(bool update, double rate, Format format, gint64 strat, gint64 stop, gint64 position, double applied_rate=1.0);
+  static Glib::RefPtr<Gst::Event> create(bool update, double rate, Format format, gint64 strat, gint64 stop, gint64 position, double applied_rate=1.0);
 
   /** Get the update flag, rate, format, start, stop and position in the
    * newsegment event.
@@ -339,12 +339,12 @@ public:
    * @param taglist Metadata list.
    * @return A new Gst::Event.
    */
-  static Glib::RefPtr<Event> create(const TagList& taglist);
+  static Glib::RefPtr<Gst::Event> create(const Gst::TagList& taglist);
 
   /** Parses a tag event and stores the results in the given taglist location.
    * @return Metadata list.
    */
-  TagList parse();
+  Gst::TagList parse();
   _IGNORE(gst_event_parse_tag)
 };
 
@@ -366,7 +366,7 @@ public:
    * @param async Thread behavior.
    * @return A new Gst::EventBufferSize.
    */
-  static Glib::RefPtr<Event> create(Format format, gint64 minsize, gint64 maxsize, bool async);
+  static Glib::RefPtr<Gst::Event> create(Format format, gint64 minsize, gint64 maxsize, bool async);
 
   /** Get the format, minsize, maxsize and async-flag in the buffersize event.
    *
@@ -423,7 +423,7 @@ public:
    * @param timestamp The timestamp of the buffer.
    * @return A new QOS event.
    */
-  static Glib::RefPtr<Event> create(double proportion, ClockTimeDiff diff, ClockTime timestamp);
+  static Glib::RefPtr<Gst::Event> create(double proportion, ClockTimeDiff diff, ClockTime timestamp);
 
   /** Get the proportion, diff and timestamp in the qos event. See create() for
    * more information about the different QoS values.
@@ -483,7 +483,7 @@ public:
    * @param stop The value of the new stop position.
    * @return A new seek event.
    */
-  static Glib::RefPtr<Event> create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop);
+  static Glib::RefPtr<Gst::Event> create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop);
 
   /** Parses a seek event and stores the results in the given result locations.
    *
@@ -513,7 +513,7 @@ public:
    * @param structure Description of the event.
    * @return A new Gst::EventNavigation.
    */
-  static Glib::RefPtr<Event> create(Structure& structure);
+  static Glib::RefPtr<Gst::Event> create(Gst::Structure& structure);
 };
 
 /** A latency event.  See create() for more details.
@@ -535,7 +535,7 @@ public:
    *
    * Since 0.10.12 
    */
-  static Glib::RefPtr<Event> create(ClockTime latency);
+  static Glib::RefPtr<Gst::Event> create(ClockTime latency);
 
   /** Get the latency in the latency event.
    *

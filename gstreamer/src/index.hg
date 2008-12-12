@@ -87,19 +87,20 @@ public:
   _WRAP_METHOD(void set_certainty(IndexCertainty certainty), gst_index_set_certainty)
   _WRAP_METHOD(IndexCertainty set_certainty() const, gst_index_get_certainty)
   _WRAP_METHOD(bool get_writer_id(const Glib::RefPtr<Gst::Object>& writer, int& id) const, gst_index_get_writer_id)
-  _WRAP_METHOD(IndexEntry add_format(int id, Format format), gst_index_add_format)
-  _WRAP_METHOD(IndexEntry add_association(int id, AssocFlags flags, int n, const IndexAssociation& list), gst_index_add_associationv)
-  _WRAP_METHOD(IndexEntry add_id(int id, const Glib::ustring& description), gst_index_add_id)
+  _WRAP_METHOD(Gst::IndexEntry add_format(int id, Format format), gst_index_add_format)
+  _WRAP_METHOD(Gst::IndexEntry add_association(int id, AssocFlags flags, int n, const Gst::IndexAssociation& list), gst_index_add_associationv)
+  _WRAP_METHOD(Gst::IndexEntry add_id(int id, const Glib::ustring& description), gst_index_add_id)
 
   //TODO: Reorder parameters to allow default values?
-  _WRAP_METHOD(IndexEntry get_assoc_entry(int id, IndexLookupMethod method, AssocFlags flags, Format format, gint64 value) const, gst_index_get_assoc_entry)
+  _WRAP_METHOD(Gst::IndexEntry get_assoc_entry(int id, IndexLookupMethod method, AssocFlags flags, Format format, gint64 value) const, gst_index_get_assoc_entry)
 
   /** For example,
-   * bool on_filter(const Glib::RefPtr<Gst::Index>& index, IndexEntry entry);.
+   * bool on_filter(const Glib::RefPtr<Gst::Index>& index, Gst::IndexEntry
+   * entry);.
    * The filter function should return true if the entry is to be added to the
    * index, false otherwise.
    */ 
-  typedef sigc::slot<bool, const Glib::RefPtr<Index>&, IndexEntry> SlotFilter;
+  typedef sigc::slot<bool, const Glib::RefPtr<Gst::Index>&, Gst::IndexEntry> SlotFilter;
 
   /** Lets the app register a custom filter slot so that it can select what
    * entries should be stored in the index.
@@ -114,7 +115,7 @@ public:
    * The resolve function should return true if an id could be assigned to
    * writer.
    */ 
-  typedef sigc::slot<bool, const Glib::RefPtr<Index>&, const Glib::RefPtr<Gst::Object>&, Glib::ustring&> SlotResolver;
+  typedef sigc::slot<bool, const Glib::RefPtr<Gst::Index>&, const Glib::RefPtr<Gst::Object>&, Glib::ustring&> SlotResolver;
 
   /** Lets the app register a custom slot to map index ids to writer
    * descriptions.
@@ -124,7 +125,7 @@ public:
 
   /** Emitted when a new entry is added to the index.
    */
-  _WRAP_SIGNAL(void entry_added(const IndexEntry& entry), "entry-added")
+  _WRAP_SIGNAL(void entry_added(const Gst::IndexEntry& entry), "entry-added")
 
   _WRAP_PROPERTY("resolver", Gst::Index::SlotResolver)
 };

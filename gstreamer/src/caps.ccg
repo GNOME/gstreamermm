@@ -30,7 +30,7 @@ GType Caps::get_type()
   return gst_caps_get_type();
 }
 
-Glib::RefPtr<Caps> Caps::create_any()
+Glib::RefPtr<Gst::Caps> Caps::create_any()
 {
   return Glib::wrap(gst_caps_new_any());
 }
@@ -41,15 +41,15 @@ Glib::RefPtr<Caps> Caps::create_any()
   creates a GstStructure for the GstCaps and will not be called, we must create
   our own GstStructure here and append it to the GstCaps.
 */
-Glib::RefPtr<Caps> Caps::create_simple(const Glib::ustring& media_type)
+Glib::RefPtr<Gst::Caps> Caps::create_simple(const Glib::ustring& media_type)
 {
-  Glib::RefPtr<Caps> result = Glib::wrap(gst_caps_new_empty());
+  Glib::RefPtr<Gst::Caps> result = Glib::wrap(gst_caps_new_empty());
   GstStructure* gst_struct = gst_structure_empty_new(media_type.c_str());
   gst_caps_append_structure(result->gobj(), gst_struct);
   return result;
 }
 
-Glib::RefPtr<Caps> Caps::create(const Structure& structure)
+Glib::RefPtr<Gst::Caps> Caps::create(const Structure& structure)
 {
   //We take a copy because gst_caps_append_structure() wants to take ownership:
   GstStructure* copy = gst_structure_copy(structure.gobj());
@@ -90,7 +90,7 @@ Structure Caps::get_structure(guint idx) const
   value to be set instead of listing out each field in the value as would be
   done with gst_caps_set_simple()
 */
-//Glib::RefPtr<Caps>
+//Glib::RefPtr<Gst::Caps>
 void
 Caps::set_simple(const Glib::ustring& name, const Glib::ValueBase& value)
 {

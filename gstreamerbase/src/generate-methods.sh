@@ -15,4 +15,5 @@ PREFIX="$JHBUILD_SOURCES/gst-plugins-base"
 DIR=`dirname "$0"`
 
 h2def.py "$PREFIX"/gst-libs/gst/{audio,cdda,fft,floatcast,interfaces,netbuffer,\
-riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h > "$DIR/gstbase_methods.defs"
+riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h "$PREFIX"/gst/*/*.h \
+"$PREFIX"/ext/*/*.h > "$DIR/gstbase_methods.defs"

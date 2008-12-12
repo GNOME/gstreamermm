@@ -159,14 +159,14 @@ public:
   //TODO: Doesn't compile with GStreamer 0.10.20:
   //_WRAP_METHOD(ClockTime get_render_delay(), gst_base_sink_get_render_delay)
 
-  _WRAP_METHOD(Glib::RefPtr<Buffer> get_last_buffer(), gst_base_sink_get_last_buffer)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> get_last_buffer(), gst_base_sink_get_last_buffer)
 
   /** Gets the sink Gst::Pad object of the element.
    */
-  _MEMBER_GET(sink_pad, sinkpad, Glib::RefPtr<Pad>, GstPad*)
+  _MEMBER_GET(sink_pad, sinkpad, Glib::RefPtr<Gst::Pad>, GstPad*)
 
   _WRAP_PROPERTY("async", bool)
-  _WRAP_PROPERTY("last-buffer", Glib::RefPtr<Buffer>)
+  _WRAP_PROPERTY("last-buffer", Glib::RefPtr<Gst::Buffer>)
   _WRAP_PROPERTY("max-lateness", gint64)
   _WRAP_PROPERTY("preroll-queue-len", guint)
   _WRAP_PROPERTY("qos", bool)
@@ -181,25 +181,25 @@ public:
   //to be specified for the callback, in which case the bool vfuncs can be made
   //to return true which would then work.
 
-#m4 _CONVERSION(`Glib::RefPtr<Caps>', `GstCaps*', `($3)->gobj()')
+#m4 _CONVERSION(`Glib::RefPtr<Gst::Caps>', `GstCaps*', `($3)->gobj()')
   /** Called to get sink pad caps from the subclass.
    */
-  _WRAP_VFUNC(Glib::RefPtr<Caps> get_caps(), "get_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps(), "get_caps")
 
-#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Caps>&', `Glib::wrap($3)')
+#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3)')
   ///** Notify subclass of changed caps.
    //*/
-  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Caps>& caps), "set_caps")
+  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& caps), "set_caps")
 
-//TODO: #m4 _CONVERSION(`Glib::RefPtr<Buffer>&', `GstBuffer**', `*($3)')
-  //_WRAP_VFUNC(FlowReturn buffer_alloc(guint64 offset, guint size, Glib::RefPtr<Buffer>& buffer), "buffer_alloc")
+//TODO: #m4 _CONVERSION(`Glib::RefPtr<Gst::Buffer>&', `GstBuffer**', `*($3)')
+  //_WRAP_VFUNC(FlowReturn buffer_alloc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer), "buffer_alloc")
 
-#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Buffer>&', `Gst::wrap($3)')
+#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Gst::wrap($3)')
 #m4 _CONVERSION(`GstClockTime*', `ClockTime&', `*($3)')
   /** Called to get the start and end times for synchronising the passed buffer
    * to the clock.
    */
-  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Buffer>& buffer, ClockTime& start, ClockTime& end), "get_times")
+  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end), "get_times")
 
   ///** Start processing. Ideal for opening resources in the subclass.
    //*/
@@ -216,16 +216,16 @@ public:
 
   ///** Override this to handle events arriving on the sink pad.
    //*/
-  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Event>& event), "event")
+  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event")
 
   /** Called to present the preroll buffer if desired.
    */
-  _WRAP_VFUNC(FlowReturn preroll(const Glib::RefPtr<Buffer>& buffer), "preroll")
+  _WRAP_VFUNC(FlowReturn preroll(const Glib::RefPtr<Gst::Buffer>& buffer), "preroll")
 
   /** Called when a buffer should be presented or output, at the correct moment
    * if the Gst::BaseSink has been set to sync to the clock.
    */
-  _WRAP_VFUNC(FlowReturn render(const Glib::RefPtr<Buffer>& buffer), "render")
+  _WRAP_VFUNC(FlowReturn render(const Glib::RefPtr<Gst::Buffer>& buffer), "render")
 
   /** Subclasses should override this when they need to perform special
    * processing when changing to the PLAYING state asynchronously. Called with
@@ -246,7 +246,7 @@ public:
    * have ideas about what should be the default values for the caps you
    * support.
    */
-  _WRAP_VFUNC(void fixate(const Glib::RefPtr<Caps>& caps), "fixate")
+  _WRAP_VFUNC(void fixate(const Glib::RefPtr<Gst::Caps>& caps), "fixate")
 
   ///** Clear the previous unlock request. Subclasses should clear any state they
    //* set during unlock_vfunc(), such as clearing command queues.

@@ -37,10 +37,10 @@ class Interface : public Glib::Interface
   _CLASS_INTERFACE(Interface, GstImplementsInterface, GST_IMPLEMENTS_INTERFACE, GstImplementsInterface)
 
 public:
-  _WRAP_METHOD(static bool element_implements(const Glib::RefPtr<const Element>&element, GType iface_type), gst_element_implements_interface)
+  _WRAP_METHOD(static bool element_implements(const Glib::RefPtr<const Gst::Element>&element, GType iface_type), gst_element_implements_interface)
 
   template <class T_CastTo>
-  static Glib::RefPtr< ElementInterfaced<T_CastTo> > cast(const Glib::RefPtr<Element>& element);
+  static Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> > cast(const Glib::RefPtr<Gst::Element>& element);
 
   //For some reason, gmmproc thinks that all of the GstElement functions (and
   //signals) are also members of GstImplementsInterface.
@@ -104,7 +104,7 @@ public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 template <class T_CastTo>
-Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> > Interface::cast(const Glib::RefPtr<Element>& element)
+Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> > Interface::cast(const Glib::RefPtr<Gst::Element>& element)
 {
   if (element && gst_element_implements_interface(element->gobj(), T_CastTo::get_type()))
   {

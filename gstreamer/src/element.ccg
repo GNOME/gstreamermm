@@ -59,7 +59,7 @@ Glib::ustring get_name(StateChangeReturn s)
 
 } //namespace Enums
 
-Glib::RefPtr<Element> Element::link(const Glib::RefPtr<Element>& dest)
+Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
 {
   const bool result = gst_element_link(gobj(), dest->gobj());
 
@@ -69,13 +69,13 @@ Glib::RefPtr<Element> Element::link(const Glib::RefPtr<Element>& dest)
     throw std::runtime_error("failed to link: " + get_name() + "->" + dest->get_name());
 }
 
-Glib::RefPtr<Pad> Element::create_compatible_pad(const Glib::RefPtr<Pad>& pad, const Glib::RefPtr<Caps>& caps)
+Glib::RefPtr<Gst::Pad> Element::create_compatible_pad(const Glib::RefPtr<Gst::Pad>& pad, const Glib::RefPtr<Gst::Caps>& caps)
 {
   GstPad* c_pad = gst_element_get_compatible_pad(gobj(), pad->gobj(), caps->gobj());
   return Glib::wrap(c_pad); //gst_element_get_compatible_pad gives us a reference.
 }
 
-Glib::RefPtr<PadTemplate> Element::get_compatible_pad_template(const Glib::RefPtr<PadTemplate>& padtemplate)
+Glib::RefPtr<Gst::PadTemplate> Element::get_compatible_pad_template(const Glib::RefPtr<Gst::PadTemplate>& padtemplate)
 {
   GstPadTemplate* c_padtemplate = gst_element_get_compatible_pad_template(gobj(), padtemplate->gobj());
   return Glib::wrap(c_padtemplate, true /* take reference */); //gst_element_get_compatible_pad_template() does not give us a reference.
@@ -93,7 +93,7 @@ bool Element::query_duration(Format& format) const
 
 // This method is written manually because an extra ref is necessary. See
 // gst_element_send_event() docs
-bool Element::send_event(const Glib::RefPtr<Event>& event)
+bool Element::send_event(const Glib::RefPtr<Gst::Event>& event)
 {
   event->reference();
   return gst_element_send_event(gobj(), event->gobj());

@@ -1,0 +1,64 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gstreamermm/pushsrc.h>
+
+_DEFS(gstreamerbasemm,gstbase)
+
+namespace GstBase
+{
+
+/** GstBase::BaseAudioSrc — Base class for audio sources.
+ * This is the base class for audio sources. Subclasses need to implement the
+ * create_ringbuffer_vfunc vmethod. This base class will then take care of
+ * reading samples from the ringbuffer, synchronisation and flushing.
+ *
+ * Last reviewed on 2006-09-27 (0.10.12).
+ *
+ * @ingroup GstBaseBaseClasses
+ */
+class BaseAudioSrc : public Gst::PushSrc
+{
+  _CLASS_GOBJECT(BaseAudioSrc, GstBaseAudioSrc, GST_BASE_AUDIO_SRC, Gst::PushSrc, GstPushSrc)
+
+public:
+  /** Get the Gst::Clock of the GstBase::AudioSrc.
+   */
+  _MEMBER_GET(clock, clock, Glib::RefPtr<Gst::Clock>, GstClock*)
+
+  //TODO: _WRAP_METHOD(Glib::RefPtr<GstBase::RingBuffer> create_ring_buffer(), gst_base_audio_src_create_ringbuffer)
+
+  _WRAP_METHOD(void set_provide_clock(bool provide), gst_base_audio_src_set_provide_clock)
+  _WRAP_METHOD(bool get_provide_clock(), gst_base_audio_src_get_provide_clock)
+
+  _WRAP_PROPERTY("actual-buffer-time", gint64)
+  _WRAP_PROPERTY("actual-latency-time", gint64)
+  _WRAP_PROPERTY("buffer-time", gint64)
+  _WRAP_PROPERTY("latency-time", gint64)
+  _WRAP_PROPERTY("provide-clock", bool)
+
+  //TODO: Wrap this property when bug #564206 is resolved.
+  //_WRAP_PROPERTY("slave-method", BaseAudioSrcSlaveMethod)
+
+  //TODO: Wrap vfuncs.
+};
+
+} // namespace GstBase
