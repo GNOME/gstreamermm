@@ -31,6 +31,8 @@
 #include <gstreamermm/element.h>
 #include <gstreamermm/pipeline.h>
 #include <gstreamermm/bus.h>
+#include <gstreamerbasemm/playbin2.h>
+#include <gstreamerbasemm/ximagesink.h>
 
 class PlayerWindow : public Gtk::Window
 {
@@ -39,7 +41,7 @@ public:
    * @param playbin The pipeline that can play media files.
    * @param video_sink The video sink to use to display stream video (if any).
    */
-  PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& video_sink);
+  PlayerWindow(const Glib::RefPtr<GstBase::PlayBin2>& playbin, const Glib::RefPtr<GstBase::XImageSink>& video_sink);
   virtual ~PlayerWindow();
 
 protected:
@@ -73,8 +75,8 @@ protected:
   Gtk::Button m_forward_button;
   Gtk::Button m_open_button;
 
-  Glib::RefPtr<Gst::Pipeline> m_play_bin;
-  Glib::RefPtr<Gst::Element> m_video_sink;
+  Glib::RefPtr<GstBase::PlayBin2> m_play_bin;
+  Glib::RefPtr<GstBase::XImageSink> m_video_sink;
   sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;
@@ -82,5 +84,3 @@ protected:
 };
 
 #endif /* _PLAYERWINDOW_H */
-
- 

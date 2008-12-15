@@ -36,7 +36,8 @@
 #include <iomanip>
 #include "player_window.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Pipeline>& playbin, const Glib::RefPtr<Gst::Element>& video_sink)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<GstBase::PlayBin2>& playbin,
+  const Glib::RefPtr<GstBase::XImageSink>& video_sink)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button(Gtk::Stock::MEDIA_PLAY),
@@ -361,8 +362,7 @@ void PlayerWindow::on_button_open()
     working_dir = chooser.get_current_folder();
 
     // Set uri property on the playbin.
-    // TODO: Create a PlayBin class that we can dynamic_cast<> to, so we can use property_uri()?
-    m_play_bin->set_property("uri", chooser.get_uri());
+    m_play_bin->property_uri() = chooser.get_uri();
 
     // Resize m_video_area and window to minimum when opening a file
     m_video_area.set_size_request(0, 0);
