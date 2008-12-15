@@ -1,5 +1,5 @@
 
-SUBDIRS=tools gstreamer gstreamerbase tests @EXAMPLE_SUBDIR@ @DEMO_SUBDIR@ @DOCS_SUBDIR@
+SUBDIRS=tools gstreamer gstreamerbase @EXAMPLE_SUBDIR@ tests @DEMO_SUBDIR@ @DOCS_SUBDIR@
 DIST_SUBDIRS=$(SUBDIRS) scripts
 
 EXTRA_DIST= build_shared/Makefile_build.am_fragment \
