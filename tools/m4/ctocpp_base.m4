@@ -78,6 +78,7 @@ _CCONVERSION(`gulong',`unsigned long')
 _CCONVERSION(`gint64',`gint64')
 _CCONVERSION(`guint64',`guint64')
 _CCONVERSION(`gfloat',`float')
+_CCONVERSION(`gdouble',`double')
 
 #String C to C++ translations
 _CCONVERSION(`gchararray',`const Glib::ustring&',`Glib::ustring')

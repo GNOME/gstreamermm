@@ -36,7 +36,7 @@ static Glib::ustring cParentTypeName;
 static Glib::ustring cppTypeName;
 static Glib::ustring cppParentTypeName;
 static Glib::ustring castMacro;
-static Glib::ustring includeRoot;
+static Glib::ustring parentInclude;
 static Glib::ustring parentNameSpace;
 
 GType type = 0;
@@ -98,12 +98,19 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
   if (iter != typeName.end())
     result.push_back(*iter);
 
-  for ( ++iter; iter != typeName.end(); ++iter)
+  int encountered_upper = 1; // The first char (above) should be upper
+
+  for (++iter; iter != typeName.end(); ++iter)
   {
     if (g_unichar_isupper(*iter))
     {
-      result.push_back('_');
+      if (!encountered_upper || encountered_upper > 1)
+        result.push_back('_');
+      ++encountered_upper;
     }
+    else
+      encountered_upper = 0;
+
     result.push_back(g_unichar_toupper(*iter));
   }
 
@@ -321,7 +328,7 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
 {
   std::cout << "include(ctocpp_base.m4)dnl" << std::endl;
   std::cout << "changecom()dnl" << std::endl;
-  std::cout << "#include <" << includeRoot << "/" <<
+  std::cout << "#include <" << parentInclude << "/" <<
     cppParentTypeName.lowercase() << ".h>" << std::endl;
 
   std::cout << includeMacroCalls;
@@ -373,14 +380,17 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
 void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   const Glib::ustring& cClassSignalDeclarations)
 {
-  std::cout << "_PINCLUDE(" << includeRoot << "/private/" <<
+  std::cout << "_PINCLUDE(" << parentInclude << "/private/" <<
     cppParentTypeName.lowercase() << "_p.h)" << std::endl << std::endl;
 
-  std::cout << "struct _" << cTypeName << "Class" << std::endl;
-  std::cout << "{" << std::endl;
-  std::cout << "  " << cParentTypeName << "Class parent_class;" << std::endl;
-  std::cout << cClassSignalDeclarations;
-  std::cout << "};" << std::endl << std::endl;
+  if (!cClassSignalDeclarations.empty())
+  {
+    std::cout << "struct _" << cTypeName << "Class" << std::endl;
+    std::cout << "{" << std::endl;
+    std::cout << "  " << cParentTypeName << "Class parent_class;" << std::endl;
+    std::cout << cClassSignalDeclarations;
+    std::cout << "};" << std::endl << std::endl;
+  }
 
   Glib::ustring getTypeName = castMacro.lowercase() + "_get_type";
 
@@ -446,8 +456,8 @@ int main(int argc, char* argv[])
     { NULL }
   };
 
-  GOptionContext* gContext = g_option_context_new("<plugin name>");
-  g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's gmmproc files to be processed by gmmproc for wrapping in gstreamermm.  Use the same syntax for the plugin name as in gst-inspect.");
+  GOptionContext* gContext = g_option_context_new("<plugin name | typename>");
+  g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  Use the same syntax for the plugin name as in\ngst-inspect.");
 
   g_option_context_add_main_entries(gContext, optionEntries, NULL);
   g_option_context_add_group(gContext, gst_init_get_option_group());
@@ -479,18 +489,19 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  if (!nmspace || !defsFile || !target)
+  Glib::ustring gTypeName;
+
+  pluginName = argv[1];
+
+  if (pluginName.substr(0,3) == "Gst")
   {
-    std::cout << "A namespace, a default defs file and a target directory "
-      "must be supplied" << std::endl << "with the --namespace, --main-defs "
-      "and --target options (run with -? option for " << std::endl <<
-      "details)." << std::endl;
-    return -1;
+    gTypeName = pluginName;
+    pluginName = pluginName.substr(3).lowercase();
   }
 
   GstElementFactory* factory = 0;
 
-  factory = gst_element_factory_find(argv[1]);
+  factory = gst_element_factory_find(pluginName.c_str());
 
   // Make sure that the feature is actually loaded:
   if (factory)
@@ -501,15 +512,36 @@ int main(int argc, char* argv[])
     g_object_unref(factory);
     factory = GST_ELEMENT_FACTORY(loaded_feature);
     type = gst_element_factory_get_element_type(factory);
+  }
+  else
+  {
+    type = g_type_from_name(gTypeName.c_str());
+  }
 
-    pluginName = argv[1];
+  if (type)
+  {
+    if (suggestHg)
+    {
+      std::cout << pluginName << ".hg" << std::endl;
+      return 0;
+    }
+
+    if (!nmspace || !defsFile || !target)
+    {
+      std::cout << "A namespace, a default defs file and a target directory "
+        "must be supplied" << std::endl << "with the --namespace, --main-defs "
+        "and --target options (run with -? option for " << std::endl <<
+        "details)." << std::endl;
+      return -1;
+    }
+
     cTypeName = g_type_name(type);
     cParentTypeName = g_type_name(g_type_parent(type));
     cppTypeName = cTypeName.substr(3);
     cppParentTypeName = cParentTypeName.substr(3);
     castMacro = get_cast_macro(cTypeName);
 
-    if (cppParentTypeName.compare("BaseSsrc") == 0 ||
+    if (cppParentTypeName.compare("BaseSrc") == 0 ||
       cppParentTypeName.compare("BaseSink") == 0 ||
       cppParentTypeName.compare("BaseTransform") == 0 ||
       cppParentTypeName.compare("PushSrc") == 0 ||
@@ -517,18 +549,16 @@ int main(int argc, char* argv[])
       cppParentTypeName.compare("Bin") == 0 ||
       cppParentTypeName.compare("Element") == 0)
     {
-      includeRoot = "gstreamermm";
+      parentInclude = "gstreamermm";
       parentNameSpace = "Gst";
     }
     else
     {
-      includeRoot = target;
+      parentInclude = target;
       parentNameSpace = nmspace;
     }
 
-    if (suggestHg)
-      std::cout << pluginName << ".hg" << std::endl;
-    else if (hgFile || ccgFile)
+    if (hgFile || ccgFile)
     {
       Glib::ustring propertyWrapStatements;
       Glib::ustring includeMacroCalls;
@@ -554,8 +584,6 @@ int main(int argc, char* argv[])
           cClassSignalDeclarations);
       }
     }
-
-    g_object_unref(factory);
   }
   else
   {
@@ -570,6 +598,9 @@ int main(int argc, char* argv[])
         std::endl;
     }
   }
+
+  if (factory)
+    g_object_unref(factory);
 
   return 0;
 }

@@ -36,7 +36,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`Glib::unwrap($3)')
 
 #Buffer
-_CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`wrap($3)')
+_CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Gst::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>(Glib::unwrap($3))')
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `Glib::unwrap($3)')

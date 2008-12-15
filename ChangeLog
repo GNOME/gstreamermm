@@ -1,3 +1,45 @@
+2008-12-14  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* gstreamerbase/src/Makefile_list_of_hg.am_fragment:
+	* gstreamerbase/src/audiofilter.ccg:
+	* gstreamerbase/src/audiofilter.hg:
+	* gstreamerbase/src/videosink.ccg:
+	* gstreamerbase/src/videosink.hg: Added GstBase::AudioFilter and
+	GstBase::VideoSink base classes (from which some plug-ins derive) and
+	a list of most of the gst-plugins-base plug-ins to be generated (the
+	rest are TODO's to be done bit by bit).
+	* configure.ac:
+	* gstreamerbase/gstreamerbasemm-0.10.pc.in: Added gstreamer-video-0.10
+	to list of package dependencies of gstreamerbasemm and to the
+	gstreamerbasemm pk-config file (needed for GstBase::VideoSink).
+	* gstreamerbase/src/audiosink.hg:
+	* gstreamerbase/src/audiosrc.hg: Added GStreamer includes so plug-ins
+	that include the .h files have access to the *Class structures.
+
+	* tools/extra_defs_gen/generate_defs_gstbase.cc:
+	* gstreamerbase/src/gstbase_signals.defs: Rewrote
+	genereate_defs_gstbase tool to include GstPlayBaseBin (base class of
+	GstPlayBin) so its properties can be wrapped.
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Renamed global
+	includeRoot to more appropriate parentInclude (the include of the
+	parent class); Rewrote get_cast_macro() to use a similar algorithm for
+	inserting the underscore ('_') in the given type name as gmmproc does
+	more or less (just a guess, but the generate *_get_type() functions of
+	the plug-in specific enums in the *.ccg files have names that gmmproc
+	is happy with).  Made *Class definition in *.ccg files optional based
+	on whether there are wrapped signals in plugin.  Modified so that the
+	plug-in name can also be a type name (e.g. GstPipeline, etc.) and so
+	that when the --suggest-hg option is used the other options like
+	--namespace, and --target are not needed.
+
+	* tools/m4/convert_gst.m4: Fixed GstBuffer conversion to work with
+	gstreamerbase branch.
+
+	* tools/m4/ctocpp_base.m4: Added gdouble C to C++ translation.
+	* tools/m4/ctocpp.m4: Added GstElement and GstTagList C to C++
+	translation (for plug-in generation).
+
 2008-12-11  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* tools/m4/convert_gst.m4:

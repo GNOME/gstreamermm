@@ -50,6 +50,9 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_COLOR_BALANCE_CHANNEL)
             << get_defs(GST_TYPE_X_OVERLAY)
 
+   // Base class of playbin plugin:
+            << get_defs(g_type_from_name("GstPlayBaseBin"))
+
   // gst-plugins-base (GStreamer base) plugin types:
             << get_plugin_defs("adder")
             << get_plugin_defs("alsamixer")
