@@ -383,6 +383,7 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "_PINCLUDE(" << parentInclude << "/private/" <<
     cppParentTypeName.lowercase() << "_p.h)" << std::endl << std::endl;
 
+  //Only output ObjectClass with signal declarations if there are signals:
   if (!cClassSignalDeclarations.empty())
   {
     std::cout << "struct _" << cTypeName << "Class" << std::endl;
