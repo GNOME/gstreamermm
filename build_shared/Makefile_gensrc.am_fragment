@@ -67,8 +67,7 @@ EXTRA_DIST	= Makefile_list_of_hg.am_fragment $(files_defs) \
 
 CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) \
 	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc \
-	$(foreach plugin,$(files_plugin_hg:.hg=), \
-	$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
+	$(files_plugin_stamp)
 
 
 # This is to generate plugin .hg files.  A few variables are defined (in make
@@ -77,14 +76,8 @@ CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) \
 # produces the final .hg file.
 $(files_plugin_hg_with_path): $(generate_plugin_gmmproc_file_path) \
 	$(tools_plugin_m4) $(files_defs)
-	$(eval plugin_hg_without_path = $$(notdir $@))
-	$(eval plugin_mktemp_output = \
-		$$(shell mktemp -t $$(plugin_hg_without_path).XXXXX))
-	$(eval plugin_hg_tmp_file = $(plugin_mktemp_output))
 	$(run_generate_plugin_gmmproc_file) --hg \
-		$(subst .hg,,$(plugin_hg_without_path)) >  $(plugin_hg_tmp_file)
-	$(M4) -I $(tools_dir_m4) $(plugin_hg_tmp_file) > $@
-	rm -f $(plugin_hg_tmp_file)
+		$(subst .hg,,$(notdir $@)) | $(M4) -I $(tools_dir_m4) > $@
 
 # This is to generate plugin .ccg files.
 $(files_plugin_hg_with_path:.hg=.ccg): $(generate_plugin_gmmproc_file_path) \
@@ -131,12 +124,14 @@ create-stamp-dir: $(stamp_plugin_dir)
 	@(test -d $(destdir_stamp_dir) || mkdir $(destdir_stamp_dir))
 
 if MAINTAINER_MODE
-all-local: create-stamp-dir $(files_stamp) $(files_plugin_stamp) \
+all-local: create-stamp-dir $(files_stamp) $(files_plugin_hg_with_path) \
+	$(files_plugin_hg_with_path:.hg=.ccg) $(files_plugin_stamp) \
 	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc \
 	$(destdir_files_stamp)
 else
-BUILT_SOURCES = $(foreach plugin,$(files_plugin_hg:.hg=),\
-		$(stamp_plugin_dir)/stamp-$(plugin)-plugin)
+BUILT_SOURCES = $(files_plugin_hg_with_path) \
+		$(files_plugin_hg_with_path:.hg=.ccg) $(files_plugin_stamp) \
+		$(gensrc_destdir)/wrap_init.cc
 endif
 
 maintainer-clean-local:

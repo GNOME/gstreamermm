@@ -1,3 +1,22 @@
+2008-12-16  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* build_shared/Makefile_build_gensrc.am_fragment:
+	* gstreamer/gstreamermm/Makefile.am:
+	* gstreamerbase/gstreamerbasemm/Makefile.am: Removed wrap_init.cc from
+	distribution because it depends on plug-in generation and should be
+	generated in build system.
+
+	* build_shared/Makefile_gensrc.am_fragment: Used variable
+	$(files_plugin_stamp) instead of complex $(foreach ...) expression in
+	CLEANFILES and in BUILT_SOURCES.  Modified plugin .hg generation to
+	pipe the output of generate_plugin_gmmproc_file to m4 instead of using
+	$(eval ...) to define variables for temporary files.  Modified build
+	process to generate plug-in .hg and .ccg files and then run through
+	gmmproc.  Added wrap_init.cc to BUILT_SOURCES because it is now not
+	distributed.
+
+	* tools/m4/Makefile.am: Added ctocpp*.m4 to distribution.
+
 2008-12-15  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* gstreamerbase/src/audiofilter.hg:
