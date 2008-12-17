@@ -148,6 +148,15 @@
   (construct-only #f)
 )
 
+(define-property render-delay
+  (of-object "GstBaseAudioSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property buffer-time
   (of-object "GstBaseAudioSink")
   (prop-type "GParamInt64")
@@ -363,6 +372,15 @@
   (of-object "GstAudioSink")
   (prop-type "GParamUInt")
   (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property render-delay
+  (of-object "GstAudioSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -828,6 +846,15 @@
   (construct-only #f)
 )
 
+(define-property render-delay
+  (of-object "GstAlsaSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property buffer-time
   (of-object "GstAlsaSink")
   (prop-type "GParamInt64")
@@ -1039,10 +1066,10 @@
   (construct-only #f)
 )
 
-;; From GstSpeexResample
+;; From GstAudioresample
 
 (define-property name
-  (of-object "GstSpeexResample")
+  (of-object "GstAudioresample")
   (prop-type "GParamString")
   (docs "The name of the object")
   (readable #t)
@@ -1051,7 +1078,7 @@
 )
 
 (define-property qos
-  (of-object "GstSpeexResample")
+  (of-object "GstAudioresample")
   (prop-type "GParamBoolean")
   (docs "Handle Quality-of-Service events")
   (readable #t)
@@ -1059,19 +1086,10 @@
   (construct-only #f)
 )
 
-(define-property quality
-  (of-object "GstSpeexResample")
-  (prop-type "GParamInt")
-  (docs "Resample quality with 0 being the lowest and 10 being the best")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 (define-property filter-length
-  (of-object "GstSpeexResample")
+  (of-object "GstAudioresample")
   (prop-type "GParamInt")
-  (docs "DEPRECATED, DON'T USE THIS! Length of the resample filter")
+  (docs "Length of the resample filter")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1173,6 +1191,134 @@
   (of-object "GstAudioTestSrc")
   (prop-type "GParamInt64")
   (docs "An offset added to timestamps set on buffers (in ns)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstCdParanoiaSrc
+
+(define-signal transport-error
+  (of-object "GstCdParanoiaSrc")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("gint" "p0")
+  )
+)
+
+(define-signal uncorrected-error
+  (of-object "GstCdParanoiaSrc")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("gint" "p0")
+  )
+)
+
+(define-property name
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamULong")
+  (docs "Size in bytes to read per buffer (-1 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property typefind
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamBoolean")
+  (docs "Run typefind before negotiating")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property do-timestamp
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamBoolean")
+  (docs "Apply current stream time to buffers")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property mode
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamEnum")
+  (docs "Mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property device
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamString")
+  (docs "CD device location")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property track
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamUInt")
+  (docs "Track")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property read-speed
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamInt")
+  (docs "Read from device at specified speed")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property paranoia-mode
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamFlags")
+  (docs "Type of checking to perform")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property search-overlap
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamInt")
+  (docs "Force minimum overlap search during verification to n sectors")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property generic-device
+  (of-object "GstCdParanoiaSrc")
+  (prop-type "GParamString")
+  (docs "Use specified generic scsi device")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1584,6 +1730,338 @@
   (construct-only #f)
 )
 
+;; From GstGioSink
+
+(define-property name
+  (of-object "GstGioSink")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property preroll-queue-len
+  (of-object "GstGioSink")
+  (prop-type "GParamUInt")
+  (docs "Number of buffers to queue during preroll")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstGioSink")
+  (prop-type "GParamBoolean")
+  (docs "Sync on the clock")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-lateness
+  (of-object "GstGioSink")
+  (prop-type "GParamInt64")
+  (docs "Maximum number of nanoseconds that a buffer can be late before it is dropped (-1 unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstGioSink")
+  (prop-type "GParamBoolean")
+  (docs "Generate Quality-of-Service events upstream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property async
+  (of-object "GstGioSink")
+  (prop-type "GParamBoolean")
+  (docs "Go asynchronously to PAUSED")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property ts-offset
+  (of-object "GstGioSink")
+  (prop-type "GParamInt64")
+  (docs "Timestamp offset in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-buffer
+  (of-object "GstGioSink")
+  (prop-type "GParamSpecMiniObject")
+  (docs "The last buffer received in the sink")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstGioSink")
+  (prop-type "GParamUInt")
+  (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property render-delay
+  (of-object "GstGioSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property location
+  (of-object "GstGioSink")
+  (prop-type "GParamString")
+  (docs "URI location to write to")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property file
+  (of-object "GstGioSink")
+  (prop-type "GParamObject")
+  (docs "GFile to write to")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstGioSrc
+
+(define-property name
+  (of-object "GstGioSrc")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstGioSrc")
+  (prop-type "GParamULong")
+  (docs "Size in bytes to read per buffer (-1 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstGioSrc")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property typefind
+  (of-object "GstGioSrc")
+  (prop-type "GParamBoolean")
+  (docs "Run typefind before negotiating")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property do-timestamp
+  (of-object "GstGioSrc")
+  (prop-type "GParamBoolean")
+  (docs "Apply current stream time to buffers")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property location
+  (of-object "GstGioSrc")
+  (prop-type "GParamString")
+  (docs "URI location to read from")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property file
+  (of-object "GstGioSrc")
+  (prop-type "GParamObject")
+  (docs "GFile to read from")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstGioStreamSink
+
+(define-property name
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property preroll-queue-len
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamUInt")
+  (docs "Number of buffers to queue during preroll")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamBoolean")
+  (docs "Sync on the clock")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-lateness
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamInt64")
+  (docs "Maximum number of nanoseconds that a buffer can be late before it is dropped (-1 unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamBoolean")
+  (docs "Generate Quality-of-Service events upstream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property async
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamBoolean")
+  (docs "Go asynchronously to PAUSED")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property ts-offset
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamInt64")
+  (docs "Timestamp offset in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-buffer
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamSpecMiniObject")
+  (docs "The last buffer received in the sink")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamUInt")
+  (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property render-delay
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property stream
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamObject")
+  (docs "Stream to write to")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstGioStreamSrc
+
+(define-property name
+  (of-object "GstGioStreamSrc")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstGioStreamSrc")
+  (prop-type "GParamULong")
+  (docs "Size in bytes to read per buffer (-1 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstGioStreamSrc")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property typefind
+  (of-object "GstGioStreamSrc")
+  (prop-type "GParamBoolean")
+  (docs "Run typefind before negotiating")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property do-timestamp
+  (of-object "GstGioStreamSrc")
+  (prop-type "GParamBoolean")
+  (docs "Apply current stream time to buffers")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property stream
+  (of-object "GstGioStreamSrc")
+  (prop-type "GParamObject")
+  (docs "Stream to read from")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstGnomeVFSSink
 
 (define-signal allow-overwrite
@@ -1671,6 +2149,15 @@
   (of-object "GstGnomeVFSSink")
   (prop-type "GParamUInt")
   (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property render-delay
+  (of-object "GstGnomeVFSSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1975,6 +2462,15 @@
   (of-object "GstMultiFdSink")
   (prop-type "GParamUInt")
   (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property render-delay
+  (of-object "GstMultiFdSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2801,6 +3297,15 @@
   (of-object "GstTCPServerSink")
   (prop-type "GParamUInt")
   (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property render-delay
+  (of-object "GstTCPServerSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4109,6 +4614,15 @@
   (construct-only #f)
 )
 
+(define-property render-delay
+  (of-object "GstXImageSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property display
   (of-object "GstXImageSink")
   (prop-type "GParamString")
@@ -4158,6 +4672,242 @@
   (of-object "GstXImageSink")
   (prop-type "GParamBoolean")
   (docs "When enabled, the current frame will always be drawn in response to X Expose events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstXvImageSink
+
+(define-property name
+  (of-object "GstXvImageSink")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property preroll-queue-len
+  (of-object "GstXvImageSink")
+  (prop-type "GParamUInt")
+  (docs "Number of buffers to queue during preroll")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "Sync on the clock")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-lateness
+  (of-object "GstXvImageSink")
+  (prop-type "GParamInt64")
+  (docs "Maximum number of nanoseconds that a buffer can be late before it is dropped (-1 unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property qos
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "Generate Quality-of-Service events upstream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property async
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "Go asynchronously to PAUSED")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property ts-offset
+  (of-object "GstXvImageSink")
+  (prop-type "GParamInt64")
+  (docs "Timestamp offset in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-buffer
+  (of-object "GstXvImageSink")
+  (prop-type "GParamSpecMiniObject")
+  (docs "The last buffer received in the sink")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property blocksize
+  (of-object "GstXvImageSink")
+  (prop-type "GParamUInt")
+  (docs "Size in bytes to pull per buffer (0 = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property render-delay
+  (of-object "GstXvImageSink")
+  (prop-type "GParamUInt64")
+  (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property contrast
+  (of-object "GstXvImageSink")
+  (prop-type "GParamInt")
+  (docs "The contrast of the video")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property brightness
+  (of-object "GstXvImageSink")
+  (prop-type "GParamInt")
+  (docs "The brightness of the video")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property hue
+  (of-object "GstXvImageSink")
+  (prop-type "GParamInt")
+  (docs "The hue of the video")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property saturation
+  (of-object "GstXvImageSink")
+  (prop-type "GParamInt")
+  (docs "The saturation of the video")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property display
+  (of-object "GstXvImageSink")
+  (prop-type "GParamString")
+  (docs "X Display name")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property synchronous
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "When enabled, runs the X display in synchronous mode. (used only for debugging)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property pixel-aspect-ratio
+  (of-object "GstXvImageSink")
+  (prop-type "GParamString")
+  (docs "The pixel aspect ratio of the device")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property force-aspect-ratio
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "When enabled, scaling will respect original aspect ratio")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property handle-events
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "When enabled, XEvents will be selected and handled")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property device
+  (of-object "GstXvImageSink")
+  (prop-type "GParamString")
+  (docs "The number of the video adaptor")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property device-name
+  (of-object "GstXvImageSink")
+  (prop-type "GParamString")
+  (docs "The name of the video adaptor")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property handle-expose
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "When enabled, the current frame will always be drawn in response to X Expose events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property double-buffer
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "Whether to double-buffer the output")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property autopaint-colorkey
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "Whether to autofill overlay with colorkey")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property colorkey
+  (of-object "GstXvImageSink")
+  (prop-type "GParamInt")
+  (docs "Color to use for the overlay mask")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property draw-borders
+  (of-object "GstXvImageSink")
+  (prop-type "GParamBoolean")
+  (docs "Draw black borders to fill unused area in force-aspect-ratio mode")
   (readable #t)
   (writable #t)
   (construct-only #f)

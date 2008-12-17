@@ -1,0 +1,75 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+ 
+#include <gst/cdda/gstcddabasesrc.h>
+#include <gstreamermm/pushsrc.h>
+
+_DEFS(gstreamerbasemm,gstbase)
+
+namespace GstBase
+{
+
+//TODO: File a bug about enum not public:
+//_WRAP_ENUM(CddaBaseSrcMode,GstCddaBaseSrcMode)
+
+/** GstBase::CddaBaseSrc — Base class for CD digital audio (CDDA) sources.
+ * Provides a base class for CDDA sources, which handles things like seeking,
+ * querying, discid calculation, tags, and buffer timestamping.
+ *
+ * GstBase::CddaBaseSrc registers two Gst::Formats of its own, namely the
+ * "track" format and the "sector" format. Applications will usually only find
+ * the "track" format interesting. You can retrieve that Gst::Format for use in
+ * seek events or queries with Gst::get_format("track").
+ *
+ * In order to query the number of tracks, for example, an application would
+ * set the CDDA source element to READY or PAUSED state and then query the the
+ * number of tracks via Gst::Element::query_duration() using the track format
+ * acquired above. Applications can query the currently playing track in the
+ * same way.
+ *
+ * Alternatively, applications may retrieve the currently playing track and the
+ * total number of tracks from the taglist that will be posted on the bus
+ * whenever the CD is opened or the currently playing track changes. The
+ * taglist will contain Gst::Tag::TRACK_NUMBER and Gst::Tag::TRACK_COUNT tags.
+ *
+ * Applications playing back CD audio using playbin and cdda://n URIs should
+ * issue a seek command in track format to change between tracks, rather than
+ * setting a new cdda://n+1 URI on playbin (as setting a new URI on playbin
+ * involves closing and re-opening the CD device, which is much much slower).
+ *
+ * CDDA sources will automatically emit a number of tags, details about which
+ * can be found in the libgsttag documentation. Those tags are:
+ * Gst::Tag::CDDA_CDDB_DISCID, Gst::Tag::CDDA_CDDB_DISCID_FULL,
+ * Gst::Tag::CDDA_MUSICBRAINZ_DISCID, Gst::Tag::CDDA_MUSICBRAINZ_DISCID_FULL,
+ * among others.
+ *
+ * @ingroup GstBaseBaseClasses
+ */
+class CddaBaseSrc : public Gst::PushSrc
+{
+  _CLASS_GOBJECT(CddaBaseSrc, GstCddaBaseSrc, GST_CDDA_BASE_SRC, Gst::PushSrc, GstPushSrc)
+
+public:
+  //TODO: _WRAP_METHOD(bool add_track(...), gst_cdda_base_src_add_track)
+  //TODO: Wrap vfuncs.
+};
+
+} // namespace GstBase

@@ -89,6 +89,27 @@ static const char* wrappedEnums[WRAPPED_ENUMS_SIZE] =
   "GstURIType"
 };
 
+// To add a base class that is already wrapped to the list of wrapped base
+// classes, add alphabetically below and increment WRAPPED_BASE_CLASSES_SIZE.
+static const int WRAPPED_BASE_CLASSES_SIZE = 14;
+static const char* wrappedBaseClasses[WRAPPED_BASE_CLASSES_SIZE] =
+{
+  "GstAudioFilter",
+  "GstAudioSink",
+  "GstAudioSrc",
+  "GstBaseAudioSink",
+  "GstBaseAudioSrc",
+  "GstBaseSink",
+  "GstBaseSrc",
+  "GstBaseTransform",
+  "GstBin",
+  "GstCddaParanoiaSrc",
+  "GstElement",
+  "GstPipeline",
+  "GstPushSrc",
+  "GstVideoSink"
+};
+
 Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 {
   Glib::ustring result;
@@ -127,6 +148,31 @@ bool is_wrapped_enum(const Glib::ustring& cTypeName)
   }
 
   return false;
+}
+
+bool is_wrapped_base_class(const Glib::ustring& cTypeName)
+{
+  for (int i = 0; i < WRAPPED_BASE_CLASSES_SIZE &&
+    cTypeName.compare(wrappedBaseClasses[i]) >= 0; i++)
+  {
+    if (cTypeName.compare(wrappedBaseClasses[i]) == 0)
+      return true;
+  }
+
+  return false;
+}
+
+bool is_plugin(const Glib::ustring& cTypeName)
+{
+  GstElementFactory* fact = gst_element_factory_find(
+    cTypeName.substr(3).lowercase().c_str());
+
+  bool const result = (fact != 0);
+
+  if (fact)
+    g_object_unref(fact);
+
+  return result;
 }
 
 void get_property_wrap_statements(Glib::ustring& wrapStatements,
@@ -538,6 +584,14 @@ int main(int argc, char* argv[])
 
     cTypeName = g_type_name(type);
     cParentTypeName = g_type_name(g_type_parent(type));
+
+    while (!cParentTypeName.empty() &&
+      !is_wrapped_base_class(cParentTypeName) && !is_plugin(cParentTypeName))
+    {
+      cParentTypeName =
+        g_type_name(g_type_parent(g_type_from_name(cParentTypeName.c_str())));
+    }
+
     cppTypeName = cTypeName.substr(3);
     cppParentTypeName = cParentTypeName.substr(3);
     castMacro = get_cast_macro(cTypeName);

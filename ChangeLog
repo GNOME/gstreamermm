@@ -1,5 +1,46 @@
 2008-12-16  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	* gstreamerbase/src/Makefile_list_of_hg.am_fragment:
+	* gstreamerbase/src/cddabasesrc.ccg:
+	* gstreamerbase/src/cddabasesrc.hg: Added cdparanoiasrc giosink giosrc
+	giostreamsink giostreamsrc xvimagesink plug-ins.  They did not exist in
+	jhbuild environment because gst-plugins-base module must be be built
+	with '--enable-experimental' and certain dependencies did not exist on
+	my system (for cdparanoiasrc and xvimagesink plug-ins).  Also added
+	base class CddaBaseSrc from which cdparanoiasrc plug-in derives.
+	* tools/m4/ctocpp.m4: Added C to C++ translations for gio types.
+	* gstreamerbase/gstreamerbasemm.h: Added base classes to includes.
+
+	* configure.ac:
+	* gstreamerbase/gstreamerbasemm-0.10.pc.in: Added giomm-2.4 and
+	gstreamer-cdda.0.10 (for CddaBaseSrc base class) dependencies to
+	gstreamerbase branch.
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Added code to
+	determine if parent type of plug-in is wrapped or will be generated as
+	a plug-in; If the parent type is not public, a parent class that is
+	public is used as the plug-ins parent type.
+
+	* gstreamerbase/src/gstbase_enums.defs:
+	* gstreamerbase/src/gstbase_enums.defs.patch:
+	* gstreamerbase/src/gstbase_signals.defs:
+	* gstreamerbase/src/gstbase_signals.defs.patch: Went back two weeks to
+	a gst-plugins-base version that uses GstAudioresample instead of
+	GstSpeexResample as the type of the audioresample plug-in and
+	regenerated these files in case a release of gstreamermm is made
+	before a new release of GStreamer modules because the change from
+	GstAudioresample to GstSpeexResample was made just two weeks ago and
+	is not reflected in current releases of GStreamer modules.  When a new
+	GStreamer release is made with the change they can be regenerated
+	then.  Changing type names like this in GStreamer plug-ins (I hope it
+	is not a common practice) makes me worry about ABI issues (if we
+	should worry about such things in gstreamermm) because the plug-in
+	class type names are taken from the GStreamer types and if they change
+	this would make it appear that a class has been removed and a new one
+	added in gstreamermm or gstreamerbasemm when plug-ins are generated.
+
+2008-12-16  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	* build_shared/Makefile_build_gensrc.am_fragment:
 	* gstreamer/gstreamermm/Makefile.am:
 	* gstreamerbase/gstreamerbasemm/Makefile.am: Removed wrap_init.cc from
