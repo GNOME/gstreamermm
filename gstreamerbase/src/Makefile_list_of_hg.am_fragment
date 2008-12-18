@@ -12,6 +12,24 @@ files_general_hg = audioclock.hg audiofilter.hg audiosink.hg audiosrc.hg \
 
 files_general_deprecated_hg =
 
+# To add a plugin, add the C++ class name to plugin_cpptype_names (which must
+# be the plugin name as recognized by gst-inspect but in camel case -- as is
+# appropriate for a class name) and also the target .hg file name (the same
+# as the class name all in lowercase with an .hg extension) to files_plugin_hg
+# below:
+
+plugin_cpptype_names = Adder AlsaMixer AlsaSink AlsaSrc \
+		  AudioConvert AudioResample AudioTestSrc \
+		  CdParanoiaSrc ClockOverlay DecodeBin \
+		  FfmpegColorSpace GioSink GioSrc GioStreamSink \
+		  GioStreamSrc \
+		  OggDemux OggMux PlayBin2 \
+		  TextOverlay \
+		  TextRender TheoraDec TheoraEnc \
+		  TimeOverlay VideoRate VideoScale \
+		  VideoTestSrc Volume VorbisDec VorbisEnc \
+		  VorbisParse VorbisTag XImageSink XvImageSink
+
 files_plugin_hg = adder.hg alsamixer.hg alsasink.hg alsasrc.hg \
 		  audioconvert.hg audioresample.hg audiotestsrc.hg \
 		  cdparanoiasrc.hg clockoverlay.hg decodebin.hg \
@@ -24,13 +42,13 @@ files_plugin_hg = adder.hg alsamixer.hg alsasink.hg alsasrc.hg \
 		  videotestsrc.hg volume.hg vorbisdec.hg vorbisenc.hg \
 		  vorbisparse.hg vorbistag.hg ximagesink.hg xvimagesink.hg
 
-#TODO: gdpdepay and gdppay plug-ins cause several warnings when their wrap_new() methods are registered in GstBase::wrap_init() (from GstBase::init).
+# TODO: gdpdepay and gdppay plug-ins cause several warnings when their
+# wrap_new() methods are registered in GstBase::wrap_init() (from
+# GstBase::init).
 
-#TODO: Add decodebin2 to plugin list above.
-#TODO: Add multifdsink to plugin list above.
-#TODO: Add playbin to plugin list above.
-#TODO: Add tcpserversink to plugin list above.
-#TODO: Add theoraparse to plugin list above.
-#TODO: Add uridecodebin to plugin list above.
+# TODO: The following plug-ins can't be wrapped yet because their signals or
+# properties use the GValueArray type which might have to be wrapped in glibmm
+# first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink, TheoraParse,
+# UriDecodeBin.
 
 include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment

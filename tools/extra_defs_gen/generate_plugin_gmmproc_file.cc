@@ -494,17 +494,22 @@ int main(int argc, char* argv[])
 
   GOptionEntry optionEntries[] =
   {
-    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate a preliminary .hg file.  Run through m4 including macros in tools/m4 directory to get final .hg file", NULL },
+    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate preliminary .hg file.", NULL },
     {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", NULL },
-    {"suggest-hg", 's', 0, G_OPTION_ARG_NONE, &suggestHg, "If the plugin exists, output the suggested .hg filename.", NULL },
+    {"suggest-hg", 's', 0, G_OPTION_ARG_NONE, &suggestHg, "If the plugin exists, output .hg filename.", NULL },
     {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin.", "namespace" },
-    {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main .defs file without .defs extension (used in _DEFS() directive).", "def" },
-    {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The target directory  of the generated .h and .cc files (used in _DEFS() directive).", "directory" },
+    {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main defs file without .defs extension.", "def" },
+    {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The .h and .cc target directory.", "directory" },
     { NULL }
   };
 
-  GOptionContext* gContext = g_option_context_new("<plugin name | typename>");
-  g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  Use the same syntax for the plugin name as in\ngst-inspect.");
+  GOptionContext* gContext = g_option_context_new("<CppPluginClassName>");
+  g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's "
+    "gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  "
+    "Use the same syntax for CppPluginClassName as in\ngst-inspect except "
+    "that camel casing should be used because this will be the\nname of the "
+    "C++ class.  The .hg file is a preliminary .hg file that needs to\nbe run "
+    "through m4 including the ctocpp*.m4 files in the tools/m4 directory.");
 
   g_option_context_add_main_entries(gContext, optionEntries, NULL);
   g_option_context_add_group(gContext, gst_init_get_option_group());
@@ -536,15 +541,8 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  Glib::ustring gTypeName;
-
-  pluginName = argv[1];
-
-  if (pluginName.substr(0,3) == "Gst")
-  {
-    gTypeName = pluginName;
-    pluginName = pluginName.substr(3).lowercase();
-  }
+  cppTypeName = argv[1];
+  pluginName = cppTypeName.lowercase();
 
   GstElementFactory* factory = 0;
 
@@ -559,10 +557,6 @@ int main(int argc, char* argv[])
     g_object_unref(factory);
     factory = GST_ELEMENT_FACTORY(loaded_feature);
     type = gst_element_factory_get_element_type(factory);
-  }
-  else
-  {
-    type = g_type_from_name(gTypeName.c_str());
   }
 
   if (type)
@@ -592,7 +586,6 @@ int main(int argc, char* argv[])
         g_type_name(g_type_parent(g_type_from_name(cParentTypeName.c_str())));
     }
 
-    cppTypeName = cTypeName.substr(3);
     cppParentTypeName = cParentTypeName.substr(3);
     castMacro = get_cast_macro(cTypeName);
 

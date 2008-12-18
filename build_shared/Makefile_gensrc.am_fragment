@@ -30,7 +30,7 @@ include $(srcdir)/../src/Makefile_list_of_hg.am_fragment
 files_all_ccg	= $(files_all_hg:%.hg=%.ccg)
 files_h		= $(files_all_hg:%.hg=$(gensrc_destdir)/%.h)
 files_stamp	= $(files_all_hg:%.hg=$(stamp_dir)/stamp-%)
-files_plugin_stamp = $(files_plugin_hg:%.hg=$(stamp_plugin_dir)/stamp-%-plugin)
+files_plugin_stamp = $(plugin_cpptype_names:%=$(stamp_plugin_dir)/stamp-%-plugin)
 destdir_files_stamp = $(files_patched_hg:%.hg=$(destdir_stamp_dir)/stamp-%)
 
 #Installed gmmproc stuff, from glibmm:
@@ -59,6 +59,7 @@ generate_plugin_gmmproc_file_args = --namespace=$(sublib_namespace) --main-defs=
 run_generate_plugin_gmmproc_file = $(generate_plugin_gmmproc_file_path) $(generate_plugin_gmmproc_file_args)
 
 files_plugin_hg_with_path = $(patsubst %.hg,$(srcdir)/%.hg,$(files_plugin_hg))
+files_plugin_camel_hg_with_path = $(patsubst %,$(stamp_plugin_dir)/%.hg,$(plugin_cpptype_names))
 
 
 EXTRA_DIST	= Makefile_list_of_hg.am_fragment $(files_defs) \
@@ -66,39 +67,49 @@ EXTRA_DIST	= Makefile_list_of_hg.am_fragment $(files_defs) \
 		  $(gensrc_destdir)/%.h.patch,$(files_patched_h))
 
 CLEANFILES = $(files_plugin_hg) $(files_plugin_hg:%.hg=%.ccg) \
+	$(files_plugin_camel_hg_with_path) \
+	$(files_plugin_camel_hg_with_path:.hg=.ccg) \
 	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc \
 	$(files_plugin_stamp)
 
 
-# This is to generate plugin .hg files.  A few variables are defined (in make
-# process), a temp file is used to generate preliminary .hg file which is then
-# run through m4 using the macros in tools/m4/ctocpp_base.m4 which then
-# produces the final .hg file.
-$(files_plugin_hg_with_path): $(generate_plugin_gmmproc_file_path) \
+# This is to generate plugin .hg files.  The generated .hg file s piped through
+# m4 using the macros in tools/m4/ctocpp_base.m4 which then produces the final
+# .hg file.  Finally, the camel hg file is linked to the final .hg file to
+# signal the successful generation of the .hg file.
+$(files_plugin_camel_hg_with_path): $(generate_plugin_gmmproc_file_path) \
 	$(tools_plugin_m4) $(files_defs)
+	$(eval hg_lowercase = $$(shell echo $$@ | tr '[:upper:]' '[:lower:]'))
 	$(run_generate_plugin_gmmproc_file) --hg \
-		$(subst .hg,,$(notdir $@)) | $(M4) -I $(tools_dir_m4) > $@
+		$(notdir $(subst .hg,,$@)) | $(M4) -I $(tools_dir_m4) > \
+		$(srcdir)/$(notdir $(hg_lowercase))
+	ln -sf $(realpath $(srcdir))/$(notdir $(hg_lowercase)) $(builddir)/$@
 
-# This is to generate plugin .ccg files.
-$(files_plugin_hg_with_path:.hg=.ccg): $(generate_plugin_gmmproc_file_path) \
-	$(files_defs)
+# This is to generate plugin .ccg files.  The .ccg file is generated and then
+# the camel ccg file is linked to the generated .ccg file to signal the
+# successful generation of the .hg file.
+$(files_plugin_camel_hg_with_path:.hg=.ccg): \
+	$(generate_plugin_gmmproc_file_path) $(tools_plugin_m4) $(files_defs)
+	$(eval ccg_lowercase = $$(shell echo $$@ | tr '[:upper:]' '[:lower:]'))
 	$(run_generate_plugin_gmmproc_file) --ccg \
-		$(notdir $(subst .ccg,,$@)) >  $@
+		$(notdir $(subst .ccg,,$@)) >  \
+		$(srcdir)/$(notdir $(ccg_lowercase))
+	ln -sf $(realpath $(srcdir))/$(notdir $(ccg_lowercase)) $(builddir)/$@
 
 $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
 	@echo 'timestamp' > $@
 
-# This is to run generated plugin .hg and .ccg files through gmmproc.
-$(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir) $(srcdir)/%.hg \
-	$(srcdir)/%.ccg $(tools_m4) $(files_defs)
-	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
+# This is to run the generated plug-in .hg and .ccg files through gmmproc
+# (they're generated if necessary by the .../%.hg and .../%.ccg dependencies.
+$(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir)/%.hg \
+	$(stamp_plugin_dir)/%.ccg \
+	$(generate_plugin_gmmproc_file_path) $(tools_m4) $(tools_plugin_m4) \
+	$(files_defs)
+	$(eval plugin_name_lowercase = \
+		$$(shell echo $$* | tr '[:upper:]' '[:lower:]'))
+	$(run_gmmproc) $(plugin_name_lowercase) $(srcdir) $(gensrc_destdir)
 	@echo 'timestamp' > $@
-
-# This is to create the plugin .stamps directory (if builddir is different than
-# srcdir)
-$(stamp_plugin_dir):
-	@(test -d $(stamp_plugin_dir) || mkdir $(stamp_plugin_dir))
 
 # This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
 $(destdir_stamp_dir)/stamp-%: $(gensrc_destdir)/%.h
@@ -119,18 +130,21 @@ $(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) \
 	$(files_hg_with_path)
 	$(run_gen_gst_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) >$@
 
+# This is to create the plugin .stamps directory (if builddir is different than
+# srcdir)
+$(stamp_plugin_dir):
+	@(test -d $(stamp_plugin_dir) || mkdir $(stamp_plugin_dir))
+
 create-stamp-dir: $(stamp_plugin_dir)
 	@(test -d $(stamp_dir) || mkdir $(stamp_dir))
 	@(test -d $(destdir_stamp_dir) || mkdir $(destdir_stamp_dir))
 
 if MAINTAINER_MODE
-all-local: create-stamp-dir $(files_stamp) $(files_plugin_hg_with_path) \
-	$(files_plugin_hg_with_path:.hg=.ccg) $(files_plugin_stamp) \
+all-local: create-stamp-dir $(files_stamp) $(files_plugin_stamp) \
 	$(gensrc_destdir)/wrap_init.cc $(gensrc_destdir)/gst_wrap_init.cc \
 	$(destdir_files_stamp)
 else
-BUILT_SOURCES = $(files_plugin_hg_with_path) \
-		$(files_plugin_hg_with_path:.hg=.ccg) $(files_plugin_stamp) \
+BUILT_SOURCES = $(stamp_plugin_dir) $(files_plugin_stamp) \
 		$(gensrc_destdir)/wrap_init.cc
 endif
 
