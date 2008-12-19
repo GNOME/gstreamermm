@@ -388,7 +388,12 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << enumWrapStatements << std::endl;
 
   std::cout << "/** " << nmspace << "::" << cppTypeName << " — " << pluginName << " plugin." << std::endl;
-  std::cout << " * Please include <" << target << "/" << cppTypeName.lowercase() << ".h> to use." << std::endl;
+  std::cout << " * Please include <" << target << "/" <<
+    cppTypeName.lowercase() << ".h> to use.  Also, though using the\n"
+    " * underlying GObject is fine, using its C <B>type</B> is not "
+    "guaranteed to be\n * API stable across releases because it is not "
+    "guaranteed to always remain\n * the same." << std::endl;
+  std::cout << " *" << std::endl;
   std::cout << " * @ingroup " << nmspace << "Plugins" << std::endl;
   std::cout << " */" << std::endl;
   std::cout << "class " << cppTypeName << std::endl;
