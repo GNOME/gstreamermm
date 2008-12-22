@@ -15,7 +15,7 @@ PREFIX="$JHBUILD_SOURCES/gstreamer"
 DIR=`dirname "$0"`
 
 h2def.py "$PREFIX"/gst/*.h "$PREFIX"/libs/gst/{base,controller,dataprotocol,\
-net,check}/*.h "$PREFIX"/plugins/elements/*.h > "$DIR/gst_methods.defs"
+net,check}/*.h > "$DIR/gst_methods.defs"
 
 #Patch generated file.
 (cd "$DIR" && patch -p0 < gst_methods.defs.patch)
