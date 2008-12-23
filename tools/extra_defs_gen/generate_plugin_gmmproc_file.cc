@@ -223,10 +223,12 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
         if ((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)) &&
           !(enumIsWrapped = is_wrapped_enum(propertyCType)))
         {
+          Glib::ustring propertyCppType = propertyCType.substr(3);
+
           enumWrapStatements += "_WRAP_ENUM(" + propertyCType.substr(3) + ", " +
             propertyCType + ")\n";
           enumWrapStatements += "_CCONVERSION(`" + propertyCType + "',`" +
-            propertyCType.substr(3) + "')dnl\n";
+            propertyCppType + "',`" + propertyCppType + "')dnl\n";
 
           Glib::ustring enumGetTypeFunctionName =
             get_cast_macro(propertyCType).lowercase() + "_get_type";
@@ -239,7 +241,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
         }
 
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
-          "_CCONVERT(" + propertyCType + ", true))\n";
+          "_CCONVERT(" + propertyCType + ", `ret'))\n";
 
         if (!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
           includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")dnl\n";
@@ -310,7 +312,7 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
       includeMacroCalls += "_CCONVERSION_INCLUDE(" + returnCType + ")dnl\n";
 
       wrapStatement = "  _WRAP_SIGNAL(_CCONVERT("  + returnCType +
-        ", true) " + signalMethodName + "(";
+        ", `ret') " + signalMethodName + "(";
 
       cClassSignalDeclarations += "  " + returnCType + " (*" +
         signalMethodName + ") (" + cTypeName + "* element";
@@ -338,12 +340,13 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
           if (gst_type_is_a_pointer(paramGType))
           {
             convertMacros += "#m4 _CONVERSION(``" + paramCType +
-              "'', _LQ()_CCONVERT(" + paramCType + ")_RQ(), ";
+              "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
             convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
               "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
           }
 
-          wrapStatement += "_CCONVERT(" + paramCType + ") " + paramName;
+          wrapStatement += "_CCONVERT(" + paramCType + ", `param') " +
+            paramName;
 
           cClassSignalDeclarations += ", " + paramCType + " " + paramName;
 
@@ -367,8 +370,39 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
     g_type_default_interface_unref(ginterface_ref); // for interface ref above.
 }
 
+void get_interface_macros(Glib::ustring& interfaceMacros,
+  Glib::ustring& includeMacroCalls,
+  Glib::ustring& cppExtends)
+{
+  guint n_interfaces = 0;
+  GType* interfaces = g_type_interfaces(type, &n_interfaces);
+
+  for (int i = 0; i < n_interfaces; i++)
+  {
+      Glib::ustring  interfaceCType = g_type_name(interfaces[i]) +
+        (Glib::ustring) "*";
+
+      cppExtends += "public _CCONVERT(`" + interfaceCType + "',`type')";
+
+      if (i < n_interfaces - 1)
+        cppExtends += ", ";
+
+      interfaceMacros += "  _IMPLEMENTS_INTERFACE(_CCONVERT(`" +
+              interfaceCType + "',`type'))\n";
+
+      //TODO: The following is to include the interface headers that the
+      //plug-in implements.  Uncomment after the rest of the interfaces have
+      //been wrapped.
+      //includeMacroCalls += "_CCONVERSION_INCLUDE(" + interfaceCType + ")dnl\n";
+  }
+
+  g_free(interfaces);
+}
+
 void generate_hg_file(const Glib::ustring& includeMacroCalls,
   const Glib::ustring& enumWrapStatements,
+  const Glib::ustring& cppExtends,
+  const Glib::ustring& interfaceMacros,
   const Glib::ustring& propertyWrapStatements,
   const Glib::ustring& signalWrapStatements)
 {
@@ -397,13 +431,25 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << " * @ingroup " << nmspace << "Plugins" << std::endl;
   std::cout << " */" << std::endl;
   std::cout << "class " << cppTypeName << std::endl;
-  std::cout << ": public " << parentNameSpace << "::" << cppParentTypeName <<
-    std::endl;
+  std::cout << ": public " << parentNameSpace << "::" << cppParentTypeName;
+
+  //TODO: The following  is to have the plug-in class extend the interfaces
+  //that it implements.  Include after the rest of the interfaces have been
+  //wrapped.
+  //if (!cppExtends.empty())
+  //  std::cout << ", " << cppExtends;
+  
+  std::cout << std::endl;
+
   std::cout << "{" << std::endl;
   std::cout << "  _CLASS_GOBJECT(" << cppTypeName << ", " << cTypeName <<
     ", " << castMacro << ", " << parentNameSpace << "::" <<
-    cppParentTypeName << ", " << cParentTypeName << ")" << std::endl <<
-    std::endl;
+    cppParentTypeName << ", " << cParentTypeName << ")" << std::endl;
+
+  //TODO: The following is to include the _IMPLEMENT_INTERFACE() macros in the
+  //plug-in class definition.  Uncomment after the rest of the interfaces have
+  //been wrapped.
+  //std::cout << interfaceMacros << std::endl;
 
   std::cout << "protected:" << std::endl;
   std::cout << "  " << cppTypeName << "();" << std::endl;
@@ -628,8 +674,14 @@ int main(int argc, char* argv[])
 
       if (hgFile)
       {
-        generate_hg_file(includeMacroCalls, enumWrapStatements,
-          propertyWrapStatements, signalWrapStatements);
+        Glib::ustring interfaceMacros;
+        Glib::ustring cppExtends;
+
+        get_interface_macros(interfaceMacros, includeMacroCalls,
+          cppExtends);
+
+        generate_hg_file(includeMacroCalls, enumWrapStatements, cppExtends,
+          interfaceMacros, propertyWrapStatements, signalWrapStatements);
       }
       else
       {
