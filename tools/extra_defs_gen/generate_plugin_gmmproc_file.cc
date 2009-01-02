@@ -423,10 +423,12 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
 
   std::cout << "/** " << nmspace << "::" << cppTypeName << " — " << pluginName << " plugin." << std::endl;
   std::cout << " * Please include <" << target << "/" <<
-    cppTypeName.lowercase() << ".h> to use.  Also, though using the\n"
-    " * underlying GObject is fine, using its C <B>type</B> is not "
-    "guaranteed to be\n * API stable across releases because it is not "
-    "guaranteed to always remain\n * the same." << std::endl;
+    cppTypeName.lowercase() << ".h> to use.  Please note that, though\n"
+    " * using the underlying GObject is fine, using its C <B>type</B> is not\n"
+    " * guaranteed to be API stable across releases because it is not "
+    "guaranteed to\n * always remain the same.  Also, not all plug-ins are "
+    "available on all systems\n * and the ones that aren't available are not "
+    "included in the build." << std::endl;
   std::cout << " *" << std::endl;
   std::cout << " * @ingroup " << nmspace << "Plugins" << std::endl;
   std::cout << " */" << std::endl;
@@ -450,6 +452,8 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   //plug-in class definition.  Uncomment after the rest of the interfaces have
   //been wrapped.
   //std::cout << interfaceMacros << std::endl;
+
+  std::cout << "  _IS_GSTREAMERMM_PLUGIN" << std::endl << std::endl;
 
   std::cout << "protected:" << std::endl;
   std::cout << "  " << cppTypeName << "();" << std::endl;

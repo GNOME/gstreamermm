@@ -20,6 +20,7 @@ pushdef([GSTREAMERMM_EXTRA_VERSION],     [])
 pushdef([GSTREAMERMM_VERSION], GSTREAMERMM_MAJOR_VERSION.GSTREAMERMM_MINOR_VERSION.GSTREAMERMM_MICRO_VERSION[]GSTREAMERMM_EXTRA_VERSION)
 AC_INIT([gstreamermm], GSTREAMERMM_VERSION, [gtkmm-list@gnome.org])
 AC_CONFIG_SRCDIR([gstreamer/gstreamermmconfig.h.in])
+AC_CONFIG_SRCDIR([gstreamerbase/gstreamerbasemmconfig.h.in])
 AC_PREREQ(2.59)
 
 #########################################################################
@@ -162,6 +163,85 @@ AC_SUBST(GMMPROC_DIR)
 GMMPROC=$GMMPROC_DIR/gmmproc
 AC_SUBST(GMMPROC)
 
+
+#########################################################################
+#  Plug-in processing
+#########################################################################
+
+# make sure grep and head are available:
+AC_PROG_GREP()
+AC_PATH_PROG([HEAD], [head])
+
+# make sure gst-inspect is available:
+AC_PATH_PROG([GST_INSPECT], [gst-inspect])
+if test x$GST_INSPECT = x ; then
+  AC_MSG_ERROR([gst-inspect is needed for plug-in processing. Please, install it.])
+fi
+AC_ARG_VAR([GST_INSPECT], [Variable to store gst-inspect executable])
+AC_SUBST(GST_INSPECT)
+
+################ gstreamermm plug-in processing ################ 
+
+# To add a plugin, add the C++ class name (which must be the plugin name as
+# recognized by gst-inspect but in camel case -- as is appropriate for a class
+# name) to the plug-in C++ name list below.  Also add the target .hg file name
+# (same name all in lowercase with a .hg) to the files_all_plugin_hg variable
+# in the gstreamer/src/Makefile_list_of_hg.am_fragment file.  Finally, be sure
+# to include an #undef in the gstreamermmconfig.h.in file.
+
+GSTREAMERMM_ALL_PLUGIN_CPPNAMES="CapsFilter FakeSrc FakeSink FdSink FdSrc \
+FileSrc FileSink Identity MultiQueue Queue Tee TypeFind"
+
+for cppname in $GSTREAMERMM_ALL_PLUGIN_CPPNAMES; do
+  plugin=[`echo $cppname | tr [:upper:] [:lower:]`]
+  if test -z "`$GST_INSPECT $plugin | $HEAD -n 1 | $GREP "No such element"`"; then
+    plugin_define=["GSTREAMERMM_PLUGIN_`echo $plugin | tr [:lower:] [:upper:]`"]
+    AC_DEFINE_UNQUOTED($plugin_define)
+    GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES $cppname"
+    GSTREAMERMM_EXISTING_PLUGIN_HG="$GSTREAMERMM_EXISTING_PLUGIN_HG $plugin.hg"
+  fi
+done
+AC_SUBST(GSTREAMERMM_ALL_PLUGIN_CPPNAMES)
+AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES)
+AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_HG)
+
+################ gstreamerbasemm plug-in processing ################ 
+
+# To add a plugin, add the C++ class name (which must be the plugin name as
+# recognized by gst-inspect but in camel case -- as is appropriate for a class
+# name) to the plug-in C++ name list below.  Also add the target .hg file name
+# (same name all in lowercase with a .hg) to the files_all_plugin_hg variable
+# in the gstreamebase/src/Makefile_list_of_hg.am_fragment file.  Finally, be
+# sure to include an #undef in the gstreamebasemmconfig.h.in file.
+
+GSTREAMERBASEMM_ALL_PLUGIN_CPPNAMES="Adder AlsaMixer AlsaSink AlsaSrc \
+AudioConvert AudioResample AudioTestSrc CdParanoiaSrc ClockOverlay DecodeBin \
+FfmpegColorSpace GioSink GioSrc GioStreamSink GioStreamSrc OggDemux OggMux \
+PlayBin2 TextOverlay TextRender TheoraDec TheoraEnc TimeOverlay VideoRate \
+VideoScale VideoTestSrc Volume VorbisDec VorbisEnc VorbisParse VorbisTag \
+XImageSink XvImageSink"
+
+# TODO: gdpdepay and gdppay plug-ins (to be added above) cause several warnings
+# when their wrap_new() methods are registered in GstBase::wrap_init() (from
+# GstBase::init).
+
+# TODO: The following plug-ins (to be added above) can't be wrapped yet because
+# their signals or properties use the GValueArray type which might have to be
+# wrapped in glibmm first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink,
+# TheoraParse, UriDecodeBin.
+
+for cppname in $GSTREAMERBASEMM_ALL_PLUGIN_CPPNAMES; do
+  plugin=[`echo $cppname | tr [:upper:] [:lower:]`]
+  if test -z "`$GST_INSPECT $plugin | $HEAD -n 1 | $GREP "No such element"`"; then
+    plugin_define=["GSTREAMERBASEMM_PLUGIN_`echo $plugin | tr [:lower:] [:upper:]`"]
+    AC_DEFINE_UNQUOTED($plugin_define)
+    GSTREAMERBASEMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERBASEMM_EXISTING_PLUGIN_CPPNAMES $cppname"
+    GSTREAMERBASEMM_EXISTING_PLUGIN_HG="$GSTREAMERBASEMM_EXISTING_PLUGIN_HG $plugin.hg"
+  fi
+done
+AC_SUBST(GSTREAMERBASEMM_ALL_PLUGIN_CPPNAMES)
+AC_SUBST(GSTREAMERBASEMM_EXISTING_PLUGIN_CPPNAMES)
+AC_SUBST(GSTREAMERBASEMM_EXISTING_PLUGIN_HG)
 
 #########################################################################
 #  C++ checks
@@ -349,6 +429,7 @@ AC_CONFIG_FILES([
       gstreamerbase/gstreamerbasemm/private/Makefile
 
   tools/Makefile
+    tools/generate_wrap_init.pl
     tools/generate_gst_wrap_init.pl
     tools/m4/Makefile
     tools/extra_defs_gen/Makefile

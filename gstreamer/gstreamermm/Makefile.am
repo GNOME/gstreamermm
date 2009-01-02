@@ -25,6 +25,8 @@ include $(top_srcdir)/build_shared/Makefile_build.am_fragment
 
 lib_LTLIBRARIES = libgstreamermm-0.10.la
 libgstreamermm_0_10_la_SOURCES = $(files_built_cc) $(files_extra_cc)
-nodist_libgstreamermm_0_10_la_SOURCES = $(files_plugin_built_cc) wrap_init.cc
+EXTRA_libgstreamermm_0_10_la_SOURCES = $(files_all_plugin_built_cc)
 libgstreamermm_0_10_la_LDFLAGS = $(common_ldflags)
-libgstreamermm_0_10_la_LIBADD  = $(GSTREAMERMM_LIBS)
+libgstreamermm_0_10_la_LIBADD  = $(GSTREAMERMM_LIBS) \
+				 $(files_existing_plugin_built_lo)
+libgstreamermm_0_10_la_DEPENDENCIES = $(files_existing_plugin_built_lo)

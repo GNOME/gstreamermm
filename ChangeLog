@@ -1,3 +1,55 @@
+2009-01-02  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	* configure.ac: Modified so that C preprocessor symbols are defined
+	for each existing plug-in from two lists (the core list and the base
+	list) of all possible plug-ins.
+	* gstreamer/gstreamermmconfig.h.in:
+	* gstreamerbase/gstreamerbasemmconfig.h.in: Modified so that if
+	plug-ins exist, a C preprocessor symbol for the plug-in is defined in
+	the two configuration files.
+	* gstreamer/gstreamermm/wrap_init.h:
+	* gstreamerbase/gstreamerbasemm/wrap_init.h: Modified to include the
+	configuration files so that wrap_init()s know if plug-ins exist.
+
+	* tools/generate_wrap_init.pl.in: Added local copy so that #ifdefs are
+	included in wrap_init() methods.
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc:
+	* tools/m4/Makefile_list_of_sources.am_fragment:
+	* tools/m4/convert.m4:
+	* tools/m4/shared.m4: Modified plug-in generation tool to include a
+	"marking" m4 macro (_IS_GSTREAMERMM_PLUGIN) so that wrap_init
+	generation tool knows and can include proper #ifdefs for each plug-in.
+	Defined the macro in the shared.m4 file so that it is simply removed
+	from the .hg when generating the .h file (much like what happens with
+	the optional windows wrapping macro in gtkmm).
+
+	* build_shared/Makefile_gensrc.am_fragment:
+	* gstreamer/src/Makefile_list_of_hg.am_fragment:
+	* gstreamerbase/src/Makefile_list_of_hg.am_fragment: Modified so that
+	all plug-ins are always generated, but only in maintainer mode and so
+	the local copy of generate_wrap_init.pl is used to generate
+	wrap_init() functions.
+
+	* build_shared/Makefile_build_gensrc.am_fragment:
+	* build_shared/Makefile_build.am_fragment:
+	* gstreamer/gstreamermm/Makefile.am:
+	* gstreamer/gstreamermm/private/Makefile.am:
+	* gstreamerbase/gstreamerbasemm/Makefile.am:
+	* gstreamerbase/gstreamerbasemm/private/Makefile.am: Modified build
+	files so that only the plug-ins that exist are built, installed and
+	included in the shared object libraries, but so that all plug-in files
+	are distributed in the tarballs whether the plug-ins exist or not.
+
+	* docs/reference/Makefile.am: Modified to make sure that the distcheck
+	is successful.  Added tarball building targets.
+
+	* gstreamerbase/src/colorbalance.hg: Commented unused enum for now to
+	fix the build with most recent changes to GStreamer sources in cvs.
+
+	* gstreamer/src/Makefile.am:
+	* gstreamerbase/src/Makefile.am: Whitespace.
+
 2009-01-01  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* AUTHORS: Aparently with checkin confusion names were not ordered in

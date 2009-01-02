@@ -17,19 +17,23 @@ files_general_hg = bin.hg buffer.hg bus.hg caps.hg childproxy.hg clock.hg \
 
 files_general_deprecated_hg =
 
-# To add a plugin, add the C++ class name to plugin_cpptype_names (which must
-# be the plugin name as recognized by gst-inspect but in camel case -- as is
-# appropriate for a class name) and also the target .hg file name (the same
-# as the class name all in lowercase with an .hg extension) to files_plugin_hg
-# below:
+# To add a plugin, add the C++ class name (which must be the plugin name as
+# recognized by gst-inspect but in camel case -- as is appropriate for a class
+# name) to the plug-in C++ name list (GSTREAMERMM_ALL_PLUGIN_CPPNAMES) in the
+# configure.ac file.  Also add the target .hg file name (same name all in
+# lowercase with a .hg) to the variable below.  Finally, be sure to include an
+# #undef in the gstreamermmconfig.h.in file.
 
-plugin_cpptype_names = CapsFilter FakeSrc FakeSink FdSink FdSrc \
-		  FileSrc FileSink Identity MultiQueue Queue \
-		  Tee TypeFind
-
-files_plugin_hg = capsfilter.hg fakesrc.hg fakesink.hg fdsink.hg fdsrc.hg \
+files_all_plugin_hg = capsfilter.hg fakesrc.hg fakesink.hg fdsink.hg fdsrc.hg \
 		  filesrc.hg filesink.hg identity.hg multiqueue.hg queue.hg \
 		  tee.hg typefind.hg
+
+# The following variables are needed for the build process to know what class
+# name to use for the plug-ins and the list of the existing plug-ins in the
+# system so only those are included in the build:
+
+cppnames_plugin_all = $(GSTREAMERMM_ALL_PLUGIN_CPPNAMES)
+files_existing_plugin_hg = $(GSTREAMERMM_EXISTING_PLUGIN_HG)
 
 files_patched_hg = taglist.hg
 

@@ -9,4 +9,3 @@ files_defs = gstbase.defs gstbase_methods.defs gstbase_signals.defs gstbase_enum
 main_defs = gstbase
 
 include $(top_srcdir)/build_shared/Makefile_gensrc.am_fragment
-

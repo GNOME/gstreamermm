@@ -9,4 +9,3 @@ files_defs = gst.defs gst_methods.defs gst_signals.defs gst_enums.defs gst_vfunc
 main_defs = gst
 
 include $(top_srcdir)/build_shared/Makefile_gensrc.am_fragment
-

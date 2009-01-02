@@ -1,23 +1,34 @@
 doxygenprog=@DOXYGEN@
 
 doxygen_configfile=Doxyfile
+doxygen_configfile_source=$(srcdir)/Doxyfile.in
 beautify_docs = @GMMPROC_DIR@/beautify_docs.pl
+
+EXTRA_DIST= Doxyfile.in html reference-index.txt
 
 docdir = $(datadir)/doc/gstreamermm-0.10/docs
 referencedir=$(docdir)/reference/html
 
-EXTRA_DIST=$(doxygen_configfile) reference-index.txt
-
 HTML_INDEX=html/index.html
 
-$(HTML_INDEX): $(doxygen_configfile) $(beautify_docs_source) $(top_srcdir)/gstreamer/gstreamermm/*.h $(top_srcdir)/gstreamerbase/gstreamerbasemm/*.h
-	rm -rf html
+$(HTML_INDEX): $(doxygen_configfile_source) $(beautify_docs) \
+	$(top_srcdir)/gstreamer/gstreamermm/*.h \
+	$(top_srcdir)/gstreamerbase/gstreamerbasemm/*.h
+	-rm -rf html
 	$(doxygenprog) $(doxygen_configfile)
 	$(PERL_PATH) $(beautify_docs) html && touch $@
 
+gstreamermm-reference-html.tar.gz: $(HTML_INDEX)
+	tar cf - html | gzip -c --best >$@
+
+gstreamermm-reference-html.tar.bz2: $(HTML_INDEX)
+	tar cf - html | bzip2 -c >$@
+
 doc-clean:
-	rm -rf html
-	rm -f doxygen-warnings.txt
+	-rm -rf html
+	-rm -f doxygen-warnings.txt
+	-rm -f gstreamermm-reference-html.tar.gz \
+		gstreamermm-reference-html.tar.bz2
 
 install-reference: $(HTML_INDEX)
 	@$(NORMAL_INSTALL)
