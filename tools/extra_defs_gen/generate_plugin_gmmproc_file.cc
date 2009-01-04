@@ -529,11 +529,21 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
 
   std::cout << cppTypeName << "::" << cppTypeName << "()" << std::endl;
   std::cout << ": _CONSTRUCT(\"name\", NULL)" << std::endl;
-  std::cout << "{}" << std::endl << std::endl;
+  std::cout << "{" << std::endl;
+  std::cout << "  //The floating reference is convenience for C," << std::endl;
+  std::cout << " //but is useless and difficult for us:" << std::endl;
+  std::cout << " gst_object_ref(gobj());" << std::endl;
+  std::cout << " gst_object_sink(gobj());" << std::endl;
+  std::cout << "}" << std::endl << std::endl;
 
   std::cout << cppTypeName << "::" << cppTypeName << "(const Glib::ustring& name)" << std::endl;
   std::cout << ": _CONSTRUCT(\"name\", name.c_str())" << std::endl;
-  std::cout << "{}" << std::endl;
+  std::cout << "{" << std::endl;
+  std::cout << "  //The floating reference is convenience for C," << std::endl;
+  std::cout << " //but is useless and difficult for us:" << std::endl;
+  std::cout << " gst_object_ref(gobj());" << std::endl;
+  std::cout << " gst_object_sink(gobj());" << std::endl;
+  std::cout << "}" << std::endl << std::endl;
 
   std::cout << std::endl << "}" << std::endl;
 }
