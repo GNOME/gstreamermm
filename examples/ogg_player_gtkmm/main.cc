@@ -20,12 +20,18 @@
  */
 
 #include <gtkmm/main.h>
-#include <gstreamermm/init.h>
+#include <gstreamerbasemm/init.h>
 #include <gstreamermm/element.h>
-#include <gstreamermm/elementfactory.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
+
+// Plug-ins
 #include <gstreamermm/filesrc.h>
+#include <gstreamerbasemm/oggdemux.h>
+#include <gstreamerbasemm/vorbisdec.h>
+#include <gstreamerbasemm/audioconvert.h>
+#include <gstreamerbasemm/alsasink.h>
+
 #include <iostream>
 #include "player_window.h"
 
@@ -51,7 +57,7 @@ int
 main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
-  Gst::init(argc, argv);
+  GstBase::init(argc, argv);
 
   // Create the pipeline
   pipeline = Gst::Pipeline::create("audio-player");
@@ -66,7 +72,7 @@ main (int argc, char *argv[])
   }
 
   // Parses the ogg streams into elementary streams (note that an ogg file may contain a video stream too)
-  Glib::RefPtr<Gst::Element> parser = Gst::ElementFactory::create_element("oggdemux");
+  Glib::RefPtr<GstBase::OggDemux> parser = GstBase::OggDemux::create();
   if(!parser)
   {
     std::cerr << "oggdemux element could not be created" << std::endl;
@@ -74,7 +80,7 @@ main (int argc, char *argv[])
   }
 
   // Decodes a vorbis stream
-  decoder = Gst::ElementFactory::create_element("vorbisdec");
+  decoder = GstBase::VorbisDec::create();
   if(!decoder)
   {
     std::cerr << "vorbisdec element could not be created" << std::endl;
@@ -82,7 +88,7 @@ main (int argc, char *argv[])
   }
 
   // Converts audio to a format which can be used by the next element
-  Glib::RefPtr<Gst::Element> conv = Gst::ElementFactory::create_element("audioconvert");
+  Glib::RefPtr<GstBase::AudioConvert> conv = GstBase::AudioConvert::create();
   if(!conv)
   {
     std::cerr << "audioconvert element could not be created" << std::endl;
@@ -90,7 +96,7 @@ main (int argc, char *argv[])
   }
 
   // Outputs sound to an ALSA audio device
-  Glib::RefPtr<Gst::Element> sink = Gst::ElementFactory::create_element("alsasink");
+  Glib::RefPtr<GstBase::AlsaSink> sink = GstBase::AlsaSink::create();
   if(!sink)
   {
     std::cerr << "sink element could not be created" << std::endl;
