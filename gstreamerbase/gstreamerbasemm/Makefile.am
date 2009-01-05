@@ -28,5 +28,6 @@ libgstreamerbasemm_0_10_la_SOURCES = $(files_built_cc) $(files_extra_cc)
 EXTRA_libgstreamerbasemm_0_10_la_SOURCES = $(files_all_plugin_built_cc)
 libgstreamerbasemm_0_10_la_LDFLAGS = $(common_ldflags)
 libgstreamerbasemm_0_10_la_LIBADD  = $(GSTREAMERBASEMM_LIBS) \
+				     $(top_builddir)/gstreamer/gstreamermm/.libs/libgstreamermm-0.10.la \
 				     $(files_existing_plugin_built_lo)
 libgstreamerbasemm_0_10_la_DEPENDENCIES = $(files_existing_plugin_built_lo)
