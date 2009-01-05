@@ -172,8 +172,6 @@ fi
 AC_ARG_VAR([GST_INSPECT], [Variable to store gst-inspect executable])
 AC_SUBST(GST_INSPECT)
 
-################ gstreamermm plug-in processing ################ 
-
 # To add a plugin, add the C++ class name (which must be the plugin name as
 # recognized by gst-inspect but in camel case -- as is appropriate for a class
 # name) to the plug-in C++ name list below.  Also add the target .hg file name
@@ -184,14 +182,10 @@ AC_SUBST(GST_INSPECT)
 GSTREAMERMM_ALL_PLUGIN_CPPNAMES="CapsFilter FakeSrc FakeSink FdSink FdSrc \
 FileSrc FileSink Identity MultiQueue Queue Tee TypeFind Adder AlsaMixer \
 AlsaSink AlsaSrc AudioConvert AudioResample AudioTestSrc CdParanoiaSrc \
-ClockOverlay DecodeBin FfmpegColorSpace GioSink GioSrc GioStreamSink \
-GioStreamSrc OggDemux OggMux PlayBin2 TextOverlay TextRender TheoraDec \
-TheoraEnc TimeOverlay VideoRate VideoScale VideoTestSrc Volume VorbisDec \
-VorbisEnc VorbisParse VorbisTag XImageSink XvImageSink"
-
-# TODO: gdpdepay and gdppay plug-ins (to be added above) cause several warnings
-# when their wrap_new() methods are registered in Gst::wrap_init() (from
-# Gst::init).
+ClockOverlay DecodeBin FfmpegColorSpace GDPDepay GDPPay GioSink GioSrc \
+GioStreamSink GioStreamSrc OggDemux OggMux PlayBin2 TextOverlay TextRender \
+TheoraDec TheoraEnc TimeOverlay VideoRate VideoScale VideoTestSrc Volume \
+VorbisDec VorbisEnc VorbisParse VorbisTag XImageSink XvImageSink"
 
 # TODO: The following plug-ins (to be added above) can't be wrapped yet because
 # their signals or properties use the GValueArray type which might have to be

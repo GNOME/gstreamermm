@@ -71,7 +71,10 @@ Object::Object(const Glib::ConstructParams& construct_params)
 :
   Glib::Object(construct_params)
 {
-
+  //The floating reference is convenience for C,
+  //but is useless and difficult for us:
+  gst_object_ref(gobj());
+  gst_object_sink(gobj());
 }
 
 Object::Object(GstObject* castitem)

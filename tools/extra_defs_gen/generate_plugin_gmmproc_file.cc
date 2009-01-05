@@ -529,21 +529,11 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
 
   std::cout << cppTypeName << "::" << cppTypeName << "()" << std::endl;
   std::cout << ": _CONSTRUCT(\"name\", NULL)" << std::endl;
-  std::cout << "{" << std::endl;
-  std::cout << "  //The floating reference is convenience for C," << std::endl;
-  std::cout << " //but is useless and difficult for us:" << std::endl;
-  std::cout << " gst_object_ref(gobj());" << std::endl;
-  std::cout << " gst_object_sink(gobj());" << std::endl;
-  std::cout << "}" << std::endl << std::endl;
+  std::cout << "{}" << std::endl << std::endl;
 
   std::cout << cppTypeName << "::" << cppTypeName << "(const Glib::ustring& name)" << std::endl;
   std::cout << ": _CONSTRUCT(\"name\", name.c_str())" << std::endl;
-  std::cout << "{" << std::endl;
-  std::cout << "  //The floating reference is convenience for C," << std::endl;
-  std::cout << " //but is useless and difficult for us:" << std::endl;
-  std::cout << " gst_object_ref(gobj());" << std::endl;
-  std::cout << " gst_object_sink(gobj());" << std::endl;
-  std::cout << "}" << std::endl << std::endl;
+  std::cout << "{}" << std::endl << std::endl;
 
   std::cout << std::endl << "}" << std::endl;
 }
@@ -654,22 +644,8 @@ int main(int argc, char* argv[])
     cppParentTypeName = cParentTypeName.substr(3);
     castMacro = get_cast_macro(cTypeName);
 
-    if (cppParentTypeName.compare("BaseSrc") == 0 ||
-      cppParentTypeName.compare("BaseSink") == 0 ||
-      cppParentTypeName.compare("BaseTransform") == 0 ||
-      cppParentTypeName.compare("PushSrc") == 0 ||
-      cppParentTypeName.compare("Pipeline") == 0 ||
-      cppParentTypeName.compare("Bin") == 0 ||
-      cppParentTypeName.compare("Element") == 0)
-    {
-      parentInclude = "gstreamermm";
-      parentNameSpace = "Gst";
-    }
-    else
-    {
-      parentInclude = target;
-      parentNameSpace = nmspace;
-    }
+    parentInclude = target;
+    parentNameSpace = nmspace;
 
     if (hgFile || ccgFile)
     {
