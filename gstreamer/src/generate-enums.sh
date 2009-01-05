@@ -7,15 +7,20 @@
 
 if [ -z "$JHBUILD_SOURCES" -o ! -x "`which enum.pl`" ]; then
   echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources and \
-  enum.pl\nneeds to be executable and in PATH."
+enum.pl\nneeds to be executable and in PATH."
   exit 1;
 fi
 
-PREFIX="$JHBUILD_SOURCES/gstreamer"
 DIR=`dirname "$0"`
 
+PREFIX="$JHBUILD_SOURCES/gstreamer"
 enum.pl "$PREFIX"/gst/*.h "$PREFIX"/libs/gst/{base,controller,dataprotocol,\
 net,check}/*.h "$PREFIX"/plugins/elements/*.h > "$DIR/gst_enums.defs"
 
+PREFIX="$JHBUILD_SOURCES/gst-plugins-base"
+enum.pl "$PREFIX"/gst-libs/gst/{audio,cdda,fft,floatcast,interfaces,netbuffer,\
+riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h "$PREFIX"/gst/*/*.h \
+"$PREFIX"/ext/*/*.h >> "$DIR/gst_enums.defs"
+
 #Patch generated file.
-(cd "$DIR" && patch -p0 < gst_enums.defs.patch)
+patch $DIR/gst_enums.defs $DIR/gst_enums.defs.patch

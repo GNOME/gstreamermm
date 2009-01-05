@@ -20,7 +20,6 @@
  */
 
 #include <gstreamermm.h>
-#include <gstreamerbasemm.h>
 #include <iostream>
 #include <gst/audio/gstaudioclock.h>
 
@@ -28,7 +27,7 @@ int main (int argc, char* argv[])
 {
   try
   {
-    bool success = GstBase::init_check(argc, argv);
+    bool success = Gst::init_check(argc, argv);
 
     if (!success)
     {
@@ -48,8 +47,8 @@ int main (int argc, char* argv[])
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 
-  Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
-    Gst::Interface::cast <GstBase::XOverlay>(element);
+  Glib::RefPtr< Gst::ElementInterfaced<Gst::XOverlay> > xoverlay =
+    Gst::Interface::cast <Gst::XOverlay>(element);
 
   if(xoverlay)
   {
@@ -60,12 +59,12 @@ int main (int argc, char* argv[])
   }
 
   GstClock* gst_clock = gst_audio_clock_new("clock", NULL, NULL);
-  Glib::RefPtr<GstBase::AudioClock> clock = Glib::wrap(GST_AUDIO_CLOCK(gst_clock));
+  Glib::RefPtr<Gst::AudioClock> clock = Glib::wrap(GST_AUDIO_CLOCK(gst_clock));
 
   if (clock)
-    std::cout << "Successfully wrapped a GstAudioClock in a GStBase::AudioClock." << std::endl;
+    std::cout << "Successfully wrapped a GstAudioClock in a GSt::AudioClock." << std::endl;
   else
-    std::cout << "Did not successfully wrap a GstAudioClock in a GstBase::AudioClock." << std::endl;
+    std::cout << "Did not successfully wrap a GstAudioClock in a Gst::AudioClock." << std::endl;
 
   return 0;
 }

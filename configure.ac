@@ -20,7 +20,6 @@ pushdef([GSTREAMERMM_EXTRA_VERSION],     [])
 pushdef([GSTREAMERMM_VERSION], GSTREAMERMM_MAJOR_VERSION.GSTREAMERMM_MINOR_VERSION.GSTREAMERMM_MICRO_VERSION[]GSTREAMERMM_EXTRA_VERSION)
 AC_INIT([gstreamermm], GSTREAMERMM_VERSION, [gtkmm-list@gnome.org])
 AC_CONFIG_SRCDIR([gstreamer/gstreamermmconfig.h.in])
-AC_CONFIG_SRCDIR([gstreamerbase/gstreamerbasemmconfig.h.in])
 AC_PREREQ(2.59)
 
 #########################################################################
@@ -66,7 +65,7 @@ AC_CONFIG_AUX_DIR(scripts)
 AM_INIT_AUTOMAKE([1.9 tar-ustar])
 
 dnl Specify a configuration file (no autoheader)
-AM_CONFIG_HEADER(config.h gstreamer/gstreamermmconfig.h gstreamerbase/gstreamerbasemmconfig.h)
+AM_CONFIG_HEADER(config.h gstreamer/gstreamermmconfig.h)
 AM_MAINTAINER_MODE
 AL_ACLOCAL_INCLUDE(scripts)
 
@@ -133,16 +132,9 @@ gstreamermm_min_libxmlpp_version=2.14.0
 
 PKG_CHECK_MODULES(GSTREAMERMM, \
         glibmm-2.4 >= ${gstreamermm_min_glibmm_version} \
+        giomm-2.4 >= ${gstreamermm_min_glibmm_version} \
         gstreamer-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-base-0.10 >= ${gstreamermm_min_gst_version} \
-        libxml++-2.6 >= ${gstreamermm_min_libxmlpp_version} \
-        )
-AC_SUBST(GSTREAMERMM_CFLAGS)
-AC_SUBST(GSTREAMERMM_LIBS)
-
-PKG_CHECK_MODULES(GSTREAMERBASEMM, \
-        glibmm-2.4 >= ${gstreamermm_min_glibmm_version} \
-        giomm-2.4 >= ${gstreamermm_min_glibmm_version} \
         gstreamer-plugins-base-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-audio-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-cdda-0.10 >= ${gstreamermm_min_gst_version} \
@@ -150,8 +142,8 @@ PKG_CHECK_MODULES(GSTREAMERBASEMM, \
         gstreamer-video-0.10 >= ${gstreamermm_min_gst_version} \
         libxml++-2.6 >= ${gstreamermm_min_libxmlpp_version} \
         )
-AC_SUBST(GSTREAMERBASEMM_CFLAGS)
-AC_SUBST(GSTREAMERBASEMM_LIBS)
+AC_SUBST(GSTREAMERMM_CFLAGS)
+AC_SUBST(GSTREAMERMM_LIBS)
 
 # This macro is installed by glibmm
 # Doxygen needs the path to the installed perl.
@@ -190,7 +182,21 @@ AC_SUBST(GST_INSPECT)
 # to include an #undef in the gstreamermmconfig.h.in file.
 
 GSTREAMERMM_ALL_PLUGIN_CPPNAMES="CapsFilter FakeSrc FakeSink FdSink FdSrc \
-FileSrc FileSink Identity MultiQueue Queue Tee TypeFind"
+FileSrc FileSink Identity MultiQueue Queue Tee TypeFind Adder AlsaMixer \
+AlsaSink AlsaSrc AudioConvert AudioResample AudioTestSrc CdParanoiaSrc \
+ClockOverlay DecodeBin FfmpegColorSpace GioSink GioSrc GioStreamSink \
+GioStreamSrc OggDemux OggMux PlayBin2 TextOverlay TextRender TheoraDec \
+TheoraEnc TimeOverlay VideoRate VideoScale VideoTestSrc Volume VorbisDec \
+VorbisEnc VorbisParse VorbisTag XImageSink XvImageSink"
+
+# TODO: gdpdepay and gdppay plug-ins (to be added above) cause several warnings
+# when their wrap_new() methods are registered in Gst::wrap_init() (from
+# Gst::init).
+
+# TODO: The following plug-ins (to be added above) can't be wrapped yet because
+# their signals or properties use the GValueArray type which might have to be
+# wrapped in glibmm first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink,
+# TheoraParse, UriDecodeBin.
 
 for cppname in $GSTREAMERMM_ALL_PLUGIN_CPPNAMES; do
   plugin=[`echo $cppname | tr [:upper:] [:lower:]`]
@@ -204,44 +210,6 @@ done
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_CPPNAMES)
 AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES)
 AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_HG)
-
-################ gstreamerbasemm plug-in processing ################ 
-
-# To add a plugin, add the C++ class name (which must be the plugin name as
-# recognized by gst-inspect but in camel case -- as is appropriate for a class
-# name) to the plug-in C++ name list below.  Also add the target .hg file name
-# (same name all in lowercase with a .hg) to the files_all_plugin_hg variable
-# in the gstreamebase/src/Makefile_list_of_hg.am_fragment file.  Finally, be
-# sure to include an #undef in the gstreamebasemmconfig.h.in file.
-
-GSTREAMERBASEMM_ALL_PLUGIN_CPPNAMES="Adder AlsaMixer AlsaSink AlsaSrc \
-AudioConvert AudioResample AudioTestSrc CdParanoiaSrc ClockOverlay DecodeBin \
-FfmpegColorSpace GioSink GioSrc GioStreamSink GioStreamSrc OggDemux OggMux \
-PlayBin2 TextOverlay TextRender TheoraDec TheoraEnc TimeOverlay VideoRate \
-VideoScale VideoTestSrc Volume VorbisDec VorbisEnc VorbisParse VorbisTag \
-XImageSink XvImageSink"
-
-# TODO: gdpdepay and gdppay plug-ins (to be added above) cause several warnings
-# when their wrap_new() methods are registered in GstBase::wrap_init() (from
-# GstBase::init).
-
-# TODO: The following plug-ins (to be added above) can't be wrapped yet because
-# their signals or properties use the GValueArray type which might have to be
-# wrapped in glibmm first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink,
-# TheoraParse, UriDecodeBin.
-
-for cppname in $GSTREAMERBASEMM_ALL_PLUGIN_CPPNAMES; do
-  plugin=[`echo $cppname | tr [:upper:] [:lower:]`]
-  if test -z "`$GST_INSPECT $plugin | $HEAD -n 1 | $GREP "No such element"`"; then
-    plugin_define=["GSTREAMERBASEMM_PLUGIN_`echo $plugin | tr [:lower:] [:upper:]`"]
-    AC_DEFINE_UNQUOTED($plugin_define)
-    GSTREAMERBASEMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERBASEMM_EXISTING_PLUGIN_CPPNAMES $cppname"
-    GSTREAMERBASEMM_EXISTING_PLUGIN_HG="$GSTREAMERBASEMM_EXISTING_PLUGIN_HG $plugin.hg"
-  fi
-done
-AC_SUBST(GSTREAMERBASEMM_ALL_PLUGIN_CPPNAMES)
-AC_SUBST(GSTREAMERBASEMM_EXISTING_PLUGIN_CPPNAMES)
-AC_SUBST(GSTREAMERBASEMM_EXISTING_PLUGIN_HG)
 
 #########################################################################
 #  C++ checks
@@ -373,7 +341,7 @@ fi
 GSTREAMERMM_DOXYGEN_INPUT=''
 gstmm_srcdir=`cd "$srcdir" && pwd`
 gstmm_builddir=`pwd`
-for sublib in gstreamer gstreamerbase
+for sublib in gstreamer
 do
   if test "x$gstmm_builddir"  = "x$gstmm_srcdir" ; then
     GSTREAMERMM_DOXYGEN_INPUT="$GSTREAMERMM_DOXYGEN_INPUT $gstmm_builddir/$sublib/$sublib""mm/"
@@ -421,12 +389,6 @@ AC_CONFIG_FILES([
     gstreamer/src/Makefile
     gstreamer/gstreamermm/Makefile
       gstreamer/gstreamermm/private/Makefile
-
-  gstreamerbase/Makefile
-  gstreamerbase/gstreamerbasemm-0.10.pc
-    gstreamerbase/src/Makefile
-    gstreamerbase/gstreamerbasemm/Makefile
-      gstreamerbase/gstreamerbasemm/private/Makefile
 
   tools/Makefile
     tools/generate_wrap_init.pl

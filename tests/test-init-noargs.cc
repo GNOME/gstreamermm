@@ -20,7 +20,7 @@
  */
 
 #include <gstreamermm.h>
-#include <gstreamerbasemm.h>
+#include <gstreamermm.h>
 #include <iostream>
 
 int main (int argc, char* argv[])
@@ -33,8 +33,8 @@ int main (int argc, char* argv[])
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 
-  Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
-    Gst::Interface::cast <GstBase::XOverlay>(element);
+  Glib::RefPtr< Gst::ElementInterfaced<Gst::XOverlay> > xoverlay =
+    Gst::Interface::cast <Gst::XOverlay>(element);
 
   if(xoverlay)
   {

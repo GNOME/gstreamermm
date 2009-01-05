@@ -1,8 +1,7 @@
 INCLUDES= -I$(top_builddir)/gstreamer -I$(top_srcdir)/gstreamer \
-	  -I$(top_builddir)/gstreamerbase -I$(top_srcdir)/gstreamerbase  @GSTREAMERMM_CFLAGS@
+	  @GSTREAMERMM_CFLAGS@
 
-LDADD=$(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la \
-	$(top_builddir)/gstreamerbase/gstreamerbasemm/libgstreamerbasemm-0.10.la
+LDADD=$(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la
 
 noinst_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \

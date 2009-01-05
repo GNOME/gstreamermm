@@ -12,8 +12,7 @@ referencedir=$(docdir)/reference/html
 HTML_INDEX=html/index.html
 
 $(HTML_INDEX): $(doxygen_configfile_source) $(beautify_docs) \
-	$(top_srcdir)/gstreamer/gstreamermm/*.h \
-	$(top_srcdir)/gstreamerbase/gstreamerbasemm/*.h
+	$(top_srcdir)/gstreamer/gstreamermm/*.h
 	-rm -rf html
 	$(doxygenprog) $(doxygen_configfile)
 	$(PERL_PATH) $(beautify_docs) html && touch $@

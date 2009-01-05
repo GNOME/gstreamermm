@@ -20,17 +20,17 @@
  */
 
 #include <gtkmm/main.h>
-#include <gstreamerbasemm/init.h>
+#include <gstreamermm/init.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
 
 // Plug-ins
 #include <gstreamermm/filesrc.h>
-#include <gstreamerbasemm/oggdemux.h>
-#include <gstreamerbasemm/vorbisdec.h>
-#include <gstreamerbasemm/audioconvert.h>
-#include <gstreamerbasemm/alsasink.h>
+#include <gstreamermm/oggdemux.h>
+#include <gstreamermm/vorbisdec.h>
+#include <gstreamermm/audioconvert.h>
+#include <gstreamermm/alsasink.h>
 
 #include <iostream>
 #include "player_window.h"
@@ -57,7 +57,7 @@ int
 main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
-  GstBase::init(argc, argv);
+  Gst::init(argc, argv);
 
   // Create the pipeline
   pipeline = Gst::Pipeline::create("audio-player");
@@ -72,7 +72,7 @@ main (int argc, char *argv[])
   }
 
   // Parses the ogg streams into elementary streams (note that an ogg file may contain a video stream too)
-  Glib::RefPtr<GstBase::OggDemux> parser = GstBase::OggDemux::create();
+  Glib::RefPtr<Gst::OggDemux> parser = Gst::OggDemux::create();
   if(!parser)
   {
     std::cerr << "oggdemux element could not be created" << std::endl;
@@ -80,7 +80,7 @@ main (int argc, char *argv[])
   }
 
   // Decodes a vorbis stream
-  decoder = GstBase::VorbisDec::create();
+  decoder = Gst::VorbisDec::create();
   if(!decoder)
   {
     std::cerr << "vorbisdec element could not be created" << std::endl;
@@ -88,7 +88,7 @@ main (int argc, char *argv[])
   }
 
   // Converts audio to a format which can be used by the next element
-  Glib::RefPtr<GstBase::AudioConvert> conv = GstBase::AudioConvert::create();
+  Glib::RefPtr<Gst::AudioConvert> conv = Gst::AudioConvert::create();
   if(!conv)
   {
     std::cerr << "audioconvert element could not be created" << std::endl;
@@ -96,7 +96,7 @@ main (int argc, char *argv[])
   }
 
   // Outputs sound to an ALSA audio device
-  Glib::RefPtr<GstBase::AlsaSink> sink = GstBase::AlsaSink::create();
+  Glib::RefPtr<Gst::AlsaSink> sink = Gst::AlsaSink::create();
   if(!sink)
   {
     std::cerr << "sink element could not be created" << std::endl;

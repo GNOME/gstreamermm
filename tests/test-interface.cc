@@ -20,7 +20,6 @@
  */
 
 #include <gstreamermm.h>
-#include <gstreamerbasemm.h>
 #include <iostream>
 
 int main (int argc, char* argv[])
@@ -59,8 +58,8 @@ int main (int argc, char* argv[])
       "'." << std::endl;
   }
 
-  Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
-    Gst::Interface::cast <GstBase::XOverlay>(element);
+  Glib::RefPtr< Gst::ElementInterfaced<Gst::XOverlay> > xoverlay =
+    Gst::Interface::cast <Gst::XOverlay>(element);
 
   if(xoverlay)
   {

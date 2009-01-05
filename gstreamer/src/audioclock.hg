@@ -21,29 +21,17 @@
 
 #include <gstreamermm/systemclock.h>
 
-_DEFS(gstreamerbasemm,gstbase)
+_DEFS(gstreamermm,gst)
 
-namespace GstBase
+namespace Gst
 {
 
-/** @defgroup GstBaseBaseClasses gstreamerbasemm Base Classes
- *  Wrapped gst-plugins-base base classes (plug-ins derrive from these).
- */
-
-/** @defgroup GstBasePlugins gstreamerbasemm Plugins
- *  Wrapped gst-plugins-base plugins.
- */
-
-/** @defgroup GstBaseInterfaces gstreamerbasemm Interfaces
- *  Wrapped gst-plugins-base interfaces.
- */
-
-/** GstBase::AudioClock — Helper object for implementing audio clocks.
- * GstBase::AudioClock makes it easy for elements to implement a Gst::Clock,
+/** Gst::AudioClock — Helper object for implementing audio clocks.
+ * Gst::AudioClock makes it easy for elements to implement a Gst::Clock,
  * they simply need to provide a slot that returns the current clock time.
  *
  * This object is internally used to implement the clock in
- * GstBase::BaseAudioSink.
+ * Gst::BaseAudioSink.
  *
  * Last reviewed on 2006-09-27 (0.10.12).
  */
@@ -59,7 +47,7 @@ public:
    * calculated. If this function returns Gst::CLOCK_TIME_NONE, the last
    * reported time will be returned by the clock.
    *
-   * @param clock The GstBase::AudioClock.
+   * @param clock The Gst::AudioClock.
    */
   typedef sigc::slot< Gst::ClockTime, const Glib::RefPtr<Gst::Clock>& > SlotGetTime;
 
@@ -67,14 +55,14 @@ protected:
   AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot);
 
 public:
-  /** Create a new GstBase::AudioClock instance. Whenever the clock time should
+  /** Create a new Gst::AudioClock instance. Whenever the clock time should
    * be calculated it will call @a time_slot. When @a time_slot returns
    * Gst::CLOCK_TIME_NONE, the clock will return the last reported time.
    * 
    *@param name The name of the clock.
    *@param time_slot A slot that returns the time.
    *
-   * @return a new GstBase::AudioClock.
+   * @return a new Gst::AudioClock.
    */
   _WRAP_CREATE(const Glib::ustring& name, const SlotGetTime& time_slot);
 
@@ -85,5 +73,5 @@ private:
 #endif
 };
 
-} // namespace GstBase
+} // namespace Gst
 

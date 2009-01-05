@@ -27,7 +27,7 @@ _CONV_ENUM(Gst,TagMergeMode)
 _CONV_ENUM(Gst,TaskState)
 _CONV_ENUM(Gst,URIType)
 
-###############Gstreamermm Class Conversions######################
+############### gstreamermm Class Conversions ######################
 
 #Gst::Object
 _CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
@@ -65,6 +65,9 @@ _CONVERSION(`GstClock*',`const Glib::RefPtr<Gst::Clock>&',`Glib::wrap($3)')
 _CONVERSION(`GstClockID',`Glib::RefPtr<Gst::ClockID>',`Glib::wrap((GstClockEntry*)($3))')
 _CONVERSION(`const Glib::RefPtr<Gst::ClockID>&',`GstClockEntry*',`($3)->gobj()')
 _CONVERSION(`GstClockEntry*',`const Glib::RefPtr<Gst::ClockID>&',`Glib::wrap($3)')
+
+#ColorBalanceChannel
+_CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`($3)->gobj()')
 
 #Element
 _CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `Glib::unwrap($3)')

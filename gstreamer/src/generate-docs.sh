@@ -7,17 +7,18 @@
 
 if [ -z "$JHBUILD_SOURCES" -o ! -x "`which docextract_to_xml.py`" ]; then
   echo -e "JHBUILD_SOURCES must contain path to jhbuild sources and \
-  docextract_to_xml.py\nneeds to be executable and in PATH."
+docextract_to_xml.py\nneeds to be executable and in PATH."
   exit 1;
 fi
 
 PREFIX="$JHBUILD_SOURCES"
 DIR=`dirname "$0"`
 
-PARAMS="-s $PREFIX/gstreamer/gst/ -s $PREFIX/gstreamer/docs/gst/tmpl -s $PREFIX/gstreamer/docs/libs/tmpl"
+PARAMS="-s $PREFIX/gstreamer/gst/ -s $PREFIX/gstreamer/docs/gst/tmpl -s $PREFIX/gstreamer/docs/libs/tmpl -s $PREFIX/gst-plugins-base/docs/libs/tmpl"
 
 for dir in "$PREFIX"/gstreamer/libs/gst/{base,controller,dataprotocol,net,\
-check}; do
+check} "$PREFIX"/gst-plugins-base/gst-libs/gst/{audio,cdda,fft,floatcast,\
+interfaces,netbuffer,riff,rtp,rtsp,sdp,tag,pbutils,video}; do
   PARAMS="$PARAMS -s $dir"
 done
 

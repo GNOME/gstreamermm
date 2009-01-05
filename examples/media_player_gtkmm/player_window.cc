@@ -30,14 +30,14 @@
 #include <gstreamermm/message.h>
 #include <gstreamermm/query.h>
 #include <gstreamermm/interface.h>
-#include <gstreamerbasemm/xoverlay.h>
+#include <gstreamermm/xoverlay.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include "player_window.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<GstBase::PlayBin2>& playbin,
-  const Glib::RefPtr<GstBase::XImageSink>& video_sink)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin,
+  const Glib::RefPtr<Gst::XImageSink>& video_sink)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button(Gtk::Stock::MEDIA_PLAY),
@@ -126,8 +126,8 @@ void PlayerWindow::on_bus_message_sync(
   Glib::RefPtr<Gst::Element> element =
       Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source());
 
-  Glib::RefPtr< Gst::ElementInterfaced<GstBase::XOverlay> > xoverlay =
-      Gst::Interface::cast <GstBase::XOverlay>(element);
+  Glib::RefPtr< Gst::ElementInterfaced<Gst::XOverlay> > xoverlay =
+      Gst::Interface::cast <Gst::XOverlay>(element);
 
   if(xoverlay)
   {

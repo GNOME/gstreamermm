@@ -49,4 +49,16 @@
 #include <gstreamermm/basetransform.h>
 #include <gstreamermm/pushsrc.h>
 
+// Base includes
+#include <gstreamermm/audioclock.h>
+#include <gstreamermm/audiofilter.h>
+#include <gstreamermm/audiosink.h>
+#include <gstreamermm/audiosrc.h>
+#include <gstreamermm/baseaudiosink.h>
+#include <gstreamermm/baseaudiosrc.h>
+#include <gstreamermm/cddabasesrc.h>
+#include <gstreamermm/colorbalance.h>
+#include <gstreamermm/colorbalancechannel.h>
+#include <gstreamermm/xoverlay.h>
+
 #endif // _GSTREAMERMM_H
