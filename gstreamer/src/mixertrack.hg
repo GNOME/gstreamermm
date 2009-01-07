@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/interfaces/colorbalancechannel.h>
 #include <glibmm/object.h>
 
 _DEFS(gstreamermm,gst)
@@ -27,17 +26,36 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-/** Gst::ColorBalanceChannel — Represents a color balance channel.
+//TODO: Include when bug #566824 is resolved.
+//_WRAP_ENUM(MixerTrackFlags, GstMixerTrackFlags)
+
+/** Gst::MixerTrack — A track in an element that implement the Gst::Mixer
+ * interface.
  */
-class ColorBalanceChannel : public Glib::Object
+class MixerTrack : public Glib::Object
 {
-  _CLASS_GOBJECT(ColorBalanceChannel, GstColorBalanceChannel, GST_COLOR_BALANCE_CHANNEL, Glib::Object, GObject)
+  _CLASS_GOBJECT(MixerTrack, GstMixerTrack, GST_MIXER_TRACK, Glib::Object, GObject)
 
 public:
-  /** Signals that the channel has changed.
-   * @param value The new value of the channel.
+  /** Get the number of channels in the Gst::MixerTrack.
    */
-  _WRAP_SIGNAL(void value_changed(int value), "value-changed")
+  _MEMBER_GET(num_channels, num_channels, guint32, guint32)
+
+  /** Get minimum volume of in the Gst::MixerTrack.
+   */
+  _MEMBER_GET(min_volume, min_volume, guint32, guint32)
+
+  /** Get the maximum volume of the Gst::MixerTrack.
+   */
+  _MEMBER_GET(max_volume, max_volume, guint32, guint32)
+
+  _WRAP_PROPERTY("flags", guint)
+  _WRAP_PROPERTY("index", guint)
+  _WRAP_PROPERTY("label", Glib::ustring)
+  _WRAP_PROPERTY("max-volume", int)
+  _WRAP_PROPERTY("min-volume", int)
+  _WRAP_PROPERTY("num-channels", int)
+  _WRAP_PROPERTY("untranslated-label", Glib::ustring)
 };
 
 } // namespace Gst

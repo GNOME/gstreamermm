@@ -133,14 +133,18 @@ gstreamermm_min_libxmlpp_version=2.14.0
 PKG_CHECK_MODULES(GSTREAMERMM, \
         glibmm-2.4 >= ${gstreamermm_min_glibmm_version} \
         giomm-2.4 >= ${gstreamermm_min_glibmm_version} \
+        libxml++-2.6 >= ${gstreamermm_min_libxmlpp_version} \
         gstreamer-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-base-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-controller-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-dataprotocol-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-net-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-plugins-base-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-audio-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-cdda-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-interfaces-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-rtp-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-video-0.10 >= ${gstreamermm_min_gst_version} \
-        libxml++-2.6 >= ${gstreamermm_min_libxmlpp_version} \
         )
 AC_SUBST(GSTREAMERMM_CFLAGS)
 AC_SUBST(GSTREAMERMM_LIBS)

@@ -1,0 +1,86 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/interfaces/mixer.h>
+#include <glibmm/interface.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+//TODO: Include enums when bug #566824 is resolved:
+//_WRAP_ENUM(MixerType, GstMixerType)
+//_WRAP_ENUM(MixerFlags, GstMixerFlags)
+//_WRAP_ENUM(MixerMessageType, GstMixerMessageType)
+
+class MixerOptions;
+class MixerTrack;
+
+/** Gst::Mixer — Interface for elements that provide mixer operations.
+ * @ingroup GstInterfaces
+ */
+class Mixer : public Glib::Interface
+{
+  _CLASS_INTERFACE(Mixer, GstMixer, GST_MIXER, GstMixerClass)
+
+public:
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<MixerTrack> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<MixerTrack> > list_tracks(), gst_mixer_list_tracks)
+
+  /** Get the current volume(s) on the given track.
+   *
+   * @param track the Gst::MixerTrack to get the volume from.
+   * @return an array of integers (of size track->num_channels) to with the
+   * current volume of each channel in the given track. 
+   */
+  Glib::ArrayHandle<int> get_volume(const Glib::RefPtr<Gst::MixerTrack>& track);
+  _IGNORE(gst_mixer_get_volume)
+
+#m4 _CONVERSION(`const Glib::ArrayHandle<int>&', `gint*', `const_cast<int*>(($3).data())')
+  _WRAP_METHOD(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), gst_mixer_set_volume)
+
+  _WRAP_METHOD(void set_mute(const Glib::RefPtr<Gst::MixerTrack>& track, bool mute), gst_mixer_set_mute)
+  _WRAP_METHOD(void set_record(const Glib::RefPtr<Gst::MixerTrack>& track, bool record), gst_mixer_set_record)
+  _WRAP_METHOD(void set_option(const Glib::RefPtr<Gst::MixerOptions>& opts, const Glib::ustring& value), gst_mixer_set_option)
+  _WRAP_METHOD(void mute_toggled(const Glib::RefPtr<Gst::MixerTrack>& track, bool mute), gst_mixer_mute_toggled)
+  _WRAP_METHOD(void record_toggled(const Glib::RefPtr<Gst::MixerTrack>& track, bool record), gst_mixer_record_toggled)
+  _WRAP_METHOD(void volume_changed(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), gst_mixer_volume_changed)
+  _WRAP_METHOD(void option_changed(const Glib::RefPtr<Gst::MixerOptions>& opts, const Glib::ustring& value), gst_mixer_option_changed)
+  _WRAP_METHOD(void options_list_changed(const Glib::RefPtr<Gst::MixerOptions>& opts), gst_mixer_options_list_changed)
+  _WRAP_METHOD(Glib::ustring get_option(const Glib::RefPtr<Gst::MixerOptions>& opts), gst_mixer_get_option)
+  _WRAP_METHOD(void mixer_changed(), gst_mixer_mixer_changed)
+
+  //TODO: Include enums when bug #566824 is resolved:
+  //_WRAP_METHOD(Gst::MixerFlags get_mixer_flags(), gst_mixer_get_mixer_flags)
+
+  /* TODO:
+  _WRAP_METHOD(satic Gst::MixerMessageType message_get_type(GstMessage *message), gst_mixer_message_get_type)
+  _WRAP_METHOD(static void message_parse_mute_toggled(GstMessage *message, GstMixerTrack **track, gboolean *mute), gst_mixer_message_parse_mute_toggled)
+  _WRAP_METHOD(static void message_parse_option_changed(GstMessage *message, GstMixerOptions **options, const gchar **value), gst_mixer_message_parse_option_changed)
+  _WRAP_METHOD(static void message_parse_record_toggled(GstMessage *message, GstMixerTrack **track, gboolean *record), gst_mixer_message_parse_record_toggled)
+  _WRAP_METHOD(static void message_parse_volume_changed(GstMessage *message, GstMixerTrack **track, gint **volumes, gint *num_channels), gst_mixer_message_parse_volume_changed)
+  _WRAP_METHOD(static void message_parse_options_list_changed(GstMessage *message, GstMixerOptions **options), gst_mixer_message_parse_options_list_changed)
+  */
+
+};
+
+} // namespace Gst

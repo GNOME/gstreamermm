@@ -288,7 +288,7 @@ void PlayerWindow::on_button_open()
   {
     working_dir = chooser.get_current_folder();
 
-    // Set filename property on the file source. 
+    // Set location property on the file source. 
     const std::string filename = chooser.get_filename(); //TODO: Can this use a URI?
     m_source_element->property_location() = filename;
     set_title( Glib::filename_display_basename(filename) );

@@ -20,9 +20,10 @@
 #include "glibmm_generate_extra_defs/generate_extra_defs.h"
 #include "get_plugin_defs.h"
 
+// Core includes
 #include <gst/gst.h>
 
-// Core includes
+// Core library includes
 #include <gst/base/gstbasesrc.h>
 #include <gst/base/gstbasesink.h>
 #include <gst/base/gstbasetransform.h>
@@ -30,8 +31,13 @@
 #include <gst/base/gstadapter.h>
 #include <gst/base/gstcollectpads.h>
 #include <gst/base/gstdataqueue.h>
+#include <gst/controller/gstcontroller.h>
+#include <gst/controller/gstcontrolsource.h>
+#include <gst/controller/gstinterpolationcontrolsource.h>
+#include <gst/controller/gstlfocontrolsource.h>
+#include <gst/net/gstnet.h>
 
-// base includes
+// Base library includes
 #include <gst/audio/gstaudioclock.h>
 #include <gst/audio/gstaudiofilter.h>
 #include <gst/audio/gstbaseaudiosink.h>
@@ -39,8 +45,22 @@
 #include <gst/audio/gstaudiosink.h>
 #include <gst/audio/gstaudiosrc.h>
 #include <gst/audio/gstringbuffer.h>
+#include <gst/cdda/gstcddabasesrc.h>
+#include <gst/rtp/gstbasertpaudiopayload.h>
+#include <gst/rtp/gstbasertpdepayload.h>
+#include <gst/rtp/gstbasertppayload.h>
+#include <gst/tag/gsttagdemux.h>
+#include <gst/video/gstvideosink.h>
+#include <gst/video/gstvideofilter.h>
+
+// Base interface includes
 #include <gst/interfaces/colorbalance.h>
 #include <gst/interfaces/colorbalancechannel.h>
+#include <gst/interfaces/mixer.h>
+#include <gst/interfaces/navigation.h>
+#include <gst/interfaces/propertyprobe.h>
+#include <gst/interfaces/tuner.h>
+#include <gst/interfaces/videoorientation.h>
 #include <gst/interfaces/xoverlay.h>
 
 int main (int argc, char *argv[])
@@ -84,7 +104,7 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_URI_HANDLER)
             << get_defs(GST_TYPE_XML)
 
-  // GStreamer library base types:
+  // GStreamer core library types:
             << get_defs(GST_TYPE_BASE_SRC)
             << get_defs(GST_TYPE_BASE_SINK)
             << get_defs(GST_TYPE_BASE_TRANSFORM)
@@ -92,6 +112,13 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_ADAPTER)
             << get_defs(GST_TYPE_COLLECT_PADS)
             << get_defs(GST_TYPE_DATA_QUEUE)
+            << get_defs(GST_TYPE_CONTROLLER)
+            << get_defs(GST_TYPE_CONTROL_SOURCE)
+            << get_defs(GST_TYPE_INTERPOLATION_CONTROL_SOURCE)
+            << get_defs(GST_TYPE_LFO_CONTROL_SOURCE)
+            << get_defs(GST_TYPE_NET_CLIENT_CLOCK)
+            << get_defs(GST_TYPE_NET_TIME_PROVIDER)
+            << get_defs(GST_TYPE_NET_TIME_PROVIDER)
 
   // GStreamer core plugin types:
             << get_plugin_defs("capsfilter")
@@ -115,10 +142,26 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_AUDIO_SINK)
             << get_defs(GST_TYPE_AUDIO_SRC)
             << get_defs(GST_TYPE_RING_BUFFER)
+            << get_defs(GST_TYPE_CDDA_BASE_SRC)
+            << get_defs(GST_TYPE_BASE_RTP_AUDIO_PAYLOAD)
+            << get_defs(GST_TYPE_BASE_RTP_DEPAYLOAD)
+            << get_defs(GST_TYPE_BASE_RTP_PAYLOAD)
+            << get_defs(GST_TYPE_TAG_DEMUX)
+            << get_defs(GST_TYPE_VIDEO_SINK)
+            << get_defs(GST_TYPE_VIDEO_FILTER)
 
   // gst-plugins-base (GStreamer base) interfaces:
             << get_defs(GST_TYPE_COLOR_BALANCE)
             << get_defs(GST_TYPE_COLOR_BALANCE_CHANNEL)
+            << get_defs(GST_TYPE_MIXER)
+            << get_defs(GST_TYPE_MIXER_TRACK)
+            << get_defs(GST_TYPE_MIXER_OPTIONS)
+            << get_defs(GST_TYPE_NAVIGATION)
+            << get_defs(GST_TYPE_PROPERTY_PROBE)
+            << get_defs(GST_TYPE_TUNER)
+            << get_defs(GST_TYPE_TUNER_CHANNEL)
+            << get_defs(GST_TYPE_TUNER_NORM)
+            << get_defs(GST_TYPE_VIDEO_ORIENTATION)
             << get_defs(GST_TYPE_X_OVERLAY)
 
    // Base class of playbin plugin:

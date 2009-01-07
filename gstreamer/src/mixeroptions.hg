@@ -19,25 +19,22 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/interfaces/colorbalancechannel.h>
-#include <glibmm/object.h>
+#include <gstreamermm/mixertrack.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-/** Gst::ColorBalanceChannel — Represents a color balance channel.
+/** Gst::MixerOptions — Options for elements that implement the * Gst::Mixer
+ * interface.
  */
-class ColorBalanceChannel : public Glib::Object
+class MixerOptions : public Gst::MixerTrack
 {
-  _CLASS_GOBJECT(ColorBalanceChannel, GstColorBalanceChannel, GST_COLOR_BALANCE_CHANNEL, Glib::Object, GObject)
-
+  _CLASS_GOBJECT(MixerOptions, GstMixerOptions, GST_MIXER_OPTIONS, Gst::MixerTrack, GstMixerTrack)
 public:
-  /** Signals that the channel has changed.
-   * @param value The new value of the channel.
-   */
-  _WRAP_SIGNAL(void value_changed(int value), "value-changed")
+#m4 _CONVERSION(`GList*', `Glib::ListHandle< Glib::ustring >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::ustring > get_values(), gst_mixer_options_get_values)
 };
 
 } // namespace Gst

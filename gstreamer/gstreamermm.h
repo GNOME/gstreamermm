@@ -43,13 +43,13 @@
 #include <gstreamermm/value.h>
 #include <gstreamermm/xml.h>
 
-// Library base includes
+// Core library base includes
 #include <gstreamermm/basesrc.h>
 #include <gstreamermm/basesink.h>
 #include <gstreamermm/basetransform.h>
 #include <gstreamermm/pushsrc.h>
 
-// Base includes
+// Base library includes
 #include <gstreamermm/audioclock.h>
 #include <gstreamermm/audiofilter.h>
 #include <gstreamermm/audiosink.h>
@@ -57,8 +57,13 @@
 #include <gstreamermm/baseaudiosink.h>
 #include <gstreamermm/baseaudiosrc.h>
 #include <gstreamermm/cddabasesrc.h>
+
+// Base inteface includes
 #include <gstreamermm/colorbalance.h>
 #include <gstreamermm/colorbalancechannel.h>
+#include <gstreamermm/mixer.h>
+#include <gstreamermm/mixeroptions.h>
+#include <gstreamermm/mixertrack.h>
 #include <gstreamermm/xoverlay.h>
 
 #endif // _GSTREAMERMM_H

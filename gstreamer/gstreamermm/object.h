@@ -44,10 +44,6 @@ namespace Gst
 //so that we can add code to the Object(GObject*) constructor.
 //(If this becomes difficult then we might add a _CUSTOM_CAST_CTOR() macro to gmmproc).
 
-//TODO: Paragraphs about floating references their effect on elements and how
-//to handle them using gst_object_ref() and gst_object_sink() are not included
-//in class docs below.  Should they be?
-
 /** Gst::Object — Base class for the GStreamer object hierarchy.
  * Gst::Object provides a root for the object hierarchy tree filed in by the
  * GStreamer library. It is currently a thin wrapper on top of Glib::Object.
@@ -143,8 +139,6 @@ public:
    */
   Glib::ustring get_name() const;
   
-  //TODO: floating reference comment not included in set_parent() method docs
-  //below.
   /** Sets the parent of object to parent. The object's reference count will
    * be incremented.
    *
