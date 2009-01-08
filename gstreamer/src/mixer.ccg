@@ -21,10 +21,9 @@
 
  #include <gst/interfaces/mixer.h>
  #include <gstreamermm/mixeroptions.h>
- #include <gstreamermm/mixertrack.h>
 
- namespace Gst
- {
+namespace Gst
+{
 
 Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<Gst::MixerTrack>& track)
 {
@@ -36,5 +35,74 @@ Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<Gst::MixerTrack>& tr
   return Glib::ArrayHandle<int>::ArrayHandle(volumes, num_channels,
     Glib::OWNERSHIP_DEEP);
 }
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+// This vfunc wrapper is manually written, because we want the C++ vfunc to
+// return the result instead of passing in a pointer in which to store it.
+
+void Mixer_Class::get_volume_vfunc_callback(GstMixer* self, GstMixerTrack* track, gint* volumes)
+{
+  CppObjectType *const obj = dynamic_cast<CppObjectType*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj && obj->is_derived_())
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    try // Trap C++ exceptions which would normally be lost because this is a C callback.
+    {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+      // Call the virtual member method, which derived classes might override.
+      Glib::ArrayHandle<int> result = obj->get_volume_vfunc(Glib::wrap(track, true));
+      const int* result_data = result.data();
+      for (int i = 0; i < result.size(); i++)
+      {
+        volumes[i] = result_data[i];
+      }
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
+  else
+  {
+    BaseClassType *const base = static_cast<BaseClassType*>(
+        g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+)    );
+
+    // Call the original underlying C function:
+    if(base && base->get_volume)
+      return (*base->get_volume)(self, track, volumes);
+  }
+}
+
+Glib::ArrayHandle<int> Gst::Mixer::get_volume_vfunc(const Glib::RefPtr<Gst::MixerTrack>& track)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  if(base && base->get_volume)
+  {
+    const guint32 num_channels = track->get_num_channels();
+    int* volumes = new int[num_channels];
+    (*base->get_volume)(const_cast<GstMixer*>(gobj()),const_cast<GstMixerTrack*>((track)->gobj()), volumes);
+    return Glib::ArrayHandle<int>(volumes, num_channels, Glib::OWNERSHIP_DEEP);
+  }
+
+  typedef Glib::ArrayHandle<int> RType;
+  return RType(0, 0, Glib::OWNERSHIP_DEEP);
+}
+#endif //GLIBMM_VFUNCS_ENABLED
+
 
 } // namespace Gst
