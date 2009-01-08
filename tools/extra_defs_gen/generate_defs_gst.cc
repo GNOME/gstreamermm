@@ -46,6 +46,7 @@
 #include <gst/audio/gstaudiosrc.h>
 #include <gst/audio/gstringbuffer.h>
 #include <gst/cdda/gstcddabasesrc.h>
+#include <gst/netbuffer/gstnetbuffer.h>
 #include <gst/rtp/gstbasertpaudiopayload.h>
 #include <gst/rtp/gstbasertpdepayload.h>
 #include <gst/rtp/gstbasertppayload.h>
@@ -143,6 +144,7 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_AUDIO_SRC)
             << get_defs(GST_TYPE_RING_BUFFER)
             << get_defs(GST_TYPE_CDDA_BASE_SRC)
+            << get_defs(GST_TYPE_NETBUFFER)
             << get_defs(GST_TYPE_BASE_RTP_AUDIO_PAYLOAD)
             << get_defs(GST_TYPE_BASE_RTP_DEPAYLOAD)
             << get_defs(GST_TYPE_BASE_RTP_PAYLOAD)

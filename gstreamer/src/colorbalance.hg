@@ -27,8 +27,7 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-//TODO: Include when bug #566822 is resolved.
-//_WRAP_ENUM(ColorBalanceType, GstColorBalanceType)
+_WRAP_ENUM(ColorBalanceType, GstColorBalanceType)
 
 class ColorBalanceChannel;
 
@@ -51,6 +50,20 @@ public:
   /** Fired when the value of the indicated channel has changed.
    */
   _WRAP_SIGNAL(void value_changed(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), "value-changed")
+
+#m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> >', `const GList*', `($3).data()')
+  //TODO: Include when bug #530416 is resolved.
+  ///** Lists the channels of the Gst::ColorBalance.
+   //*/
+  //_WRAP_VFUNC(Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> > list_channels(), "list_channels")
+
+  /** Sets the value of a Gst::ColorBalanceChannel of the Gst::ColorBalance.
+   */
+  _WRAP_VFUNC(void set_value(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), "set_value")
+
+  /** Gets the value of a Gst::ColorBalanceChannel of the Gst::ColorBalance.
+   */
+  _WRAP_VFUNC(int get_value(const Glib::RefPtr<ColorBalanceChannel>& channel), "get_value")
 };
 
 } // namespace Gst

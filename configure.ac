@@ -143,6 +143,7 @@ PKG_CHECK_MODULES(GSTREAMERMM, \
         gstreamer-audio-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-cdda-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-interfaces-0.10 >= ${gstreamermm_min_gst_version} \
+        gstreamer-netbuffer-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-rtp-0.10 >= ${gstreamermm_min_gst_version} \
         gstreamer-video-0.10 >= ${gstreamermm_min_gst_version} \
         )

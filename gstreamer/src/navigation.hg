@@ -19,42 +19,34 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/object.h>
+#include <gst/interfaces/navigation.h>
+#include <glibmm/interface.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-_WRAP_ENUM(MixerTrackFlags, GstMixerTrackFlags)
+class Structure;
 
-/** Gst::MixerTrack — A track in an element that implement the Gst::Mixer
- * interface.
+/** Gst::Naviagtion — Interface for elements that provide navigation
+ * functionality.
+ * @ingroup GstInterfaces
  */
-class MixerTrack : public Glib::Object
+class Navigation : public Glib::Interface
 {
-  _CLASS_GOBJECT(MixerTrack, GstMixerTrack, GST_MIXER_TRACK, Glib::Object, GObject)
+  _CLASS_INTERFACE(Navigation, GstNavigation, GST_NAVIGATION, GstNavigationInterface)
 
 public:
-  /** Get the number of channels in the Gst::MixerTrack.
-   */
-  _MEMBER_GET(num_channels, num_channels, guint32, guint32)
+  _WRAP_METHOD(void send_event(Gst::Structure& structure), gst_navigation_send_event)
+  _WRAP_METHOD(void send_key_event(const Glib::ustring& event, const Glib::ustring& key), gst_navigation_send_key_event)
+  _WRAP_METHOD(void send_mouse_event(const Glib::ustring& event, int button, double x, double y), gst_navigation_send_mouse_event)
 
-  /** Get minimum volume of in the Gst::MixerTrack.
-   */
-  _MEMBER_GET(min_volume, min_volume, guint32, guint32)
-
-  /** Get the maximum volume of the Gst::MixerTrack.
-   */
-  _MEMBER_GET(max_volume, max_volume, guint32, guint32)
-
-  _WRAP_PROPERTY("flags", guint)
-  _WRAP_PROPERTY("index", guint)
-  _WRAP_PROPERTY("label", Glib::ustring)
-  _WRAP_PROPERTY("max-volume", int)
-  _WRAP_PROPERTY("min-volume", int)
-  _WRAP_PROPERTY("num-channels", int)
-  _WRAP_PROPERTY("untranslated-label", Glib::ustring)
+//TODO:
+//#m4 _CONVERSION(`GstStructure*', `Gst::Structure&', `Glib::wrap(($3), true)')
+  ///** Called when an event has been sent to the Gst::Navigation.
+   //*/
+  //_WRAP_VFUNC(void send_event(Gst::Structure& structure), "send_event")
 };
 
 } // namespace Gst

@@ -1,5 +1,6 @@
 #Enums
 _CONV_ENUM(Gst,AssocFlags)
+_CONV_ENUM(Gst,BaseAudioSinkSlaveMethod)
 _CONV_ENUM(Gst,BufferCopyFlags)
 _CONV_ENUM(Gst,BufferFlag)
 _CONV_ENUM(Gst,ClockEntryType)
@@ -14,6 +15,7 @@ _CONV_ENUM(Gst,IndexFlags)
 _CONV_ENUM(Gst,IndexLookupMethod)
 _CONV_ENUM(Gst,IndexResolverMethod)
 _CONV_ENUM(Gst,MessageType)
+_CONV_ENUM(Gst,MixerFlags)
 _CONV_ENUM(Gst,PadDirection)
 _CONV_ENUM(Gst,PadLinkReturn)
 _CONV_ENUM(Gst,PadPresence)
@@ -143,6 +145,7 @@ _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')
 #Structure
 _CONVERSION(`const GstStructure*',`const Gst::Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
 _CONVERSION(`GstStructure*',`const Gst::Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
+_CONVERSION(`Gst::Structure&',`GstStructure*',`($3).gobj()')
 
 #TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`(($3).gobj())')

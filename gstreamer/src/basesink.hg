@@ -152,13 +152,8 @@ public:
   _WRAP_METHOD(bool is_async_enabled(), gst_base_sink_is_async_enabled)
   _WRAP_METHOD(void set_ts_offset(ClockTimeDiff offset), gst_base_sink_set_ts_offset)
   _WRAP_METHOD(ClockTimeDiff get_ts_offset(), gst_base_sink_get_ts_offset)
-
-  //TODO: Doesn't compile with GStreamer 0.10.20:
-  //_WRAP_METHOD(void set_render_delay(ClockTime delay), gst_base_sink_set_render_delay)
-
-  //TODO: Doesn't compile with GStreamer 0.10.20:
-  //_WRAP_METHOD(ClockTime get_render_delay(), gst_base_sink_get_render_delay)
-
+  _WRAP_METHOD(void set_render_delay(ClockTime delay), gst_base_sink_set_render_delay)
+  _WRAP_METHOD(ClockTime get_render_delay(), gst_base_sink_get_render_delay)
   _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> get_last_buffer(), gst_base_sink_get_last_buffer)
 
   /** Gets the sink Gst::Pad object of the element.
@@ -186,7 +181,7 @@ public:
    */
   _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps(), "get_caps")
 
-#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3)')
+#m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3, true)')
   ///** Notify subclass of changed caps.
    //*/
   //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& caps), "set_caps")
@@ -194,7 +189,7 @@ public:
 //TODO: #m4 _CONVERSION(`Glib::RefPtr<Gst::Buffer>&', `GstBuffer**', `*($3)')
   //_WRAP_VFUNC(FlowReturn buffer_alloc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer), "buffer_alloc")
 
-#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Gst::wrap($3)')
+#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Gst::wrap($3, true)')
 #m4 _CONVERSION(`GstClockTime*', `ClockTime&', `*($3)')
   /** Called to get the start and end times for synchronising the passed buffer
    * to the clock.

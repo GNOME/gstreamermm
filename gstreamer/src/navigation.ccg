@@ -19,22 +19,4 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
- #include <gst/interfaces/mixer.h>
- #include <gstreamermm/mixeroptions.h>
- #include <gstreamermm/mixertrack.h>
-
- namespace Gst
- {
-
-Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<Gst::MixerTrack>& track)
-{
-  const guint32 num_channels = track->get_num_channels();
-  int* volumes = new int[num_channels];
-
-  gst_mixer_get_volume(gobj(), track->gobj(), volumes);
-
-  return Glib::ArrayHandle<int>::ArrayHandle(volumes, num_channels,
-    Glib::OWNERSHIP_DEEP);
-}
-
-} // namespace Gst
+ #include <gstreamermm/structure.h>
