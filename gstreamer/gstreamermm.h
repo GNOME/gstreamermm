@@ -19,7 +19,7 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/filter.h>
 #include <gstreamermm/format.h>
-//TODO: #include <gstreamermm/ghostpad.h> (when bug #539108 is fixed)
+#include <gstreamermm/ghostpad.h>
 #include <gstreamermm/index.h>
 #include <gstreamermm/indexfactory.h>
 #include <gstreamermm/interface.h>

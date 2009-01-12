@@ -31,18 +31,24 @@ GhostPad::GhostPad(const Glib::ustring& name, const Glib::RefPtr<Gst::Pad>& targ
   : _CONSTRUCT("name", name.c_str(),
       "direction", (GstPadDirection) target->get_direction())
 {
-  if (!gst_ghost_pad_construct(gobj(), name.c_str(), target->gobj()))
+  if (!gst_ghost_pad_construct(gobj()) ||
+    !gst_ghost_pad_set_target(gobj(), target->gobj()))
+  {
     g_warning("Gst::GhostPad::GhostPad(const Glib::ustring&,"
-      " const Glib::RefPtr<Gst::Pad>&): Unsuccessful construction of ghost pad.");
+      " const Glib::RefPtr<Gst::Pad>&): "
+      "Unsuccessful construction of ghost pad (name = %s, target = %s).",
+      name.c_str(), target->get_name().c_str());
+  }
 }
 
 GhostPad::GhostPad(const Glib::ustring& name, PadDirection direction)
   : _CONSTRUCT("name", name.c_str(), "direction", (GstPadDirection) direction)
 {
-  if (!gst_ghost_pad_construct_no_target(gobj(), name.c_str(), (GstPadDirection) direction))
+  if (!gst_ghost_pad_construct(gobj()))
   {
     g_warning("Gst::GhostPad::GhostPad(const Glib::ustring&, PadDirection):"
-    " Unsuccessful construction of ghost pad.");
+    " Unsuccessful construction of ghost pad (name = %s, direction = %d).",
+    name.c_str(), direction);
   }
 }
 
@@ -51,11 +57,13 @@ GhostPad::GhostPad(const Glib::ustring& name, const Glib::RefPtr<Gst::Pad>& targ
     : _CONSTRUCT("name", name.c_str(), "direction",
         (GstPadDirection) target->get_direction(), "template", templ->gobj())
 {
-  if (!gst_ghost_pad_construct_from_template(gobj(), name.c_str(), target->gobj(), templ->gobj()))
+  if (!gst_ghost_pad_construct(gobj()) ||
+    !gst_ghost_pad_set_target(gobj(), target->gobj()))
   {
     g_warning("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::PadTemplate>&):"
-        " Unsuccessful construction of ghost pad.");
+        " Unsuccessful construction of ghost pad (name = %s, target = %s).",
+        name.c_str(), target->get_name().c_str());
   }
 }
 
@@ -63,11 +71,12 @@ GhostPad::GhostPad(const Glib::ustring& name, const Glib::RefPtr<Gst::PadTemplat
     : _CONSTRUCT("name", name.c_str(), "direction", 
         (GstPadDirection) templ->get_direction(), "template", templ->gobj())
 {
-  if (!gst_ghost_pad_construct_no_target_from_template(gobj(), name.c_str(), templ->gobj()))
+  if (!gst_ghost_pad_construct(gobj()))
   {
     g_warning("Gst::GhostPad::GhostPad(const Glib::ustring&,"
-      " const Glib::RefPtr<Gst::PadTemplate>&): Unsuccessful construction of ghost"
-        " pad.");
+      " const Glib::RefPtr<Gst::PadTemplate>&): "
+      "Unsuccessful construction of ghost pad (name = %s, templ = %s).",
+      name.c_str(), templ->get_name().c_str());
   }
 }
 
