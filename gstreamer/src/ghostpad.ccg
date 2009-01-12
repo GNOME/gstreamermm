@@ -27,9 +27,10 @@ _PINCLUDE(gstreamermm/private/pad_p.h)
 namespace Gst
 {
 
-GhostPad::GhostPad(const Glib::ustring& name, const Glib::RefPtr<Gst::Pad>& target)
+GhostPad::GhostPad(const Glib::ustring& name,
+  const Glib::RefPtr<Gst::Pad>& target)
   : _CONSTRUCT("name", name.c_str(),
-      "direction", (GstPadDirection) target->get_direction())
+    "direction", (GstPadDirection) target->get_direction())
 {
   if (!gst_ghost_pad_construct(gobj()) ||
     !gst_ghost_pad_set_target(gobj(), target->gobj()))
@@ -52,31 +53,35 @@ GhostPad::GhostPad(const Glib::ustring& name, PadDirection direction)
   }
 }
 
-GhostPad::GhostPad(const Glib::ustring& name, const Glib::RefPtr<Gst::Pad>& target,
+GhostPad::GhostPad(const Glib::ustring& name,
+  const Glib::RefPtr<Gst::Pad>& target,
   const Glib::RefPtr<Gst::PadTemplate>& templ)
-    : _CONSTRUCT("name", name.c_str(), "direction",
-        (GstPadDirection) target->get_direction(), "template", templ->gobj())
+  : _CONSTRUCT("name", name.c_str(), "direction",
+    (GstPadDirection) target->get_direction(), "template", templ->gobj())
 {
   if (!gst_ghost_pad_construct(gobj()) ||
     !gst_ghost_pad_set_target(gobj(), target->gobj()))
   {
     g_warning("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::PadTemplate>&):"
-        " Unsuccessful construction of ghost pad (name = %s, target = %s).",
-        name.c_str(), target->get_name().c_str());
+        " Unsuccessful construction of ghost pad "
+        "(name = %s, target = %s, templ = %s).",
+        name.c_str(), target->get_name().c_str(),
+        templ->get_name_template().c_str());
   }
 }
 
-GhostPad::GhostPad(const Glib::ustring& name, const Glib::RefPtr<Gst::PadTemplate>& templ)
-    : _CONSTRUCT("name", name.c_str(), "direction", 
-        (GstPadDirection) templ->get_direction(), "template", templ->gobj())
+GhostPad::GhostPad(const Glib::ustring& name,
+  const Glib::RefPtr<Gst::PadTemplate>& templ)
+  : _CONSTRUCT("name", name.c_str(), "direction", 
+    (GstPadDirection) templ->get_direction(), "template", templ->gobj())
 {
   if (!gst_ghost_pad_construct(gobj()))
   {
     g_warning("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::PadTemplate>&): "
       "Unsuccessful construction of ghost pad (name = %s, templ = %s).",
-      name.c_str(), templ->get_name().c_str());
+      name.c_str(), templ->get_name_template().c_str());
   }
 }
 
