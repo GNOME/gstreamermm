@@ -107,7 +107,7 @@ public:
    *
    * @param structure The Gst::Structure to merge.
    */
-  void merge_structure(const Structure& structure);
+  void merge_structure(Structure& structure);
   _IGNORE(gst_caps_merge_structure)
 
   /** Finds the structure in caps that has the index @a idx, and returns it.
@@ -115,7 +115,7 @@ public:
    * @param index The index of the structure.
    * @return The Gst::Structure corresponding to index.
    */
-  Structure get_structure(guint idx) const;
+  const Structure get_structure(guint idx) const;
   _IGNORE(gst_caps_get_structure)
 
   _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
@@ -155,16 +155,16 @@ public:
   _WRAP_METHOD(bool is_any() const, gst_caps_is_any)
   _WRAP_METHOD(bool empty() const, gst_caps_is_empty)
   _WRAP_METHOD(bool is_fixed() const, gst_caps_is_fixed)
-  _WRAP_METHOD(bool equals(const Glib::RefPtr<Gst::Caps>& other_caps) const, gst_caps_is_equal)
-  _WRAP_METHOD(bool equals_fixed(const Glib::RefPtr<Gst::Caps>& other_caps) const, gst_caps_is_equal_fixed)
-  _WRAP_METHOD(bool is_always_compatible(const Glib::RefPtr<Gst::Caps>& other_caps) const, gst_caps_is_always_compatible)
-  _WRAP_METHOD(bool is_subset(const Glib::RefPtr<Gst::Caps>& superset_caps) const, gst_caps_is_subset)
+  _WRAP_METHOD(bool equals(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_is_equal)
+  _WRAP_METHOD(bool equals_fixed(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_is_equal_fixed)
+  _WRAP_METHOD(bool is_always_compatible(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_is_always_compatible)
+  _WRAP_METHOD(bool is_subset(const Glib::RefPtr<const Gst::Caps>& superset_caps) const, gst_caps_is_subset)
 
   //This is const (returns a non const) because it always creates a new instance:
-  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_intersect(const Glib::RefPtr<Gst::Caps>& other_caps) const, gst_caps_intersect)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_intersect(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_intersect)
 
   //This is const (returns a non const) because it always creates a new instance:
-  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_union(const Glib::RefPtr<Gst::Caps>& other_caps) const, gst_caps_union)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_union(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_union)
 
   //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_normal() const, gst_caps_normalize)
@@ -182,8 +182,10 @@ public:
 
   _WRAP_METHOD(Glib::ustring to_string() const, gst_caps_to_string)
 
+  //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_difference(const Glib::RefPtr<const Gst::Caps>& subtrahend_caps) const, gst_caps_subtract)
-  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> make_writable(), gst_caps_make_writable)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> create_writable(), gst_caps_make_writable)
   _WRAP_METHOD(void truncate(), gst_caps_truncate)
 };
 

@@ -147,11 +147,11 @@ class BaseSrc
 
 public:
   _WRAP_METHOD(FlowReturn wait_playing(), gst_base_src_wait_playing)
-  _WRAP_METHOD(bool is_live(), gst_base_src_is_live)
+  _WRAP_METHOD(bool is_live() const, gst_base_src_is_live)
   _WRAP_METHOD(void set_live(bool live), gst_base_src_set_live)
   _WRAP_METHOD(void set_format(Format format), gst_base_src_set_format)
-  _WRAP_METHOD(bool query_latency(bool& live, ClockTime& min_latency, ClockTime& max_latency), gst_base_src_query_latency)
-  _WRAP_METHOD(bool get_do_timestamp(), gst_base_src_get_do_timestamp)
+  _WRAP_METHOD(bool query_latency(bool& live, ClockTime& min_latency, ClockTime& max_latency) const, gst_base_src_query_latency)
+  _WRAP_METHOD(bool get_do_timestamp() const, gst_base_src_get_do_timestamp)
   _WRAP_METHOD(void set_do_timestamp(bool timestamp), gst_base_src_set_do_timestamp)
 
   /** Gets the source Gst::Pad object of the element.
@@ -174,7 +174,7 @@ public:
 #m4 _CONVERSION(`Glib::RefPtr<Gst::Caps>', `GstCaps*', `($3)->gobj()')
   /** Called to get the caps to report.
    */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps(), "get_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps() const, "get_caps")
 
 #m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3, true)')
   ///** Notify subclass of changed output caps.
@@ -203,17 +203,17 @@ public:
   /** Given a buffer, return the start and stop time when it should be pushed
    * out. The base class will sync on the clock using these times.
    */
-  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end), "get_times")
+  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end) const, "get_times")
 
 #m4 _CONVERSION(`guint64&', `guint64*', `&($3)')
 #m4 _CONVERSION(`guint64*', `guint64&', `*($3)')
   ///** Return the total size of the resource, in the configured format.
    //*/
-  //_WRAP_VFUNC(bool get_size(guint64& size), "get_size")
+  //_WRAP_VFUNC(bool get_size(guint64& size) const, "get_size")
 
   ///** Check if the source can seek.
    //*/
-  //_WRAP_VFUNC(bool is_seekable(), "is_seekable")
+  //_WRAP_VFUNC(bool is_seekable() const, "is_seekable")
 
   ///** Unlock any pending access to the resource. Subclasses should unblock any
    //* blocked function ASAP.

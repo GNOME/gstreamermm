@@ -135,7 +135,7 @@ public:
   Glib::RefPtr<Gst::Event> copy() const;
 
   _WRAP_METHOD(const Gst::Structure get_structure() const, gst_event_get_structure)
-  _WRAP_METHOD(bool has_name(const Glib::ustring& name), gst_event_has_name)
+  _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_event_has_name)
 
   /** Checks if an event is writable.  If not, a writable copy is made and
    * returned.
@@ -308,7 +308,7 @@ public:
    * @param stop A pointer to store the stop value in.
    * @param position A pointer to store the stream time in.
    */
-  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position);
+  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position) const;
 
   /** Get the update, rate, format, start, stop, position and applied_rate in
    * the newsegment event. See create() for a full description of the
@@ -324,7 +324,7 @@ public:
    *
    * Since 0.10.6 
    */
-  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate);
+  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate) const;
   _IGNORE(gst_event_parse_new_segment, gst_event_parse_new_segment_full)
 };
 
@@ -344,7 +344,7 @@ public:
   /** Parses a tag event and stores the results in the given taglist location.
    * @return Metadata list.
    */
-  Gst::TagList parse();
+  Gst::TagList parse() const;
   _IGNORE(gst_event_parse_tag)
 };
 
@@ -375,7 +375,7 @@ public:
    * @param maxsize A pointer to store the maxsize in.
    * @param async A pointer to store the async-flag in.
    */
-  void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async);
+  void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async) const;
   _IGNORE(gst_event_parse_buffer_size)
 };
 
@@ -432,7 +432,7 @@ public:
    * @param diff A pointer to store the diff in.
    * @param timestamp A pointer to store the timestamp in.
    */
-  void parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp);
+  void parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp) const;
   _IGNORE(gst_event_parse_qos)
 };
 
@@ -497,7 +497,7 @@ public:
    * position.
    * @param stop Result location for the stop postion expressed in format.
    */
-  void parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop);
+  void parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop) const;
   _IGNORE(gst_event_parse_seek)
 };
 
@@ -541,7 +541,7 @@ public:
    *
    * @param latency A pointer to store the latency in. 
    */
-  void parse(ClockTime& latency);
+  void parse(ClockTime& latency) const;
   _IGNORE(gst_event_parse_latency)
 };
 

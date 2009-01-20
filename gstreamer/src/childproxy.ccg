@@ -28,6 +28,12 @@ Glib::RefPtr<Gst::ChildProxy> ChildProxy::get_proxy_property(const Glib::ustring
   return Glib::wrap(gobj(), true);
 }
 
+Glib::RefPtr<const Gst::ChildProxy> ChildProxy::get_proxy_property(const Glib::ustring& name, Glib::ValueBase& value) const
+{
+  gst_child_proxy_get_property(GST_OBJECT(gobj()), name.c_str(), value.gobj());
+  return Glib::wrap(const_cast<GstChildProxy*>(gobj()), true);
+}
+
 Glib::RefPtr<Gst::ChildProxy> ChildProxy::set_proxy_property(const Glib::ustring& name, const Glib::ValueBase& value)
 {
   gst_child_proxy_set_property(GST_OBJECT(gobj()), name.c_str(), value.gobj());

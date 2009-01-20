@@ -69,18 +69,6 @@ Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
     throw std::runtime_error("failed to link: " + get_name() + "->" + dest->get_name());
 }
 
-Glib::RefPtr<Gst::Pad> Element::create_compatible_pad(const Glib::RefPtr<Gst::Pad>& pad, const Glib::RefPtr<Gst::Caps>& caps)
-{
-  GstPad* c_pad = gst_element_get_compatible_pad(gobj(), pad->gobj(), caps->gobj());
-  return Glib::wrap(c_pad); //gst_element_get_compatible_pad gives us a reference.
-}
-
-Glib::RefPtr<Gst::PadTemplate> Element::get_compatible_pad_template(const Glib::RefPtr<Gst::PadTemplate>& padtemplate)
-{
-  GstPadTemplate* c_padtemplate = gst_element_get_compatible_pad_template(gobj(), padtemplate->gobj());
-  return Glib::wrap(c_padtemplate, true /* take reference */); //gst_element_get_compatible_pad_template() does not give us a reference.
-}
-
 bool Element::query_position(Format& format) const
 {
   return gst_element_query_position(const_cast<GstElement*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);

@@ -59,7 +59,7 @@ _CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`const GstCaps*', `Glib::unwr
 _CONVERSION(`GstClock*',`Glib::RefPtr<Gst::Clock>',`Glib::wrap($3)')
 _CONVERSION(`GstClock*',`Glib::RefPtr<const Gst::Clock>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Clock>&',`GstClock*', `Glib::unwrap($3)')
-_CONVERSION(`const Clock&',`GstClock*',`((GstClock*) (&($3)))')
+_CONVERSION(`const Clock&',`GstClock*',`((GstClock*)(&($3)))')
 _CONVERSION(`Glib::RefPtr<Gst::Clock>',`GstClock*', `Glib::unwrap($3)')
 _CONVERSION(`GstClock*',`const Glib::RefPtr<Gst::Clock>&',`Glib::wrap($3)')
 
@@ -70,6 +70,7 @@ _CONVERSION(`GstClockEntry*',`const Glib::RefPtr<Gst::ClockID>&',`Glib::wrap($3)
 
 #ColorBalanceChannel
 _CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`($3)->gobj()')
+_CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>(($3)->gobj())')
 
 #Element
 _CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `Glib::unwrap($3)')
@@ -77,10 +78,11 @@ _CONVERSION(`GstElement*',`Glib::RefPtr<Gst::Element>',`Glib::wrap($3)')
 _CONVERSION(`GstElement*',`Glib::RefPtr<const Gst::Element>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Element>&',`GstElement*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Element>&',`GstElement*', `const_cast<GstElement*>(Glib::unwrap($3))')
-_CONVERSION(`State&',`GstState*',`((GstState*) (&($3)))')
+_CONVERSION(`State&',`GstState*',`((GstState*)(&($3)))')
 
 #ElementFactory
 _CONVERSION(`GstElementFactory*',`Glib::RefPtr<Gst::ElementFactory>',`Glib::wrap($3)')
+_CONVERSION(`GstElementFactory*',`Glib::RefPtr<const Gst::ElementFactory>',`Glib::wrap($3)')
 
 #Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Gst::unwrap($3)')
@@ -103,7 +105,9 @@ _CONVERSION(`GstIndexFactory*',`Glib::RefPtr<Gst::IndexFactory>',`Glib::wrap($3)
 #
 #Iterator
 _CONVERSION(`GstIterator*',`Gst::Iterator<Gst::Element>',`Gst::Iterator<Gst::Element>::Iterator($3)')
+_CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Element>',`Gst::Iterator<const Gst::Element>::Iterator($3)')
 _CONVERSION(`GstIterator*',`Gst::Iterator<Gst::Pad>',`Gst::Iterator<Gst::Pad>::Iterator($3)')
+_CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Pad>',`Gst::Iterator<const Gst::Pad>::Iterator($3)')
 _CONVERSION(`GstIterator*',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>::IteratorBasic($3)')
 
 #Message
@@ -121,11 +125,13 @@ _CONVERSION(`GstPad*',`Glib::RefPtr<Gst::Pad>',`Glib::wrap($3)')
 _CONVERSION(`GstPad*',`Glib::RefPtr<const Gst::Pad>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Pad>',`GstPad*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Pad>&',`GstPad*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Pad>&',`GstPad*',`const_cast<GstPad*>(($3)->gobj())')
 
 #PadTemplate
 _CONVERSION(`const Glib::RefPtr<Gst::PadTemplate>&',`GstPadTemplate*', `Glib::unwrap($3)')
 _CONVERSION(`GstPadTemplate*',`Glib::RefPtr<Gst::PadTemplate>', `Glib::wrap($3)')
 _CONVERSION(`GstPadTemplate*',`const Glib::RefPtr<Gst::PadTemplate>&', `Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>(($3)->gobj())')
 
 #Plugin
 _CONVERSION(`const Glib::RefPtr<Gst::Plugin>&',`GstPlugin*',`Glib::unwrap($3)')
@@ -150,7 +156,7 @@ _CONVERSION(`Gst::Structure&',`GstStructure*',`($3).gobj()')
 #TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`(($3).gobj())')
 _CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap($3, 0, true)')
-_CONVERSION(`const Gst::TagList&',`GstTagList*',`const_cast<GstTagList*>(($3).gobj())')
+_CONVERSION(`Gst::TagList&',`GstTagList*',`($3).gobj()')
 _CONVERSION(`const GstTagList*',`Gst::TagList',`Glib::wrap(const_cast<GstTagList*>($3), 0, true)')
 _CONVERSION(`Gst::TagList',`GstTagList*',`($3).gobj()')
 
@@ -161,7 +167,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`Glib::unwra
 
 #Basic General Conversions
 _CONVERSION(`gint64&',`gint64*',`&($3)')
-_CONVERSION(`bool&',`gboolean*',`(($2) &($3))')
+_CONVERSION(`bool&',`gboolean*',`(($2)&($3))')
 _CONVERSION(`const guint&',`guint',`$3')
 _CONVERSION(`const guint32&',`guint32',`$3')
 
@@ -170,7 +176,7 @@ _CONVERSION(`ClockTime&',`GstClockTime*',`(GstClockTime*)(&($3))')
 _CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff($3)')
 _CONVERSION(`GstClockTimeDiff',`ClockTimeDiff',`ClockTimeDiff($3)')
 _CONVERSION(`ClockTimeDiff&',`GstClockTimeDiff*',`(GstClockTimeDiff*)(&($3))')
-_CONVERSION(`Format&',`GstFormat*',`(($2) &($3))')
+_CONVERSION(`Format&',`GstFormat*',`(($2)&($3))')
 _CONVERSION(`GstClockTimeDiff*',`ClockTimeDiff&',`(ClockTimeDiff&)(*($3))')
 _CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
 _CONVERSION(`GstState*',`State&',`(State&)($3)')

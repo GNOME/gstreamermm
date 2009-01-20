@@ -83,8 +83,8 @@ int main(int argc, char* argv[])
   source->property_num_buffers() = 5;
 
   // Enable the fakesink handoff signal emition and connect slot:
-  source->property_signal_handoffs() = true;
-  source->signal_handoff().connect(sigc::ptr_fun(on_handoff));
+  sink->property_signal_handoffs() = true;
+  sink->signal_handoff().connect(sigc::ptr_fun(on_handoff));
 
   // Now set to playing and iterate:
   std::cout << "Setting to PLAYING." << std::endl;

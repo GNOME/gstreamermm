@@ -22,3 +22,18 @@
 #include <gstreamermm/pad.h>
 
 _PINCLUDE(gstreamermm/private/element_p.h)
+
+namespace Gst
+{
+
+ClockReturn BaseSink::wait_clock(ClockTime time)
+{
+  return (ClockReturn)(gst_base_sink_wait_clock(const_cast<GstBaseSink*>(gobj()), (GstClockTime)(time), NULL));
+}
+
+FlowReturn BaseSink::wait_eos(ClockTime time)
+{
+  return (FlowReturn)(gst_base_sink_wait_eos(const_cast<GstBaseSink*>(gobj()), (GstClockTime)(time), NULL));
+}
+
+} // namespace Gst

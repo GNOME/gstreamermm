@@ -42,7 +42,10 @@ public:
 #m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> > list_channels(), gst_color_balance_list_channels)
 
-  _WRAP_METHOD(int get_value(const Glib::RefPtr<ColorBalanceChannel>& channel), gst_color_balance_get_value)
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const ColorBalanceChannel> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const ColorBalanceChannel> > list_channels() const, gst_color_balance_list_channels)
+
+  _WRAP_METHOD(int get_value(const Glib::RefPtr<const ColorBalanceChannel>& channel) const, gst_color_balance_get_value)
   _WRAP_METHOD(void set_value(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), gst_color_balance_set_value)
   _WRAP_METHOD(void value_changed(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), gst_color_balance_value_changed)
 
@@ -61,9 +64,10 @@ public:
    */
   _WRAP_VFUNC(void set_value(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), "set_value")
 
+#m4 _CONVERSION(`GstColorBalanceChannel*', `const Glib::RefPtr<const ColorBalanceChannel>&', `Glib::wrap($3, true)')
   /** Gets the value of a Gst::ColorBalanceChannel of the Gst::ColorBalance.
    */
-  _WRAP_VFUNC(int get_value(const Glib::RefPtr<ColorBalanceChannel>& channel), "get_value")
+  _WRAP_VFUNC(int get_value(const Glib::RefPtr<const ColorBalanceChannel>& channel) const, "get_value")
 };
 
 } // namespace Gst

@@ -137,24 +137,67 @@ class BaseSink
   _CLASS_GOBJECT(BaseSink, GstBaseSink, GST_BASE_SINK, Element, GstElement)
 
 public:
-  _WRAP_METHOD(bool query_latency(bool& live, bool& upstream_live, ClockTime& min_latency, ClockTime& max_latency), gst_base_sink_query_latency)
-  _WRAP_METHOD(ClockTime get_latency(), gst_base_sink_get_latency)
+  _WRAP_METHOD(bool query_latency(bool& live, bool& upstream_live, ClockTime& min_latency, ClockTime& max_latency) const, gst_base_sink_query_latency)
+  _WRAP_METHOD(ClockTime get_latency() const, gst_base_sink_get_latency)
   _WRAP_METHOD(FlowReturn wait_preroll(), gst_base_sink_wait_preroll)
   _WRAP_METHOD(ClockReturn wait_clock(ClockTime time, ClockTimeDiff& jitter), gst_base_sink_wait_clock)
+
+  /** This function will block until time is reached.  It is usually called by
+   * subclasses that use their own internal synchronisation.
+   *
+   * If time is not valid, no sycnhronisation is done and Gst::CLOCK_BADTIME is
+   * returned. Likewise, if synchronisation is disabled in the element or there
+   * is no clock, no synchronisation is done and Gst::CLOCK_BADTIME is
+   * returned.
+   *
+   * This function should only be called with the PREROLL_LOCK held, like when
+   * receiving an EOS event in the event vmethod or when receiving a buffer in
+   * the render vmethod.
+   *
+   * The time argument should be the running_time of when this method should
+   * return and is not adjusted with any latency or offset configured in the
+   * sink.
+   *
+   * Since 0.10.20.
+   *
+   * @param time The running_time to be reached.
+   * @return Gst::ClockReturn.
+   */
+  ClockReturn wait_clock(ClockTime time);
+
   _WRAP_METHOD(FlowReturn wait_eos(ClockTime time, ClockTimeDiff& jitter), gst_base_sink_wait_eos)
+
+  /** This function will block until time is reached.  It is usually called by
+   * subclasses that use their own internal synchronisation but want to let the
+   * EOS be handled by the base class.
+   *
+   * This function should only be called with the PREROLL_LOCK held, like when
+   * receiving an EOS event in the event vmethod.
+   *
+   * The time argument should be the running_time of when the EOS should happen
+   * and will be adjusted with any latency and offset configured in the sink.
+   * 
+   * Since 0.10.15.
+   * 
+   * @param time The running time to be reached.
+   * @return Gst::FlowReturn.
+   */
+   FlowReturn wait_eos(ClockTime time);
+
   _WRAP_METHOD(void set_sync(bool sync), gst_base_sink_set_sync)
-  _WRAP_METHOD(bool get_sync(), gst_base_sink_get_sync)
+  _WRAP_METHOD(bool get_sync() const, gst_base_sink_get_sync)
   _WRAP_METHOD(void set_max_lateness(gint64 max_lateness), gst_base_sink_set_max_lateness)
-  _WRAP_METHOD(gint64 get_max_lateness(), gst_base_sink_get_max_lateness)
+  _WRAP_METHOD(gint64 get_max_lateness() const, gst_base_sink_get_max_lateness)
   _WRAP_METHOD(void set_qos_enabled(bool enabled), gst_base_sink_set_qos_enabled)
-  _WRAP_METHOD(bool is_qos_enabled(), gst_base_sink_is_qos_enabled)
+  _WRAP_METHOD(bool is_qos_enabled() const, gst_base_sink_is_qos_enabled)
   _WRAP_METHOD(void set_async_enabled(bool enabled), gst_base_sink_set_async_enabled) 
-  _WRAP_METHOD(bool is_async_enabled(), gst_base_sink_is_async_enabled)
+  _WRAP_METHOD(bool is_async_enabled() const, gst_base_sink_is_async_enabled)
   _WRAP_METHOD(void set_ts_offset(ClockTimeDiff offset), gst_base_sink_set_ts_offset)
-  _WRAP_METHOD(ClockTimeDiff get_ts_offset(), gst_base_sink_get_ts_offset)
+  _WRAP_METHOD(ClockTimeDiff get_ts_offset() const, gst_base_sink_get_ts_offset)
   _WRAP_METHOD(void set_render_delay(ClockTime delay), gst_base_sink_set_render_delay)
-  _WRAP_METHOD(ClockTime get_render_delay(), gst_base_sink_get_render_delay)
+  _WRAP_METHOD(ClockTime get_render_delay() const, gst_base_sink_get_render_delay)
   _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> get_last_buffer(), gst_base_sink_get_last_buffer)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Buffer> get_last_buffer() const, gst_base_sink_get_last_buffer, constversion)
 
   /** Gets the sink Gst::Pad object of the element.
    */
@@ -179,7 +222,7 @@ public:
 #m4 _CONVERSION(`Glib::RefPtr<Gst::Caps>', `GstCaps*', `($3)->gobj()')
   /** Called to get sink pad caps from the subclass.
    */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps(), "get_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps() const, "get_caps")
 
 #m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3, true)')
   ///** Notify subclass of changed caps.
@@ -194,7 +237,7 @@ public:
   /** Called to get the start and end times for synchronising the passed buffer
    * to the clock.
    */
-  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end), "get_times")
+  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end) const, "get_times")
 
   ///** Start processing. Ideal for opening resources in the subclass.
    //*/
