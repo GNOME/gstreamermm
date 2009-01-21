@@ -47,7 +47,6 @@ _CONVERSION(`Glib::RefPtr<Gst::Buffer>',`GstBuffer*', `Glib::unwrap($3)')
 #Bus
 _CONVERSION(`const Glib::RefPtr<Gst::Bus>&',`GstBus*', `Glib::unwrap($3)')
 _CONVERSION(`GstBus*',`Glib::RefPtr<Gst::Bus>',`Glib::wrap($3)')
-_CONVERSION(`GstBus*',`const Glib::RefPtr<Gst::Bus>&',`Glib::wrap($3)')
 
 #Caps
 _CONVERSION(`GstCaps*',`Glib::RefPtr<Gst::Caps>',`Glib::wrap($3)')
@@ -62,12 +61,10 @@ _CONVERSION(`GstClock*',`Glib::RefPtr<const Gst::Clock>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Clock>&',`GstClock*', `Glib::unwrap($3)')
 _CONVERSION(`const Clock&',`GstClock*',`((GstClock*)(&($3)))')
 _CONVERSION(`Glib::RefPtr<Gst::Clock>',`GstClock*', `Glib::unwrap($3)')
-_CONVERSION(`GstClock*',`const Glib::RefPtr<Gst::Clock>&',`Glib::wrap($3)')
 
 #ClockID
 _CONVERSION(`GstClockID',`Glib::RefPtr<Gst::ClockID>',`Glib::wrap((GstClockEntry*)($3))')
 _CONVERSION(`const Glib::RefPtr<Gst::ClockID>&',`GstClockEntry*',`($3)->gobj()')
-_CONVERSION(`GstClockEntry*',`const Glib::RefPtr<Gst::ClockID>&',`Glib::wrap($3)')
 
 #ColorBalanceChannel
 _CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`($3)->gobj()')
@@ -87,18 +84,15 @@ _CONVERSION(`GstElementFactory*',`Glib::RefPtr<const Gst::ElementFactory>',`Glib
 
 #Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Gst::unwrap($3)')
-_CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Gst::wrap($3)')
 
 #Index
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Gst::Index>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Index>&',`GstIndex*',`Glib::unwrap($3)')
 _CONVERSION(`const Gst::IndexAssociation&',`const GstIndexAssociation*',`((GstIndexAssociation*)(&($3)))')
-_CONVERSION(`GstIndex*',`const Glib::RefPtr<Gst::Index>&',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Index>',`GstIndex*',`Glib::unwrap($3)')
 
 #IndexEntry
 _CONVERSION(`GstIndexEntry*',`Gst::IndexEntry',`Glib::wrap($3)')
-_CONVERSION(`GstIndexEntry*',`const Gst::IndexEntry&',`Glib::wrap($3)')
 _CONVERSION(`const Gst::IndexEntry&',`GstIndexEntry*',`const_cast<GstIndexEntry*>(($3).gobj())')
 
 #IndexFactory
@@ -115,7 +109,6 @@ _CONVERSION(`GstIterator*',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>',
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<const Gst::Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `Glib::unwrap($3)')
-_CONVERSION(`GstMessage*',`const Glib::RefPtr<Gst::Message>&',`Gst::Message::wrap($3)')
 
 #Mixer
 _CONVERSION(`const Glib::RefPtr<Gst::MixerOptions>&',`GstMixerOptions*', `Glib::unwrap($3)')
@@ -132,7 +125,6 @@ _CONVERSION(`const Glib::RefPtr<const Gst::Pad>&',`GstPad*',`const_cast<GstPad*>
 #PadTemplate
 _CONVERSION(`const Glib::RefPtr<Gst::PadTemplate>&',`GstPadTemplate*', `Glib::unwrap($3)')
 _CONVERSION(`GstPadTemplate*',`Glib::RefPtr<Gst::PadTemplate>', `Glib::wrap($3)')
-_CONVERSION(`GstPadTemplate*',`const Glib::RefPtr<Gst::PadTemplate>&', `Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>(($3)->gobj())')
 
 #Plugin
@@ -145,7 +137,6 @@ _CONVERSION(`const Glib::RefPtr<Gst::PluginFeature>&',`GstPluginFeature*',`Glib:
 
 #Query
 _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Gst::unwrap($3)')
-_CONVERSION(`GstQuery*',`const Glib::RefPtr<Gst::Query>&', `Gst::wrap($3)')
 
 #Registry
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')
