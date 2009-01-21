@@ -86,7 +86,8 @@ public:
   _WRAP_METHOD(Glib::ustring get_source() const, gst_plugin_get_source)
   _WRAP_METHOD(Glib::ustring get_version() const, gst_plugin_get_version)
 
-  _WRAP_METHOD(GModule* get_module() const, gst_plugin_get_module)
+  _WRAP_METHOD(GModule* get_module(), gst_plugin_get_module)
+  _WRAP_METHOD(const GModule* get_module() const, gst_plugin_get_module, constversion)
 
   _WRAP_METHOD(bool is_loaded() const, gst_plugin_is_loaded)
 
@@ -97,9 +98,9 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::Plugin> load(), gst_plugin_load)
   _WRAP_METHOD(static Glib::RefPtr<Gst::Plugin> load_by_name(const Glib::ustring& name), gst_plugin_load_by_name)
 
-
-#m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >',`GList*',`($3).data()')
-  _WRAP_METHOD(static void free(Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >), gst_plugin_list_free)
+  // Don't wrap gst_plugin_list_free because Glib::ListHandle<> already takes
+  // care of freeing.
+  _IGNORE(gst_plugin_list_free)
 
 //TODO: Include if bug #545787 is accepted; remove if not.
 /*

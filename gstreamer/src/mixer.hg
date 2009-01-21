@@ -46,13 +46,16 @@ public:
 #m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > list_tracks(), gst_mixer_list_tracks)
 
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::MixerTrack> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::MixerTrack> > list_tracks() const, gst_mixer_list_tracks)
+
   /** Get the current volume(s) on the given track.
    *
    * @param track the Gst::MixerTrack to get the volume from.
    * @return an array of integers (of size track->num_channels) to with the
    * current volume of each channel in the given track. 
    */
-  Glib::ArrayHandle<int> get_volume(const Glib::RefPtr<Gst::MixerTrack>& track);
+  Glib::ArrayHandle<int> get_volume(const Glib::RefPtr<const Gst::MixerTrack>& track) const;
   _IGNORE(gst_mixer_get_volume)
 
 #m4 _CONVERSION(`const Glib::ArrayHandle<int>&', `gint*', `const_cast<int*>(($3).data())')
@@ -66,9 +69,9 @@ public:
   _WRAP_METHOD(void volume_changed(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), gst_mixer_volume_changed)
   _WRAP_METHOD(void option_changed(const Glib::RefPtr<Gst::MixerOptions>& opts, const Glib::ustring& value), gst_mixer_option_changed)
   _WRAP_METHOD(void options_list_changed(const Glib::RefPtr<Gst::MixerOptions>& opts), gst_mixer_options_list_changed)
-  _WRAP_METHOD(Glib::ustring get_option(const Glib::RefPtr<Gst::MixerOptions>& opts), gst_mixer_get_option)
+  _WRAP_METHOD(Glib::ustring get_option(const Glib::RefPtr<const Gst::MixerOptions>& opts) const, gst_mixer_get_option)
   _WRAP_METHOD(void mixer_changed(), gst_mixer_mixer_changed)
-  _WRAP_METHOD(Gst::MixerFlags get_mixer_flags(), gst_mixer_get_mixer_flags)
+  _WRAP_METHOD(Gst::MixerFlags get_mixer_flags() const, gst_mixer_get_mixer_flags)
 
   /* TODO:
   _WRAP_METHOD(satic Gst::MixerMessageType message_get_type(GstMessage *message), gst_mixer_message_get_type)
@@ -81,15 +84,15 @@ public:
 
 //TODO:
 //#m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> >', `const GList*', `($3).data()')
-  //_WRAP_VFUNC(Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > list_tracks(), "list_tracks")
-
-#m4 _CONVERSION(`GstMixerTrack*',`const Glib::RefPtr<Gst::MixerTrack>&', `Glib::wrap(($3), true)')
+  //_WRAP_VFUNC(Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > list_tracks() const, "list_tracks")
 
 #ifdef GLIBMM_VFUNCS_ENABLED
 // This vfunc is handcoded because we want to have it return the result instead
 // of requiring a pointer parameter in which to put it like the C API does.
-  virtual Glib::ArrayHandle<int> get_volume_vfunc(const Glib::RefPtr<Gst::MixerTrack>& track);
+  virtual Glib::ArrayHandle<int> get_volume_vfunc(const Glib::RefPtr<const Gst::MixerTrack>& track) const;
 #endif //GLIBMM_VFUNCS_ENABLED
+
+#m4 _CONVERSION(`GstMixerTrack*',`const Glib::RefPtr<Gst::MixerTrack>&', `Glib::wrap(($3), true)')
 
 //TODO:
   //_WRAP_VFUNC(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), "set_volume")
@@ -101,7 +104,7 @@ public:
   _WRAP_VFUNC(void set_option(const Glib::RefPtr<Gst::MixerOptions>& opts, const Glib::ustring& value), "set_option")
 
   //TODO:
-  //_WRAP_VFUNC(Glib::ustring get_option(const Glib::RefPtr<Gst::MixerOptions>& opts), "get_option")
+  //_WRAP_VFUNC(Glib::ustring get_option(const Glib::RefPtr<const Gst::MixerOptions>& opts) const, "get_option")
 
 protected:
 #m4begin

@@ -37,6 +37,10 @@ class Event;
 class PadTemplate;
 class Query;
 
+//Gst::Iterator<> forward declaration.
+template <class CppType>
+class Iterator;
+
 _WRAP_ENUM(PadDirection, GstPadDirection)
 _WRAP_ENUM(PadFlags, GstPadFlags)
 _WRAP_ENUM(PadLinkReturn, GstPadLinkReturn)
@@ -80,8 +84,8 @@ class Pad : public Object
 protected:
   _WRAP_CTOR(Pad(const Glib::ustring& name, PadDirection direction), gst_pad_new)
   Pad(PadDirection dir);
-  Pad(const Glib::RefPtr<Gst::PadTemplate>& templ, const Glib::ustring& name);
-  Pad(const Glib::RefPtr<Gst::PadTemplate>& templ);
+  Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ, const Glib::ustring& name);
+  Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ);
 
 public:
   /** For example,
@@ -119,7 +123,7 @@ public:
    * @param name The name of the element.
    * @return A new Gst::Pad, or NULL in case of an error.
    */
-  _WRAP_CREATE(const Glib::RefPtr<Gst::PadTemplate>& pad_template)
+  _WRAP_CREATE(const Glib::RefPtr<const Gst::PadTemplate>& pad_template)
 
   /** Creates a new pad with a guaranteed unique name (across all pads) from
    * the given template.
@@ -127,16 +131,17 @@ public:
    * @param templ The pad template to use.
    * @return A new Gst::Pad, or NULL in case of an error.
    */
-  _WRAP_CREATE(const Glib::RefPtr<Gst::PadTemplate>& pad_template, const Glib::ustring& name)
+  _WRAP_CREATE(const Glib::RefPtr<const Gst::PadTemplate>& pad_template, const Glib::ustring& name)
 
   _WRAP_METHOD(PadDirection get_direction() const, gst_pad_get_direction)
   _WRAP_METHOD(Glib::RefPtr<Gst::Element> get_parent_element(), gst_pad_get_parent_element)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Element> get_parent_element() const, gst_pad_get_parent_element, constversion)
-  _WRAP_METHOD(Glib::RefPtr<Gst::PadTemplate> get_pad_template() const, gst_pad_get_pad_template)
+  _WRAP_METHOD(Glib::RefPtr<Gst::PadTemplate> get_pad_template(), gst_pad_get_pad_template)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::PadTemplate> get_pad_template() const, gst_pad_get_pad_template, constversion)
   _WRAP_METHOD(PadLinkReturn link(const Glib::RefPtr<Gst::Pad>& sink_pad), gst_pad_link)
   _WRAP_METHOD(bool unlink(const Glib::RefPtr<Gst::Pad>& sink_pad), gst_pad_unlink)
   _WRAP_METHOD(bool is_linked() const, gst_pad_is_linked)
-  _WRAP_METHOD(bool can_link(const Glib::RefPtr<Gst::Pad>& other_pad), gst_pad_can_link)
+  _WRAP_METHOD(bool can_link(const Glib::RefPtr<const Gst::Pad>& other_pad) const, gst_pad_can_link)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_pad_get_caps)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_caps() const, gst_pad_get_caps, constversion)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_allowed_caps(), gst_pad_get_allowed_caps)
@@ -152,7 +157,7 @@ public:
   Glib::RefPtr<const Gst::Caps> get_pad_template_caps() const;
   _IGNORE(gst_pad_get_pad_template_caps)
 
-  _WRAP_METHOD(bool set_caps (const Glib::RefPtr<Gst::Caps>& caps), gst_pad_set_caps)
+  _WRAP_METHOD(bool set_caps(const Glib::RefPtr<Gst::Caps>& caps), gst_pad_set_caps)
   _WRAP_METHOD(Glib::RefPtr<Gst::Pad> get_peer(), gst_pad_get_peer)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Pad> get_peer() const, gst_pad_get_peer, constversion)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> peer_get_caps(), gst_pad_peer_get_caps)
@@ -241,7 +246,8 @@ public:
    * @param offset The offset of the new buffer in the stream.
    * @param size The size of the new buffer.
    * @param caps The caps of the new buffer.
-   * @param buf A newly allocated buffer.
+   * @param buf An uninitialized Glib::RefPtr<> in which to store the new
+   * Gst::Buffer.
    * @return A result code indicating success of the operation. Any result code
    * other than Gst::FLOW_OK is an error and buf should not be used. An error
    * can occur if the pad is not connected or when the downstream peer elements
@@ -259,7 +265,8 @@ public:
    * @param offset The offset of the new buffer in the stream.
    * @param size The size of the new buffer.
    * @param caps The caps of the new buffer.
-   * @param buf A newly allocated buffer.
+   * @param buf An uninitialized Glib::RefPtr<> in which to store the new
+   * Gst::Buffer.
    * @return A result code indicating success of the operation. Any result code
    * other than Gst::FLOW_OK is an error and buf should not be used. An error
    * can occur if the pad is not connected or when the downstream peer elements
@@ -270,15 +277,29 @@ public:
 
   //This is handwritten because conversion from Glib::RefPtr<Gst::Buffer>& to
   //GstBuffer** is difficult.
+  /** When pad is flushing this function returns Gst::FLOW_WRONG_STATE
+   * immediatly.  Calls the getrange function of pad.  If pad has no getrange
+   * function installed this function returns Gst::FLOW_NOT_SUPPORTED.
+   *
+   * This is a lowlevel function. Usually pull_range() is used.  This function
+   * is designed to be used with a source pad only.
+   *
+   * @param offset The start offset of the buffer.
+   * @param size The length of the buffer.
+   * @param buffer An unitialized Glib::RefPtr<> in which to store the
+   * Gst::Buffer.
+   * @return A Gst::FlowReturn from the pad (Gst::FLOW_NOT_SUPPORTED if pad is
+   * not a source pad). MT safe.
+   */
   FlowReturn get_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer);
   _IGNORE(gst_pad_get_range)
 
-  _WRAP_METHOD(bool accept_caps(const Glib::RefPtr<Gst::Caps>& caps), gst_pad_accept_caps)
+  _WRAP_METHOD(bool accept_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_pad_accept_caps)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> proxy_getcaps(), gst_pad_proxy_getcaps)
-  _WRAP_METHOD(Glib::RefPtr<const Gst::Caps > proxy_getcaps() const, gst_pad_proxy_getcaps, constversion)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> proxy_getcaps() const, gst_pad_proxy_getcaps, constversion)
   _WRAP_METHOD(bool proxy_setcaps(const Glib::RefPtr<Gst::Caps>& caps), gst_pad_proxy_setcaps)
   _WRAP_METHOD(void fixate_caps(const Glib::RefPtr<Gst::Caps>& caps), gst_pad_fixate_caps)
-  _WRAP_METHOD(bool peer_accept_caps(const Glib::RefPtr<Gst::Caps>& caps), gst_pad_peer_accept_caps)
+  _WRAP_METHOD(bool peer_accept_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_pad_peer_accept_caps)
 
   // This method is written manually because an extra ref is necessary
   /** Pushes a buffer to the peer of the pad. The pad must be a source pad,
@@ -315,6 +336,26 @@ public:
 
   _WRAP_METHOD(bool check_pull_range() const, gst_pad_check_pull_range)
 
+  /** Pulls a buffer from the peer pad.  This function will first trigger the
+   * pad block signal if it was installed.  This method works only on sink
+   * pads.
+   *
+   * When pad is not linked Gst::FLOW_NOT_LINKED is returned else this function
+   * returns the result of get_range() on the peer pad.
+   *
+   * @a buffer's caps must either be unset or the same as what is already
+   * configured on pad. Renegotiation within a running pull-mode pipeline is
+   * not supported.
+   *
+   * @param offset The start offset of the buffer.
+   * @param size The length of the buffer.
+   * @param buffer An uninitialized Glib::RefPtr<> in which to hold the
+   * Gst::Buffer.
+   * @return A Gst::FlowReturn from the peer pad (Gst::FLOW_ERROR if pad is not
+   * a sink pad). When this function returns Gst::FLOW_OK, buffer will contain
+   * a valid Gst::Buffer. @a buffer may not be used when any other return value
+   * than Gst::FLOW_OK is returned. MT safe.
+   */
   FlowReturn pull_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer);
   _IGNORE(gst_pad_pull_range)
 
@@ -348,9 +389,9 @@ public:
   _IGNORE(gst_pad_send_event)
 
   _WRAP_METHOD(bool event_default(const Glib::RefPtr<Gst::Event>& event), gst_pad_event_default)
-  _WRAP_METHOD(bool query(const Glib::RefPtr<Gst::Query>& query), gst_pad_query)
-  _WRAP_METHOD(bool peer_query(const Glib::RefPtr<Gst::Query>& query), gst_pad_peer_query)
-  _WRAP_METHOD(bool query_default(const Glib::RefPtr<Gst::Query>& query), gst_pad_query_default)
+  _WRAP_METHOD(bool query(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_query)
+  _WRAP_METHOD(bool peer_query(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_peer_query)
+  _WRAP_METHOD(bool query_default(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_query_default)
   _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_pad_query_position)
 
   /** Queries a pad for the stream position parsing only the format.
@@ -395,9 +436,19 @@ public:
   _WRAP_METHOD(Glib::ArrayHandle<QueryType> get_query_types() const, gst_pad_get_query_types)
   _WRAP_METHOD(Glib::ArrayHandle<QueryType> get_query_types_default() const, gst_pad_get_query_types_default)
 
+  _WRAP_METHOD(Gst::Iterator<Gst::Pad> iterate_internal_links(), gst_pad_iterate_internal_links)
+  _WRAP_METHOD(Gst::Iterator<const Gst::Pad> iterate_internal_links() const, gst_pad_iterate_internal_links)
+  _WRAP_METHOD(Gst::Iterator<Gst::Pad> iterate_internal_links_default(), gst_pad_iterate_internal_links_default)
+  _WRAP_METHOD(Gst::Iterator<const Gst::Pad> iterate_internal_links_default() const, gst_pad_iterate_internal_links_default)
+
 #m4 _CONVERSION(`GList*', `Glib::ListHandle< Glib::RefPtr<Gst::Pad> >', `$2($3, Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::Pad> > get_internal_links(), gst_pad_get_internal_links)
+
+#m4 _CONVERSION(`GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::Pad> >', `$2($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::Pad> > get_internal_links() const, gst_pad_get_internal_links)
+
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::Pad> > get_internal_links_default(), gst_pad_get_internal_links_default)
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::Pad> > get_internal_links_default() const, gst_pad_get_internal_links_default)
 
   // This method is written manually because an extra ref is necessary
   FlowReturn chain(const Glib::RefPtr<Gst::Buffer>& buffer);

@@ -52,6 +52,7 @@ _CONVERSION(`GstBus*',`const Glib::RefPtr<Gst::Bus>&',`Glib::wrap($3)')
 #Caps
 _CONVERSION(`GstCaps*',`Glib::RefPtr<Gst::Caps>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`GstCaps*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`GstCaps*', `const_cast<$2>(($3)->gobj())')
 _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`const GstCaps*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`const GstCaps*', `Glib::unwrap($3)')
 
@@ -118,6 +119,7 @@ _CONVERSION(`GstMessage*',`const Glib::RefPtr<Gst::Message>&',`Gst::Message::wra
 
 #Mixer
 _CONVERSION(`const Glib::RefPtr<Gst::MixerOptions>&',`GstMixerOptions*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::MixerOptions>&',`GstMixerOptions*', `const_cast<$2>(($3)->gobj())')
 _CONVERSION(`const Glib::RefPtr<Gst::MixerTrack>&',`GstMixerTrack*', `Glib::unwrap($3)')
 
 #Pad

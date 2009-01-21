@@ -158,7 +158,7 @@ public:
    * @param error Location for the Glib::Error.
    * @param debug Location for the debug message.
    */
-  void parse(Glib::Error& error, std::string& debug);
+  void parse(Glib::Error& error, std::string& debug) const;
   _IGNORE(gst_message_parse_error)
 
   /** Extracts and returns the Glib::Error from the Gst::MessageError.
@@ -167,7 +167,7 @@ public:
    *
    * @return The Glib::Error.
    */
-  Glib::Error parse();
+  Glib::Error parse() const;
 
   /** Extracts and returns the debug message from the Gst::MessageError.
    *
@@ -175,7 +175,7 @@ public:
    *
    * @return The debug message.
    */
-  std::string parse_debug();
+  std::string parse_debug() const;
 };
 
 /** A warning message.
@@ -203,7 +203,7 @@ public:
    * @param error Location for the Glib::Error.
    * @param debug Location for the debug message.
    */
-  void parse(Glib::Error& error, std::string& debug);
+  void parse(Glib::Error& error, std::string& debug) const;
   _IGNORE(gst_message_parse_warning)
 
   /** Extracts and returns the Glib::Error from the Gst::MessageWarning.
@@ -212,7 +212,7 @@ public:
    *
    * @return The Glib::Error.
    */
-  Glib::Error parse();
+  Glib::Error parse() const;
 
   /** Extracts and returns the debug message from the Gst::MessageWarning.
    *
@@ -220,7 +220,7 @@ public:
    *
    * @return The debug message.
    */
-  std::string parse_debug();
+  std::string parse_debug() const;
 };
 
 /** An informational message.
@@ -249,7 +249,7 @@ public:
    * @param error Location for the Glib::Error.
    * @param debug Location for the debug message.
    */
-  void parse(Glib::Error& error, std::string& debug);
+  void parse(Glib::Error& error, std::string& debug) const;
   _IGNORE(gst_message_parse_info)
 
   /** Extracts and returns the Glib::Error from the Gst::MessageInfo.
@@ -258,7 +258,7 @@ public:
    *
    * @return The Glib::Error.
    */
-  Glib::Error parse();
+  Glib::Error parse() const;
 
   /** Extracts and returns the debug message from the Gst::MessageInfo.
    *
@@ -266,7 +266,7 @@ public:
    *
    * @return The debug message.
    */
-  std::string parse_debug();
+  std::string parse_debug() const;
 };
 
 /** A tag message.
@@ -292,7 +292,7 @@ public:
    *
    * @return A copy of the Gst::TagList.
    */
-  Gst::TagList parse();
+  Gst::TagList parse() const;
   _IGNORE(gst_message_parse_tag)
 };
 
@@ -328,7 +328,7 @@ public:
    * Gst::MessageBuffering.
    * @return The percent as an integer.
    */
-  int parse();
+  int parse() const;
   _IGNORE(gst_message_parse_buffering)
 
   /** Configures the buffering stats values in message.
@@ -352,33 +352,33 @@ public:
    *
    * Since 0.10.20.
    */
-  void parse_stats(BufferingMode& mode, int& avg_in, int& avg_out, gint64& buffering_left);
+  void parse_stats(BufferingMode& mode, int& avg_in, int& avg_out, gint64& buffering_left) const;
   _IGNORE(gst_message_parse_buffering_stats)
 
   /** Extracts and returns the buffering mode from message.
    *
    * @return The buffering mode.
    */
-  BufferingMode parse_stats_buffering_mode();
+  BufferingMode parse_stats_buffering_mode() const;
 
   /** Extracts and returns the average input rate from message.
    *
    * @return The average input rate.
    */
-  int parse_stats_avg_in();
+  int parse_stats_avg_in() const;
 
   /** Extracts and returns the average output rate from message.
    *
    * @return The average output rate.
    */
-  int parse_stats_avg_out();
+  int parse_stats_avg_out() const;
 
   /** Extracts and returns the buffering time in milliseconds remaining from
    * message.
    *
    * @return The buffering time remaining.
    */
-  gint64 parse_stats_buffering_left();
+  gint64 parse_stats_buffering_left() const;
 };
 
 /** A state change message.
@@ -409,7 +409,7 @@ public:
    * @param newstate The new (current) state.
    * @param pending The pending (target) state.
    */
-  void parse(State& oldstate, State& newstate, State& pending);
+  void parse(State& oldstate, State& newstate, State& pending) const;
   _IGNORE(gst_message_parse_state_changed)
 
   /** Extracts and returns the new state from the Gst::MessageStateChanged.
@@ -418,7 +418,7 @@ public:
    *
    * @return The new (current) state.
    */
-  State parse();
+  State parse() const;
 
   /** Extracts and returns the old state from the Gst::MessageStateChanged.
    *
@@ -426,7 +426,7 @@ public:
    *
    * @return The old state.
    */
-  State parse_old();
+  State parse_old() const;
 
   /** Extracts and returns the pending state from the Gst::MessageStateChanged.
    *
@@ -434,7 +434,7 @@ public:
    *
    * @return The pending state.
    */
-  State parse_pending();
+  State parse_pending() const;
 };
 
 /** A state dirty message.
@@ -484,7 +484,7 @@ public:
    * @param clock Location in which to hold a clock object.
    * @param ready Location in which to hold the ready flag.
    */
-  void parse(Glib::RefPtr<Gst::Clock>& clock, bool& ready);
+  void parse(Glib::RefPtr<Gst::Clock>& clock, bool& ready) const;
   _IGNORE(gst_message_parse_clock_provide)
 
   /** Extracts and returns the clock from the Gst::MessageClockProvide. The
@@ -496,13 +496,22 @@ public:
    */
   Glib::RefPtr<Gst::Clock> parse();
 
+  /** Extracts and returns the clock from the Gst::MessageClockProvide. The
+   * clock object returned remains valid until the message is freed.
+   *
+   * MT safe.
+   *
+   * @return The clock object of the message.
+   */
+  Glib::RefPtr<const Gst::Clock> parse() const;
+
   /** Extracts and returns the ready flag from the Gst::MessageClockProvide.
    *
    * MT safe.
    *
    * @return The ready flag of the message.
    */
-  bool parse_ready();
+  bool parse_ready() const;
 };
 
 /** A clock lost message.
@@ -532,6 +541,14 @@ public:
    */
   Glib::RefPtr<Gst::Clock> parse();
   _IGNORE(gst_message_parse_clock_lost)
+
+  /** Extracts and returns the lost clock from the Gst::MessageClockLost. The
+   * clock object returned remains valid until the message is freed.
+   *
+   * MT safe.
+   * @return The lost clock.
+   */
+  Glib::RefPtr<const Gst::Clock> parse() const;
 };
 
 /** A new clock message.
@@ -560,6 +577,15 @@ public:
    */
   Glib::RefPtr<Gst::Clock> parse();
   _IGNORE(gst_message_parse_new_clock)
+
+  /** Extracts and returns the new clock from the Gst::MessageNewClock. The
+   * clock object returned remains valid until the message is freed.
+   *
+   * MT safe.
+   *
+   * @return The selected new clock.
+   */
+  Glib::RefPtr<const Gst::Clock> parse() const;
 };
 
 /** An application message.
@@ -679,7 +705,7 @@ public:
    * @param format Result location for the format.
    * @param position Result location for the position.
    */
-  void parse(Format& format, gint64& position);
+  void parse(Format& format, gint64& position) const;
   _IGNORE(gst_message_parse_segment_start)
 
   /** Extracts and returns the position from the segment start message.
@@ -688,7 +714,7 @@ public:
    *
    * @return The position.
    */
-  gint64 parse();
+  gint64 parse() const;
 
   /** Extracts and returns the format from the segment start message.
    *
@@ -696,7 +722,7 @@ public:
    *
    * @return The format.
    */
-  Format parse_format();
+  Format parse_format() const;
 };
 
 /** A segment done message.
@@ -726,7 +752,7 @@ public:
    * @param format Result location for the format.
    * @param position Result location for the position.
    */
-  void parse(Format& format, gint64& position);
+  void parse(Format& format, gint64& position) const;
   _IGNORE(gst_message_parse_segment_done)
 
   /** Extracts and returns the position from the segment done message.
@@ -735,7 +761,7 @@ public:
    *
    * @return The position.
    */
-  gint64 parse();
+  gint64 parse() const;
 
   /** Extracts and returns the format from the segment done message.
    *
@@ -743,7 +769,7 @@ public:
    *
    * @return The format.
    */
-  Format parse_format();
+  Format parse_format() const;
 };
 
 /** A duration message.
@@ -779,7 +805,7 @@ public:
    * @param format Result location for the format.
    * @param position Result location for the position.
    */
-  void parse(Format& format, gint64& position);
+  void parse(Format& format, gint64& position) const;
   _IGNORE(gst_message_parse_duration)
 
   /** Extracts and returns the duration from the duration message. The duration
@@ -791,7 +817,7 @@ public:
    *
    * @return The position.
    */
-  gint64 parse();
+  gint64 parse() const;
 
   /** Extracts and returns the format from the duration message. Applications
    * should always use a query to retrieve the duration
@@ -801,7 +827,7 @@ public:
    *
    * @return The format.
    */
-  Format parse_format();
+  Format parse_format() const;
 };
 
 /** A latency message.
@@ -852,7 +878,7 @@ public:
    *
    * Since 0.10.13.
    */
-  bool parse();
+  bool parse() const;
   _IGNORE(gst_message_parse_async_start)
 };
 

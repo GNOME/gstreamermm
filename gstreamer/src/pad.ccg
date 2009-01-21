@@ -26,6 +26,7 @@
 #include <gstreamermm/element.h>
 #include <gstreamermm/event.h>
 #include <gstreamermm/padtemplate.h>
+#include <gstreamermm/iterator.h>
 
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstreamermm/private/object_p.h)
@@ -82,12 +83,12 @@ Pad::Pad(PadDirection dir)
   : _CONSTRUCT("name", NULL, "direction", dir)
 {}
 
-Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>& templ, const Glib::ustring& name)
-  : _CONSTRUCT("name", name.c_str(), "direction", templ->get_direction(),
-      "template", templ->gobj())
+Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ,
+  const Glib::ustring& name) : _CONSTRUCT("name", name.c_str(), "direction",
+  templ->get_direction(), "template", templ->gobj())
 {}
 
-Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>& templ)
+Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ)
   : _CONSTRUCT("name", NULL, "direction", templ->get_direction(), "template",
       templ->gobj())
 {}
