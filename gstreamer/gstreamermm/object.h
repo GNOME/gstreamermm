@@ -3,16 +3,16 @@
  * Copyright 2008 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
@@ -44,7 +44,7 @@ namespace Gst
 //so that we can add code to the Object(GObject*) constructor.
 //(If this becomes difficult then we might add a _CUSTOM_CAST_CTOR() macro to gmmproc).
 
-/** Gst::Object — Base class for the GStreamer object hierarchy.
+/** Gst::Object - Base class for the GStreamer object hierarchy.
  * Gst::Object provides a root for the object hierarchy tree filed in by the
  * GStreamer library. It is currently a thin wrapper on top of Glib::Object.
  * It is an abstract class that is not very usable on its own.
@@ -249,4 +249,3 @@ namespace Glib
 
 
 #endif /* _GSTREAMERMM_OBJECT_H */
-
