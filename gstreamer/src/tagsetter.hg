@@ -48,6 +48,7 @@ class TagSetter : public Glib::Interface
   _CLASS_INTERFACE(TagSetter, GstTagSetter, GST_TAG_SETTER, GstTagSetterIFace)
 
 public:
+  _WRAP_METHOD(void reset_tags(), gst_tag_setter_reset_tags)
   _WRAP_METHOD(void merge_tags(const Gst::TagList& list, TagMergeMode mode=TAG_MERGE_PREPEND), gst_tag_setter_merge_tags)
 
   /** Adds the given Glib::ValueBase on the setter using the given merge mode. 
@@ -77,9 +78,9 @@ public:
    */
    void add_tag(const Glib::ustring& tag, const char* data, TagMergeMode mode=TAG_MERGE_PREPEND);
 
-   _WRAP_METHOD(Gst::TagList get_tag_list(), gst_tag_setter_get_tag_list)
+   _WRAP_METHOD(const Gst::TagList get_tag_list() const, gst_tag_setter_get_tag_list)
    _WRAP_METHOD(void set_tag_merge_mode(TagMergeMode mode), gst_tag_setter_set_tag_merge_mode)
-   _WRAP_METHOD(TagMergeMode qet_tag_merge_mode(), gst_tag_setter_get_tag_merge_mode)
+   _WRAP_METHOD(TagMergeMode get_tag_merge_mode() const, gst_tag_setter_get_tag_merge_mode)
 
    //Variable argument functions are ignored.
    _IGNORE(gst_tag_setter_add_tags, gst_tag_setter_add_tag_values)

@@ -78,7 +78,18 @@ Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first)
 {
   Plugin::SlotFilter* slot_copy = new Plugin::SlotFilter(filter);
   GList* list = gst_registry_plugin_filter(gobj(), &Registry_Plugin_Filter_gstreamermm_callback, first, slot_copy);
-  return Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >(list, Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >(list,
+    Glib::OWNERSHIP_DEEP);
+}
+
+Glib::ListHandle< Glib::RefPtr<const Gst::Plugin> >
+Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first) const
+{
+  Plugin::SlotFilter* slot_copy = new Plugin::SlotFilter(filter);
+  GList* list = gst_registry_plugin_filter(const_cast<GstRegistry*>(gobj()),
+    &Registry_Plugin_Filter_gstreamermm_callback, first, slot_copy);
+  return Glib::ListHandle< Glib::RefPtr<const Gst::Plugin> >(list,
+    Glib::OWNERSHIP_DEEP);
 }
 
 Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >
@@ -86,7 +97,19 @@ Registry::get_feature_list(const PluginFeature::SlotFilter& filter, bool first)
 {
   PluginFeature::SlotFilter* slot_copy = new PluginFeature::SlotFilter(filter);
   GList* list = gst_registry_feature_filter(gobj(), &Registry_PluginFeature_Filter_gstreamermm_callback, first, slot_copy);
-  return Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >(list, Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >(list,
+    Glib::OWNERSHIP_DEEP);
+}
+
+Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> >
+Registry::get_feature_list(const PluginFeature::SlotFilter& filter,
+  bool first) const
+{
+  PluginFeature::SlotFilter* slot_copy = new PluginFeature::SlotFilter(filter);
+  GList* list = gst_registry_feature_filter(const_cast<GstRegistry*>(gobj()),
+    &Registry_PluginFeature_Filter_gstreamermm_callback, first, slot_copy);
+  return Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> >(list,
+    Glib::OWNERSHIP_DEEP);
 }
 
 #ifdef USE_BINARY_REGISTRY
@@ -96,9 +119,10 @@ bool Registry::binary_read_cache(const Glib::ustring& location)
   return gst_registry_binary_read_cache(gobj(), location.c_str());
 }
 
-bool Registry::binary_write_cache(const Glib::ustring& location)
+bool Registry::binary_write_cache(const Glib::ustring& location) const
 {
-  return gst_registry_binary_write_cache(gobj(), location.c_str());
+  return gst_registry_binary_write_cache(const_cast<GstRegistry*>(gobj()),
+    location.c_str());
 }
 
 #else
@@ -108,9 +132,10 @@ bool Registry::xml_read_cache(const Glib::ustring& location)
   return gst_registry_xml_read_cache(gobj(), location.c_str());
 }
 
-bool Registry::xml_write_cache(const Glib::ustring& location)
+bool Registry::xml_write_cache(const Glib::ustring& location) const
 {
-  return gst_registry_xml_write_cache(gobj(), location.c_str());
+  return gst_registry_xml_write_cache(const_cast<GstRegistry*>(gobj()),
+    location.c_str());
 }
 
 #endif

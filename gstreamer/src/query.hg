@@ -142,8 +142,8 @@ public:
   _WRAP_METHOD(static QueryType register_query_type(const Glib::ustring& nick, const Glib::ustring& description), gst_query_type_register)
   _WRAP_METHOD(static QueryType get_query_type(const Glib::ustring& nick), gst_query_type_get_by_nick)
 
-#m4 _CONVERSION(`const Glib::ArrayHandle<QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
-  _WRAP_METHOD(static bool query_types_contain(const Glib::ArrayHandle<QueryType>& types, QueryType type), gst_query_types_contains)
+#m4 _CONVERSION(`const Glib::ArrayHandle<const QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
+  _WRAP_METHOD(static bool query_types_contain(const Glib::ArrayHandle<const QueryType>& types, QueryType type), gst_query_types_contains)
 
   /** Get details about the given Gst::QueryType.
    *
@@ -151,7 +151,7 @@ public:
    * @param def A Gst::QueryTypeDefinition in which to store the details.
    * @return true if successful, false otherwise.
    */
-  bool get_details(QueryType type, QueryTypeDefinition& def);
+  bool get_details(QueryType type, QueryTypeDefinition& def) const;
   _IGNORE(gst_query_type_get_details)
 
   _WRAP_METHOD(static Gst::IteratorBasic<const Gst::QueryTypeDefinition> iterate_definitions(), gst_query_type_iterate_definitions)
@@ -213,36 +213,36 @@ public:
    * value.
    * @param dest_value The storage for the destination value.
    */
-  void parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value);
+  void parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value) const;
 
   /** Parse the destination format and value of a convert query answer.
    * @param dest_format The storage for the Gst::Format of the destination
    * value.
    * @param dest_value The storage for the destination value.
    */
-  void parse(Format& dest_format, gint64& dest_value);
+  void parse(Format& dest_format, gint64& dest_value) const;
 
   /** Parse the source format of a convert query answer, returning the format.
    * @return The Gst::Format of the source value.
    */
-  Format parse_src_format();
+  Format parse_src_format() const;
 
   /** Parse the source value of a convert query answer returning, the value.
    * @return The source value.
    */
-  gint64 parse_src_value();
+  gint64 parse_src_value() const;
 
   /** Parse the destination format of a convert query answer, returning the
    * format.
    * @return The Gst::Format of the destination value.
    */
-  Format parse_dest_format();
+  Format parse_dest_format() const;
 
   /** Parse the destination value of a convert query answer, returning the
    * value.
    * @return The destination value.
    */
-  gint64 parse_dest_value();
+  gint64 parse_dest_value() const;
 };
 
 /** A stream position query object.  See create() for more details.
@@ -273,17 +273,17 @@ public:
    * @param format The storage for the Gst::Format of the position values.
    * @param position The storage for the current position.
    */
-  void parse(Format& format, gint64& position);
+  void parse(Format& format, gint64& position) const;
 
   /** Parse the position of a position query, returning the position.
    * @return The current position of the position query.
    */
-  gint64 parse();
+  gint64 parse() const;
 
   /** Parse the format of a position query, returning the format.
    * @return The the Gst::Format of the position values.
    */
-  Format parse_format();
+  Format parse_format() const;
 };
 
 /** A stream duration query object.  See create() for more details.
@@ -313,17 +313,17 @@ public:
    * @param format The storage for the Gst::Format of the duration value.
    * @param duration The storage for the total duration.
    */
-  void parse(Format& format, gint64& duration);
+  void parse(Format& format, gint64& duration) const;
 
   /** Parse a duration query answer, returning the duration.  
    * @return The total duration.
    */
-  gint64 parse();
+  gint64 parse() const;
 
   /** Parse a duration query answer, returning the format of the duration. 
    * @return The Gst::Format of the duration value.
    */
-  Format parse_format();
+  Format parse_format() const;
 };
 
 /** A latency query object.  See create() for more details.
@@ -354,22 +354,22 @@ public:
    * @param min_latency The storage for the min latency.
    * @param max_latency The storage for the max latency.
    */
-  void parse(bool& live, ClockTime& min_latency, ClockTime& max_latency);
+  void parse(bool& live, ClockTime& min_latency, ClockTime& max_latency) const;
 
   /** Parse a latency query answer, returning the live status.
    * @return the live satus.
    */
-  bool parse_live();
+  bool parse_live() const;
 
   /** Parse a latency query answer, returning the minimum latency.
    * @return The minimum latency.
    */
-  ClockTime parse_min();
+  ClockTime parse_min() const;
 
   /** Parse a latency query answer, returning the maximum latency.
    * @return The maximum latency.
    */
-  ClockTime parse_max();
+  ClockTime parse_max() const;
 };
 
 /** A seeking query object.  See create() for more details.
@@ -403,27 +403,27 @@ public:
    * @param segment_start The storage location for the segment start value.
    * @param segment_end The storage location for the segment end.
    */
-  void parse(Format& format, bool& seekable, gint64& segment_start, gint64& segment_end);
+  void parse(Format& format, bool& seekable, gint64& segment_start, gint64& segment_end) const;
 
   /** Parse a seeking query, returning the format.
    * @return The format.
    */
-  Format parse_format();
+  Format parse_format() const;
 
   /** Parse a seeking query, returning the seekable status.
    * @return The seekable flag.
    */
-  bool parse_seekable();
+  bool parse_seekable() const;
 
   /** Parse a seeking query, returning the segment start value.
    * @return The segment start.
    */
-  gint64 parse_start();
+  gint64 parse_start() const;
 
   /** Parse a seeking query, returning the segment end value.
    * @return The segment end.
    */
-  gint64 parse_end();
+  gint64 parse_end() const;
 };
 
 /** A formats query object.  See create() for more details.
@@ -456,7 +456,7 @@ public:
   /** Parse and return the number of formats in the formats query.
    * @return The number of formats in this query.
    */
-  guint parse_length();
+  guint parse_length() const;
 
   /** Parse the format query and return the @a nth format from it. If the list
    * contains less elements than @a nth, Gst::FORMAT_UNDEFINED will be
@@ -464,7 +464,7 @@ public:
    * @param nth The index of the format to return.
    * @return the @a nth format or Gst::FORMAT_UNDEFINED.
    */
-  Format parse(guint nth);
+  Format parse(guint nth) const;
 };
 
 /** A new segment query object.  See create() for more details.
@@ -509,31 +509,31 @@ public:
    * @param start_value The storage for the start value.
    * @param stop_value The storage for the stop value.
    */
-  void parse(double& rate, Format& format, gint64& start_value, gint64& stop_value);
+  void parse(double& rate, Format& format, gint64& start_value, gint64& stop_value) const;
 
   /** Parse a segment query answer, returning the rate.  See set() for an
    * explanation of the function arguments.  
    * @return The rate of the segment.
    */
-  double parse_rate();
+  double parse_rate() const;
 
   /** Parse a segment query answer, returning the format.  See set() for an
    * explanation of the function arguments.
    * @return The Gst::Format of the start and stop values.
    */
-  Format parse_format();
+  Format parse_format() const;
 
   /** Parse a segment query answer, returning the start value.  See set() for
    * an explanation of the function arguments.
    * @return The start value.
    */
-  gint64 parse_start();
+  gint64 parse_start() const;
 
   /** Parse a segment query answer, returning the stop value.  See set() for
    * an explanation of the function arguments.
    * @return The stop value.
    */
-  gint64 parse_stop();
+  gint64 parse_stop() const;
 };
 
 /** A new buffering query object.  See create() for more details.
@@ -564,19 +564,19 @@ public:
    * @param busy The location to store the buffering busy flag.
    * @param percent The location to store the buffering percent.
    */
-  void parse(bool& busy, int& percent);
+  void parse(bool& busy, int& percent) const;
 
   /** Get the busy flag of the buffered data. The busy indicator is true when
    * the buffering is in progress.
    * @return The buffering busy flag.
    */
-  bool parse_busy();
+  bool parse_busy() const;
 
   /** Get the percentage of the buffered data. The percent is a value between
    * 0 and 100.
    * @return The buffering percent.
    */
-  int parse_percent();
+  int parse_percent() const;
 
   /** Configures the buffering stats values in query.
    * @param mode A buffering mode.
@@ -594,27 +594,27 @@ public:
    * @param buffering_left The location to store the amount of buffering time
    * left.
    */
-  void parse(BufferingMode& mode, int& avg_in, int& avg_out, gint64 buffering_left);
+  void parse(BufferingMode& mode, int& avg_in, int& avg_out, gint64 buffering_left) const;
 
   /** Extracts the buffering mode from the query.
    * @return The the buffering mode.
    */
-  BufferingMode parse_mode();
+  BufferingMode parse_mode() const;
 
   /** Extracts the average input rate from the query.
    * @return The average input rate.
    */
-  int parse_input_rate();
+  int parse_input_rate() const;
 
   /** Extracts the average output rate from the query.
    * @return The average output rate.
    */
-  int parse_output_rate();
+  int parse_output_rate() const;
 
   /** Extracts the buffering time left from the query.
    * @return The the amount of buffering time left.
    */
-  gint64 parse_time_left();
+  gint64 parse_time_left() const;
 
   /** Set the available query result fields in query.
    * @param format The format to set for the start and stop values.
@@ -633,27 +633,27 @@ public:
    * @param estimated_total The location to store the estimated total amount
    * of download time.
    */
-  void parse(Format& format, gint64& start, gint64& stop, gint64& estimated_total);
+  void parse(Format& format, gint64& start, gint64& stop, gint64& estimated_total) const;
 
   /** Parse the query, returning the format.
    * @return The format.
    */
-  Format parse_format();
+  Format parse_format() const;
 
   /** Parse the query, returning the start range value.
    * @return The start value.
    */
-  gint64 parse_start();
+  gint64 parse_start() const;
 
   /** Parse the query, returning the stop range value.
    * @return The stop value.
    */
-  gint64 parse_stop();
+  gint64 parse_stop() const;
 
   /** Parse the query, returning the estimated total amount of download time.
    * @return The estimated total amount of download time.
    */
-  gint64 parse_total_time();
+  gint64 parse_total_time() const;
 };
 
 } //namespace Gst

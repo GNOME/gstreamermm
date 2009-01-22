@@ -60,14 +60,18 @@ void TagList::foreach(const SlotForeach& slot)
   delete slot_copy;
 }
 
-bool TagList::get(const Glib::ustring& tag, Glib::ValueBase& dest)
+bool TagList::get(const Glib::ustring& tag, Glib::ValueBase& dest) const
 {
-  return gst_tag_list_copy_value(dest.gobj(), gobj(), tag.c_str());
+  return gst_tag_list_copy_value(dest.gobj(), const_cast<GstTagList*>(gobj()),
+    tag.c_str());
 }
 
-bool TagList::get(const Glib::ustring& tag, guint index, Glib::ValueBase& value)
+bool TagList::get(const Glib::ustring& tag, guint index,
+  Glib::ValueBase& value) const
 {
-  const GValue* gst_value = gst_tag_list_get_value_index(gobj(), tag.c_str(), index);
+  const GValue* gst_value =
+    gst_tag_list_get_value_index(const_cast<GstTagList*>(gobj()),
+    tag.c_str(), index);
   if (gst_value)
   {
     value.init(gst_value);

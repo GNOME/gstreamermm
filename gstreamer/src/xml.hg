@@ -56,7 +56,7 @@ public:
    * @param element The element to write out.
    * @return A pointer to an XML document.
    */
-  static xmlDocPtr write(const Glib::RefPtr<Gst::Element>& element);
+  static xmlDocPtr write(const Glib::RefPtr<const Gst::Element>& element);
 
   /** Converts the given element into XML and writes the formatted XML to an
    * open output stream.
@@ -64,7 +64,7 @@ public:
    * @param element The element to write out.
    * @param out An open std::ostream, like std::cout.
    */
-  static void write_to_stream(const Glib::RefPtr<Gst::Element>& element, std::ostream& out);
+  static void write_to_stream(const Glib::RefPtr<const Gst::Element>& element, std::ostream& out);
 
   _WRAP_METHOD(bool parse_doc(xmlpp::Document* doc, Glib::ustring& root), gst_xml_parse_doc)
   _WRAP_METHOD(bool parse_file(const std::string& filename, const Glib::ustring& root), gst_xml_parse_file)
@@ -79,7 +79,6 @@ public:
   bool parse_memory(const std::string& buffer, const Glib::ustring& root);
   _IGNORE(gst_xml_parse_memory)
 
-  //Note: gst_xml_get_element() returns a reference (GstElement*).
   _WRAP_METHOD(Glib::RefPtr<Gst::Element> get_element(const Glib::ustring& name), gst_xml_get_element)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Element> get_element(const Glib::ustring& name) const, gst_xml_get_element, constversion)
 
@@ -94,6 +93,7 @@ public:
 #m4 _CONVERSION(`GstObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap($3, true)')
   /** Signals that a new object has been deserialized.
    */
+  //TODO: use xmlpp::Node* for signal:
   _WRAP_SIGNAL(void object_loaded(const Glib::RefPtr<Gst::Object>& object, xmlNode* xml_node), "object-loaded")
 };
 

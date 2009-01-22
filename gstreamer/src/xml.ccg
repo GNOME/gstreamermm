@@ -28,17 +28,12 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace Gst
 {
 
-bool XML::parse_memory(const std::string& buffer, const Glib::ustring& root)
+xmlDocPtr XML::write(const Glib::RefPtr<const Gst::Element>& element)
 {
-  return gst_xml_parse_memory(this->gobj(),(guchar*)(buffer.c_str()), buffer.size(), root.c_str());
+  return gst_xml_write(const_cast<GstElement*>(element->gobj()));
 }
 
-xmlDocPtr XML::write(const Glib::RefPtr<Gst::Element>& element)
-{
-  return gst_xml_write(element->gobj());
-}
-
-void XML::write_to_stream(const Glib::RefPtr<Gst::Element>& element, std::ostream& out)
+void XML::write_to_stream(const Glib::RefPtr<const Gst::Element>& element, std::ostream& out)
 {
   xmlDocPtr xmlDoc = write(element);
   xmlpp::Node rootNode(xmlDocGetRootElement(xmlDoc));
@@ -48,6 +43,11 @@ void XML::write_to_stream(const Glib::RefPtr<Gst::Element>& element, std::ostrea
   doc.write_to_stream_formatted(out);
 
   xmlFreeDoc(xmlDoc);
+}
+
+bool XML::parse_memory(const std::string& buffer, const Glib::ustring& root)
+{
+  return gst_xml_parse_memory(this->gobj(),(guchar*)(buffer.c_str()), buffer.size(), root.c_str());
 }
 
 } //namespace Gst

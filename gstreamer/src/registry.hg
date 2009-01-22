@@ -96,13 +96,21 @@ public:
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >',`$2($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> > get_feature_list(GType type), gst_registry_get_feature_list)
+
+#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> >',`$2($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> > get_feature_list(GType type) const, gst_registry_get_feature_list)
+
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> > get_feature_list(const Glib::ustring& name), gst_registry_get_feature_list_by_plugin)
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> > get_feature_list(const Glib::ustring& name) const, gst_registry_get_feature_list_by_plugin)
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::ustring >',`$2($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::ustring > get_path_list(), gst_registry_get_path_list)
+  _WRAP_METHOD(Glib::ListHandle< Glib::ustring > get_path_list() const, gst_registry_get_path_list)
 
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >',`$2($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::Plugin> > get_plugin_list(), gst_registry_get_plugin_list)
+
+#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<const Gst::Plugin> >',`$2($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::Plugin> > get_plugin_list() const, gst_registry_get_plugin_list)
 
   _WRAP_METHOD(bool add_plugin(const Glib::RefPtr<Gst::Plugin>& plugin), gst_registry_add_plugin)
   _WRAP_METHOD(void remove_plugin(const Glib::RefPtr<Gst::Plugin>& plugin), gst_registry_remove_plugin)
@@ -119,6 +127,17 @@ public:
   Glib::ListHandle< Glib::RefPtr<Gst::Plugin> > get_plugin_list(const Plugin::SlotFilter& filter, bool first);
   _IGNORE(gst_registry_plugin_filter)
 
+  /** Runs a filter against all plugins in the registry and returns a List with
+   * the results. If the first flag is set, only the first match is returned
+   * (as a list with a single object).
+   *
+   * @param filter The filter to use.
+   * @param first Only return first match.
+   * @return A list of Gst::Plugin. MT safe.
+   *
+   */
+  Glib::ListHandle< Glib::RefPtr<const Gst::Plugin> > get_plugin_list(const Plugin::SlotFilter& filter, bool first) const;
+
   /** Runs a filter against all features of the plugins in the registry and
    * returns a List with the results. If the first flag is set, only the first
    * match is returned (as a list with a single object).
@@ -131,9 +150,23 @@ public:
   Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> > get_feature_list(const PluginFeature::SlotFilter& filter, bool first);
   _IGNORE(gst_registry_feature_filter)
 
+  /** Runs a filter against all features of the plugins in the registry and
+   * returns a List with the results. If the first flag is set, only the first
+   * match is returned (as a list with a single object).
+   *
+   * @param registry Registry to query.
+   * @param filter The filter to use.
+   * @param first Only return first match.
+   * @return A list of Gst::PluginFeature. MT safe.
+   */
+  Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> > get_feature_list(const PluginFeature::SlotFilter& filter, bool first) const;
+
   _WRAP_METHOD(Glib::RefPtr<Gst::Plugin> find_plugin(const Glib::ustring& name), gst_registry_find_plugin)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Plugin> find_plugin(const Glib::ustring& name) const, gst_registry_find_plugin, constversion)
   _WRAP_METHOD(Glib::RefPtr<Gst::PluginFeature> find_feature(const Glib::ustring& name, GType type), gst_registry_find_feature)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::PluginFeature> find_feature(const Glib::ustring& name, GType type) const, gst_registry_find_feature, constversion)
   _WRAP_METHOD(Glib::RefPtr<Gst::PluginFeature> lookup_feature(const Glib::ustring& name), gst_registry_lookup_feature)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::PluginFeature> lookup_feature(const Glib::ustring& name) const, gst_registry_lookup_feature, constversion)
   _WRAP_METHOD(void add_path(const Glib::ustring& path), gst_registry_add_path)
   _WRAP_METHOD(void scan_path(const Glib::ustring& path), gst_registry_scan_path)
   // binary or xml registry cache depends on USE_BINARY_REGISTRY def in
@@ -153,7 +186,7 @@ public:
    * @param location A filename.
    * @return true on success.
    */
-  void binary_write_cache(const Glib::ustring& location);
+  void binary_write_cache(const Glib::ustring& location) const;
 #else
   /** Read the contents of the XML cache file at location into registry.
    *
@@ -169,11 +202,12 @@ public:
    * @param location A filename.
    * @return true on success.
    */
-  bool xml_write_cache(const Glib::ustring& location);
+  bool xml_write_cache(const Glib::ustring& location) const;
   _IGNORE(gst_registry_xml_write_cache)
 #endif
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Plugin> lookup(const Glib::ustring& filename), gst_registry_lookup)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Plugin> lookup(const Glib::ustring& filename) const, gst_registry_lookup, constversion)
   _WRAP_METHOD(void remove_feature(const Glib::RefPtr<Gst::PluginFeature>& feature), gst_registry_remove_feature)
   _WRAP_METHOD(void add_feature(const Glib::RefPtr<Gst::PluginFeature>& feature), gst_registry_add_feature)
   _WRAP_METHOD(static bool check_feature_version(const Glib::ustring& feature_name, guint min_major, guint min_minor, guint min_micro), gst_default_registry_check_feature_version)
@@ -184,7 +218,6 @@ public:
    * a previously-added one by the same name)
    */
   _WRAP_SIGNAL(void feature_added(const Glib::RefPtr<Gst::PluginFeature>& feature), "feature-added")
-
 
 #m4 _CONVERSION(`GstPlugin*',`const Glib::RefPtr<Gst::Plugin>&',`Glib::wrap($3, true)')
 

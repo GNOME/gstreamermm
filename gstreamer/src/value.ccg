@@ -44,14 +44,14 @@ Fourcc::Fourcc(const Glib::ustring& s)
 : first(0), second(0), third(0), fourth(0)
 {
   guint32 fourcc = GST_STR_FOURCC(s.c_str());
-  get_ccs(fourcc);
+  set_ccs(fourcc);
 
 }
 
 Fourcc::Fourcc(guint32 fourcc)
 : first(0), second(0), third(0), fourth(0)
 {
-  get_ccs(fourcc);
+  set_ccs(fourcc);
 }
 
 Fourcc::Fourcc(const Fourcc& f)
@@ -64,7 +64,7 @@ Fourcc::Fourcc(const Glib::ValueBase& value)
   if(G_VALUE_TYPE(value.gobj()) == GST_TYPE_FOURCC)
   {
     int fourcc = gst_value_get_fourcc(value.gobj());
-    get_ccs(fourcc);
+    set_ccs(fourcc);
   }
 }
 
@@ -73,7 +73,7 @@ guint32 Fourcc::get_fourcc() const
   return GST_MAKE_FOURCC(first, second, third, fourth);
 }
 
-void Fourcc::get_ccs(guint32 fourcc)
+void Fourcc::set_ccs(guint32 fourcc)
 {
   first = fourcc & 0xff;
   second = (fourcc >> 8) & 0xff;

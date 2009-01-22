@@ -287,7 +287,7 @@ public:
    *
    * @param tag The tag name.
    * @param mode The mode to use.
-   * @param value The GValue to set.
+   * @param value The Glib::Value<> to use.
    */
   void add(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_PREPEND);
 
@@ -334,7 +334,7 @@ public:
    * @return true, if a value was copied, false if the tag didn't exist in the
    * list.
    */
-  bool get(const Glib::ustring& tag, Glib::ValueBase& dest);
+  bool get(const Glib::ustring& tag, Glib::ValueBase& dest) const;
   _IGNORE(gst_tag_list_copy_value)
 
   /** Gets the value that is at the given index for the given tag.
@@ -345,7 +345,7 @@ public:
    * @return true if tag was available and had right number of entries, false
    * otherwise.
    */
-  bool get(const Glib::ustring& tag, guint index, Glib::ValueBase& dest);
+  bool get(const Glib::ustring& tag, guint index, Glib::ValueBase& dest) const;
   _IGNORE(gst_tag_list_get_value_index)
 
   /** Copies the contents for the given tag into the value, merging multiple
@@ -355,7 +355,8 @@ public:
    * @return true, if a value was copied, false if the tag didn't exist in the
    * given list.
    */
-  template<class DataType> bool get(const Glib::ustring& tag, DataType& value);
+  template<class DataType>
+  bool get(const Glib::ustring& tag, DataType& value) const;
   _IGNORE(gst_tag_list_get_char,
           gst_tag_list_get_uchar,
           gst_tag_list_get_boolean,
@@ -377,7 +378,8 @@ public:
    * @return true, if a value was copied, false if the tag didn't exist in the
    * given list.
    */
-  template<class DataType> bool get(const Glib::ustring& tag, guint index, DataType& value);
+  template<class DataType>
+  bool get(const Glib::ustring& tag, guint index, DataType& value) const;
   _IGNORE(gst_tag_list_get_char_index,
           gst_tag_list_get_uchar_index,
           gst_tag_list_get_boolean_index,
@@ -399,7 +401,8 @@ public:
 /***************************** Gst::TagList *****************************/
 
 template <class DataType>
-void TagList::add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode)
+void TagList::add(const Glib::ustring& tag, const DataType& data,
+  TagMergeMode mode)
 {
   typedef Glib::Value<DataType> ValueType;
 
@@ -410,7 +413,7 @@ void TagList::add(const Glib::ustring& tag, const DataType& data, TagMergeMode m
 }
 
 template<class DataType>
-bool TagList::get(const Glib::ustring& tag, DataType& data)
+bool TagList::get(const Glib::ustring& tag, DataType& data) const
 {
   Glib::Value<DataType> value;
   bool result = this->get(tag, (Glib::ValueBase&) value);
@@ -422,7 +425,7 @@ bool TagList::get(const Glib::ustring& tag, DataType& data)
 }
 
 template<class DataType>
-bool TagList::get(const Glib::ustring& tag, guint index, DataType& data)
+bool TagList::get(const Glib::ustring& tag, guint index, DataType& data) const
 {
   Glib::Value<DataType> value;
   bool result = this->get(tag, index, (Glib::ValueBase&) value);
@@ -434,6 +437,5 @@ bool TagList::get(const Glib::ustring& tag, guint index, DataType& data)
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 
 } //namespace Gst
