@@ -1,6 +1,6 @@
 /* generate_defs_gst.cc
  *
- * Copyright (C) 2001 The Free Software Foundation
+ * Copyright (C) 2008 The Free Software Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
