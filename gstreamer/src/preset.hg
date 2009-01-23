@@ -1,0 +1,70 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstpreset.h>
+#include <glibmm/interface.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+/** GstPreset — helper interface for element presets.
+ * This interface offers methods to query and manipulate parameter preset sets.
+ * A preset is a bunch of property settings, together with meta data and a
+ * name. The name of a preset serves as key for subsequent method calls to
+ * manipulate single presets. All instances of one type will share the list of
+ * presets. The list is created on demand, if presets are not used, the list is
+ * not created.
+ *
+ * The interface comes with a default implementation that serves most plugins.
+ * Wrapper plugins will override most methods to implement support for the
+ * native preset format of those wrapped plugins. One method that is useful to
+ * be overridden is property_names_vfunc(). With that, one can control which
+ * properties are saved and in which order.
+ */
+class Preset : public Glib::Interface
+{
+  _CLASS_INTERFACE(Preset, GstPreset, GST_PRESET, GstPresetInterface)
+
+public:
+#m4 _CONVERSION(`gchar**', `Glib::StringArrayHandle', `Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(Glib::StringArrayHandle get_preset_names() const, gst_preset_get_preset_names)
+  _WRAP_METHOD(Glib::StringArrayHandle get_property_names() const, gst_preset_get_property_names)
+  _WRAP_METHOD(bool load_preset(const Glib::ustring& name), gst_preset_load_preset)
+  _WRAP_METHOD(bool save_preset(const Glib::ustring& name), gst_preset_save_preset)
+  _WRAP_METHOD(bool rename_preset(const Glib::ustring& old_name, const Glib::ustring& new_name), gst_preset_rename_preset)
+  _WRAP_METHOD(bool delete_preset(const Glib::ustring& name), gst_preset_delete_preset)
+  _WRAP_METHOD(bool set_meta(const Glib::ustring& name, const Glib::ustring& tag, const Glib::ustring& value), gst_preset_set_meta)
+
+  /** Gets the @a value for an existing meta data tag. Meta data tag names can
+   * be something like e.g. "comment".
+   *
+   * @param name Preset name.  
+   * @param tag Meta data item name.  
+   * @param value Glib::ustring in which to store the value.
+   * @return true for success, false if e.g. there is no preset with that name
+   * or the is no value for the given tag.
+   */
+  bool get_meta(const Glib::ustring& name, const Glib::ustring& tag, Glib::ustring& value) const;
+
+  //TODO: Wrap vfuncs.
+};
+
+} // namespace Gst

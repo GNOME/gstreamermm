@@ -32,6 +32,7 @@
 #include <gstreamermm/pipeline.h>
 #include <gstreamermm/plugin.h>
 #include <gstreamermm/pluginfeature.h>
+#include <gstreamermm/preset.h>
 #include <gstreamermm/query.h>
 #include <gstreamermm/segment.h>
 #include <gstreamermm/structure.h>
