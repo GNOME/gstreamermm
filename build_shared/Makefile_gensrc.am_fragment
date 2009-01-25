@@ -75,15 +75,22 @@ if MAINTAINER_MODE
 generate_plugin_dep = $(generate_plugin_gmmproc_file_path)
 endif
 
+# The source file from which the license header may be extracted and placed in
+# plug-in generated .hg and .ccg files (use a file that probably will not
+# change because it will be a plug-in generation dependency):
+license_header_source_file = $(gensrc_destdir)/version.h
+
 # This is to generate plugin .hg files.  The generated .hg file s piped through
 # m4 using the macros in tools/m4/ctocpp_base.m4 which then produces the final
 # .hg file.  Finally, the camel hg file is linked to the final .hg file to
 # signal the successful generation of the .hg file.
 $(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
-	$(tools_plugin_m4) $(files_defs)
+	$(tools_plugin_m4) $(files_defs) $(license_header_source_file)
 	$(eval hg_lowercase = $$(shell echo $$@ | tr [:upper:] [:lower:]))
+	sed -n '1,/^$$/p' $(license_header_source_file) > \
+		$(srcdir)/$(notdir $(hg_lowercase))
 	$(run_generate_plugin_gmmproc_file) --hg \
-		$(notdir $(subst .hg,,$@)) | $(M4) -I $(tools_dir_m4) > \
+		$(notdir $(subst .hg,,$@)) | $(M4) -I $(tools_dir_m4) >> \
 		$(srcdir)/$(notdir $(hg_lowercase))
 	ln -sf $(realpath $(srcdir))/$(notdir $(hg_lowercase)) $(builddir)/$@
 
@@ -91,10 +98,12 @@ $(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
 # the camel ccg file is linked to the generated .ccg file to signal the
 # successful generation of the .hg file.
 $(files_all_plugin_camel_hg_with_path:.hg=.ccg): $(generate_plugin_dep) \
-	$(tools_plugin_m4) $(files_defs)
+	$(tools_plugin_m4) $(files_defs) $(license_header_source_file)
 	$(eval ccg_lowercase = $$(shell echo $$@ | tr '[:upper:]' '[:lower:]'))
+	sed -n '1,/^$$/p' $(license_header_source_file) > \
+		$(srcdir)/$(notdir $(ccg_lowercase))
 	$(run_generate_plugin_gmmproc_file) --ccg \
-		$(notdir $(subst .ccg,,$@)) >  \
+		$(notdir $(subst .ccg,,$@)) >>  \
 		$(srcdir)/$(notdir $(ccg_lowercase))
 	ln -sf $(realpath $(srcdir))/$(notdir $(ccg_lowercase)) $(builddir)/$@
 
