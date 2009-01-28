@@ -27,6 +27,7 @@ _CONV_ENUM(Gst,StateChange)
 _CONV_ENUM(Gst,StateChangeReturn)
 _CONV_ENUM(Gst,TagMergeMode)
 _CONV_ENUM(Gst,TaskState)
+_CONV_ENUM(Gst,TunerChannelFlags)
 _CONV_ENUM(Gst,URIType)
 
 ############### gstreamermm Class Conversions ######################
@@ -152,6 +153,18 @@ _CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap($3, 0, true)')
 _CONVERSION(`Gst::TagList&',`GstTagList*',`($3).gobj()')
 _CONVERSION(`const GstTagList*',`const Gst::TagList',`Glib::wrap(const_cast<GstTagList*>($3), 0, true)')
 _CONVERSION(`Gst::TagList',`GstTagList*',`($3).gobj()')
+
+#TunerChannel
+_CONVERSION(`GstTunerChannel*',`Glib::RefPtr<Gst::TunerChannel>', `Glib::wrap($3)')
+_CONVERSION(`GstTunerChannel*',`Glib::RefPtr<const Gst::TunerChannel>', `Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::TunerChannel>&',`GstTunerChannel*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::TunerChannel>&',`GstTunerChannel*', `const_cast<GstTunerChannel*>(Glib::unwrap($3))')
+
+#TunerNorm
+_CONVERSION(`GstTunerNorm*',`Glib::RefPtr<Gst::TunerNorm>', `Glib::wrap($3)')
+_CONVERSION(`GstTunerNorm*',`Glib::RefPtr<const Gst::TunerNorm>', `Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::TunerNorm>&',`GstTunerNorm*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::TunerNorm>&',`GstTunerNorm*', `const_cast<GstTunerNorm*>(Glib::unwrap($3))')
 
 #URIHandler
 _CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')

@@ -70,7 +70,7 @@ void test_simple()
 
   if (caps->get_structure(0).get_field("string", string))
   {
-    std::cout << "Simple caps string after setting = " << string << "." <<
+    std::cout << "Simple caps string after setting = '" << string << "'." <<
       std::endl;
   }
   else

@@ -25,6 +25,11 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+/** @defgroup GstHelperClasses gstreamermm Helper Classes
+ *  Classes used to represent GStreamer internal GValue types such as
+ *  GST_TYPE_FRACTION, etc.
+ */
+
 /** Represents a 4 byte identifier (used in codecs).
  * Gst::Fourcc is used to store a four byte identifier in Gst::Structure of
  * Gst::Caps as a value representing a property (see GStreamer Application
@@ -47,19 +52,20 @@ namespace Gst
  * char first_char = fourcc.first;
  * ...
  * @endcode
+ * @ingroup GstHelperClasses
  */
 class Fourcc
 {
 public:
-  /** Construct an undefined Gst::Fourcc
+  /** Construct an undefined Gst::Fourcc.
    */
   Fourcc();
 
-  /** Construct a Gst::Fourcc from another
+  /** Construct a Gst::Fourcc from another.
    */
   Fourcc(const Fourcc& src);
 
-  /** Construct a Gst::Fourcc from 4 characters
+  /** Construct a Gst::Fourcc from 4 characters.
    */
   Fourcc(char first, char second, char third, char fourth);
 
@@ -68,13 +74,17 @@ public:
    */
   explicit Fourcc(const Glib::ustring& s);
 
-  /** Construct a Gst::Fourcc from a 32 bit unsigned integer
+  /** Construct a Gst::Fourcc from a 32 bit unsigned integer.
    */
   explicit Fourcc(guint32 fourcc);
 
-  /** Construct a Gst::Fourcc from a GST_TYPE_FOURCC
+  /** Construct a Gst::Fourcc from a GST_TYPE_FOURCC.
    */
   explicit Fourcc(const Glib::ValueBase& gst_fraction_value);
+
+  /** Construct a Gst::Fourcc from a GST_TYPE_FOURCC.
+   */
+  explicit Fourcc(const GValue& gst_fraction_value);
 
   Fourcc& operator=(const Fourcc& src);
 
@@ -117,25 +127,30 @@ private:
  * int numerator = fract.num;
  * ...
  * @endcode
+ * @ingroup GstHelperClasses
  */
 class Fraction
 {
 public:
-  /** Constructs a zero Gst::Fraction (0/1)
+  /** Constructs a zero Gst::Fraction (0/1).
    */
   Fraction();
 
-  /** Constructs a Gst::Fraction from another
+  /** Constructs a Gst::Fraction from another.
    */
   Fraction(const Fraction& src);
 
-  /** Constructs a Gst::Fraction (num/denom)
+  /** Constructs a Gst::Fraction (num/denom).
    */
   Fraction(int num, int denom);
 
-  /** Constructs a Gst::Fraction from a GST_TYPE_FRACTION
+  /** Constructs a Gst::Fraction from a GST_TYPE_FRACTION.
    */
   explicit Fraction(const Glib::ValueBase& gst_fraction_value);
+
+  /** Constructs a Gst::Fraction from a GST_TYPE_FRACTION.
+   */
+  explicit Fraction(const GValue& gst_fraction_value);
 
   Fraction& operator=(const Fraction& src);
 
@@ -169,25 +184,30 @@ public:
  * int max = range.max;
  * ...
  * @endcode
+ * @ingroup GstHelperClasses
  */
 class IntRange
 {
 public:
-  /** Constructs a zero Gst::IntRange (0 - 0)
+  /** Constructs a zero Gst::IntRange (0 - 0).
    */
   IntRange();
 
-  /** Constructs an Gst::IntRange (min - max)
+  /** Constructs an Gst::IntRange (min - max).
    */
   IntRange(int min, int max);
 
-  /** Constructs an Gst::IntRange from another
+  /** Constructs an Gst::IntRange from another.
    */
   IntRange(const IntRange& src);
 
-  /** Constructs an Gst::IntRange from a GST_TYPE_INT_RANGE
+  /** Constructs an Gst::IntRange from a GST_TYPE_INT_RANGE.
    */
   explicit IntRange(const Glib::ValueBase& gst_int_range_value);
+
+  /** Constructs an Gst::IntRange from a GST_TYPE_INT_RANGE.
+   */
+  explicit IntRange(const GValue& gst_int_range_value);
 
   IntRange& operator=(const IntRange& src);
 
@@ -218,25 +238,30 @@ public:
  * double min = range.min;
  * ...
  * @endcode
+ * @ingroup GstHelperClasses
  */
 class DoubleRange
 {
 public:
-  /** Constructs a zero Gst::DoubleRange (0.0 - 0.0)
+  /** Constructs a zero Gst::DoubleRange (0.0 - 0.0).
    */
   DoubleRange();
 
-  /** Constructs a Gst::DoubleRange (min - max)
+  /** Constructs a Gst::DoubleRange (min - max).
    */
   DoubleRange(double min, double max);
 
-  /** Constructs a Gst::DoubleRange from another
+  /** Constructs a Gst::DoubleRange from another.
    */
   DoubleRange(const DoubleRange& src);
 
-  /** Constructs a Gst::DoubleRange from a GST_TYPE_DOUBLE_RANGE
+  /** Constructs a Gst::DoubleRange from a GST_TYPE_DOUBLE_RANGE.
    */
   explicit DoubleRange(const Glib::ValueBase& gst_double_range_value);
+
+  /** Constructs a Gst::DoubleRange from a GST_TYPE_DOUBLE_RANGE.
+   */
+  explicit DoubleRange(const GValue& gst_double_range_value);
 
   DoubleRange& operator=(const DoubleRange& src);
 
@@ -267,25 +292,30 @@ public:
  * int min_numerator = range.min.num;
  * ...
  * @endcode
+ * @ingroup GstHelperClasses
  */
 class FractionRange
 {
 public:
-  /** Constructs a zero Gst::FractionRange (0/1 - 0/1)
+  /** Constructs a zero Gst::FractionRange (0/1 - 0/1).
    */
   FractionRange();
 
-  /** Constructs a Gst::FractionRange (min - max)
+  /** Constructs a Gst::FractionRange (min - max).
    */
   FractionRange(const Fraction& min, const Fraction& max);
 
-  /** Constructs a Gst::FractionRange from another
+  /** Constructs a Gst::FractionRange from another.
    */
   FractionRange(const FractionRange& src);
 
-  /** Constructs a Gst::FractionRange from a GST_TYPE_FRACTION_RANGE
+  /** Constructs a Gst::FractionRange from a GST_TYPE_FRACTION_RANGE.
    */
   explicit FractionRange(const Glib::ValueBase& gst_fraction_range_value);
+
+  /** Constructs a Gst::FractionRange from a GST_TYPE_FRACTION_RANGE.
+   */
+  explicit FractionRange(const GValue& gst_fraction_range_value);
 
   FractionRange& operator=(const FractionRange& src);
 

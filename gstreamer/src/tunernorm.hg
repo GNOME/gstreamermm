@@ -17,38 +17,31 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/interfaces/colorbalancechannel.h>
 #include <glibmm/object.h>
-
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-/** Gst::ColorBalanceChannel - Represents a color balance channel.
+class Fraction;
+
+/** Gst::TunerNorm - Encapsulates information about the data format(s) for a
+ * Gst::TunerChannel.
  * @ingroup GstInterfaces
  */
-class ColorBalanceChannel : public Glib::Object
+class TunerNorm : public Glib::Object
 {
-  _CLASS_GOBJECT(ColorBalanceChannel, GstColorBalanceChannel, GST_COLOR_BALANCE_CHANNEL, Glib::Object, GObject)
-
+  _CLASS_GOBJECT(TunerNorm, GstTunerNorm, GST_TUNER_NORM, Glib::Object, GObject)
 public:
-  /** Get a string containing a descriptive name for this channel.
+  /** Get a string containing a descriptive name for the norm.
    */
   _MEMBER_GET(label, label, Glib::ustring, gchar*)
 
-  /** Get the minimum valid value for this channel.
+#m4 _CONVERSION(`GValue&', `Gst::Fraction', `Gst::Fraction($3)')
+  /** Get the framerate associated with this norm, if any. (May be unset).  If
+   * it is not set the value will be 0/1.
    */
-  _MEMBER_GET(min_value, min_value, int, gint)
-
-  /** Get the maximum valid value for this channel.
-   */
-  _MEMBER_GET(max_value, max_value, int, gint)
-
-  /** Signals that the channel has changed.
-   * @param value The new value of the channel.
-   */
-  _WRAP_SIGNAL(void value_changed(int value), "value-changed")
+  _MEMBER_GET(framerate, framerate, Gst::Fraction, GValue&)
 };
 
 } // namespace Gst

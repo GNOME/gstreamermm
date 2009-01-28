@@ -1,0 +1,96 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/interfaces/tuner.h>
+#include <glibmm/interface.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class TunerChannel;
+class TunerNorm;
+
+/** Gst::Tuner - Interface for elements providing tuner operations.
+ * @ingroup GstInterfaces
+ */
+class Tuner : public Glib::Interface
+{
+  _CLASS_INTERFACE(Tuner, GstTuner, GST_TUNER, GstTunerClass)
+
+public:
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<Gst::TunerChannel> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::TunerChannel> > list_channels(), gst_tuner_list_channels)
+
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::TunerChannel> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::TunerChannel> > list_channels() const, gst_tuner_list_channels)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::TunerChannel> get_channel(), gst_tuner_get_channel)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::TunerChannel> get_channel() const, gst_tuner_get_channel)
+  _WRAP_METHOD(void set_channel(const Glib::RefPtr<Gst::TunerChannel>& channel), gst_tuner_set_channel)
+
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<Gst::TunerNorm> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::TunerNorm> >  list_norms(), gst_tuner_list_norms)
+
+#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::TunerNorm> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::TunerNorm> >  list_norms() const, gst_tuner_list_norms)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::TunerNorm> get_norm(), gst_tuner_get_norm)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::TunerNorm> get_norm() const, gst_tuner_get_norm)
+  _WRAP_METHOD(void set_norm(const Glib::RefPtr<Gst::TunerNorm>& norm), gst_tuner_set_norm)
+  _WRAP_METHOD(gulong get_frequency(const Glib::RefPtr<const Gst::TunerChannel>& channel) const, gst_tuner_get_frequency)
+  _WRAP_METHOD(void set_frequency(const Glib::RefPtr<Gst::TunerChannel>& channel, gulong frequency), gst_tuner_set_frequency)
+  _WRAP_METHOD(int get_signal_strength(const Glib::RefPtr<Gst::TunerChannel>& channel), gst_tuner_signal_strength)
+  _WRAP_METHOD(Glib::RefPtr<Gst::TunerNorm> find_norm(const Glib::ustring& norm), gst_tuner_find_norm_by_name)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::TunerNorm> find_norm(const Glib::ustring& norm) const, gst_tuner_find_norm_by_name)
+  _WRAP_METHOD(Glib::RefPtr<Gst::TunerChannel> find_channel(const Glib::ustring& channel), gst_tuner_find_channel_by_name)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::TunerChannel> find_channel(const Glib::ustring& channel) const, gst_tuner_find_channel_by_name)
+  _WRAP_METHOD(void channel_changed(const Glib::RefPtr<Gst::TunerChannel>& channel), gst_tuner_channel_changed)
+  _WRAP_METHOD(void norm_changed(const Glib::RefPtr<Gst::TunerNorm>& norm), gst_tuner_norm_changed)
+  _WRAP_METHOD(void frequency_changed(const Glib::RefPtr<Gst::TunerChannel>& channel, gulong frequency), gst_tuner_frequency_changed)
+  _WRAP_METHOD(void signal_changed(const Glib::RefPtr<Gst::TunerChannel>& channel, int signal), gst_tuner_signal_changed)
+
+#m4 _CONVERSION(`GstTunerChannel*', `const Glib::RefPtr<Gst::TunerChannel>&', `Glib::wrap($3, true)')
+
+  /** Reports that the current Gst::TunerChannel has changed.
+   * @param channel The Gst::TunerChannel that has changed.
+   */
+  _WRAP_SIGNAL(void channel_changed(const Glib::RefPtr<Gst::TunerChannel>& channel), "channel-changed")
+
+  /** Reports that the current frequency has changed.
+   * @param channel The Gst::TunerChannel who's frequency has changed.
+   * @param frequency The new frequency.
+   */
+  _WRAP_SIGNAL(void frequency_changed(const Glib::RefPtr<Gst::TunerChannel>& channel, gulong frequency), "frequency-changed")
+
+#m4 _CONVERSION(`GstTunerNorm*', `const Glib::RefPtr<Gst::TunerNorm>&', `Glib::wrap($3, true)')
+  /** Reports that the current Gst::TunerNorm has changed.
+   * @param norm The Gst::TunerNorm that has changed.
+   */
+  _WRAP_SIGNAL(void norm_changed(const Glib::RefPtr<Gst::TunerNorm>& norm), "norm-changed")
+
+  /** Reports that the signal strength has changed.
+   * @param channel The Gst::TunerChannel who's signal has changed.
+   * @param signal The new signal.
+   */
+  _WRAP_SIGNAL(void signal_changed(const Glib::RefPtr<Gst::TunerChannel>& channel, int signal), "signal-changed")
+};
+
+} // namespace Gst

@@ -1,0 +1,83 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+_WRAP_ENUM(TunerChannelFlags, GstTunerChannelFlags)
+
+/** Gst::TunerChannel - A channel from an element implementing the Gst::Tuner
+ * interface.
+ * The Gst::TunerChannel object is provided by an element implementing the
+ * Gst::Tuner interface.
+ *
+ * Gst::TunerChannel provides a name and flags to determine the type and
+ * capabilities of the channel. If the Gst::TUNER_CHANNEL_FREQUENCY flag is
+ * set, then the channel also information about the minimum and maximum
+ * frequency, and range of the reported signal strength.
+ */
+class TunerChannel : public Glib::Object
+{
+  _CLASS_GOBJECT(TunerChannel, GstTunerChannel, GST_TUNER_CHANNEL, Glib::Object, GObject)
+
+public:
+  /** Get a string containing a descriptive name for this channel.
+   */
+  _MEMBER_GET(label, label, Glib::ustring, gchar*)
+
+  /** Get a set of Gst::TunerChannelFlags for this channel.
+   */
+  _MEMBER_GET(flags, flags, TunerChannelFlags, GstTunerChannelFlags)
+
+  /** Get the step size (in Hz) for the frequency setting.
+   */
+  _MEMBER_GET(freq_multiplicator, freq_multiplicator, float, gfloat)
+
+  /** Get the minimum valid frequency setting (in Hz).
+   */
+  _MEMBER_GET(min_frequency, min_frequency, gulong, gulong)
+
+  /** Get the maximum valid frequency setting (in Hz).
+   */
+  _MEMBER_GET(max_frequency, max_frequency, gulong, gulong)
+
+  /** Get the minimum reported signal strength value.
+   */
+  _MEMBER_GET(min_signal, min_signal, int, gint)
+
+  /** Get the maximum reported signal strength value.
+   */
+  _MEMBER_GET(max_signal, max_signal, int, gint)
+
+  /** Reports that the current frequency has changed.
+   * @param frequency The new frequency.
+   */
+  _WRAP_SIGNAL(void frequency_changed(gulong frequency), "frequency-changed")
+
+  /** Reports that the signal strength has changed.
+   * @param signal The new signal value.
+   */
+  _WRAP_SIGNAL(void signal_changed(int signal), "signal-changed")
+};
+
+} // namespace Gst

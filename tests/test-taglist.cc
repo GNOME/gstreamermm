@@ -53,7 +53,7 @@ int main (int argc, char* argv[])
   if (taglist.get(Gst::Tag::BITRATE, 0, rate))
     std::cout << "Tag bit-rate is " << rate << "." << std::endl;
   else
-    std::cout << "Could not get tag `" << Gst::Tag::BITRATE << "'." << std::endl;
+    std::cout << "Could not get tag " << Gst::Tag::BITRATE << "." << std::endl;
 
   Glib::Date date;
   if (taglist.get(Gst::Tag::DATE, date))

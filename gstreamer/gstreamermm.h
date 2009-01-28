@@ -65,6 +65,9 @@
 #include <gstreamermm/mixer.h>
 #include <gstreamermm/mixeroptions.h>
 #include <gstreamermm/mixertrack.h>
+#include <gstreamermm/tuner.h>
+#include <gstreamermm/tunerchannel.h>
+#include <gstreamermm/tunernorm.h>
 #include <gstreamermm/xoverlay.h>
 
 #endif // _GSTREAMERMM_H
