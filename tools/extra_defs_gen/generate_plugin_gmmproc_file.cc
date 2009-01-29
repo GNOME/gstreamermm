@@ -233,7 +233,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
             get_cast_macro(propertyCType).lowercase() + "_get_type";
 
           enumGTypeFunctionDefinitions +=
-            "extern \"C\" GType " + enumGetTypeFunctionName + "()\n" +
+            "static GType " + enumGetTypeFunctionName + "()\n" +
             "{\n" +
             "  return g_type_from_name(\"" + propertyCType + "\");\n" +
             "}\n\n";
@@ -491,7 +491,9 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
 
   Glib::ustring getTypeName = castMacro.lowercase() + "_get_type";
 
-  std::cout << "extern \"C\" GType " << getTypeName << "();" << std::endl;
+  std::cout << "extern \"C\"" << std::endl;
+  std::cout << "{" << std::endl << std::endl;
+
   std::cout << "GType " << getTypeName << "()" << std::endl;
   std::cout << "{" << std::endl;
   std::cout << "  static GType type = 0;" << std::endl;
@@ -518,6 +520,8 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "}" << std::endl << std::endl;
 
   std::cout << enumGTypeFunctionDefinitions;
+
+  std::cout << "} // extern \"C\"" << std::endl << std::endl;
 
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
