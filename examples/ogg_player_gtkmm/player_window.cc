@@ -286,10 +286,10 @@ void PlayerWindow::on_button_open()
   {
     working_dir = chooser.get_current_folder();
 
-    // Set location property on the file source. 
-    const std::string filename = chooser.get_filename(); //TODO: Can this use a URI?
-    m_source_element->property_location() = filename;
-    set_title( Glib::filename_display_basename(filename) );
+    // Set uri on the file source. 
+    const std::string uri = chooser.get_uri();
+    m_source_element->set_uri(uri);
+    set_title(uri);
 
     m_play_button.set_sensitive();
     display_label_progress(0, 0);

@@ -376,8 +376,12 @@ void get_interface_macros(Glib::ustring& interfaceMacros,
   guint n_interfaces = 0;
   GType* interfaces = g_type_interfaces(type, &n_interfaces);
 
+  GType parent_type = g_type_parent(type);
+
   for (int i = 0; i < n_interfaces; i++)
   {
+    if (!g_type_is_a(parent_type, interfaces[i]))
+    {
       Glib::ustring  interfaceCType = g_type_name(interfaces[i]) +
         (Glib::ustring) "*";
 
@@ -387,12 +391,10 @@ void get_interface_macros(Glib::ustring& interfaceMacros,
         cppExtends += ", ";
 
       interfaceMacros += "  _IMPLEMENTS_INTERFACE(_CCONVERT(`" +
-              interfaceCType + "',`type'))\n";
+        interfaceCType + "',`type'))\n";
 
-      //TODO: The following is to include the interface headers that the
-      //plug-in implements.  Uncomment after the rest of the interfaces have
-      //been wrapped.
-      //includeMacroCalls += "_CCONVERSION_INCLUDE(" + interfaceCType + ")dnl\n";
+      includeMacroCalls += "_CCONVERSION_INCLUDE(" + interfaceCType + ")dnl\n";
+    }
   }
 
   g_free(interfaces);
@@ -434,11 +436,8 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << "class " << cppTypeName << std::endl;
   std::cout << ": public " << parentNameSpace << "::" << cppParentTypeName;
 
-  //TODO: The following  is to have the plug-in class extend the interfaces
-  //that it implements.  Include after the rest of the interfaces have been
-  //wrapped.
-  //if (!cppExtends.empty())
-  //  std::cout << ", " << cppExtends;
+  if (!cppExtends.empty())
+    std::cout << ", " << cppExtends;
   
   std::cout << std::endl;
 
@@ -447,10 +446,7 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
     ", " << castMacro << ", " << parentNameSpace << "::" <<
     cppParentTypeName << ", " << cParentTypeName << ")" << std::endl;
 
-  //TODO: The following is to include the _IMPLEMENT_INTERFACE() macros in the
-  //plug-in class definition.  Uncomment after the rest of the interfaces have
-  //been wrapped.
-  //std::cout << interfaceMacros << std::endl;
+  std::cout << interfaceMacros << std::endl;
 
   std::cout << "  _IS_GSTREAMERMM_PLUGIN" << std::endl << std::endl;
 
