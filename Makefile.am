@@ -7,7 +7,7 @@ EXTRA_DIST= build_shared/Makefile_build.am_fragment \
               build_shared/Makefile_gensrc.am_fragment \
               build_shared/Makefile_conditional.am_fragment \
               autogen.sh \
-	      COPYING.tools
+	      COPYING.examples COPYING.tools
 
 
 all-local:
