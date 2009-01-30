@@ -125,9 +125,9 @@ Please install GNU make.]))
 #########################################################################
 #  Dependancy checks (gtkmm is only used by examples)
 #########################################################################
-gstreamermm_min_glibmm_version=2.8.0
-gstreamermm_min_gtkmm_version=2.10
-gstreamermm_min_gst_version=0.10.20
+gstreamermm_min_glibmm_version=2.16.0
+gstreamermm_min_gtkmm_version=2.12.0
+gstreamermm_min_gst_version=0.10.21
 gstreamermm_min_libxmlpp_version=2.14.0
 
 PKG_CHECK_MODULES(GSTREAMERMM, \

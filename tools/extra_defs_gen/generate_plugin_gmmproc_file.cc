@@ -235,7 +235,9 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
           enumGTypeFunctionDefinitions +=
             "static GType " + enumGetTypeFunctionName + "()\n" +
             "{\n" +
-            "  return g_type_from_name(\"" + propertyCType + "\");\n" +
+            "  static GType const type = g_type_from_name(\"" +
+              propertyCType + "\");\n" +
+            "  return type;\n" +
             "}\n\n";
         }
 
