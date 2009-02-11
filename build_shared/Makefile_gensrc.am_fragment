@@ -86,26 +86,31 @@ license_header_source_file = $(gensrc_destdir)/version.h
 # signal the successful generation of the .hg file.
 $(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
 	$(tools_plugin_m4) $(files_defs) $(license_header_source_file)
-	$(eval hg_lowercase = $$(shell echo $$@ | tr [:upper:] [:lower:]))
+	$(eval cppname = $$(notdir $$(basename $$@)))
+	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
+	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
+	$(eval hg_lowercase = $$(plugin_name).hg)
 	sed -n '1,/^$$/p' $(license_header_source_file) > \
-		$(srcdir)/$(notdir $(hg_lowercase))
-	$(run_generate_plugin_gmmproc_file) --hg \
-		$(notdir $(subst .hg,,$@)) | $(M4) -I $(tools_dir_m4) >> \
-		$(srcdir)/$(notdir $(hg_lowercase))
-	ln -sf $(realpath $(srcdir))/$(notdir $(hg_lowercase)) $(builddir)/$@
+		$(srcdir)/$(hg_lowercase)
+	$(run_generate_plugin_gmmproc_file) --hg $(plugin_name) \
+		$(cppname) | $(M4) -I $(tools_dir_m4) >> \
+		$(srcdir)/$(hg_lowercase)
+	ln -sf $(realpath $(srcdir))/$(hg_lowercase) $(builddir)/$@
 
 # This is to generate plugin .ccg files.  The .ccg file is generated and then
 # the camel ccg file is linked to the generated .ccg file to signal the
 # successful generation of the .hg file.
 $(files_all_plugin_camel_hg_with_path:.hg=.ccg): $(generate_plugin_dep) \
 	$(tools_plugin_m4) $(files_defs) $(license_header_source_file)
-	$(eval ccg_lowercase = $$(shell echo $$@ | tr '[:upper:]' '[:lower:]'))
+	$(eval cppname = $$(notdir $$(basename $$@)))
+	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
+	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
+	$(eval ccg_lowercase = $$(plugin_name).ccg)
 	sed -n '1,/^$$/p' $(license_header_source_file) > \
-		$(srcdir)/$(notdir $(ccg_lowercase))
-	$(run_generate_plugin_gmmproc_file) --ccg \
-		$(notdir $(subst .ccg,,$@)) >>  \
-		$(srcdir)/$(notdir $(ccg_lowercase))
-	ln -sf $(realpath $(srcdir))/$(notdir $(ccg_lowercase)) $(builddir)/$@
+		$(srcdir)/$(ccg_lowercase)
+	$(run_generate_plugin_gmmproc_file) --ccg $(plugin_name) \
+		$(cppname) >> $(srcdir)/$(ccg_lowercase)
+	ln -sf $(realpath $(srcdir))/$(ccg_lowercase) $(builddir)/$@
 
 $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)

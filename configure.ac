@@ -177,35 +177,49 @@ fi
 AC_ARG_VAR([GST_INSPECT], [Variable to store gst-inspect executable])
 AC_SUBST(GST_INSPECT)
 
-# To add a plugin, add the C++ class name (which must be the plugin name as
-# recognized by gst-inspect but in camel case -- as is appropriate for a class
-# name) to the plug-in C++ name list below.  Also add the target .hg file name
-# (same name all in lowercase with a .hg) to the files_all_plugin_hg variable
-# in the gstreamer/src/Makefile_list_of_hg.am_fragment file.  Finally, be sure
-# to include an #undef in the gstreamermmconfig.h.in file.
+# To add a plugin, add the plugin definition, in the form of
+# "plugin=CppClassName" (where "plugin" is the plugin name as recognized by
+# gst-inspect and "CppClassName" is the desired name of the C++ class),  to the
+# list of definitions below.  Also add the target .hg file name (which must be
+# the same as "CppClassName" all in lowercase with a .hg extension) to the
+# files_all_plugin_hg variable in the
+# gstreamer/src/Makefile_list_of_hg.am_fragment file.  Finally, be sure to
+# include an #undef in the form of "#undef GSTREAMERMM_PLUGIN_name" in the
+# gstreamermmconfig.h.in file (where "name" is the plugin name all in caps).
 
-GSTREAMERMM_ALL_PLUGIN_CPPNAMES="CapsFilter FakeSrc FakeSink FdSink FdSrc \
-FileSrc FileSink Identity MultiQueue Queue Tee TypeFind Adder AlsaMixer \
-AlsaSink AlsaSrc AudioConvert AudioResample AudioTestSrc CdParanoiaSrc \
-ClockOverlay DecodeBin FfmpegColorSpace GDPDepay GDPPay GioSink GioSrc \
-GioStreamSink GioStreamSrc OggDemux OggMux PlayBin2 TextOverlay TextRender \
-TheoraDec TheoraEnc TimeOverlay VideoRate VideoScale VideoTestSrc Volume \
-VorbisDec VorbisEnc VorbisParse VorbisTag XImageSink XvImageSink"
+GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
+fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc filesink=FileSink \
+identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee typefind=TypeFind \
+adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink alsasrc=AlsaSrc \
+audioconvert=AudioConvert audioresample=AudioResample \
+audiotestsrc=AudioTestSrc cdparanoiasrc=CdParanoiaSrc \
+clockoverlay=ClockOverlay decodebin=DecodeBin \
+ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
+giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
+giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux playbin2=PlayBin2 \
+textoverlay=TextOverlay textrender=TextRender theoradec=TheoraDec \
+theoraenc=TheoraEnc timeoverlay=TimeOverlay videorate=VideoRate \
+videoscale=VideoScale videotestsrc=VideoTestSrc volume=Volume \
+vorbisdec=VorbisDec vorbisenc=VorbisEnc vorbisparse=VorbisParse \
+vorbistag=VorbisTag ximagesink=XImageSink xvimagesink=XvImageSink"
 
 # TODO: The following plug-ins (to be added above) can't be wrapped yet because
 # their signals or properties use the GValueArray type which might have to be
 # wrapped in glibmm first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink,
 # TheoraParse, UriDecodeBin.
 
-for cppname in $GSTREAMERMM_ALL_PLUGIN_CPPNAMES; do
-  plugin=[`echo $cppname | tr [:upper:] [:lower:]`]
-  if test -z "`$GST_INSPECT $plugin | $HEAD -n 1 | $GREP "No such element"`"; then
-    plugin_define=["GSTREAMERMM_PLUGIN_`echo $plugin | tr [:lower:] [:upper:]`"]
+for plugin_def in $GSTREAMERMM_ALL_PLUGIN_DEFS; do
+  plugin_name=[`echo $plugin_def | cut -d'=' -f 1`]
+  cppname=[`echo $plugin_def | cut -d'=' -f 2`]
+  GSTREAMERMM_ALL_PLUGIN_CPPNAMES="$GSTREAMERMM_ALL_PLUGIN_CPPNAMES $cppname"
+  if test -z "`$GST_INSPECT $plugin_name | $HEAD -n 1 | $GREP "No such element"`"; then
+    plugin_define=["GSTREAMERMM_PLUGIN_`echo $plugin_name | tr [:lower:] [:upper:]`"]
     AC_DEFINE_UNQUOTED($plugin_define)
     GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES $cppname"
-    GSTREAMERMM_EXISTING_PLUGIN_HG="$GSTREAMERMM_EXISTING_PLUGIN_HG $plugin.hg"
+    GSTREAMERMM_EXISTING_PLUGIN_HG="$GSTREAMERMM_EXISTING_PLUGIN_HG $plugin_name.hg"
   fi
 done
+AC_SUBST(GSTREAMERMM_ALL_PLUGIN_DEFS)
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_CPPNAMES)
 AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES)
 AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_HG)

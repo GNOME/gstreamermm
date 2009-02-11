@@ -233,12 +233,12 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
             get_cast_macro(propertyCType).lowercase() + "_get_type";
 
           enumGTypeFunctionDefinitions +=
-            "static GType " + enumGetTypeFunctionName + "()\n" +
+            "\nstatic GType " + enumGetTypeFunctionName + "()\n" +
             "{\n" +
             "  static GType const type = g_type_from_name(\"" +
               propertyCType + "\");\n" +
             "  return type;\n" +
-            "}\n\n";
+            "}\n";
         }
 
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
@@ -422,7 +422,8 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
 
-  std::cout << enumWrapStatements << std::endl;
+  if (!enumWrapStatements.empty())
+    std::cout << enumWrapStatements << std::endl;
 
   std::cout << "/** " << nmspace << "::" << cppTypeName << " - " << pluginName << " plugin." << std::endl;
   std::cout << " * Please include <" << target << "/" <<
@@ -448,7 +449,8 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
     ", " << castMacro << ", " << parentNameSpace << "::" <<
     cppParentTypeName << ", " << cParentTypeName << ")" << std::endl;
 
-  std::cout << interfaceMacros << std::endl;
+  if (!interfaceMacros.empty())
+    std::cout << interfaceMacros << std::endl;
 
   std::cout << "  _IS_GSTREAMERMM_PLUGIN" << std::endl << std::endl;
 
@@ -463,12 +465,13 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
 
   std::cout << "/** Creates a new " << pluginName << " plugin with the given name." << std::endl;
   std::cout << " */" << std::endl;
-  std::cout << "  _WRAP_CREATE(const Glib::ustring& name)" << std::endl <<
-    std::endl;
+  std::cout << "  _WRAP_CREATE(const Glib::ustring& name)" << std::endl;
 
-  std::cout << propertyWrapStatements;
+  if (!propertyWrapStatements.empty())
+    std::cout << std::endl << propertyWrapStatements;
 
-  std::cout << std::endl << signalWrapStatements;
+  if (!signalWrapStatements.empty())
+    std::cout << std::endl << signalWrapStatements;
 
   std::cout << "};" << std::endl;
 
@@ -519,11 +522,12 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "  }" << std::endl << std::endl;
 
   std::cout << "  return type;" << std::endl;
-  std::cout << "}" << std::endl << std::endl;
+  std::cout << "}" << std::endl;
 
-  std::cout << enumGTypeFunctionDefinitions;
+  if (!enumGTypeFunctionDefinitions.empty())
+    std::cout << enumGTypeFunctionDefinitions;
 
-  std::cout << "} // extern \"C\"" << std::endl << std::endl;
+  std::cout << std::endl << "} // extern \"C\"" << std::endl << std::endl;
 
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
@@ -532,18 +536,18 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << ": _CONSTRUCT(\"name\", NULL)" << std::endl;
   std::cout << "{}" << std::endl << std::endl;
 
-  std::cout << cppTypeName << "::" << cppTypeName << "(const Glib::ustring& name)" << std::endl;
+  std::cout << cppTypeName << "::" << cppTypeName <<
+    "(const Glib::ustring& name)" << std::endl;
   std::cout << ": _CONSTRUCT(\"name\", name.c_str())" << std::endl;
   std::cout << "{}" << std::endl << std::endl;
 
-  std::cout << std::endl << "}" << std::endl;
+  std::cout << "}" << std::endl;
 }
 
 int main(int argc, char* argv[])
 {
   gboolean hgFile = false;
   gboolean ccgFile = false;
-  gboolean suggestHg = false;
 
   if (!g_thread_supported())
     g_thread_init(NULL);
@@ -552,20 +556,20 @@ int main(int argc, char* argv[])
   {
     {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate preliminary .hg file.", NULL },
     {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", NULL },
-    {"suggest-hg", 's', 0, G_OPTION_ARG_NONE, &suggestHg, "If the plugin exists, output .hg filename.", NULL },
     {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin.", "namespace" },
     {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main defs file without .defs extension.", "def" },
     {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The .h and .cc target directory.", "directory" },
     { NULL }
   };
 
-  GOptionContext* gContext = g_option_context_new("<CppPluginClassName>");
+  GOptionContext* gContext =
+    g_option_context_new("<plugin-name> <CppPluginClassName>");
   g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's "
     "gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  "
-    "Use the same syntax for CppPluginClassName as in\ngst-inspect except "
-    "that camel casing should be used because this will be the\nname of the "
-    "C++ class.  The .hg file is a preliminary .hg file that needs to\nbe run "
-    "through m4 including the ctocpp*.m4 files in the tools/m4 directory.");
+    "Use the same syntax for plugin-name as in gst-inspect\nand supply the "
+    "desired C++ class name.  The .hg file is a preliminary .hg file\nthat "
+    "needs to be run through m4 including the ctocpp*.m4 files in the "
+    "tools/m4\ndirectory.");
 
   g_option_context_add_main_entries(gContext, optionEntries, NULL);
   g_option_context_add_group(gContext, gst_init_get_option_group());
@@ -589,16 +593,16 @@ int main(int argc, char* argv[])
       return -1;
   }
 
-  if (argc != 2)
+  if (argc != 3)
   {
-    std::cout << "A plugin name must be supplied to generate an .hg file." <<
-      std::endl << "Run `" << argv[0] << " -?'  for a list of options." <<
-      std::endl;
+    std::cout << "A plugin name and C++ class name must be supplied to "
+      "generate gmmproc files." << std::endl <<
+      "Run `" << argv[0] << " -?'  for help." << std::endl;
     return -1;
   }
 
-  cppTypeName = argv[1];
-  pluginName = cppTypeName.lowercase();
+  pluginName = argv[1];
+  cppTypeName = argv[2];
 
   GstElementFactory* factory = 0;
 
@@ -617,12 +621,6 @@ int main(int argc, char* argv[])
 
   if (type)
   {
-    if (suggestHg)
-    {
-      std::cout << pluginName << ".hg" << std::endl;
-      return 0;
-    }
-
     if (!nmspace || !defsFile || !target)
     {
       std::cout << "A namespace, a default defs file and a target directory "
