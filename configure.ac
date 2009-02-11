@@ -189,9 +189,9 @@ AC_SUBST(GST_INSPECT)
 
 GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
 fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc filesink=FileSink \
-identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee typefind=TypeFind \
-adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink alsasrc=AlsaSrc \
-audioconvert=AudioConvert audioresample=AudioResample \
+identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee \
+typefind=TypeFindElement adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink \
+alsasrc=AlsaSrc audioconvert=AudioConvert audioresample=AudioResample \
 audiotestsrc=AudioTestSrc cdparanoiasrc=CdParanoiaSrc \
 clockoverlay=ClockOverlay decodebin=DecodeBin \
 ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
@@ -216,7 +216,7 @@ for plugin_def in $GSTREAMERMM_ALL_PLUGIN_DEFS; do
     plugin_define=["GSTREAMERMM_PLUGIN_`echo $plugin_name | tr [:lower:] [:upper:]`"]
     AC_DEFINE_UNQUOTED($plugin_define)
     GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES $cppname"
-    GSTREAMERMM_EXISTING_PLUGIN_HG="$GSTREAMERMM_EXISTING_PLUGIN_HG $plugin_name.hg"
+    GSTREAMERMM_EXISTING_PLUGIN_HG=["$GSTREAMERMM_EXISTING_PLUGIN_HG `echo $cppname | tr [:upper:] [:lower:]`.hg"]
   fi
 done
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_DEFS)

@@ -89,7 +89,8 @@ $(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
 	$(eval cppname = $$(notdir $$(basename $$@)))
 	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
 	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
-	$(eval hg_lowercase = $$(plugin_name).hg)
+	$(eval hg_lowercase = \
+		$$(shell echo $$(cppname) | tr [:upper:] [:lower:]).hg)
 	sed -n '1,/^$$/p' $(license_header_source_file) > \
 		$(srcdir)/$(hg_lowercase)
 	$(run_generate_plugin_gmmproc_file) --hg $(plugin_name) \
@@ -105,7 +106,8 @@ $(files_all_plugin_camel_hg_with_path:.hg=.ccg): $(generate_plugin_dep) \
 	$(eval cppname = $$(notdir $$(basename $$@)))
 	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
 	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
-	$(eval ccg_lowercase = $$(plugin_name).ccg)
+	$(eval ccg_lowercase = \
+		$$(shell echo $$(cppname) | tr [:upper:] [:lower:]).ccg)
 	sed -n '1,/^$$/p' $(license_header_source_file) > \
 		$(srcdir)/$(ccg_lowercase)
 	$(run_generate_plugin_gmmproc_file) --ccg $(plugin_name) \
