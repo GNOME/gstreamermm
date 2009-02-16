@@ -380,7 +380,7 @@ void get_interface_macros(Glib::ustring& interfaceMacros,
 
   GType parent_type = g_type_parent(type);
 
-  for (int i = 0; i < n_interfaces; i++)
+  for (guint i = 0; i < n_interfaces; i++)
   {
     if (!g_type_is_a(parent_type, interfaces[i]))
     {

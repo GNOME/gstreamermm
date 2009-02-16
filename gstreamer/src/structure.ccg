@@ -44,6 +44,8 @@ Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, voi
     Glib::exception_handlers_invoke();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return false;
 }
 
 static gboolean
@@ -68,6 +70,8 @@ Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, void* data)
     Glib::exception_handlers_invoke();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return false;
 }
 
 namespace Gst
@@ -396,7 +400,7 @@ bool Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) 
     const gint max_num = gst_value_get_fraction_numerator(gst_max_val);
     const gint max_denom = gst_value_get_fraction_denominator(gst_max_val);
 
-    range = Gst::FractionRange(Gst::Fraction(min_num, max_num),
+    range = Gst::FractionRange(Gst::Fraction(min_num, min_denom),
       Gst::Fraction(max_num, max_denom));
 
     return true;

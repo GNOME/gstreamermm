@@ -65,7 +65,7 @@ int main (int argc, char* argv[])
 
   int state;
   structure.get_field("state", Glib::Value<Gst::State>::value_type(), state);
-  if (state = Gst::STATE_PAUSED)
+  if ((state = Gst::STATE_PAUSED))
     std::cout << "state value after getting = Gst::STATE_PAUSED." <<
       std::endl;
 

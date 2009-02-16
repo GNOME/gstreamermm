@@ -48,7 +48,7 @@ static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, void* 
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
-static bool Pad_Data_gstreamermm_callback(GstPad* pad, GstMiniObject* mini_obj, void* data)
+static gboolean Pad_Data_gstreamermm_callback(GstPad* pad, GstMiniObject* mini_obj, void* data)
 {
   Gst::Pad::SlotData* the_slot = static_cast<Gst::Pad::SlotData*>(data);
 
@@ -64,6 +64,8 @@ static bool Pad_Data_gstreamermm_callback(GstPad* pad, GstMiniObject* mini_obj, 
     Glib::exception_handlers_invoke();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return false;
 }
 
 static void Pad_Data_gstreamermm_callback_disconnect(void* data)
