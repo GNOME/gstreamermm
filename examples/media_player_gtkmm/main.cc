@@ -37,8 +37,6 @@ main (int argc, char *argv[])
 
   // playbin2 plays any media type, choosing an appropriate set of elements
   // and linking them together.
-  // playbin2 implements Gst::XOverlay so it accepts a window id in which 
-  // to draw video.
   Glib::RefPtr<Gst::PlayBin2> playbin = Gst::PlayBin2::create("playbin");
 
   if(!playbin)
@@ -56,7 +54,8 @@ main (int argc, char *argv[])
     return -1;
   }
 
-  // Set the playbin's video-sink property so that our video sink is used for video display:
+  // Set the playbin's video-sink property so that our video sink is used
+  // for video display:
   playbin->property_video_sink() = video_sink;
 
   //Create our player window and give it the pipeline and video sink:
