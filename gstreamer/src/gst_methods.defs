@@ -275,7 +275,7 @@
   (c-name "GstBinFlags")
   (gtype-id "GST_TYPE_BIN_FLAGS")
   (values
-    '("t" "GST_BIN_FLAG_LAST")
+    '("last" "GST_BIN_FLAG_LAST")
   )
 )
 
@@ -290,6 +290,9 @@
     '("in-caps" "GST_BUFFER_FLAG_IN_CAPS")
     '("gap" "GST_BUFFER_FLAG_GAP")
     '("delta-unit" "GST_BUFFER_FLAG_DELTA_UNIT")
+    '("media1" "GST_BUFFER_FLAG_MEDIA1")
+    '("media2" "GST_BUFFER_FLAG_MEDIA2")
+    '("media3" "GST_BUFFER_FLAG_MEDIA3")
     '("last" "GST_BUFFER_FLAG_LAST")
   )
 )
@@ -310,8 +313,8 @@
   (c-name "GstBusFlags")
   (gtype-id "GST_TYPE_BUS_FLAGS")
   (values
-    '("ushing" "GST_BUS_FLUSHING")
-    '("ag-last" "GST_BUS_FLAG_LAST")
+    '("flushing" "GST_BUS_FLUSHING")
+    '("flag-last" "GST_BUS_FLAG_LAST")
   )
 )
 
@@ -331,7 +334,7 @@
   (c-name "GstCapsFlags")
   (gtype-id "GST_TYPE_CAPS_FLAGS")
   (values
-    '("y" "GST_CAPS_FLAGS_ANY")
+    '("any" "GST_CAPS_FLAGS_ANY")
   )
 )
 
@@ -733,6 +736,7 @@
     '("latency" "GST_MESSAGE_LATENCY")
     '("async-start" "GST_MESSAGE_ASYNC_START")
     '("async-done" "GST_MESSAGE_ASYNC_DONE")
+    '("request-state" "GST_MESSAGE_REQUEST_STATE")
     '("any" "GST_MESSAGE_ANY")
   )
 )
@@ -853,8 +857,8 @@
   (c-name "GstPadTemplateFlags")
   (gtype-id "GST_TYPE_PAD_TEMPLATE_FLAGS")
   (values
-    '("ixed" "GST_PAD_TEMPLATE_FIXED")
-    '("lag-last" "GST_PAD_TEMPLATE_FLAG_LAST")
+    '("fixed" "GST_PAD_TEMPLATE_FIXED")
+    '("flag-last" "GST_PAD_TEMPLATE_FLAG_LAST")
   )
 )
 
@@ -921,7 +925,19 @@
   (c-name "GstPluginFlags")
   (gtype-id "GST_TYPE_PLUGIN_FLAGS")
   (values
-    '("d" "GST_PLUGIN_FLAG_CACHED")
+    '("cached" "GST_PLUGIN_FLAG_CACHED")
+  )
+)
+
+(define-flags PluginDependencyFlags
+  (in-module "Gst")
+  (c-name "GstPluginDependencyFlags")
+  (gtype-id "GST_TYPE_PLUGIN_DEPENDENCY_FLAGS")
+  (values
+    '("none" "GST_PLUGIN_DEPENDENCY_FLAG_NONE")
+    '("recurse" "GST_PLUGIN_DEPENDENCY_FLAG_RECURSE")
+    '("paths-are-default-only" "GST_PLUGIN_DEPENDENCY_FLAG_PATHS_ARE_DEFAULT_ONLY")
+    '("file-name-is-suffix" "GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX")
   )
 )
 
@@ -955,6 +971,16 @@
     '("download" "GST_BUFFERING_DOWNLOAD")
     '("timeshift" "GST_BUFFERING_TIMESHIFT")
     '("live" "GST_BUFFERING_LIVE")
+  )
+)
+
+(define-enum ClockType
+  (in-module "Gst")
+  (c-name "GstClockType")
+  (gtype-id "GST_TYPE_CLOCK_TYPE")
+  (values
+    '("realtime" "GST_CLOCK_TYPE_REALTIME")
+    '("monotonic" "GST_CLOCK_TYPE_MONOTONIC")
   )
 )
 
@@ -2814,6 +2840,11 @@
   (return-type "GType")
 )
 
+(define-function gst_plugin_dependency_flags_get_type
+  (c-name "gst_plugin_dependency_flags_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_rank_get_type
   (c-name "gst_rank_get_type")
   (return-type "GType")
@@ -2826,6 +2857,11 @@
 
 (define-function gst_buffering_mode_get_type
   (c-name "gst_buffering_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_clock_type_get_type
+  (c-name "gst_clock_type_get_type")
   (return-type "GType")
 )
 
@@ -4409,6 +4445,24 @@
   )
 )
 
+(define-function gst_message_new_request_state
+  (c-name "gst_message_new_request_state")
+  (return-type "GstMessage*")
+  (parameters
+    '("GstObject*" "src")
+    '("GstState" "state")
+  )
+)
+
+(define-method parse_request_state
+  (of-object "GstMessage")
+  (c-name "gst_message_parse_request_state")
+  (return-type "none")
+  (parameters
+    '("GstState*" "state")
+  )
+)
+
 (define-function gst_message_new_custom
   (c-name "gst_message_new_custom")
   (return-type "GstMessage*")
@@ -4809,6 +4863,18 @@
     '("gboolean" "blocked")
     '("GstPadBlockCallback" "callback")
     '("gpointer" "user_data")
+  )
+)
+
+(define-method set_blocked_async_full
+  (of-object "GstPad")
+  (c-name "gst_pad_set_blocked_async_full")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "blocked")
+    '("GstPadBlockCallback" "callback")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "destroy_data")
   )
 )
 
@@ -5745,6 +5811,30 @@
   )
 )
 
+(define-method add_dependency
+  (of-object "GstPlugin")
+  (c-name "gst_plugin_add_dependency")
+  (return-type "none")
+  (parameters
+    '("const-gchar**" "env_vars")
+    '("const-gchar**" "paths")
+    '("const-gchar**" "names")
+    '("GstPluginDependencyFlags" "flags")
+  )
+)
+
+(define-method add_dependency_simple
+  (of-object "GstPlugin")
+  (c-name "gst_plugin_add_dependency_simple")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "env_vars")
+    '("const-gchar*" "paths")
+    '("const-gchar*" "names")
+    '("GstPluginDependencyFlags" "flags")
+  )
+)
+
 (define-function gst_plugin_list_free
   (c-name "gst_plugin_list_free")
   (return-type "none")
@@ -5764,6 +5854,11 @@
   (parameters
     '("gboolean" "controllable")
   )
+)
+
+(define-function gst_poll_new_timer
+  (c-name "gst_poll_new_timer")
+  (return-type "GstPoll*")
 )
 
 (define-method free
@@ -5892,6 +5987,18 @@
   (parameters
     '("gboolean" "flushing")
   )
+)
+
+(define-method write_control
+  (of-object "GstPoll")
+  (c-name "gst_poll_write_control")
+  (return-type "gboolean")
+)
+
+(define-method read_control
+  (of-object "GstPoll")
+  (c-name "gst_poll_read_control")
+  (return-type "gboolean")
 )
 
 
@@ -6065,14 +6172,6 @@
 (define-function gst_query_type_iterate_definitions
   (c-name "gst_query_type_iterate_definitions")
   (return-type "GstIterator*")
-)
-
-(define-function gst_query_new_position
-  (c-name "gst_query_new_position")
-  (return-type "GstQuery*")
-  (parameters
-    '("GstFormat" "format")
-  )
 )
 
 (define-method set_position
@@ -10757,6 +10856,15 @@
   )
 )
 
+(define-function gst_type_find_helper_for_extension
+  (c-name "gst_type_find_helper_for_extension")
+  (return-type "GstCaps*")
+  (parameters
+    '("GstObject*" "obj")
+    '("const-gchar*" "extension")
+  )
+)
+
 (define-function gst_type_find_helper_get_range
   (c-name "gst_type_find_helper_get_range")
   (return-type "GstCaps*")
@@ -12087,6 +12195,8 @@
   (values
     '("none" "GST_MIXER_FLAG_NONE")
     '("auto-notifications" "GST_MIXER_FLAG_AUTO_NOTIFICATIONS")
+    '("has-whitelist" "GST_MIXER_FLAG_HAS_WHITELIST")
+    '("grouping" "GST_MIXER_FLAG_GROUPING")
   )
 )
 
@@ -12101,6 +12211,9 @@
     '("record" "GST_MIXER_TRACK_RECORD")
     '("master" "GST_MIXER_TRACK_MASTER")
     '("software" "GST_MIXER_TRACK_SOFTWARE")
+    '("no-record" "GST_MIXER_TRACK_NO_RECORD")
+    '("no-mute" "GST_MIXER_TRACK_NO_MUTE")
+    '("whitelist" "GST_MIXER_TRACK_WHITELIST")
   )
 )
 
@@ -12673,7 +12786,7 @@
   (is-constructor-of "GstAudioClock")
   (return-type "GstClock*")
   (parameters
-    '("gchar*" "name")
+    '("const-gchar*" "name")
     '("GstAudioClockGetTimeFunc" "func")
     '("gpointer" "user_data")
   )
@@ -13077,35 +13190,6 @@
 
 
 
-;; From multichannel-enumtypes.h
-
-(define-function gst_audio_channel_position_get_type
-  (c-name "gst_audio_channel_position_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_ring_buffer_state_get_type
-  (c-name "gst_ring_buffer_state_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_ring_buffer_seg_state_get_type
-  (c-name "gst_ring_buffer_seg_state_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_buffer_format_type_get_type
-  (c-name "gst_buffer_format_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_buffer_format_get_type
-  (c-name "gst_buffer_format_get_type")
-  (return-type "GType")
-)
-
-
-
 ;; From multichannel.h
 
 (define-function gst_audio_get_channel_positions
@@ -13168,6 +13252,11 @@
 
 (define-function gst_cdda_base_src_get_type
   (c-name "gst_cdda_base_src_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_cdda_base_src_mode_get_type
+  (c-name "gst_cdda_base_src_mode_get_type")
   (return-type "GType")
 )
 
@@ -13835,28 +13924,33 @@
 
 ;; From interfaces-enumtypes.h
 
-(define-function gst_audio_channel_position_get_type
-  (c-name "gst_audio_channel_position_get_type")
+(define-function gst_color_balance_type_get_type
+  (c-name "gst_color_balance_type_get_type")
   (return-type "GType")
 )
 
-(define-function gst_ring_buffer_state_get_type
-  (c-name "gst_ring_buffer_state_get_type")
+(define-function gst_mixer_type_get_type
+  (c-name "gst_mixer_type_get_type")
   (return-type "GType")
 )
 
-(define-function gst_ring_buffer_seg_state_get_type
-  (c-name "gst_ring_buffer_seg_state_get_type")
+(define-function gst_mixer_message_type_get_type
+  (c-name "gst_mixer_message_type_get_type")
   (return-type "GType")
 )
 
-(define-function gst_buffer_format_type_get_type
-  (c-name "gst_buffer_format_type_get_type")
+(define-function gst_mixer_flags_get_type
+  (c-name "gst_mixer_flags_get_type")
   (return-type "GType")
 )
 
-(define-function gst_buffer_format_get_type
-  (c-name "gst_buffer_format_get_type")
+(define-function gst_mixer_track_flags_get_type
+  (c-name "gst_mixer_track_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tuner_channel_flags_get_type
+  (c-name "gst_tuner_channel_flags_get_type")
   (return-type "GType")
 )
 
@@ -15686,6 +15780,15 @@
   )
 )
 
+(define-function gst_rtsp_connection_accept
+  (c-name "gst_rtsp_connection_accept")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("gint" "sock")
+    '("GstRTSPConnection**" "conn")
+  )
+)
+
 (define-method connect
   (of-object "GstRTSPConnection")
   (c-name "gst_rtsp_connection_connect")
@@ -15826,6 +15929,42 @@
   (return-type "const-gchar*")
 )
 
+(define-function gst_rtsp_watch_new
+  (c-name "gst_rtsp_watch_new")
+  (is-constructor-of "GstRtspWatch")
+  (return-type "GstRTSPWatch*")
+  (parameters
+    '("GstRTSPConnection*" "conn")
+    '("GstRTSPWatchFuncs*" "funcs")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method unref
+  (of-object "GstRTSPWatch")
+  (c-name "gst_rtsp_watch_unref")
+  (return-type "none")
+)
+
+(define-method attach
+  (of-object "GstRTSPWatch")
+  (c-name "gst_rtsp_watch_attach")
+  (return-type "guint")
+  (parameters
+    '("GMainContext*" "context")
+  )
+)
+
+(define-method queue_message
+  (of-object "GstRTSPWatch")
+  (c-name "gst_rtsp_watch_queue_message")
+  (return-type "guint")
+  (parameters
+    '("GstRTSPMessage*" "message")
+  )
+)
+
 
 
 ;; From gstrtspdefs.h
@@ -15863,6 +16002,14 @@
   (return-type "const-gchar*")
   (parameters
     '("GstRTSPStatusCode" "code")
+  )
+)
+
+(define-function gst_rtsp_options_as_text
+  (c-name "gst_rtsp_options_as_text")
+  (return-type "gchar*")
+  (parameters
+    '("GstRTSPMethod" "options")
   )
 )
 
@@ -16012,6 +16159,15 @@
   (return-type "GstRTSPResult")
   (parameters
     '("GstRTSPUrl*" "url")
+  )
+)
+
+(define-method receive_request
+  (of-object "GstRTSPExtension")
+  (c-name "gst_rtsp_extension_receive_request")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("GstRTSPMessage*" "req")
   )
 )
 
@@ -16166,6 +16322,16 @@
   )
 )
 
+(define-method take_header
+  (of-object "GstRTSPMessage")
+  (c-name "gst_rtsp_message_take_header")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("GstRTSPHeaderField" "field")
+    '("gchar*" "value")
+  )
+)
+
 (define-method remove_header
   (of-object "GstRTSPMessage")
   (c-name "gst_rtsp_message_remove_header")
@@ -16255,6 +16421,14 @@
   )
 )
 
+(define-function gst_rtsp_range_to_string
+  (c-name "gst_rtsp_range_to_string")
+  (return-type "gchar*")
+  (parameters
+    '("const-GstRTSPTimeRange*" "range")
+  )
+)
+
 (define-function gst_rtsp_range_free
   (c-name "gst_rtsp_range_free")
   (return-type "none")
@@ -16325,6 +16499,11 @@
 
 ;; From gstrtspurl.h
 
+(define-function gst_rtsp_url_get_type
+  (c-name "gst_rtsp_url_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_rtsp_url_parse
   (c-name "gst_rtsp_url_parse")
   (return-type "GstRTSPResult")
@@ -16332,6 +16511,12 @@
     '("const-gchar*" "urlstr")
     '("GstRTSPUrl**" "url")
   )
+)
+
+(define-method copy
+  (of-object "GstRTSPUrl")
+  (c-name "gst_rtsp_url_copy")
+  (return-type "GstRTSPUrl*")
 )
 
 (define-method free
@@ -17501,6 +17686,15 @@
   )
 )
 
+(define-function gst_video_format_parse_caps_interlaced
+  (c-name "gst_video_format_parse_caps_interlaced")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps*" "caps")
+    '("gboolean*" "interlaced")
+  )
+)
+
 (define-function gst_video_parse_caps_framerate
   (c-name "gst_video_parse_caps_framerate")
   (return-type "gboolean")
@@ -17532,6 +17726,21 @@
     '("int" "framerate_d")
     '("int" "par_n")
     '("int" "par_d")
+  )
+)
+
+(define-method new_caps_interlaced
+  (of-object "GstVideoFormat")
+  (c-name "gst_video_format_new_caps_interlaced")
+  (return-type "GstCaps*")
+  (parameters
+    '("int" "width")
+    '("int" "height")
+    '("int" "framerate_n")
+    '("int" "framerate_d")
+    '("int" "par_n")
+    '("int" "par_d")
+    '("gboolean" "interlaced")
   )
 )
 

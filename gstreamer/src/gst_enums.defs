@@ -458,6 +458,7 @@
     '("latency" "GST_MESSAGE_LATENCY" "1 << 19")
     '("async-start" "GST_MESSAGE_ASYNC_START" "1 << 20")
     '("async-done" "GST_MESSAGE_ASYNC_DONE" "1 << 21")
+    '("request-state" "GST_MESSAGE_REQUEST_STATE" "1 << 22")
     '("any" "GST_MESSAGE_ANY" "~0")
   )
 )
@@ -648,6 +649,17 @@
   )
 )
 
+(define-flags-extended PluginDependencyFlags
+  (in-module "Gst")
+  (c-name "GstPluginDependencyFlags")
+  (values
+    '("none" "GST_PLUGIN_DEPENDENCY_FLAG_NONE" "0")
+    '("recurse" "GST_PLUGIN_DEPENDENCY_FLAG_RECURSE" "1 << 0")
+    '("paths-are-default-only" "GST_PLUGIN_DEPENDENCY_FLAG_PATHS_ARE_DEFAULT_ONLY" "1 << 1")
+    '("file-name-is-suffix" "GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX" "1 << 2")
+  )
+)
+
 ;; From /usr/src/jhbuild-sources/gstreamer/gst/gstquark.h
 
 (define-enum-extended QuarkId
@@ -740,6 +752,17 @@
     '("download" "GST_BUFFERING_DOWNLOAD" "1")
     '("timeshift" "GST_BUFFERING_TIMESHIFT" "2")
     '("live" "GST_BUFFERING_LIVE" "3")
+  )
+)
+
+;; From /usr/src/jhbuild-sources/gstreamer/gst/gstsystemclock.h
+
+(define-enum-extended ClockType
+  (in-module "Gst")
+  (c-name "GstClockType")
+  (values
+    '("realtime" "GST_CLOCK_TYPE_REALTIME" "0")
+    '("monotonic" "GST_CLOCK_TYPE_MONOTONIC" "1")
   )
 )
 
@@ -1190,6 +1213,8 @@
   (values
     '("none" "GST_MIXER_FLAG_NONE" "0")
     '("auto-notifications" "GST_MIXER_FLAG_AUTO_NOTIFICATIONS" "1<<0")
+    '("has-whitelist" "GST_MIXER_FLAG_HAS_WHITELIST" "1<<1")
+    '("grouping" "GST_MIXER_FLAG_GROUPING" "1<<2")
   )
 )
 
@@ -1205,6 +1230,9 @@
     '("record" "GST_MIXER_TRACK_RECORD" "1<<3")
     '("master" "GST_MIXER_TRACK_MASTER" "1<<4")
     '("software" "GST_MIXER_TRACK_SOFTWARE" "1<<5")
+    '("no-record" "GST_MIXER_TRACK_NO_RECORD" "1<<6")
+    '("no-mute" "GST_MIXER_TRACK_NO_MUTE" "1<<7")
+    '("whitelist" "GST_MIXER_TRACK_WHITELIST" "1<<8")
   )
 )
 
