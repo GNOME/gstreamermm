@@ -1,0 +1,175 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gsttypefind.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+_WRAP_ENUM(TypeFindProbability, GstTypeFindProbability)
+
+class Caps;
+class Plugin;
+
+/** Gst::TypeFind - Stream type detection.
+ * Gst::TypeFind methods allow you to detect the media type of an unknown
+ * stream.
+ *
+ * Last reviewed on 2005-11-09 (0.9.4).
+ */
+class TypeFind
+{
+  _CLASS_BOXEDTYPE_STATIC(TypeFind, GstTypeFind)
+
+public:
+  /** For example,
+   * void on_find();.
+   */
+  typedef sigc::slot<void> SlotFind;
+
+public:
+#m4 _CONVERSION(`guint8*', `Glib::ArrayHandle<guint8>', `$2(($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ArrayHandle<guint8> peek(gint64 offset, guint size) const, gst_type_find_peek)
+
+  _WRAP_METHOD(void suggest(guint probability, const Glib::RefPtr<const Gst::Caps>& caps) const, gst_type_find_suggest)
+  _IGNORE(gst_type_find_suggest_simple)
+
+  _WRAP_METHOD(guint64 get_length() const, gst_type_find_get_length)
+
+  /** Registers a new typefind slot to be used for typefinding. After
+   * registering the slot will be available for typefinding. This method
+   * is typically called during an element's plugin initialization.
+   *
+   * @param plugin A Gst::Plugin (for a static typefind function, i.e. one not
+   * related to any  Gst::Plugin, use register_slot() without the Gst::Plugin
+   * argument).
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @param extensions Extensions belonging to this type (for no extensions use
+   * register_slot() with no extensions parameter).
+   * @param caps The caps to be returned when typefinding succeeds (for no
+   * caps, use register_slot() with no caps argument).
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::RefPtr<Gst::Plugin>& plugin, const Glib::ustring& name, guint rank, const SlotFind& find_slot, const Glib::StringArrayHandle& extensions, const Glib::RefPtr<const Gst::Caps>& caps);
+
+  /** Registers a new typefind slot to be used for typefinding. After
+   * registering the slot will be available for typefinding. This method
+   * is typically called during an element's plugin initialization.
+   *
+   * @param plugin A Gst::Plugin (for a static typefind function, i.e. one not
+   * related to any  Gst::Plugin, use register_slot() without the Gst::Plugin
+   * argument).
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @param caps The caps to be returned when typefinding succeeds (for no
+   * caps, use register_slot() with no caps argument).
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::RefPtr<Gst::Plugin>& plugin, const Glib::ustring& name, guint rank, const SlotFind& find_slot, const Glib::RefPtr<const Gst::Caps>& caps);
+
+  /** Registers a new typefind slot to be used for typefinding. After
+   * registering the slot will be available for typefinding. This method
+   * is typically called during an element's plugin initialization.
+   *
+   * @param plugin A Gst::Plugin (for a static typefind function, i.e. one not
+   * related to any  Gst::Plugin, use register_slot() without the Gst::Plugin
+   * argument).
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @param extensions Extensions belonging to this type (for no extensions use
+   * register_slot() with no extensions parameter).
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::RefPtr<Gst::Plugin>& plugin, const Glib::ustring& name, guint rank, const SlotFind& find_slot, const Glib::StringArrayHandle& extensions);
+
+  /** Registers a new typefind slot to be used for typefinding. After
+   * registering the slot will be available for typefinding. This method
+   * is typically called during an element's plugin initialization.
+   *
+   * @param plugin A Gst::Plugin (for a static typefind function, i.e. one not
+   * related to any  Gst::Plugin, use register_slot() without the Gst::Plugin
+   * argument).
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::RefPtr<Gst::Plugin>& plugin, const Glib::ustring& name, guint rank, const SlotFind& find_slot);
+
+  /** Registers a new static (not requiring a Gst::Plugin) typefind slot to be
+   * used for typefinding. After registering the slot will be available for
+   * typefinding.
+   *
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @param extensions Extensions belonging to this type (for no extensions use
+   * register_slot() with no extensions parameter).
+   * @param caps The caps to be returned when typefinding succeeds (for no
+   * caps, use register_slot() with no caps argument).
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::ustring& name, guint rank, const SlotFind& find_slot, const Glib::StringArrayHandle& extensions, const Glib::RefPtr<const Gst::Caps>& caps);
+
+  /** Registers a new static (not requiring a Gst::Plugin) typefind slot to be
+   * used for typefinding. After registering the slot will be available for
+   * typefinding.
+   *
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @param caps The caps to be returned when typefinding succeeds (for no
+   * caps, use register_slot() with no caps argument).
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::ustring& name, guint rank, const SlotFind& find_slot, const Glib::RefPtr<const Gst::Caps>& caps);
+
+  /** Registers a new static (not requiring a Gst::Plugin) typefind slot to be
+   * used for typefinding. After registering the slot will be available for
+   * typefinding.
+   *
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @param extensions Extensions belonging to this type (for no extensions use
+   * register_slot() with no extensions parameter).
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::ustring& name, guint rank, const SlotFind& find_slot, const Glib::StringArrayHandle& extensions);
+
+  /** Registers a new static (not requiring a Gst::Plugin) typefind slot to be
+   * used for typefinding. After registering the slot will be available for
+   * typefinding.
+   *
+   * @param name The name for registering.
+   * @param rank The rank (or importance) of this typefind function.
+   * @param find_slot The Gst::TypeFind::SlotFind to use.
+   * @return true on success, false otherwise.
+   */
+  static bool register_slot(const Glib::ustring& name, guint rank, const SlotFind& find_slot);
+
+};
+
+} // namespace Gst

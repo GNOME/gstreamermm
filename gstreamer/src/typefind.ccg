@@ -1,0 +1,133 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstenumtypes.h>
+#include <gst/gsttypefind.h>
+#include <gstreamermm/caps.h>
+#include <gstreamermm/plugin.h>
+
+static void TypeFind_Find_gstreamermm_callback(GstTypeFind* find, void* data)
+{
+  Gst::TypeFind::SlotFind* the_slot = static_cast<Gst::TypeFind::SlotFind*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*the_slot)();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void TypeFind_Find_gstreamermm_callback_destroy(void* data)
+{
+  delete static_cast<Gst::TypeFind::SlotFind*>(data);
+}
+
+
+namespace Gst
+{
+
+bool TypeFind::register_slot(const Glib::RefPtr<Gst::Plugin>& plugin,
+  const Glib::ustring& name, guint rank, const SlotFind& find_slot,
+  const Glib::StringArrayHandle& extensions,
+  const Glib::RefPtr<const Gst::Caps>& caps)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(plugin->gobj(), name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback,
+    const_cast<gchar**>(extensions.data()), caps->gobj(), slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+bool TypeFind::register_slot(const Glib::RefPtr<Gst::Plugin>& plugin,
+  const Glib::ustring& name, guint rank, const SlotFind& find_slot,
+  const Glib::RefPtr<const Gst::Caps>& caps)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(plugin->gobj(), name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback, 0, caps->gobj(), slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+bool TypeFind::register_slot(const Glib::RefPtr<Gst::Plugin>& plugin,
+  const Glib::ustring& name, guint rank, const SlotFind& find_slot,
+  const Glib::StringArrayHandle& extensions)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(plugin->gobj(), name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback,
+    const_cast<gchar**>(extensions.data()), 0, slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+bool TypeFind::register_slot(const Glib::RefPtr<Gst::Plugin>& plugin,
+  const Glib::ustring& name, guint rank, const SlotFind& find_slot)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(plugin->gobj(), name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback, 0, 0, slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+bool TypeFind::register_slot(const Glib::ustring& name, guint rank,
+  const SlotFind& find_slot, const Glib::StringArrayHandle& extensions,
+  const Glib::RefPtr<const Gst::Caps>& caps)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(0, name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback,
+    const_cast<gchar**>(extensions.data()), caps->gobj(), slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+bool TypeFind::register_slot(const Glib::ustring& name, guint rank,
+  const SlotFind& find_slot, const Glib::RefPtr<const Gst::Caps>& caps)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(0, name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback, 0, caps->gobj(), slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+bool TypeFind::register_slot(const Glib::ustring& name, guint rank,
+  const SlotFind& find_slot, const Glib::StringArrayHandle& extensions)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(0, name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback,
+    const_cast<gchar**>(extensions.data()), 0, slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+bool TypeFind::register_slot(const Glib::ustring& name, guint rank,
+  const SlotFind& find_slot)
+{
+  SlotFind* slot_copy = new SlotFind(find_slot);
+  gst_type_find_register(0, name.c_str(), rank,
+    &TypeFind_Find_gstreamermm_callback, 0, 0, slot_copy,
+    &TypeFind_Find_gstreamermm_callback_destroy);
+}
+
+} //namespace Gst
