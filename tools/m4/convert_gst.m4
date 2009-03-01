@@ -154,6 +154,11 @@ _CONVERSION(`Gst::TagList&',`GstTagList*',`($3).gobj()')
 _CONVERSION(`const GstTagList*',`const Gst::TagList',`Glib::wrap(const_cast<GstTagList*>($3), 0, true)')
 _CONVERSION(`Gst::TagList',`GstTagList*',`($3).gobj()')
 
+#TypeFind
+_CONVERSION(`Gst::TypeFind&',`GstTypeFind*',`($3).gobj()')
+
+############### gstreamermm Interface Conversions ######################
+
 #TunerChannel
 _CONVERSION(`GstTunerChannel*',`Glib::RefPtr<Gst::TunerChannel>', `Glib::wrap($3)')
 _CONVERSION(`GstTunerChannel*',`Glib::RefPtr<const Gst::TunerChannel>', `Glib::wrap($3)')
