@@ -20,12 +20,10 @@
 #include <gst/gstenumtypes.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
-namespace Gst
-{
-
 static gboolean Index_Filter_gstreamermm_callback(GstIndex* index, GstIndexEntry* entry, void* data)
 {
-  Index::SlotFilter * the_slot = static_cast<Index::SlotFilter*>(data);
+  Gst::Index::SlotFilter * the_slot =
+    static_cast<Gst::Index::SlotFilter*>(data);
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
@@ -45,14 +43,15 @@ static gboolean Index_Filter_gstreamermm_callback(GstIndex* index, GstIndexEntry
 
 static void Index_Filter_gstreamermm_callback_destroy(void* data)
 {
-  Index::SlotFilter* the_slot = static_cast<Index::SlotFilter*>(data);
+  Gst::Index::SlotFilter* the_slot = static_cast<Gst::Index::SlotFilter*>(data);
   if(the_slot)
     delete the_slot;
 }
 
 static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *writer, gchar **writer_string, void* data)
 {
-  Index::SlotResolver * the_slot = static_cast<Index::SlotResolver*>(data);
+  Gst::Index::SlotResolver * the_slot =
+    static_cast<Gst::Index::SlotResolver*>(data);
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
@@ -81,8 +80,21 @@ static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *
 
 static void Index_Resolver_gstreamermm_callback_destroy(void* data)
 {
-  delete static_cast<Index::SlotResolver*>(data);
+  delete static_cast<Gst::Index::SlotResolver*>(data);
 }
+
+namespace Gst
+{
+
+IndexAssociation::IndexAssociation()
+: format(Gst::FORMAT_UNDEFINED),
+  value(0)
+{}
+
+IndexAssociation::IndexAssociation(const GstIndexAssociation* castitem)
+: format((castitem) ? (Gst::Format)(castitem->format) : Gst::FORMAT_UNDEFINED),
+  value((castitem) ? castitem->value : 0)
+{}
 
 bool Index::is_readable() const
 {
@@ -92,6 +104,17 @@ bool Index::is_readable() const
 bool Index::is_writable() const
 {
   return GST_INDEX_IS_WRITABLE(gobj());
+}
+
+Gst::IndexEntry Index::get_assoc_entry(int id, gint64 value,
+  IndexLookupMethod method, AssocFlags flags, Format format) const
+{
+  GstIndexEntry* gst_entry =
+    gst_index_get_assoc_entry(const_cast<GstIndex*>(gobj()), id,
+    (GstIndexLookupMethod) method, (GstAssocFlags) flags, (GstFormat) format,
+    value);
+
+  return Glib::wrap(gst_entry);
 }
 
 void Index::set_filter(const SlotFilter& slot)
