@@ -40,6 +40,8 @@
 #include <gstreamermm/taglist.h>
 #include <gstreamermm/tagsetter.h>
 #include <gstreamermm/task.h>
+//TODO: #include <gstreamermm/typefind.h>
+//TODO: #include <gstreamermm/typefindfactory.h>
 #include <gstreamermm/urihandler.h>
 #include <gstreamermm/value.h>
 #include <gstreamermm/xml.h>
