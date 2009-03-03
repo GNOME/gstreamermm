@@ -126,6 +126,27 @@ public:
   _WRAP_SIGNAL(void entry_added(const Gst::IndexEntry& entry), "entry-added")
 
   _WRAP_PROPERTY("resolver", Gst::Index::SlotResolver)
+
+  _WRAP_VFUNC(bool get_writer_id(int& writer_id, const Glib::ustring& writer_string) const, "get_writer_id")
+
+  _WRAP_VFUNC(void commit(gint id), "commit")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  virtual void add_entry_vfunc(Gst::IndexEntry& entry);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  //TODO: This vfunc is strange because the prototype in the class structure
+  //includes a "gpointer user_data" parameter.  Is this a bug?
+  //_WRAP_VFUNC(void get_assoc_entry(Gst::LookupMethod method, Gst::AssocFlags flags, Gst::Format format, gint64 value, const SlotCompareData& compare_slot), "get_assoc_entry")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+    klass->add_entry = &add_entry_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static void add_entry_vfunc_callback(GstIndex* self, GstIndexEntry* entry);
+  _POP()
+#m4end
 };
 
 } //namespace Gst

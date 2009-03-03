@@ -89,11 +89,13 @@ _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Gst::unwrap($3)')
 #Index
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Gst::Index>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Index>&',`GstIndex*',`Glib::unwrap($3)')
-_CONVERSION(`const Gst::IndexAssociation&',`const GstIndexAssociation*',`((GstIndexAssociation*)(&($3)))')
 _CONVERSION(`Glib::RefPtr<Gst::Index>',`GstIndex*',`Glib::unwrap($3)')
 
+#IndexAssociation
+_CONVERSION(`const Gst::IndexAssociation&',`const GstIndexAssociation*',`((GstIndexAssociation*)(&($3)))')
+
 #IndexEntry
-_CONVERSION(`GstIndexEntry*',`Gst::IndexEntry',`Glib::wrap($3)')
+_CONVERSION(`GstIndexEntry*',`Gst::IndexEntry',`Glib::wrap($3, true)')
 _CONVERSION(`const Gst::IndexEntry&',`GstIndexEntry*',`const_cast<GstIndexEntry*>(($3).gobj())')
 
 #IndexFactory
