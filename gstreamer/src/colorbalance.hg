@@ -53,10 +53,12 @@ public:
   _WRAP_SIGNAL(void value_changed(const Glib::RefPtr<ColorBalanceChannel>& channel, int value), "value-changed")
 
 #m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> >', `const GList*', `($3).data()')
-  //TODO: Include when bug #530416 is resolved.
-  ///** Lists the channels of the Gst::ColorBalance.
-   //*/
-  //_WRAP_VFUNC(Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> > list_channels(), "list_channels")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Lists the channels of the Gst::ColorBalance.
+   */
+  virtual Glib::ListHandle< Glib::RefPtr<ColorBalanceChannel> > list_channels_vfunc() const;
+#endif //GLIBMM_VFUNCS_ENABLED
 
   /** Sets the value of a Gst::ColorBalanceChannel of the Gst::ColorBalance.
    */
@@ -66,6 +68,16 @@ public:
   /** Gets the value of a Gst::ColorBalanceChannel of the Gst::ColorBalance.
    */
   _WRAP_VFUNC(int get_value(const Glib::RefPtr<const ColorBalanceChannel>& channel) const, "get_value")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+    klass->list_channels = &list_channels_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+    static const GList* list_channels_vfunc_callback(GstColorBalance* self);
+  _POP()
+#m4end
+
 };
 
 } // namespace Gst
