@@ -302,28 +302,28 @@ State& pending) const
 
 State MessageStateChanged::parse() const
 {
-  GstState* new_state;
+  GstState new_state = GST_STATE_NULL;
 
-  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), NULL,
-    new_state, NULL);
-  return (State)(*new_state);
+  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), 0,
+    &new_state, 0);
+  return State(new_state);
 }
 
 State MessageStateChanged::parse_old() const
 {
-  GstState* old_state;
+  GstState old_state = GST_STATE_NULL;
 
-  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), old_state,
-    NULL, NULL);
-  return (State)(*old_state);
+  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), &old_state,
+    0, 0);
+  return State(old_state);
 }
 
 State MessageStateChanged::parse_pending() const
 {
-  GstState* pending_state;
-  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), NULL,
-    NULL, pending_state);
-  return (State)(*pending_state);
+  GstState pending_state = GST_STATE_NULL;
+  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), 0,
+    0, &pending_state);
+  return State(pending_state);
 }
 
 MessageStateDirty::MessageStateDirty(GstMessage* castitem)
