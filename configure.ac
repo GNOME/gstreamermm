@@ -271,7 +271,10 @@ AC_LANG_CPLUSPLUS
 #GSTREAMERMM_DOXYGEN_INPUT_SUBDIRS([gst])
 
 # Evaluate the --enable-warnings=level option.
-GSTREAMERMM_ARG_ENABLE_WARNINGS()
+#GSTREAMERMM_ARG_ENABLE_WARNINGS()
+DK_ARG_ENABLE_WARNINGS([GSTREAMERMM_WARNING_FLAGS],
+    [-Wall],
+    [-pedantic -Wall -Wextra])
 
 # Add an --enable-use-deprecations configure option:
 AC_ARG_ENABLE(deprecations,
