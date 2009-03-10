@@ -30,12 +30,17 @@ namespace Gst
 {
 
 Bin::Bin()
-: _CONSTRUCT("name", NULL)
+: _CONSTRUCT("name", 0)
 {}
 
 
 Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
 {
+  if(!element)
+    throw std::runtime_error("Failed to add null element.");
+
+  GstElement* celement = Glib::unwrap(element);
+
   // The following is needed because when adding an element to a bin, the bin
   // likes to have the last reference and then destroy it when the bin itself
   // is destroyed.  Without the extra reference, when the last Glib::RefPtr<>
@@ -43,22 +48,24 @@ Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
   // bin and GStreamer complains about it.  The extra reference to the element
   // is removed when the bin is destroyed or when the element is removed from
   // the bin (see gst_bin_remove).
-  if (G_LIKELY(GST_OBJECT_IS_FLOATING(element->gobj())))
+  if (G_LIKELY(GST_OBJECT_IS_FLOATING(celement)))
     element->reference();
 
-  const bool result = gst_bin_add(gobj(), element->gobj());
+  const bool result = gst_bin_add(gobj(), celement);
 
   // If addition successful, return RefPtr<..> to this bin, otherwise return
   // NULL RefPtr<...>
   if(result)
     return Glib::wrap(gobj(), true);
   else
-    throw std::runtime_error("Failed to add " + element->get_name() + " element");
+    throw std::runtime_error("Failed to add " + element->get_name() + " element.");
 }
 
 Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
 {
-  const bool result = gst_bin_remove(gobj(), element->gobj());
+  //TODO: Throw an exception if element is null?
+
+  const bool result = gst_bin_remove(gobj(), Glib::unwrap(element));
 
   // If removal successful, return RefPtr<..> to this bin, otherwise return
   // NULL RefPtr<...>
