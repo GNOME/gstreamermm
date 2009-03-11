@@ -211,6 +211,8 @@ public:
   _WRAP_METHOD(Gst::Iterator<Gst::Element> iterate_by_interface(GType iface), gst_bin_iterate_all_by_interface)
   _WRAP_METHOD(Gst::Iterator<const Gst::Element> iterate_by_interface(GType iface) const, gst_bin_iterate_all_by_interface)
 
+  _WRAP_METHOD(bool recalculate_latency(), gst_bin_recalculate_latency)
+
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Gst::Element> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
   /** Gets the bin's list of children.
    */
@@ -229,6 +231,9 @@ public:
   /** Will be emitted after the element was removed from the bin.
    */
   _WRAP_SIGNAL(void element_removed(const Glib::RefPtr<Gst::Element>& element), "element-removed")
+
+  //TODO: The default signal handler is marked as private in the C header. Is that intendend?
+  _WRAP_SIGNAL(bool do_latency(), "do-latency")
 
   _WRAP_PROPERTY("async-handling", bool)
 

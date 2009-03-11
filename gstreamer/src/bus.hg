@@ -21,6 +21,7 @@
 #include <gstreamermm/object.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/message.h>
+//#include <glibmm/main.h> //For Glib::Source
 
 _DEFS(gstreamermm,gst)
 
@@ -117,6 +118,10 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::Message> pop(ClockTime timeout), gst_bus_timed_pop)
   _WRAP_METHOD(Glib::RefPtr<Gst::Message> pop(ClockTime timeout, MessageType message_type), gst_bus_timed_pop_filtered)
   _WRAP_METHOD(void set_flushing(bool flushing = true), gst_bus_set_flushing)
+
+//TODO Glib::Source has a strange cobject constructor.
+//#m4 _CONVERSION(`GSource*',`Glib::RefPtr<Glib::Source>', `Glib::wrap($3)')
+//  _WRAP_METHOD(Glib::RefPtr<Glib::Source> create_watch(), gst_bus_create_watch)
 
   /** Adds a bus watch to the default main context with the given priority.
    * The slot is used to receive asynchronous messages in the main loop.
