@@ -80,7 +80,7 @@ namespace Gst
 {
 
 Pad::Pad(PadDirection dir)
-  : _CONSTRUCT("name", NULL, "direction", dir)
+  : _CONSTRUCT("name", 0, "direction", dir)
 {}
 
 Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ,
@@ -89,7 +89,7 @@ Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ,
 {}
 
 Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ)
-  : _CONSTRUCT("name", NULL, "direction", templ->get_direction(), "template",
+  : _CONSTRUCT("name", 0, "direction", templ->get_direction(), "template",
       templ->gobj())
 {}
 
@@ -154,22 +154,22 @@ bool Pad::send_event(const Glib::RefPtr<Gst::Event>& event)
 
 bool Pad::query_position(Format& format) const
 {
-  return gst_pad_query_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+  return gst_pad_query_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
 }
 
 bool Pad::query_duration(Format& format) const
 {
-  return gst_pad_query_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+  return gst_pad_query_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
 }
 
 bool Pad::query_peer_position(Format& format) const
 {
-  return gst_pad_query_peer_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+  return gst_pad_query_peer_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
 }
 
 bool Pad::query_peer_duration(Format& format) const
 {
-  return gst_pad_query_peer_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), NULL);
+  return gst_pad_query_peer_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
 }
 
 FlowReturn Pad::chain(const Glib::RefPtr<Gst::Buffer>& buffer)
