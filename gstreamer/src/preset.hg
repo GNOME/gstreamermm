@@ -38,6 +38,7 @@ namespace Gst
  * native preset format of those wrapped plugins. One method that is useful to
  * be overridden is property_names_vfunc(). With that, one can control which
  * properties are saved and in which order.
+ * @ingroup GstInterfaces
  */
 class Preset : public Glib::Interface
 {
@@ -53,18 +54,37 @@ public:
   _WRAP_METHOD(bool delete_preset(const Glib::ustring& name), gst_preset_delete_preset)
   _WRAP_METHOD(bool set_meta(const Glib::ustring& name, const Glib::ustring& tag, const Glib::ustring& value), gst_preset_set_meta)
 
-  /** Gets the @a value for an existing meta data tag. Meta data tag names can
-   * be something like e.g. "comment".
-   *
-   * @param name Preset name.  
-   * @param tag Meta data item name.  
-   * @param value Glib::ustring in which to store the value.
-   * @return true for success, false if e.g. there is no preset with that name
-   * or the is no value for the given tag.
-   */
+  _WRAP_METHOD_DOCS_ONLY(gst_preset_get_meta)
   bool get_meta(const Glib::ustring& name, const Glib::ustring& tag, Glib::ustring& value) const;
 
-  //TODO: Wrap vfuncs.
+#m4 _CONVERSION(`Glib::StringArrayHandle', `gchar**', `const_cast<gchar**>(($3).data())')
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  virtual Glib::StringArrayHandle get_preset_names_vfunc() const;
+  virtual Glib::StringArrayHandle get_property_names_vfunc() const;
+  virtual bool get_meta_vfunc(const Glib::ustring& name,
+    const Glib::ustring& tag, Glib::ustring& value);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  _WRAP_VFUNC(bool load_preset(const Glib::ustring& name), "load_preset")
+  _WRAP_VFUNC(bool save_preset(const Glib::ustring& name) const, "save_preset")
+  _WRAP_VFUNC(bool rename_preset(const Glib::ustring& old_name, const Glib::ustring& new_name), "rename_preset")
+  _WRAP_VFUNC(bool delete_preset(const Glib::ustring& name), "delete_preset")
+  _WRAP_VFUNC(bool set_meta(const Glib::ustring& name, const Glib::ustring& tag, const Glib::ustring& value), "set_meta")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->get_preset_names = &get_preset_names_vfunc_callback;
+  klass->get_property_names = &get_property_names_vfunc_callback;
+  klass->get_meta = &get_meta_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static gchar** get_preset_names_vfunc_callback(GstPreset* self);
+  static gchar** get_property_names_vfunc_callback(GstPreset* self);
+  static gboolean get_meta_vfunc_callback(GstPreset* self, const gchar* name,
+    const gchar* tag, gchar** value);
+  _POP()
+#m4end
 };
 
 } // namespace Gst

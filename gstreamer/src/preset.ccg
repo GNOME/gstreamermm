@@ -17,19 +17,210 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
- namespace Gst
- {
+namespace Gst
+{
 
- bool Preset::get_meta(const Glib::ustring& name, const Glib::ustring& tag,
-   Glib::ustring& value) const
- {
-   gchar** meta;
+bool Preset::get_meta(const Glib::ustring& name, const Glib::ustring& tag,
+  Glib::ustring& value) const
+{
+  gchar** meta;
 
-   gboolean result = gst_preset_get_meta(const_cast<GstPreset*>(gobj()),
-     name.c_str(), tag.c_str(), meta);
-   value = *meta;
-   g_free(*meta);
-   return result;
- }
+  gboolean result = gst_preset_get_meta(const_cast<GstPreset*>(gobj()),
+    name.c_str(), tag.c_str(), meta);
+  value = *meta;
+  g_free(*meta);
+  return result;
+}
 
- }
+#ifdef GLIBMM_VFUNCS_ENABLED
+gchar** Preset_Class::get_preset_names_vfunc_callback(GstPreset* self)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        return const_cast<gchar**>((obj->get_preset_names_vfunc()).data());
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  // Call the original underlying C function:
+  if(base && base->get_preset_names)
+    return (*base->get_preset_names)(self);
+
+
+  typedef gchar** RType;
+  return RType();
+}
+
+gchar** Preset_Class::get_property_names_vfunc_callback(GstPreset* self)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        return const_cast<gchar**>((obj->get_property_names_vfunc()).data());
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  // Call the original underlying C function:
+  if(base && base->get_property_names)
+    return (*base->get_property_names)(self);
+
+
+  typedef gchar** RType;
+  return RType();
+}
+
+gboolean Preset_Class::get_meta_vfunc_callback(GstPreset* self, const gchar* name, const gchar* tag, gchar** value)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        Glib::ustring gstmm_value;
+        // Call the virtual member method, which derived classes might override.
+        const gboolean result = static_cast<int>(obj->get_meta_vfunc(Glib::convert_const_gchar_ptr_to_ustring(name)
+, Glib::convert_const_gchar_ptr_to_ustring(tag)
+, gstmm_value
+));
+        *value = g_strdup(gstmm_value.c_str());
+        return result;
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  // Call the original underlying C function:
+  if(base && base->get_meta)
+    return (*base->get_meta)(self, name, tag, value);
+
+
+  typedef gboolean RType;
+  return RType();
+}
+
+Glib::StringArrayHandle Gst::Preset::get_preset_names_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  if(base && base->get_preset_names)
+    return Glib::StringArrayHandle((*base->get_preset_names)(const_cast<GstPreset*>(gobj())), Glib::OWNERSHIP_DEEP);
+
+  typedef Glib::StringArrayHandle RType;
+  return Glib::StringArrayHandle(0, Glib::OWNERSHIP_NONE);
+}
+
+Glib::StringArrayHandle Gst::Preset::get_property_names_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  if(base && base->get_property_names)
+    return Glib::StringArrayHandle((*base->get_property_names)(const_cast<GstPreset*>(gobj())), Glib::OWNERSHIP_DEEP);
+
+  typedef Glib::StringArrayHandle RType;
+  return Glib::StringArrayHandle(0, Glib::OWNERSHIP_NONE);
+}
+
+bool Gst::Preset::get_meta_vfunc(const Glib::ustring& name, const Glib::ustring& tag, Glib::ustring& value) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  if(base && base->get_meta)
+  {
+    gchar* gst_value;
+    const bool result = (*base->get_meta)(gobj(),((name).c_str()),((tag).c_str()), &gst_value);
+    value = gst_value;
+    g_free(gst_value);
+    return result;
+  }
+
+  typedef bool RType;
+  return RType();
+}
+#endif //GLIBMM_VFUNCS_ENABLED
+
+}
