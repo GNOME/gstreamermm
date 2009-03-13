@@ -62,7 +62,7 @@ void init()
   if(!s_init)
   {
     Glib::init();
-    gst_init(NULL, NULL);
+    gst_init(0, 0);
     initialize_wrap_system();
 
     s_init = true;
@@ -114,7 +114,7 @@ bool init_check(std::auto_ptr<Glib::Error>& error)
     Glib::init();
 
     GError* gerror = 0;
-    result = gst_init_check(NULL, NULL, &gerror);
+    result = gst_init_check(0, 0, &gerror);
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
     if(gerror)

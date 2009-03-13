@@ -32,7 +32,7 @@ int main (int argc, char* argv[])
   
   Glib::RefPtr<Gst::Message> message = Gst::Message::wrap(cmessage);
 
-  std::cout << "C++ message instance is !NULL: " << (bool)(message) << std::endl;
+  std::cout << "C++ message instance is !null: " << (bool)(message) << std::endl;
 
   Glib::RefPtr<Gst::MessageWarning> message_warning = Glib::RefPtr<Gst::MessageWarning>::cast_dynamic(message);
   std::cout << "message is a Gst::MessageWarning: " << (bool)message_warning  << std::endl;

@@ -50,7 +50,7 @@ Gst::MiniObject* wrap_auto(GstMiniObject* object, bool take_copy = false);
 
 /** Create a C++ instance of a known C++ type that is mostly closely associated with the GType of the C object.
  * @param object The C object which should be placed in a new C++ instance.
- * @param interface_gtype The returned instance will implement this interface. Otherwise it will be NULL.
+ * @param interface_gtype The returned instance will implement this interface. Otherwise it will be null.
  */
 Gst::MiniObject* wrap_create_new_wrapper_for_interface(GstMiniObject* object, GType interface_gtype);
 
@@ -102,7 +102,7 @@ Glib::RefPtr<Gst::MiniObject> wrap(GstMiniObject* object, bool take_copy = false
 
 
 /** Get the underlying C instance from the C++ instance.  This is just
- * like calling gobj(), but it does its own check for a NULL pointer.
+ * like calling gobj(), but it does its own check for a null pointer.
  */
 template <class T> inline
 typename T::BaseObjectType* unwrap(T* ptr)
@@ -111,7 +111,7 @@ typename T::BaseObjectType* unwrap(T* ptr)
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
- * like calling gobj(), but it does its own check for a NULL pointer.
+ * like calling gobj(), but it does its own check for a null pointer.
  */
 template <class T> inline
 const typename T::BaseObjectType* unwrap(const T* ptr)
@@ -120,7 +120,7 @@ const typename T::BaseObjectType* unwrap(const T* ptr)
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
- * like calling gobj(), but it does its own check for a NULL pointer.
+ * like calling gobj(), but it does its own check for a null pointer.
  */
 template <class T> inline
 typename T::BaseObjectType* unwrap(const Glib::RefPtr<T>& ptr)
@@ -129,7 +129,7 @@ typename T::BaseObjectType* unwrap(const Glib::RefPtr<T>& ptr)
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
- * like calling gobj(), but it does its own check for a NULL pointer.
+ * like calling gobj(), but it does its own check for a null pointer.
  */
 template <class T> inline
 const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
@@ -139,7 +139,7 @@ const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
 
 /** Get the underlying C instance from the C++ instance and acquire a
  * reference.  This is just like calling gobj_copy(), but it does its own
- * check for a NULL pointer.
+ * check for a null pointer.
  */
 template <class T> inline
 typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<T>& ptr)
@@ -149,7 +149,7 @@ typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<T>& ptr)
 
 /** Get the underlying C instance from the C++ instance and acquire a
  * reference.  This is just like calling gobj_copy(), but it does its own
- * check for a NULL pointer.
+ * check for a null pointer.
  */
 template <class T> inline
 const typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<const T>& ptr)

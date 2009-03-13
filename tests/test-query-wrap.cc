@@ -28,7 +28,7 @@ int main (int argc, char* argv[])
   
   Glib::RefPtr<Gst::Query> query = Gst::Query::wrap(cquery);
 
-  std::cout << "C++ query instance is !NULL: " << (bool)(query) << std::endl;
+  std::cout << "C++ query instance is !null: " << (bool)(query) << std::endl;
 
   Glib::RefPtr<Gst::QueryPosition> query_position = Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
   std::cout << "query is a Gst::QueryPosition: " << (bool)query_position  << std::endl;

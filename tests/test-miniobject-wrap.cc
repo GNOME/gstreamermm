@@ -32,7 +32,7 @@ int main (int argc, char* argv[])
   
   Glib::RefPtr<Gst::Message> message = Gst::wrap(cmessage);
 
-  std::cout << "C++ message instance is !NULL: " << (bool)(message) << std::endl;
+  std::cout << "C++ message instance is !null: " << (bool)(message) << std::endl;
 
   return 0;
 }

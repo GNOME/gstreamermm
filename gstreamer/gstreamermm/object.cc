@@ -136,7 +136,7 @@ bool Object::set_name(const Glib::ustring& name)
 
 bool Object::set_name()
 {
-  return gst_object_set_name(gobj(), NULL);
+  return gst_object_set_name(gobj(), 0);
 }
 
 Glib::ustring Object::get_name() const

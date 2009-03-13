@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
   gulong mmapsize = 0;
   GstFileSrc* obj = filesrc->gobj();
-  g_object_get(obj, "mmapsize", &mmapsize, NULL);
+  g_object_get(obj, "mmapsize", &mmapsize, 0);
 
   std::cout << "mmapsize = "  << mmapsize << std::endl;
 

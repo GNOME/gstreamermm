@@ -28,7 +28,7 @@ int main (int argc, char* argv[])
   
   Glib::RefPtr<Gst::Event> event = Gst::Event::wrap(cevent);
 
-  std::cout << "C++ event instance is !NULL: " << (bool)(event) << std::endl;
+  std::cout << "C++ event instance is !null: " << (bool)(event) << std::endl;
 
   Glib::RefPtr<Gst::EventLatency> event_latency = Glib::RefPtr<Gst::EventLatency>::cast_dynamic(event);
   std::cout << "event is a Gst::EventLatency: " << (bool)event_latency  << std::endl;

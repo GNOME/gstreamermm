@@ -132,7 +132,7 @@ public:
   bool set_name();
 
   /** Returns a copy of the name of object. For a nameless object, this
-   * returns NULL.
+   * returns null.
    *
    * @return The name of object. MT safe. This function grabs and releases
    * object's LOCK. 
@@ -154,14 +154,14 @@ public:
 
   /** Returns the parent of object. 
    *
-   * @return Parent of object, this can be NULL if object has no parent. MT
+   * @return Parent of object, this can be null if object has no parent. MT
    * safe. Grabs and releases object's LOCK.
    */
   Glib::RefPtr<Object> get_parent();
 
   /** Returns the parent of object. 
    *
-   * @return Parent of object, this can be NULL if object has no parent. MT
+   * @return Parent of object, this can be null if object has no parent. MT
    * safe. Grabs and releases object's LOCK.
    */
   Glib::RefPtr<const Object> get_parent() const;
@@ -174,7 +174,7 @@ public:
   void unparent();
   
   /** Returns a copy of the name prefix of object. For a prefixless object,
-   * this returns NULL.
+   * this returns null.
    *
    * @return The name prefix of object. MT safe. This function grabs and
    * releases object's LOCK. 

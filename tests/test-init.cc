@@ -42,7 +42,7 @@ int main (int argc, char* argv[])
     xoverlay->handle_events(false);
   }
 
-  GstClock* gst_clock = gst_audio_clock_new("clock", NULL, NULL);
+  GstClock* gst_clock = gst_audio_clock_new("clock", 0, 0);
   Glib::RefPtr<Gst::AudioClock> clock = Glib::wrap(GST_AUDIO_CLOCK(gst_clock));
 
   if (clock)
