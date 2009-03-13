@@ -533,7 +533,7 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "{" << std::endl << std::endl;
 
   std::cout << cppTypeName << "::" << cppTypeName << "()" << std::endl;
-  std::cout << ": _CONSTRUCT(\"name\", NULL)" << std::endl;
+  std::cout << ": _CONSTRUCT(\"name\", 0)" << std::endl;
   std::cout << "{}" << std::endl << std::endl;
 
   std::cout << cppTypeName << "::" << cppTypeName <<
@@ -548,30 +548,32 @@ int main(int argc, char* argv[])
 {
   gboolean hgFile = false;
   gboolean ccgFile = false;
+  gboolean confirmExistence = false;
 
   if (!g_thread_supported())
-    g_thread_init(NULL);
+    g_thread_init(0);
 
   GOptionEntry optionEntries[] =
   {
-    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate preliminary .hg file.", NULL },
-    {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", NULL },
+    {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate preliminary .hg file.", 0 },
+    {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", 0 },
+    {"confirm-existence", 'e', 0, G_OPTION_ARG_NONE, &confirmExistence, "Return success if the plugin exists, failure otherwise.", 0 },
     {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin.", "namespace" },
     {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main defs file without .defs extension.", "def" },
     {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The .h and .cc target directory.", "directory" },
-    { NULL }
+    { 0 }
   };
 
   GOptionContext* gContext =
-    g_option_context_new("<plugin-name> <CppPluginClassName>");
+    g_option_context_new("<plugin-name> [CppPluginClassName]");
   g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's "
     "gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  "
     "Use the same syntax for plugin-name as in gst-inspect\nand supply the "
-    "desired C++ class name.  The .hg file is a preliminary .hg file\nthat "
-    "needs to be run through m4 including the ctocpp*.m4 files in the "
-    "tools/m4\ndirectory.");
+    "desired C++ class name unless the confirm existence option is\nused.  "
+    "The .hg file is a preliminary .hg file that needs to be run through "
+    "m4\nincluding the ctocpp*.m4 files in the tools/m4 directory.");
 
-  g_option_context_add_main_entries(gContext, optionEntries, NULL);
+  g_option_context_add_main_entries(gContext, optionEntries, 0);
   g_option_context_add_group(gContext, gst_init_get_option_group());
 
   Glib::OptionContext optionContext(gContext, true);
@@ -593,7 +595,17 @@ int main(int argc, char* argv[])
       return -1;
   }
 
-  if (argc != 3)
+  if (confirmExistence)
+  {
+    if (argc != 2)
+    {
+      std::cout << "A plugin name must be supplied to confirm plugin "
+        "existence." << std::endl << "Run `" << argv[0] <<
+        " -?'  for help." << std::endl;
+      return -1;
+    }
+  }
+  else if (argc != 3)
   {
     std::cout << "A plugin name and C++ class name must be supplied to "
       "generate gmmproc files." << std::endl <<
@@ -602,7 +614,9 @@ int main(int argc, char* argv[])
   }
 
   pluginName = argv[1];
-  cppTypeName = argv[2];
+
+  if (!confirmExistence)
+    cppTypeName = argv[2];
 
   GstElementFactory* factory = 0;
 
@@ -621,6 +635,9 @@ int main(int argc, char* argv[])
 
   if (type)
   {
+    if (confirmExistence)
+      return 0;
+
     if (!nmspace || !defsFile || !target)
     {
       std::cout << "A namespace, a default defs file and a target directory "
@@ -681,6 +698,9 @@ int main(int argc, char* argv[])
   }
   else
   {
+    if (confirmExistence)
+      return -1;
+
     if (hgFile)
     {
       std::cout << "_DEFS(" << target << "," << defsFile << ")" <<

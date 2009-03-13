@@ -91,6 +91,13 @@ $(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
 	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
 	$(eval hg_lowercase = \
 		$$(shell echo $$(cppname) | tr [:upper:] [:lower:]).hg)
+if MAINTAINER_MODE
+	if $(run_generate_plugin_gmmproc_file) --confirm-existence \
+		$(plugin_name); then true; else \
+		echo "$(plugin_name) does not exist.  Aborting build."; \
+		false; \
+	fi
+endif
 	sed -n '1,/^$$/p' $(license_header_source_file) > \
 		$(srcdir)/$(hg_lowercase)
 	$(run_generate_plugin_gmmproc_file) --hg $(plugin_name) \
