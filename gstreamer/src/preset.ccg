@@ -23,12 +23,12 @@ namespace Gst
 bool Preset::get_meta(const Glib::ustring& name, const Glib::ustring& tag,
   Glib::ustring& value) const
 {
-  gchar** meta;
+  gchar* meta = 0;
 
   gboolean result = gst_preset_get_meta(const_cast<GstPreset*>(gobj()),
-    name.c_str(), tag.c_str(), meta);
-  value = *meta;
-  g_free(*meta);
+    name.c_str(), tag.c_str(), &meta);
+  value = meta;
+  g_free(meta);
   return result;
 }
 

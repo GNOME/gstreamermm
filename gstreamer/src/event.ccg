@@ -73,8 +73,7 @@ bool Event::is_serialized() const
 
 EventFlushStart::EventFlushStart(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventFlushStart::create()
 {
@@ -84,8 +83,7 @@ Glib::RefPtr<Gst::Event> EventFlushStart::create()
 
 EventFlushStop::EventFlushStop(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventFlushStop::create()
 {
@@ -95,8 +93,7 @@ Glib::RefPtr<Gst::Event> EventFlushStop::create()
 
 EventEos::EventEos(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventEos::create()
 {
@@ -106,8 +103,7 @@ Glib::RefPtr<Gst::Event> EventEos::create()
 
 EventNewSegment::EventNewSegment(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventNewSegment::create(bool update, double rate, Format format, gint64 start, gint64 stop, gint64 position, double applied_rate)
 {
@@ -117,22 +113,21 @@ Glib::RefPtr<Gst::Event> EventNewSegment::create(bool update, double rate, Forma
 
 void EventNewSegment::parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position) const
 {
-  gboolean result;
+  gboolean result = FALSE;
   gst_event_parse_new_segment(const_cast<GstEvent*>(gobj()), &result, &rate, (GstFormat*)&format, &start, &stop, &position);
   update = result;
 }
 
 void EventNewSegment::parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate) const
 {
-  gboolean result;
+  gboolean result = FALSE;
   gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), &result, &rate, &applied_rate, (GstFormat*)&format, &start, &stop, &position);
   update = result;
 }
 
 EventTag::EventTag(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventTag::create(const Gst::TagList& taglist)
 {
@@ -151,8 +146,7 @@ Gst::TagList EventTag::parse() const
 
 EventBufferSize::EventBufferSize(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize, bool async)
 {
@@ -162,15 +156,14 @@ Glib::RefPtr<Gst::Event> EventBufferSize::create(Format format, gint64 minsize, 
 
 void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize, bool& async) const
 {
-  gboolean result;
+  gboolean result = FALSE;
   gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()), (GstFormat*)&format, &minsize, &maxsize, &result);
   async = result;
 }
 
 EventQos::EventQos(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventQos::create(double proportion, ClockTimeDiff diff, ClockTime timestamp)
 {
@@ -185,8 +178,7 @@ void EventQos::parse(double& proportion, ClockTimeDiff& diff, ClockTime& timesta
 
 EventSeek::EventSeek(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventSeek::create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop)
 {
@@ -201,8 +193,7 @@ void EventSeek::parse(double& rate, Format& format, SeekFlags& flags, SeekType& 
 
 EventNavigation::EventNavigation(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Event> EventNavigation::create(Gst::Structure& structure)
 {
@@ -212,8 +203,7 @@ Glib::RefPtr<Gst::Event> EventNavigation::create(Gst::Structure& structure)
 
 EventLatency::EventLatency(GstEvent* castitem) :
 Event(castitem)
-{
-}
+{}
 
 void EventLatency::parse(ClockTime& latency) const
 {
@@ -226,14 +216,15 @@ Glib::RefPtr<Gst::Event> EventLatency::create(ClockTime time)
   return Gst::Event::wrap(event, false);
 }
 
-Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy) {
-
+Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)
+{
   Glib::RefPtr<Gst::Event> result;
 
   if(!event)
     return result;
 
-  switch (GST_EVENT_TYPE(event)) {
+  switch (GST_EVENT_TYPE(event))
+  {
     case GST_EVENT_FLUSH_START:
       result = Glib::RefPtr<Gst::Event>( new Gst::EventFlushStart(event) );
       break;

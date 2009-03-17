@@ -52,8 +52,7 @@ Glib::RefPtr<Gst::Message> Message::create_writable()
 
 MessageEos::MessageEos(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageEos::create(const Glib::RefPtr<Gst::Object>& src)
 {
@@ -63,8 +62,7 @@ Glib::RefPtr<Gst::Message> MessageEos::create(const Glib::RefPtr<Gst::Object>& s
 
 MessageError::MessageError(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageError::create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug)
 {
@@ -107,8 +105,7 @@ std::string MessageError::parse_debug() const
 
 MessageWarning::MessageWarning(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageWarning::create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug)
 {
@@ -151,8 +148,7 @@ std::string MessageWarning::parse_debug() const
 
 MessageInfo::MessageInfo(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageInfo::create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug)
 {
@@ -196,8 +192,7 @@ std::string MessageInfo::parse_debug() const
 
 MessageTag::MessageTag(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageTag::create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist)
 {
@@ -216,8 +211,7 @@ Gst::TagList MessageTag::parse() const
 
 MessageBuffering::MessageBuffering(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageBuffering::create(const Glib::RefPtr<Gst::Object>& src, int percent)
 {
@@ -227,7 +221,7 @@ Glib::RefPtr<Gst::Message> MessageBuffering::create(const Glib::RefPtr<Gst::Obje
 
 int MessageBuffering::parse() const
 {
-  int percent;
+  int percent = 0;
   gst_message_parse_buffering(const_cast<GstMessage*>(gobj()), &percent);
   return percent;
 }
@@ -248,16 +242,16 @@ int& avg_out, gint64& buffering_left) const
 
 BufferingMode MessageBuffering::parse_stats_buffering_mode() const
 {
-  GstBufferingMode mode;
+  GstBufferingMode mode = GST_BUFFERING_STREAM;
 
-  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()),
-    (GstBufferingMode*)(&mode), 0, 0, 0);
+  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), &mode,
+    0, 0, 0);
   return (BufferingMode)(mode);
 }
 
 int MessageBuffering::parse_stats_avg_in() const
 {
-  int avg_in;
+  int avg_in = 0;
 
   gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), 0,
     &avg_in, 0, 0);
@@ -266,7 +260,7 @@ int MessageBuffering::parse_stats_avg_in() const
 
 int MessageBuffering::parse_stats_avg_out() const
 {
-  int avg_out;
+  int avg_out = 0;
 
   gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), 0,
     0, &avg_out, 0);
@@ -275,7 +269,7 @@ int MessageBuffering::parse_stats_avg_out() const
 
 gint64 MessageBuffering::parse_stats_buffering_left() const
 {
-  gint64 buffering_left;
+  gint64 buffering_left = 0;
 
   gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), 0,
     0, 0, &buffering_left);
@@ -284,8 +278,7 @@ gint64 MessageBuffering::parse_stats_buffering_left() const
 
 MessageStateChanged::MessageStateChanged(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageStateChanged::create(const Glib::RefPtr<Gst::Object>& src, State oldstate, State newstate, State pending)
 {
@@ -328,8 +321,7 @@ State MessageStateChanged::parse_pending() const
 
 MessageStateDirty::MessageStateDirty(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageStateDirty::create(const Glib::RefPtr<Gst::Object>& src)
 {
@@ -339,8 +331,7 @@ Glib::RefPtr<Gst::Message> MessageStateDirty::create(const Glib::RefPtr<Gst::Obj
 
 MessageClockProvide::MessageClockProvide(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageClockProvide::create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock, bool ready)
 {
@@ -372,7 +363,7 @@ Glib::RefPtr<const Gst::Clock> MessageClockProvide::parse() const
 
 bool MessageClockProvide::parse_ready() const
 {
-  gboolean ready = false;
+  gboolean ready = FALSE;
   gst_message_parse_clock_provide(const_cast<GstMessage*>(gobj()), 0,
     &ready);
   return ready;
@@ -380,8 +371,7 @@ bool MessageClockProvide::parse_ready() const
 
 MessageClockLost::MessageClockLost(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageClockLost::create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock)
 {
@@ -403,8 +393,7 @@ Glib::RefPtr<const Gst::Clock> MessageClockLost::parse() const
 
 MessageNewClock::MessageNewClock(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageNewClock::create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock)
 {
@@ -426,8 +415,7 @@ Glib::RefPtr<const Gst::Clock> MessageNewClock::parse() const
 
 MessageApplication::MessageApplication(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageApplication::create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure)
 {
@@ -444,8 +432,7 @@ Glib::RefPtr<Gst::Message> MessageApplication::create(const Glib::RefPtr<Gst::Ob
 
 MessageElement::MessageElement(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageElement::create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure)
 {
@@ -462,8 +449,7 @@ Glib::RefPtr<Gst::Message> MessageElement::create(const Glib::RefPtr<Gst::Object
 
 MessageCustom::MessageCustom(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageCustom::create(MessageType type, const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure)
 {
@@ -482,8 +468,7 @@ Glib::RefPtr<Gst::Message> MessageCustom::create(MessageType type, const Glib::R
 
 MessageSegmentStart::MessageSegmentStart(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageSegmentStart::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position)
 {
@@ -499,7 +484,7 @@ void MessageSegmentStart::parse(Format& format, gint64& position) const
 
 gint64 MessageSegmentStart::parse() const
 {
-  gint64 position;
+  gint64 position = 0;
   gst_message_parse_segment_start(const_cast<GstMessage*>(gobj()), 0,
     &position);
   return position;
@@ -507,7 +492,7 @@ gint64 MessageSegmentStart::parse() const
 
 Format MessageSegmentStart::parse_format() const
 {
-  Format format;
+  Format format = Gst::FORMAT_DEFAULT;
   gst_message_parse_segment_start(const_cast<GstMessage*>(gobj()),
     (GstFormat*)(&format), 0);
   return format;
@@ -515,8 +500,7 @@ Format MessageSegmentStart::parse_format() const
 
 MessageSegmentDone::MessageSegmentDone(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageSegmentDone::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position)
 {
@@ -532,7 +516,7 @@ void MessageSegmentDone::parse(Format& format, gint64& position) const
 
 gint64 MessageSegmentDone::parse() const
 {
-  gint64 position;
+  gint64 position = 0;
   gst_message_parse_segment_done(const_cast<GstMessage*>(gobj()), 0,
     &position);
   return position;
@@ -540,7 +524,7 @@ gint64 MessageSegmentDone::parse() const
 
 Format MessageSegmentDone::parse_format() const
 {
-  Format format;
+  Format format = Gst::FORMAT_UNDEFINED;
   gst_message_parse_segment_done(const_cast<GstMessage*>(gobj()),
     (GstFormat*)(&format), 0);
   return format;
@@ -548,8 +532,7 @@ Format MessageSegmentDone::parse_format() const
 
 MessageDuration::MessageDuration(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageDuration::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position)
 {
@@ -565,14 +548,14 @@ void MessageDuration::parse(Format& format, gint64& position) const
 
 gint64 MessageDuration::parse() const
 {
-  gint64 position;
+  gint64 position = 0;
   gst_message_parse_duration(const_cast<GstMessage*>(gobj()), 0, &position);
   return position;
 }
 
 Format MessageDuration::parse_format() const
 {
-  Format format;
+  Format format = Gst::FORMAT_UNDEFINED;
   gst_message_parse_duration(const_cast<GstMessage*>(gobj()),
     (GstFormat*)(&format), 0);
   return format;
@@ -580,8 +563,7 @@ Format MessageDuration::parse_format() const
 
 MessageLatency::MessageLatency(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageLatency::create(const Glib::RefPtr<Gst::Object>& src)
 {
@@ -591,8 +573,7 @@ Glib::RefPtr<Gst::Message> MessageLatency::create(const Glib::RefPtr<Gst::Object
 
 MessageAsyncStart::MessageAsyncStart(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageAsyncStart::create(const Glib::RefPtr<Gst::Object>& src, bool new_base_time)
 {
@@ -602,7 +583,7 @@ Glib::RefPtr<Gst::Message> MessageAsyncStart::create(const Glib::RefPtr<Gst::Obj
 
 bool MessageAsyncStart::parse() const
 {
-  gboolean new_base_time;
+  gboolean new_base_time = FALSE;
   gst_message_parse_async_start(const_cast<GstMessage*>(gobj()),
     &new_base_time);
   return new_base_time;
@@ -610,8 +591,7 @@ bool MessageAsyncStart::parse() const
 
 MessageAsyncDone::MessageAsyncDone(GstMessage* castitem)
 : Message(castitem)
-{
-}
+{}
 
 Glib::RefPtr<Gst::Message> MessageAsyncDone::create(const Glib::RefPtr<Gst::Object>& src)
 {
@@ -626,7 +606,8 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   if(!message)
     return result;
 
-  switch (GST_MESSAGE_TYPE(message)) {
+  switch (GST_MESSAGE_TYPE(message))
+  {
     case GST_MESSAGE_EOS:
       result = Glib::RefPtr<Gst::Message>( new Gst::MessageEos(message) );
       break;

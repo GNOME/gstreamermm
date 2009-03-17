@@ -33,7 +33,6 @@ class Index;
 class IndexFactory : public PluginFeature
 {
   _CLASS_GOBJECT(IndexFactory, GstIndexFactory, GST_INDEX_FACTORY, PluginFeature, GstPluginFeature)
-  _CUSTOM_DTOR
 
 protected:
   _WRAP_CTOR(IndexFactory(const Glib::ustring& name, const Glib::ustring& longdesc, GType type), gst_index_factory_new)
@@ -52,7 +51,7 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::Index> create_index(), gst_index_factory_create)
   _WRAP_METHOD(static Glib::RefPtr<Gst::Index> create_index(const Glib::ustring& factory_name), gst_index_factory_make)
 
-  //Destruction occurs in destructor.
+  //Destruction occurs when last reference is lost.
   _IGNORE(gst_index_factory_destroy)
 };
 
