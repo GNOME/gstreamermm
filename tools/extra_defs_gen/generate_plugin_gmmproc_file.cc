@@ -42,7 +42,7 @@ GType type = 0;
 
 // To add an enum that is already wrapped to the list of wrapped enum, add
 // alphabetically below and increment WRAPPED_ENUMS_SIZE.
-static const int WRAPPED_ENUMS_SIZE = 41;
+static const int WRAPPED_ENUMS_SIZE = 42;
 static const char* wrappedEnums[WRAPPED_ENUMS_SIZE] =
 {
   "GstActivateMode",
@@ -82,6 +82,7 @@ static const char* wrappedEnums[WRAPPED_ENUMS_SIZE] =
   "GstState",
   "GstStateChange",
   "GstStateChangeReturn",
+  "GstTCPProtocol",
   "GstTagFlag",
   "GstTagMergeMode",
   "GstTaskState",
@@ -113,26 +114,40 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 {
   Glib::ustring result;
 
-  Glib::ustring::const_iterator iter = typeName.begin();
+  Glib::ustring::const_iterator iter = typeName.end();
 
-  if (iter != typeName.end())
-    result.push_back(*iter);
+  bool prev_is_upper = false;
+  bool prev_is_lower = true;  // Going backwards so last char should be lower.
+  int underscore_char_count = 0; // Used to count characters between underscores.
 
-  int encountered_upper = 1; // The first char (above) should be upper
-
-  for (++iter; iter != typeName.end(); ++iter)
+  for (--iter; iter != typeName.begin(); --iter, ++underscore_char_count)
   {
     if (g_unichar_isupper(*iter))
     {
-      if (!encountered_upper || encountered_upper > 1)
-        result.push_back('_');
-      ++encountered_upper;
+      result.insert(0, 1, *iter);
+      if (prev_is_lower && underscore_char_count > 1)
+      {
+        result.insert(0, 1, '_');
+        underscore_char_count = 0;
+      }
+      prev_is_upper = true;
+      prev_is_lower = false;
     }
     else
-      encountered_upper = 0;
-
-    result.push_back(g_unichar_toupper(*iter));
+    {
+      if (prev_is_upper && underscore_char_count > 1)
+      {
+        result.insert(0, 1, '_');
+        underscore_char_count = 0;
+      }
+      result.insert(0, 1, g_unichar_toupper(*iter));
+      prev_is_upper = false;
+      prev_is_lower = true;
+    }
   }
+
+  // Insert first character (not included in the for loop).
+  result.insert(0, 1, g_unichar_toupper(*iter));
 
   return result;
 }

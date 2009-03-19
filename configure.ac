@@ -194,6 +194,8 @@ clockoverlay=ClockOverlay decodebin=DecodeBin \
 ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
 giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
 giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux playbin2=PlayBin2 \
+tcpclientsrc=TCPClientSrc tcpclientsink=TCPClientSink \
+tcpserversrc=TCPServerSrc \
 textoverlay=TextOverlay textrender=TextRender theoradec=TheoraDec \
 theoraenc=TheoraEnc timeoverlay=TimeOverlay videorate=VideoRate \
 videoscale=VideoScale videotestsrc=VideoTestSrc volume=Volume \

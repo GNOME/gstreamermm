@@ -1,5 +1,6 @@
 #Enums
 _CCONVERSION(`GstFormat',`Gst::Format',`Gst::Format')
+_CCONVERSION(`GstTCPProtocol',`Gst::TCPProtocol',`Gst::TCPProtocol')
 
 #giomm
 _CCONVERSION(`GFile*',`Gio::File',`const Glib::RefPtr<Gio::File>&',`Glib::RefPtr<Gio::File>',`<giomm/file.h>')
