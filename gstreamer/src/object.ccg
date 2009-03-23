@@ -1,0 +1,65 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstenumtypes.h>
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gst
+{
+
+Object::Object(const Glib::ConstructParams& construct_params)
+:
+  Glib::Object(construct_params)
+{
+  // Get rid of the floating reference for newly constructed Gst::Objects.
+  gst_object_ref(gobj());
+  gst_object_sink(gobj());
+}
+
+Object::Object(GstObject* castitem)
+:
+  Glib::Object((GObject*)(castitem))
+{
+  if(G_LIKELY(GST_OBJECT_IS_FLOATING(castitem)))
+  {
+    //The floating reference is convenience for C,
+    //but is useless and difficult for us:
+    gst_object_ref(gobj());
+    gst_object_sink(gobj());
+  }
+}
+
+xmlpp::Node* Object::save(xmlpp::Node* parent)
+{
+  gst_object_save_thyself(gobj(), parent->cobj());
+
+  // gst_object_save_thyself() returns parent node so do so here also.
+  return parent;
+}
+
+const xmlpp::Node* Object::save(const xmlpp::Node* parent) const
+{
+  gst_object_save_thyself(const_cast<GstObject*>(gobj()),
+    const_cast<xmlNodePtr>(parent->cobj()));
+
+  // gst_object_save_thyself() returns parent node so do so here also.
+  return parent;
+}
+
+} // namespace Gst

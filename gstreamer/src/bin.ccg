@@ -63,7 +63,8 @@ Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
 
 Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
 {
-  //TODO: Throw an exception if element is null?
+  if(!element)
+    throw std::runtime_error("Failed to remove null element.");
 
   const bool result = gst_bin_remove(gobj(), Glib::unwrap(element));
 
@@ -72,7 +73,7 @@ Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
   if(result)
     return Glib::wrap(gobj(), true);
   else
-    return Glib::RefPtr<Gst::Bin>(0);
+    throw std::runtime_error("Failed to remove " + element->get_name() + " element.");
 }
 
 } //namespace Gst

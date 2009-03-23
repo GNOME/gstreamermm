@@ -37,6 +37,7 @@ _CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Object>&',`GstObject*',`const_cast<GstObject*>(($3)->gobj())')
 
 #Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Gst::wrap($3)')
@@ -210,4 +211,5 @@ _CONVERSION(`Glib::ustring&',`const guchar*', (($2)($3).c_str()))
 
 #libxml++ Conversions
 _CONVERSION(`xmlpp::Node*',`xmlNodePtr',`($3)->cobj()')
+_CONVERSION(`xmlpp::Node*',`GstXmlNodePtr',`($3)->cobj()')
 _CONVERSION(`xmlpp::Document*',`xmlDocPtr',`($3)->cobj()')

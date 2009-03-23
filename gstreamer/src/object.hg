@@ -1,0 +1,125 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstobject.h>
+#include <glibmm/object.h>
+#include <libxml++/nodes/node.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+_WRAP_ENUM(ObjectFlags, GstObjectFlags)
+
+/** @defgroup GstBaseClasses gstreamermm Base Classes
+ *  Wrapped GStreamer base classes (plug-ins and other classes derrive from
+ *  these).
+ */
+
+/** Gst::Object - Base class for the GStreamer object hierarchy.
+ * Gst::Object provides a root for the object hierarchy tree filed in by the
+ * GStreamer library. It is currently a thin wrapper on top of Glib::Object.
+ * It is an abstract class that is not very usable on its own.
+ *
+ * Gst::Object gives us basic refcounting, parenting functionality and
+ * locking. Most of the function are just extended for special GStreamer needs
+ * and can be found under the same name in the base class of Gst::Object which
+ * is Glib::Object (e.g. Glib::Object::reference() becomes
+ * Gst:Object::reference().
+ *
+ * In contrast to Glib::Object instances, Gst::Object adds a name property.
+ * The functions set_name() and get_name() are used to set/get the name of the
+ * object.
+ *
+ * Last reviewed on 2005-11-09 (0.9.4)
+ * @ingroup GstBaseClasses
+ */
+class Object : public Glib::Object 
+{
+  _CLASS_GOBJECT(Object, GstObject, GST_OBJECT, Glib::Object, GObject)
+  _IGNORE(gst_object_ref, gst_object_unref, gst_object_sink,
+          gst_class_signal_connect, gst_class_signal_emit_by_name)
+  _CUSTOM_CTOR_CAST
+
+public:
+  /** Returns the entire set of flags for the object.
+   */
+  _MEMBER_GET(flags, flags, guint32, guint32)
+
+  //TODO: _MEMBER_GET(lock, lock, Glib::Mutex, GMutex)
+
+  _WRAP_METHOD(bool set_name(const Glib::ustring& name), gst_object_set_name)
+  _WRAP_METHOD(Glib::ustring get_name() const, gst_object_get_name)
+  _WRAP_METHOD(bool set_parent(const Glib::RefPtr<Gst::Object>& parent), gst_object_set_parent)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Object> get_parent(), gst_object_get_parent)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Object> get_parent() const, gst_object_get_parent, constversion)
+  _WRAP_METHOD(void unparent(), gst_object_unparent)
+  _WRAP_METHOD(Glib::ustring get_name_prefix() const, gst_object_get_name_prefix)
+  _WRAP_METHOD(void set_name_prefix(const Glib::ustring& name_prefix), gst_object_set_name_prefix)
+
+  // Ignore default signal and error callback.
+  _IGNORE(gst_object_default_deep_notify, gst_object_default_error)
+
+#m4 _CONVERSION(`const Glib::ListHandle<const Gst::Object>&', `GList*', `($3).data()')
+  _WRAP_METHOD(static bool check_uniqueness(const Glib::ListHandle<const Gst::Object>& list, const Glib::ustring& name), gst_object_check_uniqueness)
+
+  _WRAP_METHOD(bool has_ancestor(const Glib::RefPtr<const Gst::Object>& ancestor) const, gst_object_has_ancestor)
+
+  /** Saves object into the parent XML node.
+   * @param parent The parent XML node to save object into.
+   * @return The new xmlpp::Node pointer with the saved object.
+   */
+  xmlpp::Node* save(xmlpp::Node* parent);
+  _IGNORE(gst_object_save_thyself)
+
+  /** Saves object into the parent XML node.
+   * @param parent The parent XML node to save object into.
+   * @return The new xmlpp::Node pointer with the saved object.
+   */
+  const xmlpp::Node* save(const xmlpp::Node* parent) const;
+
+  _WRAP_METHOD(void restore(xmlpp::Node* self), gst_object_restore_thyself)
+  _WRAP_METHOD(Glib::ustring get_path_string(), gst_object_get_path_string)
+
+  //TODO: Is this useful? (Note that the .def needs to be fixed by hand): _WRAP_SIGNAL(void deep_notify(Glib::RefPtr<Object> prop_object, GParamSpec* prop), "deep-notify")
+
+  /** Trigered whenever a new object is saved to XML. You can connect to this
+   * signal to insert custom XML tags into the core XML.
+   */
+  //TODO: Use xmlpp::Node for parameter?
+  _WRAP_SIGNAL(void object_saved(GstXmlNodePtr xml_node), "object-saved")  
+
+#m4 _CONVERSION(`GstObject*', `const Glib::RefPtr<Object>&', `Glib::wrap($3, true)')
+#m4 _CONVERSION(`const Glib::RefPtr<Object>&', `GstObject*', `($3)->gobj()')
+
+  /** Emitted when the parent of an object is set.
+   */
+  _WRAP_SIGNAL(void parent_set(const Glib::RefPtr<Object>& parent), "parent-set")
+
+  /** Emitted when the parent of an object is unset.
+   */
+  _WRAP_SIGNAL(void parent_unset(const Glib::RefPtr<Object>& parent), "parent-unset")
+
+  //TODO: Use xmlpp::Node as return and params in vfuncs below?
+  _WRAP_VFUNC(GstXmlNodePtr save(GstXmlNodePtr parent), "save_thyself")
+  _WRAP_VFUNC(void restore(GstXmlNodePtr self_node), "restore_thyself")
+};
+
+} // namespace Gst
