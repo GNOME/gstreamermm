@@ -103,7 +103,7 @@ endif
 	$(run_generate_plugin_gmmproc_file) --hg $(plugin_name) \
 		$(cppname) | $(M4) -I $(tools_dir_m4) >> \
 		$(srcdir)/$(hg_lowercase)
-	ln -sf $(realpath $(srcdir))/$(hg_lowercase) $(builddir)/$@
+	ln -sf "$(realpath $(srcdir))/$(hg_lowercase)" "$(builddir)/$@"
 
 # This is to generate plugin .ccg files.  The .ccg file is generated and then
 # the camel ccg file is linked to the generated .ccg file to signal the
@@ -119,7 +119,7 @@ $(files_all_plugin_camel_hg_with_path:.hg=.ccg): $(generate_plugin_dep) \
 		$(srcdir)/$(ccg_lowercase)
 	$(run_generate_plugin_gmmproc_file) --ccg $(plugin_name) \
 		$(cppname) >> $(srcdir)/$(ccg_lowercase)
-	ln -sf $(realpath $(srcdir))/$(ccg_lowercase) $(builddir)/$@
+	ln -sf "$(realpath $(srcdir))/$(ccg_lowercase)" "$(builddir)/$@"
 
 $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
