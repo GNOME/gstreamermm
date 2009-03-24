@@ -117,9 +117,21 @@ public:
    */
   _WRAP_SIGNAL(void parent_unset(const Glib::RefPtr<Object>& parent), "parent-unset")
 
-  //TODO: Use xmlpp::Node as return and params in vfuncs below?
-  _WRAP_VFUNC(GstXmlNodePtr save(GstXmlNodePtr parent), "save_thyself")
-  _WRAP_VFUNC(void restore(GstXmlNodePtr self_node), "restore_thyself")
+#ifdef GLIBMM_VFUNCS_ENABLED
+  virtual xmlpp::Node* save_vfunc(xmlpp::Node* parent);
+  virtual void restore_vfunc(xmlpp::Node* self_node);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->save_thyself = &save_thyself_vfunc_callback;
+  klass->restore_thyself = &restore_thyself_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static GstXmlNodePtr save_thyself_vfunc_callback(GstObject* self, GstXmlNodePtr parent);
+  static void restore_thyself_vfunc_callback(GstObject* self, GstXmlNodePtr self_node);
+  _POP()
+#m4end
 };
 
 } // namespace Gst
