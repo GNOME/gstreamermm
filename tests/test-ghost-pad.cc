@@ -48,12 +48,14 @@ int main (int argc, char* argv[])
     std::cout << "Successfully created pad '" << pad2->get_name() <<
       "'; direction = " << pad2->get_direction() << "." << std::endl;
 
-//Comment the following gpad1 lines to remove the warning while creating the
-//ghost pad:
+// Uncomment the following to get an exception of a failed target pad ghostpad
+// construction.
+/*
   Glib::RefPtr<Gst::GhostPad> gpad1 = Gst::GhostPad::create("gpad1", pad1);
   if (gpad1)
     std::cout << "Successfully created pad '" << gpad1->get_name() <<
       "'; direction = " << gpad1->get_direction() << "." << std::endl;
+*/
 
   Glib::RefPtr<Gst::GhostPad> gpad2 =
     Gst::GhostPad::create("gpad2", Gst::PAD_SRC);
@@ -61,13 +63,15 @@ int main (int argc, char* argv[])
     std::cout << "Successfully created pad '" << gpad2->get_name() <<
       "'; direction = " << gpad2->get_direction() << "." << std::endl;
 
-//Comment the following gpad3 lines to remove the warning while creating the
-//ghost pad:
+// Uncomment the following to see a failed target pad/template ghostpad
+// construction.
+/*
   Glib::RefPtr<Gst::GhostPad> gpad3 =
     Gst::GhostPad::create("gpad3", pad1, templ);
   if (gpad3)
     std::cout << "Successfully created pad '" << gpad3->get_name() <<
       "'; direction = " << gpad3->get_direction() << "." << std::endl;
+*/
 
   Glib::RefPtr<Gst::GhostPad> gpad4 =
     Gst::GhostPad::create("gpad4", templ);

@@ -20,7 +20,6 @@
 #include <gstreamermm/element.h>
 #include <gstreamermm/childproxy.h>
 #include <gstreamermm/pad.h>
-#include <stdexcept> //Because add() throws std::runtime_error.
 
 _DEFS(gstreamermm,gst)
 
@@ -176,8 +175,9 @@ public:
    * MT safe.
    *
    * element the Gst::Element to remove
-   * Returns this Gst::Bin if successful (for further removing if wanted), null
-   * otherwise
+   * Returns this Gst::Bin if successful, for chained calls to remove().
+   *
+   * @throws std::runtime_error if the Bin does not want to remove the Element.
    */
   Glib::RefPtr<Gst::Bin> remove(const Glib::RefPtr<Gst::Element>& element);
   _IGNORE(gst_bin_remove, gst_bin_remove_many)

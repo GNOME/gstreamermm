@@ -59,6 +59,9 @@ Glib::ustring get_name(StateChangeReturn s)
 
 Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
 {
+  if (!dest)
+    throw std::runtime_error("Failed to link null element.");
+    
   const bool result = gst_element_link(gobj(), dest->gobj());
 
   if(result)

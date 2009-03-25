@@ -53,12 +53,13 @@ Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
 
   const bool result = gst_bin_add(gobj(), celement);
 
-  // If addition successful, return RefPtr<..> to this bin, otherwise return
-  // null RefPtr<...>
+  // If addition successful, return RefPtr<..> to this bin, otherwise throw an
+  // exception
   if(result)
     return Glib::wrap(gobj(), true);
   else
-    throw std::runtime_error("Failed to add " + element->get_name() + " element.");
+    throw std::runtime_error("Failed to add " + element->get_name() +
+      " element.");
 }
 
 Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
@@ -68,12 +69,13 @@ Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
 
   const bool result = gst_bin_remove(gobj(), Glib::unwrap(element));
 
-  // If removal successful, return RefPtr<..> to this bin, otherwise return
-  // null RefPtr<...>
+  // If removal successful, return RefPtr<..> to this bin, otherwise throw an
+  // exception
   if(result)
     return Glib::wrap(gobj(), true);
   else
-    throw std::runtime_error("Failed to remove " + element->get_name() + " element.");
+    throw std::runtime_error("Failed to remove " + element->get_name() +
+      " element.");
 }
 
 } //namespace Gst
