@@ -584,9 +584,9 @@ int main(int argc, char* argv[])
   g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's "
     "gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  "
     "Use the same syntax for plugin-name as in gst-inspect\nand supply the "
-    "desired C++ class name unless the confirm existence option is\nused.  "
+    "desired C++ class name unless the --confirm-existence option is\nused.  "
     "The .hg file is a preliminary .hg file that needs to be run through "
-    "m4\nincluding the ctocpp*.m4 files in the tools/m4 directory.");
+    "m4\nincluding the macros in the ctocpp*.m4 files.");
 
   g_option_context_add_main_entries(gContext, optionEntries, 0);
   g_option_context_add_group(gContext, gst_init_get_option_group());

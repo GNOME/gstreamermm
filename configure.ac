@@ -157,6 +157,11 @@ AC_SUBST(GMMPROC_DIR)
 GMMPROC=$GMMPROC_DIR/gmmproc
 AC_SUBST(GMMPROC)
 
+# location to install generate_plugin_gmmproc_file so other gstreamermm modules
+# can generate plug-ins also.
+GENERATE_PLUGIN_GMMPROC_FILE_DIR=[${libdir}/gstreamermm-0.10/gen]
+AC_SUBST([GENERATE_PLUGIN_GMMPROC_FILE_DIR])
+
 
 #########################################################################
 #  Plug-in processing
