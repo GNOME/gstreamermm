@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gstreamermm/init.h>
 #include <gstreamermm-plugins-good/init.h>
 #include <gstreamermm-plugins-good/wrap_init.h>
-#include <gstreamermm/init.h>
 
 namespace Gst
 {
@@ -29,7 +29,7 @@ static void initialize_wrap_system()
   static bool s_init = false;
   if(!s_init)
   {
-    //For Glib::wrap(), for Glib::Object-derived classes.
+    // For Glib::wrap(), for Glib::Object-derived classes.
     Gst::wrap_init(); 
 
     s_init = true;
