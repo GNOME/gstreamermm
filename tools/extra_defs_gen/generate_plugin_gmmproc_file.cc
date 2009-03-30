@@ -675,8 +675,34 @@ int main(int argc, char* argv[])
     cppParentTypeName = cParentTypeName.substr(3);
     castMacro = get_cast_macro(cTypeName);
 
-    parentInclude = target;
-    parentNameSpace = nmspace;
+    // Check for gstreamermm base classes so that the Gst namespace and the
+    // gstreamermm include directory is always used with them.
+    if (
+      cppParentTypeName.compare("AudioFilter") == 0 ||
+      cppParentTypeName.compare("AudioSink") == 0 ||
+      cppParentTypeName.compare("AudioSrc") == 0 ||
+      cppParentTypeName.compare("BaseAudioSink") == 0 ||
+      cppParentTypeName.compare("BaseAudioSrc") == 0 ||
+      cppParentTypeName.compare("BaseSink") == 0 ||
+      cppParentTypeName.compare("BaseSrc") == 0 ||
+      cppParentTypeName.compare("BaseTransform") == 0 ||
+      cppParentTypeName.compare("Bin") == 0 ||
+      cppParentTypeName.compare("CddaBaseSrc") == 0 ||
+      cppParentTypeName.compare("Element") == 0 ||
+      cppParentTypeName.compare("Object") == 0 ||
+      cppParentTypeName.compare("Pipeline") == 0 ||
+      cppParentTypeName.compare("PushSrc") == 0 ||
+      cppParentTypeName.compare("VideoSink") == 0
+      )
+    {
+      parentInclude = "gstreamermm";
+      parentNameSpace = "Gst";
+    }
+    else
+    {
+      parentInclude = target;
+      parentNameSpace = nmspace;
+    }
 
     if (hgFile || ccgFile)
     {
