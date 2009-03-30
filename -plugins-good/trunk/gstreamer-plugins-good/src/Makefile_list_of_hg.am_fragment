@@ -1,0 +1,34 @@
+# This file is include by other Makefile.am files, using the new automake include feature.
+# The include happens in Makefile.am, not Makefile.in or Makefile,
+# so it's like copy-and-pasting this into each of those Makefile.am files.
+
+files_posix_hg =
+files_win32_hg =
+files_general_hg = 
+
+files_general_deprecated_hg =
+
+# To add a plugin, add the plugin definition, in the form of
+# "plugin=CppClassName" (where "plugin" is the plugin name as recognized by
+# gst-inspect and "CppClassName" is the desired name of the C++ class), to the
+# GSTREAMERMM_PLUGINS_GOOD_ALL_PLUGIN_DEFS variable of the configure.ac file.
+# Also add the target .hg file name (which must be the same as "CppClassName"
+# all in lowercase with a .hg extension) to the variable below.  Finally, be
+# sure to include an #undef in the form of "#undef
+# GSTREAMERMM_PLUGINS_GOOD_PLUGIN_name" in the
+# gstreamermm-plugins-good-config.h.in file (where "name" is the plugin name
+# all in caps).
+
+files_all_plugin_hg = alphacolor.hg apedemux.hg
+
+# The following variables are needed for the build process to know what class
+# name to use for the plug-ins and the list of the existing plug-ins in the
+# system so only those are included in the build:
+
+defs_plugin_all = $(GSTREAMERMM_PLUGINS_GOOD_ALL_PLUGIN_DEFS)
+cppnames_plugin_all = $(GSTREAMERMM_PLUGINS_GOOD_ALL_PLUGIN_CPPNAMES)
+files_existing_plugin_hg = $(GSTREAMERMM_PLUGINS_GOOD_EXISTING_PLUGIN_HG)
+
+files_patched_hg = 
+
+include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment
