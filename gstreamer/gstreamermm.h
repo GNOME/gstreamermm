@@ -3,7 +3,6 @@
 
 #include <gstreamermm/init.h>
 #include <gstreamermm/version.h>
-#include <gstreamermm/wrap_init.h>
 
 // Core includes
 #include <gstreamermm/bin.h>
