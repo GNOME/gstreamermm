@@ -4,7 +4,7 @@ doxygen_configfile=Doxyfile
 doxygen_configfile_source=$(srcdir)/Doxyfile.in
 beautify_docs = @GMMPROC_DIR@/beautify_docs.pl
 
-EXTRA_DIST= Doxyfile.in html reference-index.txt
+EXTRA_DIST= Doxyfile.in html
 
 docdir = $(datadir)/doc/gstreamermm-plugins-good-0.10/docs
 referencedir=$(docdir)/reference/html
