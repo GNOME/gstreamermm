@@ -34,5 +34,6 @@ generate_defs_gst_LDADD = libgstreamermm_get_plugin_defs-0.10.la
 # other gstreamermm modules can also generate plug-ins.
 
 generate_plugin_gmmproc_file_PROGRAMS = generate_plugin_gmmproc_file
+generate_plugin_gmmproc_file_SOURCES = generate_plugin_gmmproc_file.cc
 generate_plugin_gmmproc_file_LDADD = libgstreamermm_get_plugin_defs-0.10.la
 generate_plugin_gmmproc_filedir = $(GENERATE_PLUGIN_GMMPROC_FILE_DIR)
