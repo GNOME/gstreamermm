@@ -171,16 +171,17 @@ AC_SUBST(GST_INSPECT)
 # To add a plugin, add the plugin definition, in the form of
 # "plugin=CppClassName" (where "plugin" is the plugin name as recognized by
 # gst-inspect and "CppClassName" is the desired name of the C++ class),  to the
-# list of definitions below.  Also add the target .hg file name (which must be
-# the same as "CppClassName" all in lowercase with a .hg extension) to the
-# files_all_plugin_hg variable in the
+# space separated list of definitions below.  Also add the target .hg file name
+# (which must be the same as "CppClassName" all in lowercase with a .hg
+# extension) to the files_all_plugin_hg variable in the
 # gstreamer-plugins-good/src/Makefile_list_of_hg.am_fragment file.  Finally, be
 # sure to include an #undef in the form of "#undef
 # GSTREAMERMM_PLUGINS_GOOD_PLUGIN_name" in the
 # gstreamermm-plugins-good-config.h.in file (where "name" is the plugin name
 # all in caps).
 
-GSTREAMERMM_PLUGINS_GOOD_ALL_PLUGIN_DEFS="alphacolor=AlphaColor apedemux=ApeDemux"
+GSTREAMERMM_PLUGINS_GOOD_ALL_PLUGIN_DEFS="alphacolor=AlphaColor \
+apedemux=ApeDemux videoflip=VideoFlip"
 
 for plugin_def in $GSTREAMERMM_PLUGINS_GOOD_ALL_PLUGIN_DEFS; do
   plugin_name=[`echo $plugin_def | cut -d'=' -f 1`]
