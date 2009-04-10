@@ -17,8 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
- #include <gst/interfaces/mixer.h>
- #include <gstreamermm/mixeroptions.h>
+#include <gstreamermm/mixeroptions.h>
 
 namespace Gst
 {
@@ -100,6 +99,63 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
 
   typedef Glib::ArrayHandle<int> RType;
   return RType(0, 0, Glib::OWNERSHIP_DEEP);
+}
+const GList* Mixer_Class::list_tracks_vfunc_callback(GstMixer* self)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        return (obj->list_tracks_vfunc()).data();
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  // Call the original underlying C function:
+  if(base && base->list_tracks)
+    return (*base->list_tracks)(self);
+
+
+  typedef const GList* RType;
+  return RType();
+}
+Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > Gst::Mixer::list_tracks_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
+g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+)  );
+
+  if(base && base->list_tracks)
+    return Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> >(const_cast<GList*>((*base->list_tracks)(const_cast<GstMixer*>(gobj()))), Glib::OWNERSHIP_NONE);
+
+  typedef Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > RType;
+  return RType(0, Glib::OWNERSHIP_NONE);
 }
 #endif //GLIBMM_VFUNCS_ENABLED
 

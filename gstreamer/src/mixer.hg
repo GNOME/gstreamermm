@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gst/interfaces/mixer.h>
 #include <gst/interfaces/mixeroptions.h>
 #include <gstreamermm/mixertrack.h>
 #include <glibmm/interface.h>
@@ -80,21 +81,15 @@ public:
   _WRAP_METHOD(static void message_parse_options_list_changed(GstMessage *message, GstMixerOptions **options), gst_mixer_message_parse_options_list_changed)
   */
 
-//TODO:
-//#m4 _CONVERSION(`Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> >', `const GList*', `($3).data()')
-  //_WRAP_VFUNC(Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > list_tracks() const, "list_tracks")
-
 #ifdef GLIBMM_VFUNCS_ENABLED
-  // This vfunc is handcoded because we want to have it return the result
-  // instead of requiring a pointer parameter in which to put it like the C API
-  // does.
   virtual Glib::ArrayHandle<int> get_volume_vfunc(const Glib::RefPtr<const Gst::MixerTrack>& track) const;
+  virtual Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > list_tracks_vfunc() const;
 #endif //GLIBMM_VFUNCS_ENABLED
 
 #m4 _CONVERSION(`GstMixerTrack*',`const Glib::RefPtr<Gst::MixerTrack>&', `Glib::wrap(($3), true)')
 
-//TODO:
-  //_WRAP_VFUNC(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), "set_volume")
+#m4 _CONVERSION(`gint*', `const Glib::ArrayHandle<int>&', `Glib::ArrayHandle<int>(($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_VFUNC(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), "set_volume")
 
   _WRAP_VFUNC(void set_mute(const Glib::RefPtr<Gst::MixerTrack>& track, bool mute), "set_mute")
   _WRAP_VFUNC(void set_record(const Glib::RefPtr<Gst::MixerTrack>& track, bool record), "set_record")
@@ -102,17 +97,20 @@ public:
 #m4 _CONVERSION(`GstMixerOptions*',`const Glib::RefPtr<Gst::MixerOptions>&', `Glib::wrap(($3), true)')
   _WRAP_VFUNC(void set_option(const Glib::RefPtr<Gst::MixerOptions>& opts, const Glib::ustring& value), "set_option")
 
-  //TODO:
-  //_WRAP_VFUNC(Glib::ustring get_option(const Glib::RefPtr<const Gst::MixerOptions>& opts) const, "get_option")
+#m4 _CONVERSION(`Glib::ustring', `const gchar*', `($3).c_str()')
+#m4 _CONVERSION(`GstMixerOptions*',`const Glib::RefPtr<const Gst::MixerOptions>&', `Glib::wrap(($3), true)')
+  _WRAP_VFUNC(Glib::ustring get_option(const Glib::RefPtr<const Gst::MixerOptions>& opts) const, "get_option")
+
+  _WRAP_VFUNC(Gst::MixerFlags get_mixer_flags() const, "get_mixer_flags")
 
 protected:
 #m4begin
-dnl// This vfunc callback is handcoded because we want to have the C++ vfunc
-dnl// return the result instead of passing in a pointer in which to store it.
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->get_volume = &get_volume_vfunc_callback;
+  klass->list_tracks = &list_tracks_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static void get_volume_vfunc_callback(GstMixer* self, GstMixerTrack* track, gint* volumes);
+  static const GList* list_tracks_vfunc_callback(GstMixer* self);
   _POP()
 #m4end
 };
