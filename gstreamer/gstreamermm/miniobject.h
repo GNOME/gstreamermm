@@ -145,6 +145,11 @@ protected:
 
 protected:
   GstMiniObject* gobject_; //TODO: Doesn't this shadow a member variable in Glib::ObjectBase?
+
+// TODO: Virtual functions copy_vfunc() and finalize_vfunc() are not easily
+// wrapped because their class member types (GstMiniObjectCopyFunction and
+// GstMiniObjectFinalizeFunction) don't include a gpointer parameter that
+// callbacks can use.
 };
 
 } // namespace Gst
