@@ -21,3 +21,188 @@
 #include <gstreamermm/buffer.h>
 
 _PINCLUDE(gstreamermm/private/element_p.h)
+
+namespace Gst
+{
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+gboolean BaseSrc_Class::do_seek_vfunc_callback(GstBaseSrc* self, GstSegment* segment)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+      Gst::Segment gstmm_segment(segment, true);
+        // Call the virtual member method, which derived classes might override.
+        return static_cast<int>(obj->do_seek_vfunc(gstmm_segment));
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->do_seek)
+    return (*base->do_seek)(self, segment);
+
+
+  typedef gboolean RType;
+  return RType();
+}
+bool Gst::BaseSrc::do_seek_vfunc(Gst::Segment& segment) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->do_seek)
+    return (*base->do_seek)(gobj(),(segment).gobj());
+
+  typedef bool RType;
+  return RType();
+}
+gboolean BaseSrc_Class::prepare_seek_segment_vfunc_callback(GstBaseSrc* self, GstEvent* seek, GstSegment* segment)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        Gst::Segment gstmm_segment(segment, true);
+        return static_cast<int>(obj->prepare_seek_segment_vfunc(Gst::wrap(seek, true) , gstmm_segment));
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->prepare_seek_segment)
+    return (*base->prepare_seek_segment)(self, seek, segment);
+
+
+  typedef gboolean RType;
+  return RType();
+}
+bool Gst::BaseSrc::prepare_seek_segment_vfunc(const Glib::RefPtr<Gst::Event>& seek, Gst::Segment& segment) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->prepare_seek_segment)
+    return (*base->prepare_seek_segment)(gobj(),Gst::unwrap(seek),(segment).gobj());
+
+  typedef bool RType;
+  return RType();
+}
+GstFlowReturn BaseSrc_Class::create_vfunc_callback(GstBaseSrc* self, guint64 offset, guint size, GstBuffer** buf)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        Glib::RefPtr<Gst::Buffer> cpp_buffer;
+        // Call the virtual member method, which derived classes might override.
+        GstFlowReturn const result = (GstFlowReturn)(obj->create_vfunc(offset,
+          size, cpp_buffer));
+        *buf = cpp_buffer->gobj_copy();
+        return result;
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->create)
+    return (*base->create)(self, offset, size, buf);
+
+
+  typedef GstFlowReturn RType;
+  return RType();
+}
+FlowReturn Gst::BaseSrc::create_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->create)
+  {
+    GstBuffer* gst_buffer;
+    Gst::FlowReturn const result = (FlowReturn)((*base->create)(gobj(),offset,
+      size,&gst_buffer));
+    buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
+    return result;
+  }
+
+  typedef FlowReturn RType;
+  return RType();
+}
+#endif //GLIBMM_VFUNCS_ENABLED
+
+} // namespace Gst
