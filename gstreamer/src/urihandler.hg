@@ -69,7 +69,22 @@ public:
    */
   _WRAP_SIGNAL(void new_uri(const Glib::ustring& uri), "new-uri")
 
-  //TODO: Wrap vfuncs.
+#m4 _CONVERSION(`Glib::ustring', `const gchar*', `($3).c_str()')
+
+  /** Virtual method which should be implemented to return the URI currently
+   * handled by the element.
+   */
+  _WRAP_VFUNC(Glib::ustring get_uri() const, "get_uri")
+
+  /** Virtual method which should be implemented to set a new URI.
+   */
+  _WRAP_VFUNC(bool set_uri(const Glib::ustring& uri), "set_uri)
+
+  //TODO: The GstURIHandler vfuncs get_type(), get_protocols(), get_type_full()
+  //and get_protocols_full() don't have a GstURIHandler as an argument declared
+  //in the Interface structure so those seem impossible to wrap because the C++
+  //callback would have no way of knowing which object's virtual function
+  //should be called.
 };
 
 } // namespace Gst
