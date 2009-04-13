@@ -55,7 +55,7 @@ dnl Translates from a specified C type to a C++ type, param or return type.
 dnl `conversion type' may be:
 dnl `type' - For a C to C++ type translation.
 dnl `param' - For a C to C++ parameter translation.
-dnl `ret' - For a C to C++ return translation.
+dnl `return' - For a C to C++ return translation.
 dnl
 define(`_CCONVERT',`dnl
 ifelse(dnl
@@ -71,7 +71,7 @@ errprint(`No C++ parameter conversion from $1 defined.
 ')`'dnl
 m4exit(1)`'dnl
 ')',dnl
-`$2',`ret',`dnl
+`$2',`return',`dnl
 ifdef(`TFR'__HASH(`$1'), `indir(`TFR'__HASH(`$1'))',`dnl
 ifdef(`TFP'__HASH(`$1'), `indir(`TFP'__HASH(`$1'))',`dnl
 errprint(`No C++ return conversion from $1 defined.

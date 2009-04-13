@@ -140,13 +140,11 @@ gboolean Preset_Class::get_meta_vfunc_callback(GstPreset* self, const gchar* nam
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
-        Glib::ustring gstmm_value;
+        Glib::ustring cpp_value;
         // Call the virtual member method, which derived classes might override.
         const gboolean result = static_cast<int>(obj->get_meta_vfunc(Glib::convert_const_gchar_ptr_to_ustring(name)
-, Glib::convert_const_gchar_ptr_to_ustring(tag)
-, gstmm_value
-));
-        *value = g_strdup(gstmm_value.c_str());
+, Glib::convert_const_gchar_ptr_to_ustring(tag) , cpp_value));
+        *value = g_strdup(cpp_value.c_str());
         return result;
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }

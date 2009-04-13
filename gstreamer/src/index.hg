@@ -109,6 +109,12 @@ public:
   _WRAP_METHOD(void set_certainty(IndexCertainty certainty), gst_index_set_certainty)
   _WRAP_METHOD(IndexCertainty get_certainty() const, gst_index_get_certainty)
   _WRAP_METHOD(bool get_writer_id(const Glib::RefPtr<Gst::Object>& writer, int& id) const, gst_index_get_writer_id)
+
+// This conversion is used for next few add* methods (add_format,
+// add_association, etc.).  A copy is taken so the original is not freed by the
+// wrapper.
+#m4 _CONVERSION(`GstIndexEntry*',`Gst::IndexEntry',`Glib::wrap($3, true)')
+
   _WRAP_METHOD(Gst::IndexEntry add_format(int id, Format format), gst_index_add_format)
 
 #m4 _CONVERSION(`const Glib::ArrayHandle<const Gst::IndexAssociation>&', `const GstIndexAssociation*', `(const GstIndexAssociation*)(($3).data())')

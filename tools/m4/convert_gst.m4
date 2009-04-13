@@ -93,12 +93,11 @@ _CONVERSION(`const Glib::RefPtr<Gst::Index>&',`GstIndex*',`Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Index>',`GstIndex*',`Glib::unwrap($3)')
 
 #IndexEntry
-_CONVERSION(`GstIndexEntry*',`Gst::IndexEntry',`Glib::wrap($3, true)')
 _CONVERSION(`const Gst::IndexEntry&',`GstIndexEntry*',`const_cast<GstIndexEntry*>(($3).gobj())')
 
 #IndexFactory
 _CONVERSION(`GstIndexFactory*',`Glib::RefPtr<Gst::IndexFactory>',`Glib::wrap($3)')
-#
+
 #Iterator
 _CONVERSION(`GstIterator*',`Gst::Iterator<Gst::Element>',`Gst::Iterator<Gst::Element>::Iterator($3)')
 _CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Element>',`Gst::Iterator<const Gst::Element>::Iterator($3)')
@@ -124,7 +123,6 @@ _CONVERSION(`const Glib::RefPtr<Gst::Pad>&',`GstPad*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Pad>&',`GstPad*',`const_cast<GstPad*>(($3)->gobj())')
 
 #PadTemplate
-_CONVERSION(`const Glib::RefPtr<Gst::PadTemplate>&',`GstPadTemplate*', `Glib::unwrap($3)')
 _CONVERSION(`GstPadTemplate*',`Glib::RefPtr<Gst::PadTemplate>', `Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>(($3)->gobj())')
 
@@ -143,15 +141,12 @@ _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Gst::unwrap($3)')
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')
 
 #Structure
-_CONVERSION(`const GstStructure*',`const Gst::Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
-_CONVERSION(`GstStructure*',`const Gst::Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
 _CONVERSION(`Gst::Structure&',`GstStructure*',`($3).gobj()')
 
 #TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`(($3).gobj())')
-_CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap($3, 0, true)')
+_CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap($3, 0)')
 _CONVERSION(`Gst::TagList&',`GstTagList*',`($3).gobj()')
-_CONVERSION(`const GstTagList*',`const Gst::TagList',`Glib::wrap(const_cast<GstTagList*>($3), 0, true)')
 _CONVERSION(`Gst::TagList',`GstTagList*',`($3).gobj()')
 
 #TypeFind

@@ -45,9 +45,9 @@ gboolean BaseSrc_Class::do_seek_vfunc_callback(GstBaseSrc* self, GstSegment* seg
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
-      Gst::Segment gstmm_segment(segment, true);
+      Gst::Segment cpp_segment(segment, true);
         // Call the virtual member method, which derived classes might override.
-        return static_cast<int>(obj->do_seek_vfunc(gstmm_segment));
+        return static_cast<int>(obj->do_seek_vfunc(cpp_segment));
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
@@ -102,8 +102,8 @@ gboolean BaseSrc_Class::prepare_seek_segment_vfunc_callback(GstBaseSrc* self, Gs
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
-        Gst::Segment gstmm_segment(segment, true);
-        return static_cast<int>(obj->prepare_seek_segment_vfunc(Gst::wrap(seek, true) , gstmm_segment));
+        Gst::Segment cpp_segment(segment, true);
+        return static_cast<int>(obj->prepare_seek_segment_vfunc(Gst::wrap(seek, true) , cpp_segment));
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)

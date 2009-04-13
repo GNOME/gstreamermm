@@ -1,5 +1,34 @@
 2009-04-13  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	* tools/m4/convert_gst.m4: Reviewed conversions to make sure that only
+	conversions to the C type (gobj() conversions) and conversions to
+	types that are returned exist so that conversions to "const
+	Glib::RefPtr<>&" are required in the .hg file (safer for signals and
+	vfuncs).
+	* gstreamer/src/event.hg:
+	* gstreamer/src/index.hg:
+	* gstreamer/src/index.ccg:
+	* gstreamer/src/message.hg:
+	* gstreamer/src/query.hg:
+	* gstreamer/src/tagsetter.hg: Placed boxed type conversions specific
+	to certain methods in the .hg files and removed them from the convert
+	file.  Ensured that copies are made so that originals are not
+	destroyed where appropriate.
+
+	* tools/m4/ctocpp_base.m4: Modified the _CCONVERT() macro so that the
+	conversion types it accepts are: type, param and return.
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Added lines in
+	signal generation to insert "#m4 _CONVERSION()" for parameters of type
+	GstTagList because GstTagList has a different Glib::wrap() to
+	distinguish it from GstStructure's Glib::wrap() (GstTagList is a
+	GstStructure which makes the two different Glib::wrap() methods
+	necessary).
+
+	* gstreamer/src/basesrc.ccg:
+	* gstreamer/src/preset.ccg: Typos.
+
+2009-04-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	* gstreamer/src/bin.hg:
 	* gstreamer/src/element.hg:
 	* gstreamer/src/elementfactory.hg:

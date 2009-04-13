@@ -257,7 +257,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
         }
 
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
-          "_CCONVERT(" + propertyCType + ", `ret'))\n";
+          "_CCONVERT(" + propertyCType + ", `return'))\n";
 
         if (!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
           includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")dnl\n";
@@ -328,7 +328,7 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
       includeMacroCalls += "_CCONVERSION_INCLUDE(" + returnCType + ")dnl\n";
 
       wrapStatement = "  _WRAP_SIGNAL(_CCONVERT("  + returnCType +
-        ", `ret') " + signalMethodName + "(";
+        ", `return') " + signalMethodName + "(";
 
       cClassSignalDeclarations += "  " + returnCType + " (*" +
         signalMethodName + ") (" + cTypeName + "* element";
@@ -355,10 +355,22 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
 
           if (gst_type_is_a_pointer(paramGType))
           {
-            convertMacros += "#m4 _CONVERSION(``" + paramCType +
-              "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
-            convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
-              "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
+            if (paramGType == GST_TYPE_TAG_LIST)
+            // dealing with a GstTagList* which has a special Glib::wrap()
+            // because of the conflict with the Glib::wrap() for GstStructure*
+            // (GstTagList is infact a GstStructure).
+            {
+              convertMacros += "#m4 _CONVERSION(``" + paramCType +
+                "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
+              convertMacros +=  "``Glib::wrap($3, 0, true)'')\n";
+            }
+            else
+            {
+              convertMacros += "#m4 _CONVERSION(``" + paramCType +
+                "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
+              convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
+                "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
+            }
           }
 
           wrapStatement += "_CCONVERT(" + paramCType + ", `param') " +

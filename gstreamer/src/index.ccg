@@ -114,7 +114,8 @@ Gst::IndexEntry Index::get_assoc_entry(int id, gint64 value,
     (GstIndexLookupMethod) method, (GstAssocFlags) flags, (GstFormat) format,
     value);
 
-  return Glib::wrap(gst_entry);
+  // Return a copy so that the original is not freed by wrapper.
+  return Glib::wrap(gst_entry, true);
 }
 
 void Index::set_filter(const SlotFilter& slot)
