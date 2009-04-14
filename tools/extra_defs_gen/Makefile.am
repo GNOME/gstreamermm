@@ -1,8 +1,8 @@
 # Build the library, to be installed and used by other plug-in generating
 # modules:
 
-files_h = get_plugin_defs.h gst_type_is_a_pointer.h
-files_cc = get_plugin_defs.cc gst_type_is_a_pointer.cc
+files_h = get_plugin_defs.h
+files_cc = get_plugin_defs.cc
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined

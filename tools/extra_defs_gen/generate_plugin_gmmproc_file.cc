@@ -19,8 +19,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "gst_type_is_a_pointer.h"
-
 #include <gst/gst.h>
 #include <glibmm.h>
 #include <iostream>
@@ -109,6 +107,13 @@ static const char* wrappedBaseClasses[WRAPPED_BASE_CLASSES_SIZE] =
   "GstPushSrc",
   "GstVideoSink"
 };
+
+bool gst_type_is_a_pointer(GType gtype)
+{
+  return (g_type_is_a(gtype, G_TYPE_OBJECT) ||
+    g_type_is_a(gtype, G_TYPE_BOXED) ||
+    g_type_is_a(gtype, GST_TYPE_MINI_OBJECT));
+}
 
 Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 {
