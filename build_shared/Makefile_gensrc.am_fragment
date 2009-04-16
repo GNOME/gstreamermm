@@ -80,12 +80,12 @@ endif
 # change because it will be a plug-in generation dependency):
 license_header_source_file = $(gensrc_destdir)/version.h
 
-# This is to generate plugin .hg files.  The generated .hg file s piped through
-# m4 using the macros in tools/m4/ctocpp_base.m4 which then produces the final
-# .hg file.  Finally, the camel hg file is linked to the final .hg file to
-# signal the successful generation of the .hg file.
+# This is to generate plugin .hg files.  The generated .hg file is piped
+# through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
+# the final .hg file.  Finally, the camel hg file is linked to the final .hg
+# file to signal the successful generation of the .hg file.
 $(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
-	$(tools_plugin_m4) $(files_defs) $(license_header_source_file)
+	$(tools_plugin_m4) $(license_header_source_file)
 	$(eval cppname = $$(notdir $$(basename $$@)))
 	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
 	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
@@ -109,7 +109,7 @@ endif
 # the camel ccg file is linked to the generated .ccg file to signal the
 # successful generation of the .hg file.
 $(files_all_plugin_camel_hg_with_path:.hg=.ccg): $(generate_plugin_dep) \
-	$(tools_plugin_m4) $(files_defs) $(license_header_source_file)
+	$(tools_plugin_m4) $(license_header_source_file)
 	$(eval cppname = $$(notdir $$(basename $$@)))
 	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
 	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
@@ -128,7 +128,7 @@ $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 # This is to run the generated plug-in .hg and .ccg files through gmmproc
 # (they're generated if necessary by the .../%.hg and .../%.ccg dependencies.
 $(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir)/%.hg \
-	$(stamp_plugin_dir)/%.ccg $(tools_m4) $(tools_plugin_m4) $(files_defs)
+	$(stamp_plugin_dir)/%.ccg $(tools_m4) $(files_defs)
 	$(eval plugin_name_lowercase = \
 		$$(shell echo $$* | tr '[:upper:]' '[:lower:]'))
 	$(run_gmmproc) $(plugin_name_lowercase) $(srcdir) $(gensrc_destdir)
