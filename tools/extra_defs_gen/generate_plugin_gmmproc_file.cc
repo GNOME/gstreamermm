@@ -330,6 +330,51 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
       Glib::ustring  returnCType = g_type_name(returnGType) +
         (Glib::ustring) (gst_type_is_a_pointer(returnGType) ?  "*" : "");
 
+      if (gst_type_is_a_pointer(returnGType))
+      {
+        if (g_type_is_a(returnGType, G_TYPE_BOXED))
+        // Boxed type returns for signals need special conversions because
+        // when unwrapping them, gobj_copy() should be used instead of just
+        // gobj() to guard against losing the original with a temporary
+        // wrapper.
+        {
+          // Unwrapping conversion:
+          convertMacros += "#m4 _CONVERSION(_LQ()_CCONVERT(" + returnCType +
+            ",`type')_RQ(), ``" + returnCType + "'', ";
+          convertMacros +=  "``($3).gobj_copy()'')\n";
+
+          // Also include a wrapping conversion:
+
+          if (returnGType == GST_TYPE_TAG_LIST)
+          // Dealing with a GstTagList* return which has a special Glib::wrap()
+          // because of the conflict with the Glib::wrap() for GstStructure*
+          // (GstTagList is infact a GstStructure).
+          {
+            convertMacros += "#m4 _CONVERSION(``" + returnCType +
+              "'', _LQ()_CCONVERT(" + returnCType + ",`return')_RQ(), ";
+            convertMacros +=  "``Glib::wrap($3, 0)'')\n";
+          }
+          else
+          // Dealing with a regular boxed type return.
+          {
+            convertMacros += "#m4 _CONVERSION(``" + returnCType +
+              "'', _LQ()_CCONVERT(" + returnCType + ",`return')_RQ(), ";
+            convertMacros +=  "``Glib::wrap($3)'')\n";
+          }
+        }
+        else
+        // Dealing with a RefPtr<> return so include a wrapping conversion
+        // just so these conversions can be automatic for plug-ins and not
+        // needed in the global convert file.  (An unwrapping conversion will
+        // already probably be included in the global convert file).
+        {
+          convertMacros += "#m4 _CONVERSION(``" + returnCType +
+            "'', _LQ()_CCONVERT(" + returnCType + ",`return')_RQ(), ";
+          convertMacros += g_type_is_a(returnGType, GST_TYPE_MINI_OBJECT) ?
+            "``Gst::wrap($3)'')\n" : "``Glib::wrap($3)'')\n";
+        }
+      }
+
       includeMacroCalls += "_CCONVERSION_INCLUDE(" + returnCType + ")dnl\n";
 
       wrapStatement = "  _WRAP_SIGNAL(_CCONVERT("  + returnCType +
@@ -358,18 +403,23 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
 
           includeMacroCalls += "_CCONVERSION_INCLUDE(" + paramCType + ")dnl\n";
 
+          // Include wrapping conversions for signal parameters.  (Unwrapping
+          // conversions will already probably be defined in the global convert
+          // file):
+
           if (gst_type_is_a_pointer(paramGType))
           {
             if (paramGType == GST_TYPE_TAG_LIST)
-            // dealing with a GstTagList* which has a special Glib::wrap()
+            // Dealing with a GstTagList* which has a special Glib::wrap()
             // because of the conflict with the Glib::wrap() for GstStructure*
-            // (GstTagList is infact a GstStructure).
+            // (GstTagList is in fact a GstStructure).
             {
               convertMacros += "#m4 _CONVERSION(``" + paramCType +
                 "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
               convertMacros +=  "``Glib::wrap($3, 0, true)'')\n";
             }
             else
+            // Dealing with reference counted parameter or a boxed type.
             {
               convertMacros += "#m4 _CONVERSION(``" + paramCType +
                 "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
