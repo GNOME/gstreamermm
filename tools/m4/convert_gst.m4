@@ -156,12 +156,14 @@ _CONVERSION(`GstTunerChannel*',`Glib::RefPtr<Gst::TunerChannel>', `Glib::wrap($3
 _CONVERSION(`GstTunerChannel*',`Glib::RefPtr<const Gst::TunerChannel>', `Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::TunerChannel>&',`GstTunerChannel*', `($3)->gobj()')
 _CONVERSION(`const Glib::RefPtr<const Gst::TunerChannel>&',`GstTunerChannel*', `const_cast<GstTunerChannel*>(($3)->gobj())')
+_CONVERSION(`Glib::RefPtr<Gst::TunerChannel>', `GstTunerChannel*', `($3)->gobj()')
 
 #TunerNorm
 _CONVERSION(`GstTunerNorm*',`Glib::RefPtr<Gst::TunerNorm>', `Glib::wrap($3)')
 _CONVERSION(`GstTunerNorm*',`Glib::RefPtr<const Gst::TunerNorm>', `Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::TunerNorm>&',`GstTunerNorm*', `($3)->gobj()')
 _CONVERSION(`const Glib::RefPtr<const Gst::TunerNorm>&',`GstTunerNorm*', `const_cast<GstTunerNorm*>(($3)->gobj())')
+_CONVERSION(`Glib::RefPtr<Gst::TunerNorm>', `GstTunerNorm*', `($3)->gobj()')
 
 #URIHandler
 _CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`($3)->gobj()')

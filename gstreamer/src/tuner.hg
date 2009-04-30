@@ -91,6 +91,34 @@ public:
    * @param signal The new signal.
    */
   _WRAP_SIGNAL(void signal_changed(const Glib::RefPtr<Gst::TunerChannel>& channel, int signal), "signal-changed")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  virtual Glib::ListHandle< Glib::RefPtr<Gst::TunerChannel> > list_channels_vfunc() const;
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  _WRAP_VFUNC(void set_channel(const Glib::RefPtr<Gst::TunerChannel>& channel), "set_channel")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::TunerChannel> get_channel() const, "get_channel")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  virtual Glib::ListHandle< Glib::RefPtr<Gst::TunerNorm> > list_norms_vfunc() const;
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  _WRAP_VFUNC(void set_norm(const Glib::RefPtr<Gst::TunerNorm>& norm), "set_norm")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::TunerNorm> get_norm() const, "get_norm")
+  _WRAP_VFUNC(void set_frequency(const Glib::RefPtr<Gst::TunerChannel>& channel, gulong frequency), "set_frequency")
+  _WRAP_VFUNC(gulong get_frequency(const Glib::RefPtr<Gst::TunerChannel>& channel) const, "get_frequency")
+  _WRAP_VFUNC(int signal_strength(const Glib::RefPtr<Gst::TunerChannel>& channel) const, "signal_strength")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->list_channels = &list_channels_vfunc_callback;
+  klass->list_norms = &list_norms_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static const GList* list_channels_vfunc_callback(GstTuner* self);
+  static const GList* list_norms_vfunc_callback(GstTuner* self);
+  _POP()
+#m4end
 };
 
 } // namespace Gst
