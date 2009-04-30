@@ -172,9 +172,8 @@ _CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`($3)->gobj(
 
 #Basic General Conversions
 _CONVERSION(`gint64&',`gint64*',`&($3)')
-_CONVERSION(`bool&',`gboolean*',`(($2)&($3))')
 _CONVERSION(`const guint&',`guint',`$3')
-_CONVERSION(`const guint32&',`guint32',`$3')
+_CONVERSION(`const guint32&',`guint32',`($3)')
 
 #Basic Gstreamermm Conversions
 _CONVERSION(`ClockTime&',`GstClockTime*',`(GstClockTime*)(&($3))')

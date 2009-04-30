@@ -25,6 +25,19 @@ _PINCLUDE(gstreamermm/private/element_p.h)
 namespace Gst
 {
 
+bool BaseSrc::query_latency(bool& live, ClockTime& min_latency,
+  ClockTime& max_latency) const
+{
+  gboolean gst_live = 0;
+
+  const bool result =
+    gst_base_src_query_latency(const_cast<GstBaseSrc*>(gobj()),
+    &gst_live, (GstClockTime*)(&(min_latency)),
+    (GstClockTime*)(&(max_latency)));
+  live = gst_live;
+  return result;
+}
+
 #ifdef GLIBMM_VFUNCS_ENABLED
 gboolean BaseSrc_Class::do_seek_vfunc_callback(GstBaseSrc* self, GstSegment* segment)
 {

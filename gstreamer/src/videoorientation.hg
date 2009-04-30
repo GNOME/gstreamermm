@@ -37,15 +37,38 @@ class VideoOrientation : public Glib::Interface
 
 public:
   _WRAP_METHOD(bool get_hcenter(int& center) const, gst_video_orientation_get_hcenter)
-  _WRAP_METHOD(bool get_hflip(bool& flip) const, gst_video_orientation_get_hflip)
+  _WRAP_METHOD_DOCS_ONLY(gst_video_orientation_get_hflip)
+  bool get_hflip(bool& flip) const;
   _WRAP_METHOD(bool get_vcenter(int& center) const, gst_video_orientation_get_vcenter)
-  _WRAP_METHOD(bool get_vflip(bool& flip) const, gst_video_orientation_get_vflip)
+  _WRAP_METHOD_DOCS_ONLY(gst_video_orientation_get_vflip)
+  bool get_vflip(bool& flip) const;
   _WRAP_METHOD(bool set_hcenter(int center), gst_video_orientation_set_hcenter)
   _WRAP_METHOD(bool set_hflip(bool flip), gst_video_orientation_set_hflip)
   _WRAP_METHOD(bool set_vcenter(int center), gst_video_orientation_set_vcenter)
   _WRAP_METHOD(bool set_vflip(bool flip), gst_video_orientation_set_vflip)
 
-  //TODO: Wrap vfuncs.
+  #ifdef GLIBMM_VFUNCS_ENABLED
+  virtual bool get_hflip_vfunc(bool& flip) const;
+  virtual bool get_vflip_vfunc(bool& flip) const;
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  _WRAP_VFUNC(bool get_hcenter(int& center) const, "get_hcenter")
+  _WRAP_VFUNC(bool get_vcenter(int& center) const, "get_vcenter")
+  _WRAP_VFUNC(bool set_hflip(bool flip), "set_hflip")
+  _WRAP_VFUNC(bool set_vflip(bool flip), "set_vflip")
+  _WRAP_VFUNC(bool set_hcenter(int center), "set_hcenter")
+  _WRAP_VFUNC(bool set_vcenter(int center), "set_vcenter")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->get_hflip = &get_hflip_vfunc_callback;
+  klass->get_vflip = &get_vflip_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static gboolean get_hflip_vfunc_callback(GstVideoOrientation* self, gboolean* flip);
+  static gboolean get_vflip_vfunc_callback(GstVideoOrientation* self, gboolean* flip);
+  _POP()
+#m4end
 };
 
 } // namespace Gst

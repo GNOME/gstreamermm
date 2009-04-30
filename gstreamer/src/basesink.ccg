@@ -24,6 +24,22 @@ _PINCLUDE(gstreamermm/private/element_p.h)
 namespace Gst
 {
 
+bool BaseSink::query_latency(bool& live, bool& upstream_live, ClockTime& min_latency, ClockTime& max_latency) const
+{
+  gboolean gst_live = 0;
+  gboolean gst_upstream_live = 0;
+
+  const bool result =
+    gst_base_sink_query_latency(const_cast<GstBaseSink*>(gobj()),
+    &gst_live, &gst_upstream_live, (GstClockTime*)(&(min_latency)),
+    (GstClockTime*)(&(max_latency)));
+
+  live = gst_live;
+  upstream_live = gst_upstream_live;
+
+  return result;
+}
+
 ClockReturn BaseSink::wait_clock(ClockTime time)
 {
   return (ClockReturn)(gst_base_sink_wait_clock(const_cast<GstBaseSink*>(gobj()), (GstClockTime)(time), 0));
