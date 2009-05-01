@@ -36,4 +36,74 @@ void BaseTransform::unlock()
   GST_BASE_TRANSFORM_UNLOCK(gobj());
 }
 
+#ifdef GLIBMM_VFUNCS_ENABLED
+GstFlowReturn BaseTransform_Class::prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, gint size, GstCaps* caps, GstBuffer** buffer)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        Glib::RefPtr<Gst::Buffer> cpp_buffer;
+        // Call the virtual member method, which derived classes might override.
+        const GstFlowReturn result =
+          ((GstFlowReturn)(obj->prepare_output_buffer_vfunc(
+          Gst::wrap(input, true) , size , Glib::wrap(caps, true), cpp_buffer)));
+        *buffer = cpp_buffer->gobj_copy();
+        return result;
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->prepare_output_buffer)
+    return (*base->prepare_output_buffer)(self, input, size, caps, buffer);
+
+
+  typedef GstFlowReturn RType;
+  return RType();
+}
+FlowReturn Gst::BaseTransform::prepare_output_buffer_vfunc(const Glib::RefPtr<Gst::Buffer>& input, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->prepare_output_buffer)
+  {
+    GstBuffer* gst_buffer;
+    const Gst::FlowReturn result =
+      ((FlowReturn)((*base->prepare_output_buffer)(gobj(),(input)->gobj(),
+      size,(caps)->gobj(),&gst_buffer)));
+    buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
+    return result;
+  }
+
+  typedef FlowReturn RType;
+  return RType();
+}
+#endif //GLIBMM_VFUNCS_ENABLED
+
 } //namespace Gst

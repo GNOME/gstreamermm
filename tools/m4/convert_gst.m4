@@ -52,6 +52,7 @@ _CONVERSION(`GstBus*',`Glib::RefPtr<Gst::Bus>',`Glib::wrap($3)')
 
 #Caps
 _CONVERSION(`GstCaps*',`Glib::RefPtr<Gst::Caps>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Caps>',`GstCaps*',`($3)->gobj()')
 _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`GstCaps*', `($3)->gobj()')
 _CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`GstCaps*', `const_cast<$2>(($3)->gobj())')
 _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`const GstCaps*', `($3)->gobj()')
@@ -172,6 +173,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`($3)->gobj(
 
 #Basic General Conversions
 _CONVERSION(`gint64&',`gint64*',`&($3)')
+_CONVERSION(`guint*',`guint&',`*($3)')
 _CONVERSION(`const guint&',`guint',`$3')
 _CONVERSION(`const guint32&',`guint32',`($3)')
 
