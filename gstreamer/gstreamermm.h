@@ -59,6 +59,7 @@
 #include <gstreamermm/baseaudiosink.h>
 #include <gstreamermm/baseaudiosrc.h>
 #include <gstreamermm/cddabasesrc.h>
+#include <gstreamermm/ringbuffer.h>
 
 // Base inteface includes
 #include <gstreamermm/colorbalance.h>

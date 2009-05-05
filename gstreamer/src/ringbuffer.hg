@@ -1,0 +1,210 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008-2009 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/audio/gstringbuffer.h>
+#include <gstreamermm/object.h>
+#include <gstreamermm/format.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class Caps;
+
+_WRAP_ENUM(RingBufferSegState, GstRingBufferSegState)
+_WRAP_ENUM(RingBufferState, GstRingBufferState)
+_WRAP_ENUM(BufferFormat, GstBufferFormat)
+_WRAP_ENUM(BufferFormatType, GstBufferFormatType)
+
+/** The structure containing the format specification of a Gst::RingBuffer.
+ *@see Gst::RingBuffer::acquire().
+ */
+class RingBufferSpec
+{
+  _CLASS_GENERIC(RingBufferSpec, GstRingBufferSpec)
+public:
+  /** Copy the Gst::RingBufferSpec to a C object GstRingBufferSpec.  The C
+   * object should be freed when no longer needed.  A gobj() method is not
+   * implemented because there is no underlying C object to a
+   * Gst::RingBufferSpec.
+   */
+  GstRingBufferSpec* gobj_copy();
+
+  /** The caps that generated the Spec. */
+  Glib::RefPtr<Gst::Caps> caps;
+
+  /** The sample type.
+   */
+  Gst::BufferFormatType type;
+
+  /** The sample format.
+   */
+  Gst::BufferFormat format;
+
+  /** The sample sign.
+   */
+  bool          sign;
+
+  /** The endianness of the samples.
+   */
+  bool          bigend;
+
+  /** The width of the samples.
+   */
+  int           width;
+
+  /** The depth of the samples.
+   */
+  int           depth;
+
+  /** The samplerate.
+   */
+  int           rate;
+
+  /** The number of channels.
+   */
+  int           channels;
+
+  /** The latency in microseconds.
+   */
+  guint64       latency_time;
+
+  /**  The total buffer size in microseconds.
+   */
+  guint64       buffer_time;
+
+  /** The size of one segment in bytes.
+   */
+  int           segsize;
+
+  /** The total number of segments.
+   */
+  int           segtotal;
+
+  /** Number of bytes of one sample.
+  */
+  int           bytes_per_sample;
+
+  /** Bytes representing one sample of silence.
+  */
+  guint8        silence_sample[32];
+
+  /** Number of segments queued in the lower level device, defaults to
+   * segtotal.
+   */
+  int           seglatency;
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+protected:
+  friend class RingBuffer;
+  void set_fields(GstRingBufferSpec& spec);
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+};
+
+/** Gst::RingBuffer — Base class for audio ringbuffer implementations.
+ * This object is the base class for audio ringbuffers used by the base audio
+ * source and sink classes.
+ *
+ * The ringbuffer abstracts a circular buffer of data. One reader and one
+ * writer can operate on the data from different threads in a lockfree manner.
+ * The base class is sufficiently flexible to be used as an abstraction for DMA
+ * based ringbuffers as well as a pure software implementations.
+ *
+ * Last reviewed on 2006-02-02 (0.10.4).
+ * @ingroup GstBaseClasses
+ */
+class RingBuffer : public Gst::Object 
+{
+  _CLASS_GOBJECT(RingBuffer, GstRingBuffer, GST_RING_BUFFER, Gst::Object, GstObject)
+  _CUSTOM_DTOR()
+
+public:
+  /** For example,
+   * bool on_fill(const Glib::RefPtr<Gst::RingBuffer>& rbuf, guint8* data,
+   * guint len);.
+   * This slot is set with set_fill_slot() and is called to fill the memory at
+   * data with len bytes of samples.
+   */
+  typedef sigc::slot<void, guint8*, guint> SlotFill;
+
+  //TODO: _MEMBER_GET(cond, cond, Glib::Cond, GCond*)
+
+  /** Sets the given fill slot on the buffer. The slot will be called every
+   * time a segment has been written to a device.
+   *
+   * MT safe.
+   *
+   * @param slot The fill slot to set.
+   */
+  void set_fill_slot(const SlotFill& slot);
+
+  /** Allocate the resources for the ringbuffer. This function fills in the
+   * data pointer of the ring buffer with a valid Gst::Buffer to which samples
+   * can be written.
+   *
+   * @param spec The specs of the buffer.
+   *
+   * @return true if the device could be acquired, false on error. MT safe. 
+   */
+  bool acquire(Gst::RingBufferSpec& spec);
+
+  _WRAP_METHOD(bool release(), gst_ring_buffer_release)
+  _WRAP_METHOD(bool is_acquired() const, gst_ring_buffer_is_acquired)
+  _WRAP_METHOD(bool activate(bool active), gst_ring_buffer_activate)
+  _WRAP_METHOD(bool is_active() const, gst_ring_buffer_is_active)
+  _WRAP_METHOD(bool start(), gst_ring_buffer_start)
+  _WRAP_METHOD(bool pause(), gst_ring_buffer_pause)
+  _WRAP_METHOD(bool stop(), gst_ring_buffer_stop)
+  _WRAP_METHOD(guint get_delay() const, gst_ring_buffer_delay)
+  _WRAP_METHOD(guint64 get_samples_done() const, gst_ring_buffer_samples_done)
+  _WRAP_METHOD(void set_sample(guint64 sample), gst_ring_buffer_set_sample)
+  _WRAP_METHOD(guint commit(guint64 sample, guchar* data, guint len), gst_ring_buffer_commit)
+  _WRAP_METHOD(guint commit(guint64& sample, guchar* data, int in_samples, int out_samples, int& accum), gst_ring_buffer_commit_full)
+  _WRAP_METHOD(bool convert(Gst::Format src_fmt, gint64 src_val, Gst::Format dest_fmt, gint64& dest_val) const, gst_ring_buffer_convert)
+  _WRAP_METHOD(bool prepare_read(int& segment, guint8*& readptr, int& len), gst_ring_buffer_prepare_read)
+  _WRAP_METHOD(guint read(guint64 sample, guchar* data, guint len), gst_ring_buffer_read)
+  _WRAP_METHOD(void clear(int segment), gst_ring_buffer_clear)
+  _WRAP_METHOD(void clear_all(), gst_ring_buffer_clear_all)
+  _WRAP_METHOD(void advance(guint advance), gst_ring_buffer_advance)
+  _WRAP_METHOD(bool close_device(), gst_ring_buffer_close_device)
+  _WRAP_METHOD(bool open_device(), gst_ring_buffer_open_device)
+  _WRAP_METHOD(bool device_is_open() const, gst_ring_buffer_device_is_open)
+  _WRAP_METHOD(void set_may_start(bool allowed), gst_ring_buffer_may_start)
+
+  /** Parse caps into a Gst::RingBufferSpec.
+   *
+   * @param spec A Gst::RingBufferSpec.
+   * @param caps the Gst::Caps to parse.
+   * @return true if the caps could be parsed.
+   */
+  static bool parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::Caps>& caps);
+
+  _WRAP_METHOD(void set_flushing(bool flushing), gst_ring_buffer_set_flushing)
+
+  //TODO: Wrap vfuncs.
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+private:
+  SlotFill* slot;
+  bool _slot_set(bool mark_set = false) const;
+#endif
+};
+
+} // namespace Gst

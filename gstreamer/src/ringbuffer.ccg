@@ -1,0 +1,133 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008-2009 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/audio/audio-enumtypes.h>
+#include <gstreamermm/caps.h>
+#include <string.h>
+_PINCLUDE(gstreamermm/private/object_p.h)
+
+static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer* rbuf, guint8* data, guint len, gpointer user_data)
+{
+  Gst::RingBuffer::SlotFill* the_slot = static_cast<Gst::RingBuffer::SlotFill*>(user_data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*the_slot)(data, len);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+namespace Gst
+{
+
+void RingBufferSpec::set_fields(GstRingBufferSpec& spec)
+{
+  type = (Gst::BufferFormatType)(spec.type);
+  format = (Gst::BufferFormat)(spec.format);
+  sign = spec.sign;
+  bigend = spec.bigend;
+  width = spec.width;
+  depth = spec.depth;
+  rate = spec.rate;
+  channels = spec.channels;
+  latency_time = spec.latency_time;
+  buffer_time = spec.buffer_time;
+  segsize = spec.segsize;
+  segtotal = spec.segtotal;
+  bytes_per_sample = spec.bytes_per_sample;
+  seglatency = spec.seglatency;
+
+  memcpy(silence_sample, spec.silence_sample, sizeof(silence_sample));
+}
+
+void RingBuffer::set_fill_slot(const SlotFill& slot)
+{
+  if (_slot_set())
+    delete this->slot;
+
+  this->slot = new SlotFill(slot);
+  _slot_set(true);
+
+  gst_ring_buffer_set_callback(gobj(), &RingBuffer_Fill_gstreamermm_callback,
+    this->slot);
+}
+
+bool RingBuffer::_slot_set(bool mark_set) const
+{
+  static bool slot_set = false;
+
+  if (mark_set)
+    slot_set = true;
+
+  return slot_set;
+}
+
+bool RingBuffer::acquire(Gst::RingBufferSpec& spec)
+{
+  GstRingBufferSpec gst_spec =
+  {
+    spec.caps->gobj(), (GstBufferFormatType)(spec.type),
+    (GstBufferFormat)(spec.format), spec.sign, spec.bigend, spec.width,
+    spec.depth, spec.rate, spec.channels, spec.latency_time, spec.buffer_time,
+    spec.segsize, spec.segtotal, spec.bytes_per_sample, {0,},
+    spec.seglatency
+  };
+
+  memcpy(gst_spec.silence_sample, spec.silence_sample,
+    sizeof(gst_spec.silence_sample));
+
+  gboolean const result = gst_ring_buffer_acquire(gobj(), &gst_spec);
+  spec.set_fields(gst_spec);
+  return result;
+}
+
+bool RingBuffer::parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::Caps>& caps)
+{
+  GstRingBufferSpec gst_spec =
+  {
+    spec.caps->gobj(), (GstBufferFormatType)(spec.type),
+    (GstBufferFormat)(spec.format), spec.sign, spec.bigend, spec.width,
+    spec.depth, spec.rate, spec.channels, spec.latency_time, spec.buffer_time,
+    spec.segsize, spec.segtotal, spec.bytes_per_sample, {0,},
+    spec.seglatency
+  };
+
+  memcpy(gst_spec.silence_sample, spec.silence_sample,
+    sizeof(gst_spec.silence_sample));
+
+  gboolean const result = gst_ring_buffer_parse_caps(&gst_spec, caps->gobj());
+  spec.set_fields(gst_spec);
+  return result;
+}
+
+RingBuffer::~RingBuffer()
+{
+    // Delete task's slot upon destruction
+  if (_slot_set())
+    delete slot;
+}
+
+} // namespace Gst
