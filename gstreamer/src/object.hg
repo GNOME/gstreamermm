@@ -98,7 +98,12 @@ public:
   _WRAP_METHOD(void restore(xmlpp::Node* self), gst_object_restore_thyself)
   _WRAP_METHOD(Glib::ustring get_path_string(), gst_object_get_path_string)
 
-  //TODO: Is this useful? (Note that the .def needs to be fixed by hand): _WRAP_SIGNAL(void deep_notify(Glib::RefPtr<Object> prop_object, GParamSpec* prop), "deep-notify")
+#m4 _CONVERSION(`GstObject*', `const Glib::RefPtr<Object>&', `Glib::wrap($3, true)')
+  /** The deep notify signal is used to be notified of property changes. It is
+   * typically attached to the toplevel bin to receive notifications from all
+   * the elements contained in that bin.
+   */
+  _WRAP_SIGNAL(void deep_notify(const Glib::RefPtr<Object>& prop_object, GParamSpec* prop), "deep-notify")
 
   /** Trigered whenever a new object is saved to XML. You can connect to this
    * signal to insert custom XML tags into the core XML.

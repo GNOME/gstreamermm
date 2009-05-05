@@ -315,7 +315,7 @@
   (when "first")
   (parameters
     '("GstObject*" "p0")
-    '("GParam" "p1")
+    '("GParamSpec*" "p1")
   )
 )
 
@@ -2378,6 +2378,15 @@
   (construct-only #f)
 )
 
+(define-property alloc-pad
+  (of-object "GstTee")
+  (prop-type "GParamObject")
+  (docs "The pad used for gst_pad_alloc_buffer")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstTypeFindElement
 
 (define-signal have-type
@@ -3407,6 +3416,46 @@
 )
 
 ;; From GstMixer
+
+(define-signal record-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal mute-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal volume-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gpointer" "p1")
+  )
+)
+
+(define-signal option-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerOptions*" "p0")
+    '("const-gchar*" "p1")
+  )
+)
 
 ;; From GstMixerTrack
 
@@ -5732,6 +5781,24 @@
   (construct-only #f)
 )
 
+(define-property handle-read
+  (of-object "GstMultiFdSink")
+  (prop-type "GParamBoolean")
+  (docs "Handle client reads and discard the data")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property resend-streamheader
+  (of-object "GstMultiFdSink")
+  (prop-type "GParamBoolean")
+  (docs "Resend the streamheader if it changes in the caps")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstOggDemux
 
 (define-property name
@@ -6236,6 +6303,15 @@
   (of-object "GstPlayBin2")
   (prop-type "GParamObject")
   (docs "the visualization element to use (NULL = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property text-sink
+  (of-object "GstPlayBin2")
+  (prop-type "GParamObject")
+  (docs "the text output element to use (NULL = default textoverlay)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -6829,6 +6905,24 @@
   (of-object "GstTCPServerSink")
   (prop-type "GParamInt")
   (docs "Quality of Service, differentiated services code point (-1 default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property handle-read
+  (of-object "GstTCPServerSink")
+  (prop-type "GParamBoolean")
+  (docs "Handle client reads and discard the data")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property resend-streamheader
+  (of-object "GstTCPServerSink")
+  (prop-type "GParamBoolean")
+  (docs "Resend the streamheader if it changes in the caps")
   (readable #t)
   (writable #t)
   (construct-only #f)
