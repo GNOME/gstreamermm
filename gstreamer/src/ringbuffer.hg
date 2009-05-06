@@ -18,6 +18,7 @@
  */
 
 #include <gst/audio/gstringbuffer.h>
+#include <gstreamermm/caps.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/format.h>
 
@@ -25,8 +26,6 @@ _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
-
-class Caps;
 
 _WRAP_ENUM(RingBufferSegState, GstRingBufferSegState)
 _WRAP_ENUM(RingBufferState, GstRingBufferState)
@@ -40,12 +39,8 @@ class RingBufferSpec
 {
   _CLASS_GENERIC(RingBufferSpec, GstRingBufferSpec)
 public:
-  /** Copy the Gst::RingBufferSpec to a C object GstRingBufferSpec.  The C
-   * object should be freed when no longer needed.  A gobj() method is not
-   * implemented because there is no underlying C object to a
-   * Gst::RingBufferSpec.
-   */
-  GstRingBufferSpec* gobj_copy();
+  /// Construct a Gst::RingBufferSpec from a GstRingBufferSpec.
+  RingBufferSpec(GstRingBufferSpec* castitem);
 
   /** The caps that generated the Spec. */
   Glib::RefPtr<Gst::Caps> caps;
@@ -112,9 +107,8 @@ public:
   int           seglatency;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-protected:
-  friend class RingBuffer;
-  void set_fields(GstRingBufferSpec& spec);
+  void copy_fields_from(GstRingBufferSpec& spec);
+  void copy_fields_to(GstRingBufferSpec& spec);
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 

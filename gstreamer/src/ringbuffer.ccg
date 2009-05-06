@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/audio/audio-enumtypes.h>
-#include <gstreamermm/caps.h>
 #include <string.h>
+#include <gst/audio/audio-enumtypes.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
 static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer* rbuf, guint8* data, guint len, gpointer user_data)
@@ -43,7 +42,18 @@ static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer* rbuf, guint8* da
 namespace Gst
 {
 
-void RingBufferSpec::set_fields(GstRingBufferSpec& spec)
+RingBufferSpec::RingBufferSpec(GstRingBufferSpec* castitem)
+{
+  if (castitem)
+    copy_fields_from(*castitem);
+  else
+  {
+    GstRingBufferSpec empty;
+    copy_fields_from(empty);
+  }
+}
+
+void RingBufferSpec::copy_fields_from(GstRingBufferSpec& spec)
 {
   type = (Gst::BufferFormatType)(spec.type);
   format = (Gst::BufferFormat)(spec.format);
@@ -61,6 +71,26 @@ void RingBufferSpec::set_fields(GstRingBufferSpec& spec)
   seglatency = spec.seglatency;
 
   memcpy(silence_sample, spec.silence_sample, sizeof(silence_sample));
+}
+
+void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec)
+{
+  spec.type = (GstBufferFormatType)(type);
+  spec.format = (GstBufferFormat)(format);
+  spec.sign = sign;
+  spec.bigend = bigend;
+  spec.width = width;
+  spec.depth = depth;
+  spec.rate = rate;
+  spec.channels = channels;
+  spec.latency_time = latency_time;
+  spec.buffer_time = buffer_time;
+  spec.segsize = segsize;
+  spec.segtotal = segtotal;
+  spec.bytes_per_sample = bytes_per_sample;
+  spec.seglatency = seglatency;
+
+  memcpy(spec.silence_sample, silence_sample, sizeof(spec.silence_sample));
 }
 
 void RingBuffer::set_fill_slot(const SlotFill& slot)
@@ -87,39 +117,19 @@ bool RingBuffer::_slot_set(bool mark_set) const
 
 bool RingBuffer::acquire(Gst::RingBufferSpec& spec)
 {
-  GstRingBufferSpec gst_spec =
-  {
-    spec.caps->gobj(), (GstBufferFormatType)(spec.type),
-    (GstBufferFormat)(spec.format), spec.sign, spec.bigend, spec.width,
-    spec.depth, spec.rate, spec.channels, spec.latency_time, spec.buffer_time,
-    spec.segsize, spec.segtotal, spec.bytes_per_sample, {0,},
-    spec.seglatency
-  };
-
-  memcpy(gst_spec.silence_sample, spec.silence_sample,
-    sizeof(gst_spec.silence_sample));
-
+  GstRingBufferSpec gst_spec;
+  spec.copy_fields_to(gst_spec);
   gboolean const result = gst_ring_buffer_acquire(gobj(), &gst_spec);
-  spec.set_fields(gst_spec);
+  spec.copy_fields_from(gst_spec);
   return result;
 }
 
 bool RingBuffer::parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::Caps>& caps)
 {
-  GstRingBufferSpec gst_spec =
-  {
-    spec.caps->gobj(), (GstBufferFormatType)(spec.type),
-    (GstBufferFormat)(spec.format), spec.sign, spec.bigend, spec.width,
-    spec.depth, spec.rate, spec.channels, spec.latency_time, spec.buffer_time,
-    spec.segsize, spec.segtotal, spec.bytes_per_sample, {0,},
-    spec.seglatency
-  };
-
-  memcpy(gst_spec.silence_sample, spec.silence_sample,
-    sizeof(gst_spec.silence_sample));
-
+  GstRingBufferSpec gst_spec;
+  spec.copy_fields_to(gst_spec);
   gboolean const result = gst_ring_buffer_parse_caps(&gst_spec, caps->gobj());
-  spec.set_fields(gst_spec);
+  spec.copy_fields_from(gst_spec);
   return result;
 }
 

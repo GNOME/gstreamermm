@@ -20,3 +20,75 @@
 #include <gst/audio/gstaudiofilter.h>
 
 _PINCLUDE(gstreamermm/private/basetransform_p.h)
+
+namespace Gst
+{
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+gboolean AudioFilter_Class::setup_vfunc_callback(GstAudioFilter* self, GstRingBufferSpec* format)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        Gst::RingBufferSpec spec(format);
+        // Call the virtual member method, which derived classes might override.
+        gboolean const result = static_cast<int>(obj->setup_vfunc(spec));
+        spec.copy_fields_to(*format);
+        return result;
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->setup)
+    return (*base->setup)(self, format);
+
+
+  typedef gboolean RType;
+  return RType();
+}
+bool Gst::AudioFilter::setup_vfunc(Gst::RingBufferSpec& format) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->setup)
+  {
+    GstRingBufferSpec gst_spec;
+    format.copy_fields_to(gst_spec);
+    bool const result = (*base->setup)(gobj(),&gst_spec);
+    format.copy_fields_from(gst_spec);
+    return result;
+  }
+
+  typedef bool RType;
+  return RType();
+}
+#endif //GLIBMM_VFUNCS_ENABLED
+
+} // namespace Gst
