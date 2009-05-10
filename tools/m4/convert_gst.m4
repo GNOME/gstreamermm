@@ -141,6 +141,7 @@ _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')
 
 #RingBuffer
 _CONVERSION(`GstRingBuffer*',`Glib::RefPtr<Gst::RingBuffer>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::RingBuffer>',`GstRingBuffer*',`Glib::unwrap($3)')
 
 #Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
