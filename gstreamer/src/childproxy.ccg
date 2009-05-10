@@ -20,6 +20,17 @@
 namespace Gst
 {
 
+bool ChildProxy::lookup(const Glib::RefPtr<Gst::Object>& object,
+  const Glib::ustring& name, Glib::RefPtr<Gst::Object>& target,
+  GParamSpec*& pspec)
+{
+  GstObject* gst_object = 0;
+  bool const result = gst_child_proxy_lookup(object->gobj(), name.c_str(),
+    &gst_object, & pspec);
+  target = Glib::wrap(gst_object);
+  return result;
+}
+
 Glib::RefPtr<Gst::ChildProxy> ChildProxy::get_proxy_property(const Glib::ustring& name, Glib::ValueBase& value)
 {
   gst_child_proxy_get_property(GST_OBJECT(gobj()), name.c_str(), value.gobj());
