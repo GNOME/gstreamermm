@@ -38,7 +38,7 @@ int link_elements_with_filter (const Glib::RefPtr<Gst::Element> e1,
   structure2.set_field("framerate", Gst::Fraction(25, 1));
   caps->append_structure(structure2);
 
-  return e1->link_filtered(e2, caps);
+  return e1->link(e2, caps);
 }
 
 void test_simple()

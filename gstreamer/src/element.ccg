@@ -70,6 +70,31 @@ Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
     throw std::runtime_error("failed to link: " + get_name() + "->" + dest->get_name());
 }
 
+Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest, const Glib::RefPtr<Gst::Caps>& filter)
+{
+  if (!dest)
+    throw std::runtime_error("Failed to link null element.");
+    
+  const bool result = gst_element_link_filtered(gobj(), dest->gobj(), filter->gobj());
+
+  if(result)
+    return dest;
+  else
+    throw std::runtime_error("failed to link: " + get_name() + "->" + dest->get_name());
+}
+
+void Element::post_message(int code, int line, MessageType type,
+  const Glib::QueryQuark& domain, const Glib::ustring& text,
+  const Glib::ustring& debug, const Glib::ustring& file,
+  const Glib::ustring& function)
+{
+  gchar* gst_text = g_strdup(text.c_str());
+  gchar* gst_debug = g_strdup(debug.c_str());
+
+  gst_element_message_full(gobj(), (GstMessageType)(type), domain, code,
+    gst_text, gst_debug, file.c_str(), function.c_str(), line);
+}
+
 bool Element::query_position(Format& format) const
 {
   return gst_element_query_position(const_cast<GstElement*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);

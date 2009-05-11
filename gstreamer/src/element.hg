@@ -21,6 +21,7 @@
 #include <gstreamermm/object.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/enums.h>
+#include <gstreamermm/error.h>
 #include <gstreamermm/event.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/query.h>
@@ -145,14 +146,16 @@ protected:
 
 public:
   /** Links this source element to the @dest element.
-   * The link must be from source to destination - the other direction will not be tried. 
-   * The function looks for existing pads that aren't linked yet. It will request new pads
-   * if necessary. Such pads need to be released manually when unlinking. 
-   * If multiple links are possible, only one is established.
+   * The link must be from source to destination - the other direction will not
+   * be tried.  The function looks for existing pads that aren't linked yet. It
+   * will request new pads if necessary. Such pads need to be released manually
+   * when unlinking.  If multiple links are possible, only one is established.
    *
-   * Make sure you have added your elements to a bin or pipeline with Gst::Bin::add() before 
-   * trying to link them.
+   * Make sure you have added your elements to a bin or pipeline with
+   * Gst::Bin::add() before *trying to link them.
    *
+   * @param dest the Gst::Element containing the destination pad.
+   * @return the destination element for further linking if desired.
    * @throws std::runtime_error If the elements could not be linked.
    */
   Glib::RefPtr<Gst::Element> link(const Glib::RefPtr<Gst::Element>& dest);
@@ -162,8 +165,8 @@ public:
   _WRAP_METHOD(void create_all_pads(), gst_element_create_all_pads)
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Pad> create_compatible_pad(const Glib::RefPtr<const Gst::Pad>& pad, const Glib::RefPtr<const Gst::Caps>& caps), gst_element_get_compatible_pad)
-  _WRAP_METHOD(Glib::RefPtr<Gst::PadTemplate> get_compatible_pad_template(const Glib::RefPtr<const Gst::PadTemplate>& padtemplate), gst_element_get_compatible_pad_template, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const Gst::PadTemplate> get_compatible_pad_template(const Glib::RefPtr<const Gst::PadTemplate>& padtemplate) const, gst_element_get_compatible_pad_template, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Gst::PadTemplate> get_compatible_pad_template(const Glib::RefPtr<const Gst::PadTemplate>& compattempl), gst_element_get_compatible_pad_template, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::PadTemplate> get_compatible_pad_template(const Glib::RefPtr<const Gst::PadTemplate>& compattempl) const, gst_element_get_compatible_pad_template, refreturn, constversion)
 
   //TODO: The documentation says "The pad should be released with gst_element_release_request_pad().", which is odd. murrayc
   _WRAP_METHOD(Glib::RefPtr<Gst::Pad> get_request_pad(const Glib::ustring& name), gst_element_get_request_pad)
@@ -181,19 +184,36 @@ public:
   _WRAP_METHOD(Gst::Iterator<const Gst::Pad> iterate_sink_pads() const, gst_element_iterate_sink_pads)
   _WRAP_METHOD(Gst::Iterator<Gst::Pad> iterate_src_pads(), gst_element_iterate_src_pads)
   _WRAP_METHOD(Gst::Iterator<const Gst::Pad> iterate_src_pads() const, gst_element_iterate_src_pads)
-  _WRAP_METHOD(void unlink(const Glib::RefPtr<Gst::Element>& other_element), gst_element_unlink)
+  _WRAP_METHOD(void unlink(const Glib::RefPtr<Gst::Element>& dest), gst_element_unlink)
   _IGNORE(gst_element_unlink_many)
 
-  //TODO: Make this like link()?
-  _WRAP_METHOD(bool link_pads(const Glib::ustring& padname, const Glib::RefPtr<Gst::Element>& other_element, const Glib::ustring& others_padname), gst_element_link_pads)
+  //This is not like link() because link() was written to return the
+  //destination element as a convenience for further linking to compensate for
+  //C API's convenience function gst_element_link_many().
+  _WRAP_METHOD(bool link_pads(const Glib::ustring& srcpadname, const Glib::RefPtr<Gst::Element>& dest, const Glib::ustring& destpadname), gst_element_link_pads)
 
-  _WRAP_METHOD(void unlink_pads(const Glib::ustring& padname, const Glib::RefPtr<Gst::Element>& other_element, const Glib::ustring& other_padname), gst_element_unlink_pads)
+  _WRAP_METHOD(void unlink_pads(const Glib::ustring& srcpadname, const Glib::RefPtr<Gst::Element>& dest, const Glib::ustring& destpadname), gst_element_unlink_pads)
 
-  //TODO: Make this like link()?
-  _WRAP_METHOD(bool link_pads_filtered(const Glib::ustring& padname, const Glib::RefPtr<Gst::Element>& other_element, const Glib::ustring& others_padname, const Glib::RefPtr<Gst::Caps>& filter), gst_element_link_pads_filtered)
+  //This is not like link() because link() was written to return the
+  //destination element as a convenience for further linking to compensate for
+  //C API's convenience function gst_element_link_many().
+  _WRAP_METHOD(bool link_pads(const Glib::ustring& srcpadname, const Glib::RefPtr<Gst::Element>& dest, const Glib::ustring& destpadname, const Glib::RefPtr<Gst::Caps>& filter), gst_element_link_pads_filtered)
 
-  //TODO: Make this like link()?
-  _WRAP_METHOD(bool link_filtered(const Glib::RefPtr<Gst::Element>& other_element, const Glib::RefPtr<Gst::Caps>& filter), gst_element_link_filtered)
+  /** Links @a src to @a dest using the given caps as filtercaps. The link must
+   * be from source to destination; the other direction will not be tried. The
+   * function looks for existing pads that aren't linked yet. It will request
+   * new pads if necessary. If multiple links are possible, only one is
+   * established.
+   *
+   * Make sure you have added your elements to a bin or pipeline with
+   * Gst::Bin::add() before trying to link them.
+   *
+   * @param dest The Gst::Element containing the destination pad.
+   * @param filter The Gst::Caps to filter the link.
+   * @return the destination element for further linking if desired.
+   * @throws std::runtime_error If the elements could not be linked.
+   */
+  Glib::RefPtr<Gst::Element> link(const Glib::RefPtr<Gst::Element>& dest, const Glib::RefPtr<Gst::Caps>& filter);
 
   _WRAP_METHOD(void set_base_time(ClockTime time), gst_element_set_base_time)
   _WRAP_METHOD(ClockTime get_base_time() const, gst_element_get_base_time)
@@ -222,23 +242,46 @@ public:
   _WRAP_METHOD(bool set_locked_state(gboolean locked_state), gst_element_set_locked_state)
   _WRAP_METHOD(bool is_locked_state() const, gst_element_is_locked_state)
   _WRAP_METHOD(void abort_state(), gst_element_abort_state)
-  _WRAP_METHOD(StateChangeReturn continue_state(StateChangeReturn prestate_value), gst_element_continue_state)
+  _WRAP_METHOD(StateChangeReturn continue_state(StateChangeReturn ret), gst_element_continue_state)
   _WRAP_METHOD(void lost_state(), gst_element_lost_state)
   _WRAP_METHOD(bool sync_state_with_parent(), gst_element_sync_state_with_parent)
   _WRAP_METHOD(StateChangeReturn change_state(StateChange transition), gst_element_change_state)
   _WRAP_METHOD(void found_tags(Gst::TagList& list), gst_element_found_tags)
   _WRAP_METHOD(void found_tags_for_pad(const Glib::RefPtr<Gst::Pad>& pad, Gst::TagList& list), gst_element_found_tags_for_pad)
 
-  //TODO: Change the parameter order?
-  _WRAP_METHOD(void post_message(MessageType message_type, const Glib::QueryQuark& domain, int code, const Glib::ustring& message, const Glib::ustring& debug, const Glib::ustring& filename, const Glib::ustring& function_name, int line_number), gst_element_message_full)
+  /** Post an error, warning or info message on the bus from inside an element.
+   *
+   * type must be of Gst::MESSAGE_ERROR, Gst::MESSAGE_WARNING or
+   * Gst::MESSAGE_INFO.
+   *
+   * MT safe.
+   *
+   * @param code The GError code belonging to the domain.
+   * @param line The source code line where the error was generated.
+   * @param type The GstMessageType.
+   * @param domain The GStreamer GError domain this message belongs to.
+   * @param text A text string to be used as a replacement for the default
+   * message connected to code.
+   * @param debug A debug message to be used as a replacement for the default
+   * debugging information.
+   * @param file The source code file where the error was generated.
+   * @param function The source code function where the error was generated.
+   */
+  void post_message(int code, int line, MessageType type = Gst::MESSAGE_INFO,
+    const Glib::QueryQuark& domain = get_core_error_quark(),
+    const Glib::ustring& text = Glib::ustring(),
+    const Glib::ustring& debug = Glib::ustring(),
+    const Glib::ustring& file = Glib::ustring(),
+    const Glib::ustring& function = Glib::ustring());
+
   _WRAP_METHOD(bool post_message(const Glib::RefPtr<Gst::Message>& message), gst_element_post_message)
 
 #m4 _CONVERSION(`const GstQueryType*',`Glib::ArrayHandle<QueryType>',`Glib::ArrayHandle<QueryType>((QueryType*)($3), Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ArrayHandle<QueryType> get_query_types() const, gst_element_get_query_types)
 
   _WRAP_METHOD(bool query(const Glib::RefPtr<Gst::Query>& query) const, gst_element_query)
-  _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_element_query_convert)
-  _WRAP_METHOD(bool query_position(Format& format, gint64& position) const, gst_element_query_position)
+  _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_val, Format& dest_format, gint64& dest_val) const, gst_element_query_convert)
+  _WRAP_METHOD(bool query_position(Format& format, gint64& cur) const, gst_element_query_position)
 
   /** Queries an element for the stream position.
    *
@@ -258,8 +301,8 @@ public:
    */
   bool query_duration(Format& format) const;
 
-  _WRAP_METHOD(bool seek(Format format, SeekFlags flags, gint64 position), gst_element_seek_simple)
-  _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType current_type, gint64 current_position, SeekType stop_type, gint64 stop_position), gst_element_seek)
+  _WRAP_METHOD(bool seek(Format format, SeekFlags seek_flags, gint64 seek_pos), gst_element_seek_simple)
+  _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType cur_type, gint64 cur, SeekType stop_type, gint64 stop), gst_element_seek)
 
   /** Sends an event to an element. If the element doesn't implement an event
    * handler, the event will be pushed on a random linked sink pad for upstream
