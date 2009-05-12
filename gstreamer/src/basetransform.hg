@@ -53,11 +53,9 @@ const Glib::ustring BASE_TRANSFORM_SRC_NAME = GST_BASE_TRANSFORM_SRC_NAME;
  *           inspect it, in which case the element should have a
  *           transform_ip_vfunc() function. If there is no transform_ip_vfunc()
  *           function in passthrough mode, the buffer is pushed intact.
- *           - TODO: Investigate the following and fix for C++ (file bug if
- *           necessary): On the GstBaseTransformClass is the
- *           passthrough_on_same_caps variable which will automatically
- *           set/unset passthrough based on whether the element negotiates the
- *           same caps on both pads.
+ *           - On the GstBaseTransformClass is the passthrough_on_same_caps
+ *           variable which will automatically set/unset passthrough based on
+ *           whether the element negotiates the same caps on both pads.
  *           - passthrough_on_same_caps on an element that doesn't implement a
  *           transform_caps_vfunc() function is useful for elements that only
  *           inspect data (such as level).
@@ -223,9 +221,6 @@ public:
    * in-place.
    */
   _WRAP_VFUNC(FlowReturn transform_ip(const Glib::RefPtr<Gst::Buffer>& buf), "transform_ip")
-
-  //TODO: Should "passthrough_on_same_caps" variable in GstBaseTransformClass
-  //be wrapped?
 
 #ifdef GLIBMM_VFUNCS_ENABLED
   /** Optional. Subclasses can override this to do their own allocation of
