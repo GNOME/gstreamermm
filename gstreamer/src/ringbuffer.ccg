@@ -55,6 +55,8 @@ RingBufferSpec::RingBufferSpec(const GstRingBufferSpec* castitem)
 
 void RingBufferSpec::copy_fields_from(const GstRingBufferSpec& spec)
 {
+  caps = Glib::wrap(spec.caps);
+
   type = (Gst::BufferFormatType)(spec.type);
   format = (Gst::BufferFormat)(spec.format);
   sign = spec.sign;
@@ -75,6 +77,9 @@ void RingBufferSpec::copy_fields_from(const GstRingBufferSpec& spec)
 
 void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec) const
 {
+  if (caps)
+    spec.caps = caps->gobj();
+
   spec.type = (GstBufferFormatType)(type);
   spec.format = (GstBufferFormat)(format);
   spec.sign = sign;
