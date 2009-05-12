@@ -19,6 +19,7 @@
  
 #include <gst/audio/gstaudiosrc.h>
 #include <gstreamermm/baseaudiosrc.h>
+#include <gstreamermm/ringbuffer.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -31,10 +32,10 @@ namespace Gst
  *
  * - open_vfunc() - Open the device.
  * - prepare_vfunc()  - Configure the device with the specified format.
- * - write_vfunc() - Write samples to the device.
- * - reset_vfunc() - Unblock writes and flush the device.
- * - delay_vfunc() - Get the number of samples written but not yet played by
- * the device.
+ * - read_vfunc() - Read samples from the device.
+ * - reset_vfunc() - Unblock reads and flush the device.
+ * - get_delay_vfunc() - Get the number of samples written but not yet played
+ * by the device.
  * - unprepare_vfunc() - Undo operations done by prepare.
  * - close_vfunc() - Close the device.
  *
@@ -51,7 +52,48 @@ class AudioSrc : public Gst::BaseAudioSrc
   _CLASS_GOBJECT(AudioSrc, GstAudioSrc, GST_AUDIO_SRC, Gst::BaseAudioSrc, GstBaseAudioSrc)
 
 public:
-  //TODO: Wrap vfuncs.
+  /** vfunc to open the device.
+   */
+  _WRAP_VFUNC(bool open(), "open")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** vfunc to configure device with spec.
+   */
+  virtual bool prepare_vfunc(Gst::RingBufferSpec& spec);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** vfunc to undo the configuration.
+   */
+  _WRAP_VFUNC(bool unprepare(), "unprepare")
+
+  /** vfunc to close the device.
+   */
+  _WRAP_VFUNC(bool close(), "close")
+
+ #ifdef GLIBMM_VFUNCS_ENABLED
+  /** vfunc to read samples to the audio device.
+   */
+  virtual guint read_vfunc(const void* data, guint length);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** vfunc to get the number of samples queued in the device.
+   */
+  _WRAP_VFUNC(guint get_delay(), "delay")
+
+  /** vfunc to unblock a read to the device and reset.
+   */
+  _WRAP_VFUNC(void reset(), "reset")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->prepare = &prepare_vfunc_callback;
+  klass->read = &read_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static gboolean prepare_vfunc_callback(GstAudioSrc* self, GstRingBufferSpec* spec);
+  static guint read_vfunc_callback(GstAudioSrc* self, gpointer data, guint length);
+  _POP()
+#m4end
 };
 
 } // namespace Gst

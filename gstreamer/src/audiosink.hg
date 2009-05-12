@@ -19,6 +19,7 @@
 
 #include <gst/audio/gstaudiosink.h>
 #include <gstreamermm/baseaudiosink.h>
+#include <gstreamermm/ringbuffer.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -33,8 +34,8 @@ namespace Gst
  * - prepare_vfunc()  - Configure the device with the specified format.
  * - write_vfunc() - Write samples to the device.
  * - reset_vfunc() - Unblock writes and flush the device.
- * - delay_vfunc() - Get the number of samples written but not yet played by
- * the device.
+ * - get_delay_vfunc() - Get the number of samples written but not yet played
+ * by the device.
  * - unprepare_vfunc() - Undo operations done by prepare.
  * - close_vfunc() - Close the device.
  *
@@ -51,7 +52,51 @@ class AudioSink : public Gst::BaseAudioSink
   _CLASS_GOBJECT(AudioSink, GstAudioSink, GST_AUDIO_SINK, Gst::BaseAudioSink, GstBaseAudioSink)
 
 public:
-  //TODO: Wrap vfuncs.
+  /** vfunc to open the device. No configuration needs to be done at this
+   * point. This function is also used to check if the device is available.
+   */
+  _WRAP_VFUNC(bool open(), "open")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** vfunc to prepare the device to operate with the specified parameters.
+   */
+  virtual bool prepare_vfunc(Gst::RingBufferSpec& spec);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** vfunc to undo operations done in prepare.
+   */
+  _WRAP_VFUNC(bool unprepare(), "unprepare")
+
+  /** vfunc to close the device.
+   */
+  _WRAP_VFUNC(bool close(), "close")
+
+ #ifdef GLIBMM_VFUNCS_ENABLED
+  /** vfunc to write data to the device.
+   */
+  virtual guint write_vfunc(const void* data, guint length);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** vfunc to return how many samples are still in the device. This is used to
+   * drive the synchronisation.
+   */
+  _WRAP_VFUNC(guint get_delay(), "delay")
+
+  /** vfunc to return as quickly as possible from a write and flush any pending
+   * samples from the device.
+   */
+  _WRAP_VFUNC(void reset(), "reset")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->prepare = &prepare_vfunc_callback;
+  klass->write = &write_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static gboolean prepare_vfunc_callback(GstAudioSink* self, GstRingBufferSpec* spec);
+  static guint write_vfunc_callback(GstAudioSink* self, gpointer data, guint length);
+  _POP()
+#m4end
 };
 
 } // namespace Gst
