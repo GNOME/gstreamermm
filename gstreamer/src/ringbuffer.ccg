@@ -42,7 +42,7 @@ static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer* rbuf, guint8* da
 namespace Gst
 {
 
-RingBufferSpec::RingBufferSpec(GstRingBufferSpec* castitem)
+RingBufferSpec::RingBufferSpec(const GstRingBufferSpec* castitem)
 {
   if (castitem)
     copy_fields_from(*castitem);
@@ -53,7 +53,7 @@ RingBufferSpec::RingBufferSpec(GstRingBufferSpec* castitem)
   }
 }
 
-void RingBufferSpec::copy_fields_from(GstRingBufferSpec& spec)
+void RingBufferSpec::copy_fields_from(const GstRingBufferSpec& spec)
 {
   type = (Gst::BufferFormatType)(spec.type);
   format = (Gst::BufferFormat)(spec.format);
@@ -73,7 +73,7 @@ void RingBufferSpec::copy_fields_from(GstRingBufferSpec& spec)
   memcpy(silence_sample, spec.silence_sample, sizeof(silence_sample));
 }
 
-void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec)
+void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec) const
 {
   spec.type = (GstBufferFormatType)(type);
   spec.format = (GstBufferFormat)(format);
@@ -115,13 +115,11 @@ bool RingBuffer::_slot_set(bool mark_set) const
   return slot_set;
 }
 
-bool RingBuffer::acquire(Gst::RingBufferSpec& spec)
+bool RingBuffer::acquire(const Gst::RingBufferSpec& spec)
 {
   GstRingBufferSpec gst_spec;
   spec.copy_fields_to(gst_spec);
-  gboolean const result = gst_ring_buffer_acquire(gobj(), &gst_spec);
-  spec.copy_fields_from(gst_spec);
-  return result;
+  return gst_ring_buffer_acquire(gobj(), &gst_spec);
 }
 
 bool RingBuffer::parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::Caps>& caps)

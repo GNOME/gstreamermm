@@ -40,7 +40,7 @@ class RingBufferSpec
   _CLASS_GENERIC(RingBufferSpec, GstRingBufferSpec)
 public:
   /// Construct a Gst::RingBufferSpec from a GstRingBufferSpec.
-  RingBufferSpec(GstRingBufferSpec* castitem);
+  RingBufferSpec(const GstRingBufferSpec* castitem);
 
   /** The caps that generated the Spec. */
   Glib::RefPtr<Gst::Caps> caps;
@@ -107,8 +107,8 @@ public:
   int           seglatency;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  void copy_fields_from(GstRingBufferSpec& spec);
-  void copy_fields_to(GstRingBufferSpec& spec);
+  void copy_fields_from(const GstRingBufferSpec& spec);
+  void copy_fields_to(GstRingBufferSpec& spec) const;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 
@@ -157,7 +157,7 @@ public:
    *
    * @return true if the device could be acquired, false on error. MT safe. 
    */
-  bool acquire(Gst::RingBufferSpec& spec);
+  bool acquire(const Gst::RingBufferSpec& spec);
 
   _WRAP_METHOD(bool release(), gst_ring_buffer_release)
   _WRAP_METHOD(bool is_acquired() const, gst_ring_buffer_is_acquired)
