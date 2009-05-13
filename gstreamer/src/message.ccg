@@ -18,6 +18,8 @@
  */
 
 #include <gst/gstenumtypes.h>
+#include <gst/interfaces/mixer.h>
+#include <gstreamermm/mixer.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/taglist.h>
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
@@ -606,72 +608,101 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   if(!message)
     return result;
 
-  switch (GST_MESSAGE_TYPE(message))
+  if (gst_mixer_message_get_type(message) == GST_MIXER_MESSAGE_INVALID)
   {
-    case GST_MESSAGE_EOS:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageEos(message) );
-      break;
-    case GST_MESSAGE_ERROR:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageError(message) );
-      break;
-    case GST_MESSAGE_WARNING:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageWarning(message) );
-      break;
-    case GST_MESSAGE_INFO:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageInfo(message) );
-      break;
-    case GST_MESSAGE_TAG:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageTag(message) );
-      break;
-    case GST_MESSAGE_BUFFERING:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageBuffering(message) );
-      break;
-    case GST_MESSAGE_STATE_CHANGED:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageStateChanged(message) );
-      break;
-    case GST_MESSAGE_STATE_DIRTY:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageStateDirty(message) );
-      break;
-    case GST_MESSAGE_CLOCK_PROVIDE:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageClockProvide(message) );
-      break;
-    case GST_MESSAGE_CLOCK_LOST:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageClockLost(message) );
-      break;
-    case GST_MESSAGE_NEW_CLOCK:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageNewClock(message) );
-      break;
-    case GST_MESSAGE_APPLICATION:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageApplication(message) );
-      break;
-    case GST_MESSAGE_ELEMENT:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageElement(message) );
-      break;
-    case GST_MESSAGE_SEGMENT_START:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageSegmentStart(message) );
-      break;
-    case GST_MESSAGE_SEGMENT_DONE:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageSegmentDone(message) );
-      break;
-    case GST_MESSAGE_DURATION:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageDuration(message) );
-      break;
-    case GST_MESSAGE_LATENCY:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageLatency(message) );
-      break;
-    case GST_MESSAGE_ASYNC_START:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncStart(message) );
-      break;
-    case GST_MESSAGE_ASYNC_DONE:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncDone(message) );
-      break;
-    case GST_MESSAGE_UNKNOWN:
-    case GST_MESSAGE_ANY:
-      result = Gst::wrap(message, false);
-      break;
-      /* The rest of the message types are custom ones */
-    default:
-      result = Glib::RefPtr<Gst::Message>( new Gst::MessageCustom(message) );
+    switch (GST_MESSAGE_TYPE(message))
+    {
+      case GST_MESSAGE_EOS:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageEos(message) );
+        break;
+      case GST_MESSAGE_ERROR:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageError(message) );
+        break;
+      case GST_MESSAGE_WARNING:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageWarning(message) );
+        break;
+      case GST_MESSAGE_INFO:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageInfo(message) );
+        break;
+      case GST_MESSAGE_TAG:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageTag(message) );
+        break;
+      case GST_MESSAGE_BUFFERING:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageBuffering(message) );
+        break;
+      case GST_MESSAGE_STATE_CHANGED:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageStateChanged(message) );
+        break;
+      case GST_MESSAGE_STATE_DIRTY:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageStateDirty(message) );
+        break;
+      case GST_MESSAGE_CLOCK_PROVIDE:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageClockProvide(message) );
+        break;
+      case GST_MESSAGE_CLOCK_LOST:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageClockLost(message) );
+        break;
+      case GST_MESSAGE_NEW_CLOCK:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageNewClock(message) );
+        break;
+      case GST_MESSAGE_APPLICATION:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageApplication(message) );
+        break;
+      case GST_MESSAGE_ELEMENT:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageElement(message) );
+        break;
+      case GST_MESSAGE_SEGMENT_START:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageSegmentStart(message) );
+        break;
+      case GST_MESSAGE_SEGMENT_DONE:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageSegmentDone(message) );
+        break;
+      case GST_MESSAGE_DURATION:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageDuration(message) );
+        break;
+      case GST_MESSAGE_LATENCY:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageLatency(message) );
+        break;
+      case GST_MESSAGE_ASYNC_START:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncStart(message) );
+        break;
+      case GST_MESSAGE_ASYNC_DONE:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncDone(message) );
+        break;
+      case GST_MESSAGE_UNKNOWN:
+      case GST_MESSAGE_ANY:
+        result = Gst::wrap(message, false);
+        break;
+        /* The rest of the message types are custom ones */
+      default:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageCustom(message) );
+    }
+  }
+  else
+  {
+    switch (GST_MESSAGE_TYPE(message))
+    {
+      case GST_MIXER_MESSAGE_MUTE_TOGGLED:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageMixerMuteToggled(message) );
+        break;
+      case GST_MIXER_MESSAGE_RECORD_TOGGLED:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageMixerRecordToggled(message) );
+        break;
+      case GST_MIXER_MESSAGE_VOLUME_CHANGED:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageMixerVolumeChanged(message) );
+        break;
+      case GST_MIXER_MESSAGE_OPTION_CHANGED:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageMixerOptionChanged(message) );
+        break;
+      case GST_MIXER_MESSAGE_OPTIONS_LIST_CHANGED:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageMixerOptionsListChanged(message) );
+        break;
+      case GST_MIXER_MESSAGE_MIXER_CHANGED:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageMixerChanged(message) );
+        break;
+      default:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageCustom(message) );
+    }
   }
 
   if(result && take_copy)

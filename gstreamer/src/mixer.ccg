@@ -22,6 +22,177 @@
 namespace Gst
 {
 
+MessageMixerMuteToggled::MessageMixerMuteToggled(GstMessage* castitem)
+: Message(castitem)
+{}
+
+void MessageMixerMuteToggled::parse(Glib::RefPtr<Gst::MixerTrack>& track,
+  bool& mute) const
+{
+  GstMixerTrack* gst_track = 0;
+  gboolean gst_mute = 0;
+
+  gst_mixer_message_parse_mute_toggled(const_cast<GstMessage*>(gobj()),
+    &gst_track, &gst_mute);
+  track = Glib::wrap(gst_track);
+  mute = gst_mute;
+}
+
+Glib::RefPtr<Gst::MixerTrack> MessageMixerMuteToggled::parse()
+{
+  GstMixerTrack* gst_track = 0;
+  gst_mixer_message_parse_mute_toggled(gobj(), &gst_track, 0);
+  return Glib::wrap(gst_track);
+}
+
+Glib::RefPtr<const Gst::MixerTrack> MessageMixerMuteToggled::parse() const
+{
+  return parse();
+}
+
+bool MessageMixerMuteToggled::parse_mute() const
+{
+  gboolean gst_mute = 0;
+  gst_mixer_message_parse_mute_toggled(const_cast<GstMessage*>(gobj()),
+    0, &gst_mute);
+  return gst_mute;
+}
+
+MessageMixerRecordToggled::MessageMixerRecordToggled(GstMessage* castitem)
+: Message(castitem)
+{}
+
+void MessageMixerRecordToggled::parse(Glib::RefPtr<Gst::MixerTrack>& track,
+  bool& record) const
+{
+  GstMixerTrack* gst_track = 0;
+  gboolean gst_record = 0;
+
+  gst_mixer_message_parse_record_toggled(const_cast<GstMessage*>(gobj()),
+    &gst_track, &gst_record);
+  track = Glib::wrap(gst_track);
+  record = gst_record;
+}
+
+Glib::RefPtr<Gst::MixerTrack> MessageMixerRecordToggled::parse()
+{
+  GstMixerTrack* gst_track = 0;
+  gst_mixer_message_parse_record_toggled(gobj(), &gst_track, 0);
+  return Glib::wrap(gst_track);
+}
+
+Glib::RefPtr<const Gst::MixerTrack> MessageMixerRecordToggled::parse() const
+{
+  return parse();
+}
+
+bool MessageMixerRecordToggled::parse_record() const
+{
+  gboolean gst_record = 0;
+  gst_mixer_message_parse_record_toggled(const_cast<GstMessage*>(gobj()),
+    0, &gst_record);
+  return gst_record;
+}
+
+MessageMixerVolumeChanged::MessageMixerVolumeChanged(GstMessage* castitem)
+: Message(castitem)
+{}
+
+//TODO: Include when = operator is available for Glib::ArrayHandle<>.
+/*
+void MessageMixerVolumeChanged::parse(Glib::RefPtr<Gst::MixerTrack>& track,
+  Glib::ArrayHandle<int>& volumes) const
+{
+  GstMixerTrack* gst_track = 0;
+  gint* gst_volumes = 0;
+  gint gst_num_channels = 0;
+
+  gst_mixer_message_parse_volume_changed(const_cast<GstMessage*>(gobj()),
+    &gst_track, &gst_volumes, &gst_num_channels);
+  track = Glib::wrap(gst_track);
+  //TODO: = is private for Glib::ArrayHandle:
+  //track = Glib::ArrayHandle<int>(gst_volumes, gst_num_channels, Glib::OWNERSHIP_DEEP);
+}
+*/
+
+Glib::RefPtr<Gst::MixerTrack> MessageMixerVolumeChanged::parse()
+{
+  GstMixerTrack* gst_track = 0;
+  gst_mixer_message_parse_volume_changed(gobj(), &gst_track, 0, 0);
+  return Glib::wrap(gst_track);
+}
+
+Glib::RefPtr<const Gst::MixerTrack> MessageMixerVolumeChanged::parse() const
+{
+  return parse();
+}
+
+Glib::ArrayHandle<int> MessageMixerVolumeChanged::parse_volumes() const
+{
+  gint* gst_volumes = 0;
+  gint gst_num_channels = 0;
+  gst_mixer_message_parse_volume_changed(const_cast<GstMessage*>(gobj()),
+    0, &gst_volumes, &gst_num_channels);
+  return Glib::ArrayHandle<int>(gst_volumes, gst_num_channels, Glib::OWNERSHIP_DEEP);
+}
+
+MessageMixerOptionChanged::MessageMixerOptionChanged(GstMessage* castitem)
+: Message(castitem)
+{}
+
+void MessageMixerOptionChanged::parse(Glib::RefPtr<Gst::MixerOptions>& options,
+  Glib::ustring& value) const
+{
+  GstMixerOptions* gst_options = 0;
+  const gchar* gst_value = 0;
+
+  gst_mixer_message_parse_option_changed(const_cast<GstMessage*>(gobj()),
+    &gst_options, &gst_value);
+  options = Glib::wrap(gst_options);
+  value = gst_value;
+}
+
+Glib::RefPtr<Gst::MixerOptions> MessageMixerOptionChanged::parse()
+{
+  GstMixerOptions* gst_options = 0;
+  gst_mixer_message_parse_option_changed(gobj(), &gst_options, 0);
+  return Glib::wrap(gst_options);
+}
+
+Glib::RefPtr<const Gst::MixerOptions> MessageMixerOptionChanged::parse() const
+{
+  return parse();
+}
+
+Glib::ustring MessageMixerOptionChanged::parse_value() const
+{
+  const gchar* gst_value = 0;
+  gst_mixer_message_parse_option_changed(const_cast<GstMessage*>(gobj()),
+    0, &gst_value);
+  return gst_value;
+}
+
+MessageMixerOptionsListChanged::MessageMixerOptionsListChanged(GstMessage* castitem)
+: Message(castitem)
+{}
+
+Glib::RefPtr<Gst::MixerOptions> MessageMixerOptionsListChanged::parse()
+{
+  GstMixerOptions* gst_options = 0;
+  gst_mixer_message_parse_options_list_changed(gobj(), &gst_options);
+  return Glib::wrap(gst_options);
+}
+
+Glib::RefPtr<const Gst::MixerOptions> MessageMixerOptionsListChanged::parse()
+  const
+{
+  return parse();
+}
+
+MessageMixerChanged::MessageMixerChanged(GstMessage* castitem)
+: Message(castitem)
+{}
+
 Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<const Gst::MixerTrack>& track) const
 {
   const guint32 num_channels = track->get_num_channels();

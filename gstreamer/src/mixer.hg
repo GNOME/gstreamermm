@@ -20,6 +20,7 @@
 #include <gst/interfaces/mixer.h>
 #include <gst/interfaces/mixeroptions.h>
 #include <gstreamermm/mixertrack.h>
+#include <gstreamermm/message.h>
 #include <glibmm/interface.h>
 
 _DEFS(gstreamermm,gst)
@@ -71,15 +72,7 @@ public:
   _WRAP_METHOD(Glib::ustring get_option(const Glib::RefPtr<const Gst::MixerOptions>& opts) const, gst_mixer_get_option)
   _WRAP_METHOD(void mixer_changed(), gst_mixer_mixer_changed)
   _WRAP_METHOD(Gst::MixerFlags get_mixer_flags() const, gst_mixer_get_mixer_flags)
-
-  /* TODO:
-  _WRAP_METHOD(satic Gst::MixerMessageType message_get_type(GstMessage *message), gst_mixer_message_get_type)
-  _WRAP_METHOD(static void message_parse_mute_toggled(GstMessage *message, GstMixerTrack **track, gboolean *mute), gst_mixer_message_parse_mute_toggled)
-  _WRAP_METHOD(static void message_parse_option_changed(GstMessage *message, GstMixerOptions **options, const gchar **value), gst_mixer_message_parse_option_changed)
-  _WRAP_METHOD(static void message_parse_record_toggled(GstMessage *message, GstMixerTrack **track, gboolean *record), gst_mixer_message_parse_record_toggled)
-  _WRAP_METHOD(static void message_parse_volume_changed(GstMessage *message, GstMixerTrack **track, gint **volumes, gint *num_channels), gst_mixer_message_parse_volume_changed)
-  _WRAP_METHOD(static void message_parse_options_list_changed(GstMessage *message, GstMixerOptions **options), gst_mixer_message_parse_options_list_changed)
-  */
+  _WRAP_METHOD(static Gst::MixerMessageType get_message_type(const Glib::RefPtr<Gst::Message>& message), gst_mixer_message_get_type)
 
   //TODO: Wrap signals if necessary.
 
@@ -115,6 +108,233 @@ protected:
   static const GList* list_tracks_vfunc_callback(GstMixer* self);
   _POP()
 #m4end
+};
+
+/** A mute-toggled Gst::Mixer message.
+ */
+class MessageMixerMuteToggled : public Message
+{
+public:
+  explicit MessageMixerMuteToggled(GstMessage* castitem);
+
+  /** Extracts the contents of a mute-toggled bus message. Reads the
+   * Gst::MixerTrack that has changed, and the new value of the mute flag.
+   * 
+   * The Gst::MixerTrack remains valid until the message is freed.
+   *
+   * @param track Reference to hold a Gst::MixerTrack object.
+   * @param mute A reference to hold the bool new value.
+   *
+   * Since 0.10.14.
+   */
+  void parse(Glib::RefPtr<Gst::MixerTrack>& track, bool& mute) const;
+  _IGNORE(gst_mixer_message_parse_mute_toggled)
+
+  /** Extracts the contents of a mute-toggled bus message. Reads the
+   * Gst::MixerTrack that has changed, and the new value of the mute flag.
+   * 
+   * The Gst::MixerTrack remains valid until the message is freed.
+   *
+   * @return the Gst::MixerTrack object.
+   */
+  Glib::RefPtr<Gst::MixerTrack> parse();
+
+  /** Extracts the contents of a mute-toggled bus message. Reads the
+   * Gst::MixerTrack that has changed, and the new value of the mute flag.
+   * 
+   * The Gst::MixerTrack remains valid until the message is freed.
+   *
+   * @return the Gst::MixerTrack object.
+   */
+  Glib::RefPtr<const Gst::MixerTrack> parse() const;
+
+  /** Extracts the contents of a mute-toggled bus message. Reads the new value
+   * of the mute flag.
+   * 
+   * @return The bool new value.
+   */
+
+  bool parse_mute() const;
+};
+
+/** A record-toggled Gst::Mixer message.
+ */
+class MessageMixerRecordToggled : public Message
+{
+public:
+  explicit MessageMixerRecordToggled(GstMessage* castitem);
+
+  /** Extracts the contents of a record-toggled bus message. Reads the
+   * Gst::MixerTrack that has changed, and the new value of the recording flag.
+   *
+   * The Gst::MixerTrack remains valid until the message is freed.
+   *
+   * @param track A reference to hold the Gst::MixerTrack object.
+   * @param record A reference to hold the bool value.
+   *
+   * Since 0.10.14.
+   */
+  void parse(Glib::RefPtr<Gst::MixerTrack>& track, bool& record) const;
+  _IGNORE(gst_mixer_message_parse_record_toggled)
+
+  /** Extracts the contents of a record-toggled bus message. Reads the
+   * Gst::MixerTrack that has changed.
+   *
+   * The Gst::MixerTrack remains valid until the message is freed.
+   *
+   * @return A reference to the Gst::MixerTrack object.
+   */
+  Glib::RefPtr<Gst::MixerTrack> parse();
+
+  /** Extracts the contents of a record-toggled bus message. Reads the
+   * Gst::MixerTrack that has changed.
+   *
+   * The Gst::MixerTrack remains valid until the message is freed.
+   *
+   * @return A reference to the Gst::MixerTrack object.
+   */
+  Glib::RefPtr<const Gst::MixerTrack> parse() const;
+
+  /** Extracts the contents of a record-toggled bus message. Reads the new
+   * value of the recording flag.
+   *
+   * @return The bool value.
+   */
+  bool parse_record() const;
+};
+
+/** A volume-changed Gst::Mixer message.
+ */
+class MessageMixerVolumeChanged : public Message
+{
+public:
+  explicit MessageMixerVolumeChanged(GstMessage* castitem);
+
+  //TODO: Include when = operator is available for Glib::ArrayHandle<>.
+  ///** Parses a volume-changed notification message and extracts the track
+   //* object it refers to, as well as an array of volumes and the size of the
+   //* volumes array.
+   //*
+   //* The track object remains valid until the message is freed.
+   //*
+   //* @param track A reference to hold a Gst::MixerTrack object.
+   //* @param volumes A reference to receive an array of int values.
+   //*
+   //* Since 0.10.14.
+   //*/
+  //void parse(Glib::RefPtr<Gst::MixerTrack>& track,
+    //Glib::ArrayHandle<int> volumes);
+  _IGNORE(gst_mixer_message_parse_volume_changed)
+
+  /** Parses a volume-changed notification message and extracts the track
+   * object it refers to.
+   *
+   * The track object remains valid until the message is freed.
+   *
+   * @return a Gst::MixerTrack object.
+   */
+  Glib::RefPtr<Gst::MixerTrack> parse();
+
+  /** Parses a volume-changed notification message and extracts the track
+   * object it refers to.
+   *
+   * The track object remains valid until the message is freed.
+   *
+   * @return a Gst::MixerTrack object.
+   */
+  Glib::RefPtr<const Gst::MixerTrack> parse() const;
+
+  /** Parses a volume-changed notification message and extracts the array of
+   * volumes.
+   *
+   * @return The array of volume int values.
+   */
+  Glib::ArrayHandle<int> parse_volumes() const;
+};
+
+/** An option-changed Gst::Mixer message.
+ */
+class MessageMixerOptionChanged : public Message
+{
+public:
+  explicit MessageMixerOptionChanged(GstMessage* castitem);
+
+  /** Extracts the Gst::MixerOptions and new value from a option-changed bus
+   * notification message.
+   *
+   * The Gst::MixerOptions remain valid until the message is freed.
+   *
+   * @param options A reference to hold the Gst::MixerOptions object.
+   * @param value Location to store the new options value.
+   *
+   * Since 0.10.14.
+   */
+  void parse(Glib::RefPtr<Gst::MixerOptions>& options,
+    Glib::ustring& value) const;
+  _IGNORE(gst_mixer_message_parse_option_changed)
+
+  /** Extracts the Gst::MixerOptions from a option-changed bus notification
+   * message.
+   *
+   * The Gst::MixerOptions remain valid until the message is freed.
+   *
+   * @return The Gst::MixerOptions object.
+   */
+  Glib::RefPtr<Gst::MixerOptions> parse();
+
+  /** Extracts the Gst::MixerOptions from a option-changed bus notification
+   * message.
+   *
+   * The Gst::MixerOptions remain valid until the message is freed.
+   *
+   * @return The Gst::MixerOptions object.
+   */
+  Glib::RefPtr<const Gst::MixerOptions> parse() const;
+
+  /** Extracts the new value of the option from a option-changed bus
+   * notification message.
+   *
+   * @return The new options value.
+   */
+  Glib::ustring parse_value() const;
+};
+
+/** An option-list-changed Gst::Mixer message, osted when the list of available
+ * options for a GstMixerOptions object has changed (Since: 0.10.18).
+ */
+class MessageMixerOptionsListChanged : public Message
+{
+public:
+  explicit MessageMixerOptionsListChanged(GstMessage* castitem);
+
+  /** Extracts the Gst::MixerOptions whose value list has changed from an
+   * options-list-changed bus notification message.
+   *
+   * The options object returned remains valid until the message is freed.
+   *
+   * Since 0.10.18.
+   */
+  Glib::RefPtr<Gst::MixerOptions> parse();
+  _IGNORE(gst_mixer_message_parse_options_list_changed)
+
+  /** Extracts the Gst::MixerOptions whose value list has changed from an
+   * options-list-changed bus notification message.
+   *
+   * The options object returned remains valid until the message is freed.
+   *
+   * Since 0.10.18.
+   */
+  Glib::RefPtr<const Gst::MixerOptions> parse() const;
+};
+
+/** A mixer-changed Gst::Mixer message, posted when the list of available mixer
+ * tracks has changed. The application should re-build its interface in this
+ * case (Since: 0.10.18).
+ */
+class MessageMixerChanged : public Message
+{
+public:
+  explicit MessageMixerChanged(GstMessage* castitem);
 };
 
 } // namespace Gst
