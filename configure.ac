@@ -180,15 +180,14 @@ AC_ARG_VAR([GST_INSPECT], [Variable to store gst-inspect executable])
 AC_SUBST(GST_INSPECT)
 
 # To add a plugin, add the plugin definition, in the form of
-# "plugin=CppClassName" (where "plugin" is the plugin name as recognized by
-# gst-inspect and "CppClassName" is the desired name of the C++ class),  to the
-# space separated list of definitions below.  Also add the target .hg file name
-# (which must be the same as "CppClassName" all in lowercase with a .hg
-# extension) to the files_all_plugin_hg variable in the
-# gstreamer/src/Makefile_list_of_hg.am_fragment file.  Finally, be sure to
-# include an #undef in the form of "#undef GSTREAMERMM_PLUGIN_name" in the
-# gstreamermmconfig.h.in file (where "name" is the plugin name all in caps).
-
+# "plugin=CppClassName"  to the space-separated list of definitions below.  
+# (@here "plugin" is the plugin name as recognized by
+# gst-inspect and "CppClassName" is the desired name of the C++ class.)
+#
+# Also add the target .hg file name to the files_all_plugin_hg variable in the
+# gstreamer/src/Makefile_list_of_hg.am_fragment file.  
+# (That must be the same as "CppClassName" - all in lowercase with a .hg
+# extension)
 GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
 fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc filesink=FileSink \
 identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee \
@@ -212,14 +211,15 @@ vorbistag=VorbisTag ximagesink=XImageSink xvimagesink=XvImageSink"
 # wrapped in glibmm first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink,
 # TheoraParse, UriDecodeBin.
 
+# TODO: Document this:
 for plugin_def in $GSTREAMERMM_ALL_PLUGIN_DEFS; do
   plugin_name=[`echo $plugin_def | cut -d'=' -f 1`]
   cppname=[`echo $plugin_def | cut -d'=' -f 2`]
   GSTREAMERMM_ALL_PLUGIN_CPPNAMES="$GSTREAMERMM_ALL_PLUGIN_CPPNAMES $cppname"
   GSTREAMERMM_ALL_PLUGIN_HG=["$GSTREAMERMM_ALL_PLUGIN_HG `echo $cppname | tr [:upper:] [:lower:]`.hg"]
   if test -z "`$GST_INSPECT $plugin_name | $HEAD -n 1 | $GREP "No such element"`"; then
-    plugin_define=["GSTREAMERMM_PLUGIN_`echo $plugin_name | tr [:lower:] [:upper:]`"]
-    AC_DEFINE_UNQUOTED($plugin_define)
+    GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES $cppname"
+    GSTREAMERMM_EXISTING_PLUGIN_HG=["$GSTREAMERMM_EXISTING_PLUGIN_HG `echo $cppname | tr [:upper:] [:lower:]`.hg"]
   fi
 done
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_DEFS)
