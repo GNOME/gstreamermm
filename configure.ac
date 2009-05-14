@@ -216,17 +216,15 @@ for plugin_def in $GSTREAMERMM_ALL_PLUGIN_DEFS; do
   plugin_name=[`echo $plugin_def | cut -d'=' -f 1`]
   cppname=[`echo $plugin_def | cut -d'=' -f 2`]
   GSTREAMERMM_ALL_PLUGIN_CPPNAMES="$GSTREAMERMM_ALL_PLUGIN_CPPNAMES $cppname"
+  GSTREAMERMM_ALL_PLUGIN_HG=["$GSTREAMERMM_ALL_PLUGIN_HG `echo $cppname | tr [:upper:] [:lower:]`.hg"]
   if test -z "`$GST_INSPECT $plugin_name | $HEAD -n 1 | $GREP "No such element"`"; then
     plugin_define=["GSTREAMERMM_PLUGIN_`echo $plugin_name | tr [:lower:] [:upper:]`"]
     AC_DEFINE_UNQUOTED($plugin_define)
-    GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES $cppname"
-    GSTREAMERMM_EXISTING_PLUGIN_HG=["$GSTREAMERMM_EXISTING_PLUGIN_HG `echo $cppname | tr [:upper:] [:lower:]`.hg"]
   fi
 done
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_DEFS)
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_CPPNAMES)
-AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES)
-AC_SUBST(GSTREAMERMM_EXISTING_PLUGIN_HG)
+AC_SUBST(GSTREAMERMM_ALL_PLUGIN_HG)
 
 #########################################################################
 #  C++ checks
