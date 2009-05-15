@@ -19,11 +19,13 @@
 #include <gtkmm/main.h>
 #include <gstreamermm/init.h>
 #include <gstreamermm/element.h>
-#include <gstreamermm/elementfactory.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
+
+// Plug-ins:
 #include <gstreamermm/playbin2.h>
 #include <gstreamermm/ximagesink.h>
+
 #include <iostream>
 #include "player_window.h"
 

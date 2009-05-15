@@ -74,4 +74,66 @@
 #include <gstreamermm/videoorientation.h>
 #include <gstreamermm/xoverlay.h>
 
+// Plug-in core includes
+#include <gstreamermm/capsfilter.h>
+#include <gstreamermm/fakesrc.h>
+#include <gstreamermm/fakesink.h>
+#include <gstreamermm/fdsink.h>
+#include <gstreamermm/fdsrc.h>
+#include <gstreamermm/filesrc.h>
+#include <gstreamermm/filesink.h>
+#include <gstreamermm/identity.h>
+#include <gstreamermm/multiqueue.h>
+#include <gstreamermm/queue.h>
+#include <gstreamermm/tee.h>
+#include <gstreamermm/typefindelement.h>
+
+// Plug-in base includes
+#include <gstreamermm/adder.h>
+#include <gstreamermm/alsamixer.h>
+#include <gstreamermm/alsasink.h>
+#include <gstreamermm/alsasrc.h>
+#include <gstreamermm/audioconvert.h>
+#include <gstreamermm/audioresample.h>
+#include <gstreamermm/audiotestsrc.h>
+#include <gstreamermm/cdparanoiasrc.h>
+#include <gstreamermm/clockoverlay.h>
+#include <gstreamermm/decodebin.h>
+//TODO: #include <gstreamermm/decodebin2.h>
+#include <gstreamermm/ffmpegcolorspace.h>
+#include <gstreamermm/gdpdepay.h>
+#include <gstreamermm/gdppay.h>
+#include <gstreamermm/giosink.h>
+#include <gstreamermm/giosrc.h>
+#include <gstreamermm/giostreamsink.h>
+#include <gstreamermm/giostreamsrc.h>
+//TODO (Add plug-in first): #include <gstreamermm/gnomevfssink.h>
+//TODO (Add plug-in first): #include <gstreamermm/gnomevfssrc.h>
+//TODO (Add plug-in first): #include <gstreamermm/multifdsink.h>
+#include <gstreamermm/oggdemux.h>
+#include <gstreamermm/oggmux.h>
+//TODO (Add plug-in first): #include <gstreamermm/playbin.h>
+#include <gstreamermm/playbin2.h>
+#include <gstreamermm/tcpclientsrc.h>
+#include <gstreamermm/tcpclientsink.h>
+#include <gstreamermm/tcpserversrc.h>
+//TODO (Add plug-in first): #include <gstreamermm/tcpserversink.h>
+#include <gstreamermm/textoverlay.h>
+#include <gstreamermm/textrender.h>
+#include <gstreamermm/theoradec.h>
+#include <gstreamermm/theoraenc.h>
+//TODO (Add plug-in first): #include <gstreamermm/theoraparse.h>
+#include <gstreamermm/timeoverlay.h>
+//TODO (Add plug-in first): #include <gstreamermm/uridecodebin.h>
+#include <gstreamermm/videorate.h>
+#include <gstreamermm/videoscale.h>
+#include <gstreamermm/videotestsrc.h>
+#include <gstreamermm/volume.h>
+#include <gstreamermm/vorbisdec.h>
+#include <gstreamermm/vorbisenc.h>
+#include <gstreamermm/vorbisparse.h>
+#include <gstreamermm/vorbistag.h>
+#include <gstreamermm/ximagesink.h>
+#include <gstreamermm/xvimagesink.h>
+
 #endif // _GSTREAMERMM_H

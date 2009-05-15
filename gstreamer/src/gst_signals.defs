@@ -3417,46 +3417,6 @@
 
 ;; From GstMixer
 
-(define-signal record-toggled
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gboolean" "p1")
-  )
-)
-
-(define-signal mute-toggled
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gboolean" "p1")
-  )
-)
-
-(define-signal volume-changed
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gpointer" "p1")
-  )
-)
-
-(define-signal option-changed
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerOptions*" "p0")
-    '("const-gchar*" "p1")
-  )
-)
-
 ;; From GstMixerTrack
 
 (define-property label
@@ -5451,7 +5411,7 @@
   (when "last")
   (parameters
     '("gint" "p0")
-    '("gboolean" "p1")
+    '("GstSyncMethod" "p1")
     '("GstTCPUnitType" "p2")
     '("guint64" "p3")
     '("GstTCPUnitType" "p4")
@@ -6317,6 +6277,15 @@
   (construct-only #f)
 )
 
+(define-property subpic-sink
+  (of-object "GstPlayBin2")
+  (prop-type "GParamObject")
+  (docs "the subpicture output element to use (NULL = default dvdspu)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property volume
   (of-object "GstPlayBin2")
   (prop-type "GParamDouble")
@@ -7098,6 +7067,51 @@
   (of-object "GstTextRender")
   (prop-type "GParamString")
   (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property halignment
+  (of-object "GstTextRender")
+  (prop-type "GParamEnum")
+  (docs "Horizontal alignment of the text")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property valignment
+  (of-object "GstTextRender")
+  (prop-type "GParamEnum")
+  (docs "Vertical alignment of the text")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property line-alignment
+  (of-object "GstTextRender")
+  (prop-type "GParamEnum")
+  (docs "Alignment of text lines relative to each other.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property xpad
+  (of-object "GstTextRender")
+  (prop-type "GParamInt")
+  (docs "Horizontal paddding when using left/right alignment")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property ypad
+  (of-object "GstTextRender")
+  (prop-type "GParamInt")
+  (docs "Vertical padding when using top/bottom alignment")
   (readable #t)
   (writable #t)
   (construct-only #f)

@@ -508,13 +508,12 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
     std::cout << enumWrapStatements << std::endl;
 
   std::cout << "/** " << nmspace << "::" << cppTypeName << " - " << pluginName << " plugin." << std::endl;
-  std::cout << " * Please include <" << target << "/" <<
-    cppTypeName.lowercase() << ".h> to use.  Please note that, though\n"
-    " * using the underlying GObject is fine, using its C <B>type</B> is not\n"
-    " * guaranteed to be API stable across releases because it is not "
-    "guaranteed to\n * always remain the same.  Also, not all plug-ins are "
-    "available on all systems\n * and the ones that aren't available are not "
-    "included in the build." << std::endl;
+  std::cout << " * Please note that, though using the underlying GObject is "
+    "fine, using its C\n * <B>type</B> is not guaranteed to be API stable "
+    "across releases because it is\n * not guaranteed to always remain the "
+    "same.  Also, not all plug-ins are\n * available on all systems so care "
+    "must be taken that they exist before they\n * are used, otherwise there "
+    "will be errors and possibly a crash." << std::endl;
   std::cout << " *" << std::endl;
   std::cout << " * @ingroup " << nmspace << "Plugins" << std::endl;
   std::cout << " */" << std::endl;

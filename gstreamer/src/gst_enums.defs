@@ -377,7 +377,9 @@
     '("info" "GST_LEVEL_INFO" "3")
     '("debug" "GST_LEVEL_DEBUG" "4")
     '("log" "GST_LEVEL_LOG" "5")
-    '("count" "GST_LEVEL_COUNT" "6")
+    '("fixme" "GST_LEVEL_FIXME" "6")
+    '("memdump" "GST_LEVEL_MEMDUMP" "9")
+    '("count" "GST_LEVEL_COUNT" "10")
   )
 )
 
@@ -469,6 +471,20 @@
   (values
     '("link" "GST_STRUCTURE_CHANGE_TYPE_PAD_LINK" "0")
     '("unlink" "GST_STRUCTURE_CHANGE_TYPE_PAD_UNLINK" "1")
+  )
+)
+
+(define-enum-extended StreamStatusType
+  (in-module "Gst")
+  (c-name "GstStreamStatusType")
+  (values
+    '("create" "GST_STREAM_STATUS_TYPE_CREATE" "0")
+    '("enter" "GST_STREAM_STATUS_TYPE_ENTER" "1")
+    '("leave" "GST_STREAM_STATUS_TYPE_LEAVE" "2")
+    '("destroy" "GST_STREAM_STATUS_TYPE_DESTROY" "3")
+    '("start" "GST_STREAM_STATUS_TYPE_START" "8")
+    '("pause" "GST_STREAM_STATUS_TYPE_PAUSE" "9")
+    '("stop" "GST_STREAM_STATUS_TYPE_STOP" "10")
   )
 )
 
@@ -718,7 +734,8 @@
     '("stop-type" "GST_QUARK_STOP_TYPE" "49")
     '("latency" "GST_QUARK_LATENCY" "50")
     '("uri" "GST_QUARK_URI" "51")
-    '("max" "GST_QUARK_MAX" "52")
+    '("object" "GST_QUARK_OBJECT" "52")
+    '("max" "GST_QUARK_MAX" "53")
   )
 )
 
@@ -841,6 +858,18 @@
     '("unknown" "GST_URI_UNKNOWN" "0")
     '("sink" "GST_URI_SINK" "1")
     '("src" "GST_URI_SRC" "2")
+  )
+)
+
+;; From /usr/src/jhbuild-sources/gstreamer/gst/gstutils.h
+
+(define-enum-extended SearchMode
+  (in-module "Gst")
+  (c-name "GstSearchMode")
+  (values
+    '("exact" "GST_SEARCH_MODE_EXACT" "0")
+    '("before" "GST_SEARCH_MODE_BEFORE" "1")
+    '("after" "GST_SEARCH_MODE_AFTER" "2")
   )
 )
 
@@ -1236,6 +1265,65 @@
   )
 )
 
+;; From /usr/src/jhbuild-sources/gst-plugins-base/gst-libs/gst/interfaces/navigation.h
+
+(define-enum-extended NavigationCommand
+  (in-module "Gst")
+  (c-name "GstNavigationCommand")
+  (values
+    '("invalid" "GST_NAVIGATION_COMMAND_INVALID" "0")
+    '("menu1" "GST_NAVIGATION_COMMAND_MENU1" "1")
+    '("menu2" "GST_NAVIGATION_COMMAND_MENU2" "2")
+    '("menu3" "GST_NAVIGATION_COMMAND_MENU3" "3")
+    '("menu4" "GST_NAVIGATION_COMMAND_MENU4" "4")
+    '("menu5" "GST_NAVIGATION_COMMAND_MENU5" "5")
+    '("menu6" "GST_NAVIGATION_COMMAND_MENU6" "6")
+    '("menu7" "GST_NAVIGATION_COMMAND_MENU7" "7")
+    '("left" "GST_NAVIGATION_COMMAND_LEFT" "20")
+    '("right" "GST_NAVIGATION_COMMAND_RIGHT" "21")
+    '("up" "GST_NAVIGATION_COMMAND_UP" "22")
+    '("down" "GST_NAVIGATION_COMMAND_DOWN" "23")
+    '("activate" "GST_NAVIGATION_COMMAND_ACTIVATE" "24")
+    '("prev-angle" "GST_NAVIGATION_COMMAND_PREV_ANGLE" "30")
+    '("next-angle" "GST_NAVIGATION_COMMAND_NEXT_ANGLE" "31")
+  )
+)
+
+(define-enum-extended NavigationQueryType
+  (in-module "Gst")
+  (c-name "GstNavigationQueryType")
+  (values
+    '("invalid" "GST_NAVIGATION_QUERY_INVALID" "0")
+    '("commands" "GST_NAVIGATION_QUERY_COMMANDS" "1")
+    '("angles" "GST_NAVIGATION_QUERY_ANGLES" "2")
+  )
+)
+
+(define-enum-extended NavigationMessageType
+  (in-module "Gst")
+  (c-name "GstNavigationMessageType")
+  (values
+    '("invalid" "GST_NAVIGATION_MESSAGE_INVALID" "0")
+    '("mouse-over" "GST_NAVIGATION_MESSAGE_MOUSE_OVER" "1")
+    '("commands-changed" "GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED" "2")
+    '("angles-changed" "GST_NAVIGATION_MESSAGE_ANGLES_CHANGED" "3")
+  )
+)
+
+(define-enum-extended NavigationEventType
+  (in-module "Gst")
+  (c-name "GstNavigationEventType")
+  (values
+    '("invalid" "GST_NAVIGATION_EVENT_INVALID" "0")
+    '("key-press" "GST_NAVIGATION_EVENT_KEY_PRESS" "1")
+    '("key-release" "GST_NAVIGATION_EVENT_KEY_RELEASE" "2")
+    '("mouse-button-press" "GST_NAVIGATION_EVENT_MOUSE_BUTTON_PRESS" "3")
+    '("mouse-button-release" "GST_NAVIGATION_EVENT_MOUSE_BUTTON_RELEASE" "4")
+    '("mouse-move" "GST_NAVIGATION_EVENT_MOUSE_MOVE" "5")
+    '("command" "GST_NAVIGATION_EVENT_COMMAND" "6")
+  )
+)
+
 ;; From /usr/src/jhbuild-sources/gst-plugins-base/gst-libs/gst/interfaces/tunerchannel.h
 
 (define-flags-extended TunerChannelFlags
@@ -1273,6 +1361,21 @@
     '("sdes" "GST_RTCP_TYPE_SDES" "202")
     '("bye" "GST_RTCP_TYPE_BYE" "203")
     '("app" "GST_RTCP_TYPE_APP" "204")
+    '("rtpfb" "GST_RTCP_TYPE_RTPFB" "205")
+    '("psfb" "GST_RTCP_TYPE_PSFB" "206")
+  )
+)
+
+(define-enum-extended RTCPFBType
+  (in-module "Gst")
+  (c-name "GstRTCPFBType")
+  (values
+    '("fb-type-invalid" "GST_RTCP_FB_TYPE_INVALID" "0")
+    '("rtpfb-type-nack" "GST_RTCP_RTPFB_TYPE_NACK" "1")
+    '("psfb-type-pli" "GST_RTCP_PSFB_TYPE_PLI" "1")
+    '("psfb-type-sli" "GST_RTCP_PSFB_TYPE_SLI" "2")
+    '("psfb-type-rpsi" "GST_RTCP_PSFB_TYPE_RPSI" "3")
+    '("psfb-type-afb" "GST_RTCP_PSFB_TYPE_AFB" "15")
   )
 )
 
@@ -1349,7 +1452,9 @@
     '("enet" "GST_RTSP_ENET" "-12")
     '("enotip" "GST_RTSP_ENOTIP" "-13")
     '("etimeout" "GST_RTSP_ETIMEOUT" "-14")
-    '("elast" "GST_RTSP_ELAST" "-15")
+    '("etget" "GST_RTSP_ETGET" "-15")
+    '("etpost" "GST_RTSP_ETPOST" "-16")
+    '("elast" "GST_RTSP_ELAST" "-17")
   )
 )
 
@@ -1481,6 +1586,27 @@
     '("language" "GST_RTSP_HDR_LANGUAGE" "51")
     '("player-start-time" "GST_RTSP_HDR_PLAYER_START_TIME" "52")
     '("location" "GST_RTSP_HDR_LOCATION" "53")
+    '("etag" "GST_RTSP_HDR_ETAG" "54")
+    '("if-match" "GST_RTSP_HDR_IF_MATCH" "55")
+    '("accept-charset" "GST_RTSP_HDR_ACCEPT_CHARSET" "56")
+    '("supported" "GST_RTSP_HDR_SUPPORTED" "57")
+    '("vary" "GST_RTSP_HDR_VARY" "58")
+    '("x-accelerate-streaming" "GST_RTSP_HDR_X_ACCELERATE_STREAMING" "59")
+    '("x-accept-authent" "GST_RTSP_HDR_X_ACCEPT_AUTHENT" "60")
+    '("x-accept-proxy-authent" "GST_RTSP_HDR_X_ACCEPT_PROXY_AUTHENT" "61")
+    '("x-broadcast-id" "GST_RTSP_HDR_X_BROADCAST_ID" "62")
+    '("x-burst-streaming" "GST_RTSP_HDR_X_BURST_STREAMING" "63")
+    '("x-notice" "GST_RTSP_HDR_X_NOTICE" "64")
+    '("x-player-lag-time" "GST_RTSP_HDR_X_PLAYER_LAG_TIME" "65")
+    '("x-playlist" "GST_RTSP_HDR_X_PLAYLIST" "66")
+    '("x-playlist-change-notice" "GST_RTSP_HDR_X_PLAYLIST_CHANGE_NOTICE" "67")
+    '("x-playlist-gen-id" "GST_RTSP_HDR_X_PLAYLIST_GEN_ID" "68")
+    '("x-playlist-seek-id" "GST_RTSP_HDR_X_PLAYLIST_SEEK_ID" "69")
+    '("x-proxy-client-agent" "GST_RTSP_HDR_X_PROXY_CLIENT_AGENT" "70")
+    '("x-proxy-client-verb" "GST_RTSP_HDR_X_PROXY_CLIENT_VERB" "71")
+    '("x-receding-playlistchange" "GST_RTSP_HDR_X_RECEDING_PLAYLISTCHANGE" "72")
+    '("x-rtp-info" "GST_RTSP_HDR_X_RTP_INFO" "73")
+    '("x-startupprofile" "GST_RTSP_HDR_X_STARTUPPROFILE" "74")
   )
 )
 
@@ -1603,6 +1729,7 @@
     '("udp" "GST_RTSP_LOWER_TRANS_UDP" "1 << 0")
     '("udp-mcast" "GST_RTSP_LOWER_TRANS_UDP_MCAST" "1 << 1")
     '("tcp" "GST_RTSP_LOWER_TRANS_TCP" "1 << 2")
+    '("http" "GST_RTSP_LOWER_TRANS_HTTP" "1 << 4")
   )
 )
 
@@ -1702,6 +1829,7 @@
     '("bgr" "GST_VIDEO_FORMAT_BGR" "15")
     '("y41b" "GST_VIDEO_FORMAT_Y41B" "16")
     '("y42b" "GST_VIDEO_FORMAT_Y42B" "17")
+    '("yvyu" "GST_VIDEO_FORMAT_YVYU" "18")
   )
 )
 
@@ -1847,7 +1975,9 @@
     '("video" "GST_PLAY_SINK_TYPE_VIDEO" "2")
     '("video-raw" "GST_PLAY_SINK_TYPE_VIDEO_RAW" "3")
     '("text" "GST_PLAY_SINK_TYPE_TEXT" "4")
-    '("last" "GST_PLAY_SINK_TYPE_LAST" "5")
+    '("subpic" "GST_PLAY_SINK_TYPE_SUBPIC" "5")
+    '("last" "GST_PLAY_SINK_TYPE_LAST" "6")
+    '("flushing" "GST_PLAY_SINK_TYPE_FLUSHING" "7")
   )
 )
 
@@ -2108,6 +2238,38 @@
     '("left" "GST_TEXT_OVERLAY_LINE_ALIGN_LEFT" "0")
     '("center" "GST_TEXT_OVERLAY_LINE_ALIGN_CENTER" "1")
     '("right" "GST_TEXT_OVERLAY_LINE_ALIGN_RIGHT" "2")
+  )
+)
+
+;; From /usr/src/jhbuild-sources/gst-plugins-base/ext/pango/gsttextrender.h
+
+(define-enum-extended TextRenderVAlign
+  (in-module "Gst")
+  (c-name "GstTextRenderVAlign")
+  (values
+    '("baseline" "GST_TEXT_RENDER_VALIGN_BASELINE" "0")
+    '("bottom" "GST_TEXT_RENDER_VALIGN_BOTTOM" "1")
+    '("top" "GST_TEXT_RENDER_VALIGN_TOP" "2")
+  )
+)
+
+(define-enum-extended TextRenderHAlign
+  (in-module "Gst")
+  (c-name "GstTextRenderHAlign")
+  (values
+    '("left" "GST_TEXT_RENDER_HALIGN_LEFT" "0")
+    '("center" "GST_TEXT_RENDER_HALIGN_CENTER" "1")
+    '("right" "GST_TEXT_RENDER_HALIGN_RIGHT" "2")
+  )
+)
+
+(define-enum-extended TextRenderLineAlign
+  (in-module "Gst")
+  (c-name "GstTextRenderLineAlign")
+  (values
+    '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "0")
+    '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "1")
+    '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "2")
   )
 )
 

@@ -23,17 +23,17 @@
 #include <gstreamermm/pipeline.h>
 
 // Plug-ins
+#include <gstreamermm/alsasink.h>
+#include <gstreamermm/audioconvert.h>
 #include <gstreamermm/filesrc.h>
 #include <gstreamermm/oggdemux.h>
 #include <gstreamermm/vorbisdec.h>
-#include <gstreamermm/audioconvert.h>
-#include <gstreamermm/alsasink.h>
 
 #include <iostream>
 #include "player_window.h"
 
 Glib::RefPtr<Gst::Pipeline> pipeline;
-Glib::RefPtr<Gst::Element> decoder;
+Glib::RefPtr<Gst::VorbisDec> decoder;
 
 void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 {
@@ -68,7 +68,8 @@ main (int argc, char *argv[])
     return -1;
   }
 
-  // Parses the ogg streams into elementary streams (note that an ogg file may contain a video stream too)
+  // Parses the ogg streams into elementary streams (note that an ogg file may
+  // contain a video stream too)
   Glib::RefPtr<Gst::OggDemux> parser = Gst::OggDemux::create();
   if(!parser)
   {
