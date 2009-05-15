@@ -167,10 +167,6 @@ AC_SUBST([GENERATE_PLUGIN_GMMPROC_FILE_DIR])
 #  Plug-in processing
 #########################################################################
 
-# make sure grep and head are available:
-AC_PROG_GREP()
-AC_PATH_PROG([HEAD], [head])
-
 # make sure gst-inspect is available:
 AC_PATH_PROG([GST_INSPECT], [gst-inspect])
 if test x$GST_INSPECT = x ; then
@@ -180,14 +176,13 @@ AC_ARG_VAR([GST_INSPECT], [Variable to store gst-inspect executable])
 AC_SUBST(GST_INSPECT)
 
 # To add a plugin, add the plugin definition, in the form of
-# "plugin=CppClassName"  to the space-separated list of definitions below.  
-# (@here "plugin" is the plugin name as recognized by
-# gst-inspect and "CppClassName" is the desired name of the C++ class.)
+# "plugin=CppClassName" to the space-separated list of definitions below.
+# (Where "plugin" is the plugin name as recognized by gst-inspect and
+# "CppClassName" is the desired name of the C++ class.)
 #
 # Also add the target .hg file name to the files_all_plugin_hg variable in the
-# gstreamer/src/Makefile_list_of_hg.am_fragment file.  
-# (That must be the same as "CppClassName" - all in lowercase with a .hg
-# extension)
+# gstreamer/src/Makefile_list_of_hg.am_fragment file.  (That must be the same
+# as "CppClassName" - all in lowercase with a .hg extension).
 GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
 fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc filesink=FileSink \
 identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee \
@@ -211,16 +206,14 @@ vorbistag=VorbisTag ximagesink=XImageSink xvimagesink=XvImageSink"
 # wrapped in glibmm first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink,
 # TheoraParse, UriDecodeBin.
 
-# TODO: Document this:
+# Go through all the "plug-in defs", extracting the plug-in name and the C++
+# class name.  Create a list of the C++ class names and a list of the
+# corresponding .hg file names which are taken from the C++ class name.
 for plugin_def in $GSTREAMERMM_ALL_PLUGIN_DEFS; do
   plugin_name=[`echo $plugin_def | cut -d'=' -f 1`]
   cppname=[`echo $plugin_def | cut -d'=' -f 2`]
   GSTREAMERMM_ALL_PLUGIN_CPPNAMES="$GSTREAMERMM_ALL_PLUGIN_CPPNAMES $cppname"
   GSTREAMERMM_ALL_PLUGIN_HG=["$GSTREAMERMM_ALL_PLUGIN_HG `echo $cppname | tr [:upper:] [:lower:]`.hg"]
-  if test -z "`$GST_INSPECT $plugin_name | $HEAD -n 1 | $GREP "No such element"`"; then
-    GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES="$GSTREAMERMM_EXISTING_PLUGIN_CPPNAMES $cppname"
-    GSTREAMERMM_EXISTING_PLUGIN_HG=["$GSTREAMERMM_EXISTING_PLUGIN_HG `echo $cppname | tr [:upper:] [:lower:]`.hg"]
-  fi
 done
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_DEFS)
 AC_SUBST(GSTREAMERMM_ALL_PLUGIN_CPPNAMES)
