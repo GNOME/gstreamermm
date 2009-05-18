@@ -533,24 +533,26 @@ MT safe
 </return>
 </function>
 
-<function name="gst_pad_set_iterate_internal_links_function">
+<function name="gst_caps_is_subset">
 <description>
-Sets the given internal link iterator function for the pad.
+Checks if all caps represented by @subset are also represented by @superset.
+&lt;note&gt;This function does not work reliably if optional properties for caps
+are included on one caps and omitted on the other.&lt;/note&gt;
 
-Since: 0.10.21
 
 </description>
 <parameters>
-<parameter name="pad">
-<parameter_description> a #GstPad of either direction.
+<parameter name="subset">
+<parameter_description> a #GstCaps
 </parameter_description>
 </parameter>
-<parameter name="iterintlink">
-<parameter_description> the #GstPadIterIntLinkFunction to set.
+<parameter name="superset">
+<parameter_description> a potentially greater #GstCaps
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if @subset is a subset of @superset
+</return>
 </function>
 
 <function name="gst_clock_get_resolution">
@@ -663,6 +665,24 @@ muting.
 <return></return>
 </function>
 
+<function name="gst_buffer_list_iterate">
+<description>
+Iterate the buffers in @list. The owner of the iterator must also be the
+owner of a reference to @list while the returned iterator is in use.
+
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GstBufferList
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstBufferListIterator of the buffers in @list.
+gst_buffer_list_iterator_free() after usage
+</return>
+</function>
+
 <function name="gst_tag_list_insert">
 <description>
 Inserts the tags of the @from list into the first list using the given mode.
@@ -728,21 +748,60 @@ as a G_TYPE_STRING or this function will fail.
 <return></return>
 </function>
 
-<function name="gst_base_transform_is_passthrough">
+<function name="gst_param_spec_fraction">
 <description>
-See if @trans is configured as a passthrough transform.
+This function creates a fraction GParamSpec for use by objects/elements
+that want to expose properties of fraction type. This function is typically
+used in connection with g_object_class_install_property() in a GObjects's
+instance_init function.
 
 
 </description>
 <parameters>
-<parameter name="trans">
-<parameter_description> the #GstBaseTransform to query
+<parameter name="name">
+<parameter_description> canonical name of the property specified
+</parameter_description>
+</parameter>
+<parameter name="nick">
+<parameter_description> nick name for the property specified
+</parameter_description>
+</parameter>
+<parameter name="blurb">
+<parameter_description> description of the property specified
+</parameter_description>
+</parameter>
+<parameter name="min_num">
+<parameter_description> minimum value (fraction numerator)
+</parameter_description>
+</parameter>
+<parameter name="min_denom">
+<parameter_description> minimum value (fraction denominator)
+</parameter_description>
+</parameter>
+<parameter name="max_num">
+<parameter_description> maximum value (fraction numerator)
+</parameter_description>
+</parameter>
+<parameter name="max_denom">
+<parameter_description> maximum value (fraction denominator)
+</parameter_description>
+</parameter>
+<parameter name="default_num">
+<parameter_description> default value (fraction numerator)
+</parameter_description>
+</parameter>
+<parameter name="default_denom">
+<parameter_description> default value (fraction denominator)
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags for the property specified
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE is the transform is configured in passthrough mode.
+<return> a newly created parameter specification
 
-MT safe.
+Since: 0.10.14
 </return>
 </function>
 
@@ -869,6 +928,27 @@ Set the media information of @media to @information.
 </parameters>
 <return> #GST_SDP_OK.
 </return>
+</function>
+
+<function name="gst_rtsp_connection_set_tunneled">
+<description>
+Set the HTTP tunneling state of the connection. This must be configured before
+the @conn is connected.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="tunneled">
+<parameter_description> the new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_rtsp_message_init">
@@ -1233,6 +1313,24 @@ Since: 0.10.20
 <return></return>
 </function>
 
+<function name="gst_navigation_message_new_commands_changed">
+<description>
+Creates a new #GstNavigation message with type
+#GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> A #GstObject to set as source of the new message.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new #GstMessage.
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_structure_set_value">
 <description>
 Sets the field with the given name @field to @value.  If the field
@@ -1313,50 +1411,47 @@ Appends @append_value to the GstValueArray in @value.
 <return></return>
 </function>
 
-<function name="gst_video_format_new_caps_interlaced">
+<function name="gst_rtsp_connection_is_tunneled">
 <description>
-Creates a new #GstCaps object based on the parameters provided.
-
-Since: 0.10.23
+Get the tunneling state of the connection. 
 
 
 </description>
 <parameters>
-<parameter name="format">
-<parameter_description> the #GstVideoFormat describing the raw video format
-</parameter_description>
-</parameter>
-<parameter name="width">
-<parameter_description> width of video
-</parameter_description>
-</parameter>
-<parameter name="height">
-<parameter_description> height of video
-</parameter_description>
-</parameter>
-<parameter name="framerate_n">
-<parameter_description> numerator of frame rate
-</parameter_description>
-</parameter>
-<parameter name="framerate_d">
-<parameter_description> denominator of frame rate
-</parameter_description>
-</parameter>
-<parameter name="par_n">
-<parameter_description> numerator of pixel aspect ratio
-</parameter_description>
-</parameter>
-<parameter name="par_d">
-<parameter_description> denominator of pixel aspect ratio
-</parameter_description>
-</parameter>
-<parameter name="interlaced">
-<parameter_description> #TRUE if the format is interlaced
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GstCaps object, or NULL if there was an error
+<return> if @conn is using HTTP tunneling.
+
+Since: 0.10.23
 </return>
+</function>
+
+<function name="gst_navigation_event_parse_mouse_move_event">
+<description>
+Inspect a #GstNavigation mouse movement event and extract the coordinates
+of the event.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to inspect.
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> Pointer to a gdouble to receive the x coordinate of the mouse movement.
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Pointer to a gdouble to receive the y coordinate of the mouse movement.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_alloc_trace_set_flags_all">
@@ -1666,13 +1761,13 @@ as @func (object, @ret, @user_data) for each object in @it. The normal use
 of this procedure is to accumulate the results of operating on the objects in
 @ret.
 
-This procedure can be used (and is used internally) to implement the foreach
-and find_custom operations.
+This procedure can be used (and is used internally) to implement the
+gst_iterator_foreach() and gst_iterator_find_custom() operations.
 
 The fold will proceed as long as @func returns TRUE. When the iterator has no
-more arguments, #GST_ITERATOR_DONE will be returned. If @func returns FALSE,
-the fold will stop, and #GST_ITERATOR_OK will be returned. Errors or resyncs
-will cause fold to return #GST_ITERATOR_ERROR or #GST_ITERATOR_RESYNC as
+more arguments, %GST_ITERATOR_DONE will be returned. If @func returns FALSE,
+the fold will stop, and %GST_ITERATOR_OK will be returned. Errors or resyncs
+will cause fold to return %GST_ITERATOR_ERROR or %GST_ITERATOR_RESYNC as
 appropriate.
 
 The iterator will not be freed.
@@ -1857,6 +1952,26 @@ get the license of the plugin
 </return>
 </function>
 
+<function name="gst_task_pool_prepare">
+<description>
+Prepare the taskpool for accepting gst_task_pool_push() operations.
+
+MT safe.
+
+</description>
+<parameters>
+<parameter name="pool">
+<parameter_description> a #GstTaskPool
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> an error return location
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_pad_use_fixed_caps">
 <description>
 A helper function you can use that sets the
@@ -1877,18 +1992,25 @@ on it, cannot be renegotiated to something else.
 <return></return>
 </function>
 
-<function name="GstElement">
+<function name="gst_caps_union">
 <description>
-This signals that the element will not generate more dynamic pads.
+Creates a new #GstCaps that contains all the formats that are in
+either @caps1 and @caps2.
+
 
 </description>
 <parameters>
-<parameter name="gstelement">
-<parameter_description> the object which received the signal
+<parameter name="caps1">
+<parameter_description> a #GstCaps to union
+</parameter_description>
+</parameter>
+<parameter name="caps2">
+<parameter_description> a #GstCaps to union
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the new #GstCaps
+</return>
 </function>
 
 <function name="gst_collect_pads_set_flushing">
@@ -1961,22 +2083,6 @@ Since: 0.10.22
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gst_value_get_double_range_min">
-<description>
-Gets the minimum of the range specified by @value.
-
-
-</description>
-<parameters>
-<parameter name="value">
-<parameter_description> a GValue initialized to GST_TYPE_DOUBLE_RANGE
-</parameter_description>
-</parameter>
-</parameters>
-<return> the minimum of the range
-</return>
 </function>
 
 <function name="gst_byte_reader_get_float64_le">
@@ -2195,23 +2301,16 @@ and @numerator_end/@denominator_end.
 <return></return>
 </function>
 
-<function name="gst_util_set_value_from_string">
+<function name="gst_parse_error_quark">
 <description>
-Converts the string to the type of the value and
-sets the value with it.
+Get the error quark used by the parsing subsystem.
+
 
 </description>
 <parameters>
-<parameter name="value">
-<parameter_description> the value to set
-</parameter_description>
-</parameter>
-<parameter name="value_str">
-<parameter_description> the string to get the value from
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
+<return> the quark of the parse errors.
+</return>
 </function>
 
 <function name="gst_value_fraction_multiply">
@@ -2293,6 +2392,34 @@ Frees the given list and all associated values.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_navigation_message_new_angles_changed">
+<description>
+Creates a new #GstNavigation message with type
+#GST_NAVIGATION_MESSAGE_ANGLES_CHANGED for notifying an application
+that the current angle, or current number of angles available in a
+multiangle video has changed.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> A #GstObject to set as source of the new message.
+</parameter_description>
+</parameter>
+<parameter name="cur_angle">
+<parameter_description> The currently selected angle.
+</parameter_description>
+</parameter>
+<parameter name="n_angles">
+<parameter_description> The number of viewing angles now available.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new #GstMessage.
+Since: 0.10.23
+</return>
 </function>
 
 <function name="gst_fft_s32_inverse_fft">
@@ -2532,6 +2659,28 @@ function. Call this function directly after a call to g_object_new
 
 Since: 0.10.22
 </return>
+</function>
+
+<function name="gst_value_set_double_range">
+<description>
+Sets @value to the range specified by @start and @end.
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a GValue initialized to GST_TYPE_DOUBLE_RANGE
+</parameter_description>
+</parameter>
+<parameter name="start">
+<parameter_description> the start of the range
+</parameter_description>
+</parameter>
+<parameter name="end">
+<parameter_description> the end of the range
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_rtsp_transport_get_manager">
@@ -2953,6 +3102,12 @@ returned (as a list with a single object).
 <description>
 Converts @structure to a human-readable string representation.
 
+For debugging purposes its easier to do something like this:
+|[
+GST_LOG (&quot;structure is %&quot; GST_PTR_FORMAT, structure);
+]|
+This prints the structure in human readble form.
+
 
 </description>
 <parameters>
@@ -3012,6 +3167,43 @@ MT safe.
 <return></return>
 </function>
 
+<function name="gst_buffer_list_iterator_do_data">
+<description>
+Calls the given function for the last buffer returned by
+gst_buffer_list_iterator_next(). gst_buffer_list_iterator_next() must have
+been called on @it before this function is called.
+gst_buffer_list_iterator_remove() and gst_buffer_list_iterator_steal() must
+not have been called since the last call to gst_buffer_list_iterator_next().
+
+See #GstBufferListDoFunction for more details.
+
+The @data_notify function is called after @do_func has returned, before this
+function returns, usually used to free @data.
+
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+<parameter name="do_func">
+<parameter_description> the function to be called
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the gpointer to optional user data.
+</parameter_description>
+</parameter>
+<parameter name="data_notify">
+<parameter_description> function to be called when @data is no longer used
+</parameter_description>
+</parameter>
+</parameters>
+<return> the return value from @do_func
+</return>
+</function>
+
 <function name="gst_base_rtp_audio_payload_set_frame_options">
 <description>
 Sets the options for frame based audio codecs.
@@ -3052,26 +3244,6 @@ It creates a copy of the first value from the list.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gst_pad_get_parent_element">
-<description>
-Gets the parent of @pad, cast to a #GstElement. If a @pad has no parent or
-its parent is not an element, return NULL.
-
-
-</description>
-<parameters>
-<parameter name="pad">
-<parameter_description> a pad
-</parameter_description>
-</parameter>
-</parameters>
-<return> The parent of the pad. The caller has a reference on the parent, so
-unref when you're finished with it.
-
-MT safe.
-</return>
 </function>
 
 <function name="gst_value_subtract">
@@ -3118,6 +3290,31 @@ MT safe.
 </parameter>
 <parameter name="sample">
 <parameter_description> the sample number to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_navigation_query_set_commandsv">
+<description>
+Set the #GstNavigation command query result fields in @query. The number
+of commands passed must be equal to @n_commands.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="n_cmds">
+<parameter_description> the number of commands to set.
+</parameter_description>
+</parameter>
+<parameter name="cmds">
+<parameter_description> An array containing @n_cmds @GstNavigationCommand values.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3207,19 +3404,78 @@ Gets the maximum of the range specified by @value.
 </return>
 </function>
 
+<function name="gst_base_src_wait_playing">
+<description>
+If the #GstBaseSrcClass::create method performs its own synchronisation against
+the clock it must unblock when going from PLAYING to the PAUSED state and call
+this method before continuing to produce the remaining data.
+
+This function will block until a state change to PLAYING happens (in which
+case this function returns #GST_FLOW_OK) or the processing must be stopped due
+to a state change to READY or a FLUSH event (in which case this function
+Returns: #GST_FLOW_OK if @src is PLAYING and processing can
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> the src
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_FLOW_OK if @src is PLAYING and processing can
+continue. Any other return value should be returned from the create vmethod.
+</return>
+</function>
+
 <function name="SECTION">
 <description>
 &lt;refsect2&gt;
 &lt;para&gt;
-This library contains some helper functions and includes the 
-videosink and videofilter base classes.
+Provides useful functions and a base class for video sinks. 
+&lt;/para&gt;
+&lt;para&gt;
+GstVideoSink will configure the default base sink to drop frames that
+arrive later than 20ms as this is considered the default threshold for
+observing out-of-sync frames.
 &lt;/para&gt;
 &lt;/refsect2&gt;
 
 </description>
 <parameters>
 <parameter name="short_description">
-<parameter_description> Support library for video operations
+<parameter_description> Base class for video sinks
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_buffer_straw_start_pipeline">
+<description>
+Sets up a pipeline for buffer sucking. This will allow you to call
+gst_buffer_straw_get_buffer() to access buffers as they pass over @pad.
+
+This function is normally used in unit tests that want to verify that a
+particular element is outputting correct buffers. For example, you would make
+a pipeline via gst_parse_launch(), pull out the pad you want to monitor, then
+call gst_buffer_straw_get_buffer() to get the buffers that pass through @pad.
+The pipeline will block until you have sucked off the buffers.
+
+This function will set the state of @bin to PLAYING; to clean up, be sure to
+call gst_buffer_straw_stop_pipeline().
+
+Note that you may not start two buffer straws at the same time. This function
+is intended for unit tests, not general API use. In fact it calls fail_if
+from libcheck, so you cannot use it outside unit tests.
+
+</description>
+<parameters>
+<parameter name="bin">
+<parameter_description> the pipeline to run
+</parameter_description>
+</parameter>
+<parameter name="pad">
+<parameter_description> a pad on an element in @bin
 </parameter_description>
 </parameter>
 </parameters>
@@ -3289,6 +3545,54 @@ of the &quot;channels&quot; field in the given #GstStructure.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_util_array_binary_search">
+<description>
+Searches inside @array for @search_data by using the comparison function
+@search_func. @array must be sorted ascending.
+
+As @search_data is always passed as second argument to @search_func it's
+not required that @search_data has the same type as the array elements.
+
+The complexity of this search function is O(log (num_elements)).
+
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> the sorted input array
+</parameter_description>
+</parameter>
+<parameter name="num_elements">
+<parameter_description> number of elements in the array
+</parameter_description>
+</parameter>
+<parameter name="element_size">
+<parameter_description> size of every element in bytes
+</parameter_description>
+</parameter>
+<parameter name="search_func">
+<parameter_description> function to compare two elements, @search_data will always be passed as second argument
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> search mode that should be used
+</parameter_description>
+</parameter>
+<parameter name="search_data">
+<parameter_description> element that should be found
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @search_func
+</parameter_description>
+</parameter>
+</parameters>
+<return> The address of the found element or %NULL if nothing was found
+
+Since: 0.10.23
+</return>
 </function>
 
 <function name="gst_message_new_async_start">
@@ -3427,6 +3731,27 @@ gst_task_join() to stop and wait for completion.
 <return> %TRUE if the task could be stopped.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_navigation_message_get_type">
+<description>
+Check a bus message to see if it is a #GstNavigation event, and return
+the #GstNavigationMessageType identifying the type of the message if so.
+
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> A #GstMessage to inspect.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The type of the #GstNavigationMessage, or
+#GST_NAVIGATION_MESSAGE_INVALID if the message is not a #GstNavigation
+notification.
+
+Since: 0.10.23
 </return>
 </function>
 
@@ -3966,6 +4291,8 @@ the structure.
 <description>
 Activate @buf to start or stop pulling data.
 
+MT safe.
+
 
 </description>
 <parameters>
@@ -3982,65 +4309,24 @@ Activate @buf to start or stop pulling data.
 FALSE on error.
 
 Since: 0.10.22.
-
-MT safe.
 </return>
 </function>
 
-<function name="gst_param_spec_fraction">
+<function name="gst_base_transform_is_passthrough">
 <description>
-This function creates a fraction GParamSpec for use by objects/elements
-that want to expose properties of fraction type. This function is typically
-used in connection with g_object_class_install_property() in a GObjects's
-instance_init function.
+See if @trans is configured as a passthrough transform.
 
 
 </description>
 <parameters>
-<parameter name="name">
-<parameter_description> canonical name of the property specified
-</parameter_description>
-</parameter>
-<parameter name="nick">
-<parameter_description> nick name for the property specified
-</parameter_description>
-</parameter>
-<parameter name="blurb">
-<parameter_description> description of the property specified
-</parameter_description>
-</parameter>
-<parameter name="min_num">
-<parameter_description> minimum value (fraction numerator)
-</parameter_description>
-</parameter>
-<parameter name="min_denom">
-<parameter_description> minimum value (fraction denominator)
-</parameter_description>
-</parameter>
-<parameter name="max_num">
-<parameter_description> maximum value (fraction numerator)
-</parameter_description>
-</parameter>
-<parameter name="max_denom">
-<parameter_description> maximum value (fraction denominator)
-</parameter_description>
-</parameter>
-<parameter name="default_num">
-<parameter_description> default value (fraction numerator)
-</parameter_description>
-</parameter>
-<parameter name="default_denom">
-<parameter_description> default value (fraction denominator)
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> flags for the property specified
+<parameter name="trans">
+<parameter_description> the #GstBaseTransform to query
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly created parameter specification
+<return> TRUE is the transform is configured in passthrough mode.
 
-Since: 0.10.14
+MT safe.
 </return>
 </function>
 
@@ -4078,7 +4364,8 @@ Get the packet type of the packet pointed to by @packet.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The packet type.
+<return> The packet type or GST_RTCP_TYPE_INVALID when @packet is not
+pointing to a valid packet.
 </return>
 </function>
 
@@ -4136,19 +4423,22 @@ Since: 0.10.13
 <return></return>
 </function>
 
-<function name="gst_pad_set_activatepush_function">
+<function name="gst_structure_set_valist">
 <description>
-Sets the given activate_push function for the pad. An activate_push function
-prepares the element for pushing. See XXX part-activation.txt for details.
+va_list form of gst_structure_set().
 
 </description>
 <parameters>
-<parameter name="pad">
-<parameter_description> a #GstPad.
+<parameter name="structure">
+<parameter_description> a #GstStructure
 </parameter_description>
 </parameter>
-<parameter name="activatepush">
-<parameter_description> the #GstPadActivateModeFunction to set.
+<parameter name="fieldname">
+<parameter_description> the name of the field to set
+</parameter_description>
+</parameter>
+<parameter name="varargs">
+<parameter_description> variable arguments
 </parameter_description>
 </parameter>
 </parameters>
@@ -4189,22 +4479,11 @@ was given.
 </return>
 </function>
 
-<function name="GstBus">
+<function name="the">
 <description>
-A message has been posted on the bus. This signal is emitted from a
-GSource added to the mainloop. this signal will only be emitted when
-there is a mainloop running.
 
 </description>
 <parameters>
-<parameter name="bus">
-<parameter_description> the object which received the signal
-</parameter_description>
-</parameter>
-<parameter name="message">
-<parameter_description> the message that has been posted asynchronously
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -4229,22 +4508,21 @@ Validates the given packet header by checking the CRC checksum.
 </return>
 </function>
 
-<function name="gst_missing_uri_source_installer_detail_new">
+<function name="gst_rtcp_packet_fb_get_type">
 <description>
-Returns: a newly-allocated detail string, or NULL on error. Free string
+Get the feedback message type of the FB @packet.
+
 
 </description>
 <parameters>
-<parameter name="protocol">
-<parameter_description> the URI protocol the missing source needs to implement,
-e.g. &quot;http&quot; or &quot;mms&quot;
+<parameter name="packet">
+<parameter_description> a valid RTPFB or PSFB #GstRTCPPacket
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated detail string, or NULL on error. Free string
-with g_free() when not needed any longer.
+<return> The feedback message type.
 
-Since: 0.10.15
+Since: 0.10.23
 </return>
 </function>
 
@@ -4267,6 +4545,8 @@ any blocking gst_data_queue_push() should be unblocked to recheck the limts.
 <description>
 Adds the data from @buf to the data stored inside @adapter and takes
 ownership of the buffer.
+Empty buffers will be automatically dereferenced and not stored in the
+@adapter.
 
 </description>
 <parameters>
@@ -4580,6 +4860,32 @@ or modified.
 </return>
 </function>
 
+<function name="gst_rtsp_connection_set_proxy">
+<description>
+Set the proxy host and port.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="host">
+<parameter_description> the proxy host
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> the proxy port
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_RTSP_OK.
+
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_tag_to_id3_tag">
 <description>
 Looks up the ID3v2 tag for a GStreamer tag.
@@ -4647,6 +4953,26 @@ continue. Any other return value should be returned from the render vmethod.
 </return>
 </function>
 
+<function name="gst_rtcp_packet_fb_set_type">
+<description>
+Set the feedback message type of the FB @packet.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="packet">
+<parameter_description> a valid RTPFB or PSFB #GstRTCPPacket
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> the #GstRTCPFBType to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_sdp_media_get_bandwidth">
 <description>
 Get the bandwidth at position @idx in @media.
@@ -4706,53 +5032,38 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_buffer_straw_start_pipeline">
+<function name="GstPropertyProbe">
 <description>
-Sets up a pipeline for buffer sucking. This will allow you to call
-gst_buffer_straw_get_buffer() to access buffers as they pass over @pad.
-
-This function is normally used in unit tests that want to verify that a
-particular element is outputting correct buffers. For example, you would make
-a pipeline via gst_parse_launch(), pull out the pad you want to monitor, then
-call gst_buffer_straw_get_buffer() to get the buffers that pass through @pad.
-The pipeline will block until you have sucked off the buffers.
-
-This function will set the state of @bin to PLAYING; to clean up, be sure to
-call gst_buffer_straw_stop_pipeline().
-
-Note that you may not start two buffer straws at the same time. This function
-is intended for unit tests, not general API use. In fact it calls fail_if
-from libcheck, so you cannot use it outside unit tests.
 
 </description>
 <parameters>
-<parameter name="bin">
-<parameter_description> the pipeline to run
-</parameter_description>
-</parameter>
-<parameter name="pad">
-<parameter_description> a pad on an element in @bin
+<parameter name="pspec">
+<parameter_description> #GParamSpec that needs a probe
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="gst_registry_get_path_list">
+<function name="gst_element_is_locked_state">
 <description>
-Get the list of paths for the given registry.
+Checks if the state of an element is locked.
+If the state of an element is locked, state changes of the parent don't
+affect the element.
+This way you can leave currently unused elements inside bins. Just lock their
+state before changing the state from #GST_STATE_NULL.
+
+MT safe.
 
 
 </description>
 <parameters>
-<parameter name="registry">
-<parameter_description> the registry to get the pathlist of
+<parameter name="element">
+<parameter_description> a #GstElement.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A Glist of paths as strings. g_list_free after use.
-
-MT safe.
+<return> TRUE, if the element's state is locked.
 </return>
 </function>
 
@@ -4807,29 +5118,17 @@ argument is ignored.
 <return></return>
 </function>
 
-<function name="gst_tag_list_get_int">
+<function name="gst_collect_pads_new">
 <description>
-Copies the contents for the given tag into the value, merging multiple values
-into one if multiple values are associated with the tag.
+Create a new instance of #GstCollectsPads.
 
 
 </description>
 <parameters>
-<parameter name="list">
-<parameter_description> a #GstTagList to get the tag from
-</parameter_description>
-</parameter>
-<parameter name="tag">
-<parameter_description> tag to read out
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> location for the result
-</parameter_description>
-</parameter>
 </parameters>
-<return> TRUE, if a value was copied, FALSE if the tag didn't exist in the
-given list.
+<return> a new #GstCollectPads, or NULL in case of an error.
+
+MT safe.
 </return>
 </function>
 
@@ -4865,6 +5164,24 @@ partially-constructed bin or element will be returned and @error will be set
 always be returned on failure)
 
 Since: 0.10.20
+</return>
+</function>
+
+<function name="gst_rtsp_connection_get_tunnelid">
+<description>
+Get the tunnel session id the connection. 
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> returns a non-empty string if @conn is being tunneled over HTTP.
+
+Since: 0.10.23
 </return>
 </function>
 
@@ -5418,6 +5735,27 @@ as a reference to @buffer is held.
 </return>
 </function>
 
+<function name="gst_error_get_message">
+<description>
+Get a string describing the error message in the current locale.
+
+
+</description>
+<parameters>
+<parameter name="domain">
+<parameter_description> the GStreamer error domain this error belongs to.
+</parameter_description>
+</parameter>
+<parameter name="code">
+<parameter_description> the error code belonging to the domain.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string describing the error message in the
+current locale.
+</return>
+</function>
+
 <function name="gst_sdp_media_set_port_info">
 <description>
 Set the port information in @media.
@@ -5772,7 +6110,8 @@ Gets the #guint32 fourcc contained in @value.
 
 <function name="gst_rtsp_connection_close">
 <description>
-Close the connected @conn.
+Close the connected @conn. After this call, the connection is in the same
+state as when it was first created.
 
 
 </description>
@@ -5859,20 +6198,23 @@ Since: 0.10.16
 </return>
 </function>
 
-<function name="gst_rtp_buffer_get_seq">
+<function name="gst_buffer_list_iterator_remove">
 <description>
-Get the sequence number of the RTP packet in @buffer.
+Removes the last buffer returned by gst_buffer_list_iterator_next() from
+the #GstBufferList iterated with @it. gst_buffer_list_iterator_next() must
+have been called on @it before this function is called. This function can
+only be called once per call to gst_buffer_list_iterator_next().
 
+The removed buffer is unreffed.
 
 </description>
 <parameters>
-<parameter name="buffer">
-<parameter_description> the buffer
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
 </parameter_description>
 </parameter>
 </parameters>
-<return> The sequence number in host order.
-</return>
+<return></return>
 </function>
 
 <function name="gst_segment_copy">
@@ -5975,28 +6317,35 @@ Move to the first SDES item in @packet.
 </return>
 </function>
 
-<function name="gst_structure_id_set_valist">
+<function name="gst_bus_timed_pop">
 <description>
-va_list form of gst_structure_id_set().
+Get a message from the bus, waiting up to the specified timeout.
 
-Since: 0.10.10
+If @timeout is 0, this function behaves like gst_bus_pop(). If @timeout is
+#GST_CLOCK_TIME_NONE, this function will block forever until a message was
+posted on the bus.
+
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> a #GstStructure
+<parameter name="bus">
+<parameter_description> a #GstBus to pop
 </parameter_description>
 </parameter>
-<parameter name="fieldname">
-<parameter_description> the name of the field to set
-</parameter_description>
-</parameter>
-<parameter name="varargs">
-<parameter_description> variable arguments
+<parameter name="timeout">
+<parameter_description> a timeout
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> The #GstMessage that is on the bus after the specified timeout
+or NULL if the bus is empty after the timeout expired.
+The message is taken from the bus and needs to be unreffed with
+gst_message_unref() after usage.
+
+MT safe.
+
+Since: 0.10.12
+</return>
 </function>
 
 <function name="gst_structure_map_in_place">
@@ -7062,11 +7411,22 @@ MT safe.
 </return>
 </function>
 
-<function name="the">
+<function name="GstBus">
 <description>
+A message has been posted on the bus. This signal is emitted from a
+GSource added to the mainloop. this signal will only be emitted when
+there is a mainloop running.
 
 </description>
 <parameters>
+<parameter name="bus">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="message">
+<parameter_description> the message that has been posted asynchronously
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -7182,17 +7542,29 @@ Since: 0.10.5
 <return></return>
 </function>
 
-<function name="gst_collect_pads_new">
+<function name="gst_tag_list_get_int">
 <description>
-Create a new instance of #GstCollectsPads.
+Copies the contents for the given tag into the value, merging multiple values
+into one if multiple values are associated with the tag.
 
 
 </description>
 <parameters>
+<parameter name="list">
+<parameter_description> a #GstTagList to get the tag from
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> tag to read out
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> location for the result
+</parameter_description>
+</parameter>
 </parameters>
-<return> a new #GstCollectPads, or NULL in case of an error.
-
-MT safe.
+<return> TRUE, if a value was copied, FALSE if the tag didn't exist in the
+given list.
 </return>
 </function>
 
@@ -7279,6 +7651,52 @@ Variable arguments should be in the form field name, field type
 <return></return>
 </function>
 
+<function name="gst_pad_push_list">
+<description>
+Pushes a buffer list to the peer of @pad.
+
+This function will call an installed pad block before triggering any
+installed pad probes.
+
+If the caps on the first buffer in the first group of @list are different
+from the currently configured caps on @pad, this function will call any
+installed setcaps function on @pad (see gst_pad_set_setcaps_function()). In
+case of failure to renegotiate the new format, this function returns
+#GST_FLOW_NOT_NEGOTIATED.
+
+If there are any probes installed on @pad every group of the buffer list
+will be merged into a normal #GstBuffer and pushed via gst_pad_push and the
+buffer list will be unreffed.
+
+The function proceeds calling the chain function on the peer pad and returns
+the value from that function. If @pad has no peer, #GST_FLOW_NOT_LINKED will
+be returned. If the peer pad does not have any installed chainlist function
+every group buffer of the list will be merged into a normal #GstBuffer and
+chained via gst_pad_chain().
+
+In all cases, success or failure, the caller loses its reference to @list
+after calling this function.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a source #GstPad, returns #GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+<parameter name="list">
+<parameter_description> the #GstBufferList to push returns GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn from the peer pad.
+
+MT safe.
+
+Since: 0.10.24
+</return>
+</function>
+
 <function name="gst_sdp_message_bandwidths_len">
 <description>
 Get the number of bandwidth information in @msg.
@@ -7293,6 +7711,31 @@ Get the number of bandwidth information in @msg.
 </parameters>
 <return> the number of bandwidth information in @msg.
 </return>
+</function>
+
+<function name="gst_object_ref_sink">
+<description>
+Increase the reference count of @object, and possibly remove the floating
+reference, if @object has a floating reference.
+
+In other words, if the object is floating, then this call &quot;assumes ownership&quot;
+of the floating reference, converting it to a normal reference by clearing
+the floating flag while leaving the reference count unchanged. If the object
+is not floating, then this call adds a new normal reference increasing the
+reference count by one.
+
+MT safe. This function grabs and releases @object lock.
+
+Since: 0.10.24
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> a #GstObject to sink
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_query_set_segment">
@@ -7397,28 +7840,6 @@ seconds. The resulting value will be the number of nanoseconds since 1970.
 </return>
 </function>
 
-<function name="gst_element_unlink">
-<description>
-Unlinks all source pads of the source element with all sink pads
-of the sink element to which they are linked.
-
-If the link has been made using gst_element_link(), it could have created an
-requestpad, which has to be released using gst_element_release_request_pad().
-
-</description>
-<parameters>
-<parameter name="src">
-<parameter_description> the source #GstElement to unlink.
-</parameter_description>
-</parameter>
-<parameter name="dest">
-<parameter_description> the sink #GstElement to unlink.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gst_sdp_message_get_attribute_val_n">
 <description>
 Get the @nth attribute with key @key in @msg.
@@ -7440,6 +7861,24 @@ Get the @nth attribute with key @key in @msg.
 </parameter>
 </parameters>
 <return> the attribute value of the @nth attribute with @key.
+</return>
+</function>
+
+<function name="gst_mixer_get_mixer_type">
+<description>
+Get the #GstMixerType of this mixer implementation.
+
+
+</description>
+<parameters>
+<parameter name="mixer">
+<parameter_description> The #GstMixer implementation
+</parameter_description>
+</parameter>
+</parameters>
+<return> A the #GstMixerType.
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -7984,6 +8423,8 @@ MT safe.
 <description>
 Encode a sequence of binary data into its Base-64 stringified representation.
 
+Deprecated: Use g_base64_encode()
+
 
 </description>
 <parameters>
@@ -8040,29 +8481,6 @@ Since: 0.10.22
 </return>
 </function>
 
-<function name="gst_fft_s32_window">
-<description>
-This calls the window function @window on the @timedata sample buffer.
-
-
-</description>
-<parameters>
-<parameter name="self">
-<parameter_description> #GstFFTS32 instance for this call
-</parameter_description>
-</parameter>
-<parameter name="timedata">
-<parameter_description> Time domain samples
-</parameter_description>
-</parameter>
-<parameter name="window">
-<parameter_description> Window function to apply
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gst_tag_setter_set_tag_merge_mode">
 <description>
 Sets the given merge mode that is used for adding tags from events to tags
@@ -8116,6 +8534,24 @@ this @name it will be overwritten.
 
 Since: 0.10.20
 </return>
+</function>
+
+<function name="gst_buffer_list_iterator_add_group">
+<description>
+Inserts a new, empty group into the #GstBufferList iterated with @it. The
+group is inserted immediately before the group that would be returned by
+gst_buffer_list_iterator_next_group(). A subsequent call to
+gst_buffer_list_iterator_next_group() will advance the iterator to the group
+after the inserted group, if any.
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_ring_buffer_prepare_read">
@@ -8192,21 +8628,15 @@ Normally you don't want to call this, because gst_init() does it for you.
 <return></return>
 </function>
 
-<function name="gst_base_audio_src_get_slave_method">
+<function name="gst_debug_is_colored">
 <description>
-Get the current slave method used by @src.
+Checks if the debugging output should be colored.
 
 
 </description>
 <parameters>
-<parameter name="src">
-<parameter_description> a #GstBaseAudioSrc
-</parameter_description>
-</parameter>
 </parameters>
-<return> The current slave method used by @src.
-
-Since: 0.10.20
+<return> TRUE, if the debug output should be colored.
 </return>
 </function>
 
@@ -8234,6 +8664,43 @@ MT safe.
 <return></return>
 </function>
 
+<function name="gst_pad_chain">
+<description>
+Chain a buffer to @pad.
+
+The function returns #GST_FLOW_WRONG_STATE if the pad was flushing.
+
+If the caps on @buffer are different from the current caps on @pad, this
+function will call any setcaps function (see gst_pad_set_setcaps_function())
+installed on @pad. If the new caps are not acceptable for @pad, this
+function returns #GST_FLOW_NOT_NEGOTIATED.
+
+The function proceeds calling the chain function installed on @pad (see
+gst_pad_set_chain_function()) and the return value of that function is
+returned to the caller. #GST_FLOW_NOT_SUPPORTED is returned if @pad has no
+chain function.
+
+In all cases, success or failure, the caller loses its reference to @buffer
+after calling this function.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a sink #GstPad, returns GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> the #GstBuffer to send, return GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn from the pad.
+
+MT safe.
+</return>
+</function>
+
 <function name="gst_task_start">
 <description>
 Starts @task. The @task must have a lock associated with it using
@@ -8253,6 +8720,52 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_buffer_list_iterator_next_group">
+<description>
+Advance the iterator @it to the first buffer in the next group. If the
+iterator is at the last group, FALSE will be returned. This function may be
+called repeatedly to iterate through the groups in a buffer list.
+
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the iterator could be advanced to the next group, FALSE if
+the iterator was already at the last group
+</return>
+</function>
+
+<function name="gst_navigation_query_parse_commands_nth">
+<description>
+Parse the #GstNavigation command query and retrieve the @nth command from
+it into @cmd. If the list contains less elements than @nth, @cmd will be
+set to #GST_NAVIGATION_COMMAND_INVALID.
+
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="nth">
+<parameter_description> the nth command to retrieve.
+</parameter_description>
+</parameter>
+<parameter name="cmd">
+<parameter_description> a pointer to store the nth command into.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the query could be successfully parsed. %FALSE if not.
+Since: 0.10.23
+</return>
+</function>
+
 <function name="str_case_hash">
 <description>
 Hashes @key in a case-insensitive manner.
@@ -8266,6 +8779,27 @@ Hashes @key in a case-insensitive manner.
 </parameter>
 </parameters>
 <return> the hash code.
+</return>
+</function>
+
+<function name="gst_navigation_query_parse_commands_length">
+<description>
+Parse the number of commands in the #GstNavigation commands @query.
+
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="n_cmds">
+<parameter_description> the number of commands in this query.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the query could be successfully parsed. %FALSE if not.
+Since: 0.10.23
 </return>
 </function>
 
@@ -8350,25 +8884,21 @@ by this element.
 </return>
 </function>
 
-<function name="gst_collect_pads_set_function">
+<function name="gst_message_set_stream_status_object">
 <description>
-Set the callback function and user data that will be called when
-all the pads added to the collection have buffers queued.
+Configures the object handling the streaming thread. This is usually a
+GstTask object but other objects might be added in the future.
 
-MT safe.
+Since: 0.10.24
 
 </description>
 <parameters>
-<parameter name="pads">
-<parameter_description> the collectspads to use
+<parameter name="message">
+<parameter_description> A valid #GstMessage of type GST_MESSAGE_STREAM_STATUS.
 </parameter_description>
 </parameter>
-<parameter name="func">
-<parameter_description> the function to set
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data passed to the function
+<parameter name="object">
+<parameter_description> the object controlling the streaming
 </parameter_description>
 </parameter>
 </parameters>
@@ -8484,19 +9014,23 @@ Get the first attribute with key @key in @msg.
 </return>
 </function>
 
-<function name="gst_plugin_load_by_name">
+<function name="gst_bus_pop">
 <description>
-Load the named plugin. Refs the plugin.
+Get a message from the bus.
 
 
 </description>
 <parameters>
-<parameter name="name">
-<parameter_description> name of plugin to load
+<parameter name="bus">
+<parameter_description> a #GstBus to pop
 </parameter_description>
 </parameter>
 </parameters>
-<return> A reference to a loaded plugin, or NULL on error.
+<return> The #GstMessage that is on the bus, or NULL if the bus is empty.
+The message is taken from the bus and needs to be unreffed with
+gst_message_unref() after usage.
+
+MT safe.
 </return>
 </function>
 
@@ -8600,9 +9134,9 @@ Converts @caps to a string representation.  This string representation
 can be converted back to a #GstCaps by gst_caps_from_string().
 
 For debugging purposes its easier to do something like this:
-&lt;programlisting&gt;
+|[
 GST_LOG (&quot;caps are %&quot; GST_PTR_FORMAT, caps);
-&lt;/programlisting&gt;
+]|
 This prints the caps in human readble form.
 
 
@@ -9007,6 +9541,26 @@ buffer (see gst_object_set_parent()).
 </return>
 </function>
 
+<function name="gst_rtcp_packet_fb_set_media_ssrc">
+<description>
+Set the media SSRC field of the RTPFB or PSFB @packet.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="packet">
+<parameter_description> a valid RTPFB or PSFB #GstRTCPPacket
+</parameter_description>
+</parameter>
+<parameter name="ssrc">
+<parameter_description> a media SSRC
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_query_type_get_details">
 <description>
 Get details about the given #GstQueryType.
@@ -9207,22 +9761,22 @@ format key.
 
 <function name="gst_pad_can_link">
 <description>
-Checks if the source pad and the sink pad can be linked.
-Both @srcpad and @sinkpad must be unlinked.
+Checks if the source pad and the sink pad are compatible so they can be
+linked. 
 
 
 </description>
 <parameters>
 <parameter name="srcpad">
-<parameter_description> the source #GstPad to link.
+<parameter_description> the source #GstPad.
 </parameter_description>
 </parameter>
 <parameter name="sinkpad">
-<parameter_description> the sink #GstPad to link.
+<parameter_description> the sink #GstPad.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the pads can be linked, FALSE otherwise.
+<return> TRUE if the pads can be linked.
 </return>
 </function>
 
@@ -9265,19 +9819,22 @@ Converts a #GstStaticPadTemplate into a #GstPadTemplate.
 </return>
 </function>
 
-<function name="gst_trace_read_tsc">
+<function name="escape_string">
 <description>
-Read a platform independent timer value that can be used in
-benchmarks.
+Escapes @string, replacing any and all special characters
+with equivalent escape sequences.
+
 
 </description>
 <parameters>
-<parameter name="dst">
-<parameter_description> pointer to hold the result.
+<parameter name="string">
+<parameter_description> string to be escaped
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a newly allocated string equivalent to @string
+but with all special characters escaped
+</return>
 </function>
 
 <function name="gst_iterator_foreach">
@@ -9719,6 +10276,23 @@ Since: 0.10.20
 </return>
 </function>
 
+<function name="gst_navigation_event_get_type">
+<description>
+Inspect a #GstEvent and return the #GstNavigationEventType of the event, or
+#GST_NAVIGATION_EVENT_INVALID if the event is not a #GstNavigation event.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to inspect.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_plugin_feature_list_free">
 <description>
 Unrefs each member of @list, then frees the list.
@@ -9945,32 +10519,19 @@ Since: 0.10.16
 </return>
 </function>
 
-<function name="gst_message_new_segment_start">
+<function name="gst_debug_remove_log_function_by_data">
 <description>
-Create a new segment message. This message is posted by elements that
-start playback of a segment as a result of a segment seek. This message
-is not received by the application but is used for maintenance reasons in
-container elements.
+Removes all registered instances of log functions with the given user data.
 
 
 </description>
 <parameters>
-<parameter name="src">
-<parameter_description> The object originating the message.
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> The format of the position being played
-</parameter_description>
-</parameter>
-<parameter name="position">
-<parameter_description> The position of the segment being played
+<parameter name="data">
+<parameter_description> user data of the log function to remove
 </parameter_description>
 </parameter>
 </parameters>
-<return> The new segment start message.
-
-MT safe.
+<return> How many instances of the function were removed
 </return>
 </function>
 
@@ -9998,73 +10559,15 @@ manner as gst_structure_set(), and be NULL-terminated.
 <return></return>
 </function>
 
-<function name="gst_event_new_seek">
+<function name="gst_alloc_trace_live_all">
 <description>
-Allocate a new seek event with the given parameters.
-
-The seek event configures playback of the pipeline between @start to @stop
-at the speed given in @rate, also called a playback segment.
-The @start and @stop values are expressed in @format.
-
-A @rate of 1.0 means normal playback rate, 2.0 means double speed.
-Negatives values means backwards playback. A value of 0.0 for the
-rate is not allowed and should be accomplished instead by PAUSING the
-pipeline.
-
-A pipeline has a default playback segment configured with a start
-position of 0, a stop position of -1 and a rate of 1.0. The currently
-configured playback segment can be queried with #GST_QUERY_SEGMENT. 
-
-@start_type and @stop_type specify how to adjust the currently configured 
-start and stop fields in playback segment. Adjustments can be made relative
-or absolute to the last configured values. A type of #GST_SEEK_TYPE_NONE
-means that the position should not be updated.
-
-When the rate is positive and @start has been updated, playback will start
-from the newly configured start position. 
-
-For negative rates, playback will start from the newly configured stop
-position (if any). If the stop position if updated, it must be different from
--1 for negative rates.
-
-It is not possible to seek relative to the current playback position, to do
-this, PAUSE the pipeline, query the current playback position with
-#GST_QUERY_POSITION and update the playback segment current position with a
-#GST_SEEK_TYPE_SET to the desired position. 
+Get the total number of live registered alloc trace objects.
 
 
 </description>
 <parameters>
-<parameter name="rate">
-<parameter_description> The new playback rate
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> The format of the seek values
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> The optional seek flags
-</parameter_description>
-</parameter>
-<parameter name="start_type">
-<parameter_description> The type and flags for the new start position
-</parameter_description>
-</parameter>
-<parameter name="start">
-<parameter_description> The value of the new start position
-</parameter_description>
-</parameter>
-<parameter name="stop_type">
-<parameter_description> The type and flags for the new stop position
-</parameter_description>
-</parameter>
-<parameter name="stop">
-<parameter_description> The value of the new stop position
-</parameter_description>
-</parameter>
 </parameters>
-<return> A new seek event.
+<return> the total number of live registered alloc trace objects.
 </return>
 </function>
 
@@ -10133,8 +10636,10 @@ Gets the capabilities of the static pad template.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GstCaps of the static pad template. If you need to keep a
-reference to the caps, take a ref (see gst_caps_ref ()).
+<return> the #GstCaps of the static pad template.
+Unref after usage. Since the core holds an additional
+ref to the returned caps, use gst_caps_make_writable()
+on the returned caps to modify it.
 </return>
 </function>
 
@@ -10379,6 +10884,45 @@ Since: 0.10.4
 <return></return>
 </function>
 
+<function name="gst_pad_chain_list">
+<description>
+Chain a bufferlist to @pad.
+
+The function returns #GST_FLOW_WRONG_STATE if the pad was flushing.
+
+If the caps on the first buffer of @list are different from the current
+caps on @pad, this function will call any setcaps function
+(see gst_pad_set_setcaps_function()) installed on @pad. If the new caps
+are not acceptable for @pad, this function returns #GST_FLOW_NOT_NEGOTIATED.
+
+The function proceeds calling the chainlist function installed on @pad (see
+gst_pad_set_chain_list_function()) and the return value of that function is
+returned to the caller. #GST_FLOW_NOT_SUPPORTED is returned if @pad has no
+chainlist function.
+
+In all cases, success or failure, the caller loses its reference to @list
+after calling this function.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a sink #GstPad, returns GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+<parameter name="list">
+<parameter_description> the #GstBufferList to send, return GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn from the pad.
+
+Since: 0.10.24
+
+MT safe.
+</return>
+</function>
+
 <function name="gst_registry_get_plugin_list">
 <description>
 Get a copy of all plugins registered in the given registry. The refcount
@@ -10537,6 +11081,28 @@ Add @email to the list of emails in @msg.
 </return>
 </function>
 
+<function name="gst_navigation_event_parse_command">
+<description>
+Inspect a #GstNavigation command event and retrieve the enum value of the
+associated command.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to inspect.
+</parameter_description>
+</parameter>
+<parameter name="command">
+<parameter_description> Pointer to GstNavigationCommand to receive the type of the
+navigation event.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_controller_remove_properties">
 <description>
 Removes the given object properties from the controller
@@ -10579,6 +11145,25 @@ controlled by this controller or no #GstControlSource was assigned yet.
 
 Since: 0.10.14
 </return>
+</function>
+
+<function name="gst_task_pool_join">
+<description>
+Join a task and/or return it to the pool. @id is the id obtained from 
+gst_task_pool_push().
+
+</description>
+<parameters>
+<parameter name="pool">
+<parameter_description> a #GstTaskPool
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> the id
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_sdp_message_get_connection">
@@ -10695,15 +11280,43 @@ is available.
 </return>
 </function>
 
-<function name="gst_debug_is_colored">
+<function name="gst_pad_set_chain_list_function">
 <description>
-Checks if the debugging output should be colored.
+Sets the given chain list function for the pad. The chainlist function is
+called to process a #GstBufferList input buffer list. See
+#GstPadChainListFunction for more details.
+
+Since: 0.10.24
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a sink #GstPad.
+</parameter_description>
+</parameter>
+<parameter name="chainlist">
+<parameter_description> the #GstPadChainListFunction to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_base_audio_src_get_slave_method">
+<description>
+Get the current slave method used by @src.
 
 
 </description>
 <parameters>
+<parameter name="src">
+<parameter_description> a #GstBaseAudioSrc
+</parameter_description>
+</parameter>
 </parameters>
-<return> TRUE, if the debug output should be colored.
+<return> The current slave method used by @src.
+
+Since: 0.10.20
 </return>
 </function>
 
@@ -10775,6 +11388,21 @@ Sets the values for the given tags using the specified mode.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_buffer_list_iterator_n_buffers">
+<description>
+Returns: the number of buffers left to iterate in the current group
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of buffers left to iterate in the current group
+</return>
 </function>
 
 <function name="gst_xml_parse_memory">
@@ -10926,23 +11554,29 @@ is freed.
 </return>
 </function>
 
-<function name="gst_structure_has_field">
+<function name="gst_pad_get_internal_links">
 <description>
-Check if @structure contains a field named @fieldname.
+Gets a list of pads to which the given pad is linked to
+inside of the parent element.
+The caller must free this list after use.
 
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> a #GstStructure
-</parameter_description>
-</parameter>
-<parameter name="fieldname">
-<parameter_description> the name of a field
+<parameter name="pad">
+<parameter_description> the #GstPad to get the internal links of.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the structure contains a field with the given name
+<return> a newly allocated #GList of pads, free with g_list_free().
+
+Not MT safe.
+
+Deprecated: This function does not ref the pads in the list so that they
+could become invalid by the time the application accesses them. It's also
+possible that the list changes while handling the pads, which the caller of
+this function is unable to know. Use the thread-safe 
+gst_pad_iterate_internal_links() instead.
 </return>
 </function>
 
@@ -11067,23 +11701,6 @@ Returns: a copy of the list, or %NULL if the property isn't handled by the contr
 </parameter>
 </parameters>
 <return> a copy of the list, or %NULL if the property isn't handled by the controller
-</return>
-</function>
-
-<function name="gst_value_serialize">
-<description>
-tries to transform the given @value into a string representation that allows
-getting back this string later on using gst_value_deserialize().
-
-
-</description>
-<parameters>
-<parameter name="value">
-<parameter_description> a #GValue to serialize
-</parameter_description>
-</parameter>
-</parameters>
-<return> the serialization for @value or NULL if none exists
 </return>
 </function>
 
@@ -11437,25 +12054,18 @@ from the XOverlay.
 <return></return>
 </function>
 
-<function name="gst_caps_union">
+<function name="GstElement">
 <description>
-Creates a new #GstCaps that contains all the formats that are in
-either @caps1 and @caps2.
-
+This signals that the element will not generate more dynamic pads.
 
 </description>
 <parameters>
-<parameter name="caps1">
-<parameter_description> a #GstCaps to union
-</parameter_description>
-</parameter>
-<parameter name="caps2">
-<parameter_description> a #GstCaps to union
+<parameter name="gstelement">
+<parameter_description> the object which received the signal
 </parameter_description>
 </parameter>
 </parameters>
-<return> the new #GstCaps
-</return>
+<return></return>
 </function>
 
 <function name="gst_structure_get_string">
@@ -11599,6 +12209,42 @@ See Also: The #GstColorBalanceChannel::min_value and
 </parameters>
 <return> The current value of the channel.
 </return>
+</function>
+
+<function name="gst_navigation_send_mouse_event">
+<description>
+Sends a mouse event to the navigation interface. Mouse event coordinates
+are sent relative to the display space of the related output area. This is
+usually the size in pixels of the window associated with the element
+implementing the #GstNavigation interface.
+
+
+</description>
+<parameters>
+<parameter name="navigation">
+<parameter_description> The navigation interface instance
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> The type of mouse event, as a text string. Recognised values are
+&quot;mouse-button-press&quot;, &quot;mouse-button-release&quot; and &quot;mouse-move&quot;.
+</parameter_description>
+</parameter>
+<parameter name="button">
+<parameter_description> The button number of the button being pressed or released. Pass 0
+for mouse-move events.
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> The x coordinate of the mouse event.
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> The y coordinate of the mouse event.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_index_factory_make">
@@ -11765,6 +12411,25 @@ while allocating the #GstFFTS16 instance with gst_fft_s16_new().
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_rtsp_connection_get_url">
+<description>
+Retrieve the URL of the other end of @conn.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The URL. This value remains valid until the
+connection is freed.
+
+Since: 0.10.23
+</return>
 </function>
 
 <function name="gst_element_get_index">
@@ -11934,22 +12599,6 @@ Since: 0.10.11
 </return>
 </function>
 
-<function name="gst_debug_remove_log_function_by_data">
-<description>
-Removes all registered instances of log functions with the given user data.
-
-
-</description>
-<parameters>
-<parameter name="data">
-<parameter_description> user data of the log function to remove
-</parameter_description>
-</parameter>
-</parameters>
-<return> How many instances of the function were removed
-</return>
-</function>
-
 <function name="gst_color_balance_list_channels">
 <description>
 Retrieve a list of the available channels.
@@ -11985,6 +12634,21 @@ Sets the options for sample based audio codecs.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_buffer_list_n_groups">
+<description>
+Returns: the number of groups in the buffer list
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GstBufferList
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of groups in the buffer list
+</return>
 </function>
 
 <function name="gst_message_parse_async_start">
@@ -12323,6 +12987,25 @@ of the array in the given structure.
 <return></return>
 </function>
 
+<function name="gst_rtsp_connection_get_writefd">
+<description>
+Get the file descriptor for writing.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the file descriptor used for writing or -1 on error. The file
+descriptor remains valid until the connection is closed.
+
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_dp_header_payload_type">
 <description>
 Get the type of the payload described by @header.
@@ -12368,26 +13051,24 @@ or NULL if an event could not be read from the payload.
 </return>
 </function>
 
-<function name="gst_value_set_double_range">
+<function name="gst_pad_get_parent_element">
 <description>
-Sets @value to the range specified by @start and @end.
+Gets the parent of @pad, cast to a #GstElement. If a @pad has no parent or
+its parent is not an element, return NULL.
+
 
 </description>
 <parameters>
-<parameter name="value">
-<parameter_description> a GValue initialized to GST_TYPE_DOUBLE_RANGE
-</parameter_description>
-</parameter>
-<parameter name="start">
-<parameter_description> the start of the range
-</parameter_description>
-</parameter>
-<parameter name="end">
-<parameter_description> the end of the range
+<parameter name="pad">
+<parameter_description> a pad
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> The parent of the pad. The caller has a reference on the parent, so
+unref when you're finished with it.
+
+MT safe.
+</return>
 </function>
 
 <function name="str_case_equal">
@@ -12742,26 +13423,6 @@ properties.
 <return></return>
 </function>
 
-<function name="gst_registry_xml_read_cache">
-<description>
-Read the contents of the XML cache file at @location into @registry.
-
-
-</description>
-<parameters>
-<parameter name="registry">
-<parameter_description> a #GstRegistry
-</parameter_description>
-</parameter>
-<parameter name="location">
-<parameter_description> a filename
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE on success.
-</return>
-</function>
-
 <function name="gst_element_request_compatible_pad">
 <description>
 Requests a pad from @element. The returned pad should be unlinked and
@@ -12923,6 +13584,28 @@ Get a the names of the GObject properties that can be used for presets.
 <return> an array of property names which should be freed with g_strfreev() after use.
 
 Since: 0.10.20
+</return>
+</function>
+
+<function name="gst_debug_construct_win_color">
+<description>
+Constructs an integer that can be used for getting the desired color in
+windows' terminals (cmd.exe). As there is no mean to underline, we simply
+ignore this attribute.
+
+This function returns 0 on non-windows machines.
+
+
+</description>
+<parameters>
+<parameter name="colorinfo">
+<parameter_description> the color info
+</parameter_description>
+</parameter>
+</parameters>
+<return> an integer containing the color definition
+
+Since: 0.10.23
 </return>
 </function>
 
@@ -13213,7 +13896,9 @@ iterated over are read only.
 
 <function name="gst_poll_new_timer">
 <description>
-Create a new poll object that can be used for scheduling cancelable timeouts.
+Create a new poll object that can be used for scheduling cancellable
+timeouts.
+
 A timeout is performed with gst_poll_wait(). Multiple timeouts can be
 performed from different threads. 
 
@@ -13627,18 +14312,6 @@ Since: 0.10.22
 </return>
 </function>
 
-<function name="gst_parse_error_quark">
-<description>
-Get the error quark used by the parsing subsystem.
-
-
-</description>
-<parameters>
-</parameters>
-<return> the quark of the parse errors.
-</return>
-</function>
-
 <function name="gst_vorbis_tag_add">
 <description>
 Convenience function using gst_tag_from_vorbis_tag(), parsing
@@ -13660,6 +14333,31 @@ of a #GST_TAG_EXTENDED_COMMENT (since 0.10.10 at least).
 </parameter>
 <parameter name="value">
 <parameter_description> a vorbiscomment value string (value in key=value), must be valid UTF-8
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_navigation_query_set_commands">
+<description>
+Set the #GstNavigation command query result fields in @query. The number
+of commands passed must be equal to @n_commands.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="n_cmds">
+<parameter_description> the number of commands to set.
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> A list of @GstNavigationCommand values, @n_cmds entries long.
 </parameter_description>
 </parameter>
 </parameters>
@@ -13804,6 +14502,34 @@ result = gst_object_ref (object-&gt;parent);
 </return>
 </function>
 
+<function name="gst_tag_list_add_value">
+<description>
+Sets the GValue for a given tag using the specified mode.
+
+Since: 0.10.24
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> list to set tags in
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> the mode to use
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> tag
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> GValue for this tag
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtp_buffer_get_payload_buffer">
 <description>
 Create a buffer of the payload of the RTP packet in @buffer. This function
@@ -13879,6 +14605,34 @@ See if the given #GstQueryType is inside the @types query types array.
 </parameters>
 <return> TRUE if the type is found inside the array
 </return>
+</function>
+
+<function name="gst_tag_setter_add_tag_value">
+<description>
+Adds the given tag / GValue pair on the setter using the given merge mode.
+
+Since: 0.10.24
+
+</description>
+<parameters>
+<parameter name="setter">
+<parameter_description> a #GstTagSetter
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> the mode to use
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> tag to set
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> GValue to set for the tag
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_element_factory_make">
@@ -14200,6 +14954,26 @@ newly-loaded GstPlugin, or NULL if an error occurred.
 </return>
 </function>
 
+<function name="gst_navigation_send_command">
+<description>
+Sends the indicated command to the navigation interface.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="navigation">
+<parameter_description> The navigation interface instance
+</parameter_description>
+</parameter>
+<parameter name="command">
+<parameter_description> The command to issue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_bus_add_signal_watch_full">
 <description>
 Adds a bus signal watch to the default main context with the given priority.
@@ -14427,7 +15201,7 @@ type of notification it is.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The type of the GstMixerMessage, or GST_MIXER_MESSAGE_NONE
+<return> The type of the GstMixerMessage, or GST_MIXER_MESSAGE_INVALID
 if the message is not a GstMixer notification.
 
 Since: 0.10.14
@@ -14448,6 +15222,50 @@ get the package the plugin belongs to.
 </parameters>
 <return> the package of the plugin
 </return>
+</function>
+
+<function name="gst_sdp_media_get_information">
+<description>
+Get the information of @media
+
+
+</description>
+<parameters>
+<parameter name="media">
+<parameter_description> a #GstSDPMedia
+</parameter_description>
+</parameter>
+</parameters>
+<return> the information of @media.
+</return>
+</function>
+
+<function name="gst_message_parse_stream_status">
+<description>
+Extracts the stream status type and owner the GstMessage. The returned
+owner remains valid for as long as the reference to @message is valid and
+should thus not be unreffed.
+
+Since: 0.10.24.
+
+MT safe.
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> A valid #GstMessage of type GST_MESSAGE_STREAM_STATUS.
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> A pointer to hold the status type
+</parameter_description>
+</parameter>
+<parameter name="owner">
+<parameter_description> The owner element of the message source
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_mini_object_is_writable">
@@ -14513,6 +15331,23 @@ MT safe.
 </parameter>
 <parameter name="mutex">
 <parameter_description> The #GMutex to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_rtsp_watch_unref">
+<description>
+Decreases the reference count of @watch by one. If the resulting reference
+count is zero the watch and associated memory will be destroyed.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="watch">
+<parameter_description> a #GstRTSPWatch
 </parameter_description>
 </parameter>
 </parameters>
@@ -14844,6 +15679,8 @@ a 0-length list.
 Create a newly allocated #GstRTSPConnection from @url and store it in @conn.
 The connection will not yet attempt to connect to @url, use
 gst_rtsp_connection_connect().
+
+A copy of @url will be made.
 
 
 </description>
@@ -15244,22 +16081,28 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_caps_do_simplify">
+<function name="gst_index_entry_assoc_map">
 <description>
-Modifies the given @caps inplace into a representation that represents the
-same set of formats, but in a simpler form.  Component structures that are
-identical are merged.  Component structures that have values that can be
-merged are also merged.
+Gets alternative formats associated with the indexentry.
 
 
 </description>
 <parameters>
-<parameter name="caps">
-<parameter_description> a #GstCaps to simplify
+<parameter name="entry">
+<parameter_description> the index to search
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the value the find
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a pointer to store the value
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE, if the caps could be simplified
+<return> TRUE if there was a value associated with the given
+format.
 </return>
 </function>
 
@@ -15345,6 +16188,13 @@ a new thread.
 The function cannot be changed after the task has been created. You
 must create a new #GstTask to change the function.
 
+This function will not yet create and start a thread. Use gst_task_start() or
+gst_task_pause() to create and start the GThread.
+
+Before the task can be used, a #GStaticRecMutex must be configured using the
+gst_task_set_lock() function. This lock will always be acquired while
+@func is called.
+
 
 </description>
 <parameters>
@@ -15365,8 +16215,9 @@ MT safe.
 
 <function name="gst_tag_list_get_date">
 <description>
-Copies the contents for the given tag into the value, merging multiple values
-into one if multiple values are associated with the tag.
+Copies the first date for the given tag in the taglist into the variable
+pointed to by @value. Free the date with g_date_free() when it is no longer
+needed.
 
 
 </description>
@@ -15380,11 +16231,11 @@ into one if multiple values are associated with the tag.
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> location for the result
+<parameter_description> address of a GDate pointer variable to store the result into
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE, if a value was copied, FALSE if the tag didn't exist in the
+<return> TRUE, if a date was copied, FALSE if the tag didn't exist in the
 given list or if it was #NULL.
 </return>
 </function>
@@ -15993,6 +16844,30 @@ Since: 0.10.21
 <return></return>
 </function>
 
+<function name="gst_task_set_priority">
+<description>
+Changes the priority of @task to @priority.
+
+Note: try not to depend on task priorities.
+
+MT safe.
+
+Since: 0.10.24
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GstTask
+</parameter_description>
+</parameter>
+<parameter name="priority">
+<parameter_description> a new priority for @task
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_install_plugins_async">
 <description>
 Requests plugin installation without blocking. Once the plugins have been
@@ -16337,6 +17212,35 @@ Get a printable name for the given query type. Do not modify or free.
 </return>
 </function>
 
+<function name="gst_tag_list_get_buffer">
+<description>
+Copies the first buffer for the given tag in the taglist into the variable
+pointed to by @value. Free the buffer with gst_buffer_unref() when it is
+no longer needed.
+
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GstTagList to get the tag from
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> tag to read out
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> address of a GstBuffer pointer variable to store the result into
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE, if a buffer was copied, FALSE if the tag didn't exist in the
+given list or if it was #NULL.
+
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_message_new_segment_done">
 <description>
 Create a new segment done message. This message is posted by elements that
@@ -16404,23 +17308,25 @@ Looks up the GStreamer tag for a ID3v2 tag.
 </return>
 </function>
 
-<function name="gst_message_new_state_dirty">
+<function name="gst_element_get_pad_from_template">
 <description>
-Create a state dirty message. This message is posted whenever an element
-changed its state asynchronously and is used internally to update the
-states of container objects.
+Gets a pad from @element described by @templ. If the presence of @templ is
+#GST_PAD_REQUEST, requests a new pad. Can return %NULL for #GST_PAD_SOMETIMES
+templates.
 
 
 </description>
 <parameters>
-<parameter name="src">
-<parameter_description> the object originating the message
+<parameter name="element">
+<parameter_description> a #GstElement.
+</parameter_description>
+</parameter>
+<parameter name="templ">
+<parameter_description> a #GstPadTemplate belonging to @element.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The new state dirty message.
-
-MT safe.
+<return> the #GstPad, or NULL if one could not be found or created.
 </return>
 </function>
 
@@ -16438,6 +17344,39 @@ Get the name of @structure as a GQuark.
 </parameters>
 <return> the quark representing the name of the structure.
 </return>
+</function>
+
+<function name="gst_navigation_event_parse_mouse_button_event">
+<description>
+Retrieve the details of either a #GstNavigation mouse button press event or
+a mouse button release event. Determine which type the event is using
+gst_navigation_event_get_type() to retrieve the #GstNavigationEventType.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to inspect.
+</parameter_description>
+</parameter>
+<parameter name="button">
+<parameter_description> Pointer to a gint that will receive the button number associated
+with the event.
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> Pointer to a gdouble to receive the x coordinate of the mouse button
+event.
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Pointer to a gdouble to receive the y coordinate of the mouse button
+event.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_pad_activate_push">
@@ -16589,6 +17528,9 @@ MT safe.
 <description>
 Convertes the string value to the type of the objects argument and
 sets the argument with it.
+
+Note that this function silently returns if @object has no property named
+@name or when @value cannot be converted to the type of the property.
 
 </description>
 <parameters>
@@ -17184,6 +18126,29 @@ Print the status of the given GstAllocTrace.
 <return></return>
 </function>
 
+<function name="gst_navigation_message_new_mouse_over">
+<description>
+Creates a new #GstNavigation message with type
+#GST_NAVIGATION_MESSAGE_MOUSE_OVER.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> A #GstObject to set as source of the new message.
+</parameter_description>
+</parameter>
+<parameter name="active">
+<parameter_description> %TRUE if the mouse has entered a clickable area of the display.
+%FALSE if it over a non-clickable area.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new #GstMessage.
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_rtsp_connection_write">
 <description>
 Attempt to write @size bytes of @data to the connected @conn, blocking up to
@@ -17394,6 +18359,24 @@ TXXX frame or owner in UFID frame).
 </return>
 </function>
 
+<function name="gst_rtcp_packet_fb_get_sender_ssrc">
+<description>
+Get the sender SSRC field of the RTPFB or PSFB @packet.
+
+
+</description>
+<parameters>
+<parameter name="packet">
+<parameter_description> a valid RTPFB or PSFB #GstRTCPPacket
+</parameter_description>
+</parameter>
+</parameters>
+<return> the sender SSRC.
+
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_tag_list_get_value_index">
 <description>
 Gets the value that is at the given index for the given tag in the given
@@ -17460,24 +18443,32 @@ Since: 0.10.11
 </return>
 </function>
 
-<function name="gst_event_get_structure">
+<function name="gst_iterator_push">
 <description>
-Access the structure of the event.
+Pushes @other iterator onto @it. All calls performed on @it are
+forwarded to @other. If @other returns %GST_ITERATOR_DONE, it is
+popped again and calls are handled by @it again.
 
+This function is mainly used by objects implementing the iterator
+next function to recurse into substructures.
+
+When gst_iterator_resync() is called on @it, @other will automatically be
+popped.
+
+MT safe.
 
 </description>
 <parameters>
-<parameter name="event">
-<parameter_description> The #GstEvent.
+<parameter name="it">
+<parameter_description> The #GstIterator to use
+</parameter_description>
+</parameter>
+<parameter name="other">
+<parameter_description> The #GstIterator to push
 </parameter_description>
 </parameter>
 </parameters>
-<return> The structure of the event. The structure is still
-owned by the event, which means that you should not free it and
-that the pointer becomes invalid when you free the event.
-
-MT safe.
-</return>
+<return></return>
 </function>
 
 <function name="gst_registry_scan_path">
@@ -17705,6 +18696,32 @@ called from the task function.
 </parameters>
 <return> a TRUE if the task could be paused or FALSE when the pad
 has no task.
+</return>
+</function>
+
+<function name="gst_bin_get_by_interface">
+<description>
+Looks for an element inside the bin that implements the given
+interface. If such an element is found, it returns the element.
+You can cast this element to the given interface afterwards.  If you want
+all elements that implement the interface, use
+gst_bin_iterate_all_by_interface(). This function recurses into child bins.
+
+MT safe.  Caller owns returned reference.
+
+
+</description>
+<parameters>
+<parameter name="bin">
+<parameter_description> a #GstBin
+</parameter_description>
+</parameter>
+<parameter name="iface">
+<parameter_description> the #GType of an interface
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GstElement inside the bin implementing the interface
 </return>
 </function>
 
@@ -17984,6 +19001,8 @@ set to 0 when this function is first called. In case the commit operation is
 interrupted, one can resume the processing by passing the previously returned
 @accum value back to this function.
 
+MT safe.
+
 
 </description>
 <parameters>
@@ -18017,8 +19036,6 @@ number of samples written can be less than @out_samples when @buf was interrupte
 with a flush or stop.
 
 Since: 0.10.11.
-
-MT safe.
 </return>
 </function>
 
@@ -18338,20 +19355,28 @@ Since: 0.10.18
 <return></return>
 </function>
 
-<function name="gst_rtsp_find_header_field">
+<function name="gst_rtsp_message_new_request">
 <description>
-Convert @header to a #GstRTSPHeaderField.
+Create a new #GstRTSPMessage with @method and @uri and store the result
+request message in @msg. Free with gst_rtsp_message_free().
 
 
 </description>
 <parameters>
-<parameter name="header">
-<parameter_description> a header string
+<parameter name="msg">
+<parameter_description> a location for the new #GstRTSPMessage
+</parameter_description>
+</parameter>
+<parameter name="method">
+<parameter_description> the request method to use
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> the uri of the request
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstRTSPHeaderField for @header or #GST_RTSP_HDR_INVALID if the
-header field is unknown.
+<return> a #GstRTSPResult.
 </return>
 </function>
 
@@ -18387,7 +19412,7 @@ explicit reference counting should not wrap this function.
 <function name="gst_poll_read_control">
 <description>
 Read a byte from the control socket of the controllable @set.
-This function is mostly usefull for timer #GstPoll objects created with
+This function is mostly useful for timer #GstPoll objects created with
 gst_poll_new_timer(). 
 
 
@@ -18507,26 +19532,24 @@ field GType and field value)
 <return></return>
 </function>
 
-<function name="gst_caps_is_subset">
+<function name="gst_pad_set_iterate_internal_links_function">
 <description>
-Checks if all caps represented by @subset are also represented by @superset.
-&lt;note&gt;This function does not work reliably if optional properties for caps
-are included on one caps and omitted on the other.&lt;/note&gt;
+Sets the given internal link iterator function for the pad.
 
+Since: 0.10.21
 
 </description>
 <parameters>
-<parameter name="subset">
-<parameter_description> a #GstCaps
+<parameter name="pad">
+<parameter_description> a #GstPad of either direction.
 </parameter_description>
 </parameter>
-<parameter name="superset">
-<parameter_description> a potentially greater #GstCaps
+<parameter name="iterintlink">
+<parameter_description> the #GstPadIterIntLinkFunction to set.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @subset is a subset of @superset
-</return>
+<return></return>
 </function>
 
 <function name="gst_caps_replace">
@@ -18614,6 +19637,35 @@ Get the CSRC at index @idx in @buffer.
 </return>
 </function>
 
+<function name="gst_navigation_query_parse_angles">
+<description>
+Parse the current angle number in the #GstNavigation angles @query into the
+#guint pointed to by the @cur_angle variable, and the number of available
+angles into the #guint pointed to by the @n_angles variable.
+
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="cur_angle">
+<parameter_description> Pointer to a #guint into which to store the currently selected
+angle value from the query, or NULL
+</parameter_description>
+</parameter>
+<parameter name="n_angles">
+<parameter_description> Pointer to a #guint into which to store the number of angles
+value from the query, or NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the query could be successfully parsed. %FALSE if not.
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_bit_reader_get_bits_uint8">
 <description>
 Read @nbits bits into @val and update the current position.
@@ -18667,6 +19719,25 @@ stays valid as long as it remains present in @msg.
 </parameters>
 <return> #GST_RTSP_OK when @field was found, #GST_RTSP_ENOTIMPL if the key
 was not found.
+</return>
+</function>
+
+<function name="gst_navigation_query_get_type">
+<description>
+Inspect a #GstQuery and return the #GstNavigationQueryType associated with
+it if it is a #GstNavigation query.
+
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> The query to inspect
+</parameter_description>
+</parameter>
+</parameters>
+<return> The #GstNavigationQueryType of the query, or
+#GST_NAVIGATION_QUERY_INVALID
+Since: 0.10.23
 </return>
 </function>
 
@@ -18925,17 +19996,22 @@ Since: 0.10.22
 </return>
 </function>
 
-<function name="gst_segtrap_set_enabled">
+<function name="gst_util_set_value_from_string">
 <description>
-Applications might want to disable/enable the SIGSEGV handling of
-the GStreamer core. See gst_segtrap_is_enabled() for more information.
+Converts the string to the type of the value and
+sets the value with it.
 
-Since: 0.10.10
+Note that this function is dangerous as it does not return any indication
+if the conversion worked or not.
 
 </description>
 <parameters>
-<parameter name="enabled">
-<parameter_description> whether a custom SIGSEGV handler should be installed.
+<parameter name="value">
+<parameter_description> the value to set
+</parameter_description>
+</parameter>
+<parameter name="value_str">
+<parameter_description> the string to get the value from
 </parameter_description>
 </parameter>
 </parameters>
@@ -19208,27 +20284,18 @@ depending on the type of the pad.
 </return>
 </function>
 
-<function name="gst_base_src_wait_playing">
+<function name="GstBufferList">
 <description>
-If the #GstBaseSrcClass::create method performs its own synchronisation against
-the clock it must unblock when going from PLAYING to the PAUSED state and call
-this method before continuing to produce the remaining data.
-
-This function will block until a state change to PLAYING happens (in which
-case this function returns #GST_FLOW_OK) or the processing must be stopped due
-to a state change to READY or a FLUSH event (in which case this function
-Returns: #GST_FLOW_OK if @src is PLAYING and processing can
+Opaque list of grouped buffers.
 
 </description>
 <parameters>
-<parameter name="src">
-<parameter_description> the src
+<parameter name="mini_object">
+<parameter_description> the parent structure
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GST_FLOW_OK if @src is PLAYING and processing can
-continue. Any other return value should be returned from the create vmethod.
-</return>
+<return></return>
 </function>
 
 <function name="gst_mixer_options_get_values">
@@ -19342,22 +20409,43 @@ g_list_foreach (list, (GFunc) g_free, NULL) plus g_list_free (list)
 </return>
 </function>
 
-<function name="escape_string">
+<function name="gst_buffer_list_iterator_add">
 <description>
-Escapes @string, replacing any and all special characters
-with equivalent escape sequences.
+Inserts @buffer into the #GstBufferList iterated with @it. The buffer is
+inserted into the current group, immediately before the buffer that would be
+returned by gst_buffer_list_iterator_next(). The buffer is inserted before
+the implicit cursor, a subsequent call to gst_buffer_list_iterator_next()
+will return the buffer after the inserted buffer, if any.
 
+This function takes ownership of @buffer.
 
 </description>
 <parameters>
-<parameter name="string">
-<parameter_description> string to be escaped
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string equivalent to @string
-but with all special characters escaped
-</return>
+<return></return>
+</function>
+
+<function name="gst_trace_read_tsc">
+<description>
+Read a platform independent timer value that can be used in
+benchmarks.
+
+</description>
+<parameters>
+<parameter name="dst">
+<parameter_description> pointer to hold the result.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_registry_get_default">
@@ -19501,6 +20589,30 @@ Since: 0.10.22
 </return>
 </function>
 
+<function name="gst_buffer_list_iterator_merge_group">
+<description>
+Merge a buffer list group into a normal #GstBuffer by copying its metadata
+and memcpying its data into consecutive memory. All buffers in the current
+group after the implicit cursor will be merged into one new buffer. The
+metadata of the new buffer will be a copy of the metadata of the buffer that
+would be returned by gst_buffer_list_iterator_next(). If there is no buffer
+in the current group after the implicit cursor, NULL will be returned.
+
+This function will not move the implicit cursor or in any other way affect
+the state of the iterator @it or the list.
+
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstBuffer, gst_buffer_unref() after usage, or NULL
+</return>
+</function>
+
 <function name="gst_rtp_buffer_set_payload_type">
 <description>
 Set the payload type of the RTP packet in @buffer to @payload_type.
@@ -19519,24 +20631,19 @@ Set the payload type of the RTP packet in @buffer to @payload_type.
 <return></return>
 </function>
 
-<function name="gst_error_get_message">
+<function name="gst_value_get_double_range_min">
 <description>
-Get a string describing the error message in the current locale.
+Gets the minimum of the range specified by @value.
 
 
 </description>
 <parameters>
-<parameter name="domain">
-<parameter_description> the GStreamer error domain this error belongs to.
-</parameter_description>
-</parameter>
-<parameter name="code">
-<parameter_description> the error code belonging to the domain.
+<parameter name="value">
+<parameter_description> a GValue initialized to GST_TYPE_DOUBLE_RANGE
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string describing the error message in the
-current locale.
+<return> the minimum of the range
 </return>
 </function>
 
@@ -19897,28 +21004,22 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_index_entry_assoc_map">
+<function name="gst_caps_do_simplify">
 <description>
-Gets alternative formats associated with the indexentry.
+Modifies the given @caps inplace into a representation that represents the
+same set of formats, but in a simpler form.  Component structures that are
+identical are merged.  Component structures that have values that can be
+merged are also merged.
 
 
 </description>
 <parameters>
-<parameter name="entry">
-<parameter_description> the index to search
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> the format of the value the find
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> a pointer to store the value
+<parameter name="caps">
+<parameter_description> a #GstCaps to simplify
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if there was a value associated with the given
-format.
+<return> TRUE, if the caps could be simplified
 </return>
 </function>
 
@@ -20014,6 +21115,21 @@ MT safe.  Caller owns returned value.
 </parameter>
 </parameters>
 <return> a #GstIterator of #GstElement, or NULL
+</return>
+</function>
+
+<function name="gst_buffer_list_iterator_next">
+<description>
+Returns: the next buffer in the current group of the buffer list, or NULL
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+</parameters>
+<return> the next buffer in the current group of the buffer list, or NULL
 </return>
 </function>
 
@@ -20255,6 +21371,32 @@ Since: 0.10.12
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_buffer_list_iterator_do">
+<description>
+Calls the given function for the last buffer returned by
+gst_buffer_list_iterator_next(). gst_buffer_list_iterator_next() must have
+been called on @it before this function is called.
+gst_buffer_list_iterator_remove() or gst_buffer_list_iterator_steal() must
+not have been called since the last call to gst_buffer_list_iterator_next().
+
+See #GstBufferListDoFunction for more details.
+
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+<parameter name="do_func">
+<parameter_description> the function to be called
+</parameter_description>
+</parameter>
+</parameters>
+<return> the return value from @do_func
+</return>
 </function>
 
 <function name="gst_pad_add_buffer_probe_full">
@@ -20521,21 +21663,73 @@ items has been exceeded for the SDES packet or the MTU has been reached.
 </return>
 </function>
 
-<function name="gst_clock_id_ref">
+<function name="gst_event_new_seek">
 <description>
-Increase the refcount of given @id.
+Allocate a new seek event with the given parameters.
+
+The seek event configures playback of the pipeline between @start to @stop
+at the speed given in @rate, also called a playback segment.
+The @start and @stop values are expressed in @format.
+
+A @rate of 1.0 means normal playback rate, 2.0 means double speed.
+Negatives values means backwards playback. A value of 0.0 for the
+rate is not allowed and should be accomplished instead by PAUSING the
+pipeline.
+
+A pipeline has a default playback segment configured with a start
+position of 0, a stop position of -1 and a rate of 1.0. The currently
+configured playback segment can be queried with #GST_QUERY_SEGMENT. 
+
+@start_type and @stop_type specify how to adjust the currently configured 
+start and stop fields in playback segment. Adjustments can be made relative
+or absolute to the last configured values. A type of #GST_SEEK_TYPE_NONE
+means that the position should not be updated.
+
+When the rate is positive and @start has been updated, playback will start
+from the newly configured start position. 
+
+For negative rates, playback will start from the newly configured stop
+position (if any). If the stop position if updated, it must be different from
+-1 for negative rates.
+
+It is not possible to seek relative to the current playback position, to do
+this, PAUSE the pipeline, query the current playback position with
+#GST_QUERY_POSITION and update the playback segment current position with a
+#GST_SEEK_TYPE_SET to the desired position. 
 
 
 </description>
 <parameters>
-<parameter name="id">
-<parameter_description> The #GstClockID to ref
+<parameter name="rate">
+<parameter_description> The new playback rate
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> The format of the seek values
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> The optional seek flags
+</parameter_description>
+</parameter>
+<parameter name="start_type">
+<parameter_description> The type and flags for the new start position
+</parameter_description>
+</parameter>
+<parameter name="start">
+<parameter_description> The value of the new start position
+</parameter_description>
+</parameter>
+<parameter name="stop_type">
+<parameter_description> The type and flags for the new stop position
+</parameter_description>
+</parameter>
+<parameter name="stop">
+<parameter_description> The value of the new stop position
 </parameter_description>
 </parameter>
 </parameters>
-<return> The same #GstClockID with increased refcount.
-
-MT safe.
+<return> A new seek event.
 </return>
 </function>
 
@@ -20617,6 +21811,21 @@ Since: 0.10.15
 <return></return>
 </function>
 
+<function name="gst_navigation_query_new_angles">
+<description>
+Create a new #GstNavigation angles query. When executed, it will
+query the pipeline for the set of currently available angles, which may be
+greater than one in a multiangle video.
+
+
+</description>
+<parameters>
+</parameters>
+<return> The new query.
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_mixer_mute_toggled">
 <description>
 This function is called by the mixer implementation to produce
@@ -20644,6 +21853,24 @@ GstMixer interface, and the element needs to have been provided a bus.
 <return></return>
 </function>
 
+<function name="gst_color_balance_get_balance_type">
+<description>
+Get the #GstColorBalanceType of this implementation.
+
+
+</description>
+<parameters>
+<parameter name="balance">
+<parameter_description> The #GstColorBalance implementation
+</parameter_description>
+</parameter>
+</parameters>
+<return> A the #GstColorBalanceType.
+
+Since: 0.10.24
+</return>
+</function>
+
 <function name="gst_rtsp_watch_new">
 <description>
 Create a watch object for @conn. The functions provided in @funcs will be
@@ -20667,6 +21894,10 @@ maincontext with gst_rtsp_watch_attach().
 </parameter>
 <parameter name="user_data">
 <parameter_description> user data to pass to @funcs
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> notify when @user_data is not referenced anymore
 </parameter_description>
 </parameter>
 </parameters>
@@ -20804,6 +22035,24 @@ Since: 0.10.15
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_clock_id_ref">
+<description>
+Increase the refcount of given @id.
+
+
+</description>
+<parameters>
+<parameter name="id">
+<parameter_description> The #GstClockID to ref
+</parameter_description>
+</parameter>
+</parameters>
+<return> The same #GstClockID with increased refcount.
+
+MT safe.
+</return>
 </function>
 
 <function name="gst_rtcp_packet_bye_set_reason">
@@ -21209,6 +22458,23 @@ Since: 0.10.11
 </return>
 </function>
 
+<function name="gst_rtsp_watch_reset">
+<description>
+Reset @watch, this is usually called after gst_rtsp_connection_do_tunnel()
+when the file descriptors of the connection might have changed.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="watch">
+<parameter_description> a #GstRTSPWatch
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_clock_get_internal_time">
 <description>
 Gets the current internal time of the given clock. The time is returned
@@ -21229,20 +22495,30 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_sdp_media_get_information">
+<function name="gst_buffer_list_iterator_take">
 <description>
-Get the information of @media
+Replaces the last buffer returned by gst_buffer_list_iterator_next() with
+@buffer in the #GstBufferList iterated with @it and takes ownership of
+@buffer. gst_buffer_list_iterator_next() must have been called on @it before
+this function is called. gst_buffer_list_iterator_remove() must not have been
+called since the last call to gst_buffer_list_iterator_next().
 
+This function unrefs the replaced buffer if it has not been stolen with
+gst_buffer_list_iterator_steal() and takes ownership of @buffer (i.e. the
+refcount of @buffer is not increased).
 
 </description>
 <parameters>
-<parameter name="media">
-<parameter_description> a #GstSDPMedia
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
 </parameter_description>
 </parameter>
 </parameters>
-<return> the information of @media.
-</return>
+<return></return>
 </function>
 
 <function name="gst_query_type_to_quark">
@@ -21579,6 +22855,34 @@ get the source module the plugin belongs to.
 </return>
 </function>
 
+<function name="gst_rtsp_connection_get_readfd">
+<description>
+Get the file descriptor for reading.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the file descriptor used for reading or -1 on error. The file
+descriptor remains valid until the connection is closed.
+
+Since: 0.10.23
+</return>
+</function>
+
+<function name="GstClock">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_net_time_packet_new">
 <description>
 Creates a new #GstNetTimePacket from a buffer received over the network. The
@@ -21751,19 +23055,38 @@ into signals.
 </return>
 </function>
 
-<function name="gst_pad_is_linked">
+<function name="gst_clock_id_wait">
 <description>
-Checks if a @pad is linked to another pad or not.
+Perform a blocking wait on @id. 
+@id should have been created with gst_clock_new_single_shot_id()
+or gst_clock_new_periodic_id() and should not have been unscheduled
+with a call to gst_clock_id_unschedule(). 
+
+If the @jitter argument is not %NULL and this function returns #GST_CLOCK_OK
+or #GST_CLOCK_EARLY, it will contain the difference
+against the clock and the time of @id when this method was
+called. 
+Positive values indicate how late @id was relative to the clock
+(in which case this function will return #GST_CLOCK_EARLY). 
+Negative values indicate how much time was spent waiting on the clock 
+before this function returned.
 
 
 </description>
 <parameters>
-<parameter name="pad">
-<parameter_description> pad to check
+<parameter name="id">
+<parameter_description> The #GstClockID to wait on
+</parameter_description>
+</parameter>
+<parameter name="jitter">
+<parameter_description> A pointer that will contain the jitter, can be %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the pad is linked, FALSE otherwise.
+<return> the result of the blocking wait. #GST_CLOCK_EARLY will be returned
+if the current clock time is past the time of @id, #GST_CLOCK_OK if 
+@id was scheduled in time. #GST_CLOCK_UNSCHEDULED if @id was 
+unscheduled with gst_clock_id_unschedule().
 
 MT safe.
 </return>
@@ -21905,25 +23228,32 @@ Converts the given element into an XML presentation.
 </return>
 </function>
 
-<function name="gst_element_provides_clock">
+<function name="gst_pad_get_internal_links_default">
 <description>
-Query if the element provides a clock. A #GstClock provided by an
-element can be used as the global #GstClock for the pipeline.
-An element that can provide a clock is only required to do so in the PAUSED
-state, this means when it is fully negotiated and has allocated the resources
-to operate the clock.
+Gets a list of pads to which the given pad is linked to
+inside of the parent element.
+This is the default handler, and thus returns a list of all of the
+pads inside the parent element with opposite direction.
+
+The caller must free this list after use with g_list_free().
 
 
 </description>
 <parameters>
-<parameter name="element">
-<parameter_description> a #GstElement to query
+<parameter name="pad">
+<parameter_description> the #GstPad to get the internal links of.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the element provides a clock
+<return> a newly allocated #GList of pads, or NULL if the pad has no parent.
 
-MT safe.
+Not MT safe.
+
+Deprecated: This function does not ref the pads in the list so that they
+could become invalid by the time the application accesses them. It's also
+possible that the list changes while handling the pads, which the caller of
+this function is unable to know. Use the thread-safe 
+gst_pad_iterate_internal_links_default() instead.
 </return>
 </function>
 
@@ -22152,6 +23482,33 @@ should already have been released via gst_ring_buffer_release().
 <return> TRUE if the device could be closed, FALSE on error.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_rtsp_message_take_header">
+<description>
+Add a header with key @field and @value to @msg. This function takes
+ownership of @value.
+
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> a #GstRTSPMessage
+</parameter_description>
+</parameter>
+<parameter name="field">
+<parameter_description> a #GstRTSPHeaderField
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the value of the header
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstRTSPResult.
+
+Since: 0.10.23
 </return>
 </function>
 
@@ -22656,21 +24013,27 @@ internal time
 <return></return>
 </function>
 
-<function name="gst_rtp_payload_info_for_pt">
+<function name="gst_navigation_message_parse_mouse_over">
 <description>
-Get the #GstRTPPayloadInfo for @payload_type. This function is
-mostly used to get the default clock-rate and bandwidth for static payload
-types specified with @payload_type.
+Parse a #GstNavigation message of type #GST_NAVIGATION_MESSAGE_MOUSE_OVER
+and extract the active/inactive flag. If the mouse over event is marked
+active, it indicates that the mouse is over a clickable area.
 
 
 </description>
 <parameters>
-<parameter name="payload_type">
-<parameter_description> the payload_type to find
+<parameter name="message">
+<parameter_description> A #GstMessage to inspect.
+</parameter_description>
+</parameter>
+<parameter name="active">
+<parameter_description> A pointer to a gboolean to receive the active/inactive state,
+or NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstRTPPayloadInfo or NULL when no info could be found.
+<return> %TRUE if the message could be successfully parsed. %FALSE if not.
+Since: 0.10.23
 </return>
 </function>
 
@@ -22797,6 +24160,9 @@ another thread.
 An application can use gst_element_get_state() to wait for the completion
 of the state change or it can wait for a state change message on the bus.
 
+State changes to %GST_STATE_READY or %GST_STATE_NULL never return
+#GST_STATE_CHANGE_ASYNC.
+
 
 </description>
 <parameters>
@@ -22812,6 +24178,24 @@ of the state change or it can wait for a state change message on the bus.
 <return> Result of the state change using #GstStateChangeReturn.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_rtp_payload_info_for_pt">
+<description>
+Get the #GstRTPPayloadInfo for @payload_type. This function is
+mostly used to get the default clock-rate and bandwidth for static payload
+types specified with @payload_type.
+
+
+</description>
+<parameters>
+<parameter name="payload_type">
+<parameter_description> the payload_type to find
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstRTPPayloadInfo or NULL when no info could be found.
 </return>
 </function>
 
@@ -23143,6 +24527,19 @@ See gst_pad_add_*_probe functions.
 </return>
 </function>
 
+<function name="gst_buffer_list_new">
+<description>
+Creates a new, empty #GstBufferList. The caller is responsible for unreffing
+the returned #GstBufferList.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the new #GstBufferList. gst_buffer_list_unref() after usage.
+</return>
+</function>
+
 <function name="gst_event_parse_latency">
 <description>
 Get the latency in the latency event.
@@ -23182,27 +24579,6 @@ to do anything to the element after loading.
 </parameter>
 </parameters>
 <return> a pointer to a new GstElement, caller owns returned reference.
-</return>
-</function>
-
-<function name="gst_registry_xml_write_cache">
-<description>
-Write @registry in an XML format at the location given by
-@location. Directories are automatically created.
-
-
-</description>
-<parameters>
-<parameter name="registry">
-<parameter_description> a #GstRegistry
-</parameter_description>
-</parameter>
-<parameter name="location">
-<parameter_description> a filename
-</parameter_description>
-</parameter>
-</parameters>
-<return> TRUE on success.
 </return>
 </function>
 
@@ -23405,33 +24781,22 @@ Since: 0.10.7
 </return>
 </function>
 
-<function name="gst_structure_get_uint">
+<function name="gst_value_set_fourcc">
 <description>
-Sets the uint pointed to by @value corresponding to the value of the
-given field.  Caller is responsible for making sure the field exists
-and has the correct type.
-
-returns %FALSE.
+Sets @value to @fourcc.
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> a #GstStructure
-</parameter_description>
-</parameter>
-<parameter name="fieldname">
-<parameter_description> the name of a field
-</parameter_description>
-</parameter>
 <parameter name="value">
-<parameter_description> a pointer to a uint to set
+<parameter_description> a GValue initialized to #GST_TYPE_FOURCC
+</parameter_description>
+</parameter>
+<parameter name="fourcc">
+<parameter_description> the #guint32 fourcc to set
 </parameter_description>
 </parameter>
 </parameters>
-<return>%FALSE.
-
-Since: 0.10.15
-</return>
+<return></return>
 </function>
 
 <function name="gst_element_factory_get_author">
@@ -23509,6 +24874,77 @@ Get the number of SSRC fields in @packet.
 </return>
 </function>
 
+<function name="gst_plugin_register_static_full">
+<description>
+Registers a static plugin, ie. a plugin which is private to an application
+or library and contained within the application or library (as opposed to
+being shipped as a separate module file) with a #GstPluginInitFullFunc
+which allows user data to be passed to the callback function (useful
+for bindings).
+
+You must make sure that GStreamer has been initialised (with gst_init() or
+via gst_init_get_option_group()) before calling this function.
+
+
+</description>
+<parameters>
+<parameter name="major_version">
+<parameter_description> the major version number of the GStreamer core that the
+plugin was compiled for, you can just use GST_VERSION_MAJOR here
+</parameter_description>
+</parameter>
+<parameter name="minor_version">
+<parameter_description> the minor version number of the GStreamer core that the
+plugin was compiled for, you can just use GST_VERSION_MINOR here
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a unique name of the plugin (ideally prefixed with an application- or
+library-specific namespace prefix in order to avoid name conflicts in
+case a similar plugin with the same name ever gets added to GStreamer)
+</parameter_description>
+</parameter>
+<parameter name="description">
+<parameter_description> description of the plugin
+</parameter_description>
+</parameter>
+<parameter name="init_full_func">
+<parameter_description> pointer to the init function with user data of this plugin.
+</parameter_description>
+</parameter>
+<parameter name="version">
+<parameter_description> version string of the plugin
+</parameter_description>
+</parameter>
+<parameter name="license">
+<parameter_description> effective license of plugin. Must be one of the approved licenses
+(see #GstPluginDesc above) or the plugin will not be registered.
+</parameter_description>
+</parameter>
+<parameter name="source">
+<parameter_description> source module plugin belongs to
+</parameter_description>
+</parameter>
+<parameter name="package">
+<parameter_description> shipped package plugin belongs to
+</parameter_description>
+</parameter>
+<parameter name="origin">
+<parameter_description> URL to provider of plugin
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> gpointer to user data
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the plugin was registered correctly, otherwise FALSE.
+
+Since: 0.10.24
+
+</return>
+</function>
+
 <function name="gst_type_find_helper_for_extension">
 <description>
 Tries to find the best #GstCaps associated with @extension.
@@ -23575,21 +25011,23 @@ Creates a #GstCaps from its XML serialization.
 </return>
 </function>
 
-<function name="gst_object_get_parent">
+<function name="gst_bus_peek">
 <description>
-Returns: parent of @object, this can be NULL if @object has no
+Peek the message on the top of the bus' queue. The message will remain
+on the bus' message queue. A reference is returned, and needs to be unreffed
+by the caller.
+
 
 </description>
 <parameters>
-<parameter name="object">
-<parameter_description> a #GstObject
+<parameter name="bus">
+<parameter_description> a #GstBus
 </parameter_description>
 </parameter>
 </parameters>
-<return> parent of @object, this can be NULL if @object has no
-parent. unref after usage.
+<return> The #GstMessage that is on the bus, or NULL if the bus is empty.
 
-MT safe. Grabs and releases @object's LOCK.
+MT safe.
 </return>
 </function>
 
@@ -23681,28 +25119,30 @@ Since: 0.10.16
 </return>
 </function>
 
-<function name="gst_pad_set_blocked">
+<function name="gst_object_check_uniqueness">
 <description>
-Blocks or unblocks the dataflow on a pad. This function is
-a shortcut for gst_pad_set_blocked_async() with a NULL
-callback.
+Checks to see if there is any object named @name in @list. This function
+does not do any locking of any kind. You might want to protect the
+provided list with the lock of the owner of the list. This function
+will lock each #GstObject in the list to compare the name, so be
+carefull when passing a list with a locked object.
 
 
 </description>
 <parameters>
-<parameter name="pad">
-<parameter_description> the #GstPad to block or unblock
+<parameter name="list">
+<parameter_description> a list of #GstObject to check through
 </parameter_description>
 </parameter>
-<parameter name="blocked">
-<parameter_description> boolean indicating we should block or unblock
+<parameter name="name">
+<parameter_description> the name to search for
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the pad could be blocked. This function can fail if the
-wrong parameters were passed or the pad was already in the requested state.
+<return> TRUE if a #GstObject named @name does not appear in @list,
+FALSE if it does.
 
-MT safe.
+MT safe. Grabs and releases the LOCK of each object in the list.
 </return>
 </function>
 
@@ -23977,22 +25417,6 @@ Set the information in @msg.
 </parameters>
 <return> a #GstSDPResult.
 </return>
-</function>
-
-<function name="gst_ring_buffer_clear_all">
-<description>
-Fill the ringbuffer with silence.
-
-MT safe.
-
-</description>
-<parameters>
-<parameter name="buf">
-<parameter_description> the #GstRingBuffer to clear
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gst_ring_buffer_set_callback">
@@ -24349,36 +25773,18 @@ Parse the data message @msg and store the channel in @channel.
 </return>
 </function>
 
-<function name="gst_rtsp_message_init_response">
+<function name="gst_buffer_list_iterator_steal">
 <description>
-Initialize @msg with @code and @reason.
-
-When @reason is #NULL, the default reason for @code will be used.
-
-When @request is not #NULL, the relevant headers will be copied to the new
-response message.
-
+Returns: the last buffer returned by gst_buffer_list_iterator_next()
 
 </description>
 <parameters>
-<parameter name="msg">
-<parameter_description> a #GstRTSPMessage
-</parameter_description>
-</parameter>
-<parameter name="code">
-<parameter_description> the status code
-</parameter_description>
-</parameter>
-<parameter name="reason">
-<parameter_description> the status reason or #NULL
-</parameter_description>
-</parameter>
-<parameter name="request">
-<parameter_description> the request that triggered the response or #NULL
+<parameter name="it">
+<parameter_description> a #GstBufferListIterator
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstRTSPResult.
+<return> the last buffer returned by gst_buffer_list_iterator_next()
 </return>
 </function>
 
@@ -24455,6 +25861,38 @@ Get the length of the payload described by @header.
 </parameters>
 <return> the length of the payload this header describes.
 </return>
+</function>
+
+<function name="gst_basertppayload_set_options">
+<description>
+Set the rtp options of the payloader. These options will be set in the caps
+of the payloader. Subclasses must call this method before calling
+gst_basertppayload_push() or gst_basertppayload_set_outcaps().
+
+</description>
+<parameters>
+<parameter name="payload">
+<parameter_description> a #GstBaseRTPPayload
+</parameter_description>
+</parameter>
+<parameter name="media">
+<parameter_description> the media type (typically &quot;audio&quot; or &quot;video&quot;)
+</parameter_description>
+</parameter>
+<parameter name="dynamic">
+<parameter_description> if the payload type is dynamic
+</parameter_description>
+</parameter>
+<parameter name="encoding_name">
+<parameter_description> the encoding name 
+</parameter_description>
+</parameter>
+<parameter name="clock_rate">
+<parameter_description> the clock rate of the media
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_rtsp_url_set_port">
@@ -26143,6 +27581,28 @@ Get the number of attribute fields in @media.
 </return>
 </function>
 
+<function name="gst_task_get_pool">
+<description>
+Get the #GstTaskPool that this task will use for its streaming
+threads.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GstTask
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstTaskPool used by @task. gst_object_unref()
+after usage.
+
+Since: 0.10.24
+</return>
+</function>
+
 <function name="gst_mixer_record_toggled">
 <description>
 This function is called by the mixer implementation to produce
@@ -26243,52 +27703,17 @@ gst_fft_next_fast_length().
 </return>
 </function>
 
-<function name="gst_alloc_trace_live_all">
+<function name="gst_navigation_query_new_commands">
 <description>
-Get the total number of live registered alloc trace objects.
+Create a new #GstNavigation commands query. When executed, it will
+query the pipeline for the set of currently available commands.
 
 
 </description>
 <parameters>
 </parameters>
-<return> the total number of live registered alloc trace objects.
-</return>
-</function>
-
-<function name="gst_pad_chain">
-<description>
-Chain a buffer to @pad.
-
-The function returns #GST_FLOW_WRONG_STATE if the pad was flushing.
-
-If the caps on @buffer are different from the current caps on @pad, this
-function will call any setcaps function (see gst_pad_set_setcaps_function())
-installed on @pad. If the new caps are not acceptable for @pad, this
-function returns #GST_FLOW_NOT_NEGOTIATED.
-
-The function proceeds calling the chain function installed on @pad (see
-gst_pad_set_chain_function()) and the return value of that function is
-returned to the caller. #GST_FLOW_NOT_SUPPORTED is returned if @pad has no
-chain function.
-
-In all cases, success or failure, the caller loses its reference to @buffer
-after calling this function.
-
-
-</description>
-<parameters>
-<parameter name="pad">
-<parameter_description> a sink #GstPad, returns GST_FLOW_ERROR if not.
-</parameter_description>
-</parameter>
-<parameter name="buffer">
-<parameter_description> the #GstBuffer to send, return GST_FLOW_ERROR if not.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GstFlowReturn from the pad.
-
-MT safe.
+<return> The new query.
+Since: 0.10.23
 </return>
 </function>
 
@@ -26315,25 +27740,23 @@ Since: 0.10.22
 </return>
 </function>
 
-<function name="gst_element_get_pad_from_template">
+<function name="gst_message_new_state_dirty">
 <description>
-Gets a pad from @element described by @templ. If the presence of @templ is
-#GST_PAD_REQUEST, requests a new pad. Can return %NULL for #GST_PAD_SOMETIMES
-templates.
+Create a state dirty message. This message is posted whenever an element
+changed its state asynchronously and is used internally to update the
+states of container objects.
 
 
 </description>
 <parameters>
-<parameter name="element">
-<parameter_description> a #GstElement.
-</parameter_description>
-</parameter>
-<parameter name="templ">
-<parameter_description> a #GstPadTemplate belonging to @element.
+<parameter name="src">
+<parameter_description> the object originating the message
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GstPad, or NULL if one could not be found or created.
+<return> The new state dirty message.
+
+MT safe.
 </return>
 </function>
 
@@ -26353,6 +27776,26 @@ this module.
 </parameter>
 </parameters>
 <return> TRUE if @buffer is a valid RTP packet.
+</return>
+</function>
+
+<function name="gst_message_get_stream_status_object">
+<description>
+Extracts the object managing the streaming thread from @message.
+
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> A valid #GstMessage of type GST_MESSAGE_STREAM_STATUS.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a GValue containing the object that manages the streaming thread.
+This object is usually of type GstTask but other types can be added in the
+future. The object remains valid as long as @message is valid.
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -26472,22 +27915,33 @@ to this source file.
 <return></return>
 </function>
 
-<function name="gst_value_set_fourcc">
+<function name="gst_structure_get_uint">
 <description>
-Sets @value to @fourcc.
+Sets the uint pointed to by @value corresponding to the value of the
+given field.  Caller is responsible for making sure the field exists
+and has the correct type.
+
+returns %FALSE.
 
 </description>
 <parameters>
-<parameter name="value">
-<parameter_description> a GValue initialized to #GST_TYPE_FOURCC
+<parameter name="structure">
+<parameter_description> a #GstStructure
 </parameter_description>
 </parameter>
-<parameter name="fourcc">
-<parameter_description> the #guint32 fourcc to set
+<parameter name="fieldname">
+<parameter_description> the name of a field
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a pointer to a uint to set
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return>%FALSE.
+
+Since: 0.10.15
+</return>
 </function>
 
 <function name="gst_print_pad_caps">
@@ -26626,22 +28080,19 @@ is deprecated and maps to cubic interpolation.&lt;/para&gt;&lt;/note&gt;
 </return>
 </function>
 
-<function name="gst_structure_set_valist">
+<function name="gst_pad_set_activatepush_function">
 <description>
-va_list form of gst_structure_set().
+Sets the given activate_push function for the pad. An activate_push function
+prepares the element for pushing. See XXX part-activation.txt for details.
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> a #GstStructure
+<parameter name="pad">
+<parameter_description> a #GstPad.
 </parameter_description>
 </parameter>
-<parameter name="fieldname">
-<parameter_description> the name of the field to set
-</parameter_description>
-</parameter>
-<parameter name="varargs">
-<parameter_description> variable arguments
+<parameter name="activatepush">
+<parameter_description> the #GstPadActivateModeFunction to set.
 </parameter_description>
 </parameter>
 </parameters>
@@ -27296,25 +28747,20 @@ This function makes a copy of the name so you can safely free the name.
 </return>
 </function>
 
-<function name="gst_rtcp_packet_bye_add_ssrc">
+<function name="gst_value_serialize">
 <description>
-Add @ssrc to the BYE @packet.
+tries to transform the given @value into a string representation that allows
+getting back this string later on using gst_value_deserialize().
 
 
 </description>
 <parameters>
-<parameter name="packet">
-<parameter_description> a valid BYE #GstRTCPPacket
-</parameter_description>
-</parameter>
-<parameter name="ssrc">
-<parameter_description> an SSRC to add
+<parameter name="value">
+<parameter_description> a #GValue to serialize
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the ssrc was added. This function can return %FALSE if
-the max MTU is exceeded or the number of sources blocks is greater than
-#GST_RTCP_MAX_BYE_SSRC_COUNT.
+<return> the serialization for @value or NULL if none exists
 </return>
 </function>
 
@@ -27383,6 +28829,38 @@ FALSE if a copy would be required.
 </return>
 </function>
 
+<function name="gst_query_parse_seeking">
+<description>
+Parse a seeking query, writing the format into @format, and 
+other results into the passed parameters, if the respective parameters
+are non-NULL
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a GST_QUERY_SEEKING type query #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format to set for the @segment_start and @segment_end values
+</parameter_description>
+</parameter>
+<parameter name="seekable">
+<parameter_description> the seekable flag to set
+</parameter_description>
+</parameter>
+<parameter name="segment_start">
+<parameter_description> the segment_start to set
+</parameter_description>
+</parameter>
+<parameter name="segment_end">
+<parameter_description> the segment_end to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_tuner_get_norm">
 <description>
 Get the current video norm from the given tuner object for the
@@ -27397,6 +28875,33 @@ currently selected channel.
 </parameter>
 </parameters>
 <return> the current norm.
+</return>
+</function>
+
+<function name="gst_navigation_message_parse_angles_changed">
+<description>
+Parse a #GstNavigation message of type GST_NAVIGATION_MESSAGE_ANGLES_CHANGED
+and extract the @cur_angle and @n_angles parameters.
+
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> A #GstMessage to inspect.
+</parameter_description>
+</parameter>
+<parameter name="cur_angle">
+<parameter_description> A pointer to a #guint to receive the new current angle number,
+or NULL
+</parameter_description>
+</parameter>
+<parameter name="n_angles">
+<parameter_description> A pointer to a #guint to receive the new angle count, or NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the message could be successfully parsed. %FALSE if not.
+Since: 0.10.23
 </return>
 </function>
 
@@ -28001,6 +29506,57 @@ MT safe.  Caller owns returned value.
 </return>
 </function>
 
+<function name="gst_navigation_query_set_angles">
+<description>
+Set the #GstNavigation angles query result field in @query.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="cur_angle">
+<parameter_description> the current viewing angle to set.
+</parameter_description>
+</parameter>
+<parameter name="n_angles">
+<parameter_description> the number of viewing angles to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_rtsp_connection_do_tunnel">
+<description>
+If @conn received the first tunnel connection and @conn2 received
+the second tunnel connection, link the two connections together so that
+@conn manages the tunneled connection.
+
+After this call, @conn2 cannot be used anymore and must be freed with
+gst_rtsp_connection_free().
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="conn2">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> return GST_RTSP_OK on success.
+
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_bus_poll">
 <description>
 Poll the bus for messages. Will block while waiting for messages to come.
@@ -28150,6 +29706,24 @@ Sets or unsets the use of coloured debugging output.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_rtcp_packet_fb_get_media_ssrc">
+<description>
+Get the media SSRC field of the RTPFB or PSFB @packet.
+
+
+</description>
+<parameters>
+<parameter name="packet">
+<parameter_description> a valid RTPFB or PSFB #GstRTCPPacket
+</parameter_description>
+</parameter>
+</parameters>
+<return> the media SSRC.
+
+Since: 0.10.23
+</return>
 </function>
 
 <function name="gst_object_set_controller">
@@ -28320,6 +29894,25 @@ Creates a new, empty #GstStructure with the given name as a GQuark.
 </return>
 </function>
 
+<function name="gst_missing_uri_source_installer_detail_new">
+<description>
+Returns: a newly-allocated detail string, or NULL on error. Free string
+
+</description>
+<parameters>
+<parameter name="protocol">
+<parameter_description> the URI protocol the missing source needs to implement,
+e.g. &quot;http&quot; or &quot;mms&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated detail string, or NULL on error. Free string
+with g_free() when not needed any longer.
+
+Since: 0.10.15
+</return>
+</function>
+
 <function name="gst_segment_set_duration">
 <description>
 Set the duration of the segment to @duration. This function is mainly
@@ -28439,6 +30032,31 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_pad_set_blocked">
+<description>
+Blocks or unblocks the dataflow on a pad. This function is
+a shortcut for gst_pad_set_blocked_async() with a NULL
+callback.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to block or unblock
+</parameter_description>
+</parameter>
+<parameter name="blocked">
+<parameter_description> boolean indicating we should block or unblock
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the pad could be blocked. This function can fail if the
+wrong parameters were passed or the pad was already in the requested state.
+
+MT safe.
+</return>
+</function>
+
 <function name="gst_query_set_formats">
 <description>
 Set the formats query result fields in @query. The number of formats passed
@@ -28548,23 +30166,21 @@ MT safe.
 <return></return>
 </function>
 
-<function name="gst_bus_peek">
+<function name="gst_object_get_parent">
 <description>
-Peek the message on the top of the bus' queue. The message will remain
-on the bus' message queue. A reference is returned, and needs to be unreffed
-by the caller.
-
+Returns: parent of @object, this can be NULL if @object has no
 
 </description>
 <parameters>
-<parameter name="bus">
-<parameter_description> a #GstBus
+<parameter name="object">
+<parameter_description> a #GstObject
 </parameter_description>
 </parameter>
 </parameters>
-<return> The #GstMessage that is on the bus, or NULL if the bus is empty.
+<return> parent of @object, this can be NULL if @object has no
+parent. unref after usage.
 
-MT safe.
+MT safe. Grabs and releases @object's LOCK.
 </return>
 </function>
 
@@ -28620,67 +30236,51 @@ Retrieve the current channel from the tuner.
 </return>
 </function>
 
-<function name="gst_clock_id_wait">
+<function name="gst_pad_is_linked">
 <description>
-Perform a blocking wait on @id. 
-@id should have been created with gst_clock_new_single_shot_id()
-or gst_clock_new_periodic_id() and should not have been unscheduled
-with a call to gst_clock_id_unschedule(). 
-
-If the @jitter argument is not %NULL and this function returns #GST_CLOCK_OK
-or #GST_CLOCK_EARLY, it will contain the difference
-against the clock and the time of @id when this method was
-called. 
-Positive values indicate how late @id was relative to the clock
-(in which case this function will return #GST_CLOCK_EARLY). 
-Negative values indicate how much time was spent waiting on the clock 
-before this function returned.
+Checks if a @pad is linked to another pad or not.
 
 
 </description>
 <parameters>
-<parameter name="id">
-<parameter_description> The #GstClockID to wait on
-</parameter_description>
-</parameter>
-<parameter name="jitter">
-<parameter_description> A pointer that will contain the jitter, can be %NULL.
+<parameter name="pad">
+<parameter_description> pad to check
 </parameter_description>
 </parameter>
 </parameters>
-<return> the result of the blocking wait. #GST_CLOCK_EARLY will be returned
-if the current clock time is past the time of @id, #GST_CLOCK_OK if 
-@id was scheduled in time. #GST_CLOCK_UNSCHEDULED if @id was 
-unscheduled with gst_clock_id_unschedule().
+<return> TRUE if the pad is linked, FALSE otherwise.
 
 MT safe.
 </return>
 </function>
 
-<function name="gst_rtsp_message_take_header">
+<function name="gst_task_pool_push">
 <description>
-Add a header with key @field and @value to @msg. This function takes
-ownership of @value.
+Start the execution of a new thread from @pool.
 
 
 </description>
 <parameters>
-<parameter name="msg">
-<parameter_description> a #GstRTSPMessage
+<parameter name="pool">
+<parameter_description> a #GstTaskPool
 </parameter_description>
 </parameter>
-<parameter name="field">
-<parameter_description> a #GstRTSPHeaderField
+<parameter name="func">
+<parameter_description> the function to call
 </parameter_description>
 </parameter>
-<parameter name="value">
-<parameter_description> the value of the header
+<parameter name="user_data">
+<parameter_description> data to pass to @func
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstRTSPResult.
-
-Since: 0.10.23
+<return> a pointer that should be used for the gst_task_pool_join
+function. This pointer can be NULL, you must check @error to detect
+errors.
 </return>
 </function>
 
@@ -29037,31 +30637,20 @@ this module.
 </return>
 </function>
 
-<function name="gst_object_check_uniqueness">
+<function name="gst_ring_buffer_clear_all">
 <description>
-Checks to see if there is any object named @name in @list. This function
-does not do any locking of any kind. You might want to protect the
-provided list with the lock of the owner of the list. This function
-will lock each #GstObject in the list to compare the name, so be
-carefull when passing a list with a locked object.
+Fill the ringbuffer with silence.
 
+MT safe.
 
 </description>
 <parameters>
-<parameter name="list">
-<parameter_description> a list of #GstObject to check through
-</parameter_description>
-</parameter>
-<parameter name="name">
-<parameter_description> the name to search for
+<parameter name="buf">
+<parameter_description> the #GstRingBuffer to clear
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if a #GstObject named @name does not appear in @list,
-FALSE if it does.
-
-MT safe. Grabs and releases the LOCK of each object in the list.
-</return>
+<return></return>
 </function>
 
 <function name="gst_mixer_options_list_changed">
@@ -29703,9 +31292,9 @@ of the #GstTunerChannel.
 Tell the ringbuffer that it is allowed to start playback when
 the ringbuffer is filled with samples. 
 
-Since: 0.10.6
-
 MT safe.
+
+Since: 0.10.6
 
 </description>
 <parameters>
@@ -30072,6 +31661,52 @@ of %GST_PARSE_ERROR_NO_SUCH_ELEMENT was returned.
 missing elements. Free with g_strfreev() when no longer needed.
 
 Since: 0.10.20
+</return>
+</function>
+
+<function name="gst_video_format_new_caps_interlaced">
+<description>
+Creates a new #GstCaps object based on the parameters provided.
+
+Since: 0.10.23
+
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> the #GstVideoFormat describing the raw video format
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> width of video
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> height of video
+</parameter_description>
+</parameter>
+<parameter name="framerate_n">
+<parameter_description> numerator of frame rate
+</parameter_description>
+</parameter>
+<parameter name="framerate_d">
+<parameter_description> denominator of frame rate
+</parameter_description>
+</parameter>
+<parameter name="par_n">
+<parameter_description> numerator of pixel aspect ratio
+</parameter_description>
+</parameter>
+<parameter name="par_d">
+<parameter_description> denominator of pixel aspect ratio
+</parameter_description>
+</parameter>
+<parameter name="interlaced">
+<parameter_description> #TRUE if the format is interlaced
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstCaps object, or NULL if there was an error
 </return>
 </function>
 
@@ -30469,33 +32104,16 @@ Parse the RTSP transport string @str into @transport.
 </return>
 </function>
 
-<function name="gst_tag_list_get_int_index">
+<function name="gst_task_pool_new">
 <description>
-Gets the value that is at the given index for the given tag in the given
-list.
+Create a new default task pool. The default task pool will use a regular
+GThreadPool for threads.
 
 
 </description>
 <parameters>
-<parameter name="list">
-<parameter_description> a #GstTagList to get the tag from
-</parameter_description>
-</parameter>
-<parameter name="tag">
-<parameter_description> tag to read out
-</parameter_description>
-</parameter>
-<parameter name="index">
-<parameter_description> number of entry to read out
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> location for the result
-</parameter_description>
-</parameter>
 </parameters>
-<return> TRUE, if a value was copied, FALSE if the tag didn't exist in the
-given list.
+<return> a new #GstTaskPool. gst_object_unref() after usage.
 </return>
 </function>
 
@@ -30957,8 +32575,9 @@ Logs the given message using the currently registered debugging handlers.
 
 <function name="gst_tag_list_get_date_index">
 <description>
-Gets the value that is at the given index for the given tag in the given
-list.
+Gets the date that is at the given index for the given tag in the given
+list and copies it into the variable pointed to by @value. Free the date
+with g_date_free() when it is no longer needed.
 
 
 </description>
@@ -31060,6 +32679,42 @@ the caps, take a ref (see gst_caps_ref ()).
 </return>
 </function>
 
+<function name="gst_task_set_thread_callbacks">
+<description>
+Set callbacks which will be executed when a new thread is needed, the thread
+function is entered and left and when the thread is joined.
+
+By default a thread for @task will be created from a default thread pool.
+
+Objects can use custom GThreads or can perform additional configuration of
+the threads (such as changing the thread priority) by installing callbacks.
+
+Since: 0.10.24
+
+MT safe.
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> The #GstTask to use
+</parameter_description>
+</parameter>
+<parameter name="callbacks">
+<parameter_description> a #GstTaskThreadCallbacks pointer
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the callbacks
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> called when @user_data is no longer referenced
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_sdp_message_parse_buffer">
 <description>
 Parse the contents of @size bytes pointed to by @data and store the result in
@@ -31103,19 +32758,6 @@ Get the @nth SSRC of the BYE @packet.
 </parameters>
 <return> The @nth SSRC of @packet.
 </return>
-</function>
-
-<function name="GstPropertyProbe">
-<description>
-
-</description>
-<parameters>
-<parameter name="pspec">
-<parameter_description> #GParamSpec that needs a probe
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="gst_structure_id_set">
@@ -31184,6 +32826,8 @@ response message.
 <description>
 Check if @buf is activated.
 
+MT safe.
+
 
 </description>
 <parameters>
@@ -31195,8 +32839,6 @@ Check if @buf is activated.
 <return> TRUE if the device is active.
 
 Since: 0.10.22.
-
-MT safe.
 </return>
 </function>
 
@@ -31336,25 +32978,21 @@ Since: 0.10.16
 <return></return>
 </function>
 
-<function name="gst_element_is_locked_state">
+<function name="gst_registry_get_path_list">
 <description>
-Checks if the state of an element is locked.
-If the state of an element is locked, state changes of the parent don't
-affect the element.
-This way you can leave currently unused elements inside bins. Just lock their
-state before changing the state from #GST_STATE_NULL.
-
-MT safe.
+Get the list of paths for the given registry.
 
 
 </description>
 <parameters>
-<parameter name="element">
-<parameter_description> a #GstElement.
+<parameter name="registry">
+<parameter_description> the registry to get the pathlist of
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE, if the element's state is locked.
+<return> A Glist of paths as strings. g_list_free after use.
+
+MT safe.
 </return>
 </function>
 
@@ -32218,6 +33856,35 @@ Get the number of connection fields in @media.
 </return>
 </function>
 
+<function name="gst_message_new_segment_start">
+<description>
+Create a new segment message. This message is posted by elements that
+start playback of a segment as a result of a segment seek. This message
+is not received by the application but is used for maintenance reasons in
+container elements.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> The object originating the message.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> The format of the position being played
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> The position of the segment being played
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new segment start message.
+
+MT safe.
+</return>
+</function>
+
 <function name="gst_structure_get_double">
 <description>
 Sets the double pointed to by @value corresponding to the value of the
@@ -32319,32 +33986,52 @@ Since: 0.10.20
 <return></return>
 </function>
 
-<function name="gst_basertppayload_set_options">
+<function name="gst_tag_list_get_int_index">
 <description>
-Set the rtp options of the payloader. These options will be set in the caps
-of the payloader. Subclasses must call this method before calling
-gst_basertppayload_push() or gst_basertppayload_set_outcaps().
+Gets the value that is at the given index for the given tag in the given
+list.
+
 
 </description>
 <parameters>
-<parameter name="payload">
-<parameter_description> a #GstBaseRTPPayload
+<parameter name="list">
+<parameter_description> a #GstTagList to get the tag from
 </parameter_description>
 </parameter>
-<parameter name="media">
-<parameter_description> the media type (typically &quot;audio&quot; or &quot;video&quot;)
+<parameter name="tag">
+<parameter_description> tag to read out
 </parameter_description>
 </parameter>
-<parameter name="dynamic">
-<parameter_description> if the payload type is dynamic
+<parameter name="index">
+<parameter_description> number of entry to read out
 </parameter_description>
 </parameter>
-<parameter name="encoding_name">
-<parameter_description> the encoding name 
+<parameter name="value">
+<parameter_description> location for the result
 </parameter_description>
 </parameter>
-<parameter name="clock_rate">
-<parameter_description> the clock rate of the media
+</parameters>
+<return> TRUE, if a value was copied, FALSE if the tag didn't exist in the
+given list.
+</return>
+</function>
+
+<function name="gst_element_unlink">
+<description>
+Unlinks all source pads of the source element with all sink pads
+of the sink element to which they are linked.
+
+If the link has been made using gst_element_link(), it could have created an
+requestpad, which has to be released using gst_element_release_request_pad().
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> the source #GstElement to unlink.
+</parameter_description>
+</parameter>
+<parameter name="dest">
+<parameter_description> the sink #GstElement to unlink.
 </parameter_description>
 </parameter>
 </parameters>
@@ -32381,25 +34068,6 @@ usage.
 
 MT safe.
 </return>
-</function>
-
-<function name="gst_debug_set_threshold_for_name">
-<description>
-Sets all categories which match the given glob style pattern to the given
-level.
-
-</description>
-<parameters>
-<parameter name="name">
-<parameter_description> name of the categories to set
-</parameter_description>
-</parameter>
-<parameter name="level">
-<parameter_description> level to set them to
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="GstPipeline">
@@ -32453,32 +34121,24 @@ chunk. Usually codec initialization data.
 <return></return>
 </function>
 
-<function name="gst_iterator_push">
+<function name="gst_event_get_structure">
 <description>
-Pushes @other iterator onto @it. All calls performed on @it are
-forwarded to @other. If @other returns #GST_ITERATOR_DONE, it is
-popped again and calls are handled by @it again.
+Access the structure of the event.
 
-This function is mainly used by objects implementing the iterator
-next function to recurse into substructures.
-
-When gst_iterator_resync() is called on @it, @other will automatically be
-popped.
-
-MT safe.
 
 </description>
 <parameters>
-<parameter name="it">
-<parameter_description> The #GstIterator to use
-</parameter_description>
-</parameter>
-<parameter name="other">
-<parameter_description> The #GstIterator to push
+<parameter name="event">
+<parameter_description> The #GstEvent.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> The structure of the event. The structure is still
+owned by the event, which means that you should not free it and
+that the pointer becomes invalid when you free the event.
+
+MT safe.
+</return>
 </function>
 
 <function name="gst_caps_new_any">
@@ -32582,23 +34242,52 @@ gst_rtcp_packet_sdes_copy_entry() to get a null-termined copy of the entry.
 </return>
 </function>
 
-<function name="gst_bus_pop">
+<function name="gst_plugin_load_by_name">
 <description>
-Get a message from the bus.
+Load the named plugin. Refs the plugin.
 
 
 </description>
 <parameters>
-<parameter name="bus">
-<parameter_description> a #GstBus to pop
+<parameter name="name">
+<parameter_description> name of plugin to load
 </parameter_description>
 </parameter>
 </parameters>
-<return> The #GstMessage that is on the bus, or NULL if the bus is empty.
-The message is taken from the bus and needs to be unreffed with
-gst_message_unref() after usage.
+<return> A reference to a loaded plugin, or NULL on error.
+</return>
+</function>
 
-MT safe.
+<function name="gst_rtsp_message_init_response">
+<description>
+Initialize @msg with @code and @reason.
+
+When @reason is #NULL, the default reason for @code will be used.
+
+When @request is not #NULL, the relevant headers will be copied to the new
+response message.
+
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> a #GstRTSPMessage
+</parameter_description>
+</parameter>
+<parameter name="code">
+<parameter_description> the status code
+</parameter_description>
+</parameter>
+<parameter name="reason">
+<parameter_description> the status reason or #NULL
+</parameter_description>
+</parameter>
+<parameter name="request">
+<parameter_description> the request that triggered the response or #NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstRTSPResult.
 </return>
 </function>
 
@@ -32663,21 +34352,31 @@ Since: 0.10.15
 </return>
 </function>
 
-<function name="gst_rtsp_watch_free">
+<function name="gst_adapter_prev_timestamp">
 <description>
-Decreases the reference count of @watch by one. If the resulting reference
-count is zero the watch and associated memory will be destroyed.
+Get the timestamp that was before the current byte in the adapter. When
+@distance is given, the amount of bytes between the timestamp and the current
+position is returned.
 
-Since: 0.10.23
+The timestamp is reset to GST_CLOCK_TIME_NONE when the adapter is first
+created or when it is cleared.
+
 
 </description>
 <parameters>
-<parameter name="watch">
-<parameter_description> a #GstRTSPWatch
+<parameter name="adapter">
+<parameter_description> a #GstAdapter
+</parameter_description>
+</parameter>
+<parameter name="distance">
+<parameter_description> pointer to location for distance or NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> The previously seen timestamp.
+
+Since: 0.10.24
+</return>
 </function>
 
 <function name="gst_mixer_set_option">
@@ -32919,6 +34618,23 @@ Since: 0.10.16
 </return>
 </function>
 
+<function name="gst_rtsp_find_header_field">
+<description>
+Convert @header to a #GstRTSPHeaderField.
+
+
+</description>
+<parameters>
+<parameter name="header">
+<parameter_description> a header string
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstRTSPHeaderField for @header or #GST_RTSP_HDR_INVALID if the
+header field is unknown.
+</return>
+</function>
+
 <function name="gst_netaddress_get_ip4_address">
 <description>
 Get the IPv4 address stored in @naddr into @address. This function requires
@@ -33009,29 +34725,23 @@ string with g_free() when not needed any longer.
 </return>
 </function>
 
-<function name="gst_pad_get_internal_links">
+<function name="gst_structure_has_field">
 <description>
-Gets a list of pads to which the given pad is linked to
-inside of the parent element.
-The caller must free this list after use.
+Check if @structure contains a field named @fieldname.
 
 
 </description>
 <parameters>
-<parameter name="pad">
-<parameter_description> the #GstPad to get the internal links of.
+<parameter name="structure">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+<parameter name="fieldname">
+<parameter_description> the name of a field
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GList of pads, free with g_list_free().
-
-Not MT safe.
-
-Deprecated: This function does not ref the pads in the list so that they
-could become invalid by the time the application accesses them. It's also
-possible that the list changes while handling the pads, which the caller of
-this function is unable to know. Use the thread-safe 
-gst_pad_iterate_internal_links() instead.
+<return> TRUE if the structure contains a field with the given name
 </return>
 </function>
 
@@ -33209,23 +34919,19 @@ or not.
 <return></return>
 </function>
 
-<function name="gst_query_parse_position">
+<function name="gst_debug_set_threshold_for_name">
 <description>
-Parse a position query, writing the format into @format, and the position
-into @cur, if the respective parameters are non-NULL.
+Sets all categories which match the given glob style pattern to the given
+level.
 
 </description>
 <parameters>
-<parameter name="query">
-<parameter_description> a #GstQuery
+<parameter name="name">
+<parameter_description> name of the categories to set
 </parameter_description>
 </parameter>
-<parameter name="format">
-<parameter_description> the storage for the #GstFormat of the position values (may be NULL)
-</parameter_description>
-</parameter>
-<parameter name="cur">
-<parameter_description> the storage for the current position (may be NULL)
+<parameter name="level">
+<parameter_description> level to set them to
 </parameter_description>
 </parameter>
 </parameters>
@@ -33576,6 +35282,23 @@ or not.
 </return>
 </function>
 
+<function name="gst_task_pool_cleanup">
+<description>
+Wait for all tasks to be stopped. This is mainly used internally
+to ensure proper cleanup of internal data structures in test suites.
+
+MT safe.
+
+</description>
+<parameters>
+<parameter name="pool">
+<parameter_description> a #GstTaskPool
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_xml_make_element">
 <description>
 Load the element from the XML description
@@ -33667,7 +35390,7 @@ gst_iterator_next().
 
 When a concurrent update to the list is performed, usually by @owner while
 holding @lock, @master_cookie will be updated. The iterator implementation
-will notice the update of the cookie and will return #GST_ITERATOR_RESYNC to
+will notice the update of the cookie and will return %GST_ITERATOR_RESYNC to
 the user of the iterator in the next call to gst_iterator_next().
 
 @owner will be passed to the @free function when the iterator is freed.
@@ -34062,6 +35785,26 @@ the URI does not contain a location, an empty string is returned.
 </return>
 </function>
 
+<function name="gst_rtsp_connection_set_ip">
+<description>
+Set the IP address of the server.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="ip">
+<parameter_description> an ip address
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_index_get_group">
 <description>
 Get the id of the current group.
@@ -34180,30 +35923,27 @@ e.g. &quot;videoscale&quot; or &quot;cdparanoiasrc&quot;
 </return>
 </function>
 
-<function name="gst_bin_get_by_interface">
+<function name="gst_fft_s32_window">
 <description>
-Looks for an element inside the bin that implements the given
-interface. If such an element is found, it returns the element.
-You can cast this element to the given interface afterwards.  If you want
-all elements that implement the interface, use
-gst_bin_iterate_all_by_interface(). This function recurses into child bins.
-
-MT safe.  Caller owns returned reference.
+This calls the window function @window on the @timedata sample buffer.
 
 
 </description>
 <parameters>
-<parameter name="bin">
-<parameter_description> a #GstBin
+<parameter name="self">
+<parameter_description> #GstFFTS32 instance for this call
 </parameter_description>
 </parameter>
-<parameter name="iface">
-<parameter_description> the #GType of an interface
+<parameter name="timedata">
+<parameter_description> Time domain samples
+</parameter_description>
+</parameter>
+<parameter name="window">
+<parameter_description> Window function to apply
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GstElement inside the bin implementing the interface
-</return>
+<return></return>
 </function>
 
 <function name="gst_video_format_get_component_offset">
@@ -34357,6 +36097,35 @@ already registered format with that nick.
 with the same nick.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_message_new_stream_status">
+<description>
+Create a new stream status message. This message is posted when a streaming
+thread is created/destroyed or when the state changed.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> The object originating the message.
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> The stream status type.
+</parameter_description>
+</parameter>
+<parameter name="owner">
+<parameter_description> The owner element of @src.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new stream status message.
+
+MT safe.
+
+Since: 0.10.24.
 </return>
 </function>
 
@@ -34597,6 +36366,23 @@ of the array in the given structure.
 <return></return>
 </function>
 
+<function name="gst_segtrap_set_enabled">
+<description>
+Applications might want to disable/enable the SIGSEGV handling of
+the GStreamer core. See gst_segtrap_is_enabled() for more information.
+
+Since: 0.10.10
+
+</description>
+<parameters>
+<parameter name="enabled">
+<parameter_description> whether a custom SIGSEGV handler should be installed.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtsp_message_append_headers">
 <description>
 Append the currently configured headers in @msg to the #GString @str suitable
@@ -34721,6 +36507,31 @@ given vorbiscomment buffer or NULL on error.
 </return>
 </function>
 
+<function name="gst_collect_pads_set_function">
+<description>
+Set the callback function and user data that will be called when
+all the pads added to the collection have buffers queued.
+
+MT safe.
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> the function to set
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_controller_set">
 <description>
 Set the value of given controller-handled property at a certain time.
@@ -34795,7 +36606,7 @@ Get the payload type of the RTP packet in @buffer.
 <function name="gst_poll_write_control">
 <description>
 Write a byte to the control socket of the controllable @set.
-This function is mostly usefull for timer #GstPoll objects created with
+This function is mostly useful for timer #GstPoll objects created with
 gst_poll_new_timer(). 
 
 It will make any current and future gst_poll_wait() function return with
@@ -34875,6 +36686,34 @@ This returns a new, unbound #GstInterpolationControlSource.
 </return>
 </function>
 
+<function name="gst_task_set_state">
+<description>
+Sets the state of @task to @state.
+
+The @task must have a lock associated with it using
+gst_task_set_lock() when going to GST_TASK_STARTED or GST_TASK_PAUSED or
+this function will return %FALSE.
+
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GstTask
+</parameter_description>
+</parameter>
+<parameter name="state">
+<parameter_description> the new task state
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the state could be changed.
+
+Since: 0.10.24
+
+MT safe.
+</return>
+</function>
+
 <function name="gst_pad_get_negotiated_caps">
 <description>
 Gets the capabilities of the media type that currently flows through @pad
@@ -34900,11 +36739,25 @@ MT safe.
 </return>
 </function>
 
-<function name="GstClock">
+<function name="gst_query_parse_position">
 <description>
+Parse a position query, writing the format into @format, and the position
+into @cur, if the respective parameters are non-NULL.
 
 </description>
 <parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the storage for the #GstFormat of the position values (may be NULL)
+</parameter_description>
+</parameter>
+<parameter name="cur">
+<parameter_description> the storage for the current position (may be NULL)
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -34979,32 +36832,25 @@ Removes the given object properties from the controller
 </return>
 </function>
 
-<function name="gst_pad_get_internal_links_default">
+<function name="gst_element_provides_clock">
 <description>
-Gets a list of pads to which the given pad is linked to
-inside of the parent element.
-This is the default handler, and thus returns a list of all of the
-pads inside the parent element with opposite direction.
-
-The caller must free this list after use with g_list_free().
+Query if the element provides a clock. A #GstClock provided by an
+element can be used as the global #GstClock for the pipeline.
+An element that can provide a clock is only required to do so in the PAUSED
+state, this means when it is fully negotiated and has allocated the resources
+to operate the clock.
 
 
 </description>
 <parameters>
-<parameter name="pad">
-<parameter_description> the #GstPad to get the internal links of.
+<parameter name="element">
+<parameter_description> a #GstElement to query
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GList of pads, or NULL if the pad has no parent.
+<return> %TRUE if the element provides a clock
 
-Not MT safe.
-
-Deprecated: This function does not ref the pads in the list so that they
-could become invalid by the time the application accesses them. It's also
-possible that the list changes while handling the pads, which the caller of
-this function is unable to know. Use the thread-safe 
-gst_pad_iterate_internal_links_default() instead.
+MT safe.
 </return>
 </function>
 
@@ -35037,6 +36883,39 @@ value.
 </parameter>
 </parameters>
 <return> a #GstRTSPResult.
+</return>
+</function>
+
+<function name="gst_tag_list_get_buffer_index">
+<description>
+Gets the buffer that is at the given index for the given tag in the given
+list and copies it into the variable pointed to by @value. Free the buffer
+with gst_buffer_unref() when it is no longer needed.
+
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GstTagList to get the tag from
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> tag to read out
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description> number of entry to read out
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> address of a GstBuffer pointer variable to store the result into
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE, if a buffer was copied, FALSE if the tag didn't exist in the
+given list or if it was #NULL.
+
+Since: 0.10.23
 </return>
 </function>
 
@@ -35400,31 +37279,6 @@ Since: 0.10.14
 </return>
 </function>
 
-<function name="gst_rtsp_message_new_request">
-<description>
-Create a new #GstRTSPMessage with @method and @uri and store the result
-request message in @msg. Free with gst_rtsp_message_free().
-
-
-</description>
-<parameters>
-<parameter name="msg">
-<parameter_description> a location for the new #GstRTSPMessage
-</parameter_description>
-</parameter>
-<parameter name="method">
-<parameter_description> the request method to use
-</parameter_description>
-</parameter>
-<parameter name="uri">
-<parameter_description> the uri of the request
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GstRTSPResult.
-</return>
-</function>
-
 <function name="gst_byte_reader_get_int16_le">
 <description>
 Read a signed 16 bit little endian integer into @val
@@ -35630,7 +37484,7 @@ iface_type, and test whether it is supported for this specific instance.
 
 <function name="gst_rtsp_message_unset">
 <description>
-Unset the concents of @msg so that it becomes an uninitialized
+Unset the contents of @msg so that it becomes an uninitialized
 #GstRTSPMessage again. This function is mostly used in combination with 
 gst_rtsp_message_init_request(), gst_rtsp_message_init_response() and
 gst_rtsp_message_init_data() on stack allocated #GstRTSPMessage structures.
@@ -35754,6 +37608,28 @@ Since: 0.10.14
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_audio_clock_adjust">
+<description>
+Adjust @time with the internal offset of the audio clock.
+
+
+</description>
+<parameters>
+<parameter name="clock">
+<parameter_description> a #GstAudioClock
+</parameter_description>
+</parameter>
+<parameter name="time">
+<parameter_description> a #GstClockTime
+</parameter_description>
+</parameter>
+</parameters>
+<return> @time adjusted with the internal offset.
+
+Since: 0.10.23
+</return>
 </function>
 
 <function name="gst_collect_pads_is_active">
@@ -35919,6 +37795,20 @@ Get the number of time zone information entries in @msg.
 </parameters>
 <return> the number of time zone information entries in @msg.
 </return>
+</function>
+
+<function name="gst_buffer_list_iterator_free">
+<description>
+Free the iterator.
+
+</description>
+<parameters>
+<parameter name="it">
+<parameter_description> the #GstBufferListIterator to free
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_netaddress_set_ip6_address">
@@ -36099,6 +37989,22 @@ gst_rtcp_buffer_validate_data().
 </return>
 </function>
 
+<function name="gst_rtp_buffer_get_seq">
+<description>
+Get the sequence number of the RTP packet in @buffer.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> the buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> The sequence number in host order.
+</return>
+</function>
+
 <function name="gst_xml_get_topelements">
 <description>
 Retrieve a list of toplevel elements.
@@ -36256,6 +38162,25 @@ Check if the marker bit is set on the RTP packet in @buffer.
 </return>
 </function>
 
+<function name="gst_audio_clock_get_time">
+<description>
+Report the time as returned by the #GstAudioClockGetTimeFunc without applying
+any offsets. 
+
+
+</description>
+<parameters>
+<parameter name="clock">
+<parameter_description> a #GstAudioClock
+</parameter_description>
+</parameter>
+</parameters>
+<return> the time as reported by the time function of the audio clock
+
+Since: 0.10.23
+</return>
+</function>
+
 <function name="gst_controller_init">
 <description>
 Initializes the use of the controller library. Suggested to be called right
@@ -36335,8 +38260,13 @@ MT safe.
 Wait for activity on the file descriptors in @set. This function waits up to
 the specified @timeout.  A timeout of #GST_CLOCK_TIME_NONE waits forever.
 
-When this function is called from multiple threads, -1 will be returned with
-errno set to EPERM.
+For #GstPoll objects created with gst_poll_new(), this function can only be
+called from a single thread at a time.  If called from multiple threads,
+-1 will be returned with errno set to EPERM.
+
+This is not true for timer #GstPoll objects created with
+gst_poll_new_timer(), where it is allowed to have multiple threads waiting
+simultaneously.
 
 
 </description>
@@ -36358,34 +38288,34 @@ Since: 0.10.18
 </return>
 </function>
 
-<function name="gst_query_parse_seeking">
+<function name="gst_rtcp_packet_bye_add_ssrc">
 <description>
-Parse a seeking query, writing the format into @format, and 
-other results into the passed parameters, if the respective parameters
-are non-NULL
+Add @ssrc to the BYE @packet.
+
 
 </description>
 <parameters>
-<parameter name="query">
-<parameter_description> a GST_QUERY_SEEKING type query #GstQuery
+<parameter name="packet">
+<parameter_description> a valid BYE #GstRTCPPacket
 </parameter_description>
 </parameter>
-<parameter name="format">
-<parameter_description> the format to set for the @segment_start and @segment_end values
+<parameter name="ssrc">
+<parameter_description> an SSRC to add
 </parameter_description>
 </parameter>
-<parameter name="seekable">
-<parameter_description> the seekable flag to set
-</parameter_description>
-</parameter>
-<parameter name="segment_start">
-<parameter_description> the segment_start to set
-</parameter_description>
-</parameter>
-<parameter name="segment_end">
-<parameter_description> the segment_end to set
-</parameter_description>
-</parameter>
+</parameters>
+<return> %TRUE if the ssrc was added. This function can return %FALSE if
+the max MTU is exceeded or the number of sources blocks is greater than
+#GST_RTCP_MAX_BYE_SSRC_COUNT.
+</return>
+</function>
+
+<function name="GstBufferListIterator">
+<description>
+Opaque iterator for a #GstBufferList.
+
+</description>
+<parameters>
 </parameters>
 <return></return>
 </function>
@@ -36492,35 +38422,28 @@ Since: 0.10.23
 </return>
 </function>
 
-<function name="gst_bus_timed_pop">
+<function name="gst_structure_id_set_valist">
 <description>
-Get a message from the bus, waiting up to the specified timeout.
+va_list form of gst_structure_id_set().
 
-If @timeout is 0, this function behaves like gst_bus_pop(). If @timeout is
-#GST_CLOCK_TIME_NONE, this function will block forever until a message was
-posted on the bus.
-
+Since: 0.10.10
 
 </description>
 <parameters>
-<parameter name="bus">
-<parameter_description> a #GstBus to pop
+<parameter name="structure">
+<parameter_description> a #GstStructure
 </parameter_description>
 </parameter>
-<parameter name="timeout">
-<parameter_description> a timeout
+<parameter name="fieldname">
+<parameter_description> the name of the field to set
+</parameter_description>
+</parameter>
+<parameter name="varargs">
+<parameter_description> variable arguments
 </parameter_description>
 </parameter>
 </parameters>
-<return> The #GstMessage that is on the bus after the specified timeout
-or NULL if the bus is empty after the timeout expired.
-The message is taken from the bus and needs to be unreffed with
-gst_message_unref() after usage.
-
-MT safe.
-
-Since: 0.10.12
-</return>
+<return></return>
 </function>
 
 <function name="gst_bit_reader_peek_bits_uint8">
@@ -36734,6 +38657,26 @@ Move to the next SDES item in @packet.
 </parameters>
 <return> TRUE if there was a next item.
 </return>
+</function>
+
+<function name="gst_rtcp_packet_fb_set_sender_ssrc">
+<description>
+Set the sender SSRC field of the RTPFB or PSFB @packet.
+
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="packet">
+<parameter_description> a valid RTPFB or PSFB #GstRTCPPacket
+</parameter_description>
+</parameter>
+<parameter name="ssrc">
+<parameter_description> a sender SSRC
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_element_factory_can_sink_caps">
@@ -37246,6 +39189,49 @@ element (note that passing NULL only works in GStreamer 0.10.13 and later)
 </parameters>
 <return> TRUE, if the registering succeeded, FALSE on error
 </return>
+</function>
+
+<function name="gst_navigation_event_parse_key_event">
+<description>
+Since: 0.10.23
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to inspect.
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> A pointer to a location to receive the string identifying the key
+press. The returned string is owned by the event, and valid only until the
+event is unreffed.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_task_set_pool">
+<description>
+Set @pool as the new GstTaskPool for @task. Any new streaming threads that
+will be created by @task will now use @pool.
+
+MT safe.
+
+Since: 0.10.24
+
+</description>
+<parameters>
+<parameter name="task">
+<parameter_description> a #GstTask
+</parameter_description>
+</parameter>
+<parameter name="pool">
+<parameter_description> a #GstTaskPool
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_rtsp_transport_get_mime">
