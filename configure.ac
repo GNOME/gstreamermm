@@ -402,7 +402,6 @@ AC_CONFIG_FILES([
       gstreamer/gstreamermm/private/Makefile
 
   tools/Makefile
-    tools/generate_wrap_init.pl
     tools/generate_gst_wrap_init.pl
     tools/m4/Makefile
     tools/extra_defs_gen/Makefile

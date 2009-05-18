@@ -44,10 +44,9 @@ gmmproc_args	= -I $(tools_dir_m4) --defs $(srcdir)
 run_gmmproc	= $(gmmproc_path) $(gmmproc_args)
 
 # The normal Glib::wrap() table initialization:
-gen_wrap_init_in = $(tools_dir)/generate_wrap_init.pl.in
-gen_wrap_init_path = $(tools_dir)/generate_wrap_init.pl
+gen_wrap_init_path = $(gmmproc_dir)/generate_wrap_init.pl
 gen_wrap_init_args = --namespace=$(sublib_namespace) --parent_dir=$(sublib_parentdir)
-run_gen_wrap_init  = $(PERL_PATH) $(gen_wrap_init_path) $(gen_wrap_init_args)
+run_gen_wrap_init  = $(gen_wrap_init_path) $(gen_wrap_init_args)
 
 # The Gst::wrap() table initialization:
 gen_gst_wrap_init_in = $(tools_dir)/generate_gst_wrap_init.pl.in
@@ -142,7 +141,7 @@ $(destdir_stamp_dir)/stamp-%: $(gensrc_destdir)/%.h
 
 files_hg_with_path	= $(patsubst %.hg,$(srcdir)/%.hg,$(files_all_hg))
 
-$(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_in) $(files_hg_with_path) \
+$(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_path) $(files_hg_with_path) \
 	$(files_all_plugin_hg_with_path)
 	$(run_gen_wrap_init) $(files_all_hg:%.hg=$(srcdir)/%.hg) \
 	  $(files_all_plugin_hg:%.hg=$(srcdir)/%.hg) > $@
