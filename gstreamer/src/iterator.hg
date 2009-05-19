@@ -246,7 +246,7 @@ IteratorResult IteratorBase<CppType>::next()
   current_result = (Gst::IteratorResult) gst_iterator_next(cobj(), &current);
 
   // Set current to null if iterator is done:
-  if (current_result == Gst::ITERATOR_DONE)
+  if(current_result == Gst::ITERATOR_DONE)
     current = 0;
 
   return current_result;
@@ -333,7 +333,7 @@ void IteratorBase<CppType>::swap(IteratorBase<CppType>& other)
 template<class CppType>
 IteratorBase<CppType>::~IteratorBase()
 {
-  if (take_ownership && cobject_)
+  if(take_ownership && cobject_)
   {
     gst_iterator_free(cobject_);
     cobject_ = 0;
@@ -364,7 +364,7 @@ CppType IteratorBasic<CppType>::operator*() const
 {
   typedef typename CppType::BaseObjectType CType;
 
-  if (this->current)
+  if(this->current)
     return CppType((CType*)(this->current));
   else
     return CppType();
@@ -375,7 +375,7 @@ CppType* IteratorBasic<CppType>::operator->() const
 {
   static typename CppType::CppObjectType result;
 
-  if (this->current)
+  if(this->current)
   {
     result = this->operator*();
     return &result;
@@ -389,9 +389,9 @@ IteratorBasic<CppType>& IteratorBasic<CppType>::operator++()
 {
   const IteratorResult result = this->next();
 
-  if (result == Gst::ITERATOR_RESYNC)
+  if(result == Gst::ITERATOR_RESYNC)
     throw std::runtime_error("Concurrent update of iterator elements.  Please resync.");
-  else if (result == Gst::ITERATOR_ERROR)
+  else if(result == Gst::ITERATOR_ERROR)
     throw std::runtime_error("Iterator error while incrementing.");
 
   return *this;
@@ -425,7 +425,7 @@ IteratorResult Iterator<CppType>::next()
   // Remove extra reference that gst_iterator_next() takes because references
   // are taken when using Gst::Iterator<CppType> dereferencing operators (* and
   // ->).
-  if (this->current)
+  if(this->current)
     g_object_unref(this->current);
 
   return result;
@@ -436,7 +436,7 @@ Glib::RefPtr<CppType> Iterator<CppType>::operator*() const
 {
   typedef typename CppType::BaseObjectType CType;
 
-  if (this->current)
+  if(this->current)
   {
     //Take extra reference when dereferencing.  The reference will disappear
     //when Glib::RefPtr<> is destroyed.
@@ -451,7 +451,7 @@ CppType* Iterator<CppType>::operator->() const
 {
   typedef typename CppType::BaseObjectType CType;
 
-  if (this->current)
+  if(this->current)
   {
     //Take extra reference when dereferencing.  The reference will disappear
     //when Glib::RefPtr<> is destroyed.

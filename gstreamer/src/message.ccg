@@ -99,7 +99,7 @@ std::string MessageError::parse_debug() const
   gst_message_parse_error(const_cast<GstMessage*>(gobj()), 0, &c_debug);
 
   std::string result = c_debug;
-  if (c_debug)
+  if(c_debug)
     g_free(c_debug);
 
   return result;
@@ -142,7 +142,7 @@ std::string MessageWarning::parse_debug() const
   gst_message_parse_warning(const_cast<GstMessage*>(gobj()), 0, &c_debug);
 
   std::string result = c_debug;
-  if (c_debug)
+  if(c_debug)
     g_free(c_debug);
 
   return result;
@@ -186,7 +186,7 @@ std::string MessageInfo::parse_debug() const
   gst_message_parse_info(const_cast<GstMessage*>(gobj()), 0, &c_debug);
 
   std::string result = c_debug;
-  if (c_debug)
+  if(c_debug)
     g_free(c_debug);
 
   return result;
@@ -608,9 +608,9 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   if(!message)
     return result;
 
-  if (gst_mixer_message_get_type(message) == GST_MIXER_MESSAGE_INVALID)
+  if(gst_mixer_message_get_type(message) == GST_MIXER_MESSAGE_INVALID)
   {
-    switch (GST_MESSAGE_TYPE(message))
+    switch(GST_MESSAGE_TYPE(message))
     {
       case GST_MESSAGE_EOS:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageEos(message) );
@@ -680,7 +680,7 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   }
   else
   {
-    switch (GST_MESSAGE_TYPE(message))
+    switch(GST_MESSAGE_TYPE(message))
     {
       case GST_MIXER_MESSAGE_MUTE_TOGGLED:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageMixerMuteToggled(message) );

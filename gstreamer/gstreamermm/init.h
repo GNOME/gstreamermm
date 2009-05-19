@@ -39,8 +39,8 @@ namespace Gst
  * initialization can be done as follows:
  *
  * @code
- * if (!Glib::thread_supported ())
- *   Glib::thread_init ();
+ * if(!Glib::thread_supported())
+ *   Glib::thread_init();
  * ...
  * @endcode
  * 
@@ -69,8 +69,8 @@ void init(int& argc, char**& argv);
  * thread initialization can be done as follows:
  *
  * @code
- * if (!Glib::thread_supported ())
- *   Glib::thread_init ();
+ * if(!Glib::thread_supported())
+ *   Glib::thread_init();
  * ...
  * @endcode
  *
@@ -91,8 +91,8 @@ void init();
  * initialization can be done as follows:
  *
  * @code
- * if (!Glib::thread_supported ())
- *   Glib::thread_init ();
+ * if(!Glib::thread_supported())
+ *   Glib::thread_init();
  * ...
  * @endcode
  * 
@@ -122,8 +122,8 @@ void init();
  * initialization can be done as follows:
  *
  * @code
- * if (!Glib::thread_supported ())
- *   Glib::thread_init ();
+ * if(!Glib::thread_supported())
+ *   Glib::thread_init();
  * ...
  * @endcode
  * 
