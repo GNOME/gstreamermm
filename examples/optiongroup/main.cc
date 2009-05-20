@@ -46,8 +46,8 @@ int main(int argc, char** argv)
 
   // We must initialise the threading system before using any other GLib function.
   // See Gstreamer's documentation for more info.
-  if(!Glib::thread_supported ())
-    Glib::thread_init ();
+  if(!Glib::thread_supported())
+    Glib::thread_init();
 
   m_OptionContext.set_main_group(m_OptionGroup);
 
