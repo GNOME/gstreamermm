@@ -98,26 +98,28 @@ void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec) const
   memcpy(spec.silence_sample, silence_sample, sizeof(spec.silence_sample));
 }
 
+RingBuffer::RingBuffer(const Glib::ConstructParams& construct_params)
+:
+  Gst::Object(construct_params),
+  _slot_set(false)
+{}
+
+RingBuffer::RingBuffer(GstRingBuffer* castitem)
+:
+  Gst::Object((GstObject*)(castitem)),
+  _slot_set(false)
+{}
+
 void RingBuffer::set_fill_slot(const SlotFill& slot)
 {
-  if(_slot_set())
+  if(_slot_set)
     delete this->slot;
 
   this->slot = new SlotFill(slot);
-  _slot_set(true);
+  _slot_set = true;
 
   gst_ring_buffer_set_callback(gobj(), &RingBuffer_Fill_gstreamermm_callback,
     this->slot);
-}
-
-bool RingBuffer::_slot_set(bool mark_set) const
-{
-  static bool slot_set = false;
-
-  if(mark_set)
-    slot_set = true;
-
-  return slot_set;
 }
 
 bool RingBuffer::acquire(const Gst::RingBufferSpec& spec)
@@ -139,7 +141,7 @@ bool RingBuffer::parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::C
 RingBuffer::~RingBuffer()
 {
     // Delete task's slot upon destruction
-  if(_slot_set())
+  if(_slot_set)
     delete slot;
 }
 

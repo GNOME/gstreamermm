@@ -44,11 +44,24 @@ static GstClockTime AudioClock_GetTime_gstreamermm_callback(GstClock* clock, voi
 namespace Gst
 {
 
+AudioClock::AudioClock(const Glib::ConstructParams& construct_params)
+:
+  Gst::SystemClock(construct_params),
+  _slot_set(false)
+{}
+
+AudioClock::AudioClock(GstAudioClock* castitem)
+:
+  Gst::SystemClock((GstSystemClock*)(castitem)),
+  _slot_set(false)
+{}
+
+
 AudioClock::AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot)
-  : _CONSTRUCT("name", name.c_str())
+  : _CONSTRUCT("name", name.c_str()),
+    _slot_set(true)
 {
   slot = new SlotGetTime(time_slot);
-  _slot_set(true);
 
   //The following lines are taken verbatim from gst_audio_clock_new() after the
   //call to g_object_new() because it seems that bug #545782 will not be
@@ -57,20 +70,10 @@ AudioClock::AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot)
   gobj()->user_data = &slot;
 }
 
-bool AudioClock::_slot_set(bool mark_set) const
-{
-  static bool slot_set = false;
-
-  if(mark_set)
-    slot_set = true;
-
-  return slot_set;
-}
-
 
 AudioClock::~AudioClock()
 {
-  if(_slot_set())
+  if(_slot_set)
     delete slot;
 }
 
