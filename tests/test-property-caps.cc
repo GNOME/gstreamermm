@@ -28,7 +28,7 @@ main(int argc, char* argv[])
   Glib::RefPtr<Gst::Element> source = 
           Gst::ElementFactory::create_element("multifilesrc", "source");
 
-  if (!source)
+  if(!source)
   {
     std::cout << "Could not create `multifilesrc' element.  Exiting." <<
       std::endl;
@@ -40,7 +40,7 @@ main(int argc, char* argv[])
 
   source->get_property("caps", caps);
 
-  if (!caps)
+  if(!caps)
     std::cout << "`caps' property is null before setting property." <<
       std::endl;
 
@@ -48,7 +48,7 @@ main(int argc, char* argv[])
 
   source->get_property("caps", caps);
 
-  if (caps)
+  if(caps)
     std::cout << "`caps' property after setting and getting is '" <<
       caps->to_string() << "'." << std::endl;
 

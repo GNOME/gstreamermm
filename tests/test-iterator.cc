@@ -49,23 +49,23 @@ int main (int argc, char* argv[])
 
   try
   {
-    for (elements.begin(); !elements.is_end(); ++elements, ++iterations)
+    for(elements.begin(); !elements.is_end(); ++elements, ++iterations)
     {
-      if (!firstIter)
+      if(!firstIter)
         firstIter = elements;
 
       std::cout << elements->get_name() << std::endl;
     }
 
-    if (firstIter)
+    if(firstIter)
       std::cout << "The first element iterator processed is '" << 
         firstIter->get_name() << "'." << std::endl;
 
-    if (elements)
+    if(elements)
       std::cout << "elements.is_end() == true && (elements) is valid." <<
         std::endl;
   }
-  catch (std::runtime_error& e)
+  catch(std::runtime_error& e)
   {
     std::cout << "Runtime error while iterating through \"" <<
       bin->get_name() << "'s\" elements:" << std::endl << e.what() << std::endl;
@@ -87,7 +87,7 @@ int main (int argc, char* argv[])
         "." << std::endl;
     }
   }
-  catch (std::runtime_error& e)
+  catch(std::runtime_error& e)
   {
     std::cout << "Runtime error while iterating through query types." <<
       std::endl << e.what() << std::endl;
@@ -106,7 +106,7 @@ int main (int argc, char* argv[])
         "." << std::endl;
     }
   }
-  catch (std::runtime_error& e)
+  catch(std::runtime_error& e)
   {
     std::cout << "Runtime error while iterating through formats." <<
       std::endl << e.what() << std::endl;

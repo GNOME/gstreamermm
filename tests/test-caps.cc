@@ -52,7 +52,7 @@ void test_simple()
   caps->set_simple("framerate", Gst::Fraction(25, 1));
   caps->set_simple("string", "A string");
 
-  if (caps->get_structure(0).get_field("width", width))
+  if(caps->get_structure(0).get_field("width", width))
   {
     std::cout << "Simple caps width after setting = " << width << "." <<
       std::endl;
@@ -60,7 +60,7 @@ void test_simple()
   else
     std::cout << "Getting of simple caps width field failed." << std::endl;
 
-  if (caps->get_structure(0).get_field("framerate", rate))
+  if(caps->get_structure(0).get_field("framerate", rate))
   {
     std::cout << "Simple caps rate after setting = " << rate.num << "/" <<
       rate.denom << "." << std::endl;
@@ -68,7 +68,7 @@ void test_simple()
   else
     std::cout << "Getting of simple caps framerate field failed." << std::endl;
 
-  if (caps->get_structure(0).get_field("string", string))
+  if(caps->get_structure(0).get_field("string", string))
   {
     std::cout << "Simple caps string after setting = '" << string << "'." <<
       std::endl;
@@ -93,7 +93,7 @@ int main (int argc, char* argv[])
 
   pipeline->add(e1)->add(e2);
 
-  if (!link_elements_with_filter(e1, e2))
+  if(!link_elements_with_filter(e1, e2))
     std::cerr << "Falied to link e1 and e2." << std::endl;
   else
     std::cerr << "Succeeded linking e1 and e2 with filter." << std::endl;

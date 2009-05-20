@@ -27,7 +27,7 @@ Glib::RefPtr<Glib::MainLoop> mainloop;
 // This function is used to receive asynchronous messages in the main loop.
 bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<Gst::Message>& message)
 {
-  switch (message->get_message_type()) {
+  switch(message->get_message_type()) {
     case Gst::MESSAGE_EOS:
       std::cout << "End of stream." << std::endl;
       mainloop->quit();
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
   Glib::RefPtr<Gst::FakeSrc> source = Gst::FakeSrc::create();
   Glib::RefPtr<Gst::FakeSink> sink = Gst::FakeSink::create();
 
-  if (!pipeline || !source || !sink) {
+  if(!pipeline || !source || !sink) {
     std::cerr << "One element could not be created" << std::endl;
     return -1;
   }

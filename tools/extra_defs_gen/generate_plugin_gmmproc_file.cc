@@ -125,12 +125,12 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
   bool prev_is_lower = true;  // Going backwards so last char should be lower.
   int underscore_char_count = 0; // Used to count characters between underscores.
 
-  for (--iter; iter != typeName.begin(); --iter, ++underscore_char_count)
+  for(--iter; iter != typeName.begin(); --iter, ++underscore_char_count)
   {
-    if (g_unichar_isupper(*iter))
+    if(g_unichar_isupper(*iter))
     {
       result.insert(0, 1, *iter);
-      if (prev_is_lower && underscore_char_count > 1)
+      if(prev_is_lower && underscore_char_count > 1)
       {
         result.insert(0, 1, '_');
         underscore_char_count = 0;
@@ -140,7 +140,7 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
     }
     else
     {
-      if (prev_is_upper && underscore_char_count > 1)
+      if(prev_is_upper && underscore_char_count > 1)
       {
         result.insert(0, 1, '_');
         underscore_char_count = 0;
@@ -159,10 +159,10 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 
 bool is_wrapped_enum(const Glib::ustring& cTypeName)
 {
-  for (int i = 0; i < WRAPPED_ENUMS_SIZE &&
+  for(int i = 0; i < WRAPPED_ENUMS_SIZE &&
     cTypeName.compare(wrappedEnums[i]) >= 0; i++)
   {
-    if (cTypeName.compare(wrappedEnums[i]) == 0)
+    if(cTypeName.compare(wrappedEnums[i]) == 0)
       return true;
   }
 
@@ -171,10 +171,10 @@ bool is_wrapped_enum(const Glib::ustring& cTypeName)
 
 bool is_wrapped_base_class(const Glib::ustring& cTypeName)
 {
-  for (int i = 0; i < WRAPPED_BASE_CLASSES_SIZE &&
+  for(int i = 0; i < WRAPPED_BASE_CLASSES_SIZE &&
     cTypeName.compare(wrappedBaseClasses[i]) >= 0; i++)
   {
-    if (cTypeName.compare(wrappedBaseClasses[i]) == 0)
+    if(cTypeName.compare(wrappedBaseClasses[i]) == 0)
       return true;
   }
 
@@ -188,7 +188,7 @@ bool is_plugin(const Glib::ustring& cTypeName)
 
   bool const result = (fact != 0);
 
-  if (fact)
+  if(fact)
     g_object_unref(fact);
 
   return result;
@@ -207,7 +207,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
     ppParamSpec = g_object_class_list_properties (pGClass, &iCount);
     g_type_class_unref(pGClass);
   }
-  else if (G_TYPE_IS_INTERFACE(type))
+  else if(G_TYPE_IS_INTERFACE(type))
   {
     gpointer pGInterface = g_type_default_interface_ref(type);
     if(pGInterface) //We check because this fails for G_TYPE_VOLUME, for some reason.
@@ -229,7 +229,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
       GType propertyGType = pParamSpec->value_type;
       GType ownerGType = pParamSpec->owner_type;
 
-      if (ownerGType == type)
+      if(ownerGType == type)
       {
         //Name and type:
         Glib::ustring propertyName = g_param_spec_get_name(pParamSpec);
@@ -239,7 +239,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
 
         bool enumIsWrapped = false;
 
-        if ((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)) &&
+        if((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)) &&
           !(enumIsWrapped = is_wrapped_enum(propertyCType)))
         {
           Glib::ustring propertyCppType = propertyCType.substr(3);
@@ -264,7 +264,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
           "_CCONVERT(" + propertyCType + ", `return'))\n";
 
-        if (!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
+        if(!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
           includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")dnl\n";
       }
     }
@@ -277,10 +277,10 @@ Glib::ustring get_method_name(const Glib::ustring& signalName)
 {
   Glib::ustring result;
 
-  for (Glib::ustring::const_iterator iter = signalName.begin();
+  for(Glib::ustring::const_iterator iter = signalName.begin();
     iter != signalName.end(); ++iter)
   {
-    if ((*iter) == '-')
+    if((*iter) == '-')
     {
       result.push_back('_');
     }
@@ -304,7 +304,7 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
 
   //Get the list of signals:
   guint iCount = 0;
-  guint* pIDs = g_signal_list_ids (type, &iCount);
+  guint* pIDs = g_signal_list_ids(type, &iCount);
 
   //Loop through the list of signals:
   if(pIDs)
@@ -330,9 +330,9 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
       Glib::ustring  returnCType = g_type_name(returnGType) +
         (Glib::ustring) (gst_type_is_a_pointer(returnGType) ?  "*" : "");
 
-      if (gst_type_is_a_pointer(returnGType))
+      if(gst_type_is_a_pointer(returnGType))
       {
-        if (g_type_is_a(returnGType, G_TYPE_BOXED))
+        if(g_type_is_a(returnGType, G_TYPE_BOXED))
         // Boxed type returns for signals need special conversions because
         // when unwrapping them, gobj_copy() should be used instead of just
         // gobj() to guard against losing the original with a temporary
@@ -345,7 +345,7 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
 
           // Also include a wrapping conversion:
 
-          if (returnGType == GST_TYPE_TAG_LIST)
+          if(returnGType == GST_TYPE_TAG_LIST)
           // Dealing with a GstTagList* return which has a special Glib::wrap()
           // because of the conflict with the Glib::wrap() for GstStructure*
           // (GstTagList is infact a GstStructure).
@@ -407,9 +407,9 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
           // conversions will already probably be defined in the global convert
           // file):
 
-          if (gst_type_is_a_pointer(paramGType))
+          if(gst_type_is_a_pointer(paramGType))
           {
-            if (paramGType == GST_TYPE_TAG_LIST)
+            if(paramGType == GST_TYPE_TAG_LIST)
             // Dealing with a GstTagList* which has a special Glib::wrap()
             // because of the conflict with the Glib::wrap() for GstStructure*
             // (GstTagList is in fact a GstStructure).
@@ -433,7 +433,7 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
 
           cClassSignalDeclarations += ", " + paramCType + " " + paramName;
 
-          if (i < signalQuery.n_params - 1)
+          if(i < signalQuery.n_params - 1)
             wrapStatement += ", ";
         }
       }
@@ -462,16 +462,16 @@ void get_interface_macros(Glib::ustring& interfaceMacros,
 
   GType parent_type = g_type_parent(type);
 
-  for (guint i = 0; i < n_interfaces; i++)
+  for(guint i = 0; i < n_interfaces; i++)
   {
-    if (!g_type_is_a(parent_type, interfaces[i]))
+    if(!g_type_is_a(parent_type, interfaces[i]))
     {
       Glib::ustring  interfaceCType = g_type_name(interfaces[i]) +
         (Glib::ustring) "*";
 
       cppExtends += "public _CCONVERT(`" + interfaceCType + "',`type')";
 
-      if (i < n_interfaces - 1)
+      if(i < n_interfaces - 1)
         cppExtends += ", ";
 
       interfaceMacros += "  _IMPLEMENTS_INTERFACE(_CCONVERT(`" +
@@ -504,7 +504,7 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
 
-  if (!enumWrapStatements.empty())
+  if(!enumWrapStatements.empty())
     std::cout << enumWrapStatements << std::endl;
 
   std::cout << "/** " << nmspace << "::" << cppTypeName << " - " << pluginName << " plugin." << std::endl;
@@ -520,7 +520,7 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << "class " << cppTypeName << std::endl;
   std::cout << ": public " << parentNameSpace << "::" << cppParentTypeName;
 
-  if (!cppExtends.empty())
+  if(!cppExtends.empty())
     std::cout << ", " << cppExtends;
   
   std::cout << std::endl;
@@ -530,7 +530,7 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
     ", " << castMacro << ", " << parentNameSpace << "::" <<
     cppParentTypeName << ", " << cParentTypeName << ")" << std::endl;
 
-  if (!interfaceMacros.empty())
+  if(!interfaceMacros.empty())
     std::cout << interfaceMacros << std::endl;
 
   std::cout << "  _IS_GSTREAMERMM_PLUGIN" << std::endl << std::endl;
@@ -548,10 +548,10 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << " */" << std::endl;
   std::cout << "  _WRAP_CREATE(const Glib::ustring& name)" << std::endl;
 
-  if (!propertyWrapStatements.empty())
+  if(!propertyWrapStatements.empty())
     std::cout << std::endl << propertyWrapStatements;
 
-  if (!signalWrapStatements.empty())
+  if(!signalWrapStatements.empty())
     std::cout << std::endl << signalWrapStatements;
 
   std::cout << "};" << std::endl;
@@ -566,7 +566,7 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
     cppParentTypeName.lowercase() << "_p.h)" << std::endl << std::endl;
 
   //Only output ObjectClass with signal declarations if there are signals:
-  if (!cClassSignalDeclarations.empty())
+  if(!cClassSignalDeclarations.empty())
   {
     std::cout << "struct _" << cTypeName << "Class" << std::endl;
     std::cout << "{" << std::endl;
@@ -586,11 +586,11 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "  GstElementFactory* factory = 0;" << std::endl;
   std::cout << "  GstPluginFeature* feature = 0;" << std::endl << std::endl;
 
-  std::cout << "  if (!type)" << std::endl; std::cout << "  {" << std::endl;
+  std::cout << "  if(!type)" << std::endl; std::cout << "  {" << std::endl;
   std::cout << "    factory = gst_element_factory_find(\"" << pluginName << "\");" << std::endl;
 
   std::cout << "    // Make sure that the feature is actually loaded:" << std::endl;
-  std::cout << "    if (factory)" << std::endl;
+  std::cout << "    if(factory)" << std::endl;
   std::cout << "    {" << std::endl;
   std::cout << "      feature =" << std::endl;
   std::cout << "        gst_plugin_feature_load(GST_PLUGIN_FEATURE(factory));" << std::endl << std::endl;
@@ -605,7 +605,7 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "  return type;" << std::endl;
   std::cout << "}" << std::endl;
 
-  if (!enumGTypeFunctionDefinitions.empty())
+  if(!enumGTypeFunctionDefinitions.empty())
     std::cout << enumGTypeFunctionDefinitions;
 
   std::cout << std::endl << "} // extern \"C\"" << std::endl << std::endl;
@@ -631,7 +631,7 @@ int main(int argc, char* argv[])
   gboolean ccgFile = false;
   gboolean confirmExistence = false;
 
-  if (!g_thread_supported())
+  if(!g_thread_supported())
     g_thread_init(0);
 
   GOptionEntry optionEntries[] =
@@ -661,14 +661,14 @@ int main(int argc, char* argv[])
 
   try
   {
-    if (!optionContext.parse(argc, argv))
+    if(!optionContext.parse(argc, argv))
     {
       std::cout << "Error parsing options and initializing.  Sorry." <<
         std::endl;
       return -1;
     }
   }
-  catch (Glib::OptionError& error)
+  catch(Glib::OptionError& error)
   {
       std::cout << "Error parsing options and initializing GStreamer." <<
         std::endl << "Run `" << argv[0] << " -?'  for a list of options." <<
@@ -676,9 +676,9 @@ int main(int argc, char* argv[])
       return -1;
   }
 
-  if (confirmExistence)
+  if(confirmExistence)
   {
-    if (argc != 2)
+    if(argc != 2)
     {
       std::cout << "A plugin name must be supplied to confirm plugin "
         "existence." << std::endl << "Run `" << argv[0] <<
@@ -686,7 +686,7 @@ int main(int argc, char* argv[])
       return -1;
     }
   }
-  else if (argc != 3)
+  else if(argc != 3)
   {
     std::cout << "A plugin name and C++ class name must be supplied to "
       "generate gmmproc files." << std::endl <<
@@ -696,7 +696,7 @@ int main(int argc, char* argv[])
 
   pluginName = argv[1];
 
-  if (!confirmExistence)
+  if(!confirmExistence)
     cppTypeName = argv[2];
 
   GstElementFactory* factory = 0;
@@ -704,7 +704,7 @@ int main(int argc, char* argv[])
   factory = gst_element_factory_find(pluginName.c_str());
 
   // Make sure that the feature is actually loaded:
-  if (factory)
+  if(factory)
   {
     GstPluginFeature* loaded_feature =
             gst_plugin_feature_load(GST_PLUGIN_FEATURE(factory));
@@ -714,12 +714,12 @@ int main(int argc, char* argv[])
     type = gst_element_factory_get_element_type(factory);
   }
 
-  if (type)
+  if(type)
   {
-    if (confirmExistence)
+    if(confirmExistence)
       return 0;
 
-    if (!nmspace || !defsFile || !target)
+    if(!nmspace || !defsFile || !target)
     {
       std::cout << "A namespace, a default defs file and a target directory "
         "must be supplied" << std::endl << "with the --namespace, --main-defs "
@@ -731,7 +731,7 @@ int main(int argc, char* argv[])
     cTypeName = g_type_name(type);
     cParentTypeName = g_type_name(g_type_parent(type));
 
-    while (!cParentTypeName.empty() &&
+    while(!cParentTypeName.empty() &&
       !is_wrapped_base_class(cParentTypeName) && !is_plugin(cParentTypeName))
     {
       cParentTypeName =
@@ -743,7 +743,7 @@ int main(int argc, char* argv[])
 
     // Check for gstreamermm base classes so that the Gst namespace and the
     // gstreamermm include directory is always used with them.
-    if (
+    if(
       cppParentTypeName.compare("AudioFilter") == 0 ||
       cppParentTypeName.compare("AudioSink") == 0 ||
       cppParentTypeName.compare("AudioSrc") == 0 ||
@@ -770,7 +770,7 @@ int main(int argc, char* argv[])
       parentNameSpace = nmspace;
     }
 
-    if (hgFile || ccgFile)
+    if(hgFile || ccgFile)
     {
       Glib::ustring propertyWrapStatements;
       Glib::ustring includeMacroCalls;
@@ -785,7 +785,7 @@ int main(int argc, char* argv[])
       get_signal_wrap_statements(signalWrapStatements, includeMacroCalls,
         cClassSignalDeclarations);
 
-      if (hgFile)
+      if(hgFile)
       {
         Glib::ustring interfaceMacros;
         Glib::ustring cppExtends;
@@ -805,10 +805,10 @@ int main(int argc, char* argv[])
   }
   else
   {
-    if (confirmExistence)
+    if(confirmExistence)
       return -1;
 
-    if (hgFile)
+    if(hgFile)
     {
       std::cout << "_DEFS(" << target << "," << defsFile << ")" <<
         std::endl << std::endl;
@@ -820,7 +820,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  if (factory)
+  if(factory)
     g_object_unref(factory);
 
   return 0;

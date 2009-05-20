@@ -50,7 +50,7 @@ main (int argc, char *argv[])
   // Create a video sink where video (if any) will be drawn:
   Glib::RefPtr<Gst::XImageSink> video_sink =
                         Gst::XImageSink::create("ximagesink");
-  if (!video_sink)
+  if(!video_sink)
   {
     std::cerr << "The ximagesink could not be created." << std::endl;
     return -1;

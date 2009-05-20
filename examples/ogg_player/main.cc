@@ -33,7 +33,7 @@ bool on_timeout()
 
   Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
-  if (pipeline->query(query)
+  if(pipeline->query(query)
     && pipeline->query_duration(fmt, len))
   {
     // Cast query's RefPtr to RefPtr<Gst::QueryPosition> to parse the
@@ -63,7 +63,7 @@ bool on_timeout()
 // This function is used to receive asynchronous messages in the main loop.
 bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<Gst::Message>& message)
 {
-  switch (message->get_message_type()) {
+  switch(message->get_message_type()) {
     case Gst::MESSAGE_EOS:
       std::cout << std::endl << "End of stream" << std::endl;
       mainloop->quit();
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
   Gst::init(argc, argv);
 
   // Check input arguments:
-  if (argc < 2)
+  if(argc < 2)
   {
     std::cout << "Usage: " << argv[0] << " <Ogg/Vorbis filename>" << std::endl;
     return -1;
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
     std::cerr << "alsasink element could not be created." << std::endl;
 
   //Check that the elements were created:
-  if (!pipeline || !source || !parser || !decoder || !conv || !sink)
+  if(!pipeline || !source || !parser || !decoder || !conv || !sink)
   {
     std::cerr << "One element could not be created" << std::endl;
     return -1;

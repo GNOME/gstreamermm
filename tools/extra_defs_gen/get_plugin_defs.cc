@@ -31,7 +31,7 @@ std::string get_plugin_defs(const std::string& pluginName)
   factory = gst_element_factory_find(pluginName.c_str());
 
   // Make sure that the feature is actually loaded:
-  if (factory)
+  if(factory)
   {
     GstPluginFeature* loaded_feature =
             gst_plugin_feature_load(GST_PLUGIN_FEATURE(factory));

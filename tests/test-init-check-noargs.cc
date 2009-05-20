@@ -26,14 +26,14 @@ int main (int argc, char* argv[])
   {
     bool success = Gst::init_check();
 
-    if (!success)
+    if(!success)
     {
       std::cout << "Error initializing gstreamermm." << std::endl;
       return -1;
     }
 
   }
-  catch (const Glib::Error& error)
+  catch(const Glib::Error& error)
   {
     std::cout << "Error initializing gstreamermm." << std::endl;
     return -1;
@@ -41,7 +41,7 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("ximagesink", "videosink");
 
-  if (element)
+  if(element)
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 

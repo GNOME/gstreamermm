@@ -27,7 +27,7 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("ximagesink", "videosink");
 
-  if (element)
+  if(element)
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 
@@ -45,7 +45,7 @@ int main (int argc, char* argv[])
   GstClock* gst_clock = gst_audio_clock_new("clock", 0, 0);
   Glib::RefPtr<Gst::AudioClock> clock = Glib::wrap(GST_AUDIO_CLOCK(gst_clock));
 
-  if (clock)
+  if(clock)
     std::cout << "Successfully wrapped a GstAudioClock in a GSt::AudioClock." << std::endl;
   else
     std::cout << "Did not successfully wrap a GstAudioClock in a Gst::AudioClock." << std::endl;

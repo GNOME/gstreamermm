@@ -23,11 +23,11 @@ Glib::OptionEntry make_entry(const Glib::ustring& long_name, const gchar& short_
 {
   Glib::OptionEntry m_OptionEntry;
 
-  if (!long_name.empty())
+  if(!long_name.empty())
     m_OptionEntry.set_long_name(long_name);
-  if (short_name)
+  if(short_name)
     m_OptionEntry.set_short_name(short_name);
-  if (!description.empty())
+  if(!description.empty())
     m_OptionEntry.set_description(description);
 
   return m_OptionEntry;
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
   // We must initialise the threading system before using any other GLib function.
   // See Gstreamer's documentation for more info.
-  if (!Glib::thread_supported ())
+  if(!Glib::thread_supported ())
     Glib::thread_init ();
 
   m_OptionContext.set_main_group(m_OptionGroup);

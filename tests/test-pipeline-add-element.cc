@@ -31,7 +31,7 @@ int main (int argc, char* argv[])
 
   Glib::RefPtr<Gst::Element> sourceCopy = pipeline->get_element("source");
 
-  if (sourceCopy)
+  if(sourceCopy)
     std::cout << "Successfully added element '" << sourceCopy->get_name() <<
      "' to pipeline '" << pipeline->get_name() << "'." << std::endl;
 

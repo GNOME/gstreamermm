@@ -45,7 +45,7 @@ int main (int argc, char* argv[])
     const GstElement* constGstElement = handler->gobj();
     Glib::RefPtr<Gst::Element> element_copy = Glib::wrap(handler->gobj_copy());
 
-    if (!gstElement || !constGstElement || !element_copy)
+    if(!gstElement || !constGstElement || !element_copy)
     {
       std::cout << "Underlying gobject methods of cast object didn't work." <<
         std::endl;

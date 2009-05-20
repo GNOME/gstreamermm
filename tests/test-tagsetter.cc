@@ -26,7 +26,7 @@ int main (int argc, char* argv[])
   
   Glib::RefPtr<Gst::Element> vorbisenc = Gst::ElementFactory::create_element("vorbisenc");
 
-  if (!vorbisenc)
+  if(!vorbisenc)
   {
     std::cout << "Failed to create vorbisenc element." << std::endl;
     exit(1);
@@ -35,7 +35,7 @@ int main (int argc, char* argv[])
   Glib::RefPtr< Gst::ElementInterfaced<Gst::TagSetter> > setter =
     Gst::Interface::cast<Gst::TagSetter>(vorbisenc);
 
-  if (!setter)
+  if(!setter)
   {
     std::cout << "Failed to cast vorbisenc element to Gst::TagSetter." <<
       std::endl;

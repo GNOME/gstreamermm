@@ -121,7 +121,7 @@ static gboolean gtype_wraps_interface(GType implementer_type, GType interface_ty
   GType *ifaces = g_type_interfaces (implementer_type, &n_ifaces);
 
   gboolean found = false;
-  while (n_ifaces-- && !found)
+  while(n_ifaces-- && !found)
   {
     found = (ifaces[n_ifaces] == interface_type);
   }

@@ -47,7 +47,7 @@ int main (int argc, char* argv[])
   Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create();
   add_structures(caps);
 
-  for (int i = 0; i < 2; i++) {
+  for(int i = 0; i < 2; i++) {
     Glib::ustring str;
     const Gst::Structure s = caps->get_structure(i);
     if(s)

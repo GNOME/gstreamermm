@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 
   Glib::RefPtr<Gst::FileSrc> filesrc = Gst::FileSrc::create();
 
-  if (filesrc)
+  if(filesrc)
     std::cout << "filesrc is valid." << std::endl;
   else
     std::cout << "filesrc is invalid." << std::endl;
