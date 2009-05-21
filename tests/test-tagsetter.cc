@@ -42,23 +42,23 @@ int main (int argc, char* argv[])
     exit(1);
   }
 
-  setter->add_tag(Gst::Tag::BITRATE, 192);
-  setter->add_tag(Gst::Tag::TITLE, "A Song");
+  setter->add_tag(Gst::TAG_BITRATE, 192);
+  setter->add_tag(Gst::TAG_TITLE, "A Song");
 
   int bitrate = 0;
 
-  if(setter->get_tag_list().get(Gst::Tag::BITRATE, bitrate))
+  if(setter->get_tag_list().get(Gst::TAG_BITRATE, bitrate))
     std::cout << "bitrate = " << bitrate << "." << std::endl;
   else
-    std::cout << "Could not get tag `" << Gst::Tag::BITRATE <<
+    std::cout << "Could not get tag `" << Gst::TAG_BITRATE <<
       "' from tagsetter." << std::endl;
 
   std::string title;
 
-  if(setter->get_tag_list().get(Gst::Tag::TITLE, title))
+  if(setter->get_tag_list().get(Gst::TAG_TITLE, title))
     std::cout << "title = `" << title << "'." << std::endl;
   else
-    std::cout << "Could not get tag `" << Gst::Tag::TITLE <<
+    std::cout << "Could not get tag `" << Gst::TAG_TITLE <<
       "' from tagsetter." << std::endl;
 
   return 0;

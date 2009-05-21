@@ -32,35 +32,35 @@ int main (int argc, char* argv[])
     exit(1);
   }
 
-  taglist.add(Gst::Tag::TITLE, "My Song");
-  taglist.add(Gst::Tag::ARTIST, "Artist");
-  taglist.add(Gst::Tag::BITRATE, (guint) 192);
-  taglist.add(Gst::Tag::DATE, Glib::Date(5, Glib::Date::NOVEMBER, 2008));
+  taglist.add(Gst::TAG_TITLE, "My Song");
+  taglist.add(Gst::TAG_ARTIST, "Artist");
+  taglist.add(Gst::TAG_BITRATE, (guint) 192);
+  taglist.add(Gst::TAG_DATE, Glib::Date(5, Glib::Date::NOVEMBER, 2008));
 
   Glib::ustring title;
-  if(taglist.get(Gst::Tag::TITLE, title))
+  if(taglist.get(Gst::TAG_TITLE, title))
     std::cout << "Tag title is '" << title << "'." << std::endl;
   else
-    std::cout << "Could not get tag `" << Gst::Tag::TITLE << "'." << std::endl;
+    std::cout << "Could not get tag `" << Gst::TAG_TITLE << "'." << std::endl;
 
   Glib::ustring artist;
-  if(taglist.get(Gst::Tag::ARTIST, artist))
+  if(taglist.get(Gst::TAG_ARTIST, artist))
     std::cout << "Tag artist is '" << artist << "'." << std::endl;
   else
-    std::cout << "Could not get tag `" << Gst::Tag::ARTIST << "'." << std::endl;
+    std::cout << "Could not get tag `" << Gst::TAG_ARTIST << "'." << std::endl;
 
   guint rate;
-  if(taglist.get(Gst::Tag::BITRATE, 0, rate))
+  if(taglist.get(Gst::TAG_BITRATE, 0, rate))
     std::cout << "Tag bit-rate is " << rate << "." << std::endl;
   else
-    std::cout << "Could not get tag " << Gst::Tag::BITRATE << "." << std::endl;
+    std::cout << "Could not get tag " << Gst::TAG_BITRATE << "." << std::endl;
 
   Glib::Date date;
-  if(taglist.get(Gst::Tag::DATE, date))
+  if(taglist.get(Gst::TAG_DATE, date))
     std::cout << "Tag date is " << date.get_year() << "-" <<
       date.get_month() << "-" << (int) date.get_day() << "." << std::endl;
   else
-    std::cout << "Could not get tag `" << Gst::Tag::DATE << "'." << std::endl;
+    std::cout << "Could not get tag `" << Gst::TAG_DATE << "'." << std::endl;
 
   return 0;
 }

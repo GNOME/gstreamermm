@@ -41,15 +41,81 @@ static void TagList_foreach_gstreamermm_callback(const GstTagList* list, const g
 namespace Gst
 {
 
-void TagList::add(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode)
+// The size should be  the last enum in Gst::Tag + 1.  Make sure the order here
+// is the same order as in Gst:Tag.
+const char* tagStrings[TAG_GEO_LOCATION_ELEVATION + 1] =
 {
-  //TODO: The gst_tag_list_add_values() documentation says nothing about ending the ... with NULL.
-  gst_tag_list_add_values(gobj(), (GstTagMergeMode) mode, tag.c_str(), value.gobj(), (void*)0);
+  GST_TAG_TITLE,
+  GST_TAG_TITLE_SORTNAME,
+  GST_TAG_ARTIST,
+  GST_TAG_ARTIST_SORTNAME,
+  GST_TAG_ALBUM,
+  GST_TAG_ALBUM_SORTNAME,
+  GST_TAG_DATE,
+  GST_TAG_GENRE,
+  GST_TAG_COMMENT,
+  GST_TAG_EXTENDED_COMMENT,
+  GST_TAG_TRACK_NUMBER,
+  GST_TAG_TRACK_COUNT,
+  GST_TAG_ALBUM_VOLUME_NUMBER,
+  GST_TAG_ALBUM_VOLUME_COUNT,
+  GST_TAG_LOCATION,
+  GST_TAG_DESCRIPTION,
+  GST_TAG_VERSION,
+  GST_TAG_ISRC,
+  GST_TAG_ORGANIZATION,
+  GST_TAG_COPYRIGHT,
+  GST_TAG_COPYRIGHT_URI,
+  GST_TAG_COMPOSER,
+  GST_TAG_CONTACT,
+  GST_TAG_LICENSE,
+  GST_TAG_LICENSE_URI,
+  GST_TAG_PERFORMER,
+  GST_TAG_DURATION,
+  GST_TAG_CODEC,
+  GST_TAG_VIDEO_CODEC,
+  GST_TAG_AUDIO_CODEC,
+  GST_TAG_BITRATE,
+  GST_TAG_NOMINAL_BITRATE,
+  GST_TAG_MINIMUM_BITRATE,
+  GST_TAG_MAXIMUM_BITRATE,
+  GST_TAG_SERIAL,
+  GST_TAG_ENCODER,
+  GST_TAG_ENCODER_VERSION,
+  GST_TAG_TRACK_GAIN,
+  GST_TAG_TRACK_PEAK,
+  GST_TAG_ALBUM_GAIN,
+  GST_TAG_ALBUM_PEAK,
+  GST_TAG_REFERENCE_LEVEL,
+  GST_TAG_LANGUAGE_CODE,
+  GST_TAG_IMAGE,
+  GST_TAG_PREVIEW_IMAGE,
+  GST_TAG_ATTACHMENT,
+  GST_TAG_BEATS_PER_MINUTE,
+  GST_TAG_KEYWORDS,
+  GST_TAG_GEO_LOCATION_NAME,
+  GST_TAG_GEO_LOCATION_LATITUDE,
+  GST_TAG_GEO_LOCATION_LONGITUDE,
+  GST_TAG_GEO_LOCATION_ELEVATION
+};
+
+std::ostream& operator<<(std::ostream& stream, Tag tag)
+{
+  stream << tagStrings[tag];
+  return stream;
 }
 
-void TagList::add(const Glib::ustring& tag, const char* data, TagMergeMode mode)
+void TagList::add(Tag tag, const Glib::ValueBase& value, TagMergeMode mode)
 {
-  gst_tag_list_add(gobj(), (GstTagMergeMode) mode, tag.c_str(), data, (void*)0);
+  //TODO: The gst_tag_list_add_values() documentation says nothing about ending the ... with NULL.
+  gst_tag_list_add_values(gobj(), (GstTagMergeMode) mode, tagStrings[tag],
+    value.gobj(), (void*)0);
+}
+
+void TagList::add(Tag tag, const char* data, TagMergeMode mode)
+{
+  gst_tag_list_add(gobj(), (GstTagMergeMode) mode, tagStrings[tag], data,
+    (void*)0);
 }
 
 void TagList::foreach(const SlotForeach& slot)
@@ -59,18 +125,17 @@ void TagList::foreach(const SlotForeach& slot)
   delete slot_copy;
 }
 
-bool TagList::get(const Glib::ustring& tag, Glib::ValueBase& dest) const
+bool TagList::get(Tag tag, Glib::ValueBase& dest) const
 {
   return gst_tag_list_copy_value(dest.gobj(), const_cast<GstTagList*>(gobj()),
-    tag.c_str());
+    tagStrings[tag]);
 }
 
-bool TagList::get(const Glib::ustring& tag, guint index,
-  Glib::ValueBase& value) const
+bool TagList::get(Tag tag, guint index, Glib::ValueBase& value) const
 {
   const GValue* gst_value =
     gst_tag_list_get_value_index(const_cast<GstTagList*>(gobj()),
-    tag.c_str(), index);
+    tagStrings[tag], index);
   if(gst_value)
   {
     value.init(gst_value);
