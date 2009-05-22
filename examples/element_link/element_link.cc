@@ -36,25 +36,32 @@ int main(int argc, char** argv)
   element_sink = Gst::ElementFactory::create_element("fakesink");
 
   // We must add the elements to the pipeline before linking them:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     pipeline->add(element_source)->add(element_filter)->add(element_sink);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch (std::runtime_error& ex)
   {
     std::cerr << "Exception while adding: " << ex.what() << std::endl;
     return 1;
   }
+#endif
 
   // Link the elements together:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     element_source->link(element_filter)->link(element_sink);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const std::runtime_error& error)
   {
     std::cerr << "Exception while linking: " << error.what() << std::endl;
   }
-
+#endif
   return 0;
 }
