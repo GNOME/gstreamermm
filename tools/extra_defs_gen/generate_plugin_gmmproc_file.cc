@@ -659,17 +659,27 @@ int main(int argc, char* argv[])
 
   Glib::OptionContext optionContext(gContext, true);
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     if(!optionContext.parse(argc, argv))
+#else
+    std::auto_ptr<Glib::Error> error;
+    if (!optionContext.parse(argc, argv, error))
+#endif
     {
       std::cout << "Error parsing options and initializing.  Sorry." <<
         std::endl;
       return -1;
     }
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(Glib::OptionError& error)
   {
+#else 
+  if (error.get())
+  {
+#endif
       std::cout << "Error parsing options and initializing GStreamer." <<
         std::endl << "Run `" << argv[0] << " -?'  for a list of options." <<
         std::endl;

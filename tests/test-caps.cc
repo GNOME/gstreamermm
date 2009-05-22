@@ -91,7 +91,20 @@ int main (int argc, char* argv[])
   e1 = Gst::ElementFactory::create_element("fakesrc", "source");
   e2 = Gst::ElementFactory::create_element("fakesink", "sink");
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+    pipeline->add(e1)->add(e2);
+  }
+  catch (std::runtime_error& ex)
+  {
+    std::cerr << "Exception while adding: " << ex.what() << std::endl;
+    return 1;
+  }
+#else
+  // Will report errors to stderr
   pipeline->add(e1)->add(e2);
+#endif
 
   if(!link_elements_with_filter(e1, e2))
     std::cerr << "Falied to link e1 and e2." << std::endl;

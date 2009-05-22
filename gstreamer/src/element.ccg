@@ -32,6 +32,10 @@
 #include <gstreamermm/taglist.h>
 #include <gstreamermm/iterator.h>
 
+#ifndef GLIBMM_EXCEPTIONS_ENABLED
+#include <iostream>
+#endif
+
 _PINCLUDE(gstreamermm/private/object_p.h)
 
 namespace Gst
@@ -60,27 +64,33 @@ Glib::ustring get_name(StateChangeReturn s)
 Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
 {
   if(!dest)
-    throw std::runtime_error("Failed to link null element.");
+    handle_error("Failed to link null element.");
     
   const bool result = gst_element_link(gobj(), dest->gobj());
 
   if(result)
     return dest;
   else
-    throw std::runtime_error("failed to link: " + get_name() + "->" + dest->get_name());
+  {
+    handle_error("failed to link: " + get_name() + "->" + dest->get_name());
+    return Glib::RefPtr<Gst::Element>();
+  }
 }
 
 Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest, const Glib::RefPtr<Gst::Caps>& filter)
 {
   if(!dest)
-    throw std::runtime_error("Failed to link null element.");
+    handle_error("Failed to link null element.");
     
   const bool result = gst_element_link_filtered(gobj(), dest->gobj(), filter->gobj());
 
   if(result)
     return dest;
   else
-    throw std::runtime_error("failed to link: " + get_name() + "->" + dest->get_name());
+  {
+    handle_error("failed to link: " + get_name() + "->" + dest->get_name());
+    return Glib::RefPtr<Gst::Element>();
+  }
 }
 
 void Element::post_message(int code, int line, MessageType type,
@@ -227,5 +237,14 @@ Glib::ArrayHandle<QueryType> Gst::Element::get_query_types_vfunc() const
   return RType(0, 0, Glib::OWNERSHIP_NONE);
 }
 #endif //GLIBMM_VFUNCS_ENABLED
+
+void Element::handle_error(const Glib::ustring& message)
+{
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    throw std::runtime_error(message);
+#else
+    std::cerr << "GStreamermm: " << message << std::endl;
+#endif
+}
 
 } //namespace Gst

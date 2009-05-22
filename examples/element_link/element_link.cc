@@ -36,7 +36,15 @@ int main(int argc, char** argv)
   element_sink = Gst::ElementFactory::create_element("fakesink");
 
   // We must add the elements to the pipeline before linking them:
-  pipeline->add(element_source)->add(element_filter)->add(element_sink);
+  try
+  {
+    pipeline->add(element_source)->add(element_filter)->add(element_sink);
+  }
+  catch (std::runtime_error& ex)
+  {
+    std::cerr << "Exception while adding: " << ex.what() << std::endl;
+    return 1;
+  }
 
   // Link the elements together:
   try
@@ -45,7 +53,7 @@ int main(int argc, char** argv)
   }
   catch(const std::runtime_error& error)
   {
-    std::cout << "Exception while linking: " << error.what() << std::endl;
+    std::cerr << "Exception while linking: " << error.what() << std::endl;
   }
 
   return 0;

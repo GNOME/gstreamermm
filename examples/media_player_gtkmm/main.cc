@@ -58,7 +58,11 @@ main (int argc, char *argv[])
 
   // Set the playbin's video-sink property so that our video sink is used
   // for video display:
+#ifdef GLIBMM_PROPERTIES_ENABLED
   playbin->property_video_sink() = video_sink;
+#else
+  playbin->set_property("video_sink", video_sink);
+#endif
 
   //Create our player window and give it the pipeline and video sink:
   PlayerWindow mainWindow(playbin, video_sink);

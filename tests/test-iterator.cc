@@ -46,9 +46,10 @@ int main (int argc, char* argv[])
   int iterations = 0;
   Gst::Iterator<Gst::Element> elements = bin->iterate_elements();
   Gst::Iterator<Gst::Element> firstIter;
-
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     for(elements.begin(); !elements.is_end(); ++elements, ++iterations)
     {
       if(!firstIter)
@@ -64,12 +65,14 @@ int main (int argc, char* argv[])
     if(elements)
       std::cout << "elements.is_end() == true && (elements) is valid." <<
         std::endl;
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(std::runtime_error& e)
   {
     std::cout << "Runtime error while iterating through \"" <<
       bin->get_name() << "'s\" elements:" << std::endl << e.what() << std::endl;
   }
+#endif
 
   std::cout << "The loop iterated " << iterations <<
     " time(s) to print bin '" << bin->get_name() << "' elements." << std::endl;
@@ -79,38 +82,45 @@ int main (int argc, char* argv[])
 
   Gst::IteratorBasic<const Gst::QueryTypeDefinition> queryTypes =
     Gst::Query::iterate_definitions();
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     for(++queryTypes; !queryTypes.is_end(); ++queryTypes)
     {
       std::cout << queryTypes->nick << " -- " << queryTypes->description <<
         "." << std::endl;
     }
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(std::runtime_error& e)
   {
     std::cout << "Runtime error while iterating through query types." <<
       std::endl << e.what() << std::endl;
   }
-
+#endif
   std::cout << std::endl <<
     "The following are standard GStreamer formats:" << std::endl;
 
   Gst::IteratorBasic<const Gst::FormatDefinition> formats =
     Gst::iterate_format_definitions();
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     for(++formats; !formats.is_end(); ++formats)
     {
       std::cout << formats->nick << " -- " << formats->description <<
         "." << std::endl;
     }
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(std::runtime_error& e)
   {
     std::cout << "Runtime error while iterating through formats." <<
       std::endl << e.what() << std::endl;
   }
-
+#endif
   return 0;
 }
