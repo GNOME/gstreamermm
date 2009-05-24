@@ -53,6 +53,7 @@ int main(int argc, char** argv)
 
   Glib::OptionGroup m_GstOptiongroup = Gst::get_option_group();
   m_OptionContext.add_group(m_GstOptiongroup);
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {

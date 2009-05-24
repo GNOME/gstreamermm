@@ -46,6 +46,7 @@ int main (int argc, char* argv[])
   int iterations = 0;
   Gst::Iterator<Gst::Element> elements = bin->iterate_elements();
   Gst::Iterator<Gst::Element> firstIter;
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
@@ -100,11 +101,13 @@ int main (int argc, char* argv[])
       std::endl << e.what() << std::endl;
   }
 #endif
+
   std::cout << std::endl <<
     "The following are standard GStreamer formats:" << std::endl;
 
   Gst::IteratorBasic<const Gst::FormatDefinition> formats =
     Gst::iterate_format_definitions();
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
@@ -122,5 +125,6 @@ int main (int argc, char* argv[])
       std::endl << e.what() << std::endl;
   }
 #endif
+
   return 0;
 }

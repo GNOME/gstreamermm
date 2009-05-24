@@ -94,16 +94,15 @@ int main (int argc, char* argv[])
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     pipeline->add(e1)->add(e2);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch (std::runtime_error& ex)
   {
     std::cerr << "Exception while adding: " << ex.what() << std::endl;
     return 1;
   }
-#else
-  // Will report errors to stderr
-  pipeline->add(e1)->add(e2);
 #endif
 
   if(!link_elements_with_filter(e1, e2))

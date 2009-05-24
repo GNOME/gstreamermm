@@ -83,7 +83,9 @@ int main(int argc, char* argv[])
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     pipeline->add(source)->add(sink);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const Glib::Error& ex)
   {
@@ -92,9 +94,6 @@ int main(int argc, char* argv[])
 
     return -1;
   }
-#else
-  // Errors will go to stdout
-  pipeline->add(source)->add(sink);
 #endif
 
   // Link together:
