@@ -91,11 +91,11 @@ $(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
 	$(eval hg_lowercase = \
 		$$(shell echo $$(cppname) | tr [:upper:] [:lower:]).hg)
 if MAINTAINER_MODE
-	if $(run_generate_plugin_gmmproc_file) --confirm-existence \
+	$(shell if $(run_generate_plugin_gmmproc_file) --confirm-existence \
 		$(plugin_name); then true; else \
 		echo "The $(plugin_name) gstreamer plugin is not installed.  Aborting build. If you built gst-plugins-base from source code then you might need to install the appropriate -dev or --devel packages or enable experimenal plugins before rebuilding gst-plugins-base."; \
 		false; \
-	fi
+	fi)
 endif
 	sed -n '1,/^$$/p' $(license_header_source_file) > \
 		$(srcdir)/$(hg_lowercase)
@@ -106,7 +106,7 @@ endif
 
 # This is to generate plugin .ccg files.  The .ccg file is generated and then
 # the camel ccg file is linked to the generated .ccg file to signal the
-# successful generation of the .hg file.
+# successful generation of the .ccg file.
 $(files_all_plugin_camel_hg_with_path:.hg=.ccg): $(generate_plugin_dep) \
 	$(tools_plugin_m4) $(license_header_source_file)
 	$(eval cppname = $$(notdir $$(basename $$@)))
@@ -133,11 +133,19 @@ $(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir)/%.hg \
 	$(run_gmmproc) $(plugin_name_lowercase) $(srcdir) $(gensrc_destdir)
 	@echo 'timestamp' > $@
 
+files_patched_h_with_path = $(patsubst %.hg,$(gensrc_destdir)/%.h,\
+				$(files_patched_hg))
+
+# Rule to make sure that .h files exist in $(gensrc_destdir) before they are
+# patched.
+$(files_patched_h_with_path): $(files_stamp)
+	@echo $(run_gmmproc) $(notdir $(@:.h=)) $(srcdir) $(gensrc_destdir)
+
 # This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
 $(destdir_stamp_dir)/stamp-%: $(gensrc_destdir)/%.h
 	patch -Ns $(gensrc_destdir)/$*.h $(gensrc_destdir)/$*.h.patch || true
 	rm -f $(gensrc_destdir)/$*.h.rej
-	touch $@
+	@echo 'timestamp' > $@
 
 files_hg_with_path	= $(patsubst %.hg,$(srcdir)/%.hg,$(files_all_hg))
 
@@ -155,8 +163,12 @@ $(gensrc_destdir)/gst_wrap_init.cc: $(gen_gst_wrap_init_in) \
 $(stamp_plugin_dir):
 	@(test -d $(stamp_plugin_dir) || mkdir $(stamp_plugin_dir))
 
-create-stamp-dir: $(stamp_plugin_dir)
+create-stamp-dir: $(stamp_plugin_dir) $(destdir_stamp_dir)
 	@(test -d $(stamp_dir) || mkdir $(stamp_dir))
+
+# This is to create the destdir .stamps directory to keep track of sources that
+# are patched after being generated (if any).
+$(destdir_stamp_dir):
 	@(test -d $(destdir_stamp_dir) || mkdir $(destdir_stamp_dir))
 
 if MAINTAINER_MODE
