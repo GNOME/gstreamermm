@@ -182,7 +182,8 @@ AC_SUBST(GST_INSPECT)
 #
 # Also add the target .hg file name to the files_all_plugin_hg variable in the
 # gstreamer/src/Makefile_list_of_hg.am_fragment file.  (That must be the same
-# as "CppClassName" - all in lowercase with a .hg extension).
+# as "CppClassName" - all in lowercase with a .hg extension).  Make sure that
+# the order of both lists correspond.
 GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
 fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc filesink=FileSink \
 identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee \

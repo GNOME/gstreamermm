@@ -1,5 +1,5 @@
-## Copyright (c) 2001
-## The gtkmm development team.
+## Copyright (c) 2009
+## The gstreamermm development team.
 ##
 ## **** Common rules for inclusion in Makefile.am ****
 ## Included from something/src/Makefile.am
@@ -31,7 +31,7 @@ files_all_ccg	= $(files_all_hg:%.hg=%.ccg)
 files_all_plugin_ccg = $(files_all_plugin_hg:%.hg=%.ccg)
 files_h		= $(files_all_hg:%.hg=$(gensrc_destdir)/%.h)
 files_stamp	= $(files_all_hg:%.hg=$(stamp_dir)/stamp-%)
-files_stamp_plugin = $(cppnames_plugin_all:%=$(stamp_plugin_dir)/stamp-%-plugin)
+files_stamp_plugin = $(files_all_plugin_hg:%.hg=$(stamp_plugin_dir)/plugin-stamp-%)
 destdir_files_stamp = $(files_patched_hg:%.hg=$(destdir_stamp_dir)/stamp-%)
 
 #Installed gmmproc stuff, from glibmm:
@@ -59,11 +59,6 @@ generate_plugin_gmmproc_file_path = $(extra_defs_dir)/generate_plugin_gmmproc_fi
 generate_plugin_gmmproc_file_args = --namespace=$(sublib_namespace) --main-defs=$(main_defs) --target=$(sublib_parentdir)
 run_generate_plugin_gmmproc_file = $(generate_plugin_gmmproc_file_path) $(generate_plugin_gmmproc_file_args)
 
-files_all_plugin_hg_with_path = $(patsubst %.hg,$(srcdir)/%.hg,\
-				$(files_all_plugin_hg))
-files_all_plugin_camel_hg_with_path = $(patsubst %,$(stamp_plugin_dir)/%.hg,\
-				      $(cppnames_plugin_all))
-
 
 EXTRA_DIST	= Makefile_list_of_hg.am_fragment $(files_defs) \
 		  $(files_all_hg) $(files_all_ccg) $(files_all_plugin_hg) \
@@ -83,42 +78,39 @@ license_header_source_file = $(gensrc_destdir)/version.h
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
 # the final .hg file.  Finally, the camel hg file is linked to the final .hg
 # file to signal the successful generation of the .hg file.
-$(files_all_plugin_camel_hg_with_path): $(generate_plugin_dep) \
-	$(tools_plugin_m4) $(license_header_source_file)
-	$(eval cppname = $$(notdir $$(basename $$@)))
-	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
-	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
-	$(eval hg_lowercase = \
-		$$(shell echo $$(cppname) | tr [:upper:] [:lower:]).hg)
+$(files_all_plugin_hg): $(generate_plugin_dep) $(tools_plugin_m4) \
+	$(license_header_source_file)
+	$(eval list_delim = $$(patsubst $$@,*,$$(files_all_plugin_hg)))
+	$(eval prev_mems = $$(shell echo "$$(list_delim)" | cut -d'*' -f 1))
+	$(eval pos = $$(shell expr `echo "$$(prev_mems)" | wc -w` + 1))
+	$(eval plugin_def = $$(word $$(pos),$$(defs_plugin_all)))
+	$(eval plugin_name = $$(shell echo "$$(plugin_def)" | cut -d'=' -f 1))
+	$(eval cppname = $$(subst $$(plugin_name)=,,$$(plugin_def)))
 if MAINTAINER_MODE
-	$(shell if $(run_generate_plugin_gmmproc_file) --confirm-existence \
+	@if $(run_generate_plugin_gmmproc_file) --confirm-existence \
 		$(plugin_name); then true; else \
 		echo "The $(plugin_name) gstreamer plugin is not installed.  Aborting build. If you built gst-plugins-base from source code then you might need to install the appropriate -dev or --devel packages or enable experimenal plugins before rebuilding gst-plugins-base."; \
 		false; \
-	fi)
+	fi
 endif
-	sed -n '1,/^$$/p' $(license_header_source_file) > \
-		$(srcdir)/$(hg_lowercase)
+	sed -n '1,/^$$/p' $(license_header_source_file) > $(srcdir)/$@
 	$(run_generate_plugin_gmmproc_file) --hg $(plugin_name) \
-		$(cppname) | $(M4) -I $(tools_dir_m4) >> \
-		$(srcdir)/$(hg_lowercase)
-	ln -sf "$(realpath $(srcdir))/$(hg_lowercase)" "$(builddir)/$@"
+		$(cppname) | $(M4) -I $(tools_dir_m4) >> $(srcdir)/$@
 
 # This is to generate plugin .ccg files.  The .ccg file is generated and then
 # the camel ccg file is linked to the generated .ccg file to signal the
 # successful generation of the .ccg file.
-$(files_all_plugin_camel_hg_with_path:.hg=.ccg): $(generate_plugin_dep) \
-	$(tools_plugin_m4) $(license_header_source_file)
-	$(eval cppname = $$(notdir $$(basename $$@)))
-	$(eval plugin_def = $$(filter %=$$(cppname),$$(defs_plugin_all)))
-	$(eval plugin_name = $$(subst =$$(cppname),,$$(plugin_def)))
-	$(eval ccg_lowercase = \
-		$$(shell echo $$(cppname) | tr [:upper:] [:lower:]).ccg)
-	sed -n '1,/^$$/p' $(license_header_source_file) > \
-		$(srcdir)/$(ccg_lowercase)
+$(files_all_plugin_ccg): $(generate_plugin_dep) $(tools_plugin_m4) \
+	$(license_header_source_file)
+	$(eval list_delim = $$(patsubst $$@,*,$$(files_all_plugin_ccg)))
+	$(eval prev_mems = $$(shell echo "$$(list_delim)" | cut -d'*' -f 1))
+	$(eval pos = $$(shell expr `echo "$$(prev_mems)" | wc -w` + 1))
+	$(eval plugin_def = $$(word $$(pos),$$(defs_plugin_all)))
+	$(eval plugin_name = $$(shell echo "$$(plugin_def)" | cut -d'=' -f 1))
+	$(eval cppname = $$(subst $$(plugin_name)=,,$$(plugin_def)))
+	sed -n '1,/^$$/p' $(license_header_source_file) > $(srcdir)/$@
 	$(run_generate_plugin_gmmproc_file) --ccg $(plugin_name) \
-		$(cppname) >> $(srcdir)/$(ccg_lowercase)
-	ln -sf "$(realpath $(srcdir))/$(ccg_lowercase)" "$(builddir)/$@"
+		$(cppname) >> $(srcdir)/$@
 
 $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
@@ -126,11 +118,8 @@ $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 
 # This is to run the generated plug-in .hg and .ccg files through gmmproc
 # (they're generated if necessary by the .../%.hg and .../%.ccg dependencies.
-$(stamp_plugin_dir)/stamp-%-plugin: $(stamp_plugin_dir)/%.hg \
-	$(stamp_plugin_dir)/%.ccg $(tools_m4) $(files_defs)
-	$(eval plugin_name_lowercase = \
-		$$(shell echo $$* | tr '[:upper:]' '[:lower:]'))
-	$(run_gmmproc) $(plugin_name_lowercase) $(srcdir) $(gensrc_destdir)
+$(stamp_plugin_dir)/plugin-stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
+	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
 	@echo 'timestamp' > $@
 
 files_patched_h_with_path = $(patsubst %.hg,$(gensrc_destdir)/%.h,\
@@ -138,8 +127,7 @@ files_patched_h_with_path = $(patsubst %.hg,$(gensrc_destdir)/%.h,\
 
 # Rule to make sure that .h files exist in $(gensrc_destdir) before they are
 # patched.
-$(files_patched_h_with_path): $(files_stamp)
-	@echo $(run_gmmproc) $(notdir $(@:.h=)) $(srcdir) $(gensrc_destdir)
+$(files_patched_h_with_path): $(files_stamp) ;
 
 # This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
 $(destdir_stamp_dir)/stamp-%: $(gensrc_destdir)/%.h
@@ -148,6 +136,8 @@ $(destdir_stamp_dir)/stamp-%: $(gensrc_destdir)/%.h
 	@echo 'timestamp' > $@
 
 files_hg_with_path	= $(patsubst %.hg,$(srcdir)/%.hg,$(files_all_hg))
+files_all_plugin_hg_with_path = $(patsubst %.hg,$(srcdir)/%.hg,\
+				$(files_all_plugin_hg))
 
 $(gensrc_destdir)/wrap_init.cc: $(gen_wrap_init_path) $(files_hg_with_path) \
 	$(files_all_plugin_hg_with_path)
