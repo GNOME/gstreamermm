@@ -98,14 +98,12 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   // We can now link this pad with the audio decoder
   std::cout << "Dynamic pad created. Linking parser/decoder." << std::endl;
   Glib::RefPtr<Gst::Pad> sinkPad = decoder->get_static_pad("sink");
+  Gst::PadLinkReturn ret = newPad->link(sinkPad);
 
-  try
+  if (ret != Gst::PAD_LINK_OK && ret != Gst::PAD_LINK_WAS_LINKED)
   {
-    newPad->link(sinkPad);
-  }
-  catch(const std::runtime_error& ex)
-  {
-    std::cerr << "Exception caught while linking: " << ex.what() << std::endl;
+    std::cerr << "Linking of pads " << newPad->get_name() << " and " <<
+      sinkPad->get_name() << " failed." << std::endl;
   }
 }
 
@@ -185,20 +183,25 @@ int main(int argc, char* argv[])
 
 
   // Put all the elements in a pipeline:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     pipeline->add(source)->add(parser)->add(decoder)->add(conv)->add(sink);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const Glib::Error& ex)
   {
     std::cerr << "Error while adding elements to the pipeline: " << ex.what() << std::endl;
     return -1;
   }
-
+#endif
 
   // Link the elements together:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+#endif
     source->link(parser);
 
     // We cannot link the parser and decoder yet, 
@@ -207,12 +210,13 @@ int main(int argc, char* argv[])
     parser->signal_pad_added().connect( sigc::ptr_fun(&on_parser_pad_added) );
 
     decoder->link(conv)->link(sink);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const std::runtime_error& ex)
   {
     std::cout << "Exception while linking elements: " << ex.what() << std::endl;
   }
-
+#endif
 
   // Call on_timeout function at a 200ms
   // interval to regularly print the position of the stream
