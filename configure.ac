@@ -15,7 +15,7 @@
 #We use pushdef here because we can't use shell variables before AC_INIT, but we want to use a variable with AC_INIT:
 pushdef([GSTREAMERMM_MAJOR_VERSION],     [0])
 pushdef([GSTREAMERMM_MINOR_VERSION],     [10])
-pushdef([GSTREAMERMM_MICRO_VERSION],     [1])
+pushdef([GSTREAMERMM_MICRO_VERSION],     [2])
 pushdef([GSTREAMERMM_EXTRA_VERSION],     [])
 pushdef([GSTREAMERMM_VERSION], GSTREAMERMM_MAJOR_VERSION.GSTREAMERMM_MINOR_VERSION.GSTREAMERMM_MICRO_VERSION[]GSTREAMERMM_EXTRA_VERSION)
 AC_INIT([gstreamermm], GSTREAMERMM_VERSION, [gtkmm-list@gnome.org])
@@ -122,9 +122,9 @@ Please install GNU make.]))
 #########################################################################
 #  Dependancy checks (gtkmm is only used by examples)
 #########################################################################
-gstreamermm_min_glibmm_version=2.16.0
+gstreamermm_min_glibmm_version=2.18.1
 gstreamermm_min_gtkmm_version=2.12.0
-gstreamermm_min_gst_version=0.10.22
+gstreamermm_min_gst_version=0.10.23
 gstreamermm_min_libxmlpp_version=2.14.0
 
 PKG_CHECK_MODULES(GSTREAMERMM, \
