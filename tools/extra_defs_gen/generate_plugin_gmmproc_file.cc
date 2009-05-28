@@ -246,7 +246,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
 
           enumWrapStatements += "_WRAP_ENUM(" + propertyCType.substr(3) + ", " +
             propertyCType + ")\n";
-          enumWrapStatements += "_CCONVERSION(`" + propertyCType + "',`" +
+          enumWrapStatements += "_TRANSLATION(`" + propertyCType + "',`" +
             propertyCppType + "',`" + propertyCppType + "')dnl\n";
 
           Glib::ustring enumGetTypeFunctionName =
@@ -262,10 +262,10 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
         }
 
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
-          "_CCONVERT(" + propertyCType + ", `return'))\n";
+          "_TRANSLATE(" + propertyCType + ", `return'))\n";
 
         if(!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
-          includeMacroCalls += "_CCONVERSION_INCLUDE(" + propertyCType + ")dnl\n";
+          includeMacroCalls += "_TRANSLATION_INCLUDE(" + propertyCType + ")dnl\n";
       }
     }
   }
@@ -339,7 +339,7 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
         // wrapper.
         {
           // Unwrapping conversion:
-          convertMacros += "#m4 _CONVERSION(_LQ()_CCONVERT(" + returnCType +
+          convertMacros += "#m4 _CONVERSION(_LQ()_TRANSLATE(" + returnCType +
             ",`type')_RQ(), ``" + returnCType + "'', ";
           convertMacros +=  "``($3).gobj_copy()'')\n";
 
@@ -351,14 +351,14 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
           // (GstTagList is infact a GstStructure).
           {
             convertMacros += "#m4 _CONVERSION(``" + returnCType +
-              "'', _LQ()_CCONVERT(" + returnCType + ",`return')_RQ(), ";
+              "'', _LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ";
             convertMacros +=  "``Glib::wrap($3, 0)'')\n";
           }
           else
           // Dealing with a regular boxed type return.
           {
             convertMacros += "#m4 _CONVERSION(``" + returnCType +
-              "'', _LQ()_CCONVERT(" + returnCType + ",`return')_RQ(), ";
+              "'', _LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ";
             convertMacros +=  "``Glib::wrap($3)'')\n";
           }
         }
@@ -369,15 +369,15 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
         // already probably be included in the global convert file).
         {
           convertMacros += "#m4 _CONVERSION(``" + returnCType +
-            "'', _LQ()_CCONVERT(" + returnCType + ",`return')_RQ(), ";
+            "'', _LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ";
           convertMacros += g_type_is_a(returnGType, GST_TYPE_MINI_OBJECT) ?
             "``Gst::wrap($3)'')\n" : "``Glib::wrap($3)'')\n";
         }
       }
 
-      includeMacroCalls += "_CCONVERSION_INCLUDE(" + returnCType + ")dnl\n";
+      includeMacroCalls += "_TRANSLATION_INCLUDE(" + returnCType + ")dnl\n";
 
-      wrapStatement = "  _WRAP_SIGNAL(_CCONVERT("  + returnCType +
+      wrapStatement = "  _WRAP_SIGNAL(_TRANSLATE("  + returnCType +
         ", `return') " + signalMethodName + "(";
 
       cClassSignalDeclarations += "  " + returnCType + " (*" +
@@ -401,7 +401,7 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
           Glib::ustring  paramCType = g_type_name(paramGType) +
             (Glib::ustring) (gst_type_is_a_pointer(paramGType) ?  "*" : "");
 
-          includeMacroCalls += "_CCONVERSION_INCLUDE(" + paramCType + ")dnl\n";
+          includeMacroCalls += "_TRANSLATION_INCLUDE(" + paramCType + ")dnl\n";
 
           // Include wrapping conversions for signal parameters.  (Unwrapping
           // conversions will already probably be defined in the global convert
@@ -415,20 +415,20 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
             // (GstTagList is in fact a GstStructure).
             {
               convertMacros += "#m4 _CONVERSION(``" + paramCType +
-                "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
+                "'', _LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), ";
               convertMacros +=  "``Glib::wrap($3, 0, true)'')\n";
             }
             else
             // Dealing with reference counted parameter or a boxed type.
             {
               convertMacros += "#m4 _CONVERSION(``" + paramCType +
-                "'', _LQ()_CCONVERT(" + paramCType + ",`param')_RQ(), ";
+                "'', _LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), ";
               convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
                 "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
             }
           }
 
-          wrapStatement += "_CCONVERT(" + paramCType + ", `param') " +
+          wrapStatement += "_TRANSLATE(" + paramCType + ", `param') " +
             paramName;
 
           cClassSignalDeclarations += ", " + paramCType + " " + paramName;
@@ -469,15 +469,15 @@ void get_interface_macros(Glib::ustring& interfaceMacros,
       Glib::ustring  interfaceCType = g_type_name(interfaces[i]) +
         (Glib::ustring) "*";
 
-      cppExtends += "public _CCONVERT(`" + interfaceCType + "',`type')";
+      cppExtends += "public _TRANSLATE(`" + interfaceCType + "',`type')";
 
       if(i < n_interfaces - 1)
         cppExtends += ", ";
 
-      interfaceMacros += "  _IMPLEMENTS_INTERFACE(_CCONVERT(`" +
+      interfaceMacros += "  _IMPLEMENTS_INTERFACE(_TRANSLATE(`" +
         interfaceCType + "',`type'))\n";
 
-      includeMacroCalls += "_CCONVERSION_INCLUDE(" + interfaceCType + ")dnl\n";
+      includeMacroCalls += "_TRANSLATION_INCLUDE(" + interfaceCType + ")dnl\n";
     }
   }
 
