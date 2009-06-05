@@ -193,7 +193,8 @@ audiotestsrc=AudioTestSrc cdparanoiasrc=CdParanoiaSrc \
 clockoverlay=ClockOverlay decodebin=DecodeBin \
 ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
 giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
-giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux playbin2=PlayBin2 \
+giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux \
+playbin=PlayBin playbin2=PlayBin2 \
 tcpclientsrc=TCPClientSrc tcpclientsink=TCPClientSink \
 tcpserversrc=TCPServerSrc \
 textoverlay=TextOverlay textrender=TextRender theoradec=TheoraDec \
@@ -204,8 +205,8 @@ vorbistag=VorbisTag ximagesink=XImageSink xvimagesink=XvImageSink"
 
 # TODO: The following plug-ins (to be added above) can't be wrapped yet because
 # their signals or properties use the GValueArray type which might have to be
-# wrapped in glibmm first: DecodeBin2, MultiFdSink, PlayBin, TcpServerSink,
-# TheoraParse, UriDecodeBin.
+# wrapped in glibmm first: DecodeBin2, MultiFdSink, TcpServerSink, TheoraParse,
+# UriDecodeBin.
 
 # Go through all the "plug-in defs", extracting the plug-in name and the C++
 # class name.  Create a list of the C++ class names and a list of the

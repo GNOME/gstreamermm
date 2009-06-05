@@ -19,6 +19,7 @@
 
 #include <gst/interfaces/propertyprobe.h>
 #include <glibmm/interface.h>
+#include <gstreamermm/value_base_type_traits.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -38,6 +39,9 @@ class PropertyProbe : public Glib::Interface
   _CLASS_INTERFACE(PropertyProbe, GstPropertyProbe, GST_PROPERTY_PROBE, GstPropertyProbeInterface)
 
 public:
+#m4 _CONVERSION(`GValueArray*', `Glib::ArrayHandle<Glib::ValueBase>', `($3 ? Glib::ArrayHandle<Glib::ValueBase>(&($3->values), $3->n_values, Glib::OWNERSHIP_DEEP) : Glib::ArrayHandle<Glib::ValueBase>(0, 0, Glib::OWNERSHIP_NONE))')
+  _WRAP_METHOD(Glib::ArrayHandle<Glib::ValueBase> get_values(const GParamSpec* pspec), gst_property_probe_get_values)
+
   //TODO: Wrap methods.
   //TODO: Wrap vfuncs.
 };
