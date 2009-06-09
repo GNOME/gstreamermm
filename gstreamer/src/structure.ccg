@@ -25,16 +25,13 @@
 static gboolean
 Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, void* data)
 {
-  Glib::ValueBase val_base;
-  val_base.init(value);
-
   Gst::Structure::SlotForeach* slot = static_cast<Gst::Structure::SlotForeach*>(data);
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
-    bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
+    bool result = (*slot)(field_id, *reinterpret_cast<const Glib::ValueBase*>(value));
     delete slot;
     return result;
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -51,16 +48,13 @@ Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, voi
 static gboolean
 Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, void* data)
 {
-  Glib::ValueBase val_base;
-  val_base.init(value);
-
   Gst::Structure::SlotMap* slot = static_cast<Gst::Structure::SlotMap*>(data);
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
-    bool result = (*slot)(Glib::QueryQuark(field_id), val_base);
+    bool result = (*slot)(field_id, *reinterpret_cast<Glib::ValueBase*>(value));
     delete slot;
     return result;
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
