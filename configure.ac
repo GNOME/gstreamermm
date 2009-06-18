@@ -187,10 +187,11 @@ AC_SUBST(GST_INSPECT)
 GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
 fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc filesink=FileSink \
 identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee \
-typefind=TypeFindElement adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink \
-alsasrc=AlsaSrc audioconvert=AudioConvert audioresample=AudioResample \
-audiotestsrc=AudioTestSrc cdparanoiasrc=CdParanoiaSrc \
-clockoverlay=ClockOverlay decodebin=DecodeBin \
+typefind=TypeFindElement \
+adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink alsasrc=AlsaSrc \
+appsrc=AppSrc appsink=AppSink audioconvert=AudioConvert \
+audioresample=AudioResample audiotestsrc=AudioTestSrc \
+cdparanoiasrc=CdParanoiaSrc clockoverlay=ClockOverlay decodebin=DecodeBin \
 ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
 giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
 giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux \

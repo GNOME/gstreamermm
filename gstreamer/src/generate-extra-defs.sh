@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Note that script assumes it resides in the gstreamermm/gstreamer/src
 # directory.

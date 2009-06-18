@@ -2,6 +2,7 @@
 # ctocpp_base.m4 file for documentation.
 
 #Enums
+_TRANSLATION(`GstFlowReturn',`Gst::FlowReturn',`Gst::FlowReturn',,`<gstreamermm/pad.h>')
 _TRANSLATION(`GstFormat',`Gst::Format',`Gst::Format',,`<gstreamermm/format.h>')
 _TRANSLATION(`GstTCPProtocol',`Gst::TCPProtocol',`Gst::TCPProtocol',,`<gstreamermm/enums.h>')
 

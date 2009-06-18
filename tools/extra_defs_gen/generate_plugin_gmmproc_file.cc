@@ -80,10 +80,10 @@ static const char* wrappedEnums[WRAPPED_ENUMS_SIZE] =
   "GstState",
   "GstStateChange",
   "GstStateChangeReturn",
-  "GstTCPProtocol",
   "GstTagFlag",
   "GstTagMergeMode",
   "GstTaskState",
+  "GstTCPProtocol",
   "GstURIType"
 };
 

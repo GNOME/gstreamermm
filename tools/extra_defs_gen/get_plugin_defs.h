@@ -19,4 +19,5 @@
 
 #include <string>
 
-std::string get_plugin_defs(const std::string& pluginName);
+std::string get_plugin_defs(const std::string& pluginName,
+  GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);

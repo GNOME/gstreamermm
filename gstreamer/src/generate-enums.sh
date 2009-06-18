@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Note that enum.pl should be in PATH for this script to work and
 # JHBUILD_SOURCES should be defined to contain the path to the root of the
@@ -18,7 +18,7 @@ enum.pl "$PREFIX"/gst/*.h "$PREFIX"/libs/gst/{base,controller,dataprotocol,\
 net,check}/*.h "$PREFIX"/plugins/elements/*.h > "$DIR/gst_enums.defs"
 
 PREFIX="$JHBUILD_SOURCES/gst-plugins-base"
-enum.pl "$PREFIX"/gst-libs/gst/{audio,cdda,fft,floatcast,interfaces,netbuffer,\
+enum.pl "$PREFIX"/gst-libs/gst/{app,audio,cdda,fft,floatcast,interfaces,netbuffer,\
 riff,rtp,rtsp,sdp,tag,pbutils,video}/*.h "$PREFIX"/gst/*/*.h \
 "$PREFIX"/ext/*/*.h >> "$DIR/gst_enums.defs"
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Note that docextract_to_xml.py should be in PATH for this script to work and
 # JHBUILD_SOURCES should be defined to contain the path to the root of the
@@ -17,7 +17,7 @@ DIR=`dirname "$0"`
 PARAMS="-s $PREFIX/gstreamer/gst/ -s $PREFIX/gst-plugins-base/docs/libs/tmpl"
 
 for dir in "$PREFIX"/gstreamer/libs/gst/{base,controller,dataprotocol,net,\
-check} "$PREFIX"/gst-plugins-base/gst-libs/gst/{audio,cdda,fft,floatcast,\
+check} "$PREFIX"/gst-plugins-base/gst-libs/gst/{app,audio,cdda,fft,floatcast,\
 interfaces,netbuffer,riff,rtp,rtsp,sdp,tag,pbutils,video}; do
   PARAMS="$PARAMS -s $dir"
 done

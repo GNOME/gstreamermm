@@ -461,6 +461,7 @@
     '("async-start" "GST_MESSAGE_ASYNC_START" "1 << 20")
     '("async-done" "GST_MESSAGE_ASYNC_DONE" "1 << 21")
     '("request-state" "GST_MESSAGE_REQUEST_STATE" "1 << 22")
+    '("step-start" "GST_MESSAGE_STEP_START" "1 << 23")
     '("any" "GST_MESSAGE_ANY" "~0")
   )
 )
@@ -735,7 +736,45 @@
     '("latency" "GST_QUARK_LATENCY" "50")
     '("uri" "GST_QUARK_URI" "51")
     '("object" "GST_QUARK_OBJECT" "52")
-    '("max" "GST_QUARK_MAX" "53")
+    '("taglist" "GST_QUARK_TAGLIST" "53")
+    '("event-newsegment" "GST_QUARK_EVENT_NEWSEGMENT" "54")
+    '("event-buffer-size" "GST_QUARK_EVENT_BUFFER_SIZE" "55")
+    '("event-qos" "GST_QUARK_EVENT_QOS" "56")
+    '("event-seek" "GST_QUARK_EVENT_SEEK" "57")
+    '("event-latency" "GST_QUARK_EVENT_LATENCY" "58")
+    '("message-error" "GST_QUARK_MESSAGE_ERROR" "59")
+    '("message-warning" "GST_QUARK_MESSAGE_WARNING" "60")
+    '("message-info" "GST_QUARK_MESSAGE_INFO" "61")
+    '("message-buffering" "GST_QUARK_MESSAGE_BUFFERING" "62")
+    '("message-state" "GST_QUARK_MESSAGE_STATE" "63")
+    '("message-clock-provide" "GST_QUARK_MESSAGE_CLOCK_PROVIDE" "64")
+    '("message-clock-lost" "GST_QUARK_MESSAGE_CLOCK_LOST" "65")
+    '("message-new-clock" "GST_QUARK_MESSAGE_NEW_CLOCK" "66")
+    '("message-structure-change" "GST_QUARK_MESSAGE_STRUCTURE_CHANGE" "67")
+    '("message-segment-start" "GST_QUARK_MESSAGE_SEGMENT_START" "68")
+    '("message-segment-done" "GST_QUARK_MESSAGE_SEGMENT_DONE" "69")
+    '("message-duration" "GST_QUARK_MESSAGE_DURATION" "70")
+    '("message-async-start" "GST_QUARK_MESSAGE_ASYNC_START" "71")
+    '("message-request-state" "GST_QUARK_MESSAGE_REQUEST_STATE" "72")
+    '("message-stream-status" "GST_QUARK_MESSAGE_STREAM_STATUS" "73")
+    '("query-position" "GST_QUARK_QUERY_POSITION" "74")
+    '("query-duration" "GST_QUARK_QUERY_DURATION" "75")
+    '("query-latency" "GST_QUARK_QUERY_LATENCY" "76")
+    '("query-convert" "GST_QUARK_QUERY_CONVERT" "77")
+    '("query-segment" "GST_QUARK_QUERY_SEGMENT" "78")
+    '("query-seeking" "GST_QUARK_QUERY_SEEKING" "79")
+    '("query-formats" "GST_QUARK_QUERY_FORMATS" "80")
+    '("query-buffering" "GST_QUARK_QUERY_BUFFERING" "81")
+    '("query-uri" "GST_QUARK_QUERY_URI" "82")
+    '("event-step" "GST_QUARK_EVENT_STEP" "83")
+    '("message-step-done" "GST_QUARK_MESSAGE_STEP_DONE" "84")
+    '("amount" "GST_QUARK_AMOUNT" "85")
+    '("flush" "GST_QUARK_FLUSH" "86")
+    '("intermediate" "GST_QUARK_INTERMEDIATE" "87")
+    '("message-step-start" "GST_QUARK_MESSAGE_STEP_START" "88")
+    '("active" "GST_QUARK_ACTIVE" "89")
+    '("eos" "GST_QUARK_EOS" "90")
+    '("max" "GST_QUARK_MAX" "91")
   )
 )
 
@@ -1007,17 +1046,7 @@
   )
 )
 
-;; From /usr/src/jhbuild-sources/gstreamer/plugins/elements/gsttee.h
-
-(define-enum-extended TeePullMode
-  (in-module "Gst")
-  (c-name "GstTeePullMode")
-  (values
-    '("never" "GST_TEE_PULL_MODE_NEVER" "0")
-    '("single" "GST_TEE_PULL_MODE_SINGLE" "1")
-  )
-)
-
+;; Handwritten for the filesink plug-in (Gst::FileSink).
 (define-enum-extended FileSinkBufferMode
   (in-module "Gst")
   (c-name "GstFileSinkBufferMode")
@@ -1029,6 +1058,30 @@
   )
 )
 
+;; From /usr/src/jhbuild-sources/gstreamer/plugins/elements/gsttee.h
+
+(define-enum-extended TeePullMode
+  (in-module "Gst")
+  (c-name "GstTeePullMode")
+  (values
+    '("never" "GST_TEE_PULL_MODE_NEVER" "0")
+    '("single" "GST_TEE_PULL_MODE_SINGLE" "1")
+  )
+)
+
+;; From /usr/src/jhbuild-sources/gst-plugins-base/gst-libs/gst/app/gstappsrc.h
+
+(define-enum-extended AppStreamType
+  (in-module "Gst")
+  (c-name "GstAppStreamType")
+  (values
+    '("stream" "GST_APP_STREAM_TYPE_STREAM" "0")
+    '("seekable" "GST_APP_STREAM_TYPE_SEEKABLE" "1")
+    '("random-access" "GST_APP_STREAM_TYPE_RANDOM_ACCESS" "2")
+  )
+)
+
+;; Handwritten for the queue plug-in (Gst::Queue).
 (define-enum-extended QueueLeaky
   (in-module "Gst")
   (c-name "GstQueueLeaky")
@@ -1830,6 +1883,9 @@
     '("y41b" "GST_VIDEO_FORMAT_Y41B" "16")
     '("y42b" "GST_VIDEO_FORMAT_Y42B" "17")
     '("yvyu" "GST_VIDEO_FORMAT_YVYU" "18")
+    '("y444" "GST_VIDEO_FORMAT_Y444" "19")
+    '("v210" "GST_VIDEO_FORMAT_v210" "20")
+    '("v216" "GST_VIDEO_FORMAT_v216" "21")
   )
 )
 
@@ -1911,17 +1967,6 @@
     '("buffer" "GST_GDP_DEPAY_STATE_BUFFER" "2")
     '("caps" "GST_GDP_DEPAY_STATE_CAPS" "3")
     '("event" "GST_GDP_DEPAY_STATE_EVENT" "4")
-  )
-)
-;; Handwritten for GstGDPPay plugin (values taken from output of
-;; `gst-inspect gdppay' -- "version" property information)
-
-(define-enum-extended DPVersion
-  (in-module "Gst")
-  (c-name "GstDPVersion")
-  (values
-    '("0.2" "GST_GDP_VERSION_0_2" "1")
-    '("1.0" "GST_GDP_VERSION_1_0" "2")
   )
 )
 

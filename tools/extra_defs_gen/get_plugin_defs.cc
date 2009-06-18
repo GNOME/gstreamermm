@@ -22,7 +22,8 @@
 
 #include <gst/gst.h>
 
-std::string get_plugin_defs(const std::string& pluginName)
+std::string get_plugin_defs(const std::string& pluginName,
+  GTypeIsAPointerFunc is_a_pointer_func)
 {
   GType type = 0;
   GstElementFactory* factory = 0;
@@ -39,7 +40,7 @@ std::string get_plugin_defs(const std::string& pluginName)
     g_object_unref(factory);
     factory = GST_ELEMENT_FACTORY(loaded_feature);
     type = gst_element_factory_get_element_type(factory);
-    result = get_defs(type);
+    result = get_defs(type, is_a_pointer_func);
     g_object_unref(factory);
   }
   return result;
