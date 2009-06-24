@@ -87,8 +87,10 @@ Query(castitem)
 
 Glib::RefPtr<Gst::Query> QueryApplication::create(QueryType type, Gst::Structure& structure)
 {
+  // Create copy because query takes ownership of structure:
+  GstStructure* copy_struct = gst_structure_copy(structure.gobj());
   GstQuery* query = gst_query_new_application(GstQueryType(type),
-    structure.gobj()); 
+    copy_struct); 
   return Gst::Query::wrap(query);
 }
 

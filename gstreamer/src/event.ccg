@@ -197,7 +197,9 @@ Event(castitem)
 
 Glib::RefPtr<Gst::Event> EventNavigation::create(Gst::Structure& structure)
 {
-  GstEvent* event = gst_event_new_navigation(structure.gobj());
+  // Make copy because event takes ownership of structure:
+  GstStructure* copy = gst_structure_copy(structure.gobj());
+  GstEvent* event = gst_event_new_navigation(copy);
   return Gst::Event::wrap(event, false);
 }
 
