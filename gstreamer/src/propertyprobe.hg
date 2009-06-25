@@ -19,7 +19,6 @@
 
 #include <gst/interfaces/propertyprobe.h>
 #include <glibmm/interface.h>
-#include <gstreamermm/value_base_type_traits.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -39,11 +38,31 @@ class PropertyProbe : public Glib::Interface
   _CLASS_INTERFACE(PropertyProbe, GstPropertyProbe, GST_PROPERTY_PROBE, GstPropertyProbeInterface)
 
 public:
-#m4 _CONVERSION(`GValueArray*', `Glib::ArrayHandle<Glib::ValueBase>', `($3 ? Glib::ArrayHandle<Glib::ValueBase>(&($3->values), $3->n_values, Glib::OWNERSHIP_DEEP) : Glib::ArrayHandle<Glib::ValueBase>(0, 0, Glib::OWNERSHIP_NONE))')
-  _WRAP_METHOD(Glib::ArrayHandle<Glib::ValueBase> get_values(const GParamSpec* pspec), gst_property_probe_get_values)
+  //TODO: Use something other than const GList* as return:
+  _WRAP_METHOD(const GList* get_properties() const, gst_property_probe_get_properties)
 
-  //TODO: Wrap methods.
-  //TODO: Wrap vfuncs.
+  _WRAP_METHOD(const GParamSpec* get_property(const Glib::ustring& name) const, gst_property_probe_get_property)
+
+#m4 _CONVERSION(`GValueArray*', `Glib::ValueArray', `Glib::wrap($3, true)')
+  _WRAP_METHOD(Glib::ValueArray get_values(const GParamSpec* pspec) const, gst_property_probe_get_values)
+  _WRAP_METHOD(Glib::ValueArray get_values(const Glib::ustring& name) const, gst_property_probe_get_values_name)
+
+  _WRAP_METHOD(bool needs_probe(const GParamSpec* pspec) const, gst_property_probe_needs_probe)
+  _WRAP_METHOD(bool needs_probe(const Glib::ustring& name) const, gst_property_probe_needs_probe_name)
+  _WRAP_METHOD(Glib::ValueArray probe_and_get_values(const GParamSpec* pspec), gst_property_probe_probe_and_get_values)
+  _WRAP_METHOD(Glib::ValueArray probe_and_get_values(const Glib::ustring& name), gst_property_probe_probe_and_get_values_name)
+  _WRAP_METHOD(void probe_property(const GParamSpec *pspec), gst_property_probe_probe_property)
+  _WRAP_METHOD(void probe_property(const Glib::ustring& name), gst_property_probe_probe_property_name)
+
+  _WRAP_SIGNAL(void probe_needed(const GParamSpec* pspec), "probe_needed")
+
+  _WRAP_VFUNC(const GList* get_properties() const, "get_properties")
+  _WRAP_VFUNC(bool needs_probe(guint prop_id, const GParamSpec* pspec) const, "needs_probe")
+  _WRAP_VFUNC(void probe_property(guint prop_id, const GParamSpec* pspec), "probe_property")
+
+#m4 _CONVERSION(`Glib::ValueArray', `GValueArray*', `($3).gobj_copy()')
+#m4 _CONVERSION(`GValueArray*', `Glib::ValueArray', `Glib::wrap($3)')
+  _WRAP_VFUNC(Glib::ValueArray get_values(guint prop_id, const GParamSpec* pspec) const, "get_values")
 };
 
 } // namespace Gst
