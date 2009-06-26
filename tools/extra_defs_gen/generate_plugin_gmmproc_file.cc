@@ -40,11 +40,12 @@ GType type = 0;
 
 // To add an enum that is already wrapped to the list of wrapped enum, add
 // alphabetically below and increment WRAPPED_ENUMS_SIZE.
-static const int WRAPPED_ENUMS_SIZE = 42;
+static const int WRAPPED_ENUMS_SIZE = 43;
 static const char* wrappedEnums[WRAPPED_ENUMS_SIZE] =
 {
   "GstActivateMode",
   "GstAssocFlags",
+  "GstAutoplugSelectResult",
   "GstBufferCopyFlags",
   "GstBufferFlag",
   "GstBufferingMode",
@@ -194,10 +195,12 @@ bool is_plugin(const Glib::ustring& cTypeName)
   return result;
 }
 
-void get_property_wrap_statements(Glib::ustring& wrapStatements,
-  Glib::ustring& includeMacroCalls, Glib::ustring& enumWrapStatements,
+Glib::ustring get_property_wrap_statements(Glib::ustring& includeMacroCalls,
+  Glib::ustring& enumWrapStatements,
   Glib::ustring& enumGTypeFunctionDefinitions)
 {
+  Glib::ustring wrapStatements;
+
   //Get the list of properties:
   GParamSpec** ppParamSpec = 0;
   guint iCount = 0;
@@ -253,12 +256,12 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
             get_cast_macro(propertyCType).lowercase() + "_get_type";
 
           enumGTypeFunctionDefinitions +=
-            "\nstatic GType " + enumGetTypeFunctionName + "()\n" +
+            "static GType " + enumGetTypeFunctionName + "()\n" +
             "{\n" +
             "  static GType const type = g_type_from_name(\"" +
               propertyCType + "\");\n" +
             "  return type;\n" +
-            "}\n";
+            "}\n\n";
         }
 
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
@@ -271,6 +274,7 @@ void get_property_wrap_statements(Glib::ustring& wrapStatements,
   }
 
   g_free(ppParamSpec);
+  return wrapStatements;
 }
 
 Glib::ustring get_method_name(const Glib::ustring& signalName)
@@ -291,9 +295,11 @@ Glib::ustring get_method_name(const Glib::ustring& signalName)
   return result;
 }
 
-void get_signal_wrap_statements(Glib::ustring& wrapStatements,
-  Glib::ustring& includeMacroCalls, Glib::ustring& cClassSignalDeclarations)
+Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
+  Glib::ustring& cClassSignalDeclarations)
 {
+  Glib::ustring wrapStatements;
+
   gpointer gclass_ref = 0;
   gpointer ginterface_ref = 0;
 
@@ -451,12 +457,15 @@ void get_signal_wrap_statements(Glib::ustring& wrapStatements,
     g_type_class_unref(gclass_ref); //to match the g_type_class_ref() above.
   else if(ginterface_ref)
     g_type_default_interface_unref(ginterface_ref); // for interface ref above.
+
+  return wrapStatements;
 }
 
-void get_interface_macros(Glib::ustring& interfaceMacros,
-  Glib::ustring& includeMacroCalls,
+Glib::ustring get_interface_macros(Glib::ustring& includeMacroCalls,
   Glib::ustring& cppExtends)
 {
+  Glib::ustring interfaceMacros;
+
   guint n_interfaces = 0;
   GType* interfaces = g_type_interfaces(type, &n_interfaces);
 
@@ -482,6 +491,7 @@ void get_interface_macros(Glib::ustring& interfaceMacros,
   }
 
   g_free(interfaces);
+  return interfaceMacros;
 }
 
 void generate_hg_file(const Glib::ustring& includeMacroCalls,
@@ -580,6 +590,9 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "extern \"C\"" << std::endl;
   std::cout << "{" << std::endl << std::endl;
 
+  if(!enumGTypeFunctionDefinitions.empty())
+    std::cout << enumGTypeFunctionDefinitions;
+
   std::cout << "GType " << getTypeName << "()" << std::endl;
   std::cout << "{" << std::endl;
   std::cout << "  static GType type = 0;" << std::endl;
@@ -604,9 +617,6 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
 
   std::cout << "  return type;" << std::endl;
   std::cout << "}" << std::endl;
-
-  if(!enumGTypeFunctionDefinitions.empty())
-    std::cout << enumGTypeFunctionDefinitions;
 
   std::cout << std::endl << "} // extern \"C\"" << std::endl << std::endl;
 
@@ -782,17 +792,17 @@ int main(int argc, char* argv[])
 
     if(hgFile || ccgFile)
     {
-      Glib::ustring propertyWrapStatements;
       Glib::ustring includeMacroCalls;
       Glib::ustring enumWrapStatements;
+      Glib::ustring propertyWrapStatements;
       Glib::ustring signalWrapStatements;
-      Glib::ustring enumGTypeFunctionDeclarations;
       Glib::ustring cClassSignalDeclarations;
+      Glib::ustring enumGTypeFunctionDefinitions;
 
-      get_property_wrap_statements(propertyWrapStatements, includeMacroCalls,
-        enumWrapStatements, enumGTypeFunctionDeclarations);
+      propertyWrapStatements = get_property_wrap_statements(includeMacroCalls,
+        enumWrapStatements, enumGTypeFunctionDefinitions);
 
-      get_signal_wrap_statements(signalWrapStatements, includeMacroCalls,
+      signalWrapStatements = get_signal_wrap_statements(includeMacroCalls,
         cClassSignalDeclarations);
 
       if(hgFile)
@@ -800,15 +810,14 @@ int main(int argc, char* argv[])
         Glib::ustring interfaceMacros;
         Glib::ustring cppExtends;
 
-        get_interface_macros(interfaceMacros, includeMacroCalls,
-          cppExtends);
+        interfaceMacros = get_interface_macros(includeMacroCalls, cppExtends);
 
         generate_hg_file(includeMacroCalls, enumWrapStatements, cppExtends,
           interfaceMacros, propertyWrapStatements, signalWrapStatements);
       }
       else
       {
-        generate_ccg_file(enumGTypeFunctionDeclarations,
+        generate_ccg_file(enumGTypeFunctionDefinitions,
           cClassSignalDeclarations);
       }
     }

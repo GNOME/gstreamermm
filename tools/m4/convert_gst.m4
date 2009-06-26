@@ -1,5 +1,6 @@
 #Enums
 _CONV_ENUM(Gst,AssocFlags)
+_CONV_ENUM(Gst,AutoplugSelectResult)
 _CONV_ENUM(Gst,BaseAudioSinkSlaveMethod)
 _CONV_ENUM(Gst,BufferCopyFlags)
 _CONV_ENUM(Gst,BufferFlag)
@@ -85,6 +86,7 @@ _CONVERSION(`State&',`GstState*',`(GstState*)(&$3)')
 #ElementFactory
 _CONVERSION(`GstElementFactory*',`Glib::RefPtr<Gst::ElementFactory>',`Glib::wrap($3)')
 _CONVERSION(`GstElementFactory*',`Glib::RefPtr<const Gst::ElementFactory>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::ElementFactory>&',`GstElementFactory*', `$3->gobj()')
 
 #Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Gst::unwrap($3)')
@@ -205,6 +207,7 @@ _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
 _CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`$3.gobj()')
+_CONVERSION(`const Glib::ValueArray&',`GValueArray*',`const_cast<GValueArray*>($3.gobj())')
 
 #String Conversions
 _CONVERSION(`const std::string&',`const guchar*',`($2)($3.c_str())')

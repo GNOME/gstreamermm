@@ -185,13 +185,14 @@ AC_SUBST(GST_INSPECT)
 # as "CppClassName" - all in lowercase with a .hg extension).  Make sure that
 # the order of both lists correspond.
 GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
-fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc filesink=FileSink \
-identity=Identity multiqueue=MultiQueue queue=Queue tee=Tee \
-typefind=TypeFindElement \
+fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc \
+filesink=FileSink identity=Identity multiqueue=MultiQueue queue=Queue \
+tee=Tee typefind=TypeFindElement \
 adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink alsasrc=AlsaSrc \
 appsrc=AppSrc appsink=AppSink audioconvert=AudioConvert \
 audioresample=AudioResample audiotestsrc=AudioTestSrc \
 cdparanoiasrc=CdParanoiaSrc clockoverlay=ClockOverlay decodebin=DecodeBin \
+decodebin2=DecodeBin2 \
 ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
 giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
 giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux \
@@ -206,7 +207,7 @@ vorbistag=VorbisTag ximagesink=XImageSink xvimagesink=XvImageSink"
 
 # TODO: The following plug-ins (to be added above) can't be wrapped yet because
 # their signals or properties use the GValueArray type which might have to be
-# wrapped in glibmm first: DecodeBin2, MultiFdSink, TcpServerSink, TheoraParse,
+# wrapped in glibmm first: MultiFdSink, TcpServerSink, TheoraParse,
 # UriDecodeBin.
 
 # Go through all the "plug-in defs", extracting the plug-in name and the C++
