@@ -184,12 +184,12 @@ AC_SUBST(GST_INSPECT)
 # gstreamer/src/Makefile_list_of_hg.am_fragment file.  (That must be the same
 # as "CppClassName" - all in lowercase with a .hg extension).  Make sure that
 # the order of both lists correspond.
-GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesrc=FakeSrc \
-fakesink=FakeSink fdsink=FdSink fdsrc=FdSrc filesrc=FileSrc \
-filesink=FileSink identity=Identity multiqueue=MultiQueue queue=Queue \
+GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesink=FakeSink \
+fakesrc=FakeSrc fdsrc=FdSrc fdsink=FdSink filesink=FileSink \
+filesrc=FileSrc identity=Identity multiqueue=MultiQueue queue=Queue \
 tee=Tee typefind=TypeFindElement \
 adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink alsasrc=AlsaSrc \
-appsrc=AppSrc appsink=AppSink audioconvert=AudioConvert \
+appsink=AppSink appsrc=AppSrc audioconvert=AudioConvert \
 audioresample=AudioResample audiotestsrc=AudioTestSrc \
 cdparanoiasrc=CdParanoiaSrc clockoverlay=ClockOverlay decodebin=DecodeBin \
 decodebin2=DecodeBin2 \
@@ -197,7 +197,7 @@ ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
 giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
 giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux \
 playbin=PlayBin playbin2=PlayBin2 \
-tcpclientsrc=TCPClientSrc tcpclientsink=TCPClientSink \
+tcpclientsink=TCPClientSink tcpclientsrc=TCPClientSrc \
 tcpserversrc=TCPServerSrc \
 textoverlay=TextOverlay textrender=TextRender theoradec=TheoraDec \
 theoraenc=TheoraEnc timeoverlay=TimeOverlay videorate=VideoRate \
