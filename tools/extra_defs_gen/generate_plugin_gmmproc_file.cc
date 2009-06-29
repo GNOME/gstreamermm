@@ -38,56 +38,6 @@ static Glib::ustring parentNameSpace;
 
 GType type = 0;
 
-// To add an enum that is already wrapped to the list of wrapped enum, add
-// alphabetically below and increment WRAPPED_ENUMS_SIZE.
-static const int WRAPPED_ENUMS_SIZE = 43;
-static const char* wrappedEnums[WRAPPED_ENUMS_SIZE] =
-{
-  "GstActivateMode",
-  "GstAssocFlags",
-  "GstAutoplugSelectResult",
-  "GstBufferCopyFlags",
-  "GstBufferFlag",
-  "GstBufferingMode",
-  "GstBusFlags",
-  "GstBusSyncReply",
-  "GstClockEntryType",
-  "GstClockFlags",
-  "GstClockReturn",
-  "GstColorBalanceType",
-  "GstElementFlags",
-  "GstEventType",
-  "GstEventTypeFlags",
-  "GstFlowReturn",
-  "GstFormat",
-  "GstIndexCertainty",
-  "GstIndexEntryType",
-  "GstIndexFlags",
-  "GstIndexLookupMethod",
-  "GstIndexResolverMethod",
-  "GstIteratorItem",
-  "GstIteratorResult",
-  "GstMessageType",
-  "GstMiniObjectFlags",
-  "GstPadDirection",
-  "GstPadFlags",
-  "GstPadLinkReturn",
-  "GstPadPresence",
-  "GstPadTemplateFlags",
-  "GstQueryType",
-  "GstRank",
-  "GstSeekFlags",
-  "GstSeekType",
-  "GstState",
-  "GstStateChange",
-  "GstStateChangeReturn",
-  "GstTagFlag",
-  "GstTagMergeMode",
-  "GstTaskState",
-  "GstTCPProtocol",
-  "GstURIType"
-};
-
 // To add a base class that is already wrapped to the list of wrapped base
 // classes, add alphabetically below and increment WRAPPED_BASE_CLASSES_SIZE.
 static const int WRAPPED_BASE_CLASSES_SIZE = 14;
@@ -156,18 +106,6 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
   result.insert(0, 1, g_unichar_toupper(*iter));
 
   return result;
-}
-
-bool is_wrapped_enum(const Glib::ustring& cTypeName)
-{
-  for(int i = 0; i < WRAPPED_ENUMS_SIZE &&
-    cTypeName.compare(wrappedEnums[i]) >= 0; i++)
-  {
-    if(cTypeName.compare(wrappedEnums[i]) == 0)
-      return true;
-  }
-
-  return false;
 }
 
 bool is_wrapped_base_class(const Glib::ustring& cTypeName)
@@ -240,35 +178,24 @@ Glib::ustring get_property_wrap_statements(Glib::ustring& includeMacroCalls,
         Glib::ustring  propertyCType = g_type_name(propertyGType) +
           (Glib::ustring) (gst_type_is_a_pointer(propertyGType) ?  "*" : "");
 
-        bool enumIsWrapped = false;
-
-        if((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)) &&
-          !(enumIsWrapped = is_wrapped_enum(propertyCType)))
+        if((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)))
         {
           Glib::ustring propertyCppType = propertyCType.substr(3);
 
-          enumWrapStatements += "_WRAP_ENUM(" + propertyCType.substr(3) + ", " +
-            propertyCType + ")\n";
-          enumWrapStatements += "_TRANSLATION(`" + propertyCType + "',`" +
-            propertyCppType + "',`" + propertyCppType + "')dnl\n";
+          enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + propertyCppType +
+            ", " + propertyCType + ")\n";
 
           Glib::ustring enumGetTypeFunctionName =
             get_cast_macro(propertyCType).lowercase() + "_get_type";
 
           enumGTypeFunctionDefinitions +=
-            "static GType " + enumGetTypeFunctionName + "()\n" +
-            "{\n" +
-            "  static GType const type = g_type_from_name(\"" +
-              propertyCType + "\");\n" +
-            "  return type;\n" +
-            "}\n\n";
+            "_PLUGIN_ENUM_GET_TYPE_FUNC(" + propertyCType + ")";
         }
 
         wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
           "_TRANSLATE(" + propertyCType + ", `return'))\n";
 
-        if(!G_TYPE_IS_ENUM(propertyGType) || enumIsWrapped)
-          includeMacroCalls += "_TRANSLATION_INCLUDE(" + propertyCType + ")dnl\n";
+        includeMacroCalls += "_TRANSLATION_INCLUDE(" + propertyCType + ")dnl\n";
       }
     }
   }
@@ -572,6 +499,8 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
 void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   const Glib::ustring& cClassSignalDeclarations)
 {
+  std::cout << "include(ctocpp_base.m4)dnl" << std::endl;
+  std::cout << "changecom()dnl" << std::endl;
   std::cout << "_PINCLUDE(" << parentInclude << "/private/" <<
     cppParentTypeName.lowercase() << "_p.h)" << std::endl << std::endl;
 

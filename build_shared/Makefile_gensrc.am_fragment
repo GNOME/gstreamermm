@@ -109,7 +109,7 @@ $(files_all_plugin_ccg): $(generate_plugin_dep) $(tools_plugin_m4) \
 	$(eval cppname = $$(subst $$(plugin_name)=,,$$(plugin_def)))
 	sed -n '1,/^$$/p' $(license_header_source_file) > $(srcdir)/$@
 	$(run_generate_plugin_gmmproc_file) --ccg $(plugin_name) \
-		$(cppname) >> $(srcdir)/$@
+		$(cppname) | $(M4) -I $(tools_dir_m4) >> $(srcdir)/$@
 
 $(stamp_dir)/stamp-%: %.hg %.ccg $(tools_m4) $(files_defs)
 	$(run_gmmproc) $(notdir $*) $(srcdir) $(gensrc_destdir)
