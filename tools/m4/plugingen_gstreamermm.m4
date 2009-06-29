@@ -1,5 +1,5 @@
 # Translations from C to C++ types for plug-in generation.  See the
-# ctocpp_base.m4 file for documentation.
+# plugingen_base.m4 file for documentation.
 
 #Enums
 _TRANSLATION(`GstFlowReturn',`Gst::FlowReturn',`Gst::FlowReturn',,`<gstreamermm/pad.h>')
@@ -33,3 +33,50 @@ _TRANSLATION(`GstPropertyProbe*',`Gst::PropertyProbe',`const Glib::RefPtr<Gst::P
 _TRANSLATION(`GstTagSetter*',`Gst::TagSetter',`const Glib::RefPtr<Gst::TagSetter>&',`Glib::RefPtr<Gst::TagSetter>',`<gstreamermm/tagsetter.h>')
 _TRANSLATION(`GstURIHandler*',`Gst::URIHandler',`const Glib::RefPtr<Gst::URIHandler>&',`Glib::RefPtr<Gst::URIHandler>',`<gstreamermm/urihandler.h>')
 _TRANSLATION(`GstXOverlay*',`Gst::XOverlay',`const Glib::RefPtr<Gst::XOverlay>&',`Glib::RefPtr<Gst::XOverlay>',`<gstreamermm/xoverlay.h>')
+
+#Wrapped enums:
+#One should be included for each enum wrapped outside of plug-ins so that the
+#generator does not try to generate a _WRAP_ENUM() for it.
+_ENUM_IS_WRAPPED(GstActivateMode)
+_ENUM_IS_WRAPPED(GstAssocFlags)
+_ENUM_IS_WRAPPED(GstAutoplugSelectResult)
+_ENUM_IS_WRAPPED(GstBufferCopyFlags)
+_ENUM_IS_WRAPPED(GstBufferFlag)
+_ENUM_IS_WRAPPED(GstBufferingMode)
+_ENUM_IS_WRAPPED(GstBusFlags)
+_ENUM_IS_WRAPPED(GstBusSyncReply)
+_ENUM_IS_WRAPPED(GstClockEntryType)
+_ENUM_IS_WRAPPED(GstClockFlags)
+_ENUM_IS_WRAPPED(GstClockReturn)
+_ENUM_IS_WRAPPED(GstColorBalanceType)
+_ENUM_IS_WRAPPED(GstElementFlags)
+_ENUM_IS_WRAPPED(GstEventType)
+_ENUM_IS_WRAPPED(GstEventTypeFlags)
+_ENUM_IS_WRAPPED(GstFlowReturn)
+_ENUM_IS_WRAPPED(GstFormat)
+_ENUM_IS_WRAPPED(GstIndexCertainty)
+_ENUM_IS_WRAPPED(GstIndexEntryType)
+_ENUM_IS_WRAPPED(GstIndexFlags)
+_ENUM_IS_WRAPPED(GstIndexLookupMethod)
+_ENUM_IS_WRAPPED(GstIndexResolverMethod)
+_ENUM_IS_WRAPPED(GstIteratorItem)
+_ENUM_IS_WRAPPED(GstIteratorResult)
+_ENUM_IS_WRAPPED(GstMessageType)
+_ENUM_IS_WRAPPED(GstMiniObjectFlags)
+_ENUM_IS_WRAPPED(GstPadDirection)
+_ENUM_IS_WRAPPED(GstPadFlags)
+_ENUM_IS_WRAPPED(GstPadLinkReturn)
+_ENUM_IS_WRAPPED(GstPadPresence)
+_ENUM_IS_WRAPPED(GstPadTemplateFlags)
+_ENUM_IS_WRAPPED(GstQueryType)
+_ENUM_IS_WRAPPED(GstRank)
+_ENUM_IS_WRAPPED(GstSeekFlags)
+_ENUM_IS_WRAPPED(GstSeekType)
+_ENUM_IS_WRAPPED(GstState)
+_ENUM_IS_WRAPPED(GstStateChange)
+_ENUM_IS_WRAPPED(GstStateChangeReturn)
+_ENUM_IS_WRAPPED(GstTagFlag)
+_ENUM_IS_WRAPPED(GstTagMergeMode)
+_ENUM_IS_WRAPPED(GstTaskState)
+_ENUM_IS_WRAPPED(GstTCPProtocol)
+_ENUM_IS_WRAPPED(GstURIType)
