@@ -185,5 +185,5 @@ _ENUM_IS_WRAPPED(GstTaskState)
 _ENUM_IS_WRAPPED(GstTCPProtocol)
 _ENUM_IS_WRAPPED(GstURIType)
 
-include(ctocpp.m4)
+include(plugingen.m4)
 divert(0)dnl

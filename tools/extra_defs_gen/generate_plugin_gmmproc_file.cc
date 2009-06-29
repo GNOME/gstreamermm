@@ -428,7 +428,7 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   const Glib::ustring& propertyWrapStatements,
   const Glib::ustring& signalWrapStatements)
 {
-  std::cout << "include(ctocpp_base.m4)dnl" << std::endl;
+  std::cout << "include(plugingen_base.m4)dnl" << std::endl;
   std::cout << "changecom()dnl" << std::endl;
   std::cout << "#include <" << parentInclude << "/" <<
     cppParentTypeName.lowercase() << ".h>" << std::endl;
@@ -499,7 +499,7 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
 void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   const Glib::ustring& cClassSignalDeclarations)
 {
-  std::cout << "include(ctocpp_base.m4)dnl" << std::endl;
+  std::cout << "include(plugingen_base.m4)dnl" << std::endl;
   std::cout << "changecom()dnl" << std::endl;
   std::cout << "_PINCLUDE(" << parentInclude << "/private/" <<
     cppParentTypeName.lowercase() << "_p.h)" << std::endl << std::endl;
@@ -591,7 +591,7 @@ int main(int argc, char* argv[])
     "Use the same syntax for plugin-name as in gst-inspect\nand supply the "
     "desired C++ class name unless the --confirm-existence option is\nused.  "
     "The .hg file is a preliminary .hg file that needs to be run through "
-    "m4\nincluding the macros in the ctocpp*.m4 files.");
+    "m4\nincluding the macros in the plugingen*.m4 files.");
 
   g_option_context_add_main_entries(gContext, optionEntries, 0);
   g_option_context_add_group(gContext, gst_init_get_option_group());
