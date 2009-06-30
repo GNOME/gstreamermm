@@ -183,25 +183,20 @@ tee=Tee typefind=TypeFindElement \
 adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink alsasrc=AlsaSrc \
 appsink=AppSink appsrc=AppSrc audioconvert=AudioConvert \
 audioresample=AudioResample audiotestsrc=AudioTestSrc \
-cdparanoiasrc=CdParanoiaSrc clockoverlay=ClockOverlay decodebin=DecodeBin \
-decodebin2=DecodeBin2 \
+cdparanoiasrc=CdParanoiaSrc clockoverlay=ClockOverlay \
+decodebin=DecodeBin decodebin2=DecodeBin2 \
 ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
 giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
 giostreamsrc=GioStreamSrc multifdsink=MultiFdSink oggdemux=OggDemux \
-oggmux=OggMux \
-playbin=PlayBin playbin2=PlayBin2 \
+oggmux=OggMux playbin=PlayBin playbin2=PlayBin2 \
 tcpclientsink=TCPClientSink tcpclientsrc=TCPClientSrc \
-tcpserversrc=TCPServerSrc \
+tcpserversink=TcpServerSink tcpserversrc=TCPServerSrc \
 textoverlay=TextOverlay textrender=TextRender theoradec=TheoraDec \
-theoraenc=TheoraEnc timeoverlay=TimeOverlay videorate=VideoRate \
+theoraenc=TheoraEnc theoraparse=TheoraParse timeoverlay=TimeOverlay \
+uridecodebin=UriDecodeBin videorate=VideoRate \
 videoscale=VideoScale videotestsrc=VideoTestSrc volume=Volume \
 vorbisdec=VorbisDec vorbisenc=VorbisEnc vorbisparse=VorbisParse \
 vorbistag=VorbisTag ximagesink=XImageSink xvimagesink=XvImageSink"
-
-# TODO: The following plug-ins (to be added above) can't be wrapped yet because
-# their signals or properties use the GValueArray type which might have to be
-# wrapped in glibmm first: MultiFdSink, TcpServerSink, TheoraParse,
-# UriDecodeBin.
 
 # Go through all the "plug-in defs", extracting the plug-in name and the C++
 # class name.  Create a list of the C++ class names and a list of the
