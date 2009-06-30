@@ -6,9 +6,15 @@ dnl
 dnl __HASH variable borrowed form glibmm's convert_base.m4 file
 define(`__HASH',`__`'translit(`$*',`ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]&*, ',`abcdefghijklmnopqrstuvwxyzVBNMRSC_')`'')
 
+dnl _CAMEL_TO_UNDERSCORE(GtkWidget) -> gtk_widget.  Adapted from glibmm's
+dnl _GET_TYPE_FUNC() macro (see glibmm's convert_base.m4 file for docs).
+define(`_CAMEL_TO_UNDERSCORE',`dnl
+translit(substr(patsubst(patsubst(`$1',`[A-Z][A-Z]+',`_\&'),`[A-Z][a-z]',`_\&'),1),`[A-Z]',`[a-z]')`'dnl
+')
+
 dnl _GET_TYPE_FUNC(GtkWidget) -> gtk_widget_get_type().  Borrowed from glibmm's convert_base.m4 file (see glibmm's m4 file for docs).
 define(`_GET_TYPE_FUNC',`dnl
-translit(substr(patsubst(patsubst(`$1',`[A-Z][A-Z]+',`_\&'),`[A-Z][a-z]',`_\&'),1),`[A-Z]',`[a-z]')_get_type()`'dnl
+_CAMEL_TO_UNDERSCORE($1)_get_type()`'dnl
 ')
 
 dnl Macro to insert left quote
@@ -49,7 +55,7 @@ ifdef(`IFC'__HASH(`$1'),,`dnl
 ifdef(`IF'__HASH(`$1'),`dnl
 #include indir(`IF'__HASH(`$1'))
 dnl
-define(`IFC'__HASH(`$1'),`complete')dnl
+define(`IFC'__HASH(`$1'))dnl
 ')`'dnl
 ')`'dnl
 ')dnl
@@ -97,15 +103,18 @@ define(`_ENUM_IS_WRAPPED',`dnl
 define(`EIW'__HASH(`$1'))dnl
 ')dnl
 
-dnl _WRAP_PLUGIN_ENUM(CppEnumType, CEnumType)
+dnl _WRAP_PLUGIN_ENUM(prefix, CppEnumType)
 dnl
 dnl Attempts to generate a _WRAP_ENUM() and a _TRANSLATION() macro for an enum
 dnl used by a plug-in.  If the enum has been flagged as wrapped by the
 dnl _ENUM_IS_WRAPPED() macro nothing will be generated.
 define(`_WRAP_PLUGIN_ENUM',`dnl
-ifdef(`EIW'__HASH(`$2'),,`dnl
-_WRAP_ENUM($1,$2)dnl
-_TRANSLATION(`$2',`$1',`$1')dnl
+ifdef(`EIW'__HASH(`$1$2'),,`dnl
+_TRANSLATION(`$1$2',`$1::$2',`$1::$2')dnl
+_WRAP_ENUM($2,$1$2)
+_CONV_ENUM($1,$2)
+
+_ENUM_IS_WRAPPED($1$2)dnl
 ')`'dnl
 ')dnl
 
@@ -114,15 +123,52 @@ dnl
 dnl Attempts to generate a *_get_type() function for an enum specific to a
 dnl plug-in.  If the enum has been flagged as wrapped by the
 dnl _ENUM_IS_WRAPPED() macro it is taken taken to be a non-plugin enum and
-dnl nothing will be generated.
+dnl nothing will be generated.  Only one function is generated no matter how
+dnl many times the macro is used.
 define(`_PLUGIN_ENUM_GET_TYPE_FUNC',`dnl
 ifdef(`EIW'__HASH(`$1'),,`dnl
+ifdef(`EGTF'__HASH(`$1'),,`dnl
 static GType _GET_TYPE_FUNC($1)
 {
   static GType const type = g_type_from_name("$1");
   return type;
 }
 
+define(`EGTF'__HASH(`$1'))dnl
+')`'dnl
+')`'dnl
+')dnl
+
+dnl _C_ENUM_VALUES(CAPS_UNDERSCORE_C_ENUM_TYPE, nick1, val1, nick2, val2, ...)
+dnl
+dnl Generates the enum values of a C enum definition from the C enum type name
+dnl and the list of nicknames and values of the enum.  The enum type name must
+dnl be converted from camel to caps/underscore format.
+define(`_C_ENUM_VALUES',`dnl
+ifelse(eval(`$# < 3'),`1',,eval(`$# == 3'),`1',`dnl
+  $1_`'translit(translit(`$2',`a-z',`A-Z'),`-',`_') = $3
+',`dnl
+  $1_`'translit(translit(`$2',`a-z',`A-Z'),`-',`_') = $3,
+_C_ENUM_VALUES(`$1',shift(shift(shift($@))))dnl
+')`'dnl
+')dnl
+
+dnl _C_ENUM_DEFINITION(CEnumType, nick1, val1, nick2, val2, ...)
+dnl
+dnl Generates a C enum definition from the C enum type name and the list of
+dnl nicknames and values of the enum if the enum has not been flagged as
+dnl wrapped with the _ENUM_IS_WRAPPED() macro.  Only one definition is
+dnl generated per multiple calls.
+define(`_C_ENUM_DEFINITION',`dnl
+ifdef(`EIW'__HASH(`$1'),,`dnl
+ifdef(`CED'__HASH(`$1'),,`dnl
+enum $1
+{
+_C_ENUM_VALUES(translit(_CAMEL_TO_UNDERSCORE(`$1'),`a-z',`A-Z'),shift($@))dnl
+};
+
+define(`CED'__HASH(`$1'))dnl
+')`'dnl
 ')`'dnl
 ')dnl
 

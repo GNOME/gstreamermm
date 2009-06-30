@@ -22,8 +22,9 @@
 
 _DEFS(gstreamermm,gst)
 
-// Plug-in C enums used in the plug-in signals need to be handwritten.  This
-// one is used in the "autoplug-select" signal of the decodebin2 plug-in:
+// Plug-in C enums used in the plug-in signals that are shared need to be
+// declared.  This one is is shared between decodebin2 and uridecodebin so it
+// is difficult for it to be generated.
 enum GstAutoplugSelectResult
 {
   GST_AUTOPLUG_SELECT_TRY,
@@ -37,8 +38,8 @@ namespace Gst
 _WRAP_ENUM(MiniObjectFlags, GstMiniObjectFlags)
 _WRAP_ENUM(State, GstState)
 
-// Plug-in non-genereated enums (some are shared, others are used in plug-in
-// signals and there's no way of knowing whether to generate them or not):
+// Plug-in non-genereated enums.  Handled manually (and not generated because
+// they are shared by more than one plug-in):
 _WRAP_ENUM(AutoplugSelectResult, GstAutoplugSelectResult)
 _WRAP_ENUM(TCPProtocol, GstTCPProtocol)
 

@@ -195,7 +195,8 @@ cdparanoiasrc=CdParanoiaSrc clockoverlay=ClockOverlay decodebin=DecodeBin \
 decodebin2=DecodeBin2 \
 ffmpegcolorspace=FfmpegColorSpace gdpdepay=GDPDepay gdppay=GDPPay \
 giosink=GioSink giosrc=GioSrc giostreamsink=GioStreamSink \
-giostreamsrc=GioStreamSrc oggdemux=OggDemux oggmux=OggMux \
+giostreamsrc=GioStreamSrc multifdsink=MultiFdSink oggdemux=OggDemux \
+oggmux=OggMux \
 playbin=PlayBin playbin2=PlayBin2 \
 tcpclientsink=TCPClientSink tcpclientsrc=TCPClientSrc \
 tcpserversrc=TCPServerSrc \

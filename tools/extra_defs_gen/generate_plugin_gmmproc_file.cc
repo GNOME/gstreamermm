@@ -22,6 +22,7 @@
 #include <gst/gst.h>
 #include <glibmm.h>
 #include <iostream>
+#include <sstream>
 
 static gchar* nmspace = 0;
 static gchar* defsFile = 0;
@@ -180,10 +181,11 @@ Glib::ustring get_property_wrap_statements(Glib::ustring& includeMacroCalls,
 
         if((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)))
         {
+          Glib::ustring enumPrefix = propertyCType.substr(0, 3);
           Glib::ustring propertyCppType = propertyCType.substr(3);
 
-          enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + propertyCppType +
-            ", " + propertyCType + ")\n";
+          enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
+            propertyCppType + ")";
 
           Glib::ustring enumGetTypeFunctionName =
             get_cast_macro(propertyCType).lowercase() + "_get_type";
@@ -222,8 +224,56 @@ Glib::ustring get_method_name(const Glib::ustring& signalName)
   return result;
 }
 
+Glib::ustring get_c_enum_definition_macro(GType enumGType,
+  Glib::ustring& enumCType)
+{
+  Glib::ustring result;
+
+  if((G_TYPE_IS_ENUM(enumGType)))
+  {
+    GEnumClass* enumClass = G_ENUM_CLASS(g_type_class_ref(enumGType));
+    if(enumClass)
+    {
+      result += "_C_ENUM_DEFINITION(" + enumCType + ",";
+      for(guint i = 0; i < enumClass->n_values; i++)
+      {
+        std::stringstream stream;
+        result += (Glib::ustring) enumClass->values[i].value_nick + ",";
+        stream << enumClass->values[i].value;
+        result += stream.str();
+        if(i < enumClass->n_values - 1)
+          result += ",";
+      }
+      result += ")";
+    }
+    g_type_class_unref(enumClass);
+  }
+  else
+  {
+    GFlagsClass* flagsClass = G_FLAGS_CLASS(g_type_class_ref(enumGType));
+    if(flagsClass)
+    {
+      result += "_C_ENUM_DEFINITION(" + enumCType + ",";
+      for(guint i = 0; i < flagsClass->n_values; i++)
+      {
+        std::stringstream stream;
+        result += (Glib::ustring) flagsClass->values[i].value_nick + ",";
+        stream << flagsClass->values[i].value;
+        result += stream.str();
+        if(i < flagsClass->n_values - 1)
+          result += ",";
+      }
+      result += ")";
+    }
+    g_type_class_unref(flagsClass);
+  }
+  return result;
+}
+
 Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
-  Glib::ustring& cClassSignalDeclarations)
+  Glib::ustring& cEnumDefinitions, Glib::ustring& enumWrapStatements,
+  Glib::ustring& cClassSignalDeclarations,
+  Glib::ustring& enumGTypeFunctionDefinitions)
 {
   Glib::ustring wrapStatements;
 
@@ -263,7 +313,27 @@ Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
       Glib::ustring  returnCType = g_type_name(returnGType) +
         (Glib::ustring) (gst_type_is_a_pointer(returnGType) ?  "*" : "");
 
-      if(gst_type_is_a_pointer(returnGType))
+      if((G_TYPE_IS_ENUM(returnGType) || G_TYPE_IS_FLAGS(returnGType)))
+      // Check for an enum first and attempt to generate _WRAP_ENUM() and
+      // _TRANSLATION() macros if it is not wrapped (see plugingen_base.m4
+      // file for docs).
+      {
+        Glib::ustring enumPrefix = returnCType.substr(0, 3);
+        Glib::ustring returnCppType = returnCType.substr(3);
+
+        enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
+          returnCppType + ")";
+
+        Glib::ustring enumGetTypeFunctionName =
+          get_cast_macro(returnCType).lowercase() + "_get_type";
+
+        enumGTypeFunctionDefinitions +=
+          "_PLUGIN_ENUM_GET_TYPE_FUNC(" + returnCType + ")";
+
+        cEnumDefinitions += get_c_enum_definition_macro(returnGType,
+          returnCType);
+      }
+      else if(gst_type_is_a_pointer(returnGType))
       {
         if(g_type_is_a(returnGType, G_TYPE_BOXED))
         // Boxed type returns for signals need special conversions because
@@ -337,9 +407,29 @@ Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
           includeMacroCalls += "_TRANSLATION_INCLUDE(" + paramCType + ")dnl\n";
 
           // Include wrapping conversions for signal parameters.  (Unwrapping
-          // conversions will already probably be defined in the global convert
-          // file):
+          // conversions will already probably be defined in the global
+          // convert file).  Also try to wrap plug-in specific enums:
 
+          if((G_TYPE_IS_ENUM(paramGType) || G_TYPE_IS_FLAGS(paramGType)))
+          // Check for an enum first and attempt to generate _WRAP_ENUM() and
+          // _TRANSLATION() macros and other necessary code if it is not
+          // wrapped (see plugingen_base.m4 file for docs).
+          {
+            Glib::ustring enumPrefix = paramCType.substr(0, 3);
+            Glib::ustring paramCppType = paramCType.substr(3);
+
+            enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
+              paramCppType + ")";
+
+            Glib::ustring enumGetTypeFunctionName =
+              get_cast_macro(paramCType).lowercase() + "_get_type";
+
+            enumGTypeFunctionDefinitions +=
+              "_PLUGIN_ENUM_GET_TYPE_FUNC(" + paramCType + ")";
+
+            cEnumDefinitions += get_c_enum_definition_macro(paramGType,
+              paramCType);
+          }
           if(gst_type_is_a_pointer(paramGType))
           {
             if(paramGType == GST_TYPE_TAG_LIST)
@@ -422,6 +512,7 @@ Glib::ustring get_interface_macros(Glib::ustring& includeMacroCalls,
 }
 
 void generate_hg_file(const Glib::ustring& includeMacroCalls,
+  const Glib::ustring& cEnumDefinitions,
   const Glib::ustring& enumWrapStatements,
   const Glib::ustring& cppExtends,
   const Glib::ustring& interfaceMacros,
@@ -438,11 +529,17 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
   std::cout << "_DEFS(" << target << "," << defsFile << ")" << std::endl <<
     std::endl;
 
+  if(!cEnumDefinitions.empty())
+  {
+    std::cout << "// Plug-in C enums used in signals:" << std::endl;
+    std::cout << cEnumDefinitions;
+  }
+
   std::cout << "namespace " << nmspace << std::endl;
   std::cout << "{" << std::endl << std::endl;
 
   if(!enumWrapStatements.empty())
-    std::cout << enumWrapStatements << std::endl;
+    std::cout << enumWrapStatements;
 
   std::cout << "/** " << nmspace << "::" << cppTypeName << " - " << pluginName << " plugin." << std::endl;
   std::cout << " * Please note that, though using the underlying GObject is "
@@ -722,6 +819,7 @@ int main(int argc, char* argv[])
     if(hgFile || ccgFile)
     {
       Glib::ustring includeMacroCalls;
+      Glib::ustring cEnumDefinitions;
       Glib::ustring enumWrapStatements;
       Glib::ustring propertyWrapStatements;
       Glib::ustring signalWrapStatements;
@@ -732,7 +830,8 @@ int main(int argc, char* argv[])
         enumWrapStatements, enumGTypeFunctionDefinitions);
 
       signalWrapStatements = get_signal_wrap_statements(includeMacroCalls,
-        cClassSignalDeclarations);
+        cEnumDefinitions, enumWrapStatements, cClassSignalDeclarations,
+        enumGTypeFunctionDefinitions);
 
       if(hgFile)
       {
@@ -741,8 +840,9 @@ int main(int argc, char* argv[])
 
         interfaceMacros = get_interface_macros(includeMacroCalls, cppExtends);
 
-        generate_hg_file(includeMacroCalls, enumWrapStatements, cppExtends,
-          interfaceMacros, propertyWrapStatements, signalWrapStatements);
+        generate_hg_file(includeMacroCalls, cEnumDefinitions,
+          enumWrapStatements, cppExtends, interfaceMacros,
+          propertyWrapStatements, signalWrapStatements);
       }
       else
       {
