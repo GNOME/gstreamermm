@@ -167,14 +167,6 @@ AC_SUBST([GENERATE_PLUGIN_GMMPROC_FILE_DIR])
 #  Plug-in processing
 #########################################################################
 
-# make sure gst-inspect is available:
-AC_PATH_PROG([GST_INSPECT], [gst-inspect])
-if test x$GST_INSPECT = x ; then
-  AC_MSG_ERROR([gst-inspect is needed for plug-in processing. Please, install it.])
-fi
-AC_ARG_VAR([GST_INSPECT], [Variable to store gst-inspect executable])
-AC_SUBST(GST_INSPECT)
-
 # To add a plugin, add the plugin definition, in the form of
 # "plugin=CppClassName" to the space-separated list of definitions below.
 # (Where "plugin" is the plugin name as recognized by gst-inspect and
