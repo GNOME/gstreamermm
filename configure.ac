@@ -122,7 +122,7 @@ Please install GNU make.]))
 #########################################################################
 #  Dependancy checks (gtkmm is only used by examples)
 #########################################################################
-gstreamermm_min_glibmm_version=2.18.1
+gstreamermm_min_glibmm_version=2.21.1
 gstreamermm_min_gtkmm_version=2.12.0
 gstreamermm_min_gst_version=0.10.23
 gstreamermm_min_libxmlpp_version=2.14.0
@@ -261,7 +261,6 @@ AC_LANG_CPLUSPLUS
 #GSTREAMERMM_DOXYGEN_INPUT_SUBDIRS([gst])
 
 # Evaluate the --enable-warnings=level option.
-#GSTREAMERMM_ARG_ENABLE_WARNINGS()
 DK_ARG_ENABLE_WARNINGS([GSTREAMERMM_WARNING_FLAGS],
     [-Wall],
     [-pedantic -Wall -Wextra])
@@ -406,4 +405,3 @@ AC_CONFIG_FILES([
 ])
 
 AC_OUTPUT()
-
