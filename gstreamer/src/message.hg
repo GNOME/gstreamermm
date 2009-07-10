@@ -29,6 +29,7 @@ namespace Gst
 {
 
 _WRAP_ENUM(MessageType, GstMessageType)
+_WRAP_ENUM(StreamStatusType, GstStreamStatusType)
 
 namespace Enums
 {
@@ -47,6 +48,7 @@ Glib::QueryQuark get_quark(MessageType type);
 
 } //namespace Enums
 
+class Element;
 class Structure;
 class TagList;
 
@@ -900,6 +902,79 @@ public:
    * @return The new async_done message. MT safe.
    */
   static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
+};
+
+/** A stream status message.
+ * See create() for more details.
+ */
+class MessageStreamStatus : public Message
+{
+public:
+  explicit MessageStreamStatus(GstMessage* castitem);
+
+  /** Create a new stream status message. This message is posted when a
+   * streaming thread is created/destroyed or when the state changed. 
+   *
+   * @param src The object originating the message.  
+   * @param type The stream status type.  
+   * @param owner The owner element of @a src.  
+   * @return The new stream status message. MT safe.
+   */
+  static Glib::RefPtr<Gst::Message>
+    create(const Glib::RefPtr<Gst::Object>& src, Gst::StreamStatusType type,
+    const Glib::RefPtr<Gst::Element>& owner);
+
+  /** Configures the object handling the streaming thread. This is usually a
+   * Gst::Task object but other objects might be added in the future.
+   * @param object The object controlling the streaming.
+   *
+   * Since 0.10.24.
+   */
+  void set_object(const Glib::RefPtr<Gst::Object>& object);
+  _IGNORE(gst_message_set_stream_status_object)
+
+  /** Extracts the object managing the streaming thread from message.
+   * @return The object that manages the streaming thread. The actual object
+   * is usually a Gst::Task but other types can be added in the future. The
+   * object remains valid as long as the message is valid. 
+   */
+  Glib::RefPtr<Gst::Object> get_object() const;
+  _IGNORE(gst_message_get_stream_status_object)
+
+  /** Extracts the stream status type and owner of the Gst::Message. The
+   * returned owner remains valid for as long as the reference to the message
+   * is valid.
+   *
+   * MT safe.
+   *
+   * @param type A reference to hold the status type.
+   * @param owner A reference to hold the owner Gst::Element.
+   *
+   * Since 0.10.24.
+   */
+  void parse(Gst::StreamStatusType& type, Glib::RefPtr<Gst::Element>& owner) const;
+  _IGNORE(gst_message_parse_stream_status)
+
+  /** Extracts the stream status type.
+   *
+   * MT safe.
+   *
+   * @return The stream status type.
+   *
+   * Since 0.10.24.
+   */
+  Gst::StreamStatusType parse() const;
+
+  /** Extracts the owner of the Gst::Message. The returned owner remains valid
+   * for as long as the reference to the message is valid.
+   *
+   * MT safe.
+   *
+   * @return The owner Gst::Element.
+   *
+   * Since 0.10.24.
+   */
+  Glib::RefPtr<Gst::Element> parse_owner() const;
 };
 
 } //namespace Gst

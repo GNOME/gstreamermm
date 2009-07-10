@@ -19,6 +19,7 @@
 
 #include <gst/gstenumtypes.h>
 #include <gst/interfaces/mixer.h>
+#include <gstreamermm/element.h>
 #include <gstreamermm/mixer.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/taglist.h>
@@ -601,6 +602,61 @@ Glib::RefPtr<Gst::Message> MessageAsyncDone::create(const Glib::RefPtr<Gst::Obje
   return Gst::Message::wrap(message, false);
 }
 
+MessageStreamStatus::MessageStreamStatus(GstMessage* castitem)
+: Message(castitem)
+{}
+
+Glib::RefPtr<Gst::Message>
+  MessageStreamStatus::create(const Glib::RefPtr<Gst::Object>& src,
+  Gst::StreamStatusType type, const Glib::RefPtr<Gst::Element>& owner)
+{
+  GstMessage* message = gst_message_new_stream_status(src->gobj(),
+    (GstStreamStatusType)(type), owner->gobj());
+  return Gst::Message::wrap(message, false);
+}
+
+void MessageStreamStatus::set_object(const Glib::RefPtr<Gst::Object>& object)
+{
+  Glib::Value< Glib::RefPtr<Gst::Object> > value;
+  value.init(Glib::Value< Glib::RefPtr<Gst::Object> >::value_type());
+  value.set(object);
+
+  gst_message_set_stream_status_object(gobj(), value.gobj());
+}
+
+Glib::RefPtr<Gst::Object> MessageStreamStatus::get_object() const
+{
+  const GValue* g_val =
+    gst_message_get_stream_status_object(const_cast<GstMessage*>(gobj()));
+  GstObject* gst_object = static_cast<GstObject*>(g_value_get_object(g_val));
+  return Glib::wrap(gst_object, true);
+}
+
+void MessageStreamStatus::parse(Gst::StreamStatusType& type,
+  Glib::RefPtr<Gst::Element>& owner) const
+{
+  GstElement* gst_element;
+  gst_message_parse_stream_status(const_cast<GstMessage*>(gobj()),
+    (GstStreamStatusType*)(&type), &gst_element);
+  owner = Glib::wrap(gst_element, true);
+}
+
+Gst::StreamStatusType MessageStreamStatus::parse() const
+{
+  GstStreamStatusType type;
+  gst_message_parse_stream_status(const_cast<GstMessage*>(gobj()),
+    &type, 0);
+  return (Gst::StreamStatusType)(type);
+}
+
+Glib::RefPtr<Gst::Element> MessageStreamStatus::parse_owner() const
+{
+  GstElement* gst_element;
+  gst_message_parse_stream_status(const_cast<GstMessage*>(gobj()), 0,
+    &gst_element);
+  return Glib::wrap(gst_element, true);
+}
+
 Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
 {
   Glib::RefPtr<Gst::Message> result;
@@ -668,6 +724,9 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
         break;
       case GST_MESSAGE_ASYNC_DONE:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncDone(message) );
+        break;
+      case GST_MESSAGE_STREAM_STATUS:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageStreamStatus(message) );
         break;
       case GST_MESSAGE_UNKNOWN:
       case GST_MESSAGE_ANY:
