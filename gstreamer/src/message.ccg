@@ -602,6 +602,8 @@ Glib::RefPtr<Gst::Message> MessageAsyncDone::create(const Glib::RefPtr<Gst::Obje
   return Gst::Message::wrap(message, false);
 }
 
+//TODO: Include (by removing #if/#endif) when GStreamer 0.10.24 is released:
+#if 0
 MessageStreamStatus::MessageStreamStatus(GstMessage* castitem)
 : Message(castitem)
 {}
@@ -656,6 +658,7 @@ Glib::RefPtr<Gst::Element> MessageStreamStatus::parse_owner() const
     &gst_element);
   return Glib::wrap(gst_element, true);
 }
+#endif
 
 Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
 {
@@ -725,9 +728,12 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
       case GST_MESSAGE_ASYNC_DONE:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncDone(message) );
         break;
+      //TODO: Include when GStreamer 0.10.24 is released:
+      /*
       case GST_MESSAGE_STREAM_STATUS:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageStreamStatus(message) );
         break;
+      */
       case GST_MESSAGE_UNKNOWN:
       case GST_MESSAGE_ANY:
         result = Gst::wrap(message, false);
