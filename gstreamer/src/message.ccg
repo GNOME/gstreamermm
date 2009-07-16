@@ -602,6 +602,76 @@ Glib::RefPtr<Gst::Message> MessageAsyncDone::create(const Glib::RefPtr<Gst::Obje
   return Gst::Message::wrap(message, false);
 }
 
+MessageStructureChange::MessageStructureChange(GstMessage* castitem)
+: Message(castitem)
+{}
+
+Glib::RefPtr<Gst::Message>
+  MessageStructureChange::create(const Glib::RefPtr<Gst::Object>& src,
+  Gst::StructureChangeType type, const Glib::RefPtr<Gst::Element>& owner,
+  bool busy)
+{
+  GstMessage* message = gst_message_new_structure_change(src->gobj(),
+    (GstStructureChangeType)(type), owner->gobj(), busy);
+  return Gst::Message::wrap(message, false);
+}
+
+void MessageStructureChange::parse(Gst::StructureChangeType& type,
+  Glib::RefPtr<Gst::Element>& owner, bool& busy) const
+{
+  GstElement* gst_element = 0;
+  gboolean gst_busy = false;
+  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()),
+    (GstStructureChangeType*)(&type), &gst_element, &gst_busy);
+  owner = Glib::wrap(gst_element, true);
+  busy = gst_busy;
+}
+
+Gst::StructureChangeType MessageStructureChange::parse() const
+{
+  GstStructureChangeType gst_type = GST_STRUCTURE_CHANGE_TYPE_PAD_LINK;
+  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()),
+    &gst_type, 0, 0);
+  return (Gst::StructureChangeType)(gst_type);
+}
+
+Glib::RefPtr<Gst::Element> MessageStructureChange::parse_owner() const
+{
+  GstElement* gst_element = 0;
+  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()), 0,
+    &gst_element, 0);
+  return Glib::wrap(gst_element, true);
+}
+
+bool MessageStructureChange::parse_busy() const
+{
+  gboolean gst_busy = false;
+  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()), 0, 0,
+    &gst_busy);
+  return gst_busy;
+}
+
+MessageRequestState::MessageRequestState(GstMessage* castitem)
+: Message(castitem)
+{}
+
+Glib::RefPtr<Gst::Message>
+  MessageRequestState::create(const Glib::RefPtr<Gst::Object>& src,
+  Gst::State state)
+{
+  GstMessage* message = gst_message_new_request_state(src->gobj(),
+    (GstState)(state));
+  return Gst::Message::wrap(message, false);
+}
+
+Gst::State MessageRequestState::parse() const
+{
+  GstState gst_state = GST_STATE_VOID_PENDING;
+  gst_message_parse_request_state(const_cast<GstMessage*>(gobj()),
+    &gst_state);
+  return (Gst::State)(gst_state);
+}
+
 //TODO: Include (by removing #if/#endif) when GStreamer 0.10.24 is released:
 #if 0
 MessageStreamStatus::MessageStreamStatus(GstMessage* castitem)
@@ -727,6 +797,12 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
         break;
       case GST_MESSAGE_ASYNC_DONE:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncDone(message) );
+        break;
+      case GST_MESSAGE_STRUCTURE_CHANGE:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageStructureChange(message) );
+        break;
+      case GST_MESSAGE_REQUEST_STATE:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageRequestState(message) );
         break;
       //TODO: Include when GStreamer 0.10.24 is released:
       /*

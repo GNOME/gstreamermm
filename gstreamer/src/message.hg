@@ -29,6 +29,8 @@ namespace Gst
 {
 
 _WRAP_ENUM(MessageType, GstMessageType)
+_WRAP_ENUM(StructureChangeType, GstStructureChangeType)
+
 //TODO: Include when GStreamer 0.10.24 is released:
 //_WRAP_ENUM(StreamStatusType, GstStreamStatusType)
 
@@ -903,6 +905,105 @@ public:
    * @return The new async_done message. MT safe.
    */
   static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
+};
+
+/** A structure change message.
+ * See create() for more details.
+ */
+class MessageStructureChange : public Message
+{
+public:
+  explicit MessageStructureChange(GstMessage* castitem);
+
+  /** Create a new structure change message. This message is posted when the
+   * structure of a pipeline is in the process of being changed, for example
+   * when pads are linked or unlinked.
+   *
+   * @a src should be the srcpad that unlinked or linked.
+   *
+   * @param src The object originating the message.
+   * @param type The change type.
+   * @param owner The owner element of src.
+   * @param busy Whether the structure change is busy.
+   * @return The new structure change message. MT safe.
+   *
+   * Since 0.10.22.
+   */
+  static Glib::RefPtr<Gst::Message>
+    create(const Glib::RefPtr<Gst::Object>& src,
+    Gst::StructureChangeType type, const Glib::RefPtr<Gst::Element>& owner,
+    bool busy);
+
+  /** Extracts the change type and completion status from the Gst::Message.
+   * MT safe.
+   *
+   * @param type A reference to hold the change type.
+   * @param owner The owner element of the message source.
+   * @param busy A reference to hold whether the change is in progress or has
+   * been completed.
+   *
+   * Since 0.10.22.
+   */
+  void parse(Gst::StructureChangeType& type,
+    Glib::RefPtr<Gst::Element>& owner, bool& busy) const;
+  _IGNORE(gst_message_parse_structure_change)
+
+  /** Extracts the change type from the Gs::tMessage.
+   * MT safe.
+   *
+   * @return The change type.
+   *
+   * Since 0.10.22.
+   */
+  Gst::StructureChangeType parse() const;
+
+  /** Extracts the owner from the Gst::Message.
+   * MT safe.
+   *
+   * @return The owner element of the message source.
+   *
+   * Since 0.10.22.
+   */
+  Glib::RefPtr<Gst::Element> parse_owner() const;
+
+  /** Extracts the completion status from the Gst::Message.
+   * MT safe.
+   *
+   * @return whether the change is in progress or has been completed.
+   *
+   * Since 0.10.22.
+   */
+  bool parse_busy() const;
+};
+
+/** A request state message.
+ * See create() for more details.
+ */
+class MessageRequestState : public Message
+{
+public:
+  explicit MessageRequestState(GstMessage* castitem);
+
+  /** This message can be posted by elements when they want to have their
+   * state changed. A typical use case would be an audio server that wants to
+   * pause the pipeline because a higher priority stream is being played.
+   *
+   * @param src The object originating the message.
+   * @param state The new requested state.
+   * @return The new requst state message. MT safe.
+   *
+   * Since 0.10.23.
+   */
+  static Glib::RefPtr<Gst::Message>
+    create(const Glib::RefPtr<Gst::Object>& src, Gst::State state);
+
+  /** Extract the requested state from the request_state message.
+   * @return The state. MT safe.
+   *
+   * Since 0.10.23.
+   */
+  Gst::State parse() const;
+  _IGNORE(gst_message_parse_request_state)
 };
 
 //TODO: Include (by removing #if/#endif) when GStreamer 0.10.24 is released:
