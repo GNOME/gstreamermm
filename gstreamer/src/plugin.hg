@@ -25,6 +25,8 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+_WRAP_ENUM(PluginDependencyFlags, GstPluginDependencyFlags)
+
 /** The plugin loading errors
  *
  * - MODULE - The plugin could not be loaded
@@ -85,6 +87,7 @@ public:
   _WRAP_METHOD(Glib::ustring get_source() const, gst_plugin_get_source)
   _WRAP_METHOD(Glib::ustring get_version() const, gst_plugin_get_version)
 
+  //TODO: Use Glib::Module instead of GModule if possible:
   _WRAP_METHOD(GModule* get_module(), gst_plugin_get_module)
   _WRAP_METHOD(const GModule* get_module() const, gst_plugin_get_module, constversion)
 
@@ -113,6 +116,16 @@ public:
   //gst_plugin_name_filter is a C API convenience function which tells if a
   //plugin has a given name so ignore it.
   _IGNORE(gst_plugin_name_filter)
+
+  _WRAP_METHOD(void add_dependency(const Glib::StringArrayHandle& env_vars,
+    const Glib::StringArrayHandle& paths,
+    const Glib::StringArrayHandle& names,
+    Gst::PluginDependencyFlags flags), gst_plugin_add_dependency)
+
+  _WRAP_METHOD(void add_dependency(const Glib::ustring& env_vars,
+    const Glib::ustring& paths,
+    const Glib::ustring& names,
+    Gst::PluginDependencyFlags flags), gst_plugin_add_dependency_simple)
 };
 
 } // namespace Gst
