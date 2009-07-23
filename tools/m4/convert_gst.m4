@@ -2,11 +2,13 @@
 _CONV_ENUM(Gst,AssocFlags)
 _CONV_ENUM(Gst,AutoplugSelectResult)
 _CONV_ENUM(Gst,BaseAudioSinkSlaveMethod)
+_CONV_ENUM(Gst,BaseAudioSrcSlaveMethod)
 _CONV_ENUM(Gst,BufferCopyFlags)
 _CONV_ENUM(Gst,BufferFlag)
 _CONV_ENUM(Gst,ClockEntryType)
 _CONV_ENUM(Gst,ClockReturn)
 _CONV_ENUM(Gst,ClockTime)
+_CONV_ENUM(Gst,ColorBalanceType)
 _CONV_ENUM(Gst,EventType)
 _CONV_ENUM(Gst,FlowReturn)
 _CONV_ENUM(Gst,Format)
@@ -17,6 +19,8 @@ _CONV_ENUM(Gst,IndexLookupMethod)
 _CONV_ENUM(Gst,IndexResolverMethod)
 _CONV_ENUM(Gst,MessageType)
 _CONV_ENUM(Gst,MixerFlags)
+_CONV_ENUM(Gst,MixerType)
+_CONV_ENUM(Gst,NavigationCommand)
 _CONV_ENUM(Gst,PadDirection)
 _CONV_ENUM(Gst,PadLinkReturn)
 _CONV_ENUM(Gst,PadPresence)
@@ -33,14 +37,6 @@ _CONV_ENUM(Gst,TunerChannelFlags)
 _CONV_ENUM(Gst,URIType)
 
 ############### gstreamermm Class Conversions ######################
-
-#Gst::Object
-_CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
-_CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`$3->gobj()')
-_CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::Object>&',`GstObject*',`const_cast<GstObject*>($3->gobj())')
-_CONVERSION(`const Glib::RefPtr<Object>&', `GstObject*', `$3->gobj()')
 
 #Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Gst::wrap($3)')
@@ -112,10 +108,21 @@ _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<const Gst::Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `$3->gobj()')
 
+#MiniObject
+_CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`$3->gobj()')
+
 #Mixer
 _CONVERSION(`const Glib::RefPtr<Gst::MixerOptions>&',`GstMixerOptions*', `$3->gobj()')
 _CONVERSION(`const Glib::RefPtr<const Gst::MixerOptions>&',`GstMixerOptions*', `const_cast<$2>($3->gobj())')
 _CONVERSION(`const Glib::RefPtr<Gst::MixerTrack>&',`GstMixerTrack*', `$3->gobj()')
+
+#Gst::Object
+_CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
+_CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`$3->gobj()')
+_CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<const Gst::Object>&',`GstObject*',`const_cast<GstObject*>($3->gobj())')
+_CONVERSION(`const Glib::RefPtr<Object>&', `GstObject*', `$3->gobj()')
 
 #Pad
 _CONVERSION(`GstPad*',`Glib::RefPtr<Gst::Pad>',`Glib::wrap($3)')
