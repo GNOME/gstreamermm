@@ -176,12 +176,16 @@ AC_SUBST([GENERATE_PLUGIN_GMMPROC_FILE_DIR])
 # gstreamer/src/Makefile_list_of_hg.am_fragment file.  (That must be the same
 # as "CppClassName" - all in lowercase with a .hg extension).  Make sure that
 # the order of both lists correspond.
+
+# TODO: Include appsink and appsrc plug-ins in list below if they indeed are
+# plug-ins (see gst-plugins-base docs for details) and when they don't cause
+# gstreamermm initialization errors.
 GSTREAMERMM_ALL_PLUGIN_DEFS="capsfilter=CapsFilter fakesink=FakeSink \
 fakesrc=FakeSrc fdsrc=FdSrc fdsink=FdSink filesink=FileSink \
 filesrc=FileSrc identity=Identity multiqueue=MultiQueue queue=Queue \
 tee=Tee typefind=TypeFindElement \
 adder=Adder alsamixer=AlsaMixer alsasink=AlsaSink alsasrc=AlsaSrc \
-appsink=AppSink appsrc=AppSrc audioconvert=AudioConvert \
+audioconvert=AudioConvert \
 audioresample=AudioResample audiotestsrc=AudioTestSrc \
 cdparanoiasrc=CdParanoiaSrc clockoverlay=ClockOverlay \
 decodebin=DecodeBin decodebin2=DecodeBin2 \
