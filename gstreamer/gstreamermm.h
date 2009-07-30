@@ -99,7 +99,7 @@
 #include <gstreamermm/cdparanoiasrc.h>
 #include <gstreamermm/clockoverlay.h>
 #include <gstreamermm/decodebin.h>
-//TODO: #include <gstreamermm/decodebin2.h>
+#include <gstreamermm/decodebin2.h>
 #include <gstreamermm/ffmpegcolorspace.h>
 #include <gstreamermm/gdpdepay.h>
 #include <gstreamermm/gdppay.h>
@@ -109,22 +109,22 @@
 #include <gstreamermm/giostreamsrc.h>
 //TODO (Add plug-in first): #include <gstreamermm/gnomevfssink.h>
 //TODO (Add plug-in first): #include <gstreamermm/gnomevfssrc.h>
-//TODO (Add plug-in first): #include <gstreamermm/multifdsink.h>
+#include <gstreamermm/multifdsink.h>
 #include <gstreamermm/oggdemux.h>
 #include <gstreamermm/oggmux.h>
-//TODO (Add plug-in first): #include <gstreamermm/playbin.h>
+#include <gstreamermm/playbin.h>
 #include <gstreamermm/playbin2.h>
 #include <gstreamermm/tcpclientsrc.h>
 #include <gstreamermm/tcpclientsink.h>
 #include <gstreamermm/tcpserversrc.h>
-//TODO (Add plug-in first): #include <gstreamermm/tcpserversink.h>
+#include <gstreamermm/tcpserversink.h>
 #include <gstreamermm/textoverlay.h>
 #include <gstreamermm/textrender.h>
 #include <gstreamermm/theoradec.h>
 #include <gstreamermm/theoraenc.h>
-//TODO (Add plug-in first): #include <gstreamermm/theoraparse.h>
+#include <gstreamermm/theoraparse.h>
 #include <gstreamermm/timeoverlay.h>
-//TODO (Add plug-in first): #include <gstreamermm/uridecodebin.h>
+#include <gstreamermm/uridecodebin.h>
 #include <gstreamermm/videorate.h>
 #include <gstreamermm/videoscale.h>
 #include <gstreamermm/videotestsrc.h>
