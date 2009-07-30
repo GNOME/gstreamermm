@@ -21,6 +21,7 @@
 #include <gst/gstbin.h>
 #include <gst/gstutils.h>
 #include <gstreamermm/pad.h>
+#include <gstreamermm/ghostpad.h>
 #include <gstreamermm/iterator.h>
 
 #ifndef GLIBMM_EXCEPTIONS_ENABLED
@@ -78,6 +79,17 @@ Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
     handle_error("Failed to remove " + element->get_name() + " element.");
 
   return Glib::wrap(gobj(), true);
+}
+
+Glib::RefPtr<Gst::GhostPad> Bin::add_ghost_pad(const
+  Glib::RefPtr<Gst::Element>& element, const Glib::ustring& pad_name, const
+  Glib::ustring& name)
+{
+  Glib::RefPtr<Gst::Pad> static_pad = element->get_static_pad(pad_name);
+  Glib::RefPtr<Gst::GhostPad> ghost_pad = Gst::GhostPad::create(static_pad,
+    name);
+  add_pad(ghost_pad);
+  return ghost_pad;
 }
 
 void Bin::handle_error(const Glib::ustring& message)

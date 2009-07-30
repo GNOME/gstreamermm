@@ -27,6 +27,7 @@ namespace Gst
 {
 
 class Pad;
+class GhostPad;
 
 //Gst::Iterator<> forward declaration.
 template <class CppType>
@@ -193,6 +194,16 @@ public:
  
   _WRAP_METHOD(Glib::RefPtr<Gst::Element> get_element(GType interface), gst_bin_get_by_interface)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Element> get_element(GType interface) const, gst_bin_get_by_interface, constversion)
+
+  /** Adds a ghost pad to the bin using an element's static pad as a target.
+   * @param element The element with the target static pad.
+   * @param pad_name The static pad to use as the target.
+   * @param name An optional name for the ghost pad.
+   * @return The newly created Gst::GhostPad.
+   */
+  Glib::RefPtr<Gst::GhostPad> add_ghost_pad(const Glib::RefPtr<Gst::Element>&
+    element, const Glib::ustring& pad_name, const Glib::ustring& name =
+    Glib::ustring());
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Pad> find_unlinked_pad(PadDirection dir), gst_bin_find_unlinked_pad)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Pad> find_unlinked_pad(PadDirection dir) const, gst_bin_find_unlinked_pad, constversion)
