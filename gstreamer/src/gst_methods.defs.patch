@@ -1,71 +1,168 @@
---- gst_methods.defs	2009-05-18 19:28:48.000000000 -0400
-+++ gst_methods.defs.new	2009-05-18 19:28:15.000000000 -0400
-@@ -1,4 +1,7 @@
- ;; -*- scheme -*-
-+
-+;; Apply gst_methods.defs.patch after regenerating.
-+
- ; object definitions ...
- (define-object Adapter
-   (in-module "Gst")
-@@ -540,46 +543,6 @@
-   )
- )
- 
--(define-enum EventType
--  (in-module "Gst")
--  (c-name "GstEventType")
--  (gtype-id "GST_TYPE_EVENT_TYPE")
--  (values
--    '("gst-event-unknown" "GST_EVENT_UNKNOWN")
--    '("0)" "0)")
--    '("gst-event-flush-start" "GST_EVENT_FLUSH_START")
--    '("flag(both))" "FLAG(BOTH))")
--    '("gst-event-flush-stop" "GST_EVENT_FLUSH_STOP")
--    '("flag(both)" "FLAG(BOTH)")
--    '("gst-event-eos" "GST_EVENT_EOS")
--    '("flag(downstream)" "FLAG(DOWNSTREAM)")
--    '("gst-event-newsegment" "GST_EVENT_NEWSEGMENT")
--    '("flag(downstream)" "FLAG(DOWNSTREAM)")
--    '("gst-event-tag" "GST_EVENT_TAG")
--    '("flag(downstream)" "FLAG(DOWNSTREAM)")
--    '("gst-event-buffersize" "GST_EVENT_BUFFERSIZE")
--    '("flag(downstream)" "FLAG(DOWNSTREAM)")
--    '("gst-event-qos" "GST_EVENT_QOS")
--    '("flag(upstream))" "FLAG(UPSTREAM))")
--    '("gst-event-seek" "GST_EVENT_SEEK")
--    '("flag(upstream))" "FLAG(UPSTREAM))")
--    '("gst-event-navigation" "GST_EVENT_NAVIGATION")
--    '("flag(upstream))" "FLAG(UPSTREAM))")
--    '("gst-event-latency" "GST_EVENT_LATENCY")
--    '("flag(upstream))" "FLAG(UPSTREAM))")
--    '("gst-event-custom-upstream" "GST_EVENT_CUSTOM_UPSTREAM")
--    '("flag(upstream))" "FLAG(UPSTREAM))")
--    '("gst-event-custom-downstream" "GST_EVENT_CUSTOM_DOWNSTREAM")
--    '("flag(downstream)" "FLAG(DOWNSTREAM)")
--    '("gst-event-custom-downstream-oob" "GST_EVENT_CUSTOM_DOWNSTREAM_OOB")
--    '("flag(downstream))" "FLAG(DOWNSTREAM))")
--    '("gst-event-custom-both" "GST_EVENT_CUSTOM_BOTH")
--    '("flag(both)" "FLAG(BOTH)")
--    '("gst-event-custom-both-oob" "GST_EVENT_CUSTOM_BOTH_OOB")
--    '("flag(both))" "FLAG(BOTH))")
--  )
--)
--
- (define-enum SeekType
-   (in-module "Gst")
-   (c-name "GstSeekType")
-@@ -4285,6 +4248,13 @@
-   (return-type "GQuark")
- )
- 
-+;; This method is not generated for some reason.
-+(define-method get_seqnum
-+  (of-object "GstMessage")
-+  (c-name "gst_message_get_seqnum")
-+  (return-type "guint32")
-+)
-+
- (define-method set_seqnum
-   (of-object "GstMessage")
-   (c-name "gst_message_set_seqnum")
+*** gst_methods.defs.orig	2009-07-29 19:50:15.000000000 -0400
+--- gst_methods.defs	2009-07-29 20:07:35.000000000 -0400
+***************
+*** 1,4 ****
+--- 1,7 ----
+  ;; -*- scheme -*-
++ 
++ ;; Apply gst_methods.defs.patch after regenerating.
++ 
+  ; object definitions ...
+  (define-object Adapter
+    (in-module "Gst")
+***************
+*** 279,285 ****
+    (c-name "GstBinFlags")
+    (gtype-id "GST_TYPE_BIN_FLAGS")
+    (values
+!     '("t" "GST_BIN_FLAG_LAST")
+    )
+  )
+  
+--- 282,288 ----
+    (c-name "GstBinFlags")
+    (gtype-id "GST_TYPE_BIN_FLAGS")
+    (values
+!     '("last" "GST_BIN_FLAG_LAST")
+    )
+  )
+  
+***************
+*** 328,335 ****
+    (c-name "GstBusFlags")
+    (gtype-id "GST_TYPE_BUS_FLAGS")
+    (values
+!     '("ushing" "GST_BUS_FLUSHING")
+!     '("ag-last" "GST_BUS_FLAG_LAST")
+    )
+  )
+  
+--- 331,338 ----
+    (c-name "GstBusFlags")
+    (gtype-id "GST_TYPE_BUS_FLAGS")
+    (values
+!     '("flushing" "GST_BUS_FLUSHING")
+!     '("flag-last" "GST_BUS_FLAG_LAST")
+    )
+  )
+  
+***************
+*** 349,355 ****
+    (c-name "GstCapsFlags")
+    (gtype-id "GST_TYPE_CAPS_FLAGS")
+    (values
+!     '("y" "GST_CAPS_FLAGS_ANY")
+    )
+  )
+  
+--- 352,358 ----
+    (c-name "GstCapsFlags")
+    (gtype-id "GST_TYPE_CAPS_FLAGS")
+    (values
+!     '("any" "GST_CAPS_FLAGS_ANY")
+    )
+  )
+  
+***************
+*** 551,598 ****
+    )
+  )
+  
+- (define-enum EventType
+-   (in-module "Gst")
+-   (c-name "GstEventType")
+-   (gtype-id "GST_TYPE_EVENT_TYPE")
+-   (values
+-     '("gst-event-unknown" "GST_EVENT_UNKNOWN")
+-     '("0)" "0)")
+-     '("gst-event-flush-start" "GST_EVENT_FLUSH_START")
+-     '("flag(both))" "FLAG(BOTH))")
+-     '("gst-event-flush-stop" "GST_EVENT_FLUSH_STOP")
+-     '("flag(both)" "FLAG(BOTH)")
+-     '("gst-event-eos" "GST_EVENT_EOS")
+-     '("flag(downstream)" "FLAG(DOWNSTREAM)")
+-     '("gst-event-newsegment" "GST_EVENT_NEWSEGMENT")
+-     '("flag(downstream)" "FLAG(DOWNSTREAM)")
+-     '("gst-event-tag" "GST_EVENT_TAG")
+-     '("flag(downstream)" "FLAG(DOWNSTREAM)")
+-     '("gst-event-buffersize" "GST_EVENT_BUFFERSIZE")
+-     '("flag(downstream)" "FLAG(DOWNSTREAM)")
+-     '("gst-event-qos" "GST_EVENT_QOS")
+-     '("flag(upstream))" "FLAG(UPSTREAM))")
+-     '("gst-event-seek" "GST_EVENT_SEEK")
+-     '("flag(upstream))" "FLAG(UPSTREAM))")
+-     '("gst-event-navigation" "GST_EVENT_NAVIGATION")
+-     '("flag(upstream))" "FLAG(UPSTREAM))")
+-     '("gst-event-latency" "GST_EVENT_LATENCY")
+-     '("flag(upstream))" "FLAG(UPSTREAM))")
+-     '("gst-event-step" "GST_EVENT_STEP")
+-     '("flag(upstream))" "FLAG(UPSTREAM))")
+-     '("gst-event-custom-upstream" "GST_EVENT_CUSTOM_UPSTREAM")
+-     '("flag(upstream))" "FLAG(UPSTREAM))")
+-     '("gst-event-custom-downstream" "GST_EVENT_CUSTOM_DOWNSTREAM")
+-     '("flag(downstream)" "FLAG(DOWNSTREAM)")
+-     '("gst-event-custom-downstream-oob" "GST_EVENT_CUSTOM_DOWNSTREAM_OOB")
+-     '("flag(downstream))" "FLAG(DOWNSTREAM))")
+-     '("gst-event-custom-both" "GST_EVENT_CUSTOM_BOTH")
+-     '("flag(both)" "FLAG(BOTH)")
+-     '("gst-event-custom-both-oob" "GST_EVENT_CUSTOM_BOTH_OOB")
+-     '("flag(both))" "FLAG(BOTH))")
+-   )
+- )
+- 
+  (define-enum SeekType
+    (in-module "Gst")
+    (c-name "GstSeekType")
+--- 554,559 ----
+***************
+*** 932,939 ****
+    (c-name "GstPadTemplateFlags")
+    (gtype-id "GST_TYPE_PAD_TEMPLATE_FLAGS")
+    (values
+!     '("ixed" "GST_PAD_TEMPLATE_FIXED")
+!     '("lag-last" "GST_PAD_TEMPLATE_FLAG_LAST")
+    )
+  )
+  
+--- 893,900 ----
+    (c-name "GstPadTemplateFlags")
+    (gtype-id "GST_TYPE_PAD_TEMPLATE_FLAGS")
+    (values
+!     '("fixed" "GST_PAD_TEMPLATE_FIXED")
+!     '("flag-last" "GST_PAD_TEMPLATE_FLAG_LAST")
+    )
+  )
+  
+***************
+*** 1000,1006 ****
+    (c-name "GstPluginFlags")
+    (gtype-id "GST_TYPE_PLUGIN_FLAGS")
+    (values
+!     '("d" "GST_PLUGIN_FLAG_CACHED")
+    )
+  )
+  
+--- 961,967 ----
+    (c-name "GstPluginFlags")
+    (gtype-id "GST_TYPE_PLUGIN_FLAGS")
+    (values
+!     '("cached" "GST_PLUGIN_FLAG_CACHED")
+    )
+  )
+  
+***************
+*** 4363,4368 ****
+--- 4324,4336 ----
+    (return-type "GQuark")
+  )
+  
++ ;; This method is not generated for some reason.
++ (define-method get_seqnum
++   (of-object "GstMessage")
++   (c-name "gst_message_get_seqnum")
++   (return-type "guint32")
++ )
++ 
+  (define-method set_seqnum
+    (of-object "GstMessage")
+    (c-name "gst_message_set_seqnum")

@@ -3435,6 +3435,46 @@
 
 ;; From GstMixer
 
+(define-signal record-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal mute-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal volume-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gpointer" "p1")
+  )
+)
+
+(define-signal option-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerOptions*" "p0")
+    '("const-gchar*" "p1")
+  )
+)
+
 ;; From GstMixerTrack
 
 (define-property label
@@ -3650,6 +3690,15 @@
   (of-object "GstAdder")
   (prop-type "GParamString")
   (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property caps
+  (of-object "GstAdder")
+  (prop-type "GParamBoxed")
+  (docs "Set target format for mixing (NULL means ANY). Setting this property takes a reference to the supplied GstCaps object.")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4154,6 +4203,12 @@
   (when "last")
 )
 
+(define-signal new-buffer-list
+  (of-object "GstAppSink")
+  (return-type "void")
+  (when "last")
+)
+
 (define-signal pull-preroll
   (of-object "GstAppSink")
   (return-type "GstBuffer*")
@@ -4163,6 +4218,12 @@
 (define-signal pull-buffer
   (of-object "GstAppSink")
   (return-type "GstBuffer*")
+  (when "last")
+)
+
+(define-signal pull-buffer-list
+  (of-object "GstAppSink")
+  (return-type "GstBufferList*")
   (when "last")
 )
 
@@ -6540,7 +6601,7 @@
 (define-property volume
   (of-object "GstPlayBin2")
   (prop-type "GParamDouble")
-  (docs "The audio volume")
+  (docs "The audio volume, 1.0=100%")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -7830,6 +7891,15 @@
   (construct-only #f)
 )
 
+(define-property download
+  (of-object "GstURIDecodeBin")
+  (prop-type "GParamBoolean")
+  (docs "Attempt download buffering when buffering network streams")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstVideoRate
 
 (define-property name
@@ -8156,7 +8226,7 @@
 (define-property volume
   (of-object "GstVolume")
   (prop-type "GParamDouble")
-  (docs "volume factor")
+  (docs "volume factor, 1.0=100%")
   (readable #t)
   (writable #t)
   (construct-only #f)
