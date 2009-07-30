@@ -31,9 +31,9 @@ _PINCLUDE(gstreamermm/private/pad_p.h)
 namespace Gst
 {
 
-GhostPad::GhostPad(const Glib::ustring& name,
-  const Glib::RefPtr<Gst::Pad>& target)
-  : _CONSTRUCT("name", name.c_str(),
+GhostPad::GhostPad(const Glib::RefPtr<Gst::Pad>& target,
+  const Glib::ustring& name)
+  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()),
     "direction",
     ((target) ? ((GstPadDirection) target->get_direction()) : GST_PAD_UNKNOWN))
 {
@@ -52,8 +52,9 @@ GhostPad::GhostPad(const Glib::ustring& name,
   }
 }
 
-GhostPad::GhostPad(const Glib::ustring& name, PadDirection direction)
-  : _CONSTRUCT("name", name.c_str(), "direction", (GstPadDirection) direction)
+GhostPad::GhostPad( PadDirection direction, const Glib::ustring& name)
+  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()),
+    "direction", (GstPadDirection) direction)
 {
   if(!gst_ghost_pad_construct(gobj()))
   {
@@ -66,12 +67,13 @@ GhostPad::GhostPad(const Glib::ustring& name, PadDirection direction)
   }
 }
 
-GhostPad::GhostPad(const Glib::ustring& name,
-  const Glib::RefPtr<Gst::Pad>& target,
-  const Glib::RefPtr<Gst::PadTemplate>& templ)
-  : _CONSTRUCT("name", name.c_str(), "direction",
-  ((target) ? ((GstPadDirection) target->get_direction()) : GST_PAD_UNKNOWN),
-  "template", ((templ) ? templ->gobj() : 0))
+GhostPad::GhostPad( const Glib::RefPtr<Gst::Pad>& target,
+  const Glib::RefPtr<Gst::PadTemplate>& templ,
+  const Glib::ustring& name)
+  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()),
+    "direction",
+    ((target) ? ((GstPadDirection) target->get_direction()) : GST_PAD_UNKNOWN),
+    "template", ((templ) ? templ->gobj() : 0))
 {
   if(!target || !templ)
     handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
@@ -90,9 +92,9 @@ GhostPad::GhostPad(const Glib::ustring& name,
   }
 }
 
-GhostPad::GhostPad(const Glib::ustring& name,
-  const Glib::RefPtr<Gst::PadTemplate>& templ)
-  : _CONSTRUCT("name", name.c_str(), "direction", 
+GhostPad::GhostPad( const Glib::RefPtr<Gst::PadTemplate>& templ,
+  const Glib::ustring& name)
+  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()), "direction", 
     ((templ) ? ((GstPadDirection) templ->get_direction()) : GST_PAD_UNKNOWN),
     "template", ((templ) ? templ->gobj() : 0))
 {
