@@ -33,12 +33,14 @@
 #include <gstreamermm/pluginfeature.h>
 #include <gstreamermm/preset.h>
 #include <gstreamermm/query.h>
+#include <gstreamermm/registry.h>
 #include <gstreamermm/segment.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
 #include <gstreamermm/taglist.h>
 #include <gstreamermm/tagsetter.h>
 #include <gstreamermm/task.h>
+#include <gstreamermm/taskpool.h>
 //TODO: #include <gstreamermm/typefind.h>
 //TODO: #include <gstreamermm/typefindfactory.h>
 #include <gstreamermm/urihandler.h>
@@ -46,8 +48,8 @@
 #include <gstreamermm/xml.h>
 
 // Core library base includes
-#include <gstreamermm/basesrc.h>
 #include <gstreamermm/basesink.h>
+#include <gstreamermm/basesrc.h>
 #include <gstreamermm/basetransform.h>
 #include <gstreamermm/pushsrc.h>
 
@@ -60,6 +62,7 @@
 #include <gstreamermm/baseaudiosrc.h>
 #include <gstreamermm/cddabasesrc.h>
 #include <gstreamermm/ringbuffer.h>
+#include <gstreamermm/videosink.h>
 
 // Base inteface includes
 #include <gstreamermm/colorbalance.h>
@@ -67,6 +70,7 @@
 #include <gstreamermm/mixer.h>
 #include <gstreamermm/mixeroptions.h>
 #include <gstreamermm/mixertrack.h>
+#include <gstreamermm/navigation.h>
 #include <gstreamermm/propertyprobe.h>
 #include <gstreamermm/tuner.h>
 #include <gstreamermm/tunerchannel.h>

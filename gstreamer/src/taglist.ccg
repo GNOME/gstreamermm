@@ -119,9 +119,9 @@ void TagList::add(Tag tag, const char* data, TagMergeMode mode)
 
 void TagList::foreach(const SlotForeach& slot)
 {
-  SlotForeach* slot_copy = new SlotForeach(slot);
-  gst_tag_list_foreach(gobj(), &TagList_foreach_gstreamermm_callback, slot_copy);
-  delete slot_copy;
+  SlotForeach slot_copy(slot);
+  gst_tag_list_foreach(gobj(), &TagList_foreach_gstreamermm_callback,
+    &slot_copy);
 }
 
 bool TagList::get(Tag tag, Glib::ValueBase& dest) const
