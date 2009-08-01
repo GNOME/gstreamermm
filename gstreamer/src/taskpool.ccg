@@ -20,18 +20,16 @@
 #include <gst/gstenumtypes.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
-gboolean Plugin_Init_gstreamermm_callback(GstPlugin* plugin, void* data)
+static void TaskPool_Push_gstreamermm_callback(void* data)
 {
-  Gst::Plugin::SlotInit* the_slot = static_cast<Gst::Plugin::SlotInit*>(data);
-  bool result = false;
+  Gst::TaskPool::SlotPush* the_slot = static_cast<Gst::TaskPool::SlotPush*>(data);
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
-    result = (*the_slot)(Glib::wrap(plugin, true));
+    (*the_slot)();
     delete the_slot;
-    return result;
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
@@ -39,25 +37,32 @@ gboolean Plugin_Init_gstreamermm_callback(GstPlugin* plugin, void* data)
     Glib::exception_handlers_invoke();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
-
-  return false;
 }
 
 namespace Gst
 {
 
-bool Plugin::register_static(int major_version, int minor_version,
-    const Glib::ustring& name, const Glib::ustring& description,
-    const SlotInit& init_slot, const Glib::ustring& version,
-    const Glib::ustring& license, const Glib::ustring& source,
-    const Glib::ustring& package, const Glib::ustring& origin)
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gpointer TaskPool::push(const SlotPush& slot)
+#else
+gpointer TaskPool::push(const SlotPush& slot, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
-  SlotInit* slot_copy = new SlotInit(init_slot);
+  GError* gerror = 0;
+  SlotPush* slot_copy = new SlotPush(slot);
 
-  return gst_plugin_register_static_full(major_version, minor_version,
-    name.c_str(), const_cast<char*>(description.c_str()),
-    &Plugin_Init_gstreamermm_callback, version.c_str(), license.c_str(),
-    source.c_str(), package.c_str(), origin.c_str(), slot_copy);
+  gpointer ret_val = gst_task_pool_push(gobj(),
+    &TaskPool_Push_gstreamermm_callback, slot_copy, &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return ret_val;
 }
 
 } //namespace Gst
