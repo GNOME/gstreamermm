@@ -316,6 +316,7 @@ AC_CONFIG_FILES([
     examples/ogg_player/Makefile
     examples/ogg_player_gtkmm/Makefile
     examples/media_player_gtkmm/Makefile
+    examples/typefind/Makefile
     ])
 AC_SUBST(EXAMPLE_SUBDIR)
 else
