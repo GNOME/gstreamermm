@@ -22,6 +22,16 @@
 Glib::RefPtr<Glib::MainLoop> mainloop;
 bool have_type = false;
 
+static bool on_structure_foreach(const Glib::QueryQuark& id, const Glib::ValueBase& value)
+{
+  const Glib::ustring str_id = id;
+  gchar* str_value = g_strdup_value_contents(value.gobj());
+  std::cout << "Structure field: id=" << str_id << ", value=" << str_value << std::endl;
+  g_free(str_value);
+
+  return true;
+}
+
 static void on_typefind_have_type(guint probability, const Glib::RefPtr<Gst::Caps>& caps)
 {
   have_type = true;
@@ -34,9 +44,17 @@ static void on_typefind_have_type(guint probability, const Glib::RefPtr<Gst::Cap
     return;
   }
 
-  const Gst::Structure structure = caps->get_structure(0);
+  if(!caps->size())
+  {
+    std::cerr << "on_typefind_have_type(): caps is empty" << std::endl;
+    return;
+  }
+
+  Gst::Structure structure = caps->get_structure(0);
   const Glib::ustring mime_type = structure.get_name();
   std::cout << "have-type: mime_type=" << mime_type << std::endl;
+
+  structure.foreach( sigc::ptr_fun(&on_structure_foreach) );
 
   if(mainloop)
     mainloop->quit();
@@ -65,6 +83,10 @@ int main(int argc, char** argv)
   Glib::RefPtr<Gst::FileSrc> element_source = Gst::FileSrc::create();
   element_source->property_location() = filename;
 
+  //If using an MP3 file, this should provide more Caps information from typefind.
+  //Glib::RefPtr<Gst::Element> element_id3demux = Gst::ElementFactory::create_element("id3demux");
+  //g_assert(element_id3demux);
+
   Glib::RefPtr<Gst::TypeFindElement> element_typefind = Gst::TypeFindElement::create();
   element_typefind->signal_have_type().connect(
     sigc::ptr_fun(&on_typefind_have_type) );
@@ -76,6 +98,7 @@ int main(int argc, char** argv)
   {
 #endif
     pipeline->add(element_source)->add(element_typefind)->add(element_sink);
+    //pipeline->add(element_source)->add(element_id3demux)->add(element_typefind)->add(element_sink);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch (std::runtime_error& ex)
@@ -90,12 +113,14 @@ int main(int argc, char** argv)
   try
   {
 #endif
+    //element_source->link(element_id3demux)->link(element_typefind)->link(element_sink);
     element_source->link(element_typefind)->link(element_sink);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const std::runtime_error& error)
   {
     std::cerr << "Exception while linking: " << error.what() << std::endl;
+    return 1;
   }
 #endif
 
