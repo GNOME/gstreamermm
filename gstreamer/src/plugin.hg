@@ -35,6 +35,7 @@ _WRAP_ENUM(PluginDependencyFlags, GstPluginDependencyFlags)
  */
 _WRAP_GERROR(PluginError, GstPluginError, GST_PLUGIN_ERROR)
 
+class Structure;
 
 /** Gst::Plugin - Container for features loaded from a shared object module.
  * GStreamer is extensible, so Gst::Element instances can be loaded at runtime.
@@ -90,8 +91,17 @@ public:
   //TODO: Use Glib::Module instead of GModule if possible:
   _WRAP_METHOD(GModule* get_module(), gst_plugin_get_module)
   _WRAP_METHOD(const GModule* get_module() const, gst_plugin_get_module, constversion)
-
   _WRAP_METHOD(bool is_loaded() const, gst_plugin_is_loaded)
+
+// A copy is taken so that the original is not freed by the wrapper.
+#m4 _CONVERSION(`const GstStructure*',`const Gst::Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
+  _WRAP_METHOD(const Gst::Structure get_cache_data() const, gst_plugin_get_cache_data)
+
+  _WRAP_METHOD(void set_cache_data(Gst::Structure& cache_data), gst_plugin_set_cache_data)
+
+  //gst_plugin_name_filter is a C API convenience function which tells if a
+  //plugin has a given name so ignore it.
+  _IGNORE(gst_plugin_name_filter)
 
   /** @throw Gst::PluginError.
    */
@@ -109,10 +119,6 @@ public:
     const SlotInit& init_slot, const Glib::ustring& version,
     const Glib::ustring& license, const Glib::ustring& source,
     const Glib::ustring& package, const Glib::ustring& origin);
-
-  //gst_plugin_name_filter is a C API convenience function which tells if a
-  //plugin has a given name so ignore it.
-  _IGNORE(gst_plugin_name_filter)
 
   _WRAP_METHOD(void add_dependency(const Glib::StringArrayHandle& env_vars,
     const Glib::StringArrayHandle& paths,

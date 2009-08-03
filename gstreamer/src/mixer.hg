@@ -75,7 +75,10 @@ public:
   _WRAP_METHOD(Gst::MixerType get_mixer_type() const, gst_mixer_get_mixer_type)
   _WRAP_METHOD(static Gst::MixerMessageType get_message_type(const Glib::RefPtr<Gst::Message>& message), gst_mixer_message_get_type)
 
-  // Signals were deprecated before we could wrap them (see header file).
+  // Signals were deprecated before we could wrap them (see header file).  It
+  // looks like messages to the bus have replaced the signals (see the
+  // Gst::MessageMixer* classes):
+  _IGNORE_SIGNAL(mute_toggled, record_toggled, volume_changed, option_changed)
 
 #ifdef GLIBMM_VFUNCS_ENABLED
   virtual Glib::ArrayHandle<int> get_volume_vfunc(const Glib::RefPtr<const Gst::MixerTrack>& track) const;

@@ -71,14 +71,13 @@ namespace Gst
  * data to the segment boundaries.
  *
  * For elements that want to synchronize to the pipeline clock,
- * convert_to_running_time() can be used to convert a timestamp to a value that
- * can be used to synchronize to the clock. This function takes into account
- * all accumulated segments as well as any rate or applied_rate conversions.
+ * to_running_time() can be used to convert a timestamp to a value that can be
+ * used to synchronize to the clock. This function takes into account all
+ * accumulated segments as well as any rate or applied_rate conversions.
  *
  * For elements that need to perform operations on media data in stream_time,
- * convert_to_stream_time() can be used to convert a timestamp and the segment
- * info to stream time (which is always between 0 and the duration of the
- * stream).
+ * to_stream_time() can be used to convert a timestamp and the segment info to
+ * stream time (which is always between 0 and the duration of the stream).
  *
  * Last reviewed on 2007-05-17 (0.10.13)
  */
@@ -96,8 +95,10 @@ public:
   _WRAP_METHOD(void set_newsegment(bool update, double rate, double applied_rate, Format format, gint64 start, gint64 stop, gint64 time), gst_segment_set_newsegment_full)
   _WRAP_METHOD_DOCS_ONLY(gst_segment_set_seek)
   void set_seek(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop, bool& update);
-  _WRAP_METHOD(gint64 convert_to_running_time(Format format, gint64 position) const, gst_segment_to_running_time)
-  _WRAP_METHOD(gint64 convert_to_stream_time(Format format, gint64 position) const, gst_segment_to_stream_time)
+  _WRAP_METHOD(gint64 to_running_time(Format format, gint64 position) const, gst_segment_to_running_time)
+  _WRAP_METHOD(gint64 to_stream_time(Format format, gint64 position) const, gst_segment_to_stream_time)
+  _WRAP_METHOD(gint64 to_position(Format format, gint64 running_time) const, gst_segment_to_position)
+  _WRAP_METHOD(bool set_running_time(Format format, gint64 running_time), gst_segment_set_running_time)
 };
 
 } //namespace Gst
