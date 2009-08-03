@@ -31,6 +31,10 @@ _WRAP_ENUM(TagFlag, GstTagFlag)
 // When adding tags, make sure that they are added to this enum and then in the
 // ccg file in the correct order.  Also make sure that the size of the array of
 // strings is updated in the declaration below and in the ccg file.
+// These correspond to the GST_TAG_* #defines in the C API.
+//TODO: Maybe do something like Glib::StockID instead?
+/** Identifiers for commonly-used tags.
+ */
 enum Tag
 {
 /** Commonly used title (string).
@@ -339,8 +343,19 @@ public:
    * @param mode The mode to use.
    * @param value The Glib::Value<> to use.
    */
-  void add(Tag tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_PREPEND);
+  void add_value(Tag tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_PREPEND);
 
+  /** Sets a GValue for the given @a tag using the specified mode.
+   *
+   * @param tag The tag name.
+   * @param mode The mode to use.
+   * @param value The Glib::Value<> to use.
+   */
+  void add_value(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode=TAG_MERGE_PREPEND);
+
+  _IGNORE(gst_tag_list_add_value)
+
+  //TODO: Doesn't this conflict with the template?
   /** Sets the value for the given tag to string @a data using the specified
    * mode.
    *
@@ -349,6 +364,15 @@ public:
    * @param mode The merge mode to use.
    */
   void add(Tag tag, const char* data, TagMergeMode mode=TAG_MERGE_PREPEND);
+
+  /** Sets the value for the given tag to string @a data using the specified
+   * mode.
+   *
+   * @param tag The tag name.
+   * @param data A string to which the tag should be set to.
+   * @param mode The merge mode to use.
+   */
+  void add(const Glib::ustring& tag, const char* data, TagMergeMode mode=TAG_MERGE_PREPEND);
 
   /** Sets the value for the given tag using the specified mode.
    *
@@ -359,6 +383,17 @@ public:
    */
   template <class DataType>
   void add(Tag tag, const DataType& data, TagMergeMode mode=TAG_MERGE_PREPEND);
+
+  /** Sets the value for the given tag using the specified mode.
+   *
+   * @param tag The tag name.
+   * @param data A value which the tag should be set to (this can be any
+   * supported C++ type).
+   * @param mode The merge mode to use.
+   */
+  template <class DataType>
+  void add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode=TAG_MERGE_PREPEND);
+
   _IGNORE(gst_tag_list_add_valist, gst_tag_list_add_valist_values)
 
 #m4begin
@@ -366,6 +401,8 @@ dnl See .ccg implementation for how this conversion works.
   _CONVERSION(`Tag', `const gchar*', `_tag_strings[$3]')
 #m4end
   _WRAP_METHOD(void remove_tag(Tag tag), gst_tag_list_remove_tag)
+
+  _WRAP_METHOD(void remove_tag(const Glib::ustring& tag), gst_tag_list_remove_tag)
 
   /** For example,
    * void on_foreach(const Glib::ustring& tag);.
@@ -388,18 +425,38 @@ dnl See .ccg implementation for how this conversion works.
    * @return true, if a value was copied, false if the tag didn't exist in the
    * list.
    */
-  bool get(Tag tag, Glib::ValueBase& dest) const;
+  bool get_value(Tag tag, Glib::ValueBase& dest) const;
+  _IGNORE(gst_tag_list_copy_value)
+
+  /** Copies the contents for the given tag into the value, merging multiple
+   * values into one if multiple values are associated with the tag.
+   *
+   * @param dest An uninitialized Glib::ValueBase to copy into.
+   * @param tag The tag to read out.
+   * @return true, if a value was copied, false if the tag didn't exist in the
+   * list.
+   */
+  bool get_value(const Glib::ustring& tag, Glib::ValueBase& dest) const;
   _IGNORE(gst_tag_list_copy_value)
 
   /** Gets the value that is at the given index for the given tag.
-
    * @param tag The tag to read out.
    * @param index Number of entry to read out.
    * @@param The Glib::ValueBase to store the value in.
    * @return true if tag was available and had right number of entries, false
    * otherwise.
    */
-  bool get(Tag tag, guint index, Glib::ValueBase& dest) const;
+  bool get_value(Tag tag, guint index, Glib::ValueBase& dest) const;
+  _IGNORE(gst_tag_list_get_value_index)
+
+  /** Gets the value that is at the given index for the given tag.
+   * @param tag The tag to read out.
+   * @param index Number of entry to read out.
+   * @@param The Glib::ValueBase to store the value in.
+   * @return true if tag was available and had right number of entries, false
+   * otherwise.
+   */
+  bool get_value(const Glib::ustring& tag, guint index, Glib::ValueBase& dest) const;
   _IGNORE(gst_tag_list_get_value_index)
 
   /** Copies the contents for the given tag into the value, merging multiple
@@ -411,6 +468,17 @@ dnl See .ccg implementation for how this conversion works.
    */
   template<class DataType>
   bool get(Tag tag, DataType& value) const;
+
+  /** Copies the contents for the given tag into the value, merging multiple
+   * values into one if multiple values are associated with the tag.
+   * @param tag The tag to read out.
+   * @param value Location for the result (this can be any supported C++ type).
+   * @return true, if a value was copied, false if the tag didn't exist in the
+   * given list.
+   */
+  template<class DataType>
+  bool get(const Glib::ustring& tag, DataType& value) const;
+
   _IGNORE(gst_tag_list_get_char,
           gst_tag_list_get_uchar,
           gst_tag_list_get_boolean,
@@ -434,6 +502,17 @@ dnl See .ccg implementation for how this conversion works.
    */
   template<class DataType>
   bool get(Tag tag, guint index, DataType& value) const;
+
+  /** Gets the value that is at the given index for the given tag.
+   * @param tag The tag to read out.
+   * @param index Number of entry to read out.
+   * @param value Location for the result (this can be any supported C++ type).
+   * @return true, if a value was copied, false if the tag didn't exist in the
+   * given list.
+   */
+  template<class DataType>
+  bool get(const Glib::ustring& tag, guint index, DataType& value) const;
+
   _IGNORE(gst_tag_list_get_char_index,
           gst_tag_list_get_uchar_index,
           gst_tag_list_get_boolean_index,
@@ -462,14 +541,37 @@ void TagList::add(Tag tag, const DataType& data, TagMergeMode mode)
   ValueType value;
   value.init(ValueType::value_type());
   value.set(data);
-  this->add(tag, (Glib::ValueBase) value, mode);
+  this->add_value(tag, value, mode);
+}
+
+template <class DataType>
+void TagList::add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode)
+{
+  typedef Glib::Value<DataType> ValueType;
+
+  ValueType value;
+  value.init(ValueType::value_type());
+  value.set(data);
+  this->add_value(tag, value, mode);
 }
 
 template<class DataType>
 bool TagList::get(Tag tag, DataType& data) const
 {
   Glib::Value<DataType> value;
-  bool result = this->get(tag, (Glib::ValueBase&) value);
+  const bool result = this->get_value(tag, value);
+
+  if(result)
+    data = value.get();
+
+  return result;
+}
+
+template<class DataType>
+bool TagList::get(const Glib::ustring& tag, DataType& data) const
+{
+  Glib::Value<DataType> value;
+  const bool result = this->get_value(tag, value);
 
   if(result)
     data = value.get();
@@ -481,7 +583,19 @@ template<class DataType>
 bool TagList::get(Tag tag, guint index, DataType& data) const
 {
   Glib::Value<DataType> value;
-  bool result = this->get(tag, index, (Glib::ValueBase&) value);
+  bool result = this->get_value(tag, index, value);
+
+  if(result)
+    data = value.get();
+
+  return result;
+}
+
+template<class DataType>
+bool TagList::get(const Glib::ustring& tag, guint index, DataType& data) const
+{
+  Glib::Value<DataType> value;
+  bool result = this->get_value(tag, index, value);
 
   if(result)
     data = value.get();

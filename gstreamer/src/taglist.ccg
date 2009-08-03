@@ -104,16 +104,26 @@ std::ostream& operator<<(std::ostream& stream, Tag tag)
   return stream;
 }
 
-void TagList::add(Tag tag, const Glib::ValueBase& value, TagMergeMode mode)
+void TagList::add_value(Tag tag, const Glib::ValueBase& value, TagMergeMode mode)
+{
+  add_value(_tag_strings[tag], value, mode);
+}
+
+void TagList::add_value(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode)
 {
   //TODO: The gst_tag_list_add_values() documentation says nothing about ending the ... with NULL.
-  gst_tag_list_add_values(gobj(), (GstTagMergeMode) mode, _tag_strings[tag],
+  gst_tag_list_add_values(gobj(), (GstTagMergeMode) mode, tag.c_str(),
     value.gobj(), (void*)0);
 }
 
 void TagList::add(Tag tag, const char* data, TagMergeMode mode)
 {
-  gst_tag_list_add(gobj(), (GstTagMergeMode) mode, _tag_strings[tag], data,
+  add(_tag_strings[tag], data, mode);
+}
+
+void TagList::add(const Glib::ustring& tag, const char* data, TagMergeMode mode)
+{
+  gst_tag_list_add(gobj(), (GstTagMergeMode) mode, tag.c_str(), data,
     (void*)0);
 }
 
@@ -124,22 +134,33 @@ void TagList::foreach(const SlotForeach& slot)
     &slot_copy);
 }
 
-bool TagList::get(Tag tag, Glib::ValueBase& dest) const
+bool TagList::get_value(Tag tag, Glib::ValueBase& dest) const
 {
-  return gst_tag_list_copy_value(dest.gobj(), const_cast<GstTagList*>(gobj()),
-    _tag_strings[tag]);
+  return get_value(_tag_strings[tag], dest);
 }
 
-bool TagList::get(Tag tag, guint index, Glib::ValueBase& value) const
+bool TagList::get_value(const Glib::ustring& tag, Glib::ValueBase& dest) const
+{
+  return gst_tag_list_copy_value(dest.gobj(), const_cast<GstTagList*>(gobj()),
+    tag.c_str());
+}
+
+bool TagList::get_value(Tag tag, guint index, Glib::ValueBase& value) const
+{
+  return get_value(_tag_strings[tag], index, value);
+}
+
+bool TagList::get_value(const Glib::ustring& tag, guint index, Glib::ValueBase& value) const
 {
   const GValue* gst_value =
     gst_tag_list_get_value_index(const_cast<GstTagList*>(gobj()),
-    _tag_strings[tag], index);
+    tag.c_str(), index);
   if(gst_value)
   {
     value.init(gst_value);
     return true;
   }
+
   return false;
 }
 
