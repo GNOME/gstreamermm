@@ -28,10 +28,6 @@ static gboolean Filter_Filter_gstreamermm_callback(void* obj, void* data)
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
     bool result = (*the_slot)(Glib::wrap((GObject*)(obj), true));
-
-    //Delete the once executing slot before returning result
-    delete the_slot;
-
     return result;
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
@@ -50,8 +46,9 @@ namespace Gst
 Glib::ListHandle< Glib::RefPtr<Glib::Object> >
 Filter::run(const Glib::ListHandle<Glib::RefPtr<Glib::Object> >& list, const SlotFilter& slot, bool first)
 {
-  SlotFilter* slot_copy = new SlotFilter(slot);
-  return Glib::ListHandle< Glib::RefPtr<Glib::Object> >(gst_filter_run(list.data(), &Filter_Filter_gstreamermm_callback, first, slot_copy), Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandle< Glib::RefPtr<Glib::Object> >(
+    gst_filter_run(list.data(), &Filter_Filter_gstreamermm_callback, first,
+    const_cast<SlotFilter*>(&slot)), Glib::OWNERSHIP_DEEP);
 }
 
 } //namespace Gst

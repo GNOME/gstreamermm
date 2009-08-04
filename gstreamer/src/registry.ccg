@@ -31,10 +31,6 @@ static gboolean Registry_Plugin_Filter_gstreamermm_callback(GstPlugin* plugin, v
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
     bool result = (*the_slot)(Glib::wrap(plugin, true));
-
-    //Delete the once executing slot before returning result
-    delete the_slot;
-
     return result;
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
@@ -56,10 +52,6 @@ static gboolean Registry_PluginFeature_Filter_gstreamermm_callback(GstPluginFeat
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
     bool result = (*the_slot)(Glib::wrap(feature, true));
-
-    //Delete the once executing slot before returning result
-    delete the_slot;
-
     return result;
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
@@ -78,8 +70,10 @@ namespace Gst
 Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >
 Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first)
 {
-  Plugin::SlotFilter* slot_copy = new Plugin::SlotFilter(filter);
-  GList* list = gst_registry_plugin_filter(gobj(), &Registry_Plugin_Filter_gstreamermm_callback, first, slot_copy);
+  GList* list = gst_registry_plugin_filter(gobj(),
+    &Registry_Plugin_Filter_gstreamermm_callback, first,
+    const_cast<Plugin::SlotFilter*>(&filter));
+
   return Glib::ListHandle< Glib::RefPtr<Gst::Plugin> >(list,
     Glib::OWNERSHIP_DEEP);
 }
@@ -87,9 +81,10 @@ Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first)
 Glib::ListHandle< Glib::RefPtr<const Gst::Plugin> >
 Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first) const
 {
-  Plugin::SlotFilter* slot_copy = new Plugin::SlotFilter(filter);
   GList* list = gst_registry_plugin_filter(const_cast<GstRegistry*>(gobj()),
-    &Registry_Plugin_Filter_gstreamermm_callback, first, slot_copy);
+    &Registry_Plugin_Filter_gstreamermm_callback, first,
+    const_cast<Plugin::SlotFilter*>(&filter));
+
   return Glib::ListHandle< Glib::RefPtr<const Gst::Plugin> >(list,
     Glib::OWNERSHIP_DEEP);
 }
@@ -97,8 +92,10 @@ Registry::get_plugin_list(const Plugin::SlotFilter& filter, bool first) const
 Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >
 Registry::get_feature_list(const PluginFeature::SlotFilter& filter, bool first)
 {
-  PluginFeature::SlotFilter* slot_copy = new PluginFeature::SlotFilter(filter);
-  GList* list = gst_registry_feature_filter(gobj(), &Registry_PluginFeature_Filter_gstreamermm_callback, first, slot_copy);
+  GList* list = gst_registry_feature_filter(gobj(),
+    &Registry_PluginFeature_Filter_gstreamermm_callback, first,
+    const_cast<PluginFeature::SlotFilter*>(&filter));
+
   return Glib::ListHandle< Glib::RefPtr<Gst::PluginFeature> >(list,
     Glib::OWNERSHIP_DEEP);
 }
@@ -107,9 +104,10 @@ Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> >
 Registry::get_feature_list(const PluginFeature::SlotFilter& filter,
   bool first) const
 {
-  PluginFeature::SlotFilter* slot_copy = new PluginFeature::SlotFilter(filter);
   GList* list = gst_registry_feature_filter(const_cast<GstRegistry*>(gobj()),
-    &Registry_PluginFeature_Filter_gstreamermm_callback, first, slot_copy);
+    &Registry_PluginFeature_Filter_gstreamermm_callback, first,
+    const_cast<PluginFeature::SlotFilter*>(&filter));
+
   return Glib::ListHandle< Glib::RefPtr<const Gst::PluginFeature> >(list,
     Glib::OWNERSHIP_DEEP);
 }

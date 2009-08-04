@@ -129,9 +129,8 @@ void TagList::add(const Glib::ustring& tag, const char* data, TagMergeMode mode)
 
 void TagList::foreach(const SlotForeach& slot)
 {
-  SlotForeach slot_copy(slot);
   gst_tag_list_foreach(gobj(), &TagList_foreach_gstreamermm_callback,
-    &slot_copy);
+    const_cast<SlotForeach*>(&slot));
 }
 
 bool TagList::get_value(Tag tag, Glib::ValueBase& dest) const
