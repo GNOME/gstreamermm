@@ -22,6 +22,16 @@
 #include <gstreamermm/value.h>
 #include <gstreamermm/miniobject.h>
 
+static Glib::ustring quark_to_ustring(GQuark quark)
+{
+ const gchar* pch = g_quark_to_string(quark);
+ Glib::ustring str;
+ if(pch)
+   str = pch;
+   
+ return str;
+}
+
 static gboolean
 Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, void* data)
 {
@@ -31,9 +41,7 @@ Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, voi
   try
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
-    bool result = (*slot)(field_id, *reinterpret_cast<const Glib::ValueBase*>(value));
-    delete slot;
-    return result;
+    return (*slot)(quark_to_ustring(field_id), *reinterpret_cast<const Glib::ValueBase*>(value));
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
@@ -54,7 +62,7 @@ Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, void* data)
   try
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
-    bool result = (*slot)(field_id, *reinterpret_cast<Glib::ValueBase*>(value));
+    bool result = (*slot)(quark_to_ustring(field_id), *reinterpret_cast<Glib::ValueBase*>(value));
     delete slot;
     return result;
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -405,14 +413,14 @@ bool Structure::get_field(const Glib::ustring& name, Gst::FractionRange& range) 
 
 bool Structure::foreach(const SlotForeach& slot)
 {
-  SlotForeach* slot_copy = new SlotForeach(slot);
-  return gst_structure_foreach(gobj(), &Structure_Foreach_gstreamermm_callback, slot_copy);
+  SlotForeach slot_copy(slot); //TODO: Can't we just use slot directly?
+  return gst_structure_foreach(gobj(), &Structure_Foreach_gstreamermm_callback, &slot_copy);
 }
 
 bool Structure::map_in_place(const SlotMap& slot)
 {
-  SlotMap* slot_copy = new SlotMap(slot);
-  return gst_structure_map_in_place(gobj(), &Structure_Map_gstreamermm_callback, slot_copy);
+  SlotMap slot_copy = SlotMap(slot); //TODO: Can't we just use slot directly?
+  return gst_structure_map_in_place(gobj(), &Structure_Map_gstreamermm_callback, &slot_copy);
 }
 
 Structure Structure::create_from_string(const Glib::ustring& the_string)
