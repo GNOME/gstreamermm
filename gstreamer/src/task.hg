@@ -27,6 +27,8 @@ namespace Gst
 
 _WRAP_ENUM(TaskState, GstTaskState)
 
+class TaskPool;
+
 /** Gst::Task - Abstraction of GStreamer streaming threads.
  * Gst::Task is used by Gst::Element and Gst::Pad to provide the data passing
  * threads in a Gst::Pipeline.
@@ -69,6 +71,20 @@ public:
    */
   typedef sigc::slot<void> SlotTask;
 
+  /** For example,
+   * void on_enter(const Glib::RefPtr<Gst::Task>& task, Glib::Thread& thread);
+   * A thread is entered, this slot is called when the new thread enters its
+   * function.
+   */
+  typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&, Glib::Thread*> SlotEnter;
+
+  /** For example,
+   * void on_leave(const Glib::RefPtr<Gst::Task>& task, Glib::Thread& thread);
+   * A thread is exiting, this is called when the thread is about to leave its
+   * function.
+   */
+    typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&, Glib::Thread*> SlotLeave;
+
 protected:
   Task(const SlotTask& task_slot);
 
@@ -84,13 +100,38 @@ public:
    */
   _WRAP_CREATE(const SlotTask& task_slot)
 
-  _WRAP_METHOD(static void cleanup_all(), gst_task_cleanup_all)
-  _WRAP_METHOD(TaskState get_state() const, gst_task_get_state)
-  _WRAP_METHOD(bool join(), gst_task_join)
-  _WRAP_METHOD(bool pause(), gst_task_pause)
   _WRAP_METHOD(void set_lock(Glib::StaticRecMutex& mutex), gst_task_set_lock)
+  _WRAP_METHOD(void set_priority(Glib::ThreadPriority priority), gst_task_set_priority)
+  _WRAP_METHOD(void set_pool(const Glib::RefPtr<Gst::TaskPool>& pool), gst_task_set_pool)
+  _WRAP_METHOD(Glib::RefPtr<Gst::TaskPool> get_pool(), gst_task_get_pool)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::TaskPool> get_pool() const, gst_task_get_pool)
+
+  /** Set slots which will be executed when a new thread is needed, the thread
+   * function is entered and left and when the thread is joined.
+   *
+   * By default a thread for task will be created from a default thread pool.
+   *
+   * Objects can use custom Glib::Thread or can perform additional
+   * configuration of the threads (such as changing the thread priority) by
+   * installing slot.
+   *
+   * MT safe.
+   *
+   * @param enter_slot A SlotEnter slot.
+   * @param leave_slot A SlotLeave slot.
+   *
+   * Since 0.10.24.
+   */
+  void set_thread_slots(const SlotEnter& enter_slot, const SlotLeave& leave_slot);
+  _IGNORE(gst_task_set_thread_callbacks)
+
+  _WRAP_METHOD(TaskState get_state() const, gst_task_get_state)
+  _WRAP_METHOD(void set_state(Gst::TaskState state), gst_task_set_state)
+  _WRAP_METHOD(bool pause(), gst_task_pause)
   _WRAP_METHOD(bool start(), gst_task_start)
   _WRAP_METHOD(bool stop(), gst_task_stop)
+  _WRAP_METHOD(bool join(), gst_task_join)
+  _WRAP_METHOD(static void cleanup_all(), gst_task_cleanup_all)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:

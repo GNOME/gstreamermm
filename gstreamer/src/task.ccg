@@ -18,7 +18,16 @@
  */
 
 #include <gst/gstenumtypes.h>
+#include <gstreamermm/taskpool.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
+
+// Used in set_thread_slots() method to set the slots.
+struct TaskThreadCallbacks
+{
+  GstTaskThreadCallbacks gst_task_thread_callbacks;
+  Gst::Task::SlotEnter* slot_enter;
+  Gst::Task::SlotLeave* slot_leave;
+};
 
 static void Task_Task_gstreamermm_callback(void* data)
 {
@@ -36,6 +45,52 @@ static void Task_Task_gstreamermm_callback(void* data)
     Glib::exception_handlers_invoke();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void Task_Enter_gstreamermm_callback(GstTask* task, GThread* thread, gpointer user_data)
+{
+  TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(user_data);
+  Gst::Task::SlotEnter* the_slot = callbacks->slot_enter;
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*the_slot)(Glib::wrap(task, true), Glib::wrap(thread));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void Task_Leave_gstreamermm_callback(GstTask *task, GThread *thread, gpointer user_data)
+{
+  TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(user_data);
+  Gst::Task::SlotLeave* the_slot = callbacks->slot_leave;
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    (*the_slot)(Glib::wrap(task, true), Glib::wrap(thread));
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+static void Task_Callbacks_gstreamermm_callback_destroy(void* data)
+{
+  TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(data);
+  delete callbacks->slot_enter;
+  delete callbacks->slot_leave;
+  delete callbacks;
 }
 
 namespace Gst
@@ -68,6 +123,25 @@ Task::Task(const SlotTask& task_slot)
   // g_object_new().
   gobj()->func = &Task_Task_gstreamermm_callback;
   gobj()->data = &slot;
+}
+
+void Task::set_thread_slots(const SlotEnter& enter_slot,
+  const SlotLeave& leave_slot)
+{
+  TaskThreadCallbacks* callbacks = new TaskThreadCallbacks;
+
+  callbacks->gst_task_thread_callbacks.enter_thread =
+    &Task_Enter_gstreamermm_callback;
+
+  callbacks->gst_task_thread_callbacks.leave_thread =
+    &Task_Leave_gstreamermm_callback;
+
+  callbacks->slot_enter = new SlotEnter(enter_slot);
+  callbacks->slot_leave = new SlotLeave(leave_slot);
+
+  gst_task_set_thread_callbacks(gobj(),
+    reinterpret_cast<GstTaskThreadCallbacks*>(callbacks), callbacks,
+    &Task_Callbacks_gstreamermm_callback_destroy);
 }
 
 Task::~Task()

@@ -36,6 +36,10 @@ _CONV_ENUM(Gst,TaskState)
 _CONV_ENUM(Gst,TunerChannelFlags)
 _CONV_ENUM(Gst,URIType)
 
+#Glibmm Enums
+_CONV_GLIB_ENUM(ThreadPriority)
+
+
 ############### gstreamermm Class Conversions ######################
 
 #Buffer
@@ -161,6 +165,11 @@ _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')
 _CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap($3, 0)')
 _CONVERSION(`Gst::TagList&',`GstTagList*',`$3.gobj()')
 _CONVERSION(`Gst::TagList',`GstTagList*',`$3.gobj()')
+
+#TaskPool
+_CONVERSION(`const Glib::RefPtr<Gst::TaskPool>&',`GstTaskPool*', `Glib::unwrap($3)')
+_CONVERSION(`GstTaskPool*',`Glib::RefPtr<Gst::TaskPool>',`Glib::wrap($3)')
+_CONVERSION(`GstTaskPool*',`Glib::RefPtr<const Gst::TaskPool>',`Glib::wrap($3)')
 
 #TypeFind
 _CONVERSION(`Gst::TypeFind&',`GstTypeFind*',`$3.gobj()')
