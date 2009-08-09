@@ -79,6 +79,9 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin,
   m_open_button.signal_clicked().connect(sigc::mem_fun(*this,
                       &PlayerWindow::on_button_open));
 
+  m_video_area.signal_realize().connect(sigc::mem_fun(*this,
+                      &PlayerWindow::on_video_area_realize));
+
   // Get the bus from the pipeline:
   Glib::RefPtr<Gst::Bus> bus = playbin->get_bus();
 
@@ -109,7 +112,17 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin,
   m_pause_button.hide();
 }
 
-// This function is used to receive asynchronous messages from mainPipeline's bus
+void PlayerWindow::on_video_area_realize()
+{
+  // When the video area (the drawing area) is realized, Get its X Window
+  // ID and save it for when the Gst::XOverlay is ready to accept an ID in
+  // which to draw the video.
+  x_window_id = GDK_WINDOW_XID(m_video_area.get_window()->gobj());
+}
+
+// This function is used to receive asynchronous messages from mainPipeline's
+// bus specifically to prepare the Gst::XOverlay to draw inside the window
+// in which we want it to draw to.
 void PlayerWindow::on_bus_message_sync(
     const Glib::RefPtr<Gst::Message>& message)
 {
@@ -128,8 +141,7 @@ void PlayerWindow::on_bus_message_sync(
 
   if(xoverlay)
   {
-    const gulong xWindowId = GDK_WINDOW_XID(m_video_area.get_window()->gobj());
-    xoverlay->set_xwindow_id(xWindowId);
+    xoverlay->set_xwindow_id(x_window_id);
   }
 }
 
@@ -362,7 +374,7 @@ void PlayerWindow::on_button_open()
 #ifdef GLIBMM_PROPERTIES_ENABLED
     m_play_bin->property_uri() = chooser.get_uri();
 #else
-    m_play_bin->set_property("property_uri", chooser.get_uri());
+    m_play_bin->set_property("uri", chooser.get_uri());
 #endif
 
     // Resize m_video_area and window to minimum when opening a file

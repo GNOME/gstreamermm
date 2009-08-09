@@ -44,6 +44,7 @@ public:
 protected:
 
   //Signal handlers:
+  void on_video_area_realize();
   void on_bus_message_sync(const Glib::RefPtr<Gst::Message>& message);
   bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
   bool on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad, const Glib::RefPtr<Gst::MiniObject>& buffer);
@@ -77,6 +78,7 @@ protected:
   sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;
+  gulong x_window_id;
   gulong m_pad_probe_id;
 };
 
