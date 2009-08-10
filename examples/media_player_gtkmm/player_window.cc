@@ -121,7 +121,7 @@ void PlayerWindow::on_video_area_realize()
 }
 
 // This function is used to receive asynchronous messages from mainPipeline's
-// bus specifically to prepare the Gst::XOverlay to draw inside the window
+// bus, specifically to prepare the Gst::XOverlay to draw inside the window
 // in which we want it to draw to.
 void PlayerWindow::on_bus_message_sync(
     const Glib::RefPtr<Gst::Message>& message)
@@ -185,7 +185,8 @@ bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
 {
   Glib::RefPtr<Gst::Buffer> buffer = Glib::RefPtr<Gst::Buffer>::cast_dynamic(data);
 
-  if(buffer) {
+  if(buffer)
+  {
     int width_value;
     int height_value;
 
@@ -310,7 +311,8 @@ void PlayerWindow::on_button_rewind()
   {
     gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
 
-    if(m_play_bin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos)) {
+    if(m_play_bin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+    {
       m_progress_scale.set_value(double(newPos) / m_duration);
       display_label_progress(newPos, m_duration);
     }
