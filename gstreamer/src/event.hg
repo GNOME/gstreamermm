@@ -537,7 +537,7 @@ public:
    * @param latency The new latency value.
    * @return A new Gst::EventLatency.
    *
-   * Since 0.10.12 
+   * Since 0.10.12.
    */
   static Glib::RefPtr<Gst::Event> create(ClockTime latency);
 
@@ -547,6 +547,52 @@ public:
    */
   void parse(ClockTime& latency) const;
   _IGNORE(gst_event_parse_latency)
+};
+
+/** A step event.  See create() for more details.
+ */
+class EventStep : public Event
+{
+public:
+  explicit EventStep(GstEvent* event);
+
+  /** Create a new step event. The purpose of the step event is to instruct a
+   * sink to skip @a amount (expressed in @a format) of media. It can be used
+   * to implement stepping through the video frame by frame or for doing fast
+   * trick modes.
+   *
+   * A rate of <= 0.0 is not allowed, pause the pipeline or reverse the
+   * playback direction of the pipeline to get the same effect.
+   *
+   * The @a flush flag will clear any pending data in the pipeline before
+   * starting the step operation.
+   *
+   * The @a intermediate flag instructs the pipeline that this step operation
+   * is part of a larger step operation.
+   *
+   * @param format The format of amount.
+   * @param amount The amount of data to step.
+   * @param rate The step rate.
+   * @param flush Flushing steps.
+   * @param intermediate Intermediate steps.
+   * @return A new Gst::Event.
+   *
+   * Since 0.10.24.
+   */
+  static Glib::RefPtr<Gst::Event> create(Gst::Format format, guint64 amount,
+    double rate, bool flush, bool intermediate);
+
+  /** Parse the step event.
+   *
+   * @param format A reference to store the format in.
+   * @param amount A reference to store the amount in.
+   * @param rate A reference to store the rate in.
+   * @param flush A reference to store the flush boolean in.
+   * @param intermediate A reference to store the intermediate boolean in.
+   */
+  void parse(Gst::Format& format, guint64& amount, double& rate,
+    bool& flush, bool& intermediate) const;
+  _IGNORE(gst_event_parse_step)
 };
 
 } //namespace Gst

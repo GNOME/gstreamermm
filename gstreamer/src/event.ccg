@@ -207,15 +207,40 @@ EventLatency::EventLatency(GstEvent* castitem) :
 Event(castitem)
 {}
 
+Glib::RefPtr<Gst::Event> EventLatency::create(ClockTime time)
+{
+  GstEvent* event = gst_event_new_latency(GstClockTime(time));
+  return Gst::Event::wrap(event, false);
+}
+
 void EventLatency::parse(ClockTime& latency) const
 {
   gst_event_parse_latency(const_cast<GstEvent*>(gobj()), &latency);
 }
 
-Glib::RefPtr<Gst::Event> EventLatency::create(ClockTime time)
+EventStep::EventStep(GstEvent* castitem) :
+Event(castitem)
+{}
+
+Glib::RefPtr<Gst::Event> EventStep::create(Gst::Format format, guint64 amount,
+  double rate, bool flush, bool intermediate)
 {
-  GstEvent* event = gst_event_new_latency(GstClockTime(time));
+  GstEvent* event = gst_event_new_step((GstFormat)(format), amount, rate,
+    flush, intermediate);
   return Gst::Event::wrap(event, false);
+}
+
+void EventStep::parse(Gst::Format& format, guint64& amount, double& rate,
+  bool& flush, bool& intermediate) const
+{
+  gboolean gst_flush = FALSE;
+  gboolean gst_intermediate = FALSE;
+
+  gst_event_parse_step(const_cast<GstEvent*>(gobj()), (GstFormat*)(&format),
+    &amount, &rate, &gst_flush, &gst_intermediate);
+
+  flush = gst_flush;
+  intermediate = gst_intermediate;
 }
 
 Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)
@@ -256,6 +281,9 @@ Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)
       break;
     case GST_EVENT_LATENCY:
       result = Glib::RefPtr<Gst::Event>( new Gst::EventLatency(event) );
+      break;
+    case GST_EVENT_STEP:
+      result = Glib::RefPtr<Gst::Event>( new Gst::EventStep(event) );
       break;
     default:
       result = Gst::wrap(event, false);
