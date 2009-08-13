@@ -105,24 +105,71 @@ EventNewSegment::EventNewSegment(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventNewSegment::create(bool update, double rate, Format format, gint64 start, gint64 stop, gint64 position, double applied_rate)
+Glib::RefPtr<Gst::Event> EventNewSegment::create(bool update, double rate,
+  Format format, gint64 start, gint64 stop, gint64 position,
+  double applied_rate)
 {
-  GstEvent* event = gst_event_new_new_segment_full(update, rate, applied_rate, GstFormat(format), start, stop, position);
+  GstEvent* event = gst_event_new_new_segment_full(update, rate, applied_rate,
+    GstFormat(format), start, stop, position);
   return Gst::Event::wrap(event, false);
 }
 
-void EventNewSegment::parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position) const
+void EventNewSegment::parse(bool& update, double& rate, Format& format,
+  gint64& start, gint64& stop, gint64& position) const
 {
-  gboolean result = FALSE;
-  gst_event_parse_new_segment(const_cast<GstEvent*>(gobj()), &result, &rate, (GstFormat*)&format, &start, &stop, &position);
-  update = result;
+  gboolean gst_update = FALSE;
+  gst_event_parse_new_segment(const_cast<GstEvent*>(gobj()), &gst_update,
+    &rate, (GstFormat*)&format, &start, &stop, &position);
+  update = gst_update;
 }
 
-void EventNewSegment::parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate) const
+void EventNewSegment::parse(bool& update, double& rate, Format& format,
+  gint64& start, gint64& stop, gint64& position, double& applied_rate) const
 {
-  gboolean result = FALSE;
-  gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), &result, &rate, &applied_rate, (GstFormat*)&format, &start, &stop, &position);
-  update = result;
+  gboolean gst_update = FALSE;
+  gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), &gst_update,
+    &rate, &applied_rate, (GstFormat*)&format, &start, &stop, &position);
+  update = gst_update;
+}
+
+gint64 EventNewSegment::parse() const
+{
+  gint64 gst_position = 0;
+  gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), 0, 0, 0, 0,
+    0, 0, &gst_position);
+  return gst_position;
+}
+
+bool EventNewSegment::parse_update() const
+{
+  gboolean gst_update = FALSE;
+  gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), &gst_update,
+    0, 0, 0, 0, 0, 0);
+  return gst_update;
+}
+
+double EventNewSegment::parse_rate() const
+{
+  double gst_rate = 0;
+  gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), 0, &gst_rate,
+    0, 0, 0, 0, 0);
+  return gst_rate;
+}
+
+Gst::Format EventNewSegment::parse_format() const
+{
+  GstFormat gst_format = GST_FORMAT_UNDEFINED;
+  gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), 0, 0, 0,
+    &gst_format, 0, 0, 0);
+  return (Gst::Format)(gst_format);
+}
+
+double EventNewSegment::parse_applied_rate() const
+{
+  double gst_applied_rate = 0;
+  gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), 0, 0,
+    &gst_applied_rate, 0, 0, 0, 0);
+  return gst_applied_rate;
 }
 
 EventTag::EventTag(GstEvent* castitem) :
@@ -148,47 +195,171 @@ EventBufferSize::EventBufferSize(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize, bool async)
+Glib::RefPtr<Gst::Event> EventBufferSize::create(Format format, gint64 minsize,
+  gint64 maxsize, bool async)
 {
-  GstEvent* event = gst_event_new_buffer_size(GstFormat(format), minsize, maxsize, async);
+  GstEvent* event = gst_event_new_buffer_size(GstFormat(format), minsize,
+    maxsize, async);
   return Gst::Event::wrap(event, false);
 }
 
-void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize, bool& async) const
+void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize,
+  bool& async) const
 {
-  gboolean result = FALSE;
-  gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()), (GstFormat*)&format, &minsize, &maxsize, &result);
-  async = result;
+  gboolean gst_async = FALSE;
+  gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()),
+    (GstFormat*)&format, &minsize, &maxsize, &gst_async);
+  async = gst_async;
+}
+
+gint64 EventBufferSize::parse() const
+{
+  gint64 gst_minsize = 0;
+  gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()), 0, &gst_minsize,
+    0, 0);
+  return gst_minsize;
+}
+
+Gst::Format EventBufferSize::parse_format() const
+{
+  GstFormat gst_format = GST_FORMAT_UNDEFINED;
+  gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()),
+    (GstFormat*)(&gst_format), 0, 0, 0);
+  return (Gst::Format)(gst_format);
+}
+
+gint64 EventBufferSize::parse_max_size() const
+{
+  gint64 gst_maxsize = 0;
+  gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()), 0, 0,
+    &gst_maxsize, 0);
+  return gst_maxsize;
+}
+
+bool EventBufferSize::parse_async() const
+{
+  gboolean gst_async = FALSE;
+  gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()), 0, 0, 0, &gst_async);
+  return gst_async;
 }
 
 EventQos::EventQos(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventQos::create(double proportion, ClockTimeDiff diff, ClockTime timestamp)
+Glib::RefPtr<Gst::Event> EventQos::create(double proportion,
+  ClockTimeDiff diff, ClockTime timestamp)
 {
-  GstEvent* event = gst_event_new_qos(proportion, GstClockTimeDiff(diff), GstClockTime(timestamp));
+  GstEvent* event = gst_event_new_qos(proportion, GstClockTimeDiff(diff),
+    GstClockTime(timestamp));
   return Gst::Event::wrap(event, false);
 }
 
-void EventQos::parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp) const
+void EventQos::parse(double& proportion, ClockTimeDiff& diff,
+  ClockTime& timestamp) const
 {
-  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), &proportion, &diff, &timestamp);
+  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), &proportion, &diff,
+    &timestamp);
+}
+
+double EventQos::parse() const
+{
+  double gst_proportion = 0;
+  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), &gst_proportion, 0, 0);
+  return gst_proportion;
+}
+
+Gst::ClockTimeDiff EventQos::parse_diff() const
+{
+  GstClockTimeDiff gst_diff = 0;
+  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), 0, &gst_diff, 0);
+  return gst_diff;
+}
+
+Gst::ClockTime EventQos::parse_timestamp() const
+{
+  GstClockTime gst_timestamp = 0;
+  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), 0, 0, &gst_timestamp);
+  return gst_timestamp;
 }
 
 EventSeek::EventSeek(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventSeek::create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop)
+Glib::RefPtr<Gst::Event> EventSeek::create(double rate, Format format,
+  SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type,
+  gint64 stop)
 {
-  GstEvent* event = gst_event_new_seek(rate, GstFormat(format), GstSeekFlags(flags), GstSeekType(start_type), start, GstSeekType(stop_type), stop);
+  GstEvent* event = gst_event_new_seek(rate, GstFormat(format),
+    GstSeekFlags(flags), GstSeekType(start_type), start,
+    GstSeekType(stop_type), stop);
+
   return Gst::Event::wrap(event, false);
 }
 
-void EventSeek::parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop) const
+void EventSeek::parse(double& rate, Format& format, SeekFlags& flags,
+  SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop) const
 {
-  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), &rate, (GstFormat*)&format, (GstSeekFlags*)&flags, (GstSeekType*)&start_type, &start, (GstSeekType*)&stop_type, &stop);
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), &rate,
+    (GstFormat*)&format, (GstSeekFlags*)&flags, (GstSeekType*)&start_type,
+    &start, (GstSeekType*)&stop_type, &stop);
+}
+
+gint64 EventSeek::parse() const
+{
+  gint64 gst_start = 0;
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, 0, 0, &gst_start,
+    0, 0);
+  return gst_start;
+}
+
+double EventSeek::parse_rate() const
+{
+  double gst_rate = 0;
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), &gst_rate, 0, 0, 0, 0,
+    0, 0);
+  return gst_rate;
+}
+
+Gst::Format EventSeek::parse_format() const
+{
+  GstFormat gst_format = GST_FORMAT_UNDEFINED;
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, &gst_format, 0, 0, 0,
+    0, 0);
+  return (Gst::Format)(gst_format);
+}
+
+Gst::SeekFlags EventSeek::parse_flags() const
+{
+  GstSeekFlags gst_flags = GST_SEEK_FLAG_NONE;
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, &gst_flags, 0, 0,
+    0, 0);
+  return (Gst::SeekFlags)(gst_flags);
+}
+
+Gst::SeekType EventSeek::parse_start_type() const
+{
+  GstSeekType gst_type = GST_SEEK_TYPE_NONE;
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, 0, &gst_type, 0,
+    0, 0);
+  return (Gst::SeekType)(gst_type);
+}
+
+Gst::SeekType EventSeek::parse_stop_type() const
+{
+  GstSeekType gst_type = GST_SEEK_TYPE_NONE;
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, 0, 0, 0, &gst_type,
+    0);
+  return (Gst::SeekType)(gst_type);
+}
+
+gint64 EventSeek::parse_stop() const
+{
+  gint64 gst_stop = 0;
+  gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, 0, 0, 0, 0,
+    &gst_stop);
+  return gst_stop;
 }
 
 EventNavigation::EventNavigation(GstEvent* castitem) :
@@ -213,9 +384,11 @@ Glib::RefPtr<Gst::Event> EventLatency::create(ClockTime time)
   return Gst::Event::wrap(event, false);
 }
 
-void EventLatency::parse(ClockTime& latency) const
+ClockTime EventLatency::parse() const
 {
-  gst_event_parse_latency(const_cast<GstEvent*>(gobj()), &latency);
+  GstClockTime gst_latency = 0;
+  gst_event_parse_latency(const_cast<GstEvent*>(gobj()), &gst_latency);
+  return gst_latency;
 }
 
 EventStep::EventStep(GstEvent* castitem) :
@@ -241,6 +414,42 @@ void EventStep::parse(Gst::Format& format, guint64& amount, double& rate,
 
   flush = gst_flush;
   intermediate = gst_intermediate;
+}
+
+guint64 EventStep::parse() const
+{
+  guint64 gst_amount = 0;
+  gst_event_parse_step(const_cast<GstEvent*>(gobj()), 0, &gst_amount, 0, 0, 0);
+  return gst_amount;
+}
+
+Gst::Format EventStep::parse_format() const
+{
+  GstFormat gst_format = GST_FORMAT_UNDEFINED;
+  gst_event_parse_step(const_cast<GstEvent*>(gobj()), &gst_format, 0, 0, 0, 0);
+  return (Gst::Format)(gst_format);
+}
+
+double EventStep::parse_rate() const
+{
+  double gst_rate = 0;
+  gst_event_parse_step(const_cast<GstEvent*>(gobj()), 0, 0, &gst_rate, 0, 0);
+  return gst_rate;
+}
+
+bool EventStep::parse_flush() const
+{
+  gboolean gst_flush = FALSE;
+  gst_event_parse_step(const_cast<GstEvent*>(gobj()), 0, 0, 0, &gst_flush, 0);
+  return gst_flush;
+}
+
+bool EventStep::parse_intermediate() const
+{
+  gboolean gst_intermediate = FALSE;
+  gst_event_parse_step(const_cast<GstEvent*>(gobj()), 0, 0, 0, 0,
+    &gst_intermediate);
+  return gst_intermediate;
 }
 
 Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)

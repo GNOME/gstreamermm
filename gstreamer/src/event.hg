@@ -143,7 +143,7 @@ public:
 
   /** Checks if an event is writable.  If not, a writable copy is made and
    * returned.
-   * @return A Gst::Event (possibly the same pointer) that is writable. 
+   * @return A Gst::Event (possibly the same reference) that is writable. 
    */
   Glib::RefPtr<Gst::Event> create_writable();
 
@@ -300,36 +300,103 @@ public:
    *
    * Since 0.10.6
    */
-  static Glib::RefPtr<Gst::Event> create(bool update, double rate, Format format, gint64 strat, gint64 stop, gint64 position, double applied_rate=1.0);
+  static Glib::RefPtr<Gst::Event> create(bool update, double rate,
+    Format format, gint64 strat, gint64 stop, gint64 position,
+    double applied_rate=1.0);
 
   /** Get the update flag, rate, format, start, stop and position in the
    * newsegment event.
    *
-   * @param update A pointer to the update flag of the segment.
-   * @param rate A pointer to the rate of the segment.
-   * @param format A pointer to the format of the newsegment values.
-   * @param start A pointer to store the start value in.
-   * @param stop A pointer to store the stop value in.
-   * @param position A pointer to store the stream time in.
+   * @param update A reference to store the update flag of the segment.
+   * @param rate A reference to store the rate of the segment.
+   * @param format A reference to store the format of the newsegment values.
+   * @param start A reference to store the start value in.
+   * @param stop A reference to store the stop value in.
+   * @param position A reference to store the stream time in.
    */
-  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position) const;
+  void parse(bool& update, double& rate, Format& format, gint64& start,
+    gint64& stop, gint64& position) const;
+  _IGNORE(gst_event_parse_new_segment)
 
   /** Get the update, rate, format, start, stop, position and applied_rate in
    * the newsegment event. See create() for a full description of the
    * newsegment event.
    *
-   * @param update A pointer to the update flag of the segment.
-   * @param rate A pointer to the rate of the segment.
-   * @param format A pointer to the format of the newsegment values.
-   * @param start A pointer to store the start value in.
-   * @param stop A pointer to store the stop value in.
-   * @param position A pointer to store the stream time in.
-   * @param applied_rate A pointer to the applied_rate of the segment.
+   * @param update A reference to store the update flag of the segment.
+   * @param rate A reference to store the rate of the segment.
+   * @param format A reference to store the format of the newsegment values.
+   * @param start A reference to store the start value in.
+   * @param stop A reference to store the stop value in.
+   * @param position A reference to store the stream time in.
+   * @param applied_rate A reference to store the applied_rate of the segment.
    *
-   * Since 0.10.6 
+   * Since 0.10.6.
    */
-  void parse(bool& update, double& rate, Format& format, gint64& start, gint64& stop, gint64& position, double& applied_rate) const;
-  _IGNORE(gst_event_parse_new_segment, gst_event_parse_new_segment_full)
+  void parse(bool& update, double& rate, Format& format, gint64& start,
+    gint64& stop, gint64& position, double& applied_rate) const;
+  _IGNORE(gst_event_parse_new_segment_full)
+
+  /** Get the position in the newsegment event. See create() for a full
+   * description of the newsegment event.
+   * @return The position.
+   *
+   * Since 0.10.6.
+   */
+  gint64 parse() const;
+
+  /** Get the update in the newsegment event. See create() for a full
+   * description of the newsegment event.
+   *
+   * @return The update.
+   *
+   * Since 0.10.6.
+   */
+  bool parse_update() const;
+
+  /** Get the rate in the newsegment event. See create() for a full description
+   * of the newsegment event.
+   *
+   * @return The rate.
+   *
+   * Since 0.10.6.
+   */
+  double parse_rate() const;
+
+  /** Get the format in the newsegment event. See create() for a full
+   * description of the newsegment event.
+   *
+   * @return The format.
+   *
+   * Since 0.10.6.
+   */
+  Format parse_format() const;
+
+  /** Get the start in the newsegment event. See create() for a full
+   * description of the newsegment event.
+   *
+   * @return The start.
+   *
+   * Since 0.10.6.
+   */
+  gint64 parse_start() const;
+
+  /** Get the stop in the newsegment event. See create() for a full description
+   * of the newsegment event.
+   *
+   * @return The stop.
+   *
+   * Since 0.10.6.
+   */
+  gint64 parse_stop() const;
+
+  /** Get the applied_rate in the newsegment event. See create() for a full
+   * description of the newsegment event.
+   *
+   * @return The applied rate.
+   *
+   * Since 0.10.6.
+   */
+  double parse_applied_rate() const;
 };
 
 /** A tag event.
@@ -370,17 +437,43 @@ public:
    * @param async Thread behavior.
    * @return A new Gst::EventBufferSize.
    */
-  static Glib::RefPtr<Gst::Event> create(Format format, gint64 minsize, gint64 maxsize, bool async);
+  static Glib::RefPtr<Gst::Event> create(Format format, gint64 minsize,
+    gint64 maxsize, bool async);
 
   /** Get the format, minsize, maxsize and async-flag in the buffersize event.
    *
-   * @param format A pointer to store the format in.
-   * @param minsize A pointer to store the minsize in.
-   * @param maxsize A pointer to store the maxsize in.
-   * @param async A pointer to store the async-flag in.
+   * @param format A reference to store the format in.
+   * @param minsize A reference to store the minsize in.
+   * @param maxsize A reference to store the maxsize in.
+   * @param async A reference to store the async-flag in.
    */
-  void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async) const;
+  void parse(Format& format, gint64& minsize, gint64& maxsize, bool& async)
+    const;
   _IGNORE(gst_event_parse_buffer_size)
+
+  /** Get the minsize in the buffersize event.
+   *
+   * @return The mininum size.
+   */
+  gint64 parse() const;
+
+  /** Get the format, in the buffersize event.
+   *
+   * @return The format.
+   */
+  Gst::Format parse_format() const;
+
+  /** Get the maxsize in the buffersize event.
+   *
+   * @return The maximum size.
+   */
+  gint64 parse_max_size() const;
+
+  /** Get the async-flag in the buffersize event.
+   *
+   * @return The async flag.
+   */
+  bool parse_async() const;
 };
 
 /** A QOS event.  See create() for more details.
@@ -427,17 +520,38 @@ public:
    * @param timestamp The timestamp of the buffer.
    * @return A new QOS event.
    */
-  static Glib::RefPtr<Gst::Event> create(double proportion, ClockTimeDiff diff, ClockTime timestamp);
+  static Glib::RefPtr<Gst::Event> create(double proportion,
+    ClockTimeDiff diff, ClockTime timestamp);
 
   /** Get the proportion, diff and timestamp in the qos event. See create() for
    * more information about the different QoS values.
    *
-   * @param proportion A pointer to store the proportion in.
-   * @param diff A pointer to store the diff in.
-   * @param timestamp A pointer to store the timestamp in.
+   * @param proportion A reference to store the proportion in.
+   * @param diff A reference to store the diff in.
+   * @param timestamp A reference to store the timestamp in.
    */
   void parse(double& proportion, ClockTimeDiff& diff, ClockTime& timestamp) const;
   _IGNORE(gst_event_parse_qos)
+
+  /** Get the proportion in the qos event. See create() for more information
+   * about the different QoS values.
+   *
+   * @return The proportion.
+   */
+  double parse() const;
+
+  /** Get the diff in the qos event. See create() for more information about
+   * the different QoS values.
+   *
+   * @return The difference.
+   */
+  ClockTimeDiff parse_diff() const;
+
+  /** Get the timestamp in the qos event. See create() for more information
+   * about the different QoS values.
+   * @return The timestamp.
+   */
+  ClockTime parse_timestamp() const;
 };
 
 /** A seek event.  See create() for more details.
@@ -487,7 +601,9 @@ public:
    * @param stop The value of the new stop position.
    * @return A new seek event.
    */
-  static Glib::RefPtr<Gst::Event> create(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop);
+  static Glib::RefPtr<Gst::Event> create(double rate, Format format,
+    SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type,
+    gint64 stop);
 
   /** Parses a seek event and stores the results in the given result locations.
    *
@@ -501,8 +617,45 @@ public:
    * position.
    * @param stop Result location for the stop postion expressed in format.
    */
-  void parse(double& rate, Format& format, SeekFlags& flags, SeekType& start_type, gint64& start, SeekType& stop_type, gint64& stop) const;
+  void parse(double& rate, Format& format, SeekFlags& flags,
+    SeekType& start_type, gint64& start, SeekType& stop_type,
+    gint64& stop) const;
   _IGNORE(gst_event_parse_seek)
+
+  /** Parses the start of a seek event.
+   * @return The start.
+   */
+  gint64 parse() const;
+
+  /** Parses the rate of a seek event.
+   * @return The rate.
+   */
+  double parse_rate() const;
+
+  /** Parses the format of a seek event.
+   * @return The format.
+   */
+  Format parse_format() const;
+
+  /** Parses the flags of a seek event.
+   * @return The flags.
+   */
+  SeekFlags parse_flags() const;
+
+  /** Parses the start type of a seek event.
+   * @return The start type.
+   */
+  SeekType parse_start_type() const;
+
+  /** Parses the stop type of a seek event.
+   * @return The stop type.
+   */
+  SeekType parse_stop_type() const;
+
+  /** Parses the stop of a seek event.
+   * @param The stop.
+   */
+  gint64 parse_stop() const;
 };
 
 /** A Navigation event.  See create() for more details.
@@ -543,9 +696,9 @@ public:
 
   /** Get the latency in the latency event.
    *
-   * @param latency A pointer to store the latency in. 
+   * @return The latency. 
    */
-  void parse(ClockTime& latency) const;
+  ClockTime parse() const;
   _IGNORE(gst_event_parse_latency)
 };
 
@@ -593,6 +746,31 @@ public:
   void parse(Gst::Format& format, guint64& amount, double& rate,
     bool& flush, bool& intermediate) const;
   _IGNORE(gst_event_parse_step)
+
+  /** Get the amount in a step event.
+   * @return The amount.
+   */
+  guint64 parse() const;
+
+  /** Get the format in a step event.
+   * @return The format.
+   */
+  Gst::Format parse_format() const;
+
+  /** Get the rate in a step event.
+   * @return The rate.
+   */
+  double parse_rate() const;
+
+  /** Get the flush in a step event.
+   * @return The flush flag.
+   */
+  bool parse_flush() const;
+
+  /** Get the intermediate flag in a step event.
+   * @return The intermediate flag.
+   */
+  bool parse_intermediate() const;
 };
 
 } //namespace Gst
