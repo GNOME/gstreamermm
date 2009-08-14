@@ -51,6 +51,7 @@ Glib::QueryQuark get_quark(MessageType type);
 } //namespace Enums
 
 class Element;
+class Pad;
 class Structure;
 class TagList;
 
@@ -291,7 +292,33 @@ public:
    * @param tag_list The tag list for the message.
    * @return The new tag message. MT safe.
    */
-  static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist);
+  static Glib::RefPtr<Gst::Message>
+    create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist);
+
+  /** Create a new tag message. The taglist will be copied.  The message is
+   * posted by elements that discovered a new taglist.
+   *
+   * @param src The object originating the message.
+   * @param pad The originating pad for the tag.
+   * @param tag_list The tag list for the message.
+   * @return The new tag message. MT safe.
+   * 
+   * Since 0.10.24.
+   */
+  static Glib::RefPtr<Gst::Message>
+    create(const Glib::RefPtr<Gst::Object>& src,
+    const Glib::RefPtr<Gst::Pad>& pad, const Gst::TagList& taglist);
+
+  /** Extracts the Gst::Pad and Gst::TagList from the Gst::MessageTag.
+   *
+   * MT safe.
+   *
+   * @param pad Location where the originating pad is stored.
+   * @param tag_list Location for the tag-list.
+   *
+   * Since 0.10.24.
+   */
+  void parse(Glib::RefPtr<Gst::Pad>& pad, Gst::TagList& tag_list) const;
 
   /** Extracts and returns the Gst::TagList from the Gst::MessageTag.
    *
@@ -301,6 +328,17 @@ public:
    */
   Gst::TagList parse() const;
   _IGNORE(gst_message_parse_tag)
+
+  /** Extracts and returns the Gst::Pad from the Gst::MessageTag.
+   *
+   * MT safe.
+   *
+   * @return The Gst::Pad.
+   *
+   * Since 0.10.24.
+   */
+  Glib::RefPtr<Gst::Pad> parse_pad() const;
+  _IGNORE(gst_message_parse_tag_full)
 };
 
 /** A buffering message.

@@ -21,6 +21,7 @@
 #include <gst/interfaces/mixer.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/mixer.h>
+#include <gstreamermm/pad.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/taglist.h>
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
@@ -197,7 +198,9 @@ MessageTag::MessageTag(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageTag::create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist)
+Glib::RefPtr<Gst::Message>
+  MessageTag::create(const Glib::RefPtr<Gst::Object>& src,
+  const Gst::TagList& taglist)
 {
   //We create a copy because gst_message_new_tag() takes ownership:
   GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
@@ -205,11 +208,44 @@ Glib::RefPtr<Gst::Message> MessageTag::create(const Glib::RefPtr<Gst::Object>& s
   return Gst::Message::wrap(message, false);
 }
 
+Glib::RefPtr<Gst::Message>
+  MessageTag::create(const Glib::RefPtr<Gst::Object>& src,
+  const Glib::RefPtr<Gst::Pad>& pad, const Gst::TagList& taglist)
+{
+  //We create a copy because gst_message_new_tag() takes ownership:
+  GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
+  GstMessage* message = gst_message_new_tag_full(src->gobj(), pad->gobj(),
+    c_taglist);
+  return Gst::Message::wrap(message, false);
+}
+
+void MessageTag::parse(Glib::RefPtr<Gst::Pad>& pad, Gst::TagList& tag_list)
+  const
+{
+  GstTagList* gst_tag_list = 0;
+  GstPad* gst_pad = 0;
+
+  gst_message_parse_tag_full(const_cast<GstMessage*>(gobj()), &gst_pad,
+    &gst_tag_list);
+
+  pad = Glib::wrap(gst_pad);
+
+  // Use the Gst::TagList specific Glib::wrap() function:
+  tag_list = Glib::wrap(gst_tag_list, 0);
+}
+
 Gst::TagList MessageTag::parse() const
 {
-  GstTagList* gst_tag_list = gst_tag_list_new();
+  GstTagList* gst_tag_list = 0;
   gst_message_parse_tag(const_cast<GstMessage*>(gobj()), &gst_tag_list);
   return Gst::TagList(gst_tag_list);
+}
+
+Glib::RefPtr<Gst::Pad> MessageTag::parse_pad() const
+{
+  GstPad* gst_pad = 0;
+  gst_message_parse_tag_full(const_cast<GstMessage*>(gobj()), &gst_pad, 0);
+  return Glib::wrap(gst_pad);
 }
 
 MessageBuffering::MessageBuffering(GstMessage* castitem)
