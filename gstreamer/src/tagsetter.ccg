@@ -27,9 +27,23 @@ void TagSetter::add_tag(Tag tag, const Glib::ValueBase& value,
     _tag_strings[tag], value.gobj(), (void*)0);
 }
 
+void TagSetter::add_tag(const Glib::ustring& tag, const Glib::ValueBase& value,
+  TagMergeMode mode)
+{
+  gst_tag_setter_add_tag_values(gobj(), (GstTagMergeMode) mode, tag.c_str(),
+    value.gobj(), (void*)0);
+}
+
 void TagSetter::add_tag(Tag tag, const char* data, TagMergeMode mode)
 {
   gst_tag_setter_add_tags(gobj(), (GstTagMergeMode) mode, _tag_strings[tag],
+    data, (void*)0);
+}
+
+void TagSetter::add_tag(const Glib::ustring& tag, const char* data,
+  TagMergeMode mode)
+{
+  gst_tag_setter_add_tags(gobj(), (GstTagMergeMode) mode, tag.c_str(),
     data, (void*)0);
 }
 
