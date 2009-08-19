@@ -61,6 +61,8 @@ void on_handoff(const Glib::RefPtr<Gst::Buffer>& buffer,
                 const Glib::RefPtr<Gst::Pad>& pad)
 {
   std::cout << "Gst::FakeSrc's handoff signal triggered." << std::endl;
+  if(buffer->flag_is_set(Gst::BUFFER_FLAG_DISCONT))
+    std::cout << "The Gst::FakeSrc buffer's discont flag is set." << std::endl;
 }
 
 int main(int argc, char* argv[])
