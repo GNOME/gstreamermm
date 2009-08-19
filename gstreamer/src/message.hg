@@ -500,6 +500,92 @@ public:
   static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
 };
 
+/** A step done message.
+ * See create() for more details.
+ */
+class MessageStepDone : public Message
+{
+public:
+  explicit MessageStepDone(GstMessage* castitem);
+
+  /** Create a step done message.  This message is posted by elements when they
+   * complete a part, when @a intermediate set to true, or a complete step
+   * operation.
+   *
+   * @a duration will contain the amount of time (in Gst::FORMAT_TIME) of the
+   * stepped @a amount of media in format @a format.
+   *
+   * @param src The object originating the message.
+   * @param format The format of amount.
+   * @param amount The amount of stepped data.
+   * @param rate The rate of the stepped amount.
+   * @param flush Is this an flushing step.
+   * @param intermediate Is this an intermediate step.
+   * @param duration The duration of the data.
+   * @param eos The step caused EOS.
+   * @return The new step done message. MT safe.
+   *
+   * Since 0.10.24.
+   */
+  static Glib::RefPtr<Gst::Message>
+    create(const Glib::RefPtr<Gst::Object>& src, Gst::Format format,
+    guint64 amount, double rate, bool flush, bool intermediate,
+    guint64 duration, bool eos);
+
+  /** Extract the values of the step done message.
+   *
+   * MT safe.
+   *
+   * @param format Result location for the format.
+   * @param amount Result location for the amount.
+   * @param rate Result location for the rate.
+   * @param flush Result location for the flush flag.
+   * @param intermediate Result location for the intermediate flag.
+   * @param duration Result location for the duration.
+   * @param eos Result location for the EOS flag.
+   *
+   * Since 0.10.24.
+   */
+  void parse(Gst::Format& format, guint64& amount, double& rate, bool& flush,
+    bool& intermediate, guint64& duration, bool& eos) const;
+  _IGNORE(gst_message_parse_step_done)
+
+  /** Extracts the duration of the step done message.
+   * @return The duration.
+   */
+  guint64 parse() const;
+
+  /** Extracts the format of the step done message.
+   * @return The format.
+   */
+  Gst::Format parse_format() const;
+
+  /** Extracts the amount of the step done message.
+   * @return The amount.
+   */
+  guint64 parse_amount() const;
+
+  /** Extracts the rate of the step done message.
+   * @return The rate.
+   */
+  double parse_rate() const;
+
+  /** Extracts the flush flag of the step done message.
+   * @return The flush flag.
+   */
+  bool parse_flush() const;
+
+  /** Extracts the intermediate flag of the step done message.
+   * @return The intermediate flag.
+   */
+  bool parse_intermediate() const;
+
+  /** Extracts the eos flag of the step done message.
+   * @return The eos flag.
+   */
+  bool parse_eos() const;
+};
+
 /** A clock provide message.
  * See create() for more details.
  */
@@ -942,6 +1028,89 @@ public:
    * @return The new async_done message. MT safe.
    */
   static Glib::RefPtr<Gst::Message> create(const Glib::RefPtr<Gst::Object>& src);
+};
+
+/** A step start message.
+ * See create() for more details.
+ */
+class MessageStepStart : public Message
+{
+public:
+  explicit MessageStepStart(GstMessage* castitem);
+
+  /** Create a step start message.  This message is posted by elements when
+   * they accept or activate a new step event for @a amount in @a format.
+   *
+   * @a active is set to false when the element accepted the new step event and
+   * has queued it for execution in the streaming threads.
+   *
+   * @a active is set to true when the element has activated the step operation
+   * and is now ready to start executing the step in the streaming thread.
+   * After this message is emited, the application can queue a new step
+   * operation in the element.
+   *
+   * @param src The object originating the message.  
+   * @param active If the step is active or queued.  
+   * @param format The format of amount.  
+   * @param amount The amount of stepped data.
+   * @param rate The rate of the stepped amount.  
+   * @param flush Is this an flushing step.
+   * @param intermediate Is this an intermediate step.
+   * @return The new step start message. MT safe.
+   *
+   * Since 0.10.24.
+   */
+  static Glib::RefPtr<Gst::Message>
+    create(const Glib::RefPtr<Gst::Object>& src, bool active,
+    Gst::Format format, guint64 amount, double rate, bool flush,
+    bool intermediate);
+
+  /** Extract the values of the step start message.
+   *
+   * MT safe.
+   *
+   * @param active Result location for the active flag.  
+   * @param format Result location for the format.  
+   * @param amount Result location for the amount.  
+   * @param rate Result location for the rate.  
+   * @param flush Result location for the flush flag.  
+   * @param intermediate Result location for the intermediate flag.
+   *
+   * Since 0.10.24.
+   */
+  void parse(bool& active, Gst::Format& format, guint64& amount, double& rate,
+    bool& flush, bool& intermediate) const;
+  _IGNORE(gst_message_parse_step_start)
+
+  /** Extracts the amount of the step start message.
+   * @return The amount.
+   */
+  guint64 parse() const;
+
+  /** Extracts the active flag of the step start message.
+   * @return The active flag.
+   */
+  bool parse_active() const;
+
+  /** Extracts the format of the step start message.
+   * @return The format.
+   */
+  Gst::Format parse_format() const;
+
+  /** Extracts the rate of the step start message.
+   * @return The rate.
+   */
+  double parse_rate() const;
+
+  /** Extracts the flush flag of the step start message.
+   * @return The flush flag.
+   */
+  bool parse_flush() const;
+
+  /** Extracts the intermediate flag of the step start message.
+   * @return The intermediate flag.
+   */
+  bool parse_intermediate() const;
 };
 
 /** A structure change message.

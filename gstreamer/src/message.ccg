@@ -362,11 +362,99 @@ MessageStateDirty::MessageStateDirty(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageStateDirty::create(const Glib::RefPtr<Gst::Object>& src)
+Glib::RefPtr<Gst::Message>
+  MessageStateDirty::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_state_dirty(src->gobj());
   return Gst::Message::wrap(message, false);
 }
+
+MessageStepDone::MessageStepDone(GstMessage* castitem)
+: Message(castitem)
+{}
+
+Glib::RefPtr<Gst::Message>
+  MessageStepDone::create(const Glib::RefPtr<Gst::Object>& src,
+  Gst::Format format, guint64 amount, double rate, bool flush,
+  bool intermediate, guint64 duration, bool eos)
+{
+  GstMessage* message = gst_message_new_step_done(src->gobj(),
+    (GstFormat)(format), amount, rate, flush, intermediate, duration, eos);
+  return Gst::Message::wrap(message, false);
+}
+
+void MessageStepDone::parse(Gst::Format& format, guint64& amount, double& rate,
+  bool& flush, bool& intermediate, guint64& duration, bool& eos) const
+{
+  gboolean gst_flush = FALSE;
+  gboolean gst_intermediate = FALSE;
+  gboolean gst_eos = FALSE;
+
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()),
+    (GstFormat*)(&format), &amount, &rate, &gst_flush, &gst_intermediate,
+    &duration, &gst_eos);
+
+  flush = gst_flush;
+  intermediate = gst_intermediate;
+  eos = gst_eos;
+}
+
+guint64 MessageStepDone::parse() const
+{
+  guint64 duration = 0;
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0, 0,
+    &duration, 0);
+  return duration;
+}
+
+Gst::Format MessageStepDone::parse_format() const
+{
+  GstFormat format = GST_FORMAT_UNDEFINED;
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()),
+    (GstFormat*)(&format), 0, 0, 0, 0, 0, 0);
+  return (Gst::Format)(format);
+}
+
+guint64 MessageStepDone::parse_amount() const
+{
+  guint64 amount = 0;
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, &amount, 0,
+    0, 0, 0, 0);
+  return amount;
+}
+
+double MessageStepDone::parse_rate() const
+{
+  double rate = 0;
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, &rate, 0,
+    0, 0, 0);
+  return rate;
+}
+
+bool MessageStepDone::parse_flush() const
+{
+  gboolean gst_flush = FALSE;
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0,
+    &gst_flush, 0, 0, 0);
+  return gst_flush;
+}
+
+bool MessageStepDone::parse_intermediate() const
+{
+  gboolean gst_intermediate = FALSE;
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0,
+    &gst_intermediate, 0, 0);
+  return gst_intermediate;
+}
+
+bool MessageStepDone::parse_eos() const
+{
+  gboolean gst_eos = FALSE;
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0, 0,
+    0, &gst_eos);
+  return gst_eos;
+}
+
 
 MessageClockProvide::MessageClockProvide(GstMessage* castitem)
 : Message(castitem)
@@ -638,6 +726,83 @@ Glib::RefPtr<Gst::Message> MessageAsyncDone::create(const Glib::RefPtr<Gst::Obje
   return Gst::Message::wrap(message, false);
 }
 
+MessageStepStart::MessageStepStart(GstMessage* castitem)
+: Message(castitem)
+{}
+
+Glib::RefPtr<Gst::Message>
+  MessageStepStart::create(const Glib::RefPtr<Gst::Object>& src,
+  bool active, Gst::Format format, guint64 amount, double rate, bool flush,
+  bool intermediate)
+{
+  GstMessage* message = gst_message_new_step_start(src->gobj(),
+    active, (GstFormat)(format), amount, rate, flush, intermediate);
+  return Gst::Message::wrap(message, false);
+}
+
+void MessageStepStart::parse(bool& active, Gst::Format& format,
+  guint64& amount, double& rate, bool& flush, bool& intermediate) const
+{
+  gboolean gst_active = FALSE;
+  gboolean gst_flush = FALSE;
+  gboolean gst_intermediate = FALSE;
+
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), &gst_active,
+    (GstFormat*)(&format), &amount, &rate, &gst_flush, &gst_intermediate);
+
+  active = gst_active;
+  flush = gst_flush;
+  intermediate = gst_intermediate;
+}
+
+guint64 MessageStepStart::parse() const
+{
+  guint64 amount = 0;
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, &amount,
+    0, 0, 0);
+  return amount;
+}
+
+bool MessageStepStart::parse_active() const
+{
+  gboolean gst_active = FALSE;
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), &gst_active, 0,
+    0, 0, 0, 0);
+  return gst_active;
+}
+
+Gst::Format MessageStepStart::parse_format() const
+{
+  GstFormat format = GST_FORMAT_UNDEFINED;
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0,
+    (GstFormat*)(&format), 0, 0, 0, 0);
+  return (Gst::Format)(format);
+}
+
+double MessageStepStart::parse_rate() const
+{
+  double rate = 0;
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, 0, &rate,
+    0, 0);
+  return rate;
+}
+
+bool MessageStepStart::parse_flush() const
+{
+  gboolean gst_flush = FALSE;
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0,
+    &gst_flush, 0);
+  return gst_flush;
+}
+
+bool MessageStepStart::parse_intermediate() const
+{
+  gboolean gst_intermediate = FALSE;
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0, 0,
+    &gst_intermediate);
+  return gst_intermediate;
+}
+
 MessageStructureChange::MessageStructureChange(GstMessage* castitem)
 : Message(castitem)
 {}
@@ -798,6 +963,9 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
       case GST_MESSAGE_STATE_DIRTY:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageStateDirty(message) );
         break;
+      case GST_MESSAGE_STEP_DONE:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageStepDone(message) );
+        break;
       case GST_MESSAGE_CLOCK_PROVIDE:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageClockProvide(message) );
         break;
@@ -830,6 +998,9 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
         break;
       case GST_MESSAGE_ASYNC_DONE:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageAsyncDone(message) );
+        break;
+      case GST_MESSAGE_STEP_START:
+        result = Glib::RefPtr<Gst::Message>( new Gst::MessageStepStart(message) );
         break;
       case GST_MESSAGE_STRUCTURE_CHANGE:
         result = Glib::RefPtr<Gst::Message>( new Gst::MessageStructureChange(message) );
