@@ -2,16 +2,17 @@ doxygenprog=@DOXYGEN@
 
 doxygen_configfile=Doxyfile
 doxygen_configfile_source=$(srcdir)/Doxyfile.in
-beautify_docs = @GMMPROC_DIR@/beautify_docs.pl
+beautify_docs_source = $(srcdir)/beautify_docs.pl.in
+beautify_docs = beautify_docs.pl
 
-EXTRA_DIST= Doxyfile.in html
+EXTRA_DIST= Doxyfile.in beautify_docs.pl html 
 
 docdir = $(datadir)/doc/gstreamermm-0.10/docs
 referencedir=$(docdir)/reference/html
 
 HTML_INDEX=html/index.html
 
-$(HTML_INDEX): $(doxygen_configfile_source) $(beautify_docs) \
+$(HTML_INDEX): $(doxygen_configfile_source) $(beautify_docs_source) \
 	$(top_srcdir)/gstreamer/gstreamermm/*.h
 	-rm -rf html
 	$(doxygenprog) $(doxygen_configfile)

@@ -15,7 +15,7 @@
 #We use pushdef here because we can't use shell variables before AC_INIT, but we want to use a variable with AC_INIT:
 pushdef([GSTREAMERMM_MAJOR_VERSION],     [0])
 pushdef([GSTREAMERMM_MINOR_VERSION],     [10])
-pushdef([GSTREAMERMM_MICRO_VERSION],     [4])
+pushdef([GSTREAMERMM_MICRO_VERSION],     [5])
 pushdef([GSTREAMERMM_EXTRA_VERSION],     [])
 pushdef([GSTREAMERMM_VERSION], GSTREAMERMM_MAJOR_VERSION.GSTREAMERMM_MINOR_VERSION.GSTREAMERMM_MICRO_VERSION[]GSTREAMERMM_EXTRA_VERSION)
 AC_INIT([gstreamermm], GSTREAMERMM_VERSION, [gtkmm-list@gnome.org])
@@ -372,6 +372,7 @@ DOCS_SUBDIR="docs"
     docs/Makefile
       docs/reference/Makefile
       docs/reference/Doxyfile
+      docs/reference/beautify_docs.pl
   ])
 else
 DOCS_SUBDIR=""
