@@ -1,4 +1,4 @@
-# Copyright 2009 The gstreamermm Development Team
+## Copyright 2009 The gstreamermm Development Team
 ##
 ## This library is free software: you can redistribute it and/or modify it
 ## under the terms of the GNU Lesser General Public License as published
@@ -13,10 +13,10 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-binding_name    = gstreamermm
-wrap_init_flags = --namespace=Gst --parent_dir=gstreamermm
-codegen_srcdir  = $(top_srcdir)/tools
+include $(top_srcdir)/gstreamer/src/filelist.am
+include $(top_srcdir)/gstreamer/gstreamermm/filelist.am
 
-include $(srcdir)/filelist.am
-include $(top_srcdir)/tools/m4/filelist.am
-include $(top_srcdir)/build/generate-binding.am
+book_name = $(GSTREAMERMM_MODULE_NAME)
+doc_input = $(addprefix $(top_srcdir)/gstreamer/gstreamermm/,$(files_built_h))
+
+include $(top_srcdir)/build/doc-reference.am

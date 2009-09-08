@@ -1,30 +1,51 @@
-## Copyright (c) 2001
-## The gtkmm development team.
+## Copyright 2009 The gstreamermm Development Team
+##
+## This library is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS                 = private
+lib_LTLIBRARIES = libgstreamermm-@GSTREAMERMM_API_VERSION@.la
 
-sublib_name             = gstreamermm
-sublib_libname          = gstreamermm-0.10
-sublib_libversion       = $(LIBGSTREAMERMM_SO_VERSION)
-sublib_namespace        = Gst
-sublib_cflags           = $(GSTREAMERMM_CFLAGS)
-sublib_topdir           = gstreamer
-sublib_win32_dlls_libs	=
+include $(srcdir)/../src/filelist.am
+include $(srcdir)/filelist.am
+include $(top_srcdir)/build/compile-binding.am
 
-sublib_files_extra_posix_cc = 
-sublib_files_extra_win32_cc =
-sublib_files_extra_general_cc = init.cc miniobject.cc version.cc wrap.cc
-sublib_files_extra_general_deprecated_cc = 
+stampdir = $(srcdir)/.stamps
+patched_stamps = $(patched_hg:%.hg=$(stampdir)/stamp-%)
 
-sublib_files_extra_posix_h = 
-sublib_files_extra_win32_h =
-sublib_files_extra_general_h = init.h miniobject.h version.h wrap.h
-sublib_files_extra_general_deprecated_h = 
+BUILT_SOURCES = $(patched_stamps)
 
-include $(top_srcdir)/build_shared/Makefile_build.am_fragment
+generate_gst_wrap_init_in = $(top_builddir)/tools/generate_gst_wrap_init.pl.in
+generate_gst_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_gst_wrap_init.pl
+generate_gst_wrap_init_flags = --namespace=Gst --parent_dir=gstreamermm
 
-lib_LTLIBRARIES = libgstreamermm-0.10.la
-libgstreamermm_0_10_la_SOURCES = $(files_built_cc) $(files_extra_cc) \
-				 $(files_all_plugin_built_cc)
-libgstreamermm_0_10_la_LDFLAGS = $(common_ldflags)
-libgstreamermm_0_10_la_LIBADD  = $(GSTREAMERMM_LIBS)
+gst_wrap_init.cc: $(generate_gst_wrap_init_in) $(files_hg:%=$(srcdir)/../src/%)
+	$(generate_gst_wrap_init) $(generate_gst_wrap_init_flags) \
+		$(files_hg:%=$(srcdir)/../src/%) > $@
+
+$(stampdir):
+	@(test -d $(stampdir) || mkdir $(stampdir))
+	
+# This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
+$(stampdir)/stamp-%: $(stampdir) $(srcdir)/%.h
+	patch -Ns $(srcdir)/$*.h $(srcdir)/$*.h.patch || true
+	rm -f $(srcdir)/$*.h.rej
+	@echo 'timestamp' > $@
+
+local_cppflags = $(binding_includes) $(binding_cppflags) -DGSTREAMERMM_BUILD=1
+
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GSTREAMERMM_CFLAGS)
+AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
+
+libgstreamermm_@GSTREAMERMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libgstreamermm_@GSTREAMERMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(GSTREAMERMM_SO_VERSION)
+libgstreamermm_@GSTREAMERMM_API_VERSION@_la_LIBADD  = $(GSTREAMERMM_LIBS)

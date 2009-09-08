@@ -1,3 +1,5 @@
+dnl Copyright 2008 The gstreamermm Development Team
+
 define(`_CLASS_GSTMINIOBJECT',`dnl
 _PUSH()
 dnl

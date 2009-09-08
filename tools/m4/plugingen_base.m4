@@ -1,3 +1,5 @@
+dnl Copyright 2008 The gstreamermm Development Team
+
 divert(-1)
 dnl
 dnl Macros to translate from C to C++ types.

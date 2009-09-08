@@ -1,4 +1,4 @@
-dnl $Id: class_boxedtype.m4 413 2007-05-14 19:28:31Z murrayc $
+dnl Copyright 2008 The gstreamermm Development Team
 
 dnl
 dnl _CLASS_BOXEDTYPE_EXTRA(Region, GdkRegion, gdk_region_new, gdk_region_copy, gdk_region_destroy)
