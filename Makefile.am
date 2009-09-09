@@ -17,9 +17,9 @@ ACLOCAL_AMFLAGS = -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 if MAINTAINER_MODE
-src_subdirs = tools gstreamer/src
+src_subdirs = gstreamer/src
 else
-src_subdirs =
+src_subdirs = tools
 endif
 if ENABLE_DOCUMENTATION
 doc_subdirs = doc
