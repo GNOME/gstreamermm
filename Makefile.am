@@ -26,7 +26,8 @@ doc_subdirs = doc
 else
 doc_subdirs =
 endif
-SUBDIRS = $(src_subdirs) gstreamer/gstreamermm $(doc_subdirs)
+SUBDIRS = $(src_subdirs) gstreamer/gstreamermm tests @EXAMPLE_SUBDIR@ \
+	  $(doc_subdirs)
 
 gstreamermm_includedir = $(includedir)/$(GSTREAMERMM_MODULE_NAME)
 gstreamermm_include_HEADERS = gstreamer/gstreamermm.h

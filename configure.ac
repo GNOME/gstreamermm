@@ -82,6 +82,40 @@ MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
                        [G GSTREAMER])
 
 #########################################################################
+#  Examples
+#########################################################################
+
+AC_ARG_ENABLE(examples,
+  [AC_HELP_STRING([--enable-examples],
+    [enable compilation of example programs [default=yes]])],
+  [enable_examples=$enableval], [enable_examples=yes])
+
+if test "x$enable_examples" = "xyes"; then
+
+# Extra dependencies needed for the examples. Use --enable-examples=no to build
+# the library without this.
+PKG_CHECK_MODULES(GSTREAMERMM_EXAMPLES, gtkmm-2.4 >= ${min_gtkmm_version})
+AC_SUBST(GSTREAMERMM_EXAMPLES_CFLAGS)
+AC_SUBST(GSTREAMERMM_EXAMPLES_LIBS)
+
+MM_ARG_WITH_TAGFILE_DOC([gtkmm-2.4.tag], [gtkmm-2.4])
+
+EXAMPLE_SUBDIR="examples"
+AC_CONFIG_FILES([
+    examples/Makefile
+    examples/optiongroup/Makefile
+    examples/element_link/Makefile
+    examples/ogg_player/Makefile
+    examples/ogg_player_gtkmm/Makefile
+    examples/media_player_gtkmm/Makefile
+    examples/typefind/Makefile
+    ])
+AC_SUBST(EXAMPLE_SUBDIR)
+else
+EXAMPLE_SUBDIR=""
+fi
+
+#########################################################################
 #  Plug-in definitions
 #########################################################################
 
@@ -159,7 +193,7 @@ xvimagesink=XvImageSink \
 
 AC_SUBST(GSTREAMERMM_PLUGIN_DEFS)
 
-##########################################################################
+#########################################################################
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
@@ -168,6 +202,7 @@ AC_CONFIG_FILES([Makefile
                  gstreamer/${GSTREAMERMM_MODULE_NAME}-uninstalled.pc:gstreamer/gstreamermm-uninstalled.pc.in
                  gstreamer/src/Makefile
                  gstreamer/gstreamermm/Makefile
+                 tests/Makefile
                  doc/Makefile
                  doc/reference/Doxyfile])
 AC_OUTPUT
