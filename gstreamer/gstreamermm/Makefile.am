@@ -22,8 +22,6 @@ include $(top_srcdir)/build/compile-binding.am
 stampdir = $(srcdir)/.stamps
 patched_stamps = $(patched_hg:%.hg=$(stampdir)/stamp-%)
 
-BUILT_SOURCES = $(patched_stamps)
-
 generate_gst_wrap_init_in = $(top_builddir)/tools/generate_gst_wrap_init.pl.in
 generate_gst_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_gst_wrap_init.pl
 generate_gst_wrap_init_flags = --namespace=Gst --parent_dir=gstreamermm
@@ -40,6 +38,16 @@ $(stampdir)/stamp-%: $(stampdir) $(srcdir)/%.h
 	patch -Ns $(srcdir)/$*.h $(srcdir)/$*.h.patch || true
 	rm -f $(srcdir)/$*.h.rej
 	@echo 'timestamp' > $@
+
+# Patch the generated .hg files that need to be patched but only in maintainer
+# mode
+if MAINTAINER_MODE
+BUILT_SOURCES = $(patched_stamps)
+endif
+
+# Distribute the patch files for the generated .hg files that need to be
+# patched.
+EXTRA_DIST = $(patched_hg:%.hg=%.h.patch)
 
 local_cppflags = $(binding_includes) $(binding_cppflags) -DGSTREAMERMM_BUILD=1
 

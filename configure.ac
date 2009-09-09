@@ -48,6 +48,7 @@ min_libxmlpp_version='2.14.0'
 AC_SUBST([GSTREAMERMM_MODULES],
          ["\
 glibmm-2.4 >= $min_glibmm_version \
+giomm-2.4 >= $min_glibmm_version \
 libxml++-2.6 >= $min_libxmlpp_version \
 gstreamer-0.10 >= $min_gstreamer_version \
 gstreamer-base-0.10 >= $min_gstreamer_version \
@@ -72,12 +73,93 @@ MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
+MM_ARG_WITH_TAGFILE_DOC([giomm-2.4.tag], [giomm-2.4])
 
 AC_LANG([C++])
 MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra],
                        [G GSTREAMER])
+
+#########################################################################
+#  Plug-in definitions
+#########################################################################
+
+# To add a plugin, add the plugin definition, in the form of
+# "plugin=CppClassName" to the space-separated list of definitions below.
+# (Where "plugin" is the plugin name as recognized by gst-inspect and
+# "CppClassName" is the desired name of the C++ class.)
+#
+# Also add the target .hg file name to the plugins_hg variable in the
+# gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
+# in lowercase with a .hg extension).  Make sure that the order of both lists
+# correspond.
+
+# TODO: Include appsink and appsrc plug-ins in list below if they indeed are
+# plug-ins (see gst-plugins-base docs for details) and when they don't cause
+# gstreamermm initialization errors.
+GSTREAMERMM_PLUGIN_DEFS="\
+adder=Adder \
+alsamixer=AlsaMixer \
+alsasink=AlsaSink \
+alsasrc=AlsaSrc \
+audioconvert=AudioConvert \
+audioresample=AudioResample \
+audiotestsrc=AudioTestSrc \
+capsfilter=CapsFilter \
+cdparanoiasrc=CdParanoiaSrc \
+clockoverlay=ClockOverlay \
+decodebin2=DecodeBin2 \
+decodebin=DecodeBin \
+fakesink=FakeSink \
+fakesrc=FakeSrc \
+fdsink=FdSink \
+fdsrc=FdSrc \
+ffmpegcolorspace=FfmpegColorSpace \
+filesink=FileSink \
+filesrc=FileSrc \
+gdpdepay=GDPDepay \
+gdppay=GDPPay \
+giosink=GioSink \
+giosrc=GioSrc \
+giostreamsink=GioStreamSink \
+giostreamsrc=GioStreamSrc \
+identity=Identity \
+multifdsink=MultiFdSink \
+multiqueue=MultiQueue \
+oggdemux=OggDemux \
+oggmux=OggMux \
+playbin2=PlayBin2 \
+playbin=PlayBin \
+queue=Queue \
+tcpclientsink=TCPClientSink \
+tcpclientsrc=TCPClientSrc \
+tcpserversink=TcpServerSink \
+tcpserversrc=TCPServerSrc \
+tee=Tee \
+textoverlay=TextOverlay \
+textrender=TextRender \
+theoradec=TheoraDec \
+theoraenc=TheoraEnc \
+theoraparse=TheoraParse \
+timeoverlay=TimeOverlay \
+typefind=TypeFindElement \
+uridecodebin=UriDecodeBin \
+videorate=VideoRate \
+videoscale=VideoScale \
+videotestsrc=VideoTestSrc \
+volume=Volume \
+vorbisdec=VorbisDec \
+vorbisenc=VorbisEnc \
+vorbisparse=VorbisParse \
+vorbistag=VorbisTag \
+ximagesink=XImageSink \
+xvimagesink=XvImageSink \
+"
+
+AC_SUBST(GSTREAMERMM_PLUGIN_DEFS)
+
+##########################################################################
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
