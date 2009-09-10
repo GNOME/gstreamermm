@@ -103,12 +103,6 @@ MM_ARG_WITH_TAGFILE_DOC([gtkmm-2.4.tag], [gtkmm-2.4])
 EXAMPLE_SUBDIR="examples"
 AC_CONFIG_FILES([
     examples/Makefile
-    examples/optiongroup/Makefile
-    examples/element_link/Makefile
-    examples/ogg_player/Makefile
-    examples/ogg_player_gtkmm/Makefile
-    examples/media_player_gtkmm/Makefile
-    examples/typefind/Makefile
     ])
 AC_SUBST(EXAMPLE_SUBDIR)
 else
