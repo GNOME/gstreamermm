@@ -22,7 +22,7 @@ else
 src_subdirs = tools
 endif
 if ENABLE_DOCUMENTATION
-doc_subdirs = doc
+doc_subdirs = docs
 else
 doc_subdirs =
 endif

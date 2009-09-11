@@ -197,6 +197,6 @@ AC_CONFIG_FILES([Makefile
                  gstreamer/src/Makefile
                  gstreamer/gstreamermm/Makefile
                  tests/Makefile
-                 doc/Makefile
-                 doc/reference/Doxyfile])
+                 docs/Makefile
+                 docs/reference/Doxyfile])
 AC_OUTPUT
