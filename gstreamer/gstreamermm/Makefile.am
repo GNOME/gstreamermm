@@ -36,7 +36,7 @@ $(stampdir):
 # This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
 $(stampdir)/stamp-%: $(stampdir) $(srcdir)/%.h
 	patch -Ns $(srcdir)/$*.h $(srcdir)/$*.h.patch || true
-	rm -f $(srcdir)/$*.h.rej
+	rm -f $(srcdir)/$*.h.rej $(srcdir)/$*.h.orig
 	@echo 'timestamp' > $@
 
 # Patch the generated .hg files that need to be patched but only in maintainer

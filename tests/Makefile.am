@@ -5,7 +5,7 @@ LDADD 		= $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la \
 		  $(GSTREAMERMM_LIBS)
 
 
-noinst_PROGRAMS  = test-caps test-create-element test-pipeline-add-element \
+check_PROGRAMS  = test-caps test-create-element test-pipeline-add-element \
                   test-link-elements test-create-bin test-miniobject-wrap \
                   test-message-wrap test-event-wrap test-query-wrap \
 		  test-structure test-caps-structures test-interface \
