@@ -14,6 +14,9 @@ check_PROGRAMS  = test-caps test-create-element test-pipeline-add-element \
 		  test-init-check-noargs test-init-noargs test-iterator \
 		  test-property-caps test-plugin-gen test-plugin-signals
 
+# Include run of test programs in check:
+TESTS 		= $(check_PROGRAMS)
+
 test_caps_SOURCES			= test-caps.cc
 test_create_element_SOURCES		= test-create-element.cc
 test_pipeline_add_element_SOURCES	= test-pipeline-add-element.cc
