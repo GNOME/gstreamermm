@@ -3,5 +3,5 @@ test -n "$srcdir" || srcdir=`dirname "$0"`
 test -n "$srcdir" || srcdir=.
 
 mm-common-prepare --force --copy "$srcdir"
-autoreconf --force --install "$srcdir"
+autoreconf --force --install --verbose "$srcdir"
 test -n "$NOCONFIGURE" || "$srcdir/configure" --enable-maintainer-mode "$@"

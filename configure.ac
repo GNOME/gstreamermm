@@ -30,6 +30,7 @@ MM_INIT_MODULE([gstreamermm-0.10])
 AC_SUBST([GSTREAMERMM_SO_VERSION], [2:1:0])
 
 AM_INIT_AUTOMAKE([1.9 -Wno-portability check-news dist-bzip2 no-define nostdinc tar-pax])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
@@ -38,13 +39,22 @@ AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
+# Check for the patch command in maintainer mode for patching generated .hg
+# files like taglist.hg.
+AS_IF([test "x$USE_MAINTAINER_MODE" != xno], AC_CHECK_PROGS([PATCH], [patch], [patch]))
+
+
+# Check for m4 and sed which are used for plug-in .hg and .ccg file generation.
+AC_CHECK_PROGS([M4], [gm4 m4], [m4])
+AC_PROG_SED
+
 min_glibmm_version='2.21.1'
 min_gtkmm_version='2.12.0'
 min_gstreamer_version='0.10.24'
 min_libxmlpp_version='2.14.0'
 
-## The format below is used so that the requirements appear nicely in the .pc
-## file.
+# The format below is used so that the requirements appear nicely in the .pc
+# file.
 AC_SUBST([GSTREAMERMM_MODULES],
          ["\
 glibmm-2.4 >= $min_glibmm_version \

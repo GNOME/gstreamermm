@@ -27,15 +27,15 @@ generate_gst_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_gst_wrap_init
 generate_gst_wrap_init_flags = --namespace=Gst --parent_dir=gstreamermm
 
 gst_wrap_init.cc: $(generate_gst_wrap_init_in) $(files_hg:%=$(srcdir)/../src/%)
-	$(generate_gst_wrap_init) $(generate_gst_wrap_init_flags) \
+	$(AM_V_GEN)$(generate_gst_wrap_init) $(generate_gst_wrap_init_flags) \
 		$(files_hg:%=$(srcdir)/../src/%) > $@
 
 $(stampdir):
-	@(test -d $(stampdir) || mkdir $(stampdir))
+	@(test -d $(stampdir) || $(MKDIR_P) $(stampdir))
 	
 # This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
 $(stampdir)/stamp-%: $(stampdir) $(srcdir)/%.h
-	patch -Ns $(srcdir)/$*.h $(srcdir)/$*.h.patch || true
+	$(PATCH) -Ns $(srcdir)/$*.h $(srcdir)/$*.h.patch || true
 	rm -f $(srcdir)/$*.h.rej $(srcdir)/$*.h.orig
 	@echo 'timestamp' > $@
 

@@ -56,9 +56,10 @@ if MAINTAINER_MODE
 		false; \
 	fi
 endif
-	sed -n '1,/^$$/p' $(license_header_source_file) > $(srcdir)/$@
-	$(run_generate_plugin_gmmproc_file) --ccg $(plugin_name) \
-		$(cppname) | m4 -I $(m4_srcdir) >> $(srcdir)/$@
+	$(AM_V_at)$(SED) -n '1,/^$$/p' $(license_header_source_file) > \
+		$(srcdir)/$@
+	$(AM_V_GEN)$(run_generate_plugin_gmmproc_file) --ccg $(plugin_name) \
+		$(cppname) | $(M4) -I $(m4_srcdir) >> $(srcdir)/$@
 
 # This is to generate plugin .hg files.  The generated .hg file is piped
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
@@ -71,8 +72,8 @@ $(plugins_hg): %.hg: $(generate_plugin_dep) \
 	$(eval plugin_def = $$(word $$(pos),$$(GSTREAMERMM_PLUGIN_DEFS)))
 	$(eval plugin_name = $$(shell echo "$$(plugin_def)" | cut -d'=' -f 1))
 	$(eval cppname = $$(subst $$(plugin_name)=,,$$(plugin_def)))
-	sed -n '1,/^$$/p' $(license_header_source_file) > $(srcdir)/$@
-	$(run_generate_plugin_gmmproc_file) --hg $(plugin_name) \
-		$(cppname) | m4 -I $(m4_srcdir) >> $(srcdir)/$@
+	$(AM_V_at)$(SED) -n '1,/^$$/p' $(license_header_source_file) > $(srcdir)/$@
+	$(AM_V_GEN)$(run_generate_plugin_gmmproc_file) --hg $(plugin_name) \
+		$(cppname) | $(M4) -I $(m4_srcdir) >> $(srcdir)/$@
 
 MAINTAINERCLEANFILES += $(plugins_hg) $(plugins_ccg)
