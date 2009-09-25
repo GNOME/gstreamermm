@@ -60,6 +60,7 @@
 #include <gst/interfaces/mixer.h>
 #include <gst/interfaces/navigation.h>
 #include <gst/interfaces/propertyprobe.h>
+#include <gst/interfaces/streamvolume.h>
 #include <gst/interfaces/tuner.h>
 #include <gst/interfaces/videoorientation.h>
 #include <gst/interfaces/xoverlay.h>
@@ -166,6 +167,7 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_MIXER_OPTIONS, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_NAVIGATION, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_PROPERTY_PROBE, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_STREAM_VOLUME, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_TUNER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_TUNER_CHANNEL, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_TUNER_NORM, gst_type_is_a_pointer)

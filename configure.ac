@@ -23,7 +23,7 @@ AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h])
 
-MM_PREREQ([0.7.2])
+MM_PREREQ([0.8])
 MM_INIT_MODULE([gstreamermm-0.10])
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html

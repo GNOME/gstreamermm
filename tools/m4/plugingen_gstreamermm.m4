@@ -32,6 +32,7 @@ _TRANSLATION(`GstMixer*',`Gst::Mixer',`const Glib::RefPtr<Gst::Mixer>&',`Glib::R
 _TRANSLATION(`GstNavigation*',`Gst::Navigation',`const Glib::RefPtr<Gst::Navigation>&',`Glib::RefPtr<Gst::Navigation>',`<gstreamermm/navigation.h>')
 _TRANSLATION(`GstPreset*',`Gst::Preset',`const Glib::RefPtr<Gst::Preset>&',`Glib::RefPtr<Gst::Preset>',`<gstreamermm/preset.h>')
 _TRANSLATION(`GstPropertyProbe*',`Gst::PropertyProbe',`const Glib::RefPtr<Gst::PropertyProbe>&',`Glib::RefPtr<Gst::PropertyProbe>',`<gstreamermm/propertyprobe.h>')
+_TRANSLATION(`GstStreamVolume*',`Gst::StreamVolume',`const Glib::RefPtr<Gst::StreamVolume>&',`Glib::RefPtr<Gst::StreamVolume>',`<gstreamermm/streamvolume.h>')
 _TRANSLATION(`GstTagSetter*',`Gst::TagSetter',`const Glib::RefPtr<Gst::TagSetter>&',`Glib::RefPtr<Gst::TagSetter>',`<gstreamermm/tagsetter.h>')
 _TRANSLATION(`GstURIHandler*',`Gst::URIHandler',`const Glib::RefPtr<Gst::URIHandler>&',`Glib::RefPtr<Gst::URIHandler>',`<gstreamermm/urihandler.h>')
 _TRANSLATION(`GstXOverlay*',`Gst::XOverlay',`const Glib::RefPtr<Gst::XOverlay>&',`Glib::RefPtr<Gst::XOverlay>',`<gstreamermm/xoverlay.h>')
