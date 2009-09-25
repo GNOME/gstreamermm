@@ -1,7 +1,4 @@
-#! @PERL@
-#
-# @configure_input@
-#
+package main;
 
 use strict;
 
@@ -162,7 +159,7 @@ foreach $i (sort keys %objects)
   {
     print "#ifndef G_OS_WIN32\n"
   }
-  
+
   print "GType $basenames{$i}_get_type(void);\n";
 
   if( $win32_nowrap{$i} eq 1 )
@@ -203,7 +200,7 @@ foreach $i (sort keys %objects)
   {
     print "#ifndef G_OS_WIN32\n"
   }
-  
+
   my $namespace_declarations = "";
   my $namespace_close = "";
   foreach ( @{$namespaces{$i}} )
@@ -213,7 +210,7 @@ foreach $i (sort keys %objects)
   }
 
   print "${namespace_declarations} class ${i}_Class { public: static Gst::MiniObject* wrap_new(GstMiniObject*); }; ${namespace_close}\n";
-  
+
   if( $win32_nowrap{$i} eq 1 )
   {
     print "#endif //G_OS_WIN32\n"
@@ -275,7 +272,7 @@ foreach $i (sort keys %objects)
   {
     print "#ifndef G_OS_WIN32\n"
   }
-  
+
   my $namespace_prefix = "";
   foreach( @{$namespaces{$i}} )
   {
@@ -311,7 +308,7 @@ foreach $i (sort keys %objects)
   {
     print "#ifndef G_OS_WIN32\n"
   }
-  
+
   my $namespace_prefix = "";
   foreach( @{$namespaces{$i}} )
   {
@@ -340,4 +337,3 @@ $namespace_whole_close
 EOF
 
 exit 0;
-

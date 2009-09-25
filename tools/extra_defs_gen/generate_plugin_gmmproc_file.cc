@@ -680,7 +680,7 @@ int main(int argc, char* argv[])
     {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin.", "namespace" },
     {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main defs file without .defs extension.", "def" },
     {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The .h and .cc target directory.", "directory" },
-    { 0 }
+    { 0, '\0', 0, G_OPTION_ARG_NONE, 0, 0, 0 }
   };
 
   GOptionContext* gContext =

@@ -1,3 +1,61 @@
+2009-09-29  Daniel Elstner  <danielk@openismus.com>
+
+	Clean up and simplify build system customizations
+
+	* configure.ac (PATCH): Properly quote the AS_IF() macro arguments.
+	(GSTREAMERMM_MODULES): Use m4_foreach() to reduce repetition.
+	(ENABLE_GUI_EXAMPLES): Define an Automake conditional for the purpose
+	of excluding the GUI example programs from the build if gtkmm is not
+	available.  Remove the --enable-examples configure option, and always
+	build the GUI examples if gtkmm is available at build time.
+	(AC_CONFIG_FILES): Generate examples/Makefile unconditionally.
+	Remove tools/generate_gst_wrap_init.pl from the list of output files.
+	(GSTREAMERMM_WXXFLAGS): Remove -pedantic flag since it is too strict
+	for the gstreamer header files.
+	(GTHREAD_CFLAGS): Remove substitution variable for the thread-safety
+	compiler flags, as gstreamer itself depends on gthread and therefore
+	already includes the necessary flags in the pkg-config output.
+	(MM_ARG_WITH_TAGFILE_DOC): Remove reference to giomm-2.4.tag, which
+	does not exist.  Add tag file references for cairomm and pangomm.
+	Tentatively remove gtkmm-2.4.tag reference because gtkmm symbols are
+	not actually used in the documentation.  The mere presence of the
+	gtkmm tags already confuses Doxygen, causing it to link to gtkmm for
+	symbols in the Gst namespace.
+	* Makefile.am (DISTCHECK_CONFIGURE_FLAGS): As a temporary workaround,
+	disable fatal warnings during distcheck.
+	(SUBDIRS): Always recurse into tools/ and examples/.
+	* examples/Makefile.am (noinst_PROGRAMS): Make the inclusion of the
+	GUI examples depend on the ENABLE_GUI_EXAMPLES Automake conditional.
+	(AM_CPPFLAGS): Expand $(GUI_EXAMPLES_CFLAGS) if the GUI examples are
+	enabled, or $(GSTREAMERMM_CFLAGS) if not.
+	(LDADD): Link with $(GSTREAMERMM_LIBS) by default, and override the
+	global LDADD for the GUI programs to use $(GUI_EXAMPLES_LIBS).
+	* gstreamer/gstreamermm/Makefile.am: Completely kill the build rules
+	for patching the generated source code on the fly.  The single source
+	file this was applied to turns out to be fixable by other means.
+	* gstreamer/src/Makefile.am: Significantly simplify the convoluted
+	logic of the custom rules and expressions for generating the gmmproc
+	input files for the gstreamer plugins.
+	($(binding_outputdir)/gst_wrap_init.cc): Build gst_wrap_init.cc from
+	the src/ subdirectory like the other generated source files.
+	* gstreamer/src/element.ccg
+	(Gst::ElementInterfaced_WeakNotify_gstreamermm_callback): Remove
+	unused parameter name to avoid a compiler warning.
+	* gstreamer/src/filelist.am (files_hg): Combine variable assignments.
+	* gstreamer/src/taglist.hg (Gst::TagList): Call the special gmmproc
+	macro _CUSTOM_STRUCT_PROTOTYPE to suppress the output of a typedef
+	for the C struct.  This removes the need to patch the generated file.
+	* gstreamer/gstreamermm/taglist.h.patch: Delete obsolete file.
+	* tests/Makefile.am: Do not hard-code the libgstreamermm API version.
+	(AM_CXXFLAGS): Build tests with $(GSTREAMERMM_WXXFLAGS), too.
+	* tools/Makefile.am: Clean up and simplify.
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Add missing
+	struct initializers to avoid a compiler warning.
+	* tools/generate_gst_wrap_init.pl: Rename the configure input file
+	generate_gst_wrap_init.pl.in to generate_gst_wrap_init.pl.  Remove
+	the unnecessary she-bang line with the @PERL@ substitution, so that
+	it is no longer necessary for this file to be generated.
+
 2009-09-25  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	Add Gst::StreamVolume interface.

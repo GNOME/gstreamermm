@@ -14,20 +14,20 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I build ${ACLOCAL_FLAGS}
-DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
+# TODO: Fix warnings and switch back to fatal warnings mode.
+DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=max
 
 if MAINTAINER_MODE
-src_subdirs = tools gstreamer/src
+src_subdirs = gstreamer/src
 else
-src_subdirs = tools
+src_subdirs =
 endif
 if ENABLE_DOCUMENTATION
 doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = $(src_subdirs) gstreamer/gstreamermm tests @EXAMPLE_SUBDIR@ \
-	  $(doc_subdirs)
+SUBDIRS = tools $(src_subdirs) gstreamer/gstreamermm tests examples $(doc_subdirs)
 
 gstreamermm_includedir = $(includedir)/$(GSTREAMERMM_MODULE_NAME)
 gstreamermm_include_HEADERS = gstreamer/gstreamermm.h

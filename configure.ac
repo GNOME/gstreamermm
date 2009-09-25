@@ -41,83 +41,40 @@ AC_PROG_LIBTOOL
 
 # Check for the patch command in maintainer mode for patching generated .hg
 # files like taglist.hg.
-AS_IF([test "x$USE_MAINTAINER_MODE" != xno], AC_CHECK_PROGS([PATCH], [patch], [patch]))
-
+AS_IF([test "x$USE_MAINTAINER_MODE" != xno], [AC_CHECK_PROGS([PATCH], [patch], [patch])])
 
 # Check for m4 and sed which are used for plug-in .hg and .ccg file generation.
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 AC_PROG_SED
 
-min_glibmm_version='2.21.1'
-min_gtkmm_version='2.12.0'
-min_gstreamer_version='0.10.24'
-min_libxmlpp_version='2.14.0'
-
 # The format below is used so that the requirements appear nicely in the .pc
 # file.
 AC_SUBST([GSTREAMERMM_MODULES],
-         ["\
-glibmm-2.4 >= $min_glibmm_version \
-giomm-2.4 >= $min_glibmm_version \
-libxml++-2.6 >= $min_libxmlpp_version \
-gstreamer-0.10 >= $min_gstreamer_version \
-gstreamer-base-0.10 >= $min_gstreamer_version \
-gstreamer-controller-0.10 >= $min_gstreamer_version \
-gstreamer-dataprotocol-0.10 >= $min_gstreamer_version \
-gstreamer-net-0.10 >= $min_gstreamer_version \
-gstreamer-plugins-base-0.10 >= $min_gstreamer_version \
-gstreamer-audio-0.10 >= $min_gstreamer_version \
-gstreamer-cdda-0.10 >= $min_gstreamer_version \
-gstreamer-interfaces-0.10 >= $min_gstreamer_version \
-gstreamer-netbuffer-0.10 >= $min_gstreamer_version \
-gstreamer-rtp-0.10 >= $min_gstreamer_version \
-gstreamer-video-0.10 >= $min_gstreamer_version"
-])
-
+         ['giomm-2.4 >= 2.21.1 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
+         [[], [-base], [-controller], [-dataprotocol], [-net], [-plugins-base],
+              [-audio], [-cdda], [-interfaces], [-netbuffer], [-rtp], [-video]],
+         [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.24])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
-MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
+PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-2.4 >= 2.12],
+                  [gstreamermm_enable_gui_examples=yes], [gstreamermm_enable_gui_examples=no])
+AS_IF([test "x$gstreamermm_enable_gui_examples" != xyes],
+      [AC_MSG_WARN([gtkmm not available: GUI examples will not be built.])])
+AM_CONDITIONAL([ENABLE_GUI_EXAMPLES], [test "x$gstreamermm_enable_gui_examples" = xyes])
+
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.4])
 
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
-MM_ARG_WITH_TAGFILE_DOC([giomm-2.4.tag], [giomm-2.4])
+MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
+MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 
 AC_LANG([C++])
 MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
-                       [-Wall],
-                       [-pedantic -Wall -Wextra],
+                       [-Wall], [-Wall -Wextra],
                        [G GSTREAMER])
-
-#########################################################################
-#  Examples
-#########################################################################
-
-AC_ARG_ENABLE(examples,
-  [AC_HELP_STRING([--enable-examples],
-    [enable compilation of example programs [default=yes]])],
-  [enable_examples=$enableval], [enable_examples=yes])
-
-if test "x$enable_examples" = "xyes"; then
-
-# Extra dependencies needed for the examples. Use --enable-examples=no to build
-# the library without this.
-PKG_CHECK_MODULES(GSTREAMERMM_EXAMPLES, gtkmm-2.4 >= ${min_gtkmm_version})
-AC_SUBST(GSTREAMERMM_EXAMPLES_CFLAGS)
-AC_SUBST(GSTREAMERMM_EXAMPLES_LIBS)
-
-MM_ARG_WITH_TAGFILE_DOC([gtkmm-2.4.tag], [gtkmm-2.4])
-
-EXAMPLE_SUBDIR="examples"
-AC_CONFIG_FILES([
-    examples/Makefile
-    ])
-AC_SUBST(EXAMPLE_SUBDIR)
-else
-EXAMPLE_SUBDIR=""
-fi
 
 #########################################################################
 #  Plug-in definitions
@@ -195,17 +152,17 @@ ximagesink=XImageSink \
 xvimagesink=XvImageSink \
 "
 
-AC_SUBST(GSTREAMERMM_PLUGIN_DEFS)
+AC_SUBST([GSTREAMERMM_PLUGIN_DEFS])
 
 #########################################################################
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
-                 tools/generate_gst_wrap_init.pl
                  gstreamer/${GSTREAMERMM_MODULE_NAME}.pc:gstreamer/gstreamermm.pc.in
                  gstreamer/${GSTREAMERMM_MODULE_NAME}-uninstalled.pc:gstreamer/gstreamermm-uninstalled.pc.in
                  gstreamer/src/Makefile
                  gstreamer/gstreamermm/Makefile
+                 examples/Makefile
                  tests/Makefile
                  docs/Makefile
                  docs/reference/Doxyfile])

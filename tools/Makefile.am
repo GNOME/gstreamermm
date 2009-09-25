@@ -17,40 +17,40 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 include $(srcdir)/m4/filelist.am
 
-lib_LTLIBRARIES	= extra_defs_gen/libgstreamermm_get_plugin_defs-0.10.la
-extra_defs_gen_libgstreamermm_get_plugin_defs_0_10_la_SOURCES = \
-			extra_defs_gen/get_plugin_defs.cc
-extra_defs_gen_libgstreamermm_get_plugin_defs_0_10_la_LIBADD = \
-			$(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4
+lib_LTLIBRARIES	= extra_defs_gen/libgstreamermm_get_plugin_defs-@GSTREAMERMM_API_VERSION@.la
 
-defs_includedir   = $(includedir)/gstreamermm-0.10/gstreamermm_get_plugin_defs
+extra_defs_gen_libgstreamermm_get_plugin_defs_@GSTREAMERMM_API_VERSION@_la_SOURCES = \
+	extra_defs_gen/get_plugin_defs.cc
+extra_defs_gen_libgstreamermm_get_plugin_defs_@GSTREAMERMM_API_VERSION@_la_LIBADD = \
+	$(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4
+extra_defs_gen_libgstreamermm_get_plugin_defs_@GSTREAMERMM_API_VERSION@_la_LDFLAGS = \
+	-no-undefined -version-info $(GSTREAMERMM_SO_VERSION)
+
+defs_includedir = $(includedir)/$(GSTREAMERMM_MODULE_NAME)/gstreamermm_get_plugin_defs
 defs_include_HEADERS = extra_defs_gen/get_plugin_defs.h
-defs_ldflags 	  = $(no_undefined) -version-info $(LIBGSTREAMERMM_SO_VERSION)
 
 #TODO: Should these go into $(datadir)/$(PACKAGE_TARNAME)/ instead as in gtkmm?
 plugingen_bindir = $(libdir)/$(GSTREAMERMM_MODULE_NAME)/gen
 plugingen_m4dir  = $(plugingen_bindir)/m4
-dist_plugingen_m4_DATA = $(files_codegen_m4:%=m4/%) $(files_plugin_m4:%=m4/%)
-
-noinst_PROGRAMS = extra_defs_gen/generate_defs_gst
-
-extra_defs_gen_generate_defs_gst_SOURCES = extra_defs_gen/generate_defs_gst.cc
-extra_defs_gen_generate_defs_gst_LDADD   = $(GSTREAMERMM_LIBS) \
-			-lglibmm_generate_extra_defs-2.4 \
-			extra_defs_gen/libgstreamermm_get_plugin_defs-0.10.la
+dist_plugingen_m4_DATA = $(addprefix m4/,$(files_codegen_m4) $(files_plugin_m4))
 
 # Build and install the generate_plugin_gmmproc_file utility executable so that
 # other gstreamermm modules can also generate plug-ins.
+plugingen_bin_PROGRAMS = extra_defs_gen/generate_plugin_gmmproc_file
+
+noinst_PROGRAMS = extra_defs_gen/generate_defs_gst
+
+local_lib = extra_defs_gen/libgstreamermm_get_plugin_defs-$(GSTREAMERMM_API_VERSION).la
 
 extra_defs_gen_generate_plugin_gmmproc_file_SOURCES = \
-			extra_defs_gen/generate_plugin_gmmproc_file.cc
-extra_defs_gen_generate_plugin_gmmproc_file_LDADD = \
-			extra_defs_gen/libgstreamermm_get_plugin_defs-0.10.la
-extra_defs_gen_generate_plugin_gmmproc_file_PROGRAMS = \
-			extra_defs_gen/generate_plugin_gmmproc_file
-extra_defs_gen_generate_plugin_gmmproc_filedir = $(plugingen_bindir)
+	extra_defs_gen/generate_plugin_gmmproc_file.cc
+extra_defs_gen_generate_plugin_gmmproc_file_LDADD = $(local_lib)
 
-AM_CPPFLAGS = -I$(top_builddir) $(GTHREAD_CFLAGS) $(GSTREAMERMM_CFLAGS)
+extra_defs_gen_generate_defs_gst_SOURCES = extra_defs_gen/generate_defs_gst.cc
+extra_defs_gen_generate_defs_gst_LDADD = \
+	$(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4 $(local_lib)
+
+AM_CPPFLAGS = -I$(top_builddir) $(GSTREAMERMM_CFLAGS)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
 
 # Instruct GNU make to delete the targets of a rule after it failed, in

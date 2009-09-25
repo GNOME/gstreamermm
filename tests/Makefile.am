@@ -1,21 +1,36 @@
-INCLUDES	= -I$(top_builddir)/gstreamer -I$(top_srcdir)/gstreamer \
-		  @GSTREAMERMM_CFLAGS@
+## Copyright 2009 The gstreamermm Development Team
+##
+## This library is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-LDADD 		= $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-0.10.la \
-		  $(GSTREAMERMM_LIBS)
+gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
+local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
 
+AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(GSTREAMERMM_CFLAGS)
+AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
+LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
 
-check_PROGRAMS  = test-caps test-create-element test-pipeline-add-element \
-                  test-link-elements test-create-bin test-miniobject-wrap \
-                  test-message-wrap test-event-wrap test-query-wrap \
-		  test-structure test-caps-structures test-interface \
-		  test-create-bus test-taglist test-tagsetter test-pad \
-		  test-ghost-pad test-init-check test-init \
-		  test-init-check-noargs test-init-noargs test-iterator \
-		  test-property-caps test-plugin-gen test-plugin-signals
+check_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
+                 test-link-elements test-create-bin test-miniobject-wrap \
+                 test-message-wrap test-event-wrap test-query-wrap \
+                 test-structure test-caps-structures test-interface \
+                 test-create-bus test-taglist test-tagsetter test-pad \
+                 test-ghost-pad test-init-check test-init \
+                 test-init-check-noargs test-init-noargs test-iterator \
+                 test-property-caps test-plugin-gen test-plugin-signals
 
 # Include run of test programs in check:
-TESTS 		= $(check_PROGRAMS)
+TESTS = $(check_PROGRAMS)
 
 test_caps_SOURCES			= test-caps.cc
 test_create_element_SOURCES		= test-create-element.cc

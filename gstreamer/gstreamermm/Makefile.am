@@ -19,39 +19,9 @@ include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
 include $(top_srcdir)/build/compile-binding.am
 
-stampdir = $(srcdir)/.stamps
-patched_stamps = $(patched_hg:%.hg=$(stampdir)/stamp-%)
-
-generate_gst_wrap_init_in = $(top_builddir)/tools/generate_gst_wrap_init.pl.in
-generate_gst_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_gst_wrap_init.pl
-generate_gst_wrap_init_flags = --namespace=Gst --parent_dir=gstreamermm
-
-gst_wrap_init.cc: $(generate_gst_wrap_init_in) $(files_hg:%=$(srcdir)/../src/%)
-	$(AM_V_GEN)$(generate_gst_wrap_init) $(generate_gst_wrap_init_flags) \
-		$(files_hg:%=$(srcdir)/../src/%) > $@
-
-$(stampdir):
-	@(test -d $(stampdir) || $(MKDIR_P) $(stampdir))
-	
-# This is to patch generated .h files in $(gensrc_destdir) (e.g. taglist.h).
-$(stampdir)/stamp-%: $(stampdir) $(srcdir)/%.h
-	$(PATCH) -Ns $(srcdir)/$*.h $(srcdir)/$*.h.patch || true
-	rm -f $(srcdir)/$*.h.rej $(srcdir)/$*.h.orig
-	@echo 'timestamp' > $@
-
-# Patch the generated .hg files that need to be patched but only in maintainer
-# mode
-if MAINTAINER_MODE
-BUILT_SOURCES = $(patched_stamps)
-endif
-
-# Distribute the patch files for the generated .hg files that need to be
-# patched.
-EXTRA_DIST = $(patched_hg:%.hg=%.h.patch)
-
 local_cppflags = $(binding_includes) $(binding_cppflags) -DGSTREAMERMM_BUILD=1
 
-AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GSTREAMERMM_CFLAGS)
+AM_CPPFLAGS = $(local_cppflags) $(GSTREAMERMM_CFLAGS)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
 
 libgstreamermm_@GSTREAMERMM_API_VERSION@_la_SOURCES = $(binding_sources)
