@@ -34,7 +34,7 @@ generate_plugin_dependencies = \
 generate_gst_wrap_init = $(top_srcdir)/tools/generate_gst_wrap_init.pl
 
 target_plugin     = $(patsubst %element,%,$(basename $(notdir $@)))
-target_plugin_def = $(subst =, ,$(filter $(target_plugin)=%,$(GSTREAMERMM_PLUGIN_DEFS)))
+target_plugin_def = $(subst =, ,$(filter $(target_plugin)=%,$(plugin_type_map)))
 
 $(binding_outputdir)/gst_wrap_init.cc: $(generate_gst_wrap_init) $(binding_relfiles_hg)
 	$(AM_V_GEN)$(PERL) -- $(generate_gst_wrap_init) $(wrap_init_flags) \
@@ -43,10 +43,11 @@ $(binding_outputdir)/gst_wrap_init.cc: $(generate_gst_wrap_init) $(binding_relfi
 # This is to generate plugin .ccg files.  The generated .ccg file is piped
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
 # the final .ccg file.
-# TODO: The confirm-existence check should probably run at configure time.
-# Also, even if this stays in the makefile, why the need for a separate
-# invocation of generate_plugin_gmmproc_file, when it could be done with
-# just one step?
+# TODO: The confirm-existence check should probably run at configure time.  Hm,
+# probably not possible as the required test program isn't available at that
+# point.  Also, even if this stays in the makefile, why the need for a separate
+# invocation of generate_plugin_gmmproc_file, when it could be done with just
+# one step?
 $(addprefix $(srcdir)/,$(plugins_ccg)): $(generate_plugin_dependencies)
 	@plugin='$(firstword $(target_plugin_def))'; \
 	 $(generate_plugin_gmmproc_file) --confirm-existence "$$plugin" || \
