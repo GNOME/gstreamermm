@@ -1,7 +1,4 @@
-/* $Id: generate_plugin_gmmproc_file.cc 740 2008-10-15 15:58:17Z jaalburqu $ */
-
-/* generate_plugin_gmmproc_file.cc
- *
+/*
  * Copyright 2008 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -28,21 +25,20 @@ static gchar* nmspace = 0;
 static gchar* defsFile = 0;
 static gchar* target = 0;
 
-static Glib::ustring pluginName;
-static Glib::ustring cTypeName;
-static Glib::ustring cParentTypeName;
-static Glib::ustring cppTypeName;
-static Glib::ustring cppParentTypeName;
-static Glib::ustring castMacro;
-static Glib::ustring parentInclude;
-static Glib::ustring parentNameSpace;
+static std::string pluginName;
+static std::string cTypeName;
+static std::string cParentTypeName;
+static std::string cppTypeName;
+static std::string cppParentTypeName;
+static std::string castMacro;
+static std::string parentInclude;
+static std::string parentNameSpace;
 
-GType type = 0;
+static GType type = 0;
 
 // To add a base class that is already wrapped to the list of wrapped base
-// classes, add alphabetically below and increment WRAPPED_BASE_CLASSES_SIZE.
-static const int WRAPPED_BASE_CLASSES_SIZE = 14;
-static const char* wrappedBaseClasses[WRAPPED_BASE_CLASSES_SIZE] =
+// classes, add alphabetically below.
+static const char *const wrappedBaseClasses[] =
 {
   "GstAudioFilter",
   "GstAudioSink",
@@ -59,19 +55,27 @@ static const char* wrappedBaseClasses[WRAPPED_BASE_CLASSES_SIZE] =
   "GstPushSrc",
   "GstVideoSink"
 };
+enum { WRAPPED_BASE_CLASSES_SIZE = G_N_ELEMENTS(wrappedBaseClasses) };
 
-bool gst_type_is_a_pointer(GType gtype)
+static bool gst_type_is_a_pointer(GType gtype)
 {
   return (g_type_is_a(gtype, G_TYPE_OBJECT) ||
     g_type_is_a(gtype, G_TYPE_BOXED) ||
     g_type_is_a(gtype, GST_TYPE_MINI_OBJECT));
 }
 
-Glib::ustring get_cast_macro(const Glib::ustring& typeName)
+static std::string to_lowercase(const std::string& str)
 {
-  Glib::ustring result;
+  std::string result = str;
+  std::transform(result.begin(), result.end(), result.begin(), &Glib::Ascii::tolower);
+  return result;
+}
 
-  Glib::ustring::const_iterator iter = typeName.end();
+static std::string get_cast_macro(const std::string& typeName)
+{
+  std::string result;
+
+  std::string::const_iterator iter = typeName.end();
 
   bool prev_is_upper = false;
   bool prev_is_lower = true;  // Going backwards so last char should be lower.
@@ -79,7 +83,7 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
 
   for(--iter; iter != typeName.begin(); --iter, ++underscore_char_count)
   {
-    if(g_unichar_isupper(*iter))
+    if(Glib::Ascii::isupper(*iter))
     {
       result.insert(0, 1, *iter);
       if(prev_is_lower && underscore_char_count > 1)
@@ -97,19 +101,19 @@ Glib::ustring get_cast_macro(const Glib::ustring& typeName)
         result.insert(0, 1, '_');
         underscore_char_count = 0;
       }
-      result.insert(0, 1, g_unichar_toupper(*iter));
+      result.insert(0, 1, Glib::Ascii::toupper(*iter));
       prev_is_upper = false;
       prev_is_lower = true;
     }
   }
 
   // Insert first character (not included in the for loop).
-  result.insert(0, 1, g_unichar_toupper(*iter));
+  result.insert(0, 1, Glib::Ascii::toupper(*iter));
 
   return result;
 }
 
-bool is_wrapped_base_class(const Glib::ustring& cTypeName)
+static bool is_wrapped_base_class(const std::string& cTypeName)
 {
   for(int i = 0; i < WRAPPED_BASE_CLASSES_SIZE &&
     cTypeName.compare(wrappedBaseClasses[i]) >= 0; i++)
@@ -121,10 +125,10 @@ bool is_wrapped_base_class(const Glib::ustring& cTypeName)
   return false;
 }
 
-bool is_plugin(const Glib::ustring& cTypeName)
+static bool is_plugin(const std::string& cTypeName)
 {
   GstElementFactory* fact = gst_element_factory_find(
-    cTypeName.substr(3).lowercase().c_str());
+    to_lowercase(cTypeName.substr(3)).c_str());
 
   bool const result = (fact != 0);
 
@@ -134,11 +138,11 @@ bool is_plugin(const Glib::ustring& cTypeName)
   return result;
 }
 
-Glib::ustring get_property_wrap_statements(Glib::ustring& includeMacroCalls,
-  Glib::ustring& enumWrapStatements,
-  Glib::ustring& enumGTypeFunctionDefinitions)
+static std::string get_property_wrap_statements(std::string& includeMacroCalls,
+                                                std::string& enumWrapStatements,
+                                                std::string& enumGTypeFunctionDefinitions)
 {
-  Glib::ustring wrapStatements;
+  std::string wrapStatements;
 
   //Get the list of properties:
   GParamSpec** ppParamSpec = 0;
@@ -174,27 +178,27 @@ Glib::ustring get_property_wrap_statements(Glib::ustring& includeMacroCalls,
       if(ownerGType == type)
       {
         //Name and type:
-        Glib::ustring propertyName = g_param_spec_get_name(pParamSpec);
+        std::string propertyName = g_param_spec_get_name(pParamSpec);
 
-        Glib::ustring  propertyCType = g_type_name(propertyGType) +
-          (Glib::ustring) (gst_type_is_a_pointer(propertyGType) ?  "*" : "");
+        std::string  propertyCType = g_type_name(propertyGType) +
+          (std::string) (gst_type_is_a_pointer(propertyGType) ?  "*" : "");
 
         if((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)))
         {
-          Glib::ustring enumPrefix = propertyCType.substr(0, 3);
-          Glib::ustring propertyCppType = propertyCType.substr(3);
+          std::string enumPrefix = propertyCType.substr(0, 3);
+          std::string propertyCppType = propertyCType.substr(3);
 
           enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
             propertyCppType + ")";
 
-          Glib::ustring enumGetTypeFunctionName =
-            get_cast_macro(propertyCType).lowercase() + "_get_type";
+          std::string enumGetTypeFunctionName =
+            to_lowercase(get_cast_macro(propertyCType)) + "_get_type";
 
           enumGTypeFunctionDefinitions +=
             "_PLUGIN_ENUM_GET_TYPE_FUNC(" + propertyCType + ")";
         }
 
-        wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", " +
+        wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", "
           "_TRANSLATE(" + propertyCType + ", `return'))\n";
 
         includeMacroCalls += "_TRANSLATION_INCLUDE(" + propertyCType + ")dnl\n";
@@ -206,11 +210,11 @@ Glib::ustring get_property_wrap_statements(Glib::ustring& includeMacroCalls,
   return wrapStatements;
 }
 
-Glib::ustring get_method_name(const Glib::ustring& signalName)
+static std::string get_method_name(const std::string& signalName)
 {
-  Glib::ustring result;
+  std::string result;
 
-  for(Glib::ustring::const_iterator iter = signalName.begin();
+  for(std::string::const_iterator iter = signalName.begin();
     iter != signalName.end(); ++iter)
   {
     if((*iter) == '-')
@@ -224,10 +228,10 @@ Glib::ustring get_method_name(const Glib::ustring& signalName)
   return result;
 }
 
-Glib::ustring get_c_enum_definition_macro(GType enumGType,
-  Glib::ustring& enumCType)
+static std::string get_c_enum_definition_macro(GType enumGType,
+                                               std::string& enumCType)
 {
-  Glib::ustring result;
+  std::string result;
 
   if((G_TYPE_IS_ENUM(enumGType)))
   {
@@ -238,7 +242,7 @@ Glib::ustring get_c_enum_definition_macro(GType enumGType,
       for(guint i = 0; i < enumClass->n_values; i++)
       {
         std::stringstream stream;
-        result += (Glib::ustring) enumClass->values[i].value_nick + ",";
+        result += (std::string) enumClass->values[i].value_nick + ",";
         stream << enumClass->values[i].value;
         result += stream.str();
         if(i < enumClass->n_values - 1)
@@ -257,7 +261,7 @@ Glib::ustring get_c_enum_definition_macro(GType enumGType,
       for(guint i = 0; i < flagsClass->n_values; i++)
       {
         std::stringstream stream;
-        result += (Glib::ustring) flagsClass->values[i].value_nick + ",";
+        result += (std::string) flagsClass->values[i].value_nick + ",";
         stream << flagsClass->values[i].value;
         result += stream.str();
         if(i < flagsClass->n_values - 1)
@@ -270,12 +274,13 @@ Glib::ustring get_c_enum_definition_macro(GType enumGType,
   return result;
 }
 
-Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
-  Glib::ustring& cEnumDefinitions, Glib::ustring& enumWrapStatements,
-  Glib::ustring& cClassSignalDeclarations,
-  Glib::ustring& enumGTypeFunctionDefinitions)
+static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
+                                              std::string& cEnumDefinitions,
+                                              std::string& enumWrapStatements,
+                                              std::string& cClassSignalDeclarations,
+                                              std::string& enumGTypeFunctionDefinitions)
 {
-  Glib::ustring wrapStatements;
+  std::string wrapStatements;
 
   gpointer gclass_ref = 0;
   gpointer ginterface_ref = 0;
@@ -294,14 +299,14 @@ Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
   {
     for(guint i = 0; i < iCount; i++)
     {
-      Glib::ustring convertMacros;
-      Glib::ustring wrapStatement;
+      std::string convertMacros;
+      std::string wrapStatement;
 
       guint signal_id = pIDs[i];
 
       //Name:
-      Glib::ustring signalName = g_signal_name(signal_id);
-      Glib::ustring signalMethodName = get_method_name(signalName);
+      std::string signalName = g_signal_name(signal_id);
+      std::string signalMethodName = get_method_name(signalName);
 
       //Other information about the signal:
       GSignalQuery signalQuery = { 0, 0, 0, GSignalFlags(0), 0, 0, 0, };
@@ -310,22 +315,22 @@ Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
       //Return type:
       GType returnGType = signalQuery.return_type & ~G_SIGNAL_TYPE_STATIC_SCOPE;
 
-      Glib::ustring  returnCType = g_type_name(returnGType) +
-        (Glib::ustring) (gst_type_is_a_pointer(returnGType) ?  "*" : "");
+      std::string  returnCType = g_type_name(returnGType) +
+        (std::string) (gst_type_is_a_pointer(returnGType) ?  "*" : "");
 
       if((G_TYPE_IS_ENUM(returnGType) || G_TYPE_IS_FLAGS(returnGType)))
       // Check for an enum first and attempt to generate _WRAP_ENUM() and
       // _TRANSLATION() macros if it is not wrapped (see plugingen_base.m4
       // file for docs).
       {
-        Glib::ustring enumPrefix = returnCType.substr(0, 3);
-        Glib::ustring returnCppType = returnCType.substr(3);
+        std::string enumPrefix = returnCType.substr(0, 3);
+        std::string returnCppType = returnCType.substr(3);
 
         enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
           returnCppType + ")";
 
-        Glib::ustring enumGetTypeFunctionName =
-          get_cast_macro(returnCType).lowercase() + "_get_type";
+        std::string enumGetTypeFunctionName =
+          to_lowercase(get_cast_macro(returnCType)) + "_get_type";
 
         enumGTypeFunctionDefinitions +=
           "_PLUGIN_ENUM_GET_TYPE_FUNC(" + returnCType + ")";
@@ -396,13 +401,14 @@ Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
 
           //Parameter name:
           //TODO: How can we get the real parameter name?
-          gchar* pchNum = g_strdup_printf("%d", i);
-          Glib::ustring paramName = "arg" + std::string(pchNum);
+          gchar* pchNum = g_strdup_printf("arg%u", i);
+          std::string paramName = std::string(pchNum);
           g_free(pchNum);
           pchNum = 0;
 
-          Glib::ustring  paramCType = g_type_name(paramGType) +
-            (Glib::ustring) (gst_type_is_a_pointer(paramGType) ?  "*" : "");
+          std::string paramCType = g_type_name(paramGType);
+          if (gst_type_is_a_pointer(paramGType))
+            paramCType += '*';
 
           includeMacroCalls += "_TRANSLATION_INCLUDE(" + paramCType + ")dnl\n";
 
@@ -415,14 +421,14 @@ Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
           // _TRANSLATION() macros and other necessary code if it is not
           // wrapped (see plugingen_base.m4 file for docs).
           {
-            Glib::ustring enumPrefix = paramCType.substr(0, 3);
-            Glib::ustring paramCppType = paramCType.substr(3);
+            std::string enumPrefix = paramCType.substr(0, 3);
+            std::string paramCppType = paramCType.substr(3);
 
             enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
               paramCppType + ")";
 
-            Glib::ustring enumGetTypeFunctionName =
-              get_cast_macro(paramCType).lowercase() + "_get_type";
+            std::string enumGetTypeFunctionName =
+              to_lowercase(get_cast_macro(paramCType)) + "_get_type";
 
             enumGTypeFunctionDefinitions +=
               "_PLUGIN_ENUM_GET_TYPE_FUNC(" + paramCType + ")";
@@ -471,17 +477,17 @@ Glib::ustring get_signal_wrap_statements(Glib::ustring& includeMacroCalls,
   g_free(pIDs);
 
   if(gclass_ref)
-    g_type_class_unref(gclass_ref); //to match the g_type_class_ref() above.
+    g_type_class_unref(gclass_ref);
   else if(ginterface_ref)
-    g_type_default_interface_unref(ginterface_ref); // for interface ref above.
+    g_type_default_interface_unref(ginterface_ref);
 
   return wrapStatements;
 }
 
-Glib::ustring get_interface_macros(Glib::ustring& includeMacroCalls,
-  Glib::ustring& cppExtends)
+static std::string get_interface_macros(std::string& includeMacroCalls,
+                                        std::string& cppExtends)
 {
-  Glib::ustring interfaceMacros;
+  std::string interfaceMacros;
 
   guint n_interfaces = 0;
   GType* interfaces = g_type_interfaces(type, &n_interfaces);
@@ -492,8 +498,7 @@ Glib::ustring get_interface_macros(Glib::ustring& includeMacroCalls,
   {
     if(!g_type_is_a(parent_type, interfaces[i]))
     {
-      Glib::ustring  interfaceCType = g_type_name(interfaces[i]) +
-        (Glib::ustring) "*";
+      std::string interfaceCType = std::string(g_type_name(interfaces[i])) + '*';
 
       cppExtends += "public _TRANSLATE(`" + interfaceCType + "',`type')";
 
@@ -511,19 +516,19 @@ Glib::ustring get_interface_macros(Glib::ustring& includeMacroCalls,
   return interfaceMacros;
 }
 
-void generate_hg_file(const Glib::ustring& includeMacroCalls,
-  const Glib::ustring& cEnumDefinitions,
-  const Glib::ustring& enumWrapStatements,
-  const Glib::ustring& cppExtends,
-  const Glib::ustring& interfaceMacros,
-  const Glib::ustring& propertyWrapStatements,
-  const Glib::ustring& signalWrapStatements)
+static void generate_hg_file(const std::string& includeMacroCalls,
+                             const std::string& cEnumDefinitions,
+                             const std::string& enumWrapStatements,
+                             const std::string& cppExtends,
+                             const std::string& interfaceMacros,
+                             const std::string& propertyWrapStatements,
+                             const std::string& signalWrapStatements)
 {
   std::cout << "// Generated by generate_plugin_gmmproc_file. Don't edit this file." << std::endl << std::endl;
   std::cout << "include(plugingen_base.m4)dnl" << std::endl;
   std::cout << "changecom()dnl" << std::endl;
   std::cout << "#include <" << parentInclude << "/" <<
-    cppParentTypeName.lowercase() << ".h>" << std::endl;
+    to_lowercase(cppParentTypeName) << ".h>" << std::endl;
 
   std::cout << includeMacroCalls;
 
@@ -591,17 +596,17 @@ void generate_hg_file(const Glib::ustring& includeMacroCalls,
 
   std::cout << "};" << std::endl;
 
-  std::cout << std::endl << "} //namespace " << nmspace << std::endl;
+  std::cout << std::endl << "} // namespace " << nmspace << std::endl;
 }
 
-void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
-  const Glib::ustring& cClassSignalDeclarations)
+static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
+  const std::string& cClassSignalDeclarations)
 {
   std::cout << "// Generated by generate_plugin_gmmproc_file. Don't edit this file." << std::endl << std::endl;
   std::cout << "include(plugingen_base.m4)dnl" << std::endl;
   std::cout << "changecom()dnl" << std::endl;
   std::cout << "_PINCLUDE(" << parentInclude << "/private/" <<
-    cppParentTypeName.lowercase() << "_p.h)" << std::endl << std::endl;
+    to_lowercase(cppParentTypeName) << "_p.h)" << std::endl << std::endl;
 
   //Only output ObjectClass with signal declarations if there are signals:
   if(!cClassSignalDeclarations.empty())
@@ -613,7 +618,7 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
     std::cout << "};" << std::endl << std::endl;
   }
 
-  Glib::ustring getTypeName = castMacro.lowercase() + "_get_type";
+  std::string getTypeName = to_lowercase(castMacro) + "_get_type";
 
   std::cout << "extern \"C\"" << std::endl;
   std::cout << "{" << std::endl << std::endl;
@@ -652,7 +657,7 @@ void generate_ccg_file(const Glib::ustring& enumGTypeFunctionDefinitions,
   std::cout << "{" << std::endl << std::endl;
 
   std::cout << cppTypeName << "::" << cppTypeName << "()" << std::endl;
-  std::cout << ": _CONSTRUCT(\"name\", 0)" << std::endl;
+  std::cout << ": _CONSTRUCT(\"name\", static_cast<char*>(0))" << std::endl;
   std::cout << "{}" << std::endl << std::endl;
 
   std::cout << cppTypeName << "::" << cppTypeName <<
@@ -672,7 +677,7 @@ int main(int argc, char* argv[])
   if(!g_thread_supported())
     g_thread_init(0);
 
-  GOptionEntry optionEntries[] =
+  static const GOptionEntry optionEntries[] =
   {
     {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate preliminary .hg file.", 0 },
     {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", 0 },
@@ -708,7 +713,7 @@ int main(int argc, char* argv[])
     {
       std::cout << "Error parsing options and initializing.  Sorry." <<
         std::endl;
-      return -1;
+      return 1;
     }
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
@@ -721,7 +726,7 @@ int main(int argc, char* argv[])
       std::cout << "Error parsing options and initializing GStreamer." <<
         std::endl << "Run `" << argv[0] << " -?'  for a list of options." <<
         std::endl;
-      return -1;
+      return 1;
   }
 
   if(confirmExistence)
@@ -731,7 +736,7 @@ int main(int argc, char* argv[])
       std::cout << "A plugin name must be supplied to confirm plugin "
         "existence." << std::endl << "Run `" << argv[0] <<
         " -?'  for help." << std::endl;
-      return -1;
+      return 1;
     }
   }
   else if(argc != 3)
@@ -739,7 +744,7 @@ int main(int argc, char* argv[])
     std::cout << "A plugin name and C++ class name must be supplied to "
       "generate gmmproc files." << std::endl <<
       "Run `" << argv[0] << " -?'  for help." << std::endl;
-    return -1;
+    return 1;
   }
 
   pluginName = argv[1];
@@ -773,7 +778,7 @@ int main(int argc, char* argv[])
         "must be supplied" << std::endl << "with the --namespace, --main-defs "
         "and --target options (run with -? option for " << std::endl <<
         "details)." << std::endl;
-      return -1;
+      return 1;
     }
 
     cTypeName = g_type_name(type);
@@ -820,13 +825,13 @@ int main(int argc, char* argv[])
 
     if(hgFile || ccgFile)
     {
-      Glib::ustring includeMacroCalls;
-      Glib::ustring cEnumDefinitions;
-      Glib::ustring enumWrapStatements;
-      Glib::ustring propertyWrapStatements;
-      Glib::ustring signalWrapStatements;
-      Glib::ustring cClassSignalDeclarations;
-      Glib::ustring enumGTypeFunctionDefinitions;
+      std::string includeMacroCalls;
+      std::string cEnumDefinitions;
+      std::string enumWrapStatements;
+      std::string propertyWrapStatements;
+      std::string signalWrapStatements;
+      std::string cClassSignalDeclarations;
+      std::string enumGTypeFunctionDefinitions;
 
       propertyWrapStatements = get_property_wrap_statements(includeMacroCalls,
         enumWrapStatements, enumGTypeFunctionDefinitions);
@@ -837,8 +842,8 @@ int main(int argc, char* argv[])
 
       if(hgFile)
       {
-        Glib::ustring interfaceMacros;
-        Glib::ustring cppExtends;
+        std::string interfaceMacros;
+        std::string cppExtends;
 
         interfaceMacros = get_interface_macros(includeMacroCalls, cppExtends);
 
@@ -858,7 +863,7 @@ int main(int argc, char* argv[])
     std::cerr << "Unrecognized Gstreamer element type." << std::endl;
    
     if(confirmExistence)
-      return -1;
+      return 1;
 
     if(hgFile)
     {
