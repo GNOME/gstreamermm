@@ -76,6 +76,111 @@ MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
                        [-Wall], [-Wall -Wextra],
                        [G GSTREAMER])
 
+#########################################################################
+#  Plug-in processing
+#########################################################################
+
+# Check for programs used to verify that the plug-ins exist in maintainer
+# mode:
+if test "x$USE_MAINTAINER_MODE" != "xno"; then
+  AC_CHECK_PROG([GST_INSPECT], [gst-inspect], [gst-inspect])
+  AC_CHECK_PROG([HEAD], [head], [head])
+  AC_CHECK_PROG([CUT], [cut], [cut])
+  AC_PROG_GREP
+fi
+
+# To add a plugin, add the plugin definition, in the form of
+# "plugin=CppClassName" to the space-separated list of definitions below.
+# (Where "plugin" is the plugin name as recognized by gst-inspect and
+# "CppClassName" is the desired name of the C++ class.)
+#
+# Also add the target .hg file name to the plugins_hg variable in the
+# gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
+# in lowercase with a .hg extension).  Make sure that the order of both lists
+# correspond.
+
+# TODO: Include appsink and appsrc plug-ins in list below if they indeed are
+# plug-ins (see gst-plugins-base docs for details) and when they don't cause
+# gstreamermm initialization errors.
+
+GSTREAMERMM_PLUGIN_DEFS="                       \
+	adder=Adder				\
+	alsamixer=AlsaMixer			\
+	alsasink=AlsaSink			\
+	alsasrc=AlsaSrc				\
+	audioconvert=AudioConvert		\
+	audioresample=AudioResample		\
+	audiotestsrc=AudioTestSrc		\
+	capsfilter=CapsFilter			\
+	cdparanoiasrc=CdParanoiaSrc		\
+	clockoverlay=ClockOverlay		\
+	decodebin2=DecodeBin2			\
+	decodebin=DecodeBin			\
+	fakesink=FakeSink			\
+	fakesrc=FakeSrc				\
+	fdsink=FdSink				\
+	fdsrc=FdSrc				\
+	ffmpegcolorspace=FfmpegColorSpace	\
+	filesink=FileSink			\
+	filesrc=FileSrc				\
+	gdpdepay=GDPDepay			\
+	gdppay=GDPPay				\
+	giosink=GioSink				\
+	giosrc=GioSrc				\
+	giostreamsink=GioStreamSink		\
+	giostreamsrc=GioStreamSrc		\
+	identity=Identity			\
+	multifdsink=MultiFdSink			\
+	multiqueue=MultiQueue			\
+	oggdemux=OggDemux			\
+	oggmux=OggMux				\
+	playbin2=PlayBin2			\
+	playbin=PlayBin				\
+	queue=Queue				\
+	tcpclientsink=TCPClientSink		\
+	tcpclientsrc=TCPClientSrc		\
+	tcpserversink=TcpServerSink		\
+	tcpserversrc=TCPServerSrc		\
+	tee=Tee					\
+	textoverlay=TextOverlay			\
+	textrender=TextRender			\
+	theoradec=TheoraDec			\
+	theoraenc=TheoraEnc			\
+	theoraparse=TheoraParse			\
+	timeoverlay=TimeOverlay			\
+	typefind=TypeFindElement		\
+	uridecodebin=UriDecodeBin		\
+	videorate=VideoRate			\
+	videoscale=VideoScale			\
+	videotestsrc=VideoTestSrc		\
+	volume=Volume				\
+	vorbisdec=VorbisDec			\
+	vorbisenc=VorbisEnc			\
+	vorbisparse=VorbisParse			\
+	vorbistag=VorbisTag			\
+	ximagesink=XImageSink			\
+	xvimagesink=XvImageSink                 \
+"
+
+# Check for the existence of plug-ins in maintainer mode:
+if test "x$USE_MAINTAINER_MODE" != "xno"; then
+  # Go through all the "plug-in defs", extracting the plug-in name.  Ensure
+  # that the plug-ins exist.  If they don't report it:
+  for plugin_def in $GSTREAMERMM_PLUGIN_DEFS; do
+    plugin_name=[`echo $plugin_def | $CUT -d'=' -f 1`]
+    if test -n "`$GST_INSPECT $plugin_name | $HEAD -1 | $GREP 'No such element'`"; then
+    AC_MSG_ERROR([The gstreamer plug-in '$plugin_name' does not exist. \
+If you built gst-plugins-base from source code then you might need to \
+install the appropriate -dev or -devel packages or enable experimental \
+plugins before rebuilding gst-plugins-base.])
+    fi;
+  done
+fi
+
+AC_SUBST([GSTREAMERMM_PLUGIN_DEFS])
+
+#########################################################################
+
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
                  gstreamer/${GSTREAMERMM_MODULE_NAME}.pc:gstreamer/gstreamermm.pc.in
