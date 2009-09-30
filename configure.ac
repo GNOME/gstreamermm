@@ -169,7 +169,7 @@ if test "x$USE_MAINTAINER_MODE" != "xno"; then
   for plugin_def in $GSTREAMERMM_PLUGIN_DEFS; do
     plugin_name=[`echo $plugin_def | $CUT -d'=' -f 1`]
     if test -n "`$GST_INSPECT $plugin_name | $HEAD -1 | $GREP 'No such element'`"; then
-    AC_MSG_ERROR([The gstreamer plug-in '$plugin_name' does not exist. \
+      AC_MSG_ERROR([The gstreamer plug-in '$plugin_name' does not exist. \
 If you built gst-plugins-base from source code then you might need to \
 install the appropriate -dev or -devel packages or enable experimental \
 plugins before rebuilding gst-plugins-base.])
