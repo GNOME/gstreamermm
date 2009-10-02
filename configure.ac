@@ -39,10 +39,6 @@ AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-# Check for the patch command in maintainer mode for patching generated .hg
-# files like taglist.hg.
-AS_IF([test "x$USE_MAINTAINER_MODE" != xno], [AC_CHECK_PROGS([PATCH], [patch], [patch])])
-
 # Check for m4 and sed which are used for plug-in .hg and .ccg file generation.
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 AC_PROG_SED
@@ -83,7 +79,7 @@ MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
 # Check for programs used to verify that the plug-ins exist in maintainer
 # mode:
 if test "x$USE_MAINTAINER_MODE" != "xno"; then
-  AC_CHECK_PROG([GST_INSPECT], [gst-inspect], [gst-inspect])
+  AC_PATH_PROGS([GST_INSPECT], [gst-inspect gst-inspect-0.10])
   AC_CHECK_PROG([HEAD], [head], [head])
   AC_CHECK_PROG([CUT], [cut], [cut])
   AC_PROG_GREP
