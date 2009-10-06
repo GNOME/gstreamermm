@@ -19,29 +19,38 @@
 
 #include <gst/gstenumtypes.h>
 
-static void TagList_foreach_gstreamermm_callback(const GstTagList* list, const gchar *tag, void* data)
+namespace
 {
-  Gst::TagList::SlotForeach* slot = static_cast<Gst::TagList::SlotForeach*>(data);
+extern "C"
+{
 
-  const Glib::ustring tag_str = Glib::convert_const_gchar_ptr_to_ustring(tag);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+static void TagList_foreach_gstreamermm_callback(const GstTagList*, const char *tag, void* data)
+{
+  Gst::TagList::SlotForeach& slot_foreach = *static_cast<Gst::TagList::SlotForeach*>(data);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
+#endif
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-    (*slot)(tag_str);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    slot_foreach(Glib::convert_const_gchar_ptr_to_ustring(tag));
   }
-  catch(...)
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
+#endif
 }
+
+} // extern "C"
+} // anonymous namespace
 
 namespace Gst
 {
 
 // Make sure the order here is the same order as in Gst:Tag.
+// TODO: It would probably be better to export a lookup function instead of
+// the array itself.
 const char* const _tag_strings[] =
 {
   GST_TAG_TITLE,
@@ -111,9 +120,8 @@ void TagList::add_value(Tag tag, const Glib::ValueBase& value, TagMergeMode mode
 
 void TagList::add_value(const Glib::ustring& tag, const Glib::ValueBase& value, TagMergeMode mode)
 {
-  //TODO: The gst_tag_list_add_values() documentation says nothing about ending the ... with NULL.
-  gst_tag_list_add_values(gobj(), (GstTagMergeMode) mode, tag.c_str(),
-    value.gobj(), (void*)0);
+  gst_tag_list_add_value(gobj(), static_cast<GstTagMergeMode>(mode),
+                         tag.c_str(), value.gobj());
 }
 
 void TagList::add(Tag tag, const char* data, TagMergeMode mode)
@@ -123,14 +131,14 @@ void TagList::add(Tag tag, const char* data, TagMergeMode mode)
 
 void TagList::add(const Glib::ustring& tag, const char* data, TagMergeMode mode)
 {
-  gst_tag_list_add(gobj(), (GstTagMergeMode) mode, tag.c_str(), data,
-    (void*)0);
+  gst_tag_list_add(gobj(), static_cast<GstTagMergeMode>(mode), tag.c_str(), data,
+                   static_cast<void*>(0));
 }
 
 void TagList::foreach(const SlotForeach& slot)
 {
   gst_tag_list_foreach(gobj(), &TagList_foreach_gstreamermm_callback,
-    const_cast<SlotForeach*>(&slot));
+                       const_cast<SlotForeach*>(&slot));
 }
 
 bool TagList::get_value(Tag tag, Glib::ValueBase& dest) const
@@ -163,4 +171,4 @@ bool TagList::get_value(const Glib::ustring& tag, guint index, Glib::ValueBase& 
   return false;
 }
 
-} //namespace Gst
+} // namespace Gst

@@ -324,6 +324,11 @@ extern const char* const _tag_strings[];
  */
 class TagList : public Structure
 {
+  // TODO: Gst::Structure is already wrapped as a boxed type.  Wrapping this
+  // derived class as a boxed type again is wrong.  It even means that there
+  // are *two* separate gobject_ members!  The compiler warning about the
+  // missing explicit base instance initialization in the copy constructor
+  // exposes the problem, too.
   _CUSTOM_STRUCT_PROTOTYPE
   _CLASS_BOXEDTYPE_EXTRA(TagList, GstTagList, gst_tag_list_new, gst_tag_list_copy, gst_tag_list_free)
   _IGNORE(gst_tag_list_copy, gst_tag_list_free)

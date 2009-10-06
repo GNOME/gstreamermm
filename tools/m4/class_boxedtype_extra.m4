@@ -66,6 +66,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl else
 
 /** A Glib::wrap() method for this object. The dummy int parameter is added to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap() (GstTagList is in fact a GstStructure so wrap method becomes ambiguous).
+dnl TODO: This seems like a bad idea to me.  Why not just rename the function?
  * 
  * @param object The C instance.
  * @param dummy An unused parameter to disambiguate Gst::TagList::wrap() from Gst::Structure::wrap().  The value of this parameter is irrelevant.
@@ -92,7 +93,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 namespace Glib
 {
 
-__NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, int dummy, bool take_copy)
+__NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, int, bool take_copy)
 {
   return __NAMESPACE__::__CPPNAME__`'(object, take_copy);
 }

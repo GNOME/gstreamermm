@@ -1,5 +1,22 @@
 2009-10-06  Daniel Elstner  <danielk@openismus.com>
 
+	Comment on TagList code and avoid some warnings
+
+	* tools/m4/class_boxedtype_extra.m4 (_END_CLASS_BOXEDTYPE_EXTRA):
+	Remove dummy parameter name from the definition of Glib::wrap().
+	Comment on the dummy parameter looking fishy to me.
+	* gstreamer/src/taglist.hg (TagList): Explain in a comment that the
+	class is wrapped incorrectly and should be reworked at the next ABI
+	break.
+	* gstreamer/src/taglist.ccg: Place file-scope declarations into an
+	anonymous namespace.
+	(TagList_foreach_gstreamermm_callback): Remove unused parameter name
+	to get rid of a compiler warning.  Use extern "C" calling convention.
+	(TagList::add_value): Call new gst_tag_list_add_value() function.
+	(TagList::add): Replace C-style casts with appropriate C++ casts.
+
+2009-10-06  Daniel Elstner  <danielk@openismus.com>
+
 	Clean up RingBuffer code and avoid warning
 
 	* gstreamer/src/ringbuffer.hg: Annotate API with a few TODO comments.
