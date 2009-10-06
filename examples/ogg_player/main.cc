@@ -20,6 +20,9 @@
 #include <iostream>
 #include <iomanip>
 
+namespace
+{
+
 Glib::RefPtr<Glib::MainLoop> mainloop;
 Glib::RefPtr<Gst::Pipeline> pipeline;
 Glib::RefPtr<Gst::Element> decoder;
@@ -108,13 +111,15 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 }
 
 bool on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad,
-        const Glib::RefPtr<Gst::MiniObject>& data)
+                           const Glib::RefPtr<Gst::MiniObject>&)
 {
   std::cout << "Sink pad '" << pad->get_name() << "' has received data;";
   std::cout << " will now remove sink data probe id: " << data_probe_id << std::endl;
   pad->remove_data_probe(data_probe_id);
   return true;
 }
+
+} // anonymous namespace
 
 int main(int argc, char* argv[])
 {
@@ -125,7 +130,7 @@ int main(int argc, char* argv[])
   if(argc < 2)
   {
     std::cout << "Usage: " << argv[0] << " <Ogg/Vorbis filename>" << std::endl;
-    return -1;
+    return 1;
   }
 
   const std::string filename = argv[1];
@@ -166,7 +171,7 @@ int main(int argc, char* argv[])
   if(!pipeline || !source || !parser || !decoder || !conv || !sink)
   {
     std::cerr << "One element could not be created" << std::endl;
-    return -1;
+    return 1;
   }
 
   Glib::RefPtr<Gst::Pad> pad = sink->get_static_pad("sink");
@@ -176,7 +181,7 @@ int main(int argc, char* argv[])
 
   source->set_property("location", filename);
 
-  // Get the bus from the pipeline, 
+  // Get the bus from the pipeline,
   // and add a bus watch to the default main context with the default priority:
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
   bus->add_watch( sigc::ptr_fun(&on_bus_message) );
@@ -193,7 +198,7 @@ int main(int argc, char* argv[])
   catch(const Glib::Error& ex)
   {
     std::cerr << "Error while adding elements to the pipeline: " << ex.what() << std::endl;
-    return -1;
+    return 1;
   }
 #endif
 
@@ -204,7 +209,7 @@ int main(int argc, char* argv[])
 #endif
     source->link(parser);
 
-    // We cannot link the parser and decoder yet, 
+    // We cannot link the parser and decoder yet,
     // because the parser uses dynamic pads.
     // So we do it later in a pad-added signal handler:
     parser->signal_pad_added().connect( sigc::ptr_fun(&on_parser_pad_added) );
