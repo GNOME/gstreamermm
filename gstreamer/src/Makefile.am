@@ -24,14 +24,14 @@ include $(top_srcdir)/build/generate-binding.am
 other_built_sources  += $(binding_outputdir)/gst_wrap_init.cc
 MAINTAINERCLEANFILES += $(addprefix $(srcdir)/,$(plugins_ccg) $(plugins_hg))
 
+generate_gst_wrap_init = $(codegen_srcdir)/generate_gst_wrap_init.pl
+
 generate_plugin_gmmproc_file = \
 	$(top_builddir)/tools/extra_defs_gen/generate_plugin_gmmproc_file$(EXEEXT) \
 	--namespace=Gst --main-defs=gst --target=gstreamermm
 generate_plugin_dependencies = \
 	$(codegen_srcdir)/extra_defs_gen/generate_plugin_gmmproc_file.cc \
 	$(addprefix $(codegen_m4_srcdir)/,$(files_plugin_m4))
-
-generate_gst_wrap_init = $(top_srcdir)/tools/generate_gst_wrap_init.pl
 
 target_plugin     = $(patsubst %element,%,$(basename $(notdir $@)))
 target_plugin_def = $(subst =, ,$(filter $(target_plugin)=%,$(GSTREAMERMM_PLUGIN_DEFS)))
@@ -44,7 +44,6 @@ $(binding_outputdir)/gst_wrap_init.cc: $(generate_gst_wrap_init) $(binding_relfi
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
 # the final .ccg file.
 $(addprefix $(srcdir)/,$(plugins_ccg)): $(generate_plugin_dependencies)
-	@plugin='$(firstword $(target_plugin_def))'; \
 	$(AM_V_GEN)$(generate_plugin_gmmproc_file) --ccg $(target_plugin_def) \
 	 | $(M4) -I $(codegen_m4_srcdir) >$@
 
