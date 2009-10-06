@@ -17,27 +17,36 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <string.h>
+#include <cstring>
 #include <gst/audio/audio-enumtypes.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
-static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer* rbuf, guint8* data, guint len, gpointer user_data)
+namespace
 {
-  Gst::RingBuffer::SlotFill* the_slot = static_cast<Gst::RingBuffer::SlotFill*>(user_data);
+extern "C"
+{
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer*, guint8* data, guint len,
+                                                 gpointer user_data)
+{
+  Gst::RingBuffer::SlotFill& slot_fill = *static_cast<Gst::RingBuffer::SlotFill*>(user_data);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
+#endif
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-    (*the_slot)(data, len);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    slot_fill(data, len);
   }
-  catch(...)
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
+#endif
 }
+
+} // extern "C"
+} // anonymous namespace
 
 namespace Gst
 {
@@ -57,8 +66,8 @@ void RingBufferSpec::copy_fields_from(const GstRingBufferSpec& spec)
 {
   caps = Glib::wrap(spec.caps);
 
-  type = (Gst::BufferFormatType)(spec.type);
-  format = (Gst::BufferFormat)(spec.format);
+  type = static_cast<Gst::BufferFormatType>(spec.type);
+  format = static_cast<Gst::BufferFormat>(spec.format);
   sign = spec.sign;
   bigend = spec.bigend;
   width = spec.width;
@@ -72,16 +81,14 @@ void RingBufferSpec::copy_fields_from(const GstRingBufferSpec& spec)
   bytes_per_sample = spec.bytes_per_sample;
   seglatency = spec.seglatency;
 
-  memcpy(silence_sample, spec.silence_sample, sizeof(silence_sample));
+  std::memcpy(silence_sample, spec.silence_sample, sizeof(silence_sample));
 }
 
 void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec) const
 {
-  if(caps)
-    spec.caps = caps->gobj();
-
-  spec.type = (GstBufferFormatType)(type);
-  spec.format = (GstBufferFormat)(format);
+  spec.caps = Glib::unwrap(caps);
+  spec.type = static_cast<GstBufferFormatType>(type);
+  spec.format = static_cast<GstBufferFormat>(format);
   spec.sign = sign;
   spec.bigend = bigend;
   spec.width = width;
@@ -95,7 +102,7 @@ void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec) const
   spec.bytes_per_sample = bytes_per_sample;
   spec.seglatency = seglatency;
 
-  memcpy(spec.silence_sample, silence_sample, sizeof(spec.silence_sample));
+  std::memcpy(spec.silence_sample, silence_sample, sizeof(spec.silence_sample));
 }
 
 RingBuffer::RingBuffer(const Glib::ConstructParams& construct_params)
@@ -106,12 +113,16 @@ RingBuffer::RingBuffer(const Glib::ConstructParams& construct_params)
 
 RingBuffer::RingBuffer(GstRingBuffer* castitem)
 :
-  Gst::Object((GstObject*)(castitem)),
+  Gst::Object(reinterpret_cast<GstObject*>(castitem)),
   _slot_set(false)
 {}
 
 void RingBuffer::set_fill_slot(const SlotFill& slot)
 {
+  // TODO: Not safe against self assignment, and not exception-safe.  Is the
+  // separate _slot_set flag really needed?  Is dynamic allocation actually
+  // needed at all?  This would not have to be a member at all if there were
+  // an accessor to the callback user data in the C API.
   if(_slot_set)
     delete this->slot;
 
@@ -133,9 +144,9 @@ bool RingBuffer::parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::C
 {
   GstRingBufferSpec gst_spec;
   spec.copy_fields_to(gst_spec);
-  gboolean const result = gst_ring_buffer_parse_caps(&gst_spec, caps->gobj());
+  gboolean const result = gst_ring_buffer_parse_caps(&gst_spec, Glib::unwrap(caps));
   spec.copy_fields_from(gst_spec);
-  return result;
+  return (result != 0);
 }
 
 RingBuffer::~RingBuffer()

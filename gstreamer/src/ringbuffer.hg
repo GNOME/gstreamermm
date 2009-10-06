@@ -32,8 +32,11 @@ _WRAP_ENUM(RingBufferState, GstRingBufferState)
 _WRAP_ENUM(BufferFormat, GstBufferFormat)
 _WRAP_ENUM(BufferFormatType, GstBufferFormatType)
 
+// TODO: Rewrite at next API break, either as a real class with accessors
+// instead of public data members, or alternatively as a plain struct
+// accompanied by a justification.
 /** The structure containing the format specification of a Gst::RingBuffer.
- *@see Gst::RingBuffer::acquire().
+ * @see Gst::RingBuffer::acquire().
  */
 class RingBufferSpec
 {
@@ -94,11 +97,12 @@ public:
   int           segtotal;
 
   /** Number of bytes of one sample.
-  */
+   */
   int           bytes_per_sample;
 
+  // TODO: Ouch.  No way.
   /** Bytes representing one sample of silence.
-  */
+   */
   guint8        silence_sample[32];
 
   /** Number of segments queued in the lower level device, defaults to
@@ -124,7 +128,7 @@ public:
  * Last reviewed on 2006-02-02 (0.10.4).
  * @ingroup GstBaseClasses
  */
-class RingBuffer : public Gst::Object 
+class RingBuffer : public Gst::Object
 {
   _CLASS_GOBJECT(RingBuffer, GstRingBuffer, GST_RING_BUFFER, Gst::Object, GstObject)
   _CUSTOM_DTOR()
@@ -157,7 +161,7 @@ public:
    *
    * @param spec The specs of the buffer.
    *
-   * @return true if the device could be acquired, false on error. MT safe. 
+   * @return true if the device could be acquired, false on error. MT safe.
    */
   bool acquire(const Gst::RingBufferSpec& spec);
   _IGNORE(gst_ring_buffer_acquire)
@@ -199,6 +203,7 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
+  // TODO: Follow naming conventions and use std::auto_ptr<SlotFill>.
   SlotFill* slot;
   bool _slot_set;
 #endif

@@ -1,3 +1,17 @@
+2009-10-06  Daniel Elstner  <danielk@openismus.com>
+
+	Clean up RingBuffer code and avoid warning
+
+	* gstreamer/src/ringbuffer.hg: Annotate API with a few TODO comments.
+	* gstreamer/src/ringbuffer.ccg: Include STL <cstring> header instead
+	of <string.h>.  Place file-scope declarations in anonymous namespace.
+	(RingBuffer_Fill_gstreamermm_callback): Remove unused parameter name
+	to get rid of a compiler warning.  Use extern "C" calling convention.
+	(RingBuffer::copy_fields_from): Replace C-style casts with C++ casts.
+	(copy_fields_to): Likewise.  Unconditionally assign spec.caps field.
+	(set_fill_slot): Comment on a couple of problems with the code.
+	(parse_caps): Use Glib::unwrap() to handle a null RefPtr<>.
+
 2009-10-06  Daniel Elstner  <daniel.kitta@gmail.com>
 
 	Further streamline the C++ plugin generator code
