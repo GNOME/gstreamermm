@@ -148,7 +148,8 @@ xvimagesink=XvImageSink"])
 AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
 [
   gstmm_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-0.10 2>&AS_MESSAGE_LOG_FD`
-  AC_PATH_PROGS([GST_INSPECT], [gst-inspect-0.10 gst-inspect],, [$gstmm_toolsdir:$PATH])
+  AC_PATH_PROGS([GST_INSPECT], [gst-inspect-0.10 gst-inspect],,
+                [$gstmm_toolsdir$PATH_SEPARATOR$PATH])
 
   for gstmm_plugin_def in $GSTREAMERMM_PLUGIN_DEFS
   do
