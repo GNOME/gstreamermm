@@ -53,10 +53,10 @@ AC_SUBST([GSTREAMERMM_MODULES],
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-2.4 >= 2.12],
-                  [gstreamermm_enable_gui_examples=yes], [gstreamermm_enable_gui_examples=no])
-AS_IF([test "x$gstreamermm_enable_gui_examples" != xyes],
+                  [gstmm_enable_gui_examples=yes], [gstmm_enable_gui_examples=no])
+AS_IF([test "x$gstmm_enable_gui_examples" != xyes],
       [AC_MSG_WARN([gtkmm not available: GUI examples will not be built.])])
-AM_CONDITIONAL([ENABLE_GUI_EXAMPLES], [test "x$gstreamermm_enable_gui_examples" = xyes])
+AM_CONDITIONAL([ENABLE_GUI_EXAMPLES], [test "x$gstmm_enable_gui_examples" = xyes])
 
 MM_PKG_CONFIG_SUBST([GMMPROC_DIR], [--variable=gmmprocdir glibmm-2.4])
 
@@ -67,23 +67,9 @@ MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 
-AC_LANG([C++])
-MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
-                       [-Wall], [-Wall -Wextra],
-                       [G GSTREAMER])
-
 #########################################################################
 #  Plug-in processing
 #########################################################################
-
-# Check for programs used to verify that the plug-ins exist in maintainer
-# mode:
-if test "x$USE_MAINTAINER_MODE" != "xno"; then
-  AC_PATH_PROGS([GST_INSPECT], [gst-inspect gst-inspect-0.10])
-  AC_CHECK_PROG([HEAD], [head], [head])
-  AC_CHECK_PROG([CUT], [cut], [cut])
-  AC_PROG_GREP
-fi
 
 # To add a plugin, add the plugin definition, in the form of
 # "plugin=CppClassName" to the space-separated list of definitions below.
@@ -92,90 +78,97 @@ fi
 #
 # Also add the target .hg file name to the plugins_hg variable in the
 # gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
-# in lowercase with a .hg extension).  Make sure that the order of both lists
-# correspond.
-
+# in lowercase with a .hg extension).
+#
 # TODO: Include appsink and appsrc plug-ins in list below if they indeed are
 # plug-ins (see gst-plugins-base docs for details) and when they don't cause
 # gstreamermm initialization errors.
 
-GSTREAMERMM_PLUGIN_DEFS="                       \
-	adder=Adder				\
-	alsamixer=AlsaMixer			\
-	alsasink=AlsaSink			\
-	alsasrc=AlsaSrc				\
-	audioconvert=AudioConvert		\
-	audioresample=AudioResample		\
-	audiotestsrc=AudioTestSrc		\
-	capsfilter=CapsFilter			\
-	cdparanoiasrc=CdParanoiaSrc		\
-	clockoverlay=ClockOverlay		\
-	decodebin2=DecodeBin2			\
-	decodebin=DecodeBin			\
-	fakesink=FakeSink			\
-	fakesrc=FakeSrc				\
-	fdsink=FdSink				\
-	fdsrc=FdSrc				\
-	ffmpegcolorspace=FfmpegColorSpace	\
-	filesink=FileSink			\
-	filesrc=FileSrc				\
-	gdpdepay=GDPDepay			\
-	gdppay=GDPPay				\
-	giosink=GioSink				\
-	giosrc=GioSrc				\
-	giostreamsink=GioStreamSink		\
-	giostreamsrc=GioStreamSrc		\
-	identity=Identity			\
-	multifdsink=MultiFdSink			\
-	multiqueue=MultiQueue			\
-	oggdemux=OggDemux			\
-	oggmux=OggMux				\
-	playbin2=PlayBin2			\
-	playbin=PlayBin				\
-	queue=Queue				\
-	tcpclientsink=TCPClientSink		\
-	tcpclientsrc=TCPClientSrc		\
-	tcpserversink=TcpServerSink		\
-	tcpserversrc=TCPServerSrc		\
-	tee=Tee					\
-	textoverlay=TextOverlay			\
-	textrender=TextRender			\
-	theoradec=TheoraDec			\
-	theoraenc=TheoraEnc			\
-	theoraparse=TheoraParse			\
-	timeoverlay=TimeOverlay			\
-	typefind=TypeFindElement		\
-	uridecodebin=UriDecodeBin		\
-	videorate=VideoRate			\
-	videoscale=VideoScale			\
-	videotestsrc=VideoTestSrc		\
-	volume=Volume				\
-	vorbisdec=VorbisDec			\
-	vorbisenc=VorbisEnc			\
-	vorbisparse=VorbisParse			\
-	vorbistag=VorbisTag			\
-	ximagesink=XImageSink			\
-	xvimagesink=XvImageSink                 \
-"
+AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
+adder=Adder \
+alsamixer=AlsaMixer \
+alsasink=AlsaSink \
+alsasrc=AlsaSrc \
+audioconvert=AudioConvert \
+audioresample=AudioResample \
+audiotestsrc=AudioTestSrc \
+capsfilter=CapsFilter \
+cdparanoiasrc=CdParanoiaSrc \
+clockoverlay=ClockOverlay \
+decodebin2=DecodeBin2 \
+decodebin=DecodeBin \
+fakesink=FakeSink \
+fakesrc=FakeSrc \
+fdsink=FdSink \
+fdsrc=FdSrc \
+ffmpegcolorspace=FfmpegColorSpace \
+filesink=FileSink \
+filesrc=FileSrc \
+gdpdepay=GDPDepay \
+gdppay=GDPPay \
+giosink=GioSink \
+giosrc=GioSrc \
+giostreamsink=GioStreamSink \
+giostreamsrc=GioStreamSrc \
+identity=Identity \
+multifdsink=MultiFdSink \
+multiqueue=MultiQueue \
+oggdemux=OggDemux \
+oggmux=OggMux \
+playbin2=PlayBin2 \
+playbin=PlayBin \
+queue=Queue \
+tcpclientsink=TCPClientSink \
+tcpclientsrc=TCPClientSrc \
+tcpserversink=TcpServerSink \
+tcpserversrc=TCPServerSrc \
+tee=Tee \
+textoverlay=TextOverlay \
+textrender=TextRender \
+theoradec=TheoraDec \
+theoraenc=TheoraEnc \
+theoraparse=TheoraParse \
+timeoverlay=TimeOverlay \
+typefind=TypeFindElement \
+uridecodebin=UriDecodeBin \
+videorate=VideoRate \
+videoscale=VideoScale \
+videotestsrc=VideoTestSrc \
+volume=Volume \
+vorbisdec=VorbisDec \
+vorbisenc=VorbisEnc \
+vorbisparse=VorbisParse \
+vorbistag=VorbisTag \
+ximagesink=XImageSink \
+xvimagesink=XvImageSink"])
 
-# Check for the existence of plug-ins in maintainer mode:
-if test "x$USE_MAINTAINER_MODE" != "xno"; then
-  # Go through all the "plug-in defs", extracting the plug-in name.  Ensure
-  # that the plug-ins exist.  If they don't report it:
-  for plugin_def in $GSTREAMERMM_PLUGIN_DEFS; do
-    plugin_name=[`echo $plugin_def | $CUT -d'=' -f 1`]
-    if test -n "`$GST_INSPECT $plugin_name | $HEAD -1 | $GREP 'No such element'`"; then
-      AC_MSG_ERROR([The gstreamer plug-in '$plugin_name' does not exist. \
-If you built gst-plugins-base from source code then you might need to \
-install the appropriate -dev or -devel packages or enable experimental \
-plugins before rebuilding gst-plugins-base.])
-    fi;
+# Check for the existence of the plug-ins.  Note that this check doesn't
+# work when cross-compiling.  That isn't much of a problem though since
+# it only applies in maintainer-mode.
+AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
+[
+  gstmm_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-0.10 2>&AS_MESSAGE_LOG_FD`
+  AC_PATH_PROGS([GST_INSPECT], [gst-inspect-0.10 gst-inspect],, [$gstmm_toolsdir:$PATH])
+
+  for gstmm_plugin_def in $GSTREAMERMM_PLUGIN_DEFS
+  do
+    # Extract plugin name and run gst-inspect to check whether the plugin
+    # is installed on the build system.
+    gstmm_plugin_name=`[expr "X$gstmm_plugin_def" : 'X\([^=]*\)' 2>&]AS_MESSAGE_LOG_FD`
+    AS_IF([$GST_INSPECT "$gstmm_plugin_name" >/dev/null 2>&AS_MESSAGE_LOG_FD],,
+          [AC_MSG_FAILURE([[The gstreamer plug-in '$gstmm_plugin_name' does not exist.
+If you built gst-plugins-base from source code then you might need to
+install the appropriate -dev or -devel packages or enable experimental
+plugins before rebuilding gst-plugins-base.]])])
   done
-fi
-
-AC_SUBST([GSTREAMERMM_PLUGIN_DEFS])
+])
 
 #########################################################################
+
+AC_LANG([C++])
+MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
+                       [-Wall], [-Wall -Wextra],
+                       [G GSTREAMER])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
