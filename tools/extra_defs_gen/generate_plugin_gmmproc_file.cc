@@ -18,8 +18,12 @@
 
 #include <gst/gst.h>
 #include <glibmm.h>
+#include <algorithm>
 #include <iostream>
 #include <sstream>
+
+namespace
+{
 
 static gchar* nmspace = 0;
 static gchar* defsFile = 0;
@@ -37,7 +41,7 @@ static std::string parentNameSpace;
 static GType type = 0;
 
 // To add a base class that is already wrapped to the list of wrapped base
-// classes, add alphabetically below.
+// classes, insert it alphabetically below.
 static const char *const wrappedBaseClasses[] =
 {
   "GstAudioFilter",
@@ -55,7 +59,6 @@ static const char *const wrappedBaseClasses[] =
   "GstPushSrc",
   "GstVideoSink"
 };
-enum { WRAPPED_BASE_CLASSES_SIZE = G_N_ELEMENTS(wrappedBaseClasses) };
 
 static bool gst_type_is_a_pointer(GType gtype)
 {
@@ -66,8 +69,8 @@ static bool gst_type_is_a_pointer(GType gtype)
 
 static std::string to_lowercase(const std::string& str)
 {
-  std::string result = str;
-  std::transform(result.begin(), result.end(), result.begin(), &Glib::Ascii::tolower);
+  std::string result (str.size(), '\0');
+  std::transform(str.begin(), str.end(), result.begin(), &Glib::Ascii::tolower);
   return result;
 }
 
@@ -115,27 +118,21 @@ static std::string get_cast_macro(const std::string& typeName)
 
 static bool is_wrapped_base_class(const std::string& cTypeName)
 {
-  for(int i = 0; i < WRAPPED_BASE_CLASSES_SIZE &&
-    cTypeName.compare(wrappedBaseClasses[i]) >= 0; i++)
-  {
-    if(cTypeName.compare(wrappedBaseClasses[i]) == 0)
-      return true;
-  }
-
-  return false;
+  return std::binary_search(&wrappedBaseClasses[0],
+                            &wrappedBaseClasses[G_N_ELEMENTS(wrappedBaseClasses)],
+                            cTypeName);
 }
 
 static bool is_plugin(const std::string& cTypeName)
 {
-  GstElementFactory* fact = gst_element_factory_find(
-    to_lowercase(cTypeName.substr(3)).c_str());
+  const std::string element = to_lowercase(cTypeName.substr(3));
 
-  bool const result = (fact != 0);
-
-  if(fact)
+  if (GstElementFactory *const fact = gst_element_factory_find(element.c_str()))
+  {
     g_object_unref(fact);
-
-  return result;
+    return true;
+  }
+  return false;
 }
 
 static std::string get_property_wrap_statements(std::string& includeMacroCalls,
@@ -179,27 +176,23 @@ static std::string get_property_wrap_statements(std::string& includeMacroCalls,
       {
         //Name and type:
         std::string propertyName = g_param_spec_get_name(pParamSpec);
-
-        std::string  propertyCType = g_type_name(propertyGType) +
-          (std::string) (gst_type_is_a_pointer(propertyGType) ?  "*" : "");
+        std::string propertyCType = g_type_name(propertyGType);
+        if (gst_type_is_a_pointer(propertyGType))
+          propertyCType += '*';
 
         if((G_TYPE_IS_ENUM(propertyGType) || G_TYPE_IS_FLAGS(propertyGType)))
         {
           std::string enumPrefix = propertyCType.substr(0, 3);
           std::string propertyCppType = propertyCType.substr(3);
 
-          enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
-            propertyCppType + ")";
-
-          std::string enumGetTypeFunctionName =
-            to_lowercase(get_cast_macro(propertyCType)) + "_get_type";
-
+          enumWrapStatements +=
+            "_WRAP_PLUGIN_ENUM(" + enumPrefix + ',' + propertyCppType + ')';
           enumGTypeFunctionDefinitions +=
-            "_PLUGIN_ENUM_GET_TYPE_FUNC(" + propertyCType + ")";
+            "_PLUGIN_ENUM_GET_TYPE_FUNC(" + propertyCType + ')';
         }
 
-        wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName + "\", "
-          "_TRANSLATE(" + propertyCType + ", `return'))\n";
+        wrapStatements += "  _WRAP_PROPERTY(\"" + propertyName
+          + "\", _TRANSLATE(" + propertyCType + ", `return'))\n";
 
         includeMacroCalls += "_TRANSLATION_INCLUDE(" + propertyCType + ")dnl\n";
       }
@@ -212,19 +205,8 @@ static std::string get_property_wrap_statements(std::string& includeMacroCalls,
 
 static std::string get_method_name(const std::string& signalName)
 {
-  std::string result;
-
-  for(std::string::const_iterator iter = signalName.begin();
-    iter != signalName.end(); ++iter)
-  {
-    if((*iter) == '-')
-    {
-      result.push_back('_');
-    }
-    else
-      result.push_back(*iter);
-  }
-
+  std::string result = signalName;
+  std::replace(result.begin(), result.end(), '-', '_');
   return result;
 }
 
@@ -233,22 +215,22 @@ static std::string get_c_enum_definition_macro(GType enumGType,
 {
   std::string result;
 
-  if((G_TYPE_IS_ENUM(enumGType)))
+  if(G_TYPE_IS_ENUM(enumGType))
   {
     GEnumClass* enumClass = G_ENUM_CLASS(g_type_class_ref(enumGType));
     if(enumClass)
     {
-      result += "_C_ENUM_DEFINITION(" + enumCType + ",";
+      result += "_C_ENUM_DEFINITION(" + enumCType + ',';
       for(guint i = 0; i < enumClass->n_values; i++)
       {
         std::stringstream stream;
-        result += (std::string) enumClass->values[i].value_nick + ",";
+        result += std::string(enumClass->values[i].value_nick) + ',';
         stream << enumClass->values[i].value;
         result += stream.str();
         if(i < enumClass->n_values - 1)
-          result += ",";
+          result += ',';
       }
-      result += ")";
+      result += ')';
     }
     g_type_class_unref(enumClass);
   }
@@ -257,17 +239,17 @@ static std::string get_c_enum_definition_macro(GType enumGType,
     GFlagsClass* flagsClass = G_FLAGS_CLASS(g_type_class_ref(enumGType));
     if(flagsClass)
     {
-      result += "_C_ENUM_DEFINITION(" + enumCType + ",";
+      result += "_C_ENUM_DEFINITION(" + enumCType + ',';
       for(guint i = 0; i < flagsClass->n_values; i++)
       {
         std::stringstream stream;
-        result += (std::string) flagsClass->values[i].value_nick + ",";
+        result += std::string(flagsClass->values[i].value_nick) + ',';
         stream << flagsClass->values[i].value;
         result += stream.str();
         if(i < flagsClass->n_values - 1)
-          result += ",";
+          result += ',';
       }
-      result += ")";
+      result += ')';
     }
     g_type_class_unref(flagsClass);
   }
@@ -315,67 +297,61 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
       //Return type:
       GType returnGType = signalQuery.return_type & ~G_SIGNAL_TYPE_STATIC_SCOPE;
 
-      std::string  returnCType = g_type_name(returnGType) +
-        (std::string) (gst_type_is_a_pointer(returnGType) ?  "*" : "");
+      std::string returnCType = g_type_name(returnGType);
+      if (gst_type_is_a_pointer(returnGType))
+        returnCType += '*';
 
-      if((G_TYPE_IS_ENUM(returnGType) || G_TYPE_IS_FLAGS(returnGType)))
       // Check for an enum first and attempt to generate _WRAP_ENUM() and
       // _TRANSLATION() macros if it is not wrapped (see plugingen_base.m4
       // file for docs).
+      if(G_TYPE_IS_ENUM(returnGType) || G_TYPE_IS_FLAGS(returnGType))
       {
         std::string enumPrefix = returnCType.substr(0, 3);
         std::string returnCppType = returnCType.substr(3);
 
-        enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
-          returnCppType + ")";
-
-        std::string enumGetTypeFunctionName =
-          to_lowercase(get_cast_macro(returnCType)) + "_get_type";
+        enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + ','
+          + returnCppType + ')';
 
         enumGTypeFunctionDefinitions +=
-          "_PLUGIN_ENUM_GET_TYPE_FUNC(" + returnCType + ")";
+          "_PLUGIN_ENUM_GET_TYPE_FUNC(" + returnCType + ')';
 
-        cEnumDefinitions += get_c_enum_definition_macro(returnGType,
-          returnCType);
+        cEnumDefinitions += get_c_enum_definition_macro(returnGType, returnCType);
       }
       else if(gst_type_is_a_pointer(returnGType))
       {
-        if(g_type_is_a(returnGType, G_TYPE_BOXED))
         // Boxed type returns for signals need special conversions because
         // when unwrapping them, gobj_copy() should be used instead of just
         // gobj() to guard against losing the original with a temporary
         // wrapper.
+        if(g_type_is_a(returnGType, G_TYPE_BOXED))
         {
           // Unwrapping conversion:
-          convertMacros += "#m4 _CONVERSION(_LQ()_TRANSLATE(" + returnCType +
-            ",`type')_RQ(), ``" + returnCType + "'', ";
-          convertMacros +=  "``($3).gobj_copy()'')\n";
+          convertMacros += "#m4 _CONVERSION(_LQ()_TRANSLATE(" + returnCType
+            + ",`type')_RQ(), ``" + returnCType + "'', ``($3).gobj_copy()'')\n";
 
           // Also include a wrapping conversion:
 
           if(returnGType == GST_TYPE_TAG_LIST)
-          // Dealing with a GstTagList* return which has a special Glib::wrap()
-          // because of the conflict with the Glib::wrap() for GstStructure*
-          // (GstTagList is infact a GstStructure).
           {
-            convertMacros += "#m4 _CONVERSION(``" + returnCType +
-              "'', _LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ";
-            convertMacros +=  "``Glib::wrap($3, 0)'')\n";
+            // Dealing with a GstTagList* return which has a special Glib::wrap()
+            // because of the conflict with the Glib::wrap() for GstStructure*
+            // (GstTagList is infact a GstStructure).
+            convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', "
+              "_LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ``Glib::wrap($3, 0)'')\n";
           }
           else
-          // Dealing with a regular boxed type return.
           {
-            convertMacros += "#m4 _CONVERSION(``" + returnCType +
-              "'', _LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ";
-            convertMacros +=  "``Glib::wrap($3)'')\n";
+            // Dealing with a regular boxed type return.
+            convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', "
+              "_LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ``Glib::wrap($3)'')\n";
           }
         }
         else
-        // Dealing with a RefPtr<> return so include a wrapping conversion
-        // just so these conversions can be automatic for plug-ins and not
-        // needed in the global convert file.  (An unwrapping conversion will
-        // already probably be included in the global convert file).
         {
+          // Dealing with a RefPtr<> return so include a wrapping conversion
+          // just so these conversions can be automatic for plug-ins and not
+          // needed in the global convert file.  (An unwrapping conversion will
+          // already probably be included in the global convert file).
           convertMacros += "#m4 _CONVERSION(``" + returnCType +
             "'', _LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ";
           convertMacros += g_type_is_a(returnGType, GST_TYPE_MINI_OBJECT) ?
@@ -386,7 +362,7 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
       includeMacroCalls += "_TRANSLATION_INCLUDE(" + returnCType + ")dnl\n";
 
       wrapStatement = "  _WRAP_SIGNAL(_TRANSLATE("  + returnCType +
-        ", `return') " + signalMethodName + "(";
+        ", `return') " + signalMethodName + '(';
 
       cClassSignalDeclarations += "  " + returnCType + " (*" +
         signalMethodName + ") (" + cTypeName + "* element";
@@ -404,7 +380,6 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
           gchar* pchNum = g_strdup_printf("arg%u", i);
           std::string paramName = std::string(pchNum);
           g_free(pchNum);
-          pchNum = 0;
 
           std::string paramCType = g_type_name(paramGType);
           if (gst_type_is_a_pointer(paramGType))
@@ -416,40 +391,36 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
           // conversions will already probably be defined in the global
           // convert file).  Also try to wrap plug-in specific enums:
 
-          if((G_TYPE_IS_ENUM(paramGType) || G_TYPE_IS_FLAGS(paramGType)))
-          // Check for an enum first and attempt to generate _WRAP_ENUM() and
-          // _TRANSLATION() macros and other necessary code if it is not
-          // wrapped (see plugingen_base.m4 file for docs).
+          if(G_TYPE_IS_ENUM(paramGType) || G_TYPE_IS_FLAGS(paramGType))
           {
+            // Check for an enum first and attempt to generate _WRAP_ENUM() and
+            // _TRANSLATION() macros and other necessary code if it is not
+            // wrapped (see plugingen_base.m4 file for docs).
             std::string enumPrefix = paramCType.substr(0, 3);
             std::string paramCppType = paramCType.substr(3);
 
-            enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + "," +
-              paramCppType + ")";
-
-            std::string enumGetTypeFunctionName =
-              to_lowercase(get_cast_macro(paramCType)) + "_get_type";
+            enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + ',' +
+              paramCppType + ')';
 
             enumGTypeFunctionDefinitions +=
-              "_PLUGIN_ENUM_GET_TYPE_FUNC(" + paramCType + ")";
+              "_PLUGIN_ENUM_GET_TYPE_FUNC(" + paramCType + ')';
 
-            cEnumDefinitions += get_c_enum_definition_macro(paramGType,
-              paramCType);
+            cEnumDefinitions += get_c_enum_definition_macro(paramGType, paramCType);
           }
           if(gst_type_is_a_pointer(paramGType))
           {
             if(paramGType == GST_TYPE_TAG_LIST)
-            // Dealing with a GstTagList* which has a special Glib::wrap()
-            // because of the conflict with the Glib::wrap() for GstStructure*
-            // (GstTagList is in fact a GstStructure).
             {
-              convertMacros += "#m4 _CONVERSION(``" + paramCType +
-                "'', _LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), ";
-              convertMacros +=  "``Glib::wrap($3, 0, true)'')\n";
+              // Dealing with a GstTagList* which has a special Glib::wrap()
+              // because of the conflict with the Glib::wrap() for GstStructure*
+              // (GstTagList is in fact a GstStructure).
+              convertMacros += "#m4 _CONVERSION(``" + paramCType + "'', "
+                "_LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), "
+                "``Glib::wrap($3, 0, true)'')\n";
             }
             else
-            // Dealing with reference counted parameter or a boxed type.
             {
+              // Dealing with reference counted parameter or a boxed type.
               convertMacros += "#m4 _CONVERSION(``" + paramCType +
                 "'', _LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), ";
               convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
@@ -460,7 +431,7 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
           wrapStatement += "_TRANSLATE(" + paramCType + ", `param') " +
             paramName;
 
-          cClassSignalDeclarations += ", " + paramCType + " " + paramName;
+          cClassSignalDeclarations += ", " + paramCType + ' ' + paramName;
 
           if(i < signalQuery.n_params - 1)
             wrapStatement += ", ";
@@ -527,12 +498,12 @@ static void generate_hg_file(const std::string& includeMacroCalls,
   std::cout << "// Generated by generate_plugin_gmmproc_file. Don't edit this file." << std::endl << std::endl;
   std::cout << "include(plugingen_base.m4)dnl" << std::endl;
   std::cout << "changecom()dnl" << std::endl;
-  std::cout << "#include <" << parentInclude << "/" <<
+  std::cout << "#include <" << parentInclude << '/' <<
     to_lowercase(cppParentTypeName) << ".h>" << std::endl;
 
   std::cout << includeMacroCalls;
 
-  std::cout << "_DEFS(" << target << "," << defsFile << ")" << std::endl <<
+  std::cout << "_DEFS(" << target << ',' << defsFile << ')' << std::endl <<
     std::endl;
 
   if(!cEnumDefinitions.empty())
@@ -542,7 +513,7 @@ static void generate_hg_file(const std::string& includeMacroCalls,
   }
 
   std::cout << "namespace " << nmspace << std::endl;
-  std::cout << "{" << std::endl << std::endl;
+  std::cout << '{' << std::endl << std::endl;
 
   if(!enumWrapStatements.empty())
     std::cout << enumWrapStatements;
@@ -565,10 +536,10 @@ static void generate_hg_file(const std::string& includeMacroCalls,
   
   std::cout << std::endl;
 
-  std::cout << "{" << std::endl;
+  std::cout << '{' << std::endl;
   std::cout << "  _CLASS_GOBJECT(" << cppTypeName << ", " << cTypeName <<
     ", " << castMacro << ", " << parentNameSpace << "::" <<
-    cppParentTypeName << ", " << cParentTypeName << ")" << std::endl;
+    cppParentTypeName << ", " << cParentTypeName << ')' << std::endl;
 
   if(!interfaceMacros.empty())
     std::cout << interfaceMacros << std::endl;
@@ -612,7 +583,7 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
   if(!cClassSignalDeclarations.empty())
   {
     std::cout << "struct _" << cTypeName << "Class" << std::endl;
-    std::cout << "{" << std::endl;
+    std::cout << '{' << std::endl;
     std::cout << "  " << cParentTypeName << "Class parent_class;" << std::endl;
     std::cout << cClassSignalDeclarations;
     std::cout << "};" << std::endl << std::endl;
@@ -621,18 +592,19 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
   std::string getTypeName = to_lowercase(castMacro) + "_get_type";
 
   std::cout << "extern \"C\"" << std::endl;
-  std::cout << "{" << std::endl << std::endl;
+  std::cout << '{' << std::endl << std::endl;
 
   if(!enumGTypeFunctionDefinitions.empty())
     std::cout << enumGTypeFunctionDefinitions;
 
   std::cout << "GType " << getTypeName << "()" << std::endl;
-  std::cout << "{" << std::endl;
+  std::cout << '{' << std::endl;
   std::cout << "  static GType type = 0;" << std::endl;
   std::cout << "  GstElementFactory* factory = 0;" << std::endl;
   std::cout << "  GstPluginFeature* feature = 0;" << std::endl << std::endl;
 
-  std::cout << "  if(!type)" << std::endl; std::cout << "  {" << std::endl;
+  std::cout << "  if(!type)" << std::endl;
+  std::cout << "  {" << std::endl;
   std::cout << "    factory = gst_element_factory_find(\"" << pluginName << "\");" << std::endl;
 
   std::cout << "    // Make sure that the feature is actually loaded:" << std::endl;
@@ -649,12 +621,12 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
   std::cout << "  }" << std::endl << std::endl;
 
   std::cout << "  return type;" << std::endl;
-  std::cout << "}" << std::endl;
+  std::cout << '}' << std::endl;
 
   std::cout << std::endl << "} // extern \"C\"" << std::endl << std::endl;
 
   std::cout << "namespace " << nmspace << std::endl;
-  std::cout << "{" << std::endl << std::endl;
+  std::cout << '{' << std::endl << std::endl;
 
   std::cout << cppTypeName << "::" << cppTypeName << "()" << std::endl;
   std::cout << ": _CONSTRUCT(\"name\", static_cast<char*>(0))" << std::endl;
@@ -665,17 +637,19 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
   std::cout << ": _CONSTRUCT(\"name\", name.c_str())" << std::endl;
   std::cout << "{}" << std::endl << std::endl;
 
-  std::cout << "}" << std::endl;
+  std::cout << '}' << std::endl;
 }
 
-int main(int argc, char* argv[])
+} // anonymous namespace
+
+int main(int argc, char** argv)
 {
   gboolean hgFile = false;
   gboolean ccgFile = false;
   gboolean confirmExistence = false;
 
-  if(!g_thread_supported())
-    g_thread_init(0);
+  if(!Glib::thread_supported())
+    Glib::thread_init();
 
   static const GOptionEntry optionEntries[] =
   {
@@ -867,7 +841,7 @@ int main(int argc, char* argv[])
 
     if(hgFile)
     {
-      std::cout << "_DEFS(" << target << "," << defsFile << ")" <<
+      std::cout << "_DEFS(" << target << ',' << defsFile << ')' <<
         std::endl << std::endl;
 
       std::cout << "// The build system does not know of a gstreamer plugin named " <<

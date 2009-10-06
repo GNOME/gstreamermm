@@ -1,5 +1,22 @@
 2009-10-06  Daniel Elstner  <daniel.kitta@gmail.com>
 
+	Further streamline the C++ plugin generator code
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Add missing
+	include statement for <algorithm>.  Move all file-scope declarations
+	and definitions into an anonymous namespace.  Do not use conditional
+	expressions if one of the branches is a no-op.  Avoid C-style casts,
+	in particular for non-POD types.  Replace string literals of length
+	one by character literals.  Concatenate string literals at compile
+	time where possible.
+	(is_wrapped_base_class): Use std::binary_search().
+	(is_plugin): Disentangle.
+	(get_method_name): Use std::replace().
+	(main): Call the glibmm wrapper functions Glib::thread_supported()
+	and Glib::thread_init() instead of using the GLib C API directly.
+
+2009-10-06  Daniel Elstner  <daniel.kitta@gmail.com>
+
 	Unbreak build with silent rules enabled
 
 	* gstreamer/src/Makefile.am: Remove a left-over shell statement
