@@ -22,6 +22,9 @@
 #include <gstreamermm/value.h>
 #include <gstreamermm/miniobject.h>
 
+namespace
+{
+
 static Glib::ustring quark_to_ustring(GQuark quark)
 {
  const gchar* pch = g_quark_to_string(quark);
@@ -31,6 +34,9 @@ static Glib::ustring quark_to_ustring(GQuark quark)
    
  return str;
 }
+
+extern "C"
+{
 
 static gboolean
 Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, void* data)
@@ -74,6 +80,10 @@ Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, void* data)
 
   return false;
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {

@@ -22,6 +22,12 @@
 #include <gstreamermm/plugin.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
 static gboolean Registry_Plugin_Filter_gstreamermm_callback(GstPlugin* plugin, void* data)
 {
   Gst::Plugin::SlotFilter* the_slot = static_cast<Gst::Plugin::SlotFilter*>(data);
@@ -63,6 +69,10 @@ static gboolean Registry_PluginFeature_Filter_gstreamermm_callback(GstPluginFeat
 
   return false;
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {

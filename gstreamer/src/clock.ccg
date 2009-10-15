@@ -21,6 +21,12 @@
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstreamermm/private/object_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
 static gboolean ClockID_Clock_gstreamermm_callback(GstClock* clock, GstClockTime time, GstClockID id, void* data)
 {
   Gst::ClockID::SlotClock* the_slot = static_cast<Gst::ClockID::SlotClock*>(data);
@@ -45,6 +51,10 @@ static gboolean ClockID_Clock_gstreamermm_callback(GstClock* clock, GstClockTime
 
   return false;
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {

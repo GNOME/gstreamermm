@@ -20,6 +20,12 @@
 #include <gst/gstenumtypes.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
 static void TaskPool_Push_gstreamermm_callback(void* data)
 {
   Gst::TaskPool::SlotPush* the_slot = static_cast<Gst::TaskPool::SlotPush*>(data);
@@ -38,6 +44,10 @@ static void TaskPool_Push_gstreamermm_callback(void* data)
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {

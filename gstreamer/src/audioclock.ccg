@@ -21,6 +21,12 @@
 
 _PINCLUDE(gstreamermm/private/systemclock_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
 static GstClockTime AudioClock_GetTime_gstreamermm_callback(GstClock* clock, void* data)
 {
   Gst::AudioClock::SlotGetTime* the_slot = static_cast<Gst::AudioClock::SlotGetTime*>(data);
@@ -40,6 +46,10 @@ static GstClockTime AudioClock_GetTime_gstreamermm_callback(GstClock* clock, voi
 
   return 0; // arbitrary value
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {

@@ -29,6 +29,12 @@
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstreamermm/private/object_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
 static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, void* data)
 {
   Gst::Pad::SlotBlock * the_slot = static_cast<Gst::Pad::SlotBlock*>(data);
@@ -75,6 +81,10 @@ static void Pad_Data_gstreamermm_callback_disconnect(void* data)
   if(the_slot)
     delete the_slot;
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {

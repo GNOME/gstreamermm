@@ -405,7 +405,8 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
             enumGTypeFunctionDefinitions +=
               "_PLUGIN_ENUM_GET_TYPE_FUNC(" + paramCType + ')';
 
-            cEnumDefinitions += get_c_enum_definition_macro(paramGType, paramCType);
+            cEnumDefinitions +=
+              get_c_enum_definition_macro(paramGType, paramCType);
           }
           if(gst_type_is_a_pointer(paramGType))
           {

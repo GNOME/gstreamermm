@@ -21,6 +21,12 @@
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstreamermm/private/object_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
 static gboolean Bus_Message_gstreamermm_callback(GstBus* bus, GstMessage* message, void* data)
 {
   Gst::Bus::SlotMessage* the_slot = static_cast<Gst::Bus::SlotMessage*>(data);
@@ -65,6 +71,10 @@ static GstBusSyncReply Bus_Message_Sync_gstreamermm_callback(GstBus* bus, GstMes
 
   return GST_BUS_PASS;
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {

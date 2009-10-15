@@ -20,6 +20,12 @@
 #include <gst/gstenumtypes.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
 static gboolean Index_Filter_gstreamermm_callback(GstIndex* index, GstIndexEntry* entry, void* data)
 {
   Gst::Index::SlotFilter * the_slot =
@@ -82,6 +88,10 @@ static void Index_Resolver_gstreamermm_callback_destroy(void* data)
 {
   delete static_cast<Gst::Index::SlotResolver*>(data);
 }
+
+} // extern "C"
+
+} // anonymous namespace
 
 namespace Gst
 {
