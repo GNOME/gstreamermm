@@ -109,7 +109,7 @@ FlowReturn Gst::BaseSink::buffer_alloc_vfunc(guint64 offset, guint size, const G
   {
     GstBuffer* gst_buffer;
     const Gst::FlowReturn result =
-      static_cast<Gst::FlowReturn>((*base->buffer_alloc)(gobj(), offset,size,(caps)->gobj(),&gst_buffer));
+      static_cast<Gst::FlowReturn>((*base->buffer_alloc)(gobj(), offset,size,Glib::unwrap(caps), &gst_buffer));
     buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
     return result;
   }

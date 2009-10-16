@@ -113,10 +113,10 @@ public:
 template <class T_CastTo>
 Glib::RefPtr< Gst::ElementInterfaced<T_CastTo> > Interface::cast(const Glib::RefPtr<Gst::Element>& element)
 {
-  if(element && gst_element_implements_interface(element->gobj(), T_CastTo::get_type()))
+  if(element && gst_element_implements_interface(Glib::unwrap(element), T_CastTo::get_type()))
   {
     void* result =
-      gst_implements_interface_cast(element->gobj(), T_CastTo::get_type());
+      gst_implements_interface_cast(Glib::unwrap(element), T_CastTo::get_type());
 
     Gst::ElementInterfaced<T_CastTo>* element_interfaced =
       new ElementInterfaced<T_CastTo>((GstElement*) result);

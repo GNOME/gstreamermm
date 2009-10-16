@@ -199,7 +199,7 @@ Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<const Gst::MixerTrac
   int* volumes = new int[num_channels];
 
   gst_mixer_get_volume(const_cast<GstMixer*>(gobj()),
-    const_cast<GstMixerTrack*>(track->gobj()), volumes);
+    const_cast<GstMixerTrack*>(Glib::unwrap(track)), volumes);
 
   return Glib::ArrayHandle<int>::ArrayHandle(volumes, num_channels,
     Glib::OWNERSHIP_DEEP);
@@ -264,7 +264,7 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
     const guint32 num_channels = track->get_num_channels();
     int* volumes = new int[num_channels];
     (*base->get_volume)(const_cast<GstMixer*>(gobj()),
-      const_cast<GstMixerTrack*>((track)->gobj()), volumes);
+      const_cast<GstMixerTrack*>(Glib::unwrap(track)), volumes);
     return Glib::ArrayHandle<int>(volumes, num_channels, Glib::OWNERSHIP_DEEP);
   }
 

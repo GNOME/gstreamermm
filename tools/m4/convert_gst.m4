@@ -47,58 +47,58 @@ dnl ############### gstreamermm Class Conversions ######################
 
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Gst::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>($3->gobj())')
-_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `$3->gobj()')
-_CONVERSION(`Glib::RefPtr<Gst::Buffer>',`GstBuffer*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `Gst::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>(Gst::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `Gst::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Buffer>',`GstBuffer*', `Gst::unwrap($3)')
 
 dnl Bus
-_CONVERSION(`const Glib::RefPtr<Gst::Bus>&',`GstBus*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::Bus>&',`GstBus*', `Glib::unwrap($3)')
 _CONVERSION(`GstBus*',`Glib::RefPtr<Gst::Bus>',`Glib::wrap($3)')
 
 dnl Caps
 _CONVERSION(`GstCaps*',`Glib::RefPtr<Gst::Caps>',`Glib::wrap($3)')
-_CONVERSION(`Glib::RefPtr<Gst::Caps>',`GstCaps*',`$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`GstCaps*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`GstCaps*', `const_cast<$2>($3->gobj())')
-_CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`const GstCaps*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`const GstCaps*', `$3->gobj()')
+_CONVERSION(`Glib::RefPtr<Gst::Caps>',`GstCaps*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`GstCaps*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`GstCaps*', `const_cast<$2>(Glib::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`const GstCaps*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`const GstCaps*', `Glib::unwrap($3)')
 
 dnl Clock
 _CONVERSION(`GstClock*',`Glib::RefPtr<Gst::Clock>',`Glib::wrap($3)')
 _CONVERSION(`GstClock*',`Glib::RefPtr<const Gst::Clock>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Clock>&',`GstClock*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::Clock>&',`GstClock*', `Glib::unwrap($3)')
 _CONVERSION(`const Clock&',`GstClock*',`((GstClock*)(&$3))')
-_CONVERSION(`Glib::RefPtr<Gst::Clock>',`GstClock*', `$3->gobj()')
+_CONVERSION(`Glib::RefPtr<Gst::Clock>',`GstClock*', `Glib::unwrap($3)')
 
 dnl ClockID
 _CONVERSION(`GstClockID',`Glib::RefPtr<Gst::ClockID>',`Glib::wrap((GstClockEntry*)($3))')
-_CONVERSION(`const Glib::RefPtr<Gst::ClockID>&',`GstClockEntry*',`$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::ClockID>&',`GstClockEntry*',`Glib::unwrap($3)')
 
 dnl ColorBalanceChannel
-_CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>($3->gobj())')
+_CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>(Glib::unwrap($3))')
 
 dnl Element
-_CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `$3->gobj()')
+_CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `Glib::unwrap($3)')
 _CONVERSION(`GstElement*',`Glib::RefPtr<Gst::Element>',`Glib::wrap($3)')
 _CONVERSION(`GstElement*',`Glib::RefPtr<const Gst::Element>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Element>&',`GstElement*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::Element>&',`GstElement*', `const_cast<GstElement*>($3->gobj())')
+_CONVERSION(`const Glib::RefPtr<Gst::Element>&',`GstElement*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Element>&',`GstElement*', `const_cast<GstElement*>(Glib::unwrap($3))')
 _CONVERSION(`State&',`GstState*',`(GstState*)(&$3)')
 
 dnl ElementFactory
 _CONVERSION(`GstElementFactory*',`Glib::RefPtr<Gst::ElementFactory>',`Glib::wrap($3)')
 _CONVERSION(`GstElementFactory*',`Glib::RefPtr<const Gst::ElementFactory>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::ElementFactory>&',`GstElementFactory*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::ElementFactory>&',`GstElementFactory*', `Glib::unwrap($3)')
 
 dnl Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Gst::unwrap($3)')
 
 dnl Index
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Gst::Index>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Index>&',`GstIndex*',`$3->gobj()')
-_CONVERSION(`Glib::RefPtr<Gst::Index>',`GstIndex*',`$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::Index>&',`GstIndex*',`Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Index>',`GstIndex*',`Glib::unwrap($3)')
 
 dnl IndexFactory
 _CONVERSION(`GstIndexFactory*',`Glib::RefPtr<Gst::IndexFactory>',`Glib::wrap($3)')
@@ -113,42 +113,42 @@ _CONVERSION(`GstIterator*',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>',
 dnl Message
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<const Gst::Message>',`Gst::Message::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `Gst::unwrap($3)')
 
 dnl MiniObject
-_CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`Gst::unwrap($3)')
 
 dnl Mixer
-_CONVERSION(`const Glib::RefPtr<Gst::MixerOptions>&',`GstMixerOptions*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::MixerOptions>&',`GstMixerOptions*', `const_cast<$2>($3->gobj())')
-_CONVERSION(`const Glib::RefPtr<Gst::MixerTrack>&',`GstMixerTrack*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::MixerOptions>&',`GstMixerOptions*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::MixerOptions>&',`GstMixerOptions*', `const_cast<$2>(Glib::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<Gst::MixerTrack>&',`GstMixerTrack*', `Glib::unwrap($3)')
 
 dnl Gst::Object
 _CONVERSION(`GstObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`$3->gobj()')
-_CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::Object>&',`GstObject*',`const_cast<GstObject*>($3->gobj())')
-_CONVERSION(`const Glib::RefPtr<Object>&', `GstObject*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Object>&',`GstObject*',`const_cast<GstObject*>(Glib::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<Object>&', `GstObject*', `Glib::unwrap($3)')
 
 dnl Pad
 _CONVERSION(`GstPad*',`Glib::RefPtr<Gst::Pad>',`Glib::wrap($3)')
 _CONVERSION(`GstPad*',`Glib::RefPtr<const Gst::Pad>',`Glib::wrap($3)')
-_CONVERSION(`Glib::RefPtr<Gst::Pad>',`GstPad*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<Gst::Pad>&',`GstPad*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::Pad>&',`GstPad*',`const_cast<GstPad*>($3->gobj())')
+_CONVERSION(`Glib::RefPtr<Gst::Pad>',`GstPad*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Pad>&',`GstPad*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Pad>&',`GstPad*',`const_cast<GstPad*>(Glib::unwrap($3))')
 
 dnl PadTemplate
 _CONVERSION(`GstPadTemplate*',`Glib::RefPtr<Gst::PadTemplate>', `Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>($3->gobj())')
+_CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>(Glib::unwrap($3))')
 
 dnl Plugin
-_CONVERSION(`const Glib::RefPtr<Gst::Plugin>&',`GstPlugin*',`$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::Plugin>&',`GstPlugin*',`Glib::unwrap($3)')
 _CONVERSION(`GstPlugin*',`Glib::RefPtr<Gst::Plugin>',`Glib::wrap($3)')
 
 dnl PluginFeature
 _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<Gst::PluginFeature>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::PluginFeature>&',`GstPluginFeature*',`$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::PluginFeature>&',`GstPluginFeature*',`Glib::unwrap($3)')
 
 dnl Query
 _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Gst::unwrap($3)')
@@ -182,19 +182,19 @@ dnl ############## gstreamermm Interface Conversions ######################
 dnl TunerChannel
 _CONVERSION(`GstTunerChannel*',`Glib::RefPtr<Gst::TunerChannel>', `Glib::wrap($3)')
 _CONVERSION(`GstTunerChannel*',`Glib::RefPtr<const Gst::TunerChannel>', `Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::TunerChannel>&',`GstTunerChannel*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::TunerChannel>&',`GstTunerChannel*', `const_cast<GstTunerChannel*>($3->gobj())')
-_CONVERSION(`Glib::RefPtr<Gst::TunerChannel>', `GstTunerChannel*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::TunerChannel>&',`GstTunerChannel*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::TunerChannel>&',`GstTunerChannel*', `const_cast<GstTunerChannel*>(Glib::unwrap($3))')
+_CONVERSION(`Glib::RefPtr<Gst::TunerChannel>', `GstTunerChannel*', `Glib::unwrap($3)')
 
 dnl TunerNorm
 _CONVERSION(`GstTunerNorm*',`Glib::RefPtr<Gst::TunerNorm>', `Glib::wrap($3)')
 _CONVERSION(`GstTunerNorm*',`Glib::RefPtr<const Gst::TunerNorm>', `Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::TunerNorm>&',`GstTunerNorm*', `$3->gobj()')
-_CONVERSION(`const Glib::RefPtr<const Gst::TunerNorm>&',`GstTunerNorm*', `const_cast<GstTunerNorm*>($3->gobj())')
-_CONVERSION(`Glib::RefPtr<Gst::TunerNorm>', `GstTunerNorm*', `$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::TunerNorm>&',`GstTunerNorm*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::TunerNorm>&',`GstTunerNorm*', `const_cast<GstTunerNorm*>(Glib::unwrap($3))')
+_CONVERSION(`Glib::RefPtr<Gst::TunerNorm>', `GstTunerNorm*', `Glib::unwrap($3)')
 
 dnl URIHandler
-_CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`$3->gobj()')
+_CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`Glib::unwrap($3)')
 
 dnl ##################General Conversions############################
 

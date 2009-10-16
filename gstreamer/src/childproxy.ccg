@@ -25,8 +25,8 @@ bool ChildProxy::lookup(const Glib::RefPtr<Gst::Object>& object,
   GParamSpec*& pspec)
 {
   GstObject* gst_object = 0;
-  bool const result = gst_child_proxy_lookup(object->gobj(), name.c_str(),
-    &gst_object, & pspec);
+  bool const result = gst_child_proxy_lookup(Glib::unwrap(object),
+    name.c_str(), &gst_object, & pspec);
   target = Glib::wrap(gst_object);
   return result;
 }
@@ -51,12 +51,12 @@ Glib::RefPtr<Gst::ChildProxy> ChildProxy::set_proxy_property(const Glib::ustring
 
 void ChildProxy::child_added(const Glib::RefPtr<Gst::Object>& child)
 {
-  gst_child_proxy_child_added(GST_OBJECT(gobj()), child->gobj());
+  gst_child_proxy_child_added(GST_OBJECT(gobj()), Glib::unwrap(child));
 }
 
 void ChildProxy::child_removed(const Glib::RefPtr<Gst::Object>& child)
 {
-  gst_child_proxy_child_removed(GST_OBJECT(gobj()), child->gobj());
+  gst_child_proxy_child_removed(GST_OBJECT(gobj()), Glib::unwrap(child));
 }
 
 } //namespace Gst

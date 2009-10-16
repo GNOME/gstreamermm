@@ -71,7 +71,7 @@ Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
   if(!dest)
     handle_error("Failed to link null element.");
     
-  const bool result = gst_element_link(gobj(), dest->gobj());
+  const bool result = gst_element_link(gobj(), Glib::unwrap(dest));
 
   if(result)
     return dest;
@@ -87,7 +87,8 @@ Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest,
   if(!dest)
     handle_error("Failed to link null element.");
     
-  const bool result = gst_element_link_filtered(gobj(), dest->gobj(), filter->gobj());
+  const bool result = gst_element_link_filtered(gobj(), Glib::unwrap(dest),
+    Glib::unwrap(filter));
 
   if(result)
     return dest;
@@ -125,7 +126,7 @@ bool Element::query_duration(Format& format) const
 bool Element::send_event(const Glib::RefPtr<Gst::Event>& event)
 {
   event->reference();
-  return gst_element_send_event(gobj(), event->gobj());
+  return gst_element_send_event(gobj(), Gst::unwrap(event));
 }
 
 #ifdef GLIBMM_VFUNCS_ENABLED
