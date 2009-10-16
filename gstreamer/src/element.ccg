@@ -106,8 +106,8 @@ void Element::post_message(int code, int line, MessageType type,
   gchar* gst_text = g_strdup(text.c_str());
   gchar* gst_debug = g_strdup(debug.c_str());
 
-  gst_element_message_full(gobj(), (GstMessageType)(type), domain, code,
-    gst_text, gst_debug, file.c_str(), function.c_str(), line);
+  gst_element_message_full(gobj(), static_cast<GstMessageType>(type),
+    domain, code, gst_text, gst_debug, file.c_str(), function.c_str(), line);
 }
 
 bool Element::query_position(Format& format) const
@@ -174,7 +174,7 @@ gboolean Element_Class::set_clock_vfunc_callback(GstElement* self, GstClock* clo
   // when base class has no set_clock() vfunc.
   return true;
 }
-bool Gst::Element::set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock) 
+bool Gst::Element::set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -206,7 +206,7 @@ const GstQueryType* Element_Class::get_query_types_vfunc_callback(GstElement* se
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
-        return (GstQueryType*)((obj->get_query_types_vfunc()).data());
+        return reinterpret_cast<const GstQueryType*>((obj->get_query_types_vfunc()).data());
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
@@ -236,7 +236,7 @@ Glib::ArrayHandle<QueryType> Gst::Element::get_query_types_vfunc() const
   );
 
   if(base && base->get_query_types)
-    return Glib::ArrayHandle<QueryType>((QueryType*)((*base->get_query_types)(const_cast<GstElement*>(gobj()))), Glib::OWNERSHIP_SHALLOW);
+    return Glib::ArrayHandle<QueryType>(reinterpret_cast<const QueryType*>((*base->get_query_types)(const_cast<GstElement*>(gobj()))), Glib::OWNERSHIP_SHALLOW);
 
   typedef Glib::ArrayHandle<QueryType> RType;
   return RType(0, 0, Glib::OWNERSHIP_NONE);

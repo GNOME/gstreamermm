@@ -45,7 +45,9 @@ void XML::write_to_stream(const Glib::RefPtr<const Gst::Element>& element, std::
 
 bool XML::parse_memory(const std::string& buffer, const Glib::ustring& root)
 {
-  return gst_xml_parse_memory(this->gobj(),(guchar*)(buffer.c_str()), buffer.size(), root.c_str());
+  return gst_xml_parse_memory(this->gobj(),
+    reinterpret_cast<guchar*>(const_cast<char*>(buffer.c_str())),
+    buffer.size(), root.c_str());
 }
 
 } //namespace Gst

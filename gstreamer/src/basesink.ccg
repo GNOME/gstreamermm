@@ -31,8 +31,8 @@ bool BaseSink::query_latency(bool& live, bool& upstream_live, ClockTime& min_lat
 
   const bool result =
     gst_base_sink_query_latency(const_cast<GstBaseSink*>(gobj()),
-    &gst_live, &gst_upstream_live, (GstClockTime*)(&(min_latency)),
-    (GstClockTime*)(&(max_latency)));
+    &gst_live, &gst_upstream_live, static_cast<GstClockTime*>(&(min_latency)),
+    static_cast<GstClockTime*>(&(max_latency)));
 
   live = gst_live;
   upstream_live = gst_upstream_live;
@@ -42,12 +42,12 @@ bool BaseSink::query_latency(bool& live, bool& upstream_live, ClockTime& min_lat
 
 ClockReturn BaseSink::wait_clock(ClockTime time)
 {
-  return (ClockReturn)(gst_base_sink_wait_clock(const_cast<GstBaseSink*>(gobj()), (GstClockTime)(time), 0));
+  return static_cast<ClockReturn>(gst_base_sink_wait_clock(const_cast<GstBaseSink*>(gobj()), static_cast<GstClockTime>(time), 0));
 }
 
 FlowReturn BaseSink::wait_eos(ClockTime time)
 {
-  return (FlowReturn)(gst_base_sink_wait_eos(const_cast<GstBaseSink*>(gobj()), (GstClockTime)(time), 0));
+  return static_cast<FlowReturn>(gst_base_sink_wait_eos(const_cast<GstBaseSink*>(gobj()), static_cast<GstClockTime>(time), 0));
 }
 
 #ifdef GLIBMM_VFUNCS_ENABLED
@@ -73,8 +73,8 @@ GstFlowReturn BaseSink_Class::buffer_alloc_vfunc_callback(GstBaseSink* self, gui
         Glib::RefPtr<Gst::Buffer> cpp_buffer;
         // Call the virtual member method, which derived classes might override.
         const GstFlowReturn result =
-          ((GstFlowReturn)(obj->buffer_alloc_vfunc(offset, size,
-          Glib::wrap(caps, true) , cpp_buffer)));
+          static_cast<GstFlowReturn>(obj->buffer_alloc_vfunc(offset, size,
+          Glib::wrap(caps, true), cpp_buffer));
         *buf = cpp_buffer->gobj_copy();
         return result;
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -99,7 +99,7 @@ GstFlowReturn BaseSink_Class::buffer_alloc_vfunc_callback(GstBaseSink* self, gui
   typedef GstFlowReturn RType;
   return RType();
 }
-FlowReturn Gst::BaseSink::buffer_alloc_vfunc(guint64 offset, guint size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer) 
+FlowReturn Gst::BaseSink::buffer_alloc_vfunc(guint64 offset, guint size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -108,8 +108,8 @@ FlowReturn Gst::BaseSink::buffer_alloc_vfunc(guint64 offset, guint size, const G
   if(base && base->buffer_alloc)
   {
     GstBuffer* gst_buffer;
-    const Gst::FlowReturn result = ((FlowReturn)((*base->buffer_alloc)(gobj(),
-      offset,size,(caps)->gobj(),&gst_buffer)));
+    const Gst::FlowReturn result =
+      static_cast<Gst::FlowReturn>((*base->buffer_alloc)(gobj(), offset,size,(caps)->gobj(),&gst_buffer));
     buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
     return result;
   }

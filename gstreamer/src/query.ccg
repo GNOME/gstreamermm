@@ -27,7 +27,7 @@ namespace Gst
 
 QueryTypeDefinition::QueryTypeDefinition()
 : value(Gst::QUERY_NONE),
-  quark((GQuark)(0))
+  quark(static_cast<GQuark>(0))
 {}
 
 QueryTypeDefinition::QueryTypeDefinition(const GstQueryTypeDefinition* castitem)
@@ -36,7 +36,7 @@ QueryTypeDefinition::QueryTypeDefinition(const GstQueryTypeDefinition* castitem)
 {
   if(castitem)
   {
-    value = (QueryType)(castitem->value);
+    value = static_cast<QueryType>(castitem->value);
     nick = castitem->nick;
     description = castitem->description;
   }
@@ -47,12 +47,12 @@ namespace Enums
 
 Glib::ustring get_name(QueryType t)
 {
-  return gst_query_type_get_name(GstQueryType(t));
+  return gst_query_type_get_name(static_cast<GstQueryType>(t));
 }
 
 Glib::QueryQuark get_quark(QueryType t)
 {
-  return Glib::QueryQuark(gst_query_type_to_quark(GstQueryType(t)));
+  return Glib::QueryQuark(gst_query_type_to_quark(static_cast<GstQueryType>(t)));
 }
 
 } //namespace Enums
@@ -73,7 +73,7 @@ bool get_details(QueryType type, QueryTypeDefinition &def)
 
   g_return_val_if_fail(gstdef != 0, false);
 
-  def.value = QueryType(gstdef->value);
+  def.value = static_cast<QueryType>(gstdef->value);
   def.nick = gstdef->nick;
   def.description = gstdef->description;
   def.quark = gstdef->quark;
@@ -113,21 +113,21 @@ void QueryConvert::set(Format src_format, gint64 src_value, Format dest_format, 
 void QueryConvert::parse(Format& src_format, gint64& src_value, Format& dest_format, gint64& dest_value) const
 {
   gst_query_parse_convert(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&src_format), &src_value, (GstFormat*)(&dest_format),
-    &dest_value);
+    reinterpret_cast<GstFormat*>(&src_format), &src_value,
+    reinterpret_cast<GstFormat*>(&dest_format), &dest_value);
 }
 
 void QueryConvert::parse(Format& dest_format, gint64& dest_value) const
 {
   gst_query_parse_convert(const_cast<GstQuery*>(gobj()), 0, 0,
-    (GstFormat*)(&dest_format), &dest_value);
+    reinterpret_cast<GstFormat*>(&dest_format), &dest_value);
 }
 
 Format QueryConvert::parse_src_format() const
 {
   Format src_format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_convert(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&src_format), 0, 0, 0);
+    reinterpret_cast<GstFormat*>(&src_format), 0, 0, 0);
   return src_format;
 }
 
@@ -143,7 +143,7 @@ Format QueryConvert::parse_dest_format() const
 {
   Format dest_format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_convert(const_cast<GstQuery*>(gobj()), 0, 0,
-    (GstFormat*)(&dest_format), 0);
+    reinterpret_cast<GstFormat*>(&dest_format), 0);
   return dest_format;
 }
 
@@ -173,7 +173,7 @@ void QueryPosition::set(Format format, gint64 position)
 void QueryPosition::parse(Format& format, gint64& position) const
 {
   gst_query_parse_position(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), &position);
+    reinterpret_cast<GstFormat*>(&format), &position);
 }
 
 gint64 QueryPosition::parse() const
@@ -187,7 +187,7 @@ Format QueryPosition::parse_format() const
 {
   Format format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_position(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), 0);
+    reinterpret_cast<GstFormat*>(&format), 0);
   return format;
 }
 
@@ -209,7 +209,7 @@ void QueryDuration::set(Format format, gint64 duration)
 void QueryDuration::parse(Format& format, gint64& duration) const
 {
   gst_query_parse_duration(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), &duration);
+    reinterpret_cast<GstFormat*>(&format), &duration);
 }
 
 gint64 QueryDuration::parse() const
@@ -223,7 +223,7 @@ Format QueryDuration::parse_format() const
 {
   Format format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_duration(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), 0);
+    reinterpret_cast<GstFormat*>(&format), 0);
   return format;
 }
 
@@ -246,7 +246,8 @@ void QueryLatency::parse(bool& live, ClockTime& min_latency, ClockTime& max_late
 {
   gboolean glive = FALSE;
   gst_query_parse_latency(const_cast<GstQuery*>(gobj()), &glive,
-    (ClockTime*)(&min_latency), (ClockTime*)(&max_latency));
+    reinterpret_cast<ClockTime*>(&min_latency),
+    reinterpret_cast<ClockTime*>(&max_latency));
   live = glive;
 }
 
@@ -261,7 +262,7 @@ ClockTime QueryLatency::parse_min() const
 {
   ClockTime min = 0;
   gst_query_parse_latency(const_cast<GstQuery*>(gobj()), 0,
-    (ClockTime*)(&min), 0);
+    reinterpret_cast<ClockTime*>(&min), 0);
   return min;
 }
 
@@ -269,7 +270,7 @@ ClockTime QueryLatency::parse_max() const
 {
   ClockTime max = 0;
   gst_query_parse_latency(const_cast<GstQuery*>(gobj()), 0, 0,
-    (ClockTime*)(&max));
+    reinterpret_cast<ClockTime*>(&max));
   return max;
 }
 
@@ -292,7 +293,8 @@ void QuerySeeking::parse(Format& format, bool& seekable, gint64& segment_start, 
 {
   gboolean gseekable = FALSE;
   gst_query_parse_seeking(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), &gseekable, &segment_start, &segment_end);
+    reinterpret_cast<GstFormat*>(&format), &gseekable, &segment_start,
+    &segment_end);
   seekable = gseekable;
 }
 
@@ -300,7 +302,7 @@ Format QuerySeeking::parse_format() const
 {
   Format format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_seeking(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), 0, 0, 0);
+    reinterpret_cast<GstFormat*>(&format), 0, 0, 0);
   return format;
 }
 
@@ -340,12 +342,14 @@ Glib::RefPtr<Gst::Query> QueryFormats::create()
 
 void QueryFormats::set(const Glib::ArrayHandle<Format>& formats)
 {
-  gst_query_set_formatsv(gobj(), formats.size(), (GstFormat*)(formats.data()));
+  gst_query_set_formatsv(gobj(), formats.size(),
+    reinterpret_cast<GstFormat*>(const_cast<Gst::Format*>(formats.data())));
 }
 
 void QueryFormats::set(int n_formats, const Glib::ArrayHandle<Format>& formats)
 {
-  gst_query_set_formatsv(gobj(), n_formats, (GstFormat*)(formats.data()));
+  gst_query_set_formatsv(gobj(), n_formats,
+    reinterpret_cast<GstFormat*>(const_cast<Gst::Format*>(formats.data())));
 }
 
 guint QueryFormats::parse_length() const
@@ -359,7 +363,7 @@ Format QueryFormats::parse(guint nth) const
 {
   Format format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_formats_nth(const_cast<GstQuery*>(gobj()), nth,
-    (GstFormat*)(&format));
+    reinterpret_cast<GstFormat*>(&format));
   return format;
 }
 
@@ -375,13 +379,14 @@ Glib::RefPtr<Gst::Query> QuerySegment::create(Format format)
 
 void QuerySegment::set(double rate, Format format, gint64 start_value, gint64 stop_value)
 {
-  gst_query_set_segment(gobj(), rate, GstFormat(format), start_value, stop_value);
+  gst_query_set_segment(gobj(), rate, static_cast<GstFormat>(format),
+    start_value, stop_value);
 }
 
 void QuerySegment::parse(double& rate, Format& format, gint64& start_value, gint64& stop_value) const
 {
   gst_query_parse_segment(const_cast<GstQuery*>(gobj()), &rate,
-    (GstFormat*)(&format), &start_value, &stop_value);
+    reinterpret_cast<GstFormat*>(&format), &start_value, &stop_value);
 }
 
 double QuerySegment::parse_rate() const
@@ -396,7 +401,7 @@ Format QuerySegment::parse_format() const
 {
   Format format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_segment(const_cast<GstQuery*>(gobj()), 0,
-    (GstFormat*)(&format), 0, 0);
+    reinterpret_cast<GstFormat*>(&format), 0, 0);
   return format;
 }
 
@@ -457,21 +462,22 @@ int QueryBuffering::parse_percent() const
 
 void QueryBuffering::set(BufferingMode mode, int avg_in, int avg_out, gint64 buffering_left)
 {
-  gst_query_set_buffering_stats(gobj(), (GstBufferingMode)(mode), avg_in,
-    avg_out, buffering_left);
+  gst_query_set_buffering_stats(gobj(), static_cast<GstBufferingMode>(mode),
+    avg_in, avg_out, buffering_left);
 }
 
 void QueryBuffering::parse(BufferingMode& mode, int& avg_in, int& avg_out, gint64 buffering_left) const
 {
   gst_query_parse_buffering_stats(const_cast<GstQuery*>(gobj()),
-    (GstBufferingMode*)(&mode), &avg_in, &avg_out, &buffering_left);
+    reinterpret_cast<GstBufferingMode*>(&mode), &avg_in, &avg_out,
+    &buffering_left);
 }
 
 BufferingMode QueryBuffering::parse_mode() const
 {
   BufferingMode mode = Gst::BUFFERING_STREAM;
   gst_query_parse_buffering_stats(const_cast<GstQuery*>(gobj()),
-    (GstBufferingMode*)(&mode), 0, 0, 0);
+    reinterpret_cast<GstBufferingMode*>(&mode), 0, 0, 0);
   return mode;
 }
 
@@ -501,21 +507,21 @@ gint64 QueryBuffering::parse_time_left() const
 
 void QueryBuffering::set(Format format, gint64 start, gint64 stop, gint64 estimated_total)
 {
-  gst_query_set_buffering_range(gobj(), (GstFormat)(format), start, stop,
-    estimated_total);
+  gst_query_set_buffering_range(gobj(), static_cast<GstFormat>(format),
+    start, stop, estimated_total);
 }
 
 void QueryBuffering::parse(Format& format, gint64& start, gint64& stop, gint64& estimated_total) const
 {
   gst_query_parse_buffering_range(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), &start, &stop, &estimated_total);
+    reinterpret_cast<GstFormat*>(&format), &start, &stop, &estimated_total);
 }
 
 Format QueryBuffering::parse_format() const
 {
   Format format = Gst::FORMAT_UNDEFINED;
   gst_query_parse_buffering_range(const_cast<GstQuery*>(gobj()),
-    (GstFormat*)(&format), 0, 0, 0);
+    reinterpret_cast<GstFormat*>(&format), 0, 0, 0);
   return format;
 }
 

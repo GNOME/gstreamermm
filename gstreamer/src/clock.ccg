@@ -35,7 +35,8 @@ static gboolean ClockID_Clock_gstreamermm_callback(GstClock* clock, GstClockTime
   try
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
-    bool result = (*the_slot)(Glib::wrap(clock, true), time, Glib::wrap((GstClockEntry*)(id), true));
+    bool result = (*the_slot)(Glib::wrap(clock, true), time,
+      Glib::wrap(reinterpret_cast<GstClockEntry*>(id), true));
 
     //Delete the once executing slot before returning result
     delete the_slot;
@@ -61,55 +62,48 @@ namespace Gst
 
 guint get_hours(ClockTime time)
 {
-  return GST_CLOCK_TIME_IS_VALID (time) ? \
-        (guint) (((GstClockTime)(time)) / (GST_SECOND * 60 * 60)) : 99;
+  return GST_CLOCK_TIME_IS_VALID (time) ? time / (GST_SECOND * 60 * 60) : 99;
 }
 
 guint get_minutes(ClockTime time)
 {
-  return GST_CLOCK_TIME_IS_VALID (time) ? \
-        (guint) ((((GstClockTime)(time)) / (GST_SECOND * 60)) % 60) : 99;
+  return GST_CLOCK_TIME_IS_VALID (time) ? (time / (GST_SECOND * 60)) % 60 : 99;
 }
 
 guint get_seconds(ClockTime time)
 {
-  return GST_CLOCK_TIME_IS_VALID (time) ? \
-        (guint) ((((GstClockTime)(time)) / GST_SECOND) % 60) : 99;
+  return GST_CLOCK_TIME_IS_VALID (time) ? (time / GST_SECOND) % 60 : 99;
 }
 
 guint get_milliseconds(ClockTime time)
 {
-  return GST_CLOCK_TIME_IS_VALID (time) ? \
-        (guint) ((((GstClockTime)(time)) / GST_MSECOND) % 1000) : 999;
+  return GST_CLOCK_TIME_IS_VALID (time) ? (time / GST_MSECOND) % 1000 : 999;
 }
 
 guint get_microseconds(ClockTime time)
 {
-  return GST_CLOCK_TIME_IS_VALID (time) ? \
-        (guint) ((((GstClockTime)(time)) / GST_USECOND) % 1000) : 999;
+  return GST_CLOCK_TIME_IS_VALID (time) ? (time / GST_USECOND) % 1000 : 999;
 }
 
 guint get_nanoseconds(ClockTime time)
 {
-  return GST_CLOCK_TIME_IS_VALID (time) ? \
-        (guint) ((((GstClockTime)(time)) / GST_NSECOND) % 1000) : 999;
+  return GST_CLOCK_TIME_IS_VALID (time) ?  (time / GST_NSECOND) % 1000 : 999;
 }
 
 guint get_fractional_seconds(ClockTime time)
 {
-  return GST_CLOCK_TIME_IS_VALID (time) ? \
-        (guint) (((GstClockTime)(time)) % GST_SECOND) : 999999999;
+  return GST_CLOCK_TIME_IS_VALID (time) ? time % GST_SECOND : 999999999;
 }
 
 ClockReturn ClockID::wait_async(const SlotClock& slot)
 {
   SlotClock* slot_copy = new SlotClock(slot);
-  return (ClockReturn) gst_clock_id_wait_async(gobj(), &ClockID_Clock_gstreamermm_callback, slot_copy);
+  return static_cast<ClockReturn>(gst_clock_id_wait_async(gobj(), &ClockID_Clock_gstreamermm_callback, slot_copy));
 }
 
 ClockReturn ClockID::wait()
 {
-  return (ClockReturn) gst_clock_id_wait(gobj(), 0);
+  return static_cast<ClockReturn>(gst_clock_id_wait(gobj(), 0));
 }
 
 } //namespace Gst

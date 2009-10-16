@@ -34,7 +34,7 @@ Object::Object(const Glib::ConstructParams& construct_params)
 
 Object::Object(GstObject* castitem)
 :
-  Glib::Object((GObject*)(castitem))
+  Glib::Object(reinterpret_cast<GObject*>(castitem))
 {
   if(G_LIKELY(GST_OBJECT_IS_FLOATING(castitem)))
   {
@@ -158,7 +158,7 @@ xmlpp::Node* Gst::Object::save_vfunc(xmlpp::Node* parent)
 
   if(base && base->save_thyself)
   {
-    (void) (*base->save_thyself)(gobj(),parent->cobj());
+    (*base->save_thyself)(gobj(),parent->cobj());
     return parent;
   }
 

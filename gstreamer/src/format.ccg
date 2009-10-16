@@ -25,16 +25,16 @@ namespace Gst
 
 FormatDefinition::FormatDefinition()
 : value(Gst::FORMAT_UNDEFINED),
-  quark((GQuark)(0))
+  quark(static_cast<GQuark>(0))
 {}
 
 FormatDefinition::FormatDefinition(const GstFormatDefinition* castitem)
 : value(Gst::FORMAT_UNDEFINED),
-  quark((castitem) ? castitem->quark : 0)
+  quark((castitem) ? castitem->quark : static_cast<GQuark>(0))
 {
   if(castitem)
   {
-    value = (Format)(castitem->value);
+    value = static_cast<Format>(castitem->value);
     nick = castitem->nick;
     description = castitem->description;
   }
@@ -45,35 +45,35 @@ namespace Enums
 
 Glib::ustring get_name(Format f)
 {
-  return gst_format_get_name(GstFormat(f));
+  return gst_format_get_name(static_cast<GstFormat>(f));
 }
 
 Glib::QueryQuark get_quark(Format f)
 {
-  return Glib::QueryQuark(gst_format_to_quark(GstFormat(f)));
+  return Glib::QueryQuark(gst_format_to_quark(static_cast<GstFormat>(f)));
 }
 
 } //namespace Enums
 
 Format get_format(const Glib::ustring& nick)
 {
-  return (Format)(gst_format_get_by_nick(nick.c_str()));
+  return static_cast<Format>(gst_format_get_by_nick(nick.c_str()));
 }
 
 Format register_format(const Glib::ustring& nick, const Glib::ustring&
 description)
 {
-  return (Format)(gst_format_register(nick.c_str(), description.c_str()));
+  return static_cast<Format>(gst_format_register(nick.c_str(), description.c_str()));
 }
 
 bool formats_contain(const Glib::ArrayHandle<Format>& formats, Format format)
 {
-  return gst_formats_contains((GstFormat*)((formats).data()), (GstFormat)(format));
+  return gst_formats_contains(reinterpret_cast<const GstFormat*>((formats).data()), static_cast<GstFormat>(format));
 }
 
 bool get_format_details(Format format, FormatDefinition& def)
 {
-  const GstFormatDefinition* gstdef = gst_format_get_details(GstFormat(format));
+  const GstFormatDefinition* gstdef = gst_format_get_details(static_cast<GstFormat>(format));
 
   g_return_val_if_fail(gstdef != 0, false);
 

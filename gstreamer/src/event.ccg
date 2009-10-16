@@ -40,7 +40,7 @@ Glib::QueryQuark get_quark(EventType t)
 
 EventTypeFlags get_flags(EventType t)
 {
-  return (EventTypeFlags) gst_event_type_get_flags((GstEventType)(t));
+  return static_cast<EventTypeFlags>(gst_event_type_get_flags(static_cast<GstEventType>(t)));
 }
 
 } //namespace Enums
@@ -161,7 +161,7 @@ Gst::Format EventNewSegment::parse_format() const
   GstFormat gst_format = GST_FORMAT_UNDEFINED;
   gst_event_parse_new_segment_full(const_cast<GstEvent*>(gobj()), 0, 0, 0,
     &gst_format, 0, 0, 0);
-  return (Gst::Format)(gst_format);
+  return static_cast<Gst::Format>(gst_format);
 }
 
 double EventNewSegment::parse_applied_rate() const
@@ -224,8 +224,8 @@ Gst::Format EventBufferSize::parse_format() const
 {
   GstFormat gst_format = GST_FORMAT_UNDEFINED;
   gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()),
-    (GstFormat*)(&gst_format), 0, 0, 0);
-  return (Gst::Format)(gst_format);
+    reinterpret_cast<GstFormat*>(&gst_format), 0, 0, 0);
+  return static_cast<Gst::Format>(gst_format);
 }
 
 gint64 EventBufferSize::parse_max_size() const
@@ -327,7 +327,7 @@ Gst::Format EventSeek::parse_format() const
   GstFormat gst_format = GST_FORMAT_UNDEFINED;
   gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, &gst_format, 0, 0, 0,
     0, 0);
-  return (Gst::Format)(gst_format);
+  return static_cast<Gst::Format>(gst_format);
 }
 
 Gst::SeekFlags EventSeek::parse_flags() const
@@ -335,7 +335,7 @@ Gst::SeekFlags EventSeek::parse_flags() const
   GstSeekFlags gst_flags = GST_SEEK_FLAG_NONE;
   gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, &gst_flags, 0, 0,
     0, 0);
-  return (Gst::SeekFlags)(gst_flags);
+  return static_cast<Gst::SeekFlags>(gst_flags);
 }
 
 Gst::SeekType EventSeek::parse_start_type() const
@@ -343,7 +343,7 @@ Gst::SeekType EventSeek::parse_start_type() const
   GstSeekType gst_type = GST_SEEK_TYPE_NONE;
   gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, 0, &gst_type, 0,
     0, 0);
-  return (Gst::SeekType)(gst_type);
+  return static_cast<Gst::SeekType>(gst_type);
 }
 
 Gst::SeekType EventSeek::parse_stop_type() const
@@ -351,7 +351,7 @@ Gst::SeekType EventSeek::parse_stop_type() const
   GstSeekType gst_type = GST_SEEK_TYPE_NONE;
   gst_event_parse_seek(const_cast<GstEvent*>(gobj()), 0, 0, 0, 0, 0, &gst_type,
     0);
-  return (Gst::SeekType)(gst_type);
+  return static_cast<Gst::SeekType>(gst_type);
 }
 
 gint64 EventSeek::parse_stop() const
@@ -398,8 +398,8 @@ Event(castitem)
 Glib::RefPtr<Gst::Event> EventStep::create(Gst::Format format, guint64 amount,
   double rate, bool flush, bool intermediate)
 {
-  GstEvent* event = gst_event_new_step((GstFormat)(format), amount, rate,
-    flush, intermediate);
+  GstEvent* event = gst_event_new_step(static_cast<GstFormat>(format),
+    amount, rate, flush, intermediate);
   return Gst::Event::wrap(event, false);
 }
 
@@ -409,8 +409,9 @@ void EventStep::parse(Gst::Format& format, guint64& amount, double& rate,
   gboolean gst_flush = FALSE;
   gboolean gst_intermediate = FALSE;
 
-  gst_event_parse_step(const_cast<GstEvent*>(gobj()), (GstFormat*)(&format),
-    &amount, &rate, &gst_flush, &gst_intermediate);
+  gst_event_parse_step(const_cast<GstEvent*>(gobj()),
+    reinterpret_cast<GstFormat*>(&format), &amount, &rate, &gst_flush,
+    &gst_intermediate);
 
   flush = gst_flush;
   intermediate = gst_intermediate;
@@ -427,7 +428,7 @@ Gst::Format EventStep::parse_format() const
 {
   GstFormat gst_format = GST_FORMAT_UNDEFINED;
   gst_event_parse_step(const_cast<GstEvent*>(gobj()), &gst_format, 0, 0, 0, 0);
-  return (Gst::Format)(gst_format);
+  return static_cast<Gst::Format>(gst_format);
 }
 
 double EventStep::parse_rate() const

@@ -32,8 +32,8 @@ bool BaseSrc::query_latency(bool& live, ClockTime& min_latency,
 
   const bool result =
     gst_base_src_query_latency(const_cast<GstBaseSrc*>(gobj()),
-    &gst_live, (GstClockTime*)(&(min_latency)),
-    (GstClockTime*)(&(max_latency)));
+    &gst_live, static_cast<GstClockTime*>(&min_latency),
+    static_cast<GstClockTime*>(&max_latency));
   live = gst_live;
   return result;
 }
@@ -83,7 +83,7 @@ gboolean BaseSrc_Class::do_seek_vfunc_callback(GstBaseSrc* self, GstSegment* seg
   typedef gboolean RType;
   return RType();
 }
-bool Gst::BaseSrc::do_seek_vfunc(Gst::Segment& segment) 
+bool Gst::BaseSrc::do_seek_vfunc(Gst::Segment& segment)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -139,7 +139,7 @@ gboolean BaseSrc_Class::prepare_seek_segment_vfunc_callback(GstBaseSrc* self, Gs
   typedef gboolean RType;
   return RType();
 }
-bool Gst::BaseSrc::prepare_seek_segment_vfunc(const Glib::RefPtr<Gst::Event>& seek, Gst::Segment& segment) 
+bool Gst::BaseSrc::prepare_seek_segment_vfunc(const Glib::RefPtr<Gst::Event>& seek, Gst::Segment& segment)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -172,8 +172,7 @@ GstFlowReturn BaseSrc_Class::create_vfunc_callback(GstBaseSrc* self, guint64 off
       #endif //GLIBMM_EXCEPTIONS_ENABLED
         Glib::RefPtr<Gst::Buffer> cpp_buffer;
         // Call the virtual member method, which derived classes might override.
-        GstFlowReturn const result = (GstFlowReturn)(obj->create_vfunc(offset,
-          size, cpp_buffer));
+        GstFlowReturn const result = static_cast<GstFlowReturn>(obj->create_vfunc(offset, size, cpp_buffer));
         *buf = cpp_buffer->gobj_copy();
         return result;
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -198,7 +197,7 @@ GstFlowReturn BaseSrc_Class::create_vfunc_callback(GstBaseSrc* self, guint64 off
   typedef GstFlowReturn RType;
   return RType();
 }
-FlowReturn Gst::BaseSrc::create_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer) 
+FlowReturn Gst::BaseSrc::create_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -207,8 +206,8 @@ FlowReturn Gst::BaseSrc::create_vfunc(guint64 offset, guint size, Glib::RefPtr<G
   if(base && base->create)
   {
     GstBuffer* gst_buffer;
-    Gst::FlowReturn const result = (FlowReturn)((*base->create)(gobj(),offset,
-      size,&gst_buffer));
+    Gst::FlowReturn const result =
+      static_cast<FlowReturn>((*base->create)(gobj(),offset, size,&gst_buffer));
     buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
     return result;
   }

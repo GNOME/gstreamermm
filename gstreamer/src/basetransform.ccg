@@ -59,8 +59,8 @@ GstFlowReturn BaseTransform_Class::prepare_output_buffer_vfunc_callback(GstBaseT
         Glib::RefPtr<Gst::Buffer> cpp_buffer;
         // Call the virtual member method, which derived classes might override.
         const GstFlowReturn result =
-          ((GstFlowReturn)(obj->prepare_output_buffer_vfunc(
-          Gst::wrap(input, true) , size , Glib::wrap(caps, true), cpp_buffer)));
+          static_cast<GstFlowReturn>(obj->prepare_output_buffer_vfunc(
+          Gst::wrap(input, true), size , Glib::wrap(caps, true), cpp_buffer));
         *buffer = cpp_buffer->gobj_copy();
         return result;
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -85,7 +85,7 @@ GstFlowReturn BaseTransform_Class::prepare_output_buffer_vfunc_callback(GstBaseT
   typedef GstFlowReturn RType;
   return RType();
 }
-FlowReturn Gst::BaseTransform::prepare_output_buffer_vfunc(const Glib::RefPtr<Gst::Buffer>& input, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer) 
+FlowReturn Gst::BaseTransform::prepare_output_buffer_vfunc(const Glib::RefPtr<Gst::Buffer>& input, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -95,8 +95,7 @@ FlowReturn Gst::BaseTransform::prepare_output_buffer_vfunc(const Glib::RefPtr<Gs
   {
     GstBuffer* gst_buffer;
     const Gst::FlowReturn result =
-      ((FlowReturn)((*base->prepare_output_buffer)(gobj(),(input)->gobj(),
-      size,(caps)->gobj(),&gst_buffer)));
+      static_cast<Gst::FlowReturn>((*base->prepare_output_buffer)(gobj(),(input)->gobj(), size,(caps)->gobj(),&gst_buffer));
     buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
     return result;
   }
