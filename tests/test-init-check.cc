@@ -31,13 +31,13 @@ int main (int argc, char* argv[])
     if(!success)
     {
       std::cout << "Error initializing gstreamermm." << std::endl;
-      return -1;
+      return 1;
     }
   }
   catch(const Glib::Error& error)
   {
     std::cout << "Error initializing gstreamermm." << std::endl;
-    return -1;
+    return 1;
   }
 #else
   std::auto_ptr<Glib::Error> error;

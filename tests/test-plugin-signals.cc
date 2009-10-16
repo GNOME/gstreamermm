@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 
   if(!pipeline || !source || !sink) {
     std::cerr << "One element could not be created" << std::endl;
-    return -1;
+    return 1;
   }
 
   // Put all elements in a bin:
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     std::cerr << "Error while adding elements to the pipeline: " <<
       ex.what() << std::endl;
 
-    return -1;
+    return 1;
   }
 #endif
 

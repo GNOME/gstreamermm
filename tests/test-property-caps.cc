@@ -33,7 +33,7 @@ main(int argc, char* argv[])
     std::cout << "Could not create `multifilesrc' element.  Exiting." <<
       std::endl;
 
-    return -1;
+    return 1;
   }
 
   Glib::RefPtr<Gst::Caps> caps;

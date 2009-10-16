@@ -44,7 +44,7 @@ main (int argc, char *argv[])
   if(!playbin)
   {
     std::cerr << "The playbin could not be created." << std::endl;
-    return -1;
+    return 1;
   }
 
   // Create a video sink where video (if any) will be drawn:
@@ -53,7 +53,7 @@ main (int argc, char *argv[])
   if(!video_sink)
   {
     std::cerr << "The ximagesink could not be created." << std::endl;
-    return -1;
+    return 1;
   }
 
   // Set the playbin's video-sink property so that our video sink is used

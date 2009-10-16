@@ -63,7 +63,7 @@ main (int argc, char *argv[])
   if(!source)
   {
     std::cerr << "filesrc element could not be created" << std::endl;
-    return -1;
+    return 1;
   }
 
   // Parses the ogg streams into elementary streams (note that an ogg file may
@@ -72,7 +72,7 @@ main (int argc, char *argv[])
   if(!parser)
   {
     std::cerr << "oggdemux element could not be created" << std::endl;
-    return -1;
+    return 1;
   }
 
   // Decodes a vorbis stream
@@ -80,7 +80,7 @@ main (int argc, char *argv[])
   if(!decoder)
   {
     std::cerr << "vorbisdec element could not be created" << std::endl;
-    return -1;
+    return 1;
   }
 
   // Converts audio to a format which can be used by the next element
@@ -88,7 +88,7 @@ main (int argc, char *argv[])
   if(!conv)
   {
     std::cerr << "audioconvert element could not be created" << std::endl;
-    return -1;
+    return 1;
   }
 
   // Outputs sound to an ALSA audio device
@@ -96,7 +96,7 @@ main (int argc, char *argv[])
   if(!sink)
   {
     std::cerr << "sink element could not be created" << std::endl;
-    return -1;
+    return 1;
   }
 
 
@@ -111,7 +111,7 @@ main (int argc, char *argv[])
   catch(const std::runtime_error& ex)
   {
     std::cerr << "Error while adding elements to the pipeline: " << ex.what() << std::endl;
-    return -1;
+    return 1;
   }
 #endif
 
