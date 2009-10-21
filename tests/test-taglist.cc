@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
   Gst::TagList taglist;
 
-  if(taglist)
+  if(!taglist)
   {
     std::cout << "TagList is invalid.  Exiting." << std::endl;
     exit(1);
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   else
     std::cout << "Could not get tag `" << Gst::TAG_ARTIST << "'." << std::endl;
 
-  guint rate;
+  guint rate = 0;
   if(taglist.get(Gst::TAG_BITRATE, 0, rate))
     std::cout << "Tag bit-rate is " << rate << "." << std::endl;
   else
