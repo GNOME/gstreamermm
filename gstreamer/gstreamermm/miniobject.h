@@ -20,7 +20,7 @@
 #ifndef _GSTREAMERMM_MINIOBJECT_H
 #define _GSTREAMERMM_MINIOBJECT_H
 
-#include <glibmm/objectbase.h>
+#include <glibmm/refptr.h>
 #include <gst/gstminiobject.h>
 
 namespace Gst
@@ -31,7 +31,7 @@ class MiniObject_Class;
 /** This is a base class for some gstreamermm objects.
  * It is similar to Glib::Object but has no GObject property or signal support.
  */
-class MiniObject : public Glib::ObjectBase
+class MiniObject
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -43,8 +43,6 @@ public:
 
 //protected:
 public:
-  //friend Glib::wrap;
-
   MiniObject();
   MiniObject(GstMiniObject* castitem, bool take_copy = false);
 
@@ -144,20 +142,9 @@ protected:
   void swap(MiniObject& other);
 
 protected:
-  GstMiniObject* gobject_; //TODO: Doesn't this shadow a member variable in Glib::ObjectBase?
+  GstMiniObject* gobject_;
 };
 
 } // namespace Gst
-
-/*
-namespace Glib
-{
-  inline Glib::RefPtr<Gst::MiniObject> wrap(GstMiniObject *object, bool take_copy)
-  {
-    return Glib::RefPtr<Gst::MiniObject>(new MiniObject(object, take_copy));
-  }
-
-} //namespace Glib
-*/
 
 #endif //#ifndef _GSTREAMERMM_MINIOBJECT_H

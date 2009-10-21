@@ -21,7 +21,7 @@
 #include <gstreamermm/filesrc.h>
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
   Gst::init(argc, argv);
 

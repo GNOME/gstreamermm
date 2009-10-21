@@ -58,14 +58,14 @@ bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<
 }
 
 void on_handoff(const Glib::RefPtr<Gst::Buffer>& buffer,
-                const Glib::RefPtr<Gst::Pad>& pad)
+                const Glib::RefPtr<Gst::Pad>&)
 {
   std::cout << "Gst::FakeSrc's handoff signal triggered." << std::endl;
   if(buffer->flag_is_set(Gst::BUFFER_FLAG_DISCONT))
     std::cout << "The Gst::FakeSrc buffer's discont flag is set." << std::endl;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
   Gst::init(argc, argv);
 

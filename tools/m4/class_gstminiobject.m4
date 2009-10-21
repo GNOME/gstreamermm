@@ -127,7 +127,7 @@ ifdef(`__BOOL_NO_DERIVED_CLASS__',`dnl
   static void class_init_function(void* g_class, void* class_data);
 ')dnl
 
-  static Glib::ObjectBase* wrap_new(GstMiniObject*);
+  static Gst::MiniObject* wrap_new(GstMiniObject*);
 };
 ')
 
@@ -173,7 +173,7 @@ __NAMESPACE_BEGIN__
 _PCC_CLASS_IMPLEMENTATION()
 
 m4_ifdef(`__BOOL_CUSTOM_WRAP_NEW__',,`dnl else
-Glib::ObjectBase* __CPPNAME__`'_Class::wrap_new(GstMiniObject* object)
+Gst::MiniObject* __CPPNAME__`'_Class::wrap_new(GstMiniObject* object)
 {
   return new __CPPNAME__`'((__CNAME__*)`'object);
 }

@@ -21,7 +21,7 @@
 #include <iostream>
 #include <gst/audio/gstaudioclock.h>
 
-int main (int argc, char* argv[])
+int main(int argc, char** argv)
 {
   Gst::init(argc, argv);
 

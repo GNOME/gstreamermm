@@ -14,8 +14,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I build ${ACLOCAL_FLAGS}
-# TODO: Fix warnings and switch back to fatal warnings mode.
-DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=max
+DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 if MAINTAINER_MODE
 src_subdirs = gstreamer/src

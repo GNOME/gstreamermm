@@ -157,7 +157,7 @@ Gst::MiniObject* wrap_create_new_wrapper_for_interface(GstMiniObject* object, GT
     // But only if the type implements the interface, 
     // so that the C++ instance is likely to inherit from the appropriate class too.
     //
-    const gpointer idx = g_type_get_qdata(type, Glib::quark_);
+    const gpointer idx = g_type_get_qdata(type, Gst::quark_);
     if(idx && gtype_wraps_interface(type, interface_gtype))
     {
       const Gst::WrapNewFunction func = (*wrap_func_table)[GPOINTER_TO_UINT(idx)];

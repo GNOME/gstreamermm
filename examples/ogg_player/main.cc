@@ -121,7 +121,7 @@ bool on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad,
 
 } // anonymous namespace
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
   // Initialize Gstreamermm:
   Gst::init(argc, argv);

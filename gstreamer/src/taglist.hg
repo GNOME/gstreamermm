@@ -322,18 +322,17 @@ extern const char* const _tag_strings[];
  * as merging mode, so that a new title (which came in later) has a preference
  * over the old one for display.
  */
-class TagList : public Structure
+class TagList
 {
-  // TODO: Gst::Structure is already wrapped as a boxed type.  Wrapping this
-  // derived class as a boxed type again is wrong.  It even means that there
-  // are *two* separate gobject_ members!  The compiler warning about the
-  // missing explicit base instance initialization in the copy constructor
-  // exposes the problem, too.
   _CUSTOM_STRUCT_PROTOTYPE
   _CLASS_BOXEDTYPE_EXTRA(TagList, GstTagList, gst_tag_list_new, gst_tag_list_copy, gst_tag_list_free)
   _IGNORE(gst_tag_list_copy, gst_tag_list_free)
 
 public:
+  /** Use this to discover if the TagList is a valid object.
+   */
+  operator bool() const;
+
   _WRAP_METHOD(static bool exists(const Glib::ustring& tag), gst_tag_exists)
   _WRAP_METHOD(static GType get_type(const Glib::ustring& tag), gst_tag_get_type)
   _WRAP_METHOD(static Glib::ustring get_nick(const Glib::ustring& tag), gst_tag_get_nick)

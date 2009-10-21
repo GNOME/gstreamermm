@@ -48,8 +48,7 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   }
 }
 
-int
-main (int argc, char *argv[])
+int main(int argc, char** argv)
 {
   Gtk::Main kit(argc, argv);
   Gst::init(argc, argv);

@@ -40,7 +40,7 @@ void add_structures(const Glib::RefPtr<Gst::Caps>& caps)
   caps->append_structure(struct3);
 }
 
-int main (int argc, char* argv[])
+int main(int argc, char** argv)
 {
   Gst::init(argc, argv);
 

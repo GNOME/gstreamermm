@@ -29,8 +29,7 @@
 #include <iostream>
 #include "player_window.h"
 
-int
-main (int argc, char *argv[])
+int main(int argc, char** argv)
 {
   Gtk::Main kit(argc, argv);
   Gst::init(argc, argv);

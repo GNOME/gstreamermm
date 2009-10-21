@@ -77,7 +77,7 @@ void test_simple()
     std::cout << "Getting of simple caps sting field failed." << std::endl;
 }
 
-int main (int argc, char* argv[])
+int main(int argc, char** argv)
 {
   Glib::RefPtr<Gst::Pipeline> pipeline;
   Glib::RefPtr<Gst::Element> e1, e2;

@@ -25,23 +25,22 @@ namespace Gst
 {
 
 
+// gst_mini_object_base_[init|finalize]() don't do anything so those don't
+// have to be called from here.
 void MiniObject_Class::class_init_function(void*, void*)
 {}
 
 MiniObject::MiniObject()
 : gobject_(0)
-{
-}
+{}
 
 MiniObject::MiniObject(GstMiniObject* castitem, bool take_copy)
 : gobject_(take_copy ? gst_mini_object_copy(castitem) : castitem)
-{
-}
+{}
 
 MiniObject::MiniObject(const MiniObject& other)
 : gobject_(gst_mini_object_copy(other.gobject_))
-{
-}
+{}
 
 MiniObject&
 MiniObject::operator=(const MiniObject& other)
