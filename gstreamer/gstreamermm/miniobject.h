@@ -47,29 +47,26 @@ private:
   friend class MiniObject_Class;
   static CppClassType mini_object_class_;
 
-//protected:
-public:
-  MiniObject();
-  MiniObject(GstMiniObject* castitem, bool take_copy = false);
-
-public:
-  virtual ~MiniObject();
-  
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  static GType get_type()      G_GNUC_CONST;
-  static GType get_base_type() G_GNUC_CONST;
-#endif
-
-  //Note that we don't add a constructor for gst_mini_object_new()
-  //because it's just an equivalent for g_object_new(), 
-  //which is just an equivalent for C++'s new(). 
-
-private:
   // noncopyable
   MiniObject(const MiniObject&);
   MiniObject& operator=(const MiniObject&);
 
+protected:
+  MiniObject();
+  explicit MiniObject(GstMiniObject* castitem, bool take_copy = false);
+  virtual ~MiniObject();
+  
 public:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  static GType get_type()      G_GNUC_CONST;
+  static GType get_base_type() G_GNUC_CONST;
+#endif
+
+public:
+  //Note that we don't add a constructor for gst_mini_object_new()
+  //because it's just an equivalent for g_object_new(), 
+  //which is just an equivalent for C++'s new(). 
+
   /** Returns the entire set of flags for the mini-object.
    * @return The Gst::MiniObject flags.
    */
