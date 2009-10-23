@@ -1,3 +1,31 @@
+2009-10-22  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Make sure the MiniObject type is registered in the GType system.
+
+	* gstreamer/gstreamermm/miniobject.cc:
+	* gstreamer/gstreamermm/miniobject.h:
+	* gstreamer/gstreamermm/private/miniobject_p.h: Added code to ensure
+	that the MiniObject class can be successfully registered with the
+	GType system.  Made the class non-copyable as it should be with
+	reference counted classes.  Removed the copy() method which doesn't
+	make sense for a reference counted class.  Use gst_mini_object_copy()
+	in gobj_copy().  Included a Value< Glib::RefPtr<Gst::MiniObject> >
+	template specialization to make sure that MiniObject can work with the
+	Glib::ValueBase system.
+	* tools/m4/class_gstminiobject.m4: Use gst_mini_object_copy() in
+	gobj_copy() for MiniObject derived classes.
+	* gstreamer/src/event.ccg:
+	* gstreamer/src/event.hg:
+	* gstreamer/src/message.ccg:
+	* gstreamer/src/message.hg:
+	* gstreamer/src/query.ccg:
+	* gstreamer/src/query.hg: Remove the copy() method which doesn't make
+	sense for reference counted classes.
+	* gstreamer/src/structure.ccg: Remove the MiniObject conversion
+	section in the _set_gstructure_field() gstreamermm/GStreamer
+	translation function because it is not needed.
+	* gstreamer/gstreamermm/wrap.h: Remove unneeded include.
+
 2009-10-21  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	Fix the taglist test to fix the distcheck.

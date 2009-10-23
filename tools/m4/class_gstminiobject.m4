@@ -184,8 +184,10 @@ Gst::MiniObject* __CPPNAME__`'_Class::wrap_new(GstMiniObject* object)
 
 __CNAME__* __CPPNAME__::gobj_copy()
 {
-  reference();
-  return gobj();
+  // Use the mini object copying function to get a copy of the underlying
+  // gobject instead of referencing and returning the underlying gobject as
+  // would be done normally:
+  return reinterpret_cast<__CNAME__*>(gst_mini_object_copy(reinterpret_cast<GstMiniObject*>(gobj())));
 }
 
 
@@ -227,7 +229,8 @@ public:
 
 m4_ifdef(`__BOOL_PROTECTED_GCLASS__',
 `protected:',`dnl else
-private:')dnl endif
+private:
+')dnl endif
   friend class __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
 

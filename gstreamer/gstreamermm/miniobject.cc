@@ -24,11 +24,34 @@
 namespace Gst
 {
 
+  /**** Gst::MiniObject_Class *********************************************/
+
+const Glib::Class& MiniObject_Class::init()
+{
+  if(!gtype_)
+  {
+    class_init_func_ = &MiniObject_Class::class_init_function;
+    register_derived_type(GST_TYPE_MINI_OBJECT);
+  }
+
+  return *this;
+}
 
 // gst_mini_object_base_[init|finalize]() don't do anything so those don't
 // have to be called from here.
 void MiniObject_Class::class_init_function(void*, void*)
 {}
+
+MiniObject* MiniObject_Class::wrap_new(GstMiniObject* object)
+{
+  return new MiniObject(object);
+}
+
+
+/**** Gst::MiniObject *****************************************************/
+
+// static data
+MiniObject::CppClassType MiniObject::mini_object_class_;
 
 MiniObject::MiniObject()
 : gobject_(0)
@@ -38,22 +61,28 @@ MiniObject::MiniObject(GstMiniObject* castitem, bool take_copy)
 : gobject_(take_copy ? gst_mini_object_copy(castitem) : castitem)
 {}
 
-MiniObject::MiniObject(const MiniObject& other)
-: gobject_(gst_mini_object_copy(other.gobject_))
-{}
-
-MiniObject&
-MiniObject::operator=(const MiniObject& other)
+GstMiniObject* MiniObject::gobj_copy()
 {
-  MiniObject temp(other);
-  swap(temp);
-  return *this;
+  // Use the mini object copying function to get a copy of the underlying
+  // gobject instead of referencing and returning the underlying gobject as
+  // would be done normally:
+  return gst_mini_object_copy(gobj());
 }
 
 MiniObject::~MiniObject()
 {
   if(gobject_)
     gst_mini_object_unref(gobject_);
+}
+
+GType MiniObject::get_type()
+{
+  return mini_object_class_.init().get_type();
+}
+
+GType MiniObject::get_base_type()
+{
+  return GST_TYPE_MINI_OBJECT;
 }
 
 void MiniObject::swap(MiniObject& other)
@@ -93,13 +122,6 @@ void MiniObject::set_flag(guint flag)
 void MiniObject::unset_flag(guint flag)
 {
   GST_MINI_OBJECT_FLAG_UNSET(gobj(), flag);
-}
-
-Glib::RefPtr<Gst::MiniObject>
-MiniObject::copy() const
-{
-  GstMiniObject * copy = gst_mini_object_copy(gobject_);
-  return Gst::wrap(copy, false);
 }
 
 bool

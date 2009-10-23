@@ -24,7 +24,6 @@
 
 #include <gst/gstminiobject.h>
 #include <glibmm/refptr.h>
-#include <gstreamermm/miniobject.h>
 
 namespace Gst
 {

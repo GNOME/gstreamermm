@@ -20,8 +20,10 @@
 #ifndef _GSTREAMERMM_MINIOBJECT_H
 #define _GSTREAMERMM_MINIOBJECT_H
 
-#include <glibmm/refptr.h>
 #include <gst/gstminiobject.h>
+#include <glibmm/refptr.h>
+#include <glibmm/value.h>
+#include <gstreamermm/wrap.h>
 
 namespace Gst
 {
@@ -41,6 +43,10 @@ public:
   typedef GstMiniObjectClass BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+private:
+  friend class MiniObject_Class;
+  static CppClassType mini_object_class_;
+
 //protected:
 public:
   MiniObject();
@@ -49,24 +55,18 @@ public:
 public:
   virtual ~MiniObject();
   
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+  static GType get_type()      G_GNUC_CONST;
+  static GType get_base_type() G_GNUC_CONST;
+#endif
+
   //Note that we don't add a constructor for gst_mini_object_new()
   //because it's just an equivalent for g_object_new(), 
   //which is just an equivalent for C++'s new(). 
 
-//protected:
+private:
   // noncopyable
-  /** A copy constructor.  Please note that copying is actually only supported
-   * in sub-classes that define their own custom copy function in the C API
-   * such as Gst::Event, Gst::Buffer, etc. otherwise the copy is not
-   * successful and a warning is issued.
-   */
   MiniObject(const MiniObject&);
-
-  /** Assignment operator.  Please note that copying is actually only
-   * supported in sub-classes that define their own custom copy function in
-   * the C API such as Gst::Event, Gst::Buffer, etc. otherwise the copy
-   * is not successful and a warning is issued.
-   */
   MiniObject& operator=(const MiniObject&);
 
 public:
@@ -90,20 +90,6 @@ public:
    * @param flag The flag to unset, must be a single bit in guint32. 
    */
   void unset_flag(guint flag);
-
-  /** Creates a copy of the mini-object.  Please note that copying is
-   * supported only by sub-classes of Gst::MiniObject such as Gst::Event,
-   * Gst::Buffer, etc. that define their own custom copy function in the C API
-   * and not directly by Gst::MiniObject, a base class.  If used from only a
-   * Gst::MiniObject instance and not a sub-class instance the copy is not
-   * successful and a warning is issued.
-   *
-   * MT safe.
-   *
-   * @return A copy of the mini-object or warn if this object is only a
-   * Gst::MiniObject and not a sub-class that defines its own copy function.
-   */
-  Glib::RefPtr<Gst::MiniObject> copy() const;
 
   /** Checks if a mini-object is writable. A mini-object is writable if the
    * reference count is one and the Gst::MINI_OBJECT_FLAG_READONLY flag is not
@@ -135,6 +121,8 @@ public:
   ///Provides access to the underlying C GstMiniObject.
   const GstMiniObject* gobj() const { return reinterpret_cast<GstMiniObject*>(gobject_); }
 
+  ///Provides access to the underlying C instance. The caller is responsible for unrefing it. Use when directly setting fields in structs.
+  GstMiniObject* gobj_copy();
 
   // static void replace(Glib::RefPtr<Gst::MiniObject> & olddata, Glib::RefPtr<Gst::MiniObject> & newdata);
 
@@ -147,4 +135,31 @@ protected:
 
 } // namespace Gst
 
-#endif //#ifndef _GSTREAMERMM_MINIOBJECT_H
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+namespace Glib
+{
+
+template <>
+class Value< Glib::RefPtr<Gst::MiniObject> > : public ValueBase
+{
+public:
+  static GType value_type()
+  {
+    return Gst::MiniObject::get_type();
+  }
+
+  void set(const Glib::RefPtr<Gst::MiniObject>& object)
+  {
+    g_value_set_pointer(&gobject_, Gst::unwrap(object));
+  }
+
+  Glib::RefPtr<Gst::MiniObject> get()
+  {
+    return Glib::RefPtr<Gst::MiniObject>(Gst::wrap_auto(static_cast<GstMiniObject*>(g_value_get_pointer(&gobject_)), true));
+  }
+};
+
+} // namespace Glib
+#endif // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+#endif // #ifndef _GSTREAMERMM_MINIOBJECT_H
