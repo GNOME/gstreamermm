@@ -165,7 +165,7 @@ _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
 
 dnl TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')
-_CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap($3, 0)')
+_CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap_taglist($3)')
 _CONVERSION(`Gst::TagList&',`GstTagList*',`$3.gobj()')
 _CONVERSION(`Gst::TagList',`GstTagList*',`$3.gobj()')
 

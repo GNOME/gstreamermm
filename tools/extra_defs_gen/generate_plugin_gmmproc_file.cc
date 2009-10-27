@@ -333,17 +333,19 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
 
           if(returnGType == GST_TYPE_TAG_LIST)
           {
-            // Dealing with a GstTagList* return which has a special Glib::wrap()
-            // because of the conflict with the Glib::wrap() for GstStructure*
-            // (GstTagList is infact a GstStructure).
+            // Dealing with a GstTagList* return which has a special
+            // Glib::wrap() because of the conflict with the Glib::wrap() for
+            // GstStructure* (GstTagList is infact a GstStructure).
             convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', "
-              "_LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ``Glib::wrap($3, 0)'')\n";
+              "_LQ()_TRANSLATE(" + returnCType +
+              ",`return')_RQ(), ``Glib::wrap_taglist($3)'')\n";
           }
           else
           {
             // Dealing with a regular boxed type return.
             convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', "
-              "_LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ``Glib::wrap($3)'')\n";
+              "_LQ()_TRANSLATE(" + returnCType +
+              ",`return')_RQ(), ``Glib::wrap($3)'')\n";
           }
         }
         else
@@ -413,11 +415,11 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
             if(paramGType == GST_TYPE_TAG_LIST)
             {
               // Dealing with a GstTagList* which has a special Glib::wrap()
-              // because of the conflict with the Glib::wrap() for GstStructure*
-              // (GstTagList is in fact a GstStructure).
+              // because of the conflict with the Glib::wrap() for
+              // GstStructure* (GstTagList is in fact a GstStructure).
               convertMacros += "#m4 _CONVERSION(``" + paramCType + "'', "
                 "_LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), "
-                "``Glib::wrap($3, 0, true)'')\n";
+                "``Glib::wrap_taglist($3, true)'')\n";
             }
             else
             {
