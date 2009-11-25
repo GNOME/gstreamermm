@@ -196,7 +196,7 @@ MessageMixerChanged::MessageMixerChanged(GstMessage* castitem)
 Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<const Gst::MixerTrack>& track) const
 {
   const guint32 num_channels = track->get_num_channels();
-  int* volumes = new int[num_channels];
+  int* volumes = g_new(int, num_channels);
 
   gst_mixer_get_volume(const_cast<GstMixer*>(gobj()),
     const_cast<GstMixerTrack*>(Glib::unwrap(track)), volumes);

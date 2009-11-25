@@ -140,7 +140,8 @@ vorbisenc=VorbisEnc \
 vorbisparse=VorbisParse \
 vorbistag=VorbisTag \
 ximagesink=XImageSink \
-xvimagesink=XvImageSink"])
+xvimagesink=XvImageSink
+"])
 
 # Check for the existence of the plug-ins.  Note that this check doesn't
 # work when cross-compiling.  That isn't much of a problem though since
