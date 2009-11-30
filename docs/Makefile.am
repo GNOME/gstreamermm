@@ -17,6 +17,7 @@ include $(top_srcdir)/gstreamer/src/filelist.am
 include $(top_srcdir)/gstreamer/gstreamermm/filelist.am
 
 book_name = $(GSTREAMERMM_MODULE_NAME)
-doc_input = $(addprefix $(top_srcdir)/gstreamer/gstreamermm/,$(files_built_h))
+doc_input = $(addprefix $(top_srcdir)/gstreamer/gstreamermm/,$(files_built_h)) \
+	    $(addprefix $(top_srcdir)/gstreamer/gstreamermm/,$(files_extra_h))
 
 include $(top_srcdir)/build/doc-reference.am
