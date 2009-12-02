@@ -94,11 +94,17 @@ Glib::Error MessageError::parse() const
 std::string MessageError::parse_debug() const
 {
   gchar* c_debug = 0;
-  gst_message_parse_error(const_cast<GstMessage*>(gobj()), 0, &c_debug);
+  GError* c_error = 0;
+
+  gst_message_parse_error(const_cast<GstMessage*>(gobj()), &c_error, &c_debug);
 
   std::string result = c_debug;
+
   if(c_debug)
     g_free(c_debug);
+
+  if(c_error)
+    g_error_free(c_error);
 
   return result;
 }
@@ -138,11 +144,18 @@ Glib::Error MessageWarning::parse() const
 std::string MessageWarning::parse_debug() const
 {
   gchar* c_debug = 0;
-  gst_message_parse_warning(const_cast<GstMessage*>(gobj()), 0, &c_debug);
+  GError* c_error = 0;
+
+  gst_message_parse_warning(const_cast<GstMessage*>(gobj()), &c_error,
+    &c_debug);
 
   std::string result = c_debug;
+
   if(c_debug)
     g_free(c_debug);
+
+  if(c_error)
+    g_error_free(c_error);
 
   return result;
 }
@@ -183,11 +196,17 @@ Glib::Error MessageInfo::parse() const
 std::string MessageInfo::parse_debug() const
 {
   gchar* c_debug = 0;
-  gst_message_parse_info(const_cast<GstMessage*>(gobj()), 0, &c_debug);
+  GError* c_error = 0;
+
+  gst_message_parse_info(const_cast<GstMessage*>(gobj()), &c_error, &c_debug);
 
   std::string result = c_debug;
+
   if(c_debug)
     g_free(c_debug);
+
+  if(c_error)
+    g_error_free(c_error);
 
   return result;
 }
