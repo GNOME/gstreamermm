@@ -72,7 +72,48 @@ public:
   _WRAP_METHOD(void join(gpointer id), gst_task_pool_join)
   _WRAP_METHOD(void cleanup(), gst_task_pool_cleanup)
 
-  //TODO: Wrap vfuncs.
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function which prepares the thread pool.
+   * @throw Glib::Error.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  virtual void prepare_vfunc();
+  #else
+  virtual void prepare_vfunc(std::auto_ptr<Glib::Error>& error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** Virtual function to cleanup the thread pool.
+   */
+  _WRAP_VFUNC(void cleanup(), "cleanup")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function which starts a new thread.
+   * @throw Glib::Error.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  virtual gpointer push_vfunc(const SlotPush& slot);
+  #else
+  virtual gpointer push_vfunc(const SlotPush& slot,
+    std::auto_ptr<Glib::Error>& error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** Virtual function to join a thread.
+   */
+  _WRAP_VFUNC(void join(gpointer id), "join")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->prepare = &prepare_vfunc_callback;
+  klass->push = &push_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static void prepare_vfunc_callback(GstTaskPool* self, GError** error);
+  static gpointer push_vfunc_callback(GstTaskPool* self,
+    GstTaskPoolFunction func, gpointer user_data, GError** error);
+  _POP()
+#m4end
 };
 
 } // namespace Gst

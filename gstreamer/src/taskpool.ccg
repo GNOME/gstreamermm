@@ -75,4 +75,167 @@ gpointer TaskPool::push(const SlotPush& slot, std::auto_ptr<Glib::Error>& error)
   return ret_val;
 }
 
+#ifdef GLIBMM_VFUNCS_ENABLED
+void TaskPool_Class::prepare_vfunc_callback(GstTaskPool* self, GError** error)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        #ifdef GLIBMM_EXCEPTIONS_ENABLED
+        obj->prepare_vfunc();
+        #else
+        std::auto_ptr<Glib::Error> cpp_error(0);
+        obj->prepare_vfunc(cpp_error);
+        if (cpp_error.get())
+          *error = g_error_copy(cpp_error->gobj());
+        #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+        return;
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->prepare)
+    (*base->prepare)(self, error);
+
+}
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void Gst::TaskPool::prepare_vfunc() 
+#else
+void Gst::TaskPool::prepare_vfunc(std::auto_ptr<Glib::Error>& error) 
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->prepare)
+  {
+    GError* gerror = 0;
+    (*base->prepare)(gobj(),&gerror);
+
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    if(gerror)
+      ::Glib::Error::throw_exception(gerror);
+    #else
+    if(gerror)
+      error = ::Glib::Error::throw_exception(gerror);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
+}
+gpointer TaskPool_Class::push_vfunc_callback(GstTaskPool* self, GstTaskPoolFunction func, gpointer user_data, GError** error)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        Gst::TaskPool::SlotPush* slot =
+          static_cast<Gst::TaskPool::SlotPush*>(user_data);
+
+        #ifdef GLIBMM_EXCEPTIONS_ENABLED
+        return obj->push_vfunc(*slot);
+        #else
+        std::auto_ptr<Glib::Error> cpp_error(0);
+        gpointer result = obj->push_vfunc(*slot, cpp_error);
+        if (cpp_error.get())
+          *error = g_error_copy(cpp_error->gobj());
+        return result;
+        #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->push)
+    return (*base->push)(self, func, user_data, error);
+
+
+  typedef gpointer RType;
+  return RType();
+}
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gpointer Gst::TaskPool::push_vfunc(const SlotPush& slot) 
+#else
+gpointer Gst::TaskPool::push_vfunc(const SlotPush& slot,
+  std::auto_ptr<Glib::Error>& error) 
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->push)
+  {
+    GError* gerror = 0;
+    gpointer result = (*base->push)(gobj(),
+      &TaskPool_Push_gstreamermm_callback, const_cast<SlotPush*>(&slot),
+        &gerror);
+
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    if(gerror)
+      ::Glib::Error::throw_exception(gerror);
+    #else
+    if(gerror)
+      error = ::Glib::Error::throw_exception(gerror);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+    return result;
+  }
+
+  typedef gpointer RType;
+  return RType();
+}
+#endif //GLIBMM_VFUNCS_ENABLED
+
 } //namespace Gst

@@ -81,7 +81,11 @@ int main(int argc, char** argv)
 
   // Create elements:
   Glib::RefPtr<Gst::FileSrc> element_source = Gst::FileSrc::create();
+#ifdef GLIBMM_PROPERTIES_ENABLED
   element_source->property_location() = filename;
+#else
+  element_source->set_property("location", filename);
+#endif /* GLIBMM_PROPERTIES_ENABLED */
 
   //If using an MP3 file, this should provide more Caps information from typefind.
   //Glib::RefPtr<Gst::Element> element_id3demux = Gst::ElementFactory::create_element("id3demux");
