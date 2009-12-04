@@ -19,6 +19,7 @@
  
 #include <gst/cdda/gstcddabasesrc.h>
 #include <gstreamermm/pushsrc.h>
+#include <gstreamermm/taglist.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -45,7 +46,7 @@ _WRAP_ENUM(CddaBaseSrcMode,GstCddaBaseSrcMode)
  * Alternatively, applications may retrieve the currently playing track and the
  * total number of tracks from the taglist that will be posted on the bus
  * whenever the CD is opened or the currently playing track changes. The
- * taglist will contain Gst::Tag::TRACK_NUMBER and Gst::Tag::TRACK_COUNT tags.
+ * taglist will contain Gst::TAG_TRACK_NUMBER and Gst::TAG_TRACK_COUNT tags.
  *
  * Applications playing back CD audio using playbin and cdda://n URIs should
  * issue a seek command in track format to change between tracks, rather than
@@ -54,8 +55,8 @@ _WRAP_ENUM(CddaBaseSrcMode,GstCddaBaseSrcMode)
  *
  * CDDA sources will automatically emit a number of tags, details about which
  * can be found in the libgsttag documentation. Those tags are:
- * Gst::Tag::CDDA_CDDB_DISCID, Gst::Tag::CDDA_CDDB_DISCID_FULL,
- * Gst::Tag::CDDA_MUSICBRAINZ_DISCID, Gst::Tag::CDDA_MUSICBRAINZ_DISCID_FULL,
+ * Gst::TAG_CDDA_CDDB_DISCID, Gst::TAG_CDDA_CDDB_DISCID_FULL,
+ * Gst::TAG_CDDA_MUSICBRAINZ_DISCID, Gst::TAG_CDDA_MUSICBRAINZ_DISCID_FULL,
  * among others.
  *
  * @ingroup GstBaseClasses
@@ -65,13 +66,60 @@ class CddaBaseSrc : public Gst::PushSrc
   _CLASS_GOBJECT(CddaBaseSrc, GstCddaBaseSrc, GST_CDDA_BASE_SRC, Gst::PushSrc, GstPushSrc)
 
 public:
-  //TODO: _WRAP_METHOD(bool add_track(...), gst_cdda_base_src_add_track)
+  /** CDDA sources use this function from their start vfunc to announce the
+   * available data and audio tracks to the base source class.
+   *
+   * @param num Track number in TOC (usually starts from 1, but not always).
+   * @param start The first sector of the track (LBA).
+   * @param end The last sector of the track (LBA).
+   * @param is_audio Whether this is an audio track.
+   * @param tags Track-specific tags (e.g. from cd-text information).
+   * @return false on error, otherwise true.
+   */
+  bool add_track(guint num, guint start, guint end, bool is_audio = true,
+    const Gst::TagList& tags = Gst::TagList());
+  _IGNORE(gst_cdda_base_src_add_track)
 
-  _WRAP_PROPERTY("device", Glib::ustring)
+  _WRAP_PROPERTY("device", std::string)
   _WRAP_PROPERTY("mode", CddaBaseSrcMode)
   _WRAP_PROPERTY("track", guint)
 
-  //TODO: Wrap vfuncs.
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function to open a CD device.
+   */
+   virtual bool open_vfunc(std::string& device);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** Virtual function to close the device.
+   */
+  _WRAP_VFUNC(void close(), "close")
+
+  /** Virtual function to read one sector (LBA).
+   */
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Buffer> read_sector(gint sector), "read_sector")
+
+  /** Virtual function to get default device.  It is optional and may return
+   * an empty string.
+   */
+  _WRAP_VFUNC(std::string get_default_device(), "get_default_device")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function to return array of CD devices.  It is optional and may
+   * return an empty array.
+   */
+  virtual Glib::ArrayHandle<std::string> probe_devices_vfunc();
+#endif //GLIBMM_VFUNCS_ENABLED
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->open = &open_vfunc_callback;
+  klass->probe_devices = &probe_devices_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static gboolean open_vfunc_callback(GstCddaBaseSrc* self, const gchar* device);
+  static gchar** probe_devices_vfunc_callback(GstCddaBaseSrc* self);
+  _POP()
+#m4end
 };
 
 } // namespace Gst

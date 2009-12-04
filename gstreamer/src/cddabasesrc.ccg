@@ -18,4 +18,140 @@
  */
 
 #include <gst/cdda/gstcddabasesrc.h>
+#include <gstreamermm/buffer.h>
 _PINCLUDE(gstreamermm/private/pushsrc_p.h)
+
+namespace Gst
+{
+
+bool CddaBaseSrc::add_track(guint num, guint start, guint end, bool is_audio,
+  const Gst::TagList& tags)
+{
+  GstCddaBaseSrcTrack track;
+
+  track.num = num;
+  track.start = start;
+  track.end = end;
+  track.is_audio = is_audio;
+
+  if (tags)
+    track.tags = tags.gobj_copy();
+
+  return gst_cdda_base_src_add_track(gobj(), &track);
+}
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+gboolean CddaBaseSrc_Class::open_vfunc_callback(GstCddaBaseSrc* self, const gchar* device)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        std::string cpp_device(device);
+        return static_cast<int>(obj->open_vfunc(cpp_device));
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->open)
+    return (*base->open)(self, device);
+
+
+  typedef gboolean RType;
+  return RType();
+}
+bool Gst::CddaBaseSrc::open_vfunc(std::string& device) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->open)
+    return (*base->open)(gobj(),device.c_str());
+
+  typedef bool RType;
+  return RType();
+}
+gchar** CddaBaseSrc_Class::probe_devices_vfunc_callback(GstCddaBaseSrc* self)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
+        return const_cast<gchar**>(obj->probe_devices_vfunc().data());
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->probe_devices)
+    return (*base->probe_devices)(self);
+
+
+  typedef gchar** RType;
+  return RType();
+}
+Glib::ArrayHandle<std::string> Gst::CddaBaseSrc::probe_devices_vfunc() 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->probe_devices)
+    return Glib::ArrayHandle<std::string>((*base->probe_devices)(gobj()), Glib::OWNERSHIP_DEEP);
+
+  typedef Glib::ArrayHandle<std::string> RType;
+  return RType(0, Glib::OWNERSHIP_NONE);
+}
+#endif //GLIBMM_VFUNCS_ENABLED
+
+} // namespace Gst
