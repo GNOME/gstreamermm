@@ -24,6 +24,24 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+/** Helper structure for the Gst::VideoSink class representing a rectangular
+ * area.
+ */
+struct VideoRectangle
+{
+  /// The X coordinate of the rectangle's top-left point.
+  int x;
+
+  /// The Y coordinate of rectangle's top-left point.
+  int y;
+
+  /// The width of the rectangle.
+  int w;
+
+  /// The height of the rectangle.
+  int h;
+};
+
 /** Gst::VideoSink - Base class for video sinks.
  * Provides useful functions and a base class for video sinks.
  *
@@ -46,7 +64,11 @@ public:
    */
   _MEMBER_GET(width, width, int, gint)
 
-  //TODO: _WRAP_METHOD(void center_rect(...), gst_video_sink_center_rect)
+#m4 _CONVERSION(`const Gst::VideoRectangle&', `GstVideoRectangle', `reinterpret_cast<const $2&>($3)')
+#m4 _CONVERSION(`Gst::VideoRectangle&', `GstVideoRectangle*', `reinterpret_cast<GstVideoRectangle*>(&$3)')
+  _WRAP_METHOD(static void center_rect(const Gst::VideoRectangle& src, const Gst::VideoRectangle& dst, Gst::VideoRectangle& result, bool scaling = false), gst_video_sink_center_rect)
+
+  _WRAP_PROPERTY("show-preroll-frame", bool)
 };
 
 } // namespace Gst
