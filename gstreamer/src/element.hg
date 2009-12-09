@@ -472,20 +472,30 @@ class ElementInterfaced
   public T_Interface
 {
 public:
-  // Make calls involving underlying gobject unambiguous (specifically, gobj()
-  // is ambiguous when called from an ElementInterfaced<..> class
+  // The gobj() methods make calls involving access to the underlying gobject
+  // unambiguous (specifically, gobj() is ambiguous when called from an
+  // ElementInterfaced<..> class).
+
+  /// Gets the underlying gobject.
   GstElement* gobj();
+
+  /// Gets the underlying gobject.
   const GstElement* gobj() const;
+
+  /// Gets a copy of the underlying gobject.  The copy should be freed.
   GstElement* gobj_copy();
 
   ~ElementInterfaced();
 
 protected:
-  ElementInterfaced(const ElementInterfaced&);
-  ElementInterfaced& operator=(const ElementInterfaced&);
+  /// Cast constructor.
+  explicit ElementInterfaced(GstElement* castitem);
 
-protected:
-  ElementInterfaced(GstElement* castitem);
+  /// Copy constructor.
+  ElementInterfaced(const ElementInterfaced&);
+
+  /// Assignment operator.
+  ElementInterfaced& operator=(const ElementInterfaced&);
 
 private:
   friend class Gst::Interface;

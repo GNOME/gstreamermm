@@ -551,7 +551,7 @@ static void generate_hg_file(const std::string& includeMacroCalls,
 
   std::cout << "protected:" << std::endl;
   std::cout << "  " << cppTypeName << "();" << std::endl;
-  std::cout << "  " << cppTypeName << "(const Glib::ustring& name);" << std::endl << std::endl;
+  std::cout << "  explicit " << cppTypeName << "(const Glib::ustring& name);" << std::endl << std::endl;
 
   std::cout << "public:" << std::endl;
   std::cout << "/** Creates a new " << pluginName << " plugin with a unique name." << std::endl;
