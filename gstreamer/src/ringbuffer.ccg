@@ -36,7 +36,8 @@ static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer*, guint8* data, g
   try
 #endif
   {
-    slot_fill(data, len);
+    Glib::ArrayHandle<guint8> cpp_data(data, len, Glib::OWNERSHIP_NONE);
+    slot_fill(cpp_data, len);
   }
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   catch (...)
@@ -53,18 +54,7 @@ static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer*, guint8* data, g
 namespace Gst
 {
 
-RingBufferSpec::RingBufferSpec(const GstRingBufferSpec* castitem)
-{
-  if(castitem)
-    copy_fields_from(*castitem);
-  else
-  {
-    GstRingBufferSpec empty;
-    copy_fields_from(empty);
-  }
-}
-
-void RingBufferSpec::copy_fields_from(const GstRingBufferSpec& spec)
+void RingBufferSpec::copy_from(const GstRingBufferSpec& spec)
 {
   caps = Glib::wrap(spec.caps);
 
@@ -83,10 +73,10 @@ void RingBufferSpec::copy_fields_from(const GstRingBufferSpec& spec)
   bytes_per_sample = spec.bytes_per_sample;
   seglatency = spec.seglatency;
 
-  std::memcpy(silence_sample, spec.silence_sample, sizeof(silence_sample));
+  silence_sample.assign(spec.silence_sample, spec.silence_sample + 32);
 }
 
-void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec) const
+void RingBufferSpec::copy_to(GstRingBufferSpec& spec) const
 {
   spec.caps = Glib::unwrap(caps);
   spec.type = static_cast<GstBufferFormatType>(type);
@@ -104,58 +94,181 @@ void RingBufferSpec::copy_fields_to(GstRingBufferSpec& spec) const
   spec.bytes_per_sample = bytes_per_sample;
   spec.seglatency = seglatency;
 
-  std::memcpy(spec.silence_sample, silence_sample, sizeof(spec.silence_sample));
+  std::copy(silence_sample.begin(), silence_sample.end(), spec.silence_sample);
 }
-
-RingBuffer::RingBuffer(const Glib::ConstructParams& construct_params)
-:
-  Gst::Object(construct_params),
-  _slot_set(false)
-{}
-
-RingBuffer::RingBuffer(GstRingBuffer* castitem)
-:
-  Gst::Object(reinterpret_cast<GstObject*>(castitem)),
-  _slot_set(false)
-{}
 
 void RingBuffer::set_fill_slot(const SlotFill& slot)
 {
-  // TODO: Not safe against self assignment, and not exception-safe.  Is the
-  // separate _slot_set flag really needed?  Is dynamic allocation actually
-  // needed at all?  This would not have to be a member at all if there were
-  // an accessor to the callback user data in the C API.
-  if(_slot_set)
-    delete this->slot;
-
-  this->slot = new SlotFill(slot);
-  _slot_set = true;
+  // The slot is dynamically allocated because according to the
+  // gst_ring_buffer_set_callback() docs, the slot may be called several times.
+  // A copy is hence created to avoid losing the slot.  The copy is kept in an
+  // auto_ptr<> so that is released upon the ring buffer's destruction.
+  m_slot.reset(new SlotFill(slot));
 
   gst_ring_buffer_set_callback(gobj(), &RingBuffer_Fill_gstreamermm_callback,
-    this->slot);
+    m_slot.get());
+}
+
+bool RingBuffer::prepare_read(int& segment, std::vector<guint8>& readptr,
+  int& len)
+{
+  guint8* c_readptr = 0;
+
+  const bool result = static_cast<bool>(gst_ring_buffer_prepare_read(gobj(), &segment, &c_readptr, &len));
+  readptr.assign(c_readptr, c_readptr + len);
+
+  if (c_readptr)
+    g_free(c_readptr);
+
+  return result;
 }
 
 bool RingBuffer::acquire(const Gst::RingBufferSpec& spec)
 {
   GstRingBufferSpec gst_spec;
-  spec.copy_fields_to(gst_spec);
+  spec.copy_to(gst_spec);
   return gst_ring_buffer_acquire(gobj(), &gst_spec);
 }
 
 bool RingBuffer::parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::Caps>& caps)
 {
   GstRingBufferSpec gst_spec;
-  spec.copy_fields_to(gst_spec);
+  spec.copy_to(gst_spec);
   gboolean const result = gst_ring_buffer_parse_caps(&gst_spec, Glib::unwrap(caps));
-  spec.copy_fields_from(gst_spec);
+  spec.copy_from(gst_spec);
   return (result != 0);
 }
 
-RingBuffer::~RingBuffer()
+#ifdef GLIBMM_VFUNCS_ENABLED
+gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBufferSpec* spec)
 {
-    // Delete ringbuffer's slot upon destruction
-  if(_slot_set)
-    delete slot;
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        Gst::RingBufferSpec cpp_spec;
+        cpp_spec.copy_from(*spec);
+        // Call the virtual member method, which derived classes might override.
+        const gboolean result = static_cast<int>(obj->acquire_vfunc(cpp_spec));
+        cpp_spec.copy_to(*spec);
+        return result;
+
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->acquire)
+    return (*base->acquire)(self, spec);
+
+
+  typedef gboolean RType;
+  return RType();
 }
+bool Gst::RingBuffer::acquire_vfunc(Gst::RingBufferSpec& spec) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->acquire)
+  {
+    GstRingBufferSpec c_spec;
+    spec.copy_to(c_spec);
+    const bool result = static_cast<bool>((*base->acquire)(gobj(), &c_spec));
+    spec.copy_from(c_spec);
+    return result;
+  }
+
+  typedef bool RType;
+  return RType();
+}
+guint RingBuffer_Class::commit_vfunc_callback(GstRingBuffer* self, guint64* sample, guchar* data, gint in_samples, gint out_samples, gint* accum)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // This formula is obtained from the definition of the data_end
+        // variable in the default_commit() function of the C API
+        // gstringbuffer.c file.
+        size_t data_length = (self->spec.bytes_per_sample * in_samples);
+
+        // Declare the ArrayHandle for the C++ vfunc.
+        Glib::ArrayHandle<guchar> cpp_data(data, data_length, Glib::OWNERSHIP_NONE);
+        // Call the virtual member method, which derived classes might override.
+        return obj->commit_vfunc(*(sample), cpp_data, in_samples, out_samples,
+          *(accum));
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->commit)
+    return (*base->commit)(self, sample, data, in_samples, out_samples, accum);
+
+
+  typedef guint RType;
+  return RType();
+}
+guint Gst::RingBuffer::commit_vfunc(guint64& sample, const Glib::ArrayHandle<guchar>& data, int in_samples, int out_samples, int& accum) 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->commit)
+    return (*base->commit)(gobj(),&sample,const_cast<guchar*>(data.data()),in_samples,out_samples,&accum);
+
+  typedef guint RType;
+  return RType();
+}
+#endif //GLIBMM_VFUNCS_ENABLED
 
 } // namespace Gst

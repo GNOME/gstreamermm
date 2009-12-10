@@ -1,5 +1,46 @@
 2009-12-09  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	RingBuffer: Wrap virtual functions.
+
+	* gstreamer/src/ringbuffer.ccg:
+	* gstreamer/src/ringbuffer.hg: Wrapped virtual functions.
+	(RingBufferSpec): Declare it as a struct and make the members public.
+	Document the use of the members and justify why it was declared as a
+	struct and not a class.
+	(RingBufferSpec::silence_sample): Use a std::vector<> for the member
+	type instead of int[32].
+	(RingBufferSpec::copy_fields_from): Renamed to copy_from().
+	(RingBufferSpec::copy_fields_to): Renamed to copy_to().
+	(RingBufferSpec::RingBufferSpec): Deleted "castitem" constructor.
+	(RingBuffer::SlotFill): Use std::vector<guint8> instead of a guint8*
+	for the data parameter.
+	(RingBuffer::commit):
+	(RingBuffer::read):  Use a Glib::ArrayHandle<guchar> for the data
+	parameter in these three methods instead of a guchar*.
+	(RingBuffer::prepare_read): Use a std::vector<guint8> for the readptr
+	parameter instead of a guint8*&.
+	(slot): Renamed member to m_slot and used a std::auto_ptr<> for
+	automatic memory management.  This made it unnecessary to use the bool
+	member _slot_set and to have custom constructors and destructors.
+	(_slot_set): Deleted.
+	* gstreamer/src/gst_vfuncs.defs: Alphabetized and added
+	GstRingBuffer's virtual method definitions.
+
+	* gstreamer/src/audiofilter.ccg:
+	* gstreamer/src/audiofilter.hg: Correct class docs.
+	(setup_vfunc):
+	* gstreamer/src/audiosink.ccg:
+	* gstreamer/src/audiosink.hg:
+	(prepare_vfunc):
+	* gstreamer/src/audiosrc.ccg:
+	* gstreamer/src/audiosrc.hg:
+	(prepare_vfunc): Use a non-const RingBufferSpec in the virtual
+	methods as it could be modified.  Also correct the implementation of
+	the methods (and their callbacks) to copy back and forth between the C
+	struct and the C++ struct.
+
+2009-12-09  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	Make single argument constructors explicit.
 
 	* gstreamer/src/format.hg:

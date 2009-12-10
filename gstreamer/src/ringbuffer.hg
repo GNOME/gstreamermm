@@ -21,6 +21,7 @@
 #include <gstreamermm/caps.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/format.h>
+#include <memory>
 
 _DEFS(gstreamermm,gst)
 
@@ -32,87 +33,95 @@ _WRAP_ENUM(RingBufferState, GstRingBufferState)
 _WRAP_ENUM(BufferFormat, GstBufferFormat)
 _WRAP_ENUM(BufferFormatType, GstBufferFormatType)
 
-// TODO: Rewrite at next API break, either as a real class with accessors
-// instead of public data members, or alternatively as a plain struct
-// accompanied by a justification.
+// The reason that this is implemented as just a struct with public members
+// and not a class is that it is only used in two methods:
+// 1) In Gst::RingBuffer::acquire() to acquire a ring buffer (some members
+// should be set while acquire() modifies others).
+// 2) In Gst::RingBuffer::parse_caps() by attempting to merge the given caps
+// in to the spec (with some existing members already set).
+// It doesn't seem necessary to implement a full blown class for this yet.
+
 /** The structure containing the format specification of a Gst::RingBuffer.
+ * The "in" members should be specified by the caller of the
+ * Gst::RingBuffer::acquire() method while the "in/out" members may be set by
+ * the caller but are also modifiable by Gst::RingBuffer::acquire().  The
+ * "out" members are generated as a result of the call to
+ * Gst::RingBuffer::acquire().
  * @see Gst::RingBuffer::acquire().
  */
-class RingBufferSpec
+struct RingBufferSpec
 {
-  _CLASS_GENERIC(RingBufferSpec, GstRingBufferSpec)
-public:
-  /// Construct a Gst::RingBufferSpec from a GstRingBufferSpec.
-  RingBufferSpec(const GstRingBufferSpec* castitem);
-
-  /** The caps that generated the Spec. */
+  /** The caps of the buffer (in). */
   Glib::RefPtr<Gst::Caps> caps;
 
-  /** The sample type.
+  /** The sample type (in/out).
    */
   Gst::BufferFormatType type;
 
-  /** The sample format.
+  /** The sample format (in/out).
    */
   Gst::BufferFormat format;
 
-  /** The sample sign.
+  /** The sample sign (in/out).
    */
   bool          sign;
 
-  /** The endianness of the samples.
+  /** The endianness of the samples (in/out).
    */
   bool          bigend;
 
-  /** The width of the samples.
+  /** The width of the samples (in/out).
    */
   int           width;
 
-  /** The depth of the samples.
+  /** The depth of the samples (in/out).
    */
   int           depth;
 
-  /** The samplerate.
+  /** The samplerate (in/out).
    */
   int           rate;
 
-  /** The number of channels.
+  /** The number of channels (in/out).
    */
   int           channels;
 
-  /** The latency in microseconds.
+  /** The latency in microseconds (in/out).
    */
   guint64       latency_time;
 
-  /**  The total buffer size in microseconds.
+  /**  The total buffer size in microseconds (in/out).
    */
   guint64       buffer_time;
 
-  /** The size of one segment in bytes.
+  /** The size of one segment in bytes (in/out).
    */
   int           segsize;
 
-  /** The total number of segments.
+  /** The total number of segments (in/out).
    */
   int           segtotal;
 
-  /** Number of bytes of one sample.
+  /** Number of segments queued in the lower level device, defaults to
+   * segtotal (in/out).
+   */
+  int           seglatency;
+
+  /** Number of bytes of one sample (out).  This is set by the call to
+   * Gst::RingBuffer::acquire().
    */
   int           bytes_per_sample;
 
   // TODO: Ouch.  No way.
-  /** Bytes representing one sample of silence.
+  /** Bytes representing one sample of silence (out).  This is set by the call
+   * to Gst::RingBuffer::acquire().
    */
-  guint8        silence_sample[32];
-
-  /** Number of segments queued in the lower level device, defaults to
-   * segtotal.
-   */
-  int           seglatency;
+  // I hope this is what the TODO means:
+  std::vector<guint8> silence_sample;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  void copy_fields_from(const GstRingBufferSpec& spec);
-  void copy_fields_to(GstRingBufferSpec& spec) const;
+  void copy_from(const GstRingBufferSpec& spec);
+  void copy_to(GstRingBufferSpec& spec) const;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 
@@ -122,8 +131,8 @@ public:
  *
  * The ringbuffer abstracts a circular buffer of data. One reader and one
  * writer can operate on the data from different threads in a lockfree manner.
- * The base class is sufficiently flexible to be used as an abstraction for DMA
- * based ringbuffers as well as a pure software implementations.
+ * The base class is sufficiently flexible to be used as an abstraction for
+ * DMA based ringbuffers as well as a pure software implementations.
  *
  * Last reviewed on 2006-02-02 (0.10.4).
  * @ingroup GstBaseClasses
@@ -131,17 +140,15 @@ public:
 class RingBuffer : public Gst::Object
 {
   _CLASS_GOBJECT(RingBuffer, GstRingBuffer, GST_RING_BUFFER, Gst::Object, GstObject)
-  _CUSTOM_DTOR()
-  _CUSTOM_CTOR_CAST()
 
 public:
   /** For example,
-   * bool on_fill(const Glib::RefPtr<Gst::RingBuffer>& rbuf, guint8* data,
-   * guint len);.
+   * bool on_fill(const Glib::RefPtr<Gst::RingBuffer>& rbuf,
+   * const std::vector<guint8>& data, guint len);.
    * This slot is set with set_fill_slot() and is called to fill the memory at
    * data with len bytes of samples.
    */
-  typedef sigc::slot<void, guint8*, guint> SlotFill;
+  typedef sigc::slot<void, const Glib::ArrayHandle<guint8>&, guint> SlotFill;
 
   //TODO: _MEMBER_GET(cond, cond, Glib::Cond, GCond*)
 
@@ -176,11 +183,18 @@ public:
   _WRAP_METHOD(guint get_delay() const, gst_ring_buffer_delay)
   _WRAP_METHOD(guint64 get_samples_done() const, gst_ring_buffer_samples_done)
   _WRAP_METHOD(void set_sample(guint64 sample), gst_ring_buffer_set_sample)
-  _WRAP_METHOD(guint commit(guint64 sample, guchar* data, guint len), gst_ring_buffer_commit)
-  _WRAP_METHOD(guint commit(guint64& sample, guchar* data, int in_samples, int out_samples, int& accum), gst_ring_buffer_commit_full)
+
+#m4 _CONVERSION(`const Glib::ArrayHandle<guchar>&', `guchar*', `const_cast<guchar*>($3.data())')
+  _WRAP_METHOD(guint commit(guint64 sample, const Glib::ArrayHandle<guchar>& data, guint len), gst_ring_buffer_commit)
+  _WRAP_METHOD(guint commit(guint64& sample, const Glib::ArrayHandle<guchar>& data, int in_samples, int out_samples, int& accum), gst_ring_buffer_commit_full)
+
   _WRAP_METHOD(bool convert(Gst::Format src_fmt, gint64 src_val, Gst::Format dest_fmt, gint64& dest_val) const, gst_ring_buffer_convert)
-  _WRAP_METHOD(bool prepare_read(int& segment, guint8*& readptr, int& len), gst_ring_buffer_prepare_read)
-  _WRAP_METHOD(guint read(guint64 sample, guchar* data, guint len), gst_ring_buffer_read)
+
+  _WRAP_METHOD_DOCS_ONLY(gst_ring_buffer_prepare_read)
+  bool prepare_read(int& segment, std::vector<guint8>& readptr, int& len);
+
+  _WRAP_METHOD(guint read(guint64 sample, const Glib::ArrayHandle<guchar>& data, guint len), gst_ring_buffer_read)
+
   _WRAP_METHOD(void clear(int segment), gst_ring_buffer_clear)
   _WRAP_METHOD(void clear_all(), gst_ring_buffer_clear_all)
   _WRAP_METHOD(void advance(guint advance), gst_ring_buffer_advance)
@@ -199,13 +213,75 @@ public:
 
   _WRAP_METHOD(void set_flushing(bool flushing), gst_ring_buffer_set_flushing)
 
-  //TODO: Wrap vfuncs.
+  /** Virtual function to open the device.  Don't set any params or allocate
+   * anything.
+   */
+  _WRAP_VFUNC(bool open_device(), "open_device")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function to allocate the resources for the ring buffer using the
+   * given spec.
+   */
+  virtual bool acquire_vfunc(Gst::RingBufferSpec& spec);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** Virtual function to free resources of the ring buffer.
+   */
+  _WRAP_VFUNC(bool release(), "release")
+
+  /** Virtual function to close the device.
+   */
+  _WRAP_VFUNC(bool close_device(), "close_device")
+
+  /** Virtual function to start processing of samples.
+   */
+  _WRAP_VFUNC(bool start(), "start")
+
+  /** Virtual function to pause processing of samples.
+   */
+  _WRAP_VFUNC(bool pause(), "pause")
+
+  /** Virtual function to resume processing of samples after pause.
+   */
+  _WRAP_VFUNC(bool resume(), "resume")
+
+  /** Virtual function to stop processing of samples.
+   */
+  _WRAP_VFUNC(bool stop(), "stop")
+
+  /** Virtual function to get number of samples queued in device.
+   */
+  _WRAP_VFUNC(guint delay(), "delay")
+
+  /** Virtual function to activate the thread that starts pulling and
+   * monitoring the consumed segments in the device. Since 0.10.22.
+   */
+  _WRAP_VFUNC(bool activate(bool active), "activate")
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function to write samples into the ring buffer.
+   */
+  virtual guint commit_vfunc(guint64& sample, const Glib::ArrayHandle<guchar>& data, int in_samples, int out_samples, int& accum);
+#endif //GLIBMM_VFUNCS_ENABLED
+
+  /** Virtual function to clear the entire ringbuffer Since 0.10.24.
+   */
+  _WRAP_VFUNC(void clear_all(), "clear_all")
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->acquire = &acquire_vfunc_callback;
+  klass->commit = &commit_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static gboolean acquire_vfunc_callback(GstRingBuffer* self, GstRingBufferSpec* spec);
+  static guint commit_vfunc_callback(GstRingBuffer* self, guint64* sample, guchar* data, gint in_samples, gint out_samples, gint* accum);
+  _POP()
+#m4end
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
-  // TODO: Follow naming conventions and use std::auto_ptr<SlotFill>.
-  SlotFill* slot;
-  bool _slot_set;
+  std::auto_ptr<SlotFill> m_slot;
 #endif
 };
 

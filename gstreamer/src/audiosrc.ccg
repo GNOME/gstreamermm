@@ -43,9 +43,12 @@ gboolean AudioSrc_Class::prepare_vfunc_callback(GstAudioSrc* self, GstRingBuffer
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
+        Gst::RingBufferSpec cpp_spec;
+        cpp_spec.copy_from(*spec);
         // Call the virtual member method, which derived classes might override.
-        Gst::RingBufferSpec cpp_spec(spec);
-        return static_cast<int>(obj->prepare_vfunc(cpp_spec));
+        const gboolean result = static_cast<int>(obj->prepare_vfunc(cpp_spec));
+        cpp_spec.copy_to(*spec);
+        return result;
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
@@ -68,7 +71,7 @@ gboolean AudioSrc_Class::prepare_vfunc_callback(GstAudioSrc* self, GstRingBuffer
   typedef gboolean RType;
   return RType();
 }
-bool Gst::AudioSrc::prepare_vfunc(const Gst::RingBufferSpec& spec)
+bool Gst::AudioSrc::prepare_vfunc(Gst::RingBufferSpec& spec)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -77,8 +80,10 @@ bool Gst::AudioSrc::prepare_vfunc(const Gst::RingBufferSpec& spec)
   if(base && base->prepare)
   {
     GstRingBufferSpec gst_spec;
-    spec.copy_fields_to(gst_spec);
-    return (*base->prepare)(gobj(),&gst_spec);
+    spec.copy_to(gst_spec);
+    const bool result = static_cast<bool>((*base->prepare)(gobj(),&gst_spec));
+    spec.copy_from(gst_spec);
+    return result;
   }
 
   typedef bool RType;
