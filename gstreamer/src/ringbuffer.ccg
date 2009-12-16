@@ -21,6 +21,10 @@
 #include <gst/audio/audio-enumtypes.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
+// This constant is obtained from the "silence_sample" member in the
+// GstRingBufferSpec structure definition.
+#define GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE 32
+
 namespace
 {
 
@@ -54,47 +58,289 @@ static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer*, guint8* data, g
 namespace Gst
 {
 
-void RingBufferSpec::copy_from(const GstRingBufferSpec& spec)
+RingBufferSpec::RingBufferSpec()
+: m_spec(g_new(GstRingBufferSpec, 1)),
+  take_ownership(true)
+{}
+
+RingBufferSpec::RingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
+  Gst::BufferFormatType type, Gst::BufferFormat format, bool sign,
+  bool bigend, int width, int depth, int rate, int channels,
+  guint64 latency_time, guint64 buffer_time, int segsize, int segtotal,
+  int seglatency)
+: m_spec(g_new(GstRingBufferSpec, 1)),
+  take_ownership(true)
+  
 {
-  caps = Glib::wrap(spec.caps);
+  GstRingBufferSpec* spec = gobj();
 
-  type = static_cast<Gst::BufferFormatType>(spec.type);
-  format = static_cast<Gst::BufferFormat>(spec.format);
-  sign = spec.sign;
-  bigend = spec.bigend;
-  width = spec.width;
-  depth = spec.depth;
-  rate = spec.rate;
-  channels = spec.channels;
-  latency_time = spec.latency_time;
-  buffer_time = spec.buffer_time;
-  segsize = spec.segsize;
-  segtotal = spec.segtotal;
-  bytes_per_sample = spec.bytes_per_sample;
-  seglatency = spec.seglatency;
+  spec->caps = Glib::unwrap(caps);
 
-  silence_sample.assign(spec.silence_sample, spec.silence_sample + 32);
+  // Keep a copy of the caps (it will be unreferenced in the destructor).
+  if (caps)
+    caps->reference();
+
+  spec->type = static_cast<GstBufferFormatType>(type);
+  spec->format = static_cast<GstBufferFormat>(format);
+  spec->sign = static_cast<int>(sign);
+  spec->bigend = static_cast<int>(bigend);
+  spec->width = width;
+  spec->depth = depth;
+  spec->rate = rate;
+  spec->channels = channels;
+  spec->latency_time = latency_time;
+  spec->buffer_time = buffer_time;
+  spec->segsize = segsize;
+  spec->segtotal = segtotal;
+  spec->seglatency = seglatency;
 }
 
-void RingBufferSpec::copy_to(GstRingBufferSpec& spec) const
-{
-  spec.caps = Glib::unwrap(caps);
-  spec.type = static_cast<GstBufferFormatType>(type);
-  spec.format = static_cast<GstBufferFormat>(format);
-  spec.sign = sign;
-  spec.bigend = bigend;
-  spec.width = width;
-  spec.depth = depth;
-  spec.rate = rate;
-  spec.channels = channels;
-  spec.latency_time = latency_time;
-  spec.buffer_time = buffer_time;
-  spec.segsize = segsize;
-  spec.segtotal = segtotal;
-  spec.bytes_per_sample = bytes_per_sample;
-  spec.seglatency = seglatency;
 
-  std::copy(silence_sample.begin(), silence_sample.end(), spec.silence_sample);
+RingBufferSpec::RingBufferSpec(GstRingBufferSpec& castitem, bool take_ownership)
+: m_spec(&castitem),
+  take_ownership(take_ownership)
+{
+  // Keep a copy of the caps (it will be unreferenced in the destructor).
+  if(castitem.caps)
+      gst_caps_ref(castitem.caps);
+}
+
+RingBufferSpec::RingBufferSpec(const RingBufferSpec& other)
+: m_spec(g_new(GstRingBufferSpec, 1)),
+  take_ownership(true)
+{
+  m_spec->caps = other.m_spec->caps;
+
+  // Keep a copy of the caps (it will be unreferenced in the destructor).
+  if(m_spec->caps)
+    gst_caps_ref(m_spec->caps);
+
+  m_spec->type = other.m_spec->type;
+  m_spec->format = other.m_spec->format;
+  m_spec->sign = other.m_spec->sign;
+  m_spec->bigend = other.m_spec->bigend;
+  m_spec->width = other.m_spec->width;
+  m_spec->depth = other.m_spec->depth;
+  m_spec->rate = other.m_spec->rate;
+  m_spec->channels = other.m_spec->channels;
+  m_spec->latency_time = other.m_spec->latency_time;
+  m_spec->buffer_time = other.m_spec->buffer_time;
+  m_spec->segsize = other.m_spec->segsize;
+  m_spec->segtotal = other.m_spec->segtotal;
+  m_spec->bytes_per_sample = other.m_spec->bytes_per_sample;
+  m_spec->seglatency = other.m_spec->seglatency;
+
+  std::copy(other.m_spec->silence_sample, other.m_spec->silence_sample + GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE, m_spec->silence_sample);
+}
+
+RingBufferSpec& RingBufferSpec::operator=(const RingBufferSpec& other)
+{
+  RingBufferSpec temp(other);
+  swap(temp);
+  return *this;
+}
+
+RingBufferSpec::~RingBufferSpec()
+{
+  // Unref existing reference to caps.
+  if(m_spec->caps)
+    gst_caps_unref(m_spec->caps);
+
+  // Release the underlying m_spec if it is owned.
+  if(take_ownership)
+    g_free(m_spec);
+}
+
+void RingBufferSpec::swap(RingBufferSpec& other)
+{
+  GstRingBufferSpec* spec_temp = m_spec;
+  m_spec = other.m_spec;
+  other.m_spec = spec_temp;
+
+  const bool take_temp = take_ownership;
+  take_ownership = other.take_ownership;
+  other.take_ownership = take_temp;
+}
+
+GstRingBufferSpec* RingBufferSpec::gobj()
+{
+  return m_spec;
+}
+
+const GstRingBufferSpec* RingBufferSpec::gobj() const
+{
+  return m_spec;
+}
+
+Glib::RefPtr<Gst::Caps> RingBufferSpec::qet_caps()
+{
+  return Glib::wrap(m_spec->caps);
+}
+
+void RingBufferSpec::set_caps(const Glib::RefPtr<Gst::Caps>& caps)
+{
+  // Unrefence possible previous caps.
+  if(m_spec->caps)
+    gst_caps_unref(m_spec->caps);
+
+  m_spec->caps = Glib::unwrap(caps);
+
+  // Keep a copy of the new caps (it will be unreferenced in the destructor).
+  if(m_spec->caps)
+    gst_caps_ref(m_spec->caps);
+}
+
+Gst::BufferFormatType RingBufferSpec::qet_type()
+{
+  return static_cast<Gst::BufferFormatType>(m_spec->type);
+}
+
+void RingBufferSpec::set_type(Gst::BufferFormatType type)
+{
+  m_spec->type = static_cast<GstBufferFormatType>(type);
+}
+
+Gst::BufferFormat RingBufferSpec::qet_format()
+{
+  return static_cast<Gst::BufferFormat>(m_spec->format);
+}
+
+void RingBufferSpec::set_format(Gst::BufferFormat format)
+{
+  m_spec->format = static_cast<GstBufferFormat>(format);
+}
+
+bool RingBufferSpec::qet_sign()
+{
+  return static_cast<bool>(m_spec->sign);
+}
+
+void RingBufferSpec::set_sign(bool sign)
+{
+  m_spec->sign = static_cast<gboolean>(sign);
+}
+
+bool RingBufferSpec::qet_bigend()
+{
+  return static_cast<bool>(m_spec->bigend);
+}
+
+void RingBufferSpec::set_bigend(bool bigend)
+{
+  m_spec->sign = static_cast<gboolean>(bigend);
+}
+
+int RingBufferSpec::qet_width()
+{
+  return m_spec->width;
+}
+
+void RingBufferSpec::set_width(int width)
+{
+  m_spec->width = width;
+}
+
+int RingBufferSpec::qet_depth()
+{
+  return m_spec->depth;
+}
+
+void RingBufferSpec::set_depth(int depth)
+{
+  m_spec->depth = depth;
+}
+
+int RingBufferSpec::qet_rate()
+{
+  return m_spec->rate;
+}
+
+void RingBufferSpec::set_rate(int rate)
+{
+  m_spec->rate = rate;
+}
+
+int RingBufferSpec::qet_channels()
+{
+  return m_spec->channels;
+}
+
+void RingBufferSpec::set_channels(int channels)
+{
+  m_spec->channels = channels;
+}
+
+guint64 RingBufferSpec::qet_latency_time()
+{
+  return m_spec->latency_time;
+}
+
+void RingBufferSpec::set_latency_time(guint64 latency_time)
+{
+  m_spec->latency_time = latency_time;
+}
+
+guint64 RingBufferSpec::qet_buffer_time()
+{
+  return m_spec->buffer_time;
+}
+
+void RingBufferSpec::set_buffer_time(guint64 buffer_time)
+{
+  m_spec->buffer_time = buffer_time;
+}
+
+int RingBufferSpec::qet_segsize()
+{
+  return m_spec->segsize;
+}
+
+void RingBufferSpec::set_segsize(int segsize)
+{
+  m_spec->segsize = segsize;
+}
+
+int RingBufferSpec::qet_segtotal()
+{
+  return m_spec->segtotal;
+}
+
+void RingBufferSpec::set_segtotal(int segtotal)
+{
+  m_spec->segtotal = segtotal;
+}
+
+int RingBufferSpec::qet_seglatency()
+{
+  return m_spec->seglatency;
+}
+
+void RingBufferSpec::set_seglatency(int seglatency)
+{
+  m_spec->seglatency = seglatency;
+}
+
+int RingBufferSpec::qet_bytes_per_sample()
+{
+  return m_spec->bytes_per_sample;
+}
+
+void RingBufferSpec::set_bytes_per_sample(int bytes_per_sample)
+{
+  m_spec->bytes_per_sample = bytes_per_sample;
+}
+
+Glib::ArrayHandle<guint8> RingBufferSpec::get_silence_sample()
+{
+  return Glib::ArrayHandle<guint8>(m_spec->silence_sample,
+    GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE, Glib::OWNERSHIP_NONE);
+}
+
+void RingBufferSpec::set_silence_sample(const Glib::ArrayHandle<guint8>& silence_sample)
+{
+  std::copy(silence_sample.data(),
+    silence_sample.data() + GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE,
+    m_spec->silence_sample);
 }
 
 void RingBuffer::set_fill_slot(const SlotFill& slot)
@@ -123,22 +369,6 @@ bool RingBuffer::prepare_read(int& segment, std::vector<guint8>& readptr,
   return result;
 }
 
-bool RingBuffer::acquire(const Gst::RingBufferSpec& spec)
-{
-  GstRingBufferSpec gst_spec;
-  spec.copy_to(gst_spec);
-  return gst_ring_buffer_acquire(gobj(), &gst_spec);
-}
-
-bool RingBuffer::parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::Caps>& caps)
-{
-  GstRingBufferSpec gst_spec;
-  spec.copy_to(gst_spec);
-  gboolean const result = gst_ring_buffer_parse_caps(&gst_spec, Glib::unwrap(caps));
-  spec.copy_from(gst_spec);
-  return (result != 0);
-}
-
 #ifdef GLIBMM_VFUNCS_ENABLED
 gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBufferSpec* spec)
 {
@@ -159,12 +389,10 @@ gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBu
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
-        Gst::RingBufferSpec cpp_spec;
-        cpp_spec.copy_from(*spec);
+        Gst::RingBufferSpec cpp_spec(*spec);
+
         // Call the virtual member method, which derived classes might override.
-        const gboolean result = static_cast<int>(obj->acquire_vfunc(cpp_spec));
-        cpp_spec.copy_to(*spec);
-        return result;
+        return static_cast<int>(obj->acquire_vfunc(cpp_spec));
 
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
@@ -195,13 +423,7 @@ bool Gst::RingBuffer::acquire_vfunc(Gst::RingBufferSpec& spec)
   );
 
   if(base && base->acquire)
-  {
-    GstRingBufferSpec c_spec;
-    spec.copy_to(c_spec);
-    const bool result = static_cast<bool>((*base->acquire)(gobj(), &c_spec));
-    spec.copy_from(c_spec);
-    return result;
-  }
+    return static_cast<bool>((*base->acquire)(gobj(), spec.gobj()));
 
   typedef bool RType;
   return RType();

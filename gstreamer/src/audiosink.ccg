@@ -43,12 +43,10 @@ gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstRingBuff
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
-        Gst::RingBufferSpec cpp_spec;
-        cpp_spec.copy_from(*spec);
+        Gst::RingBufferSpec cpp_spec(*spec);
+
         // Call the virtual member method, which derived classes might override.
-        const gboolean result = static_cast<int>(obj->prepare_vfunc(cpp_spec));
-        cpp_spec.copy_to(*spec);
-        return result;
+        return static_cast<int>(obj->prepare_vfunc(cpp_spec));
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
@@ -78,13 +76,7 @@ bool Gst::AudioSink::prepare_vfunc(Gst::RingBufferSpec& spec)
   );
 
   if(base && base->prepare)
-  {
-    GstRingBufferSpec gst_spec;
-    spec.copy_to(gst_spec);
-    const bool result = static_cast<bool>((*base->prepare)(gobj(),&gst_spec));
-    spec.copy_from(gst_spec);
-    return result;
-  }
+    return static_cast<bool>((*base->prepare)(gobj(),spec.gobj()));
 
   typedef bool RType;
   return RType();

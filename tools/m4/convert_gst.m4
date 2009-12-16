@@ -160,6 +160,9 @@ dnl RingBuffer
 _CONVERSION(`GstRingBuffer*',`Glib::RefPtr<Gst::RingBuffer>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::RingBuffer>',`GstRingBuffer*',`Glib::unwrap($3)')
 
+dnl RingBufferSpec
+_CONVERSION(`Gst::RingBufferSpec&', `GstRingBufferSpec*', `$3.gobj()')
+
 dnl Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
 

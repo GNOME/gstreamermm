@@ -1,3 +1,23 @@
+2009-12-10  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gst::RingBufferSpec: Avoid copying between it and its C counterpart.
+
+	* gstreamer/src/ringbuffer.ccg:
+	* gstreamer/src/ringbuffer.hg (RingBufferSpec): Re-implement as a
+	class with an underlying GstRingBufferSpec* instead of a struct so
+	that copying to and from the C object is not necessary in the
+	implementation of virtual functions.  Also, functions with
+	GstRingBufferSpec* parameters can be wrapped with _WRAP_METHOD.
+	(acquire):
+	(parse_caps): Wrapped with _WRAP_METHOD.
+	* gstreamer/src/audiofilter.ccg (setup_vfunc):
+	* gstreamer/src/audiosink.ccg (prepare_vfunc):
+	* gstreamer/src/audiosrc.ccg (prepare_vfunc): Modified usage of
+	Gst::RingBufferSpec in virtual functions and their callbacks so that
+	copying is now not done because it is no longer necessary.
+	* tools/m4/convert_gst.m4: Added a conversion from
+	Gst::RingBufferSpec& to GstRingBufferSpec*.
+
 2009-12-09  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	RingBuffer: Wrap virtual functions.

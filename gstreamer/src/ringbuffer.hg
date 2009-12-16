@@ -33,95 +33,204 @@ _WRAP_ENUM(RingBufferState, GstRingBufferState)
 _WRAP_ENUM(BufferFormat, GstBufferFormat)
 _WRAP_ENUM(BufferFormatType, GstBufferFormatType)
 
-// The reason that this is implemented as just a struct with public members
-// and not a class is that it is only used in two methods:
-// 1) In Gst::RingBuffer::acquire() to acquire a ring buffer (some members
-// should be set while acquire() modifies others).
-// 2) In Gst::RingBuffer::parse_caps() by attempting to merge the given caps
-// in to the spec (with some existing members already set).
-// It doesn't seem necessary to implement a full blown class for this yet.
-
-/** The structure containing the format specification of a Gst::RingBuffer.
- * The "in" members should be specified by the caller of the
+/** The class containing the format specification of a Gst::RingBuffer.  The
+ * "in" members should be specified by the caller of the
  * Gst::RingBuffer::acquire() method while the "in/out" members may be set by
  * the caller but are also modifiable by Gst::RingBuffer::acquire().  The
  * "out" members are generated as a result of the call to
  * Gst::RingBuffer::acquire().
  * @see Gst::RingBuffer::acquire().
  */
-struct RingBufferSpec
+class RingBufferSpec
 {
-  /** The caps of the buffer (in). */
-  Glib::RefPtr<Gst::Caps> caps;
+    _CLASS_GENERIC(RingBufferSpec, GstRingBufferSpec)
+public:
+  /// Default constructor.
+  RingBufferSpec();
 
-  /** The sample type (in/out).
+  /** Fully construct a Gst::RingBufferSpec.  Only the "(in)" parameters are
+   * required.  The "(in/out)" parameters are optional and may be modified by
+   * the call to the Gst::RingBuffer::acquire() method.
+   * @param caps The caps of the buffer (in).
+   * @param type The sample type (in/out).
+   * @param format The sample format (in/out).
+   * @param sign The sample sign (in/out).
+   * @param bigend The endianness of the samples (in/out).
+   * @param width The width of the samples (in/out).
+   * @param depth The depth of the samples (in/out).
+   * @param rate The sample rate (in/out).
+   * @param channels The number of channels (in/out).
+   * @param latency_time The latency in microseconds (in/out).
+   * @param buffer_time The total buffer size in microseconds (in/out).
+   * @param segsize The size of one segment in bytes (in/out).
+   * @param segtotal The total number of segments (in/out).
+   * @param seglatency Number of segments queued in the lower level device,
+   * defaults to @a segtotal in the C API (in/out).
    */
-  Gst::BufferFormatType type;
+  RingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
+    Gst::BufferFormatType type = Gst::BUFTYPE_LINEAR,
+    Gst::BufferFormat format = Gst::UNKNOWN, bool sign = false,
+    bool bigend = false, int width = 0, int depth = 0, int rate = 0,
+    int channels = 0, guint64 latency_time = 0, guint64 buffer_time = 0,
+    int segsize = 0, int segtotal = 0, int seglatency = 0);
 
-  /** The sample format (in/out).
+  /// Construct a Gst::RingBufferSpec from a GstRingBufferSpec.
+  RingBufferSpec(GstRingBufferSpec& castitem, bool take_ownership = false);
+
+  /// Copy constructor.
+  RingBufferSpec(const RingBufferSpec& other);
+
+  /// Assignment operator.
+  RingBufferSpec& operator=(const RingBufferSpec& other);
+
+  /// Destructor.
+  virtual ~RingBufferSpec();
+
+  void swap(RingBufferSpec& other);
+
+  /// Gets the underlying gobject.
+  GstRingBufferSpec* gobj();
+
+  /// Gets the underlying gobject.
+  const GstRingBufferSpec* gobj() const;
+
+  /** Get the caps of the buffer (in). */
+  Glib::RefPtr<Gst::Caps> qet_caps();
+
+  /** Set the caps of the buffer (in). */
+  void set_caps(const Glib::RefPtr<Gst::Caps>& caps);
+
+  /** Get the sample type (in/out).
    */
-  Gst::BufferFormat format;
+  Gst::BufferFormatType qet_type();
 
-  /** The sample sign (in/out).
+  /** Set the sample type (in/out).
    */
-  bool          sign;
+  void set_type(Gst::BufferFormatType type);
 
-  /** The endianness of the samples (in/out).
+  /** Get the sample format (in/out).
    */
-  bool          bigend;
+  Gst::BufferFormat qet_format();
 
-  /** The width of the samples (in/out).
+  /** Set the sample format (in/out).
    */
-  int           width;
+  void set_format(Gst::BufferFormat format);
 
-  /** The depth of the samples (in/out).
+  /** Get the sample sign (in/out).
    */
-  int           depth;
+  bool qet_sign();
 
-  /** The samplerate (in/out).
+  /** Set the sample sign (in/out).
    */
-  int           rate;
+  void set_sign(bool sign);
 
-  /** The number of channels (in/out).
+  /** Get the endianness of the samples (in/out).
    */
-  int           channels;
+  bool qet_bigend();
 
-  /** The latency in microseconds (in/out).
+  /** Set the endianness of the samples (in/out).
    */
-  guint64       latency_time;
+  void set_bigend(bool bigend);
 
-  /**  The total buffer size in microseconds (in/out).
+  /** Get the width of the samples (in/out).
    */
-  guint64       buffer_time;
+  int qet_width();
 
-  /** The size of one segment in bytes (in/out).
+  /** Set the width of the samples (in/out).
    */
-  int           segsize;
+  void set_width(int width);
 
-  /** The total number of segments (in/out).
+  /** Get the depth of the samples (in/out).
    */
-  int           segtotal;
+  int qet_depth();
 
-  /** Number of segments queued in the lower level device, defaults to
+  /** Set the depth of the samples (in/out).
+   */
+  void set_depth(int depth);
+
+  /** Get the samplerate (in/out).
+   */
+  int qet_rate();
+
+  /** Set the samplerate (in/out).
+   */
+  void set_rate(int rate);
+
+  /** Get the number of channels (in/out).
+   */
+  int qet_channels();
+
+  /** Set the number of channels (in/out).
+   */
+  void set_channels(int channels);
+
+  /** Get the latency in microseconds (in/out).
+   */
+  guint64 qet_latency_time();
+
+  /** Set the latency in microseconds (in/out).
+   */
+  void set_latency_time(guint64 latency_time);
+
+  /** Get the total buffer size in microseconds (in/out).
+   */
+  guint64 qet_buffer_time();
+
+  /** Set the total buffer size in microseconds (in/out).
+   */
+  void set_buffer_time(guint64 buffer_time);
+
+  /** Get the size of one segment in bytes (in/out).
+   */
+  int qet_segsize();
+
+  /** Set the size of one segment in bytes (in/out).
+   */
+  void set_segsize(int segsize);
+
+  /** Get the total number of segments (in/out).
+   */
+  int qet_segtotal();
+
+  /** Set the total number of segments (in/out).
+   */
+  void set_segtotal(int segtotal);
+
+  /** Get the number of segments queued in the lower level device, defaults to
    * segtotal (in/out).
    */
-  int           seglatency;
+  int qet_seglatency();
 
-  /** Number of bytes of one sample (out).  This is set by the call to
+  /** Set the number of segments queued in the lower level device, defaults to
+   * segtotal (in/out).
+   */
+  void set_seglatency(int seglatency);
+
+  /** Get the number of bytes of one sample (out).  This is set by the call to
    * Gst::RingBuffer::acquire().
    */
-  int           bytes_per_sample;
+  int qet_bytes_per_sample();
 
-  // TODO: Ouch.  No way.
-  /** Bytes representing one sample of silence (out).  This is set by the call
-   * to Gst::RingBuffer::acquire().
+  /** Set the number of bytes of one sample (out).  This is set by the call to
+   * Gst::RingBuffer::acquire() and should probably not be set.
    */
-  // I hope this is what the TODO means:
-  std::vector<guint8> silence_sample;
+  void set_bytes_per_sample(int bytes_per_sample);
 
+  /** Get the bytes representing one sample of silence (out).  This is set by
+   * the call to Gst::RingBuffer::acquire().
+   */
+  Glib::ArrayHandle<guint8> get_silence_sample();
+
+  /** Sets the bytes representing one sample of silence (out).  This is set by
+   * the call to Gst::RingBuffer::acquire() and probably should not be set.
+   */
+  void set_silence_sample(const Glib::ArrayHandle<guint8>& silence_sample);
+
+protected:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  void copy_from(const GstRingBufferSpec& spec);
-  void copy_to(GstRingBufferSpec& spec) const;
+  GstRingBufferSpec* m_spec;
+  // Tells whether the m_spec member should be freed upon destruction.
+  bool take_ownership;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 
@@ -162,17 +271,7 @@ public:
   void set_fill_slot(const SlotFill& slot);
   _IGNORE(gst_ring_buffer_set_callback)
 
-  /** Allocate the resources for the ringbuffer. This function fills in the
-   * data pointer of the ring buffer with a valid Gst::Buffer to which samples
-   * can be written.
-   *
-   * @param spec The specs of the buffer.
-   *
-   * @return true if the device could be acquired, false on error. MT safe.
-   */
-  bool acquire(const Gst::RingBufferSpec& spec);
-  _IGNORE(gst_ring_buffer_acquire)
-
+  _WRAP_METHOD(bool acquire(Gst::RingBufferSpec& spec), gst_ring_buffer_acquire)
   _WRAP_METHOD(bool release(), gst_ring_buffer_release)
   _WRAP_METHOD(bool is_acquired() const, gst_ring_buffer_is_acquired)
   _WRAP_METHOD(bool activate(bool active), gst_ring_buffer_activate)
@@ -202,15 +301,7 @@ public:
   _WRAP_METHOD(bool open_device(), gst_ring_buffer_open_device)
   _WRAP_METHOD(bool device_is_open() const, gst_ring_buffer_device_is_open)
   _WRAP_METHOD(void set_may_start(bool allowed), gst_ring_buffer_may_start)
-
-  /** Parse caps into a Gst::RingBufferSpec.
-   *
-   * @param spec A Gst::RingBufferSpec.
-   * @param caps the Gst::Caps to parse.
-   * @return true if the caps could be parsed.
-   */
-  static bool parse_caps(Gst::RingBufferSpec& spec, const Glib::RefPtr<Gst::Caps>& caps);
-
+  _WRAP_METHOD(static bool parse_caps(Gst::RingBufferSpec&, const Glib::RefPtr<Gst::Caps>& caps), gst_ring_buffer_parse_caps)
   _WRAP_METHOD(void set_flushing(bool flushing), gst_ring_buffer_set_flushing)
 
   /** Virtual function to open the device.  Don't set any params or allocate
