@@ -18,6 +18,7 @@
  */
 
 #include <gstreamermm/systemclock.h>
+#include <memory>
 
 _DEFS(gstreamermm,gst)
 
@@ -36,8 +37,6 @@ namespace Gst
 class AudioClock : public Gst::SystemClock
 {
   _CLASS_GOBJECT(AudioClock, GstAudioClock, GST_AUDIO_CLOCK, Gst::SystemClock, GstSystemClock)
-  _CUSTOM_DTOR()
-  _CUSTOM_CTOR_CAST()
 
 public:
   /** For example,
@@ -67,8 +66,7 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
-  SlotGetTime* slot;
-  bool _slot_set;
+  std::auto_ptr<SlotGetTime> m_slot;
 #endif
 };
 

@@ -19,6 +19,7 @@
 
 #include <gst/gsttask.h>
 #include <gstreamermm/object.h>
+#include <memory>
 
 _DEFS(gstreamermm,gst)
 
@@ -62,8 +63,6 @@ class TaskPool;
 class Task : public Object
 {
   _CLASS_GOBJECT(Task, GstTask, GST_TASK, Object, GstObject)
-  _CUSTOM_CTOR_CAST()
-  _CUSTOM_DTOR()
 
 public:
   /** For example,
@@ -136,8 +135,7 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
-  SlotTask* slot;
-  bool _slot_set;
+  std::auto_ptr<SlotTask> m_slot;
 #endif
 };
 

@@ -54,37 +54,18 @@ static GstClockTime AudioClock_GetTime_gstreamermm_callback(GstClock* clock, voi
 namespace Gst
 {
 
-AudioClock::AudioClock(const Glib::ConstructParams& construct_params)
-:
-  Gst::SystemClock(construct_params),
-  _slot_set(false)
-{}
-
-AudioClock::AudioClock(GstAudioClock* castitem)
-:
-  Gst::SystemClock(reinterpret_cast<GstSystemClock*>(castitem)),
-  _slot_set(false)
-{}
-
-
 AudioClock::AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot)
-  : _CONSTRUCT("name", name.c_str()),
-    _slot_set(true)
+  : _CONSTRUCT("name", name.c_str())
 {
-  slot = new SlotGetTime(time_slot);
+  // The slot is dynamically allocated because it is called each time the time
+  // is gotten.
+  m_slot.reset(new SlotGetTime(time_slot));
 
-  //The following lines are taken verbatim from gst_audio_clock_new() after the
-  //call to g_object_new() because it seems that bug #545782 will not be
-  //accepted:
+  // The following lines are taken verbatim from gst_audio_clock_new() after
+  // the call to g_object_new() because it seems that bug #545782 will not be
+  // accepted.
   gobj()->func = &AudioClock_GetTime_gstreamermm_callback;
-  gobj()->user_data = &slot;
-}
-
-
-AudioClock::~AudioClock()
-{
-  if(_slot_set)
-    delete slot;
+  gobj()->user_data = m_slot.get();
 }
 
 } //namespace Gst

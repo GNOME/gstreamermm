@@ -106,33 +106,19 @@ static void Task_Callbacks_gstreamermm_callback_destroy(void* data)
 namespace Gst
 {
 
-Task::Task(const Glib::ConstructParams& construct_params)
-:
-  Object(construct_params),
-  _slot_set(false)
-{}
-
-Task::Task(GstTask* castitem)
-:
-  Object(reinterpret_cast<GstObject*>(castitem)),
-  _slot_set(false)
-{}
-
-
 Task::Task(const SlotTask& task_slot)
 :
-  _CONSTRUCT(),
-  _slot_set(true)
+  _CONSTRUCT()
 {
-  //Create a copy of the slot.  A pointer to this copy will be passed through
-  //the call back's data parameter.  It will be destroyed in the Task's
-  //destructor
-  slot = new SlotTask(task_slot);
+  // Create a copy of the slot.  A pointer to this copy will be passed through
+  // the call back's data parameter.  It will be destroyed with the
+  // std::auto_ptr<>.
+  m_slot.reset(new SlotTask(task_slot));
 
   // These lines are taken verbatim from gst_task_create() after calling
   // g_object_new().
   gobj()->func = &Task_Task_gstreamermm_callback;
-  gobj()->data = &slot;
+  gobj()->data = m_slot.get();
 }
 
 void Task::set_thread_slots(const SlotEnter& enter_slot,
@@ -152,13 +138,6 @@ void Task::set_thread_slots(const SlotEnter& enter_slot,
   gst_task_set_thread_callbacks(gobj(),
     reinterpret_cast<GstTaskThreadCallbacks*>(callbacks), callbacks,
     &Task_Callbacks_gstreamermm_callback_destroy);
-}
-
-Task::~Task()
-{
-  // Delete task's slot upon destruction
-  if(_slot_set)
-    delete slot;
 }
 
 } //namespace Gst
