@@ -20,7 +20,6 @@
 #include <glibmm.h>
 #include <algorithm>
 #include <iostream>
-#include <sstream>
 
 namespace
 {
@@ -259,8 +258,10 @@ static std::string get_c_enum_definition_macro(GType enumGType,
 static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
                                               std::string& cEnumDefinitions,
                                               std::string& enumWrapStatements,
+                                              std::string& actionSignalsMethodDeclarations,
                                               std::string& cClassSignalDeclarations,
-                                              std::string& enumGTypeFunctionDefinitions)
+                                              std::string& enumGTypeFunctionDefinitions,
+                                              std::string& actionSignalsMethodDefinitions)
 {
   std::string wrapStatements;
 
@@ -283,6 +284,13 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
     {
       std::string convertMacros;
       std::string wrapStatement;
+      std::string pluginEnumsTranslationMacros;
+
+      std::string actionSignalMethodDeclaration;
+      std::string actionSignalReturnDeclaration;
+      std::string actionSignalReturnStatement;
+      std::string actionSignalEmitSignalStatement;
+      std::string actionSignalMethodDefinition;
 
       guint signal_id = pIDs[i];
 
@@ -301,21 +309,70 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
       if (gst_type_is_a_pointer(returnGType))
         returnCType += '*';
 
+      std::string returnCTypeTranslation = "_TRANSLATE("  + returnCType +
+        ", `return')";
+
+      // Start building action signal method declaration, definition and
+      // emit statement if dealing with an action signal.
+      if(signalQuery.signal_flags & G_SIGNAL_ACTION)
+      {
+        // Start the method declaration with a Doxygen comment about its
+        // purpose.
+        actionSignalMethodDeclaration = "  /** This is a convenience method "
+          "for the action signal\n   * signal_" + signalMethodName + "().\n"
+          "   */\n";
+
+        // Append the actual method declaration.
+        actionSignalMethodDeclaration += "  " + returnCTypeTranslation + ' ' +
+          signalMethodName + '(';
+
+        // Start the method definition.
+        actionSignalMethodDefinition = returnCTypeTranslation + ' ' +
+          cppTypeName + "::" + signalMethodName + '(';
+
+        // Start the g_signal_emit() statement that will go in the method
+        // body.
+        actionSignalEmitSignalStatement =
+          "  g_signal_emit_by_name(gobj(), \"" + signalName + "\"";
+
+        // Generate return declaration and return statement if not a void
+        // return.
+        if (returnCType != "void")
+        {
+          actionSignalReturnDeclaration = "  " + returnCType + " result;\n";
+          actionSignalReturnStatement = (std::string)"  return " +
+            "_CONVERT(``" + returnCType + "'', _LQ()" +
+            returnCTypeTranslation + "_RQ(), ``" + "result'');\n";
+        }
+
+        // Insert a newline above the action signal wrapping statements to
+        // separte it since it will have a Doxygen comment.
+        convertMacros += '\n';
+      }
+
       // Check for an enum first and attempt to generate _WRAP_ENUM() and
       // _TRANSLATION() macros if it is not wrapped (see plugingen_base.m4
       // file for docs).
       if(G_TYPE_IS_ENUM(returnGType) || G_TYPE_IS_FLAGS(returnGType))
       {
         std::string enumPrefix = returnCType.substr(0, 3);
-        std::string returnCppType = returnCType.substr(3);
+        std::string enumCppType = returnCType.substr(3);
 
         enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + ','
-          + returnCppType + ')';
+          + enumCppType + ')';
 
         enumGTypeFunctionDefinitions +=
           "_PLUGIN_ENUM_GET_TYPE_FUNC(" + returnCType + ')';
 
-        cEnumDefinitions += get_c_enum_definition_macro(returnGType, returnCType);
+        cEnumDefinitions += get_c_enum_definition_macro(returnGType,
+          returnCType);
+
+        // Define a translation for the plug-in enum in case the enum is
+        // used in an action signal method.  These translations will be
+        // prepended to the action signals method definitions in the ccg file.
+        pluginEnumsTranslationMacros += "_TRANSLATION(`" + returnCType +
+          "', `" + enumPrefix + "::" + enumCppType + "', `" + enumPrefix +
+          "::" + enumCppType + "')";
       }
       else if(gst_type_is_a_pointer(returnGType))
       {
@@ -326,8 +383,8 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
         if(g_type_is_a(returnGType, G_TYPE_BOXED))
         {
           // Unwrapping conversion:
-          convertMacros += "#m4 _CONVERSION(_LQ()_TRANSLATE(" + returnCType
-            + ",`type')_RQ(), ``" + returnCType + "'', ``($3).gobj_copy()'')\n";
+          convertMacros += "#m4 _CONVERSION(_LQ()" + returnCTypeTranslation +
+            "_RQ(), ``" + returnCType + "'', ``($3).gobj_copy()'')\n";
 
           // Also include a wrapping conversion:
 
@@ -336,16 +393,14 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
             // Dealing with a GstTagList* return which has a special
             // Glib::wrap() because of the conflict with the Glib::wrap() for
             // GstStructure* (GstTagList is infact a GstStructure).
-            convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', "
-              "_LQ()_TRANSLATE(" + returnCType +
-              ",`return')_RQ(), ``Glib::wrap_taglist($3)'')\n";
+            convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', _LQ()" +
+              returnCTypeTranslation + "_RQ(), ``Glib::wrap_taglist($3)'')\n";
           }
           else
           {
             // Dealing with a regular boxed type return.
             convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', "
-              "_LQ()_TRANSLATE(" + returnCType +
-              ",`return')_RQ(), ``Glib::wrap($3)'')\n";
+              "_LQ()" + returnCTypeTranslation + "_RQ(), ``Glib::wrap($3)'')\n";
           }
         }
         else
@@ -355,7 +410,7 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
           // needed in the global convert file.  (An unwrapping conversion will
           // already probably be included in the global convert file).
           convertMacros += "#m4 _CONVERSION(``" + returnCType +
-            "'', _LQ()_TRANSLATE(" + returnCType + ",`return')_RQ(), ";
+            "'', _LQ()" + returnCTypeTranslation + "_RQ(), ";
           convertMacros += g_type_is_a(returnGType, GST_TYPE_MINI_OBJECT) ?
             "``Gst::wrap($3)'')\n" : "``Glib::wrap($3)'')\n";
         }
@@ -363,8 +418,18 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
 
       includeMacroCalls += "_TRANSLATION_INCLUDE(" + returnCType + ")dnl\n";
 
-      wrapStatement = "  _WRAP_SIGNAL(_TRANSLATE("  + returnCType +
-        ", `return') " + signalMethodName + '(';
+      // Start the wrap statement with a comment about action signals if
+      // dealing with an action signal.
+      if(signalQuery.signal_flags & G_SIGNAL_ACTION)
+      {
+        wrapStatement =
+          "  /** This is an action signal which is designed to be used "
+          "as a method.  To \n   * do that, use its convenience method, " +
+          signalMethodName + "().\n   */\n";
+      }
+
+      wrapStatement += "  _WRAP_SIGNAL(" + returnCTypeTranslation + ' ' +
+        signalMethodName + '(';
 
       cClassSignalDeclarations += "  " + returnCType + " (*" +
         signalMethodName + ") (" + cTypeName + "* element";
@@ -387,7 +452,25 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
           if (gst_type_is_a_pointer(paramGType))
             paramCType += '*';
 
+          std::string paramCTypeTranslation = "_TRANSLATE(" + paramCType +
+            ",`param')";
+
           includeMacroCalls += "_TRANSLATION_INCLUDE(" + paramCType + ")dnl\n";
+
+          // Continue building action signal method declaration, definition
+          // and emit statement if it is an action signal.
+          if(signalQuery.signal_flags & G_SIGNAL_ACTION)
+          {
+            actionSignalMethodDeclaration += paramCTypeTranslation + ' ' +
+              paramName;
+
+            actionSignalMethodDefinition += paramCTypeTranslation + ' ' +
+              paramName;
+
+            actionSignalEmitSignalStatement += ", _CONVERT(_LQ()" +
+              paramCTypeTranslation + "_RQ(), ``" + paramCType + "'', ``" +
+              paramName + "'')";
+          }
 
           // Include wrapping conversions for signal parameters.  (Unwrapping
           // conversions will already probably be defined in the global
@@ -399,16 +482,24 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
             // _TRANSLATION() macros and other necessary code if it is not
             // wrapped (see plugingen_base.m4 file for docs).
             std::string enumPrefix = paramCType.substr(0, 3);
-            std::string paramCppType = paramCType.substr(3);
+            std::string enumCppType = paramCType.substr(3);
 
             enumWrapStatements += "_WRAP_PLUGIN_ENUM(" + enumPrefix + ',' +
-              paramCppType + ')';
+              enumCppType + ')';
 
             enumGTypeFunctionDefinitions +=
               "_PLUGIN_ENUM_GET_TYPE_FUNC(" + paramCType + ')';
 
             cEnumDefinitions +=
               get_c_enum_definition_macro(paramGType, paramCType);
+
+            // Define a translation for the plug-in enum in case the enum is
+            // used in an action signal method.  These translations will be
+            // prepended to the action signals method definitions in the
+            // ccg file.
+            pluginEnumsTranslationMacros += "_TRANSLATION(`" + paramCType +
+              "', `" + enumPrefix + "::" + enumCppType + "', `" + enumPrefix +
+              "::" + enumCppType + "')";
           }
           if(gst_type_is_a_pointer(paramGType))
           {
@@ -418,31 +509,73 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
               // because of the conflict with the Glib::wrap() for
               // GstStructure* (GstTagList is in fact a GstStructure).
               convertMacros += "#m4 _CONVERSION(``" + paramCType + "'', "
-                "_LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), "
+                "_LQ()" + paramCTypeTranslation + "_RQ(), "
                 "``Glib::wrap_taglist($3, true)'')\n";
             }
             else
             {
               // Dealing with reference counted parameter or a boxed type.
               convertMacros += "#m4 _CONVERSION(``" + paramCType +
-                "'', _LQ()_TRANSLATE(" + paramCType + ",`param')_RQ(), ";
+                "'', _LQ()" + paramCTypeTranslation + "_RQ(), ";
               convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
                 "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
             }
           }
 
-          wrapStatement += "_TRANSLATE(" + paramCType + ", `param') " +
-            paramName;
+          wrapStatement += paramCTypeTranslation + ' ' + paramName;
 
           cClassSignalDeclarations += ", " + paramCType + ' ' + paramName;
 
           if(i < signalQuery.n_params - 1)
+          {
             wrapStatement += ", ";
+
+            // Append commas to action signal method declaration and
+            // definition if it is an action signal.  The emit statement
+            // pre-pends the commas so adding commas to it is not done here.
+            if(signalQuery.signal_flags & G_SIGNAL_ACTION)
+            {
+              actionSignalMethodDeclaration += ", ";
+              actionSignalMethodDefinition += ", ";
+            }
+          }
         }
       }
+
       wrapStatement += "), \"" + signalName + "\")\n";
 
+      // Finish off the action signal declaration and definition if this
+      // is an action signal.
+      if(signalQuery.signal_flags & G_SIGNAL_ACTION)
+      {
+        // Close off the method declaration.
+        actionSignalMethodDeclaration += ");\n\n";
+
+        // Append a return location if the signal return is not void.
+        if(returnCType != "void")
+          actionSignalEmitSignalStatement += ", &result";
+
+        // Close off the emit statement.
+        actionSignalEmitSignalStatement += ", static_cast<void*>(0));\n";
+
+        // Generate the method  definition.
+        actionSignalMethodDefinition += ")\n"
+          "{\n" +
+          actionSignalReturnDeclaration +
+          actionSignalEmitSignalStatement +
+          actionSignalReturnStatement +
+          "}\n\n";
+
+        // Append and extra end of line to separate the wrap statement from
+        // the rest since it has a Doxygen comment block (that's how the wrap
+        // statement was started if this is an action signal).
+        wrapStatement += '\n';
+      }
+
       wrapStatements += convertMacros + wrapStatement;
+      actionSignalsMethodDeclarations += actionSignalMethodDeclaration;
+      actionSignalsMethodDefinitions +=  pluginEnumsTranslationMacros +
+        actionSignalMethodDefinition;
 
       cClassSignalDeclarations += ");\n";
     }
@@ -495,6 +628,7 @@ static void generate_hg_file(const std::string& includeMacroCalls,
                              const std::string& enumWrapStatements,
                              const std::string& cppExtends,
                              const std::string& interfaceMacros,
+                             const std::string& actionSignalsMethodDeclarations,
                              const std::string& propertyWrapStatements,
                              const std::string& signalWrapStatements)
 {
@@ -554,13 +688,16 @@ static void generate_hg_file(const std::string& includeMacroCalls,
   std::cout << "  explicit " << cppTypeName << "(const Glib::ustring& name);" << std::endl << std::endl;
 
   std::cout << "public:" << std::endl;
-  std::cout << "/** Creates a new " << pluginName << " plugin with a unique name." << std::endl;
-  std::cout << " */" << std::endl;
+  std::cout << "  /** Creates a new " << pluginName << " plugin with a unique name." << std::endl;
+  std::cout << "   */" << std::endl;
   std::cout << "  _WRAP_CREATE()" << std::endl << std::endl;
 
-  std::cout << "/** Creates a new " << pluginName << " plugin with the given name." << std::endl;
-  std::cout << " */" << std::endl;
+  std::cout << "  /** Creates a new " << pluginName << " plugin with the given name." << std::endl;
+  std::cout << "   */" << std::endl;
   std::cout << "  _WRAP_CREATE(const Glib::ustring& name)" << std::endl;
+
+  if(!actionSignalsMethodDeclarations.empty())
+    std::cout << std::endl << actionSignalsMethodDeclarations;
 
   if(!propertyWrapStatements.empty())
     std::cout << std::endl << propertyWrapStatements;
@@ -574,7 +711,8 @@ static void generate_hg_file(const std::string& includeMacroCalls,
 }
 
 static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
-  const std::string& cClassSignalDeclarations)
+  const std::string& cClassSignalDeclarations,
+  const std::string& actionSignalsMethodDefinitions)
 {
   std::cout << "// Generated by generate_plugin_gmmproc_file. Don't edit this file." << std::endl << std::endl;
   std::cout << "include(plugingen_base.m4)dnl" << std::endl;
@@ -639,6 +777,9 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
     "(const Glib::ustring& name)" << std::endl;
   std::cout << ": _CONSTRUCT(\"name\", name.c_str())" << std::endl;
   std::cout << "{}" << std::endl << std::endl;
+
+  if(!actionSignalsMethodDefinitions.empty())
+    std::cout << actionSignalsMethodDefinitions;
 
   std::cout << '}' << std::endl;
 }
@@ -805,17 +946,20 @@ int main(int argc, char** argv)
       std::string includeMacroCalls;
       std::string cEnumDefinitions;
       std::string enumWrapStatements;
+      std::string actionSignalsMethodDeclarations;
       std::string propertyWrapStatements;
       std::string signalWrapStatements;
       std::string cClassSignalDeclarations;
       std::string enumGTypeFunctionDefinitions;
+      std::string actionSignalsMethodDefinitions;
 
       propertyWrapStatements = get_property_wrap_statements(includeMacroCalls,
         enumWrapStatements, enumGTypeFunctionDefinitions);
 
       signalWrapStatements = get_signal_wrap_statements(includeMacroCalls,
-        cEnumDefinitions, enumWrapStatements, cClassSignalDeclarations,
-        enumGTypeFunctionDefinitions);
+        cEnumDefinitions, enumWrapStatements, actionSignalsMethodDeclarations,
+        cClassSignalDeclarations, enumGTypeFunctionDefinitions,
+        actionSignalsMethodDefinitions);
 
       if(hgFile)
       {
@@ -826,12 +970,13 @@ int main(int argc, char** argv)
 
         generate_hg_file(includeMacroCalls, cEnumDefinitions,
           enumWrapStatements, cppExtends, interfaceMacros,
-          propertyWrapStatements, signalWrapStatements);
+          actionSignalsMethodDeclarations, propertyWrapStatements,
+          signalWrapStatements);
       }
       else
       {
         generate_ccg_file(enumGTypeFunctionDefinitions,
-          cClassSignalDeclarations);
+          cClassSignalDeclarations, actionSignalsMethodDefinitions);
       }
     }
   }
