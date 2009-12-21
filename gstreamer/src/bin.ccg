@@ -17,16 +17,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdexcept>
 #include <gst/gstbin.h>
 #include <gst/gstutils.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/ghostpad.h>
 #include <gstreamermm/iterator.h>
-
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-#include <iostream>
-#endif
+#include <gstreamermm/handle_error.h>
 
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstreamermm/private/element_p.h)
@@ -35,13 +31,13 @@ namespace Gst
 {
 
 Bin::Bin()
-: _CONSTRUCT("name", 0)
+: _CONSTRUCT("name", static_cast<char*>(0))
 {}
 
 Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
 {
   if(!element)
-    handle_error("Failed to add null element.");
+    gstreamermm_handle_error("Failed to add null element.");
 
   GstElement* celement = Glib::unwrap(element);
 
@@ -60,7 +56,8 @@ Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
   // If addition successful, return RefPtr<..> to this bin, otherwise throw an
   // exception
   if(!result)
-    handle_error("Failed to add " + element->get_name() + " element.");
+    gstreamermm_handle_error("Failed to add " + element->get_name() +
+      " element.");
 
   return Glib::wrap(gobj(), true);
 }
@@ -68,7 +65,7 @@ Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
 Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
 {
   if(!element)
-    handle_error("Failed to remove null element.");
+    gstreamermm_handle_error("Failed to remove null element.");
 
 
   const bool result = gst_bin_remove(gobj(), Glib::unwrap(element));
@@ -76,7 +73,8 @@ Glib::RefPtr<Gst::Bin> Bin::remove(const Glib::RefPtr<Gst::Element>& element)
   // If removal successful, return RefPtr<..> to this bin, otherwise throw an
   // exception
   if(!result)
-    handle_error("Failed to remove " + element->get_name() + " element.");
+    gstreamermm_handle_error("Failed to remove " + element->get_name() +
+      " element.");
 
   return Glib::wrap(gobj(), true);
 }
@@ -90,15 +88,6 @@ Glib::RefPtr<Gst::GhostPad> Bin::add_ghost_pad(const
     name);
   add_pad(ghost_pad);
   return ghost_pad;
-}
-
-void Bin::handle_error(const Glib::ustring& message)
-{
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-    throw std::runtime_error(message);
-#else
-      std::cerr << "gstreamermm: " << message << std::endl;
-#endif
 }
 
 } //namespace Gst

@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <cstring>
 #include <gst/audio/audio-enumtypes.h>
+#include <gstreamermm/handle_error.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
 // This constant is obtained from the "silence_sample" member in the
@@ -59,19 +59,33 @@ namespace Gst
 {
 
 RingBufferSpec::RingBufferSpec()
-: m_spec(g_new(GstRingBufferSpec, 1)),
+: m_spec(g_try_new(GstRingBufferSpec, 1)),
   take_ownership(true)
-{}
+{
+  // Handle possible memory allocation failure.
+  if(!m_spec)
+  {
+    gstreamermm_handle_error("Failed to allocate a new Gst::RingBufferSpec.");
+    return;
+  }
+}
 
 RingBufferSpec::RingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
   Gst::BufferFormatType type, Gst::BufferFormat format, bool sign,
   bool bigend, int width, int depth, int rate, int channels,
   guint64 latency_time, guint64 buffer_time, int segsize, int segtotal,
   int seglatency)
-: m_spec(g_new(GstRingBufferSpec, 1)),
+: m_spec(g_try_new(GstRingBufferSpec, 1)),
   take_ownership(true)
   
 {
+  // Handle possible memory allocation failure.
+  if(!m_spec)
+  {
+    gstreamermm_handle_error("Failed to allocate a new Gst::RingBufferSpec.");
+    return;
+  }
+
   GstRingBufferSpec* spec = gobj();
 
   spec->caps = Glib::unwrap(caps);
@@ -106,9 +120,16 @@ RingBufferSpec::RingBufferSpec(GstRingBufferSpec& castitem, bool take_ownership)
 }
 
 RingBufferSpec::RingBufferSpec(const RingBufferSpec& other)
-: m_spec(g_new(GstRingBufferSpec, 1)),
+: m_spec(g_try_new(GstRingBufferSpec, 1)),
   take_ownership(true)
 {
+  // Handle possible memory allocation failure.
+  if(!m_spec)
+  {
+    gstreamermm_handle_error("Failed to allocate a new Gst::RingBufferSpec.");
+    return;
+  }
+
   m_spec->caps = other.m_spec->caps;
 
   // Keep a copy of the caps (it will be unreferenced in the destructor).

@@ -18,11 +18,7 @@
  */
 
 #include <gst/gstiterator.h>
-#include <stdexcept>
-
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-#include <iostream>
-#endif
+#include <gstreamermm/handle_error.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -186,9 +182,6 @@ public:
    * concurrent update to the iterator occurs while it iterates).
    */
   IteratorBasic<CppType> operator++(int);
-
-private:
-  void handle_error(const Glib::ustring& message);
 };
 
 /**  Gst::Iterator - Class that retrieve multiple reference counted elements in
@@ -397,9 +390,10 @@ IteratorBasic<CppType>& IteratorBasic<CppType>::operator++()
   const IteratorResult result = this->next();
 
   if(result == Gst::ITERATOR_RESYNC)
-    handle_error("Concurrent update of iterator elements.  Please resync.");
+    gstreamermm_handle_error("Concurrent update of iterator elements.  "
+      "Please resync.");
   else if(result == Gst::ITERATOR_ERROR)
-    handle_error("Iterator error while incrementing.");
+    gstreamermm_handle_error("Iterator error while incrementing.");
 
   return *this;
 }
@@ -410,16 +404,6 @@ IteratorBasic<CppType> IteratorBasic<CppType>::operator++(int)
   IteratorBasic<CppType> original = *this;
   ++(*this);
   return original;
-}
-
-template<class CppType>
-void IteratorBasic<CppType>::handle_error(const Glib::ustring& message)
-{
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-  throw std::runtime_error(message);
-#else
-  std::cerr << "gstreamermm: " << message << std::endl;
-#endif
 }
 
 /******************* Gst::Iterator<CppType> **************************/

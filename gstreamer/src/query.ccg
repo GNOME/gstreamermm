@@ -66,7 +66,8 @@ bool get_details(QueryType type, QueryTypeDefinition &def)
 {
   const GstQueryTypeDefinition* gstdef = gst_query_type_get_details(GstQueryType(type));
 
-  g_return_val_if_fail(gstdef != 0, false);
+  if(!gstdef)
+    return false;
 
   def.value = static_cast<QueryType>(gstdef->value);
   def.nick = gstdef->nick;

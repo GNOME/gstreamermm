@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdexcept>
 #include <gst/gstenumtypes.h>
 #include <gst/gstinterface.h>
 #include <gst/gstutils.h>
@@ -31,10 +30,7 @@
 #include <gstreamermm/query.h>
 #include <gstreamermm/taglist.h>
 #include <gstreamermm/iterator.h>
-
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-#include <iostream>
-#endif
+#include <gstreamermm/handle_error.h>
 
 _PINCLUDE(gstreamermm/private/object_p.h)
 
@@ -69,7 +65,7 @@ Glib::ustring get_name(StateChangeReturn s)
 Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
 {
   if(!dest)
-    handle_error("Failed to link null element.");
+    gstreamermm_handle_error("Failed to link null element.");
     
   const bool result = gst_element_link(gobj(), Glib::unwrap(dest));
 
@@ -77,7 +73,8 @@ Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
     return dest;
   else
   {
-    handle_error("failed to link: " + get_name() + "->" + dest->get_name());
+    gstreamermm_handle_error("failed to link: " + get_name() + "->" +
+      dest->get_name());
     return Glib::RefPtr<Gst::Element>();
   }
 }
@@ -85,7 +82,7 @@ Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest)
 Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest, const Glib::RefPtr<Gst::Caps>& filter)
 {
   if(!dest)
-    handle_error("Failed to link null element.");
+    gstreamermm_handle_error("Failed to link null element.");
     
   const bool result = gst_element_link_filtered(gobj(), Glib::unwrap(dest),
     Glib::unwrap(filter));
@@ -94,7 +91,8 @@ Glib::RefPtr<Gst::Element> Element::link(const Glib::RefPtr<Gst::Element>& dest,
     return dest;
   else
   {
-    handle_error("failed to link: " + get_name() + "->" + dest->get_name());
+    gstreamermm_handle_error("failed to link: " + get_name() + "->" +
+      dest->get_name());
     return Glib::RefPtr<Gst::Element>();
   }
 }
@@ -243,14 +241,5 @@ Glib::ArrayHandle<QueryType> Gst::Element::get_query_types_vfunc() const
   return RType(0, 0, Glib::OWNERSHIP_NONE);
 }
 #endif //GLIBMM_VFUNCS_ENABLED
-
-void Element::handle_error(const Glib::ustring& message)
-{
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-    throw std::runtime_error(message);
-#else
-    std::cerr << "gstreamermm: " << message << std::endl;
-#endif
-}
 
 } //namespace Gst

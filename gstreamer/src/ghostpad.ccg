@@ -17,14 +17,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdexcept>
 #include <sstream>
 #include <gst/gstghostpad.h>
 #include <gstreamermm/padtemplate.h>
-
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-#include <iostream>
-#endif
+#include <gstreamermm/handle_error.h>
 
 _PINCLUDE(gstreamermm/private/pad_p.h)
 
@@ -33,19 +29,19 @@ namespace Gst
 
 GhostPad::GhostPad(const Glib::RefPtr<Gst::Pad>& target,
   const Glib::ustring& name)
-  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()),
+  : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
     "direction",
-    ((target) ? ((GstPadDirection) target->get_direction()) : GST_PAD_UNKNOWN))
+    (target ? ((GstPadDirection) target->get_direction()) : GST_PAD_UNKNOWN))
 {
   if(!target)
-    handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
+    gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::Pad>&): "
       "Failed to construct ghost pad (name = " + name + ") from null target.");
 
   if(!gst_ghost_pad_construct(gobj()) ||
     !gst_ghost_pad_set_target(gobj(), target->gobj()))
   {
-    handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
+    gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::Pad>&): "
       "Unsuccessful construction of ghost pad (name = " + name +
       ", target = " + target->get_name() + ").");
@@ -53,15 +49,15 @@ GhostPad::GhostPad(const Glib::RefPtr<Gst::Pad>& target,
 }
 
 GhostPad::GhostPad( PadDirection direction, const Glib::ustring& name)
-  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()),
-    "direction", (GstPadDirection) direction)
+  : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
+    "direction", static_cast<GstPadDirection>(direction))
 {
   if(!gst_ghost_pad_construct(gobj()))
   {
     std::stringstream int_conv_stream;
     int_conv_stream << direction;
 
-    handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&, "
+    gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&, "
     "PadDirection): Unsuccessful construction of ghost pad (name = " +
     name + ", direction = " + int_conv_stream.str() + ").");
   }
@@ -70,13 +66,13 @@ GhostPad::GhostPad( PadDirection direction, const Glib::ustring& name)
 GhostPad::GhostPad( const Glib::RefPtr<Gst::Pad>& target,
   const Glib::RefPtr<Gst::PadTemplate>& templ,
   const Glib::ustring& name)
-  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()),
+  : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
     "direction",
-    ((target) ? ((GstPadDirection) target->get_direction()) : GST_PAD_UNKNOWN),
-    "template", ((templ) ? templ->gobj() : 0))
+    (target ? static_cast<GstPadDirection>(target->get_direction()) : GST_PAD_UNKNOWN),
+    "template", (templ ? templ->gobj() : static_cast<GstPadTemplate*>(0)))
 {
   if(!target || !templ)
-    handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
+    gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::PadTemplate>&):"
       " Failed to construct ghost pad (name = " + name + ") from null "
       "target or template.");
@@ -84,7 +80,7 @@ GhostPad::GhostPad( const Glib::RefPtr<Gst::Pad>& target,
   if(!gst_ghost_pad_construct(gobj()) ||
     !gst_ghost_pad_set_target(gobj(), target->gobj()))
   {
-    handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
+    gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::PadTemplate>&):"
       " Unsuccessful construction of ghost pad (name = " + name +
       ", target = " + target->get_name() + ", templ = " +
@@ -94,32 +90,23 @@ GhostPad::GhostPad( const Glib::RefPtr<Gst::Pad>& target,
 
 GhostPad::GhostPad( const Glib::RefPtr<Gst::PadTemplate>& templ,
   const Glib::ustring& name)
-  : _CONSTRUCT("name", (name.empty() ? 0 : name.c_str()), "direction", 
-    ((templ) ? ((GstPadDirection) templ->get_direction()) : GST_PAD_UNKNOWN),
-    "template", ((templ) ? templ->gobj() : 0))
+  : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
+    "direction", (templ ? static_cast<GstPadDirection>(templ->get_direction()) : GST_PAD_UNKNOWN),
+    "template", (templ ? templ->gobj() : static_cast<GstPadTemplate*>(0)))
 {
   if(!templ)
-    handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
+    gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::PadTemplate>&): "
       "Failed to construct ghost pad (name = " + name +
       ") from null template.");
 
   if(!gst_ghost_pad_construct(gobj()))
   {
-    handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
+    gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
       " const Glib::RefPtr<Gst::PadTemplate>&): "
       "Unsuccessful construction of ghost pad (name = " + name +
       ", templ = " + templ->get_name_template() + ").");
   }
-}
-
-void GhostPad::handle_error(const Glib::ustring& message)
-{
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-    throw std::runtime_error(message);
-#else
-      std::cerr << "gstreamermm: " << message << std::endl;
-#endif
 }
 
 } //namespace Gst

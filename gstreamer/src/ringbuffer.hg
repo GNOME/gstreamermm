@@ -45,7 +45,10 @@ class RingBufferSpec
 {
     _CLASS_GENERIC(RingBufferSpec, GstRingBufferSpec)
 public:
-  /// Default constructor.
+  /** Default constructor.
+   * @throw std::runtime_error if memory is unavailable for the new
+   * Gst::RingBufferSpec.
+   */
   RingBufferSpec();
 
   /** Fully construct a Gst::RingBufferSpec.  Only the "(in)" parameters are
@@ -66,6 +69,9 @@ public:
    * @param segtotal The total number of segments (in/out).
    * @param seglatency Number of segments queued in the lower level device,
    * defaults to @a segtotal in the C API (in/out).
+   *
+   * @throw std::runtime_error if memory is unavailable for the new
+   * Gst::RingBufferSpec.
    */
   RingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
     Gst::BufferFormatType type = Gst::BUFTYPE_LINEAR,
@@ -77,7 +83,11 @@ public:
   /// Construct a Gst::RingBufferSpec from a GstRingBufferSpec.
   RingBufferSpec(GstRingBufferSpec& castitem, bool take_ownership = false);
 
-  /// Copy constructor.
+  /** Copy constructor.
+   *
+   * @throw std::runtime_error if memory is unavailable for the new
+   * Gst::RingBufferSpec.
+   */
   RingBufferSpec(const RingBufferSpec& other);
 
   /// Assignment operator.

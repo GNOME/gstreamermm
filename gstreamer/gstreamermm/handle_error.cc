@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2009 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,17 +17,18 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gstpipeline.h>
-#include <gstreamermm/bus.h>
-
-_PINCLUDE(glibmm/private/object_p.h)
-_PINCLUDE(gstreamermm/private/bin_p.h)
+#include <gstreamermm/handle_error.h>
 
 namespace Gst
 {
 
-Pipeline::Pipeline()
-: _CONSTRUCT("name", static_cast<char*>(0))
-{}
+void gstreamermm_handle_error(const Glib::ustring& message)
+{
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    throw std::runtime_error(message);
+#else
+      std::cerr << "gstreamermm: " << message << std::endl;
+#endif
+}
 
-} // namespace Gst
+}

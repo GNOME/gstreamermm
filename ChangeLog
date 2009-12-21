@@ -1,3 +1,35 @@
+2009-12-20  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Make exception handling code in classes accessible globally.
+
+	* gstreamer/gstreamermm/filelist.am:
+	* gstreamer/gstreamermm/handle_error.cc:
+	* gstreamer/gstreamermm/handle_error.h (gstreamermm_handle_error):
+	Added this new function to report errors in gstreamermm either by
+	exception (if they are enabled) or to std::err (otherwise) so that it
+	can be used globally throughout gstreamermm.
+	* gstreamer/src/bin.ccg:
+	* gstreamer/src/bin.hg:
+	* gstreamer/src/element.ccg:
+	* gstreamer/src/element.hg:
+	* gstreamer/src/iterator.hg:
+	* gstreamer/src/ghostpad.hg:
+	* gstreamer/src/ghostpad.ccg: Modified to use the global error
+	handling function above and not a member class defined one.
+	(GhostPad):
+	* gstreamer/src/pipeline.ccg (Pipeline): Use proper casting in
+	_CONSTRUCT macros of these constructors.
+	* gstreamer/src/ringbuffer.hg:
+	* gstreamer/src/ringbuffer.ccg (RingBufferSpec): Use g_try_new() for
+	underlying C object allocation in the constructors and use the error
+	handling function above to report errors if any allocation errors
+	occur.
+	* gstreamer/src/format.ccg (get_format_details):
+	* gstreamer/src/query.ccg (get_details): Use "if(!...) return false;"
+	instead of g_return_val_if_fail().
+	* gstreamer/src/basesink.ccg:
+	* gstreamer/src/parse.ccg: Removed unneeded parenthesis.
+
 2009-12-18  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	Plugin Generator: Generate convenience methods for action signals.

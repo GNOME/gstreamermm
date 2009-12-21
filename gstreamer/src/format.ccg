@@ -75,7 +75,8 @@ bool get_format_details(Format format, FormatDefinition& def)
 {
   const GstFormatDefinition* gstdef = gst_format_get_details(static_cast<GstFormat>(format));
 
-  g_return_val_if_fail(gstdef != 0, false);
+  if(!gstdef)
+    return false;
 
   def.value = Format(gstdef->value);
   def.nick = gstdef->nick;
