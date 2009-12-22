@@ -80,10 +80,32 @@ class Pad : public Object
   _CLASS_GOBJECT(Pad, GstPad, GST_PAD, Object, GstObject)
 
 protected:
+  /** Constructs a Pad given a name and a direction.
+   * @param name The desired name of the pad.
+   * @param direction The desired direction of the pad.
+   */
   _WRAP_CTOR(Pad(const Glib::ustring& name, PadDirection direction), gst_pad_new)
-  explicit Pad(PadDirection dir);
-  Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ, const Glib::ustring& name);
-  Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ);
+
+  /** Constructs a Pad given a direction without specifying a name.  A unique
+   * name will be assigned to the pad.
+   * @param direction the direction of the pad.
+   */
+  explicit Pad(PadDirection direction);
+
+  /** Constructs a Pad from a PadTemplate with the specified name.
+   * @param templ The PadTemplate.
+   * @param name The desired name of the pad.
+   * @throw std::runtime_error if construction fails.
+   */
+  Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ,
+    const Glib::ustring& name);
+
+  /** Constructs a Pad from a PadTemplate without specifying a name.  A unique
+   * name will ge assigned to the pad.
+   * @param templ The PadTemplate.
+   * @throw std::runtime_error if construction fails.
+   */
+  explicit Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ);
 
 public:
   /** For example,
@@ -120,6 +142,7 @@ public:
    * @param templ The pad template to use.
    * @param name The name of the element.
    * @return A new Gst::Pad, or a null RefPtr<> in case of an error.
+   * @throw std::runtime_error if construction fails.
    */
   _WRAP_CREATE(const Glib::RefPtr<const Gst::PadTemplate>& pad_template)
 
@@ -128,6 +151,7 @@ public:
    *
    * @param templ The pad template to use.
    * @return A new Gst::Pad, or a null RefPtr<> in case of an error.
+   * @throw std::runtime_error if construction fails.
    */
   _WRAP_CREATE(const Glib::RefPtr<const Gst::PadTemplate>& pad_template, const Glib::ustring& name)
 

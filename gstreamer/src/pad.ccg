@@ -90,18 +90,34 @@ namespace Gst
 {
 
 Pad::Pad(PadDirection dir)
-  : _CONSTRUCT("name", 0, "direction", dir)
+  : _CONSTRUCT("name", static_cast<char*>(0), "direction", dir)
 {}
 
 Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ,
-  const Glib::ustring& name) : _CONSTRUCT("name", name.c_str(), "direction",
-  templ->get_direction(), "template", templ->gobj())
-{}
+  const Glib::ustring& name)
+  : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
+    "direction", (templ ? static_cast<GstPadDirection>(templ->get_direction())
+      : GST_PAD_UNKNOWN),
+    "template", Glib::unwrap(templ))
+{
+  if(!templ)
+    gstreamermm_handle_error(
+      "Gst::Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>&, "
+      "const Glib::ustring&): Failed to construct pad (name = " + name + ") "
+      "from null template.");
+}
 
 Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ)
-  : _CONSTRUCT("name", 0, "direction", templ->get_direction(), "template",
-      templ->gobj())
-{}
+  : _CONSTRUCT("name", static_cast<char*>(0),
+    "direction", (templ ? static_cast<GstPadDirection>(templ->get_direction())
+      : GST_PAD_UNKNOWN),
+    "template", Glib::unwrap(templ))
+{
+  if(!templ)
+    gstreamermm_handle_error(
+      "Gst::Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>&): Failed to "
+      "construct pad from null template.");
+}
 
 // This is handcoded because the documentation tells us that we need to copy
 // the Caps

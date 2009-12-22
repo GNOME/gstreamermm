@@ -69,7 +69,7 @@ GhostPad::GhostPad( const Glib::RefPtr<Gst::Pad>& target,
   : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
     "direction",
     (target ? static_cast<GstPadDirection>(target->get_direction()) : GST_PAD_UNKNOWN),
-    "template", (templ ? templ->gobj() : static_cast<GstPadTemplate*>(0)))
+    "template", Glib::unwrap(templ))
 {
   if(!target || !templ)
     gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
@@ -92,7 +92,7 @@ GhostPad::GhostPad( const Glib::RefPtr<Gst::PadTemplate>& templ,
   const Glib::ustring& name)
   : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
     "direction", (templ ? static_cast<GstPadDirection>(templ->get_direction()) : GST_PAD_UNKNOWN),
-    "template", (templ ? templ->gobj() : static_cast<GstPadTemplate*>(0)))
+    "template", Glib::unwrap(templ))
 {
   if(!templ)
     gstreamermm_handle_error("Gst::GhostPad::GhostPad(const Glib::ustring&,"
