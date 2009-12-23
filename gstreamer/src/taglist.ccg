@@ -50,10 +50,8 @@ static void TagList_foreach_gstreamermm_callback(const GstTagList*, const char *
 namespace Gst
 {
 
-// Make sure the order here is the same order as in Gst:Tag.
-// TODO: It would probably be better to export a lookup function instead of
-// the array itself.
-const char* const _tag_strings[] =
+// Make sure the order here is the same order as in Gst::Tag.
+static const char* const _tag_strings[] =
 {
   GST_TAG_TITLE,
   GST_TAG_TITLE_SORTNAME,
@@ -108,6 +106,11 @@ const char* const _tag_strings[] =
   GST_TAG_GEO_LOCATION_LONGITUDE,
   GST_TAG_GEO_LOCATION_ELEVATION
 };
+
+const char* gstreamermm_get_stock_tag(Tag tag)
+{
+  return _tag_strings[tag];
+}
 
 TagList::operator bool() const
 {
