@@ -40,7 +40,7 @@ namespace Gst
  */
 
  /** @defgroup GstInterfaces gstreamermm Interfaces
- *  Wrapped GStreamer interfaces.
+ *  Wrapped GStreamer interfaces and classes related to them.
  */
 
 class Bus;
@@ -461,40 +461,42 @@ protected:
  *     "'." << std::endl;
  * }
  * @endcode
+ * @ingroup GstInterfaces
  */
 template <class T_Interface>
 class ElementInterfaced
 : public Element,
   public T_Interface
 {
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+private:
+  friend class Gst::Interface;
+
+private:
+  // noncopyable
+  ElementInterfaced(const ElementInterfaced&);
+  ElementInterfaced& operator=(const ElementInterfaced&);
+
+protected:
+  explicit ElementInterfaced(GstElement* castitem);
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 public:
   // The gobj() methods make calls involving access to the underlying gobject
   // unambiguous (specifically, gobj() is ambiguous when called from an
   // ElementInterfaced<..> class).
 
   /// Gets the underlying gobject.
-  GstElement* gobj();
+  GstElement* gobj() { return Element::gobj(); };
 
   /// Gets the underlying gobject.
-  const GstElement* gobj() const;
+  const GstElement* gobj() const { return Element::gobj(); };
 
   /// Gets a copy of the underlying gobject.  The copy should be freed.
-  GstElement* gobj_copy();
+  GstElement* gobj_copy() { return Element::gobj_copy(); };
 
-  ~ElementInterfaced();
-
-protected:
-  /// Cast constructor.
-  explicit ElementInterfaced(GstElement* castitem);
-
-  /// Copy constructor.
-  ElementInterfaced(const ElementInterfaced&);
-
-  /// Assignment operator.
-  ElementInterfaced& operator=(const ElementInterfaced&);
-
-private:
-  friend class Gst::Interface;
+  virtual ~ElementInterfaced();
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -507,28 +509,10 @@ ElementInterfaced<T_Interface>::ElementInterfaced(GstElement* castitem)
 {
   gobject_ = (GObject*)castitem;
   if(gobject_) {
-    gst_object_ref(Element::gobj());
+    gst_object_ref(gobj());
     g_object_weak_ref(gobject_,
       &ElementInterfaced_WeakNotify_gstreamermm_callback, this);
   }
-}
-
-template <class T_Interface>
-GstElement* ElementInterfaced<T_Interface>::gobj()
-{
-  return Element::gobj();
-}
-
-template <class T_Interface>
-const GstElement* ElementInterfaced<T_Interface>::gobj() const
-{
-  return Element::gobj();
-}
-
-template <class T_Interface>
-GstElement* ElementInterfaced<T_Interface>::gobj_copy()
-{
-  return Element::gobj_copy();
 }
 
 template <class T_Interface>
