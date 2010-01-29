@@ -677,7 +677,8 @@
   (in-module "Gst")
   (c-name "GstPluginFlags")
   (values
-    '("d" "GST_PLUGIN_FLAG_CACHED" "1<<0")
+    '("cached" "GST_PLUGIN_FLAG_CACHED" "1<<0")
+    '("blacklisted" "GST_PLUGIN_FLAG_BLACKLISTED" "1<<1")
   )
 )
 
@@ -789,7 +790,9 @@
     '("message-step-start" "GST_QUARK_MESSAGE_STEP_START" "88")
     '("active" "GST_QUARK_ACTIVE" "89")
     '("eos" "GST_QUARK_EOS" "90")
-    '("max" "GST_QUARK_MAX" "91")
+    '("event-sink-message" "GST_QUARK_EVENT_SINK_MESSAGE" "91")
+    '("message" "GST_QUARK_MESSAGE" "92")
+    '("max" "GST_QUARK_MAX" "93")
   )
 )
 
@@ -1928,6 +1931,8 @@
     '("y444" "GST_VIDEO_FORMAT_Y444" "19")
     '("v210" "GST_VIDEO_FORMAT_v210" "20")
     '("v216" "GST_VIDEO_FORMAT_v216" "21")
+    '("nv12" "GST_VIDEO_FORMAT_NV12" "22")
+    '("nv21" "GST_VIDEO_FORMAT_NV21" "23")
   )
 )
 
@@ -2050,6 +2055,7 @@
     '("native-audio" "GST_PLAY_FLAG_NATIVE_AUDIO" "1 << 5")
     '("native-video" "GST_PLAY_FLAG_NATIVE_VIDEO" "1 << 6")
     '("download" "GST_PLAY_FLAG_DOWNLOAD" "1 << 7")
+    '("buffering" "GST_PLAY_FLAG_BUFFERING" "1 << 8")
   )
 )
 
@@ -2064,9 +2070,8 @@
     '("video" "GST_PLAY_SINK_TYPE_VIDEO" "2")
     '("video-raw" "GST_PLAY_SINK_TYPE_VIDEO_RAW" "3")
     '("text" "GST_PLAY_SINK_TYPE_TEXT" "4")
-    '("subpic" "GST_PLAY_SINK_TYPE_SUBPIC" "5")
-    '("last" "GST_PLAY_SINK_TYPE_LAST" "6")
-    '("flushing" "GST_PLAY_SINK_TYPE_FLUSHING" "7")
+    '("last" "GST_PLAY_SINK_TYPE_LAST" "5")
+    '("flushing" "GST_PLAY_SINK_TYPE_FLUSHING" "6")
   )
 )
 
@@ -2099,6 +2104,7 @@
     '("tmplayer" "GST_SUB_PARSE_FORMAT_TMPLAYER" "5")
     '("mpl2" "GST_SUB_PARSE_FORMAT_MPL2" "6")
     '("subviewer" "GST_SUB_PARSE_FORMAT_SUBVIEWER" "7")
+    '("dks" "GST_SUB_PARSE_FORMAT_DKS" "8")
   )
 )
 
@@ -2252,6 +2258,7 @@
     '("blink" "GST_VIDEO_TEST_SRC_BLINK" "12")
     '("smpte75" "GST_VIDEO_TEST_SRC_SMPTE75" "13")
     '("zone-plate" "GST_VIDEO_TEST_SRC_ZONE_PLATE" "14")
+    '("gamut" "GST_VIDEO_TEST_SRC_GAMUT" "15")
   )
 )
 
@@ -2273,6 +2280,123 @@
     '("capture" "GST_ALSA_MIXER_CAPTURE" "1<<0")
     '("playback" "GST_ALSA_MIXER_PLAYBACK" "1<<1")
     '("all" "GST_ALSA_MIXER_ALL" "0x1")
+  )
+)
+
+;; From dirac_parse.h
+
+(define-flags-extended SchroParseCode
+  (in-module "Gst")
+  (c-name "SchroParseCode")
+  (values
+    '("sequence-header" "SCHRO_PARSE_CODE_SEQUENCE_HEADER" "0x00")
+    '("end-of-sequence" "SCHRO_PARSE_CODE_END_OF_SEQUENCE" "0x10")
+    '("auxiliary-data" "SCHRO_PARSE_CODE_AUXILIARY_DATA" "0x20")
+    '("padding" "SCHRO_PARSE_CODE_PADDING" "0x30")
+    '("intra-ref" "SCHRO_PARSE_CODE_INTRA_REF" "0x0c")
+    '("intra-non-ref" "SCHRO_PARSE_CODE_INTRA_NON_REF" "0x08")
+    '("intra-ref-noarith" "SCHRO_PARSE_CODE_INTRA_REF_NOARITH" "0x4c")
+    '("intra-non-ref-noarith" "SCHRO_PARSE_CODE_INTRA_NON_REF_NOARITH" "0x48")
+    '("inter-ref-1" "SCHRO_PARSE_CODE_INTER_REF_1" "0x0d")
+    '("inter-ref-1-noarith" "SCHRO_PARSE_CODE_INTER_REF_1_NOARITH" "0x4d")
+    '("inter-ref-2" "SCHRO_PARSE_CODE_INTER_REF_2" "0x0e")
+    '("inter-ref-2-noarith" "SCHRO_PARSE_CODE_INTER_REF_2_NOARITH" "0x4e")
+    '("inter-non-ref-1" "SCHRO_PARSE_CODE_INTER_NON_REF_1" "0x09")
+    '("inter-non-ref-1-noarith" "SCHRO_PARSE_CODE_INTER_NON_REF_1_NOARITH" "0x49")
+    '("inter-non-ref-2" "SCHRO_PARSE_CODE_INTER_NON_REF_2" "0x0a")
+    '("inter-non-ref-2-noarith" "SCHRO_PARSE_CODE_INTER_NON_REF_2_NOARITH" "0x4a")
+    '("ld-intra-ref" "SCHRO_PARSE_CODE_LD_INTRA_REF" "0xcc")
+    '("ld-intra-non-ref" "SCHRO_PARSE_CODE_LD_INTRA_NON_REF" "0xc8")
+  )
+)
+
+(define-enum-extended SchroVideoFormatEnum
+  (in-module "Gst")
+  (c-name "SchroVideoFormatEnum")
+  (values
+    '("custom" "SCHRO_VIDEO_FORMAT_CUSTOM" "0")
+    '("qsif" "SCHRO_VIDEO_FORMAT_QSIF" "1")
+    '("qcif" "SCHRO_VIDEO_FORMAT_QCIF" "2")
+    '("sif" "SCHRO_VIDEO_FORMAT_SIF" "3")
+    '("cif" "SCHRO_VIDEO_FORMAT_CIF" "4")
+    '("4sif" "SCHRO_VIDEO_FORMAT_4SIF" "5")
+    '("4cif" "SCHRO_VIDEO_FORMAT_4CIF" "6")
+    '("sd480i-60" "SCHRO_VIDEO_FORMAT_SD480I_60" "7")
+    '("sd576i-50" "SCHRO_VIDEO_FORMAT_SD576I_50" "8")
+    '("hd720p-60" "SCHRO_VIDEO_FORMAT_HD720P_60" "9")
+    '("hd720p-50" "SCHRO_VIDEO_FORMAT_HD720P_50" "10")
+    '("hd1080i-60" "SCHRO_VIDEO_FORMAT_HD1080I_60" "11")
+    '("hd1080i-50" "SCHRO_VIDEO_FORMAT_HD1080I_50" "12")
+    '("hd1080p-60" "SCHRO_VIDEO_FORMAT_HD1080P_60" "13")
+    '("hd1080p-50" "SCHRO_VIDEO_FORMAT_HD1080P_50" "14")
+    '("dc2k-24" "SCHRO_VIDEO_FORMAT_DC2K_24" "15")
+    '("dc4k-24" "SCHRO_VIDEO_FORMAT_DC4K_24" "16")
+  )
+)
+
+(define-enum-extended SchroChromaFormat
+  (in-module "Gst")
+  (c-name "SchroChromaFormat")
+  (values
+    '("444" "SCHRO_CHROMA_444" "0")
+    '("422" "SCHRO_CHROMA_422" "1")
+    '("420" "SCHRO_CHROMA_420" "2")
+  )
+)
+
+(define-enum-extended SchroSignalRange
+  (in-module "Gst")
+  (c-name "SchroSignalRange")
+  (values
+    '("custom" "SCHRO_SIGNAL_RANGE_CUSTOM" "0")
+    '("8bit-full" "SCHRO_SIGNAL_RANGE_8BIT_FULL" "1")
+    '("8bit-video" "SCHRO_SIGNAL_RANGE_8BIT_VIDEO" "2")
+    '("10bit-video" "SCHRO_SIGNAL_RANGE_10BIT_VIDEO" "3")
+    '("12bit-video" "SCHRO_SIGNAL_RANGE_12BIT_VIDEO" "4")
+  )
+)
+
+(define-enum-extended SchroColourSpec
+  (in-module "Gst")
+  (c-name "SchroColourSpec")
+  (values
+    '("custom" "SCHRO_COLOUR_SPEC_CUSTOM" "0")
+    '("sdtv-525" "SCHRO_COLOUR_SPEC_SDTV_525" "1")
+    '("sdtv-625" "SCHRO_COLOUR_SPEC_SDTV_625" "2")
+    '("hdtv" "SCHRO_COLOUR_SPEC_HDTV" "3")
+    '("cinema" "SCHRO_COLOUR_SPEC_CINEMA" "4")
+  )
+)
+
+(define-enum-extended SchroColourPrimaries
+  (in-module "Gst")
+  (c-name "SchroColourPrimaries")
+  (values
+    '("hdtv" "SCHRO_COLOUR_PRIMARY_HDTV" "0")
+    '("sdtv-525" "SCHRO_COLOUR_PRIMARY_SDTV_525" "1")
+    '("sdtv-625" "SCHRO_COLOUR_PRIMARY_SDTV_625" "2")
+    '("cinema" "SCHRO_COLOUR_PRIMARY_CINEMA" "3")
+  )
+)
+
+(define-enum-extended SchroColourMatrix
+  (in-module "Gst")
+  (c-name "SchroColourMatrix")
+  (values
+    '("hdtv" "SCHRO_COLOUR_MATRIX_HDTV" "0")
+    '("sdtv" "SCHRO_COLOUR_MATRIX_SDTV" "1")
+    '("reversible" "SCHRO_COLOUR_MATRIX_REVERSIBLE" "2")
+  )
+)
+
+(define-enum-extended SchroTransferFunction
+  (in-module "Gst")
+  (c-name "SchroTransferFunction")
+  (values
+    '("tv-gamma" "SCHRO_TRANSFER_CHAR_TV_GAMMA" "0")
+    '("extended-gamut" "SCHRO_TRANSFER_CHAR_EXTENDED_GAMUT" "1")
+    '("linear" "SCHRO_TRANSFER_CHAR_LINEAR" "2")
+    '("dci-gamma" "SCHRO_TRANSFER_CHAR_DCI_GAMMA" "3")
   )
 )
 

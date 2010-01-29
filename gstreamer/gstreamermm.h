@@ -90,6 +90,7 @@
 #include <gstreamermm/identity.h>
 #include <gstreamermm/multiqueue.h>
 #include <gstreamermm/queue.h>
+#include <gstreamermm/queue2.h>
 #include <gstreamermm/tee.h>
 #include <gstreamermm/typefindelement.h>
 
@@ -119,6 +120,7 @@
 #include <gstreamermm/oggmux.h>
 #include <gstreamermm/playbin.h>
 #include <gstreamermm/playbin2.h>
+#include <gstreamermm/subtitleoverlay.h>
 #include <gstreamermm/tcpclientsrc.h>
 #include <gstreamermm/tcpclientsink.h>
 #include <gstreamermm/tcpserversrc.h>

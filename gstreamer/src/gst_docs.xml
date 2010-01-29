@@ -144,6 +144,24 @@ Since: 0.10.18
 <return></return>
 </function>
 
+<function name="gst_byte_writer_reset_and_get_buffer">
+<description>
+Resets @writer and returns the current data as buffer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current data as buffer. gst_buffer_unref() after usage.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_caps_normalize">
 <description>
 Creates a new #GstCaps that represents the same set of formats as
@@ -1214,7 +1232,7 @@ Get the certainty of the given index.
 
 <function name="gst_query_parse_latency">
 <description>
-Parse a latency query answer. 
+Parse a latency query answer.
 
 Since: 0.10.12
 
@@ -1225,7 +1243,7 @@ Since: 0.10.12
 </parameter_description>
 </parameter>
 <parameter name="live">
-<parameter_description> storage for live or NULL 
+<parameter_description> storage for live or NULL
 </parameter_description>
 </parameter>
 <parameter name="min_latency">
@@ -2052,6 +2070,8 @@ Prepare the taskpool for accepting gst_task_pool_push() operations.
 
 MT safe.
 
+Since: 0.10.24
+
 </description>
 <parameters>
 <parameter name="pool">
@@ -2178,7 +2198,7 @@ Since: 0.10.22
 
 <function name="gst_byte_reader_get_float64_le">
 <description>
-Read a 64 bit little endian integer into @val
+Read a 64 bit little endian floating point value into @val
 and update the current position.
 
 
@@ -2406,8 +2426,8 @@ Get the error quark used by the parsing subsystem.
 
 <function name="gst_value_fraction_multiply">
 <description>
-Multiplies the two GValues containing a GstFraction and sets @product
-to the product of the two fractions.
+Multiplies the two #GValue items containing a #GST_TYPE_FRACTION and sets
+@product to the product of the two fractions.
 
 
 </description>
@@ -2513,28 +2533,29 @@ Since: 0.10.23
 </return>
 </function>
 
-<function name="gst_fft_s32_inverse_fft">
+<function name="gst_bus_add_signal_watch_full">
 <description>
-This performs the inverse FFT on @freqdata and puts the result in @timedata.
+Adds a bus signal watch to the default main context with the given priority.
+After calling this statement, the bus will emit the &quot;message&quot; signal for each
+message posted on the bus when the main loop is running.
 
-@freqdata must have @len/2 + 1 samples, where @len is the parameter specified
-while allocating the #GstFFTS32 instance with gst_fft_s32_new().
+This function may be called multiple times. To clean up, the caller is
+responsible for calling gst_bus_remove_signal_watch() as many times as this
+function is called.
 
-@timedata must be large enough to hold @len time domain samples.
+There can only be a single bus watch per bus, you most remove all signal watch
+before you can set another type of watch.
 
+MT safe.
 
 </description>
 <parameters>
-<parameter name="self">
-<parameter_description> #GstFFTS32 instance for this call
+<parameter name="bus">
+<parameter_description> a #GstBus on which you want to receive the &quot;message&quot; signal
 </parameter_description>
 </parameter>
-<parameter name="freqdata">
-<parameter_description> Buffer of the samples in the frequency domain
-</parameter_description>
-</parameter>
-<parameter name="timedata">
-<parameter_description> Target buffer for the samples in the time domain
+<parameter name="priority">
+<parameter_description> The priority of the watch.
 </parameter_description>
 </parameter>
 </parameters>
@@ -2611,7 +2632,7 @@ the bin does not want to remove the element.
 
 <function name="gst_query_parse_segment">
 <description>
-Parse a segment query answer. Any of @rate, @format, @start_value, and 
+Parse a segment query answer. Any of @rate, @format, @start_value, and
 @stop_value may be NULL, which will cause this value to be omitted.
 
 See gst_query_set_segment() for an explanation of the function arguments.
@@ -2899,6 +2920,30 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_byte_writer_init_with_size">
+<description>
+Initializes @writer with the given initial data size.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Initial size of data
+</parameter_description>
+</parameter>
+<parameter name="fixed">
+<parameter_description> If %TRUE the data can't be reallocated
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_alloc_trace_print_live">
 <description>
 Print the status of all registered alloc trace objects, ignoring those
@@ -2942,9 +2987,42 @@ Move to the next SDES entry in the current item.
 </return>
 </function>
 
+<function name="gst_util_uint64_scale_ceil">
+<description>
+Scale @val by the rational number @num / @denom, avoiding overflows and
+underflows and without loss of precision.
+
+This function can potentially be very slow if val and num are both
+greater than G_MAXUINT32.
+
+
+</description>
+<parameters>
+<parameter name="val">
+<parameter_description> the number to scale
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> the numerator of the scale ratio
+</parameter_description>
+</parameter>
+<parameter name="denom">
+<parameter_description> the denominator of the scale ratio
+</parameter_description>
+</parameter>
+</parameters>
+<return> @val * @num / @denom.  In the case of an overflow, this
+function returns G_MAXUINT64.  If the result is not exactly
+representable as an integer, it is rounded up.  See also
+gst_util_uint64_scale(), gst_util_uint64_scale_round(),
+gst_util_uint64_scale_int(), gst_util_uint64_scale_int_round(),
+gst_util_uint64_scale_int_ceil().
+</return>
+</function>
+
 <function name="gst_data_queue_flush">
 <description>
-Flushes all the contents of the @queue. Any call to #gst_data_queue_pull and
+Flushes all the contents of the @queue. Any call to #gst_data_queue_push and
 #gst_data_queue_pop will be released.
 MT safe.
 
@@ -3103,6 +3181,26 @@ Removes all registered instances of the given logging functions.
 </parameters>
 <return> How many instances of the function were removed
 </return>
+</function>
+
+<function name="gst_event_parse_sink_message">
+<description>
+Parse the sink-message event. Unref @msg after usage.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> The event to query
+</parameter_description>
+</parameter>
+<parameter name="msg">
+<parameter_description> A pointer to store the #GstMessage in.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_sdp_media_add_connection">
@@ -3309,6 +3407,43 @@ Sets the options for frame based audio codecs.
 <return></return>
 </function>
 
+<function name="gst_rtsp_watch_write_data">
+<description>
+Write @data using the connection of the @watch. If it cannot be sent
+immediately, it will be queued for transmission in @watch. The contents of
+@message will then be serialized and transmitted when the connection of the
+@watch becomes writable. In case the @message is queued, the ID returned in
+@id will be non-zero and used as the ID argument in the message_sent
+callback.
+
+This function will take ownership of @data and g_free() it after use.
+
+
+</description>
+<parameters>
+<parameter name="watch">
+<parameter_description> a #GstRTSPWatch
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to queue
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the size of @data
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> location for a message ID or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_RTSP_OK on success.
+
+Since: 0.10.25
+</return>
+</function>
+
 <function name="gst_tag_merge_use_first">
 <description>
 This is a convenience function for the func argument of gst_tag_register().
@@ -3492,9 +3627,9 @@ Gets the maximum of the range specified by @value.
 
 <function name="gst_base_src_wait_playing">
 <description>
-If the #GstBaseSrcClass::create method performs its own synchronisation against
-the clock it must unblock when going from PLAYING to the PAUSED state and call
-this method before continuing to produce the remaining data.
+If the #GstBaseSrcClass.create() method performs its own synchronisation
+against the clock it must unblock when going from PLAYING to the PAUSED state
+and call this method before continuing to produce the remaining data.
 
 This function will block until a state change to PLAYING happens (in which
 case this function returns #GST_FLOW_OK) or the processing must be stopped due
@@ -3985,6 +4120,8 @@ message will be serialized and transmitted when the connection of the
 The return value of this function will be used as the id argument in the
 message_sent callback.
 
+Deprecated: Use gst_rtsp_watch_send_message()
+
 
 </description>
 <parameters>
@@ -4031,7 +4168,7 @@ configured MTU or max_ptime.
 
 <function name="gst_structure_get_fourcc">
 <description>
-Sets the #GstFourcc pointed to by @value corresponding to the value of the
+Sets the Fourcc pointed to by @value corresponding to the value of the
 given field.  Caller is responsible for making sure the field exists
 and has the correct type.
 
@@ -4048,7 +4185,7 @@ returns FALSE.
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a pointer to a #GstFourcc to set
+<parameter_description> a pointer to a 32bit unsigned int to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -4237,7 +4374,7 @@ Since: 0.10.20
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description> a buffering mode 
+<parameter_description> a buffering mode
 </parameter_description>
 </parameter>
 <parameter name="avg_in">
@@ -4467,9 +4604,12 @@ Same as gst_property_probe_needs_probe ().
 
 <function name="GstBaseRTPAudioPayload">
 <description>
-Minimum duration of the packet data in ns (can't go above MTU)
+Try to use the offset fields to generate perfect RTP timestamps. when this
+option is disabled, RTP timestamps are generated from the GStreamer
+timestamps, which could result in RTP timestamps that don't increment with
+the amount of data in the packet.
 
-Since: 0.10.13
+Since: 0.10.25
 
 </description>
 <parameters>
@@ -4477,22 +4617,19 @@ Since: 0.10.13
 <return></return>
 </function>
 
-<function name="gst_structure_set_valist">
+<function name="gst_pad_set_activatepush_function">
 <description>
-va_list form of gst_structure_set().
+Sets the given activate_push function for the pad. An activate_push function
+prepares the element for pushing. See XXX part-activation.txt for details.
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> a #GstStructure
+<parameter name="pad">
+<parameter_description> a #GstPad.
 </parameter_description>
 </parameter>
-<parameter name="fieldname">
-<parameter_description> the name of the field to set
-</parameter_description>
-</parameter>
-<parameter name="varargs">
-<parameter_description> variable arguments
+<parameter name="activatepush">
+<parameter_description> the #GstPadActivateModeFunction to set.
 </parameter_description>
 </parameter>
 </parameters>
@@ -4540,6 +4677,28 @@ was given.
 <parameters>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_int64_be">
+<description>
+Writes a signed big endian 64 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_dp_validate_header">
@@ -4739,6 +4898,24 @@ Since: 0.10.22
 </return>
 </function>
 
+<function name="gst_byte_writer_reset_and_get_data">
+<description>
+Resets @writer and returns the current data.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current data. g_free() after usage.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_app_src_get_max_bytes">
 <description>
 Get the maximum amount of bytes that can be queued in @appsrc.
@@ -4778,6 +4955,28 @@ Add time zone information to @msg.
 </parameter>
 </parameters>
 <return> a #GstSDPResult.
+</return>
+</function>
+
+<function name="gst_byte_writer_put_string_utf16">
+<description>
+Writes a null-terminated UTF16 string to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> UTF16 string to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -4995,7 +5194,7 @@ Looks up the ID3v2 tag for a GStreamer tag.
 
 <function name="gst_byte_reader_get_float32_le">
 <description>
-Read a 32 bit little endian integer into @val
+Read a 32 bit little endian floating point value into @val
 and update the current position.
 
 
@@ -5058,6 +5257,22 @@ Since: 0.10.23
 </parameter>
 <parameter name="type">
 <parameter_description> the #GstRTCPFBType to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_byte_writer_free">
+<description>
+Frees @writer and all memory allocated by it.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
 </parameter_description>
 </parameter>
 </parameters>
@@ -5211,7 +5426,7 @@ argument is ignored.
 
 <function name="gst_collect_pads_new">
 <description>
-Create a new instance of #GstCollectsPads.
+Create a new instance of #GstCollectPads.
 
 
 </description>
@@ -5811,10 +6026,10 @@ Get the information in @msg.
 
 <function name="gst_base_sink_set_render_delay">
 <description>
-Set the render delay in @sink to @delay. The render delay is the time 
+Set the render delay in @sink to @delay. The render delay is the time
 between actual rendering of a buffer and its synchronisation time. Some
 devices might delay media rendering which can be compensated for with this
-function. 
+function.
 
 After calling this function, this sink will report additional latency and
 other sinks will adjust their latency to delay the rendering of their media.
@@ -6266,20 +6481,25 @@ Gets the #guint32 fourcc contained in @value.
 </return>
 </function>
 
-<function name="gst_rtsp_connection_close">
+<function name="gst_byte_writer_put_int8">
 <description>
-Close the connected @conn. After this call, the connection is in the same
-state as when it was first created.
+Writes a signed 8 bit integer to @writer.
 
 
 </description>
 <parameters>
-<parameter name="conn">
-<parameter_description> a #GstRTSPConnection
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GST_RTSP_OK on success.
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -6594,6 +6814,8 @@ This function will take ownership of @data and g_free() it after use.
 The return value of this function will be used as the id argument in the
 message_sent callback.
 
+Deprecated: Use gst_rtsp_watch_write_data()
+
 
 </description>
 <parameters>
@@ -6796,6 +7018,28 @@ Reset the timeout of @conn.
 </parameters>
 <return> #GST_RTSP_OK.
 </return>
+</function>
+
+<function name="gst_rtsp_connection_set_http_mode">
+<description>
+By setting the HTTP mode to %TRUE the message parsing will support HTTP
+messages in addition to the RTSP messages. It will also disable the
+automatic handling of setting up an HTTP tunnel.
+
+Since: 0.10.25
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="enable">
+<parameter_description> %TRUE to enable manual HTTP mode
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_byte_reader_dup_string_utf8">
@@ -7084,25 +7328,73 @@ Creates a new empty GstTagList.
 </return>
 </function>
 
-<function name="gst_bit_reader_skip">
+<function name="gst_event_new_new_segment_full">
 <description>
-Skips @nbits bits of the #GstBitReader instance.
+Allocate a new newsegment event with the given format/values triplets.
+
+The newsegment event marks the range of buffers to be processed. All
+data not within the segment range is not to be processed. This can be
+used intelligently by plugins to apply more efficient methods of skipping
+unneeded data. The valid range is expressed with the @start and @stop
+values.
+
+The position value of the segment is used in conjunction with the start
+value to convert the buffer timestamps into the stream time. This is 
+usually done in sinks to report the current stream_time. 
+@position represents the stream_time of a buffer carrying a timestamp of 
+@start. @position cannot be -1.
+
+@start cannot be -1, @stop can be -1. If there
+is a valid @stop given, it must be greater or equal the @start, including 
+when the indicated playback @rate is &lt; 0.
+
+The @applied_rate value provides information about any rate adjustment that
+has already been made to the timestamps and content on the buffers of the 
+stream. (@rate * @applied_rate) should always equal the rate that has been 
+requested for playback. For example, if an element has an input segment 
+with intended playback @rate of 2.0 and applied_rate of 1.0, it can adjust 
+incoming timestamps and buffer content by half and output a newsegment event 
+with @rate of 1.0 and @applied_rate of 2.0
+
+After a newsegment event, the buffer stream time is calculated with:
+
+position + (TIMESTAMP(buf) - start) * ABS (rate * applied_rate)
 
 
 </description>
 <parameters>
-<parameter name="reader">
-<parameter_description> a #GstBitReader instance
+<parameter name="update">
+<parameter_description> Whether this segment is an update to a previous one
 </parameter_description>
 </parameter>
-<parameter name="nbits">
-<parameter_description> the number of bits to skip
+<parameter name="rate">
+<parameter_description> A new rate for playback
+</parameter_description>
+</parameter>
+<parameter name="applied_rate">
+<parameter_description> The rate factor which has already been applied
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> The format of the segment values
+</parameter_description>
+</parameter>
+<parameter name="start">
+<parameter_description> The start value of the segment
+</parameter_description>
+</parameter>
+<parameter name="stop">
+<parameter_description> The stop value of the segment
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> stream position
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @nbits bits could be skipped, %FALSE otherwise.
+<return> A new newsegment event.
 
-Since: 0.10.22
+Since: 0.10.6
 </return>
 </function>
 
@@ -7321,76 +7613,6 @@ gst_fft_next_fast_length().
 </parameter>
 </parameters>
 <return> a new #GstFFTF64 instance.
-</return>
-</function>
-
-<function name="gst_event_new_new_segment_full">
-<description>
-Allocate a new newsegment event with the given format/values triplets.
-
-The newsegment event marks the range of buffers to be processed. All
-data not within the segment range is not to be processed. This can be
-used intelligently by plugins to apply more efficient methods of skipping
-unneeded data. The valid range is expressed with the @start and @stop
-values.
-
-The position value of the segment is used in conjunction with the start
-value to convert the buffer timestamps into the stream time. This is 
-usually done in sinks to report the current stream_time. 
-@position represents the stream_time of a buffer carrying a timestamp of 
-@start. @position cannot be -1.
-
-@start cannot be -1, @stop can be -1. If there
-is a valid @stop given, it must be greater or equal the @start, including 
-when the indicated playback @rate is &lt; 0.
-
-The @applied_rate value provides information about any rate adjustment that
-has already been made to the timestamps and content on the buffers of the 
-stream. (@rate * @applied_rate) should always equal the rate that has been 
-requested for playback. For example, if an element has an input segment 
-with intended playback @rate of 2.0 and applied_rate of 1.0, it can adjust 
-incoming timestamps and buffer content by half and output a newsegment event 
-with @rate of 1.0 and @applied_rate of 2.0
-
-After a newsegment event, the buffer stream time is calculated with:
-
-position + (TIMESTAMP(buf) - start) * ABS (rate * applied_rate)
-
-
-</description>
-<parameters>
-<parameter name="update">
-<parameter_description> Whether this segment is an update to a previous one
-</parameter_description>
-</parameter>
-<parameter name="rate">
-<parameter_description> A new rate for playback
-</parameter_description>
-</parameter>
-<parameter name="applied_rate">
-<parameter_description> The rate factor which has already been applied
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> The format of the segment values
-</parameter_description>
-</parameter>
-<parameter name="start">
-<parameter_description> The start value of the segment
-</parameter_description>
-</parameter>
-<parameter name="stop">
-<parameter_description> The stop value of the segment
-</parameter_description>
-</parameter>
-<parameter name="position">
-<parameter_description> stream position
-</parameter_description>
-</parameter>
-</parameters>
-<return> A new newsegment event.
-
-Since: 0.10.6
 </return>
 </function>
 
@@ -7665,7 +7887,7 @@ Since: 0.10.15
 
 <function name="gst_collect_pads_read_buffer">
 <description>
-Get a subbuffer of @size bytes from the given pad @data.
+Get a buffer of @size bytes from the given pad @data.
 
 This function should be called with @pads LOCK held, such as in the callback.
 
@@ -7687,7 +7909,7 @@ Since: 0.10.18
 </parameter_description>
 </parameter>
 </parameters>
-<return> A sub buffer. The size of the buffer can be less that requested.
+<return> A #GstBuffer. The size of the buffer can be less that requested.
 A return of NULL signals that the pad is end-of-stream.
 Unref the buffer after use.
 
@@ -7697,7 +7919,8 @@ MT safe.
 
 <function name="gst_pipeline_get_bus">
 <description>
-Gets the #GstBus of @pipeline. The bus allows applications to receive #GstMessages.
+Gets the #GstBus of @pipeline. The bus allows applications to receive
+#GstMessage packets.
 
 
 </description>
@@ -7772,6 +7995,28 @@ Gets the #GList of #GstStaticPadTemplate for this factory.
 </parameter>
 </parameters>
 <return> the padtemplates
+</return>
+</function>
+
+<function name="gst_byte_writer_put_uint8">
+<description>
+Writes a unsigned 8 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -7936,9 +8181,9 @@ playback segment of a pipeline is 0 to duration at the default rate of
 1.0. If a seek was performed on the pipeline to play a different
 segment, this query will return the range specified in the last seek.
 
-@start_value and @stop_value will respectively contain the configured 
-playback range start and stop values expressed in @format. 
-The values are always between 0 and the duration of the media and 
+@start_value and @stop_value will respectively contain the configured
+playback range start and stop values expressed in @format.
+The values are always between 0 and the duration of the media and
 @start_value &lt;= @stop_value. @rate will contain the playback rate. For
 negative rates, playback will actually happen from @stop_value to
 @start_value.
@@ -8311,7 +8556,7 @@ channel object.
 
 <function name="gst_value_register">
 <description>
-Registers functions to perform calculations on #GValues of a given
+Registers functions to perform calculations on #GValue items of a given
 type. Each type can only be added once.
 
 </description>
@@ -8367,11 +8612,11 @@ using g_thread_init() before any other GLib functions are called.
 </description>
 <parameters>
 <parameter name="argc">
-<parameter_description> pointer to application's argc
+<parameter_description> (inout): pointer to application's argc
 </parameter_description>
 </parameter>
 <parameter name="argv">
-<parameter_description> pointer to application's argv
+<parameter_description> (inout) (array length=argc) (allow-none): pointer to application's argv
 </parameter_description>
 </parameter>
 <parameter name="err">
@@ -8781,6 +9026,29 @@ Since: 0.10.22
 </return>
 </function>
 
+<function name="gst_fft_s32_window">
+<description>
+This calls the window function @window on the @timedata sample buffer.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> #GstFFTS32 instance for this call
+</parameter_description>
+</parameter>
+<parameter name="timedata">
+<parameter_description> Time domain samples
+</parameter_description>
+</parameter>
+<parameter name="window">
+<parameter_description> Window function to apply
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_tag_setter_set_tag_merge_mode">
 <description>
 Sets the given merge mode that is used for adding tags from events to tags
@@ -8815,8 +9083,8 @@ Creates a new #GstAdapter. Free with g_object_unref().
 
 <function name="gst_preset_save_preset">
 <description>
-Save the current preset under the given name. If there is already a preset by
-this @name it will be overwritten.
+Save the current object settings as a preset under the given name. If there
+is already a preset by this @name it will be overwritten.
 
 
 </description>
@@ -8940,6 +9208,36 @@ Checks if the debugging output should be colored.
 </return>
 </function>
 
+<function name="gst_tag_list_get_double_index">
+<description>
+Gets the value that is at the given index for the given tag in the given
+list.
+
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GstTagList to get the tag from
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> tag to read out
+</parameter_description>
+</parameter>
+<parameter name="index">
+<parameter_description> number of entry to read out
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> location for the result
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE, if a value was copied, FALSE if the tag didn't exist in the
+given list.
+</return>
+</function>
+
 <function name="gst_message_parse_segment_done">
 <description>
 Extracts the position and format from the segment start message.
@@ -8964,67 +9262,23 @@ MT safe.
 <return></return>
 </function>
 
-<function name="gst_adapter_masked_scan_uint32">
+<function name="gst_structure_remove_field">
 <description>
-Scan for pattern @pattern with applied mask @mask in the adapter data,
-starting from offset @offset. 
-
-The bytes in @pattern and @mask are interpreted left-to-right, regardless
-of endianness.  All four bytes of the pattern must be present in the
-adapter for it to match, even if the first or last bytes are masked out.
-
-It is an error to call this function without making sure that there is
-enough data (offset+size bytes) in the adapter.
-
+Removes the field with the given name.  If the field with the given
+name does not exist, the structure is unchanged.
 
 </description>
 <parameters>
-<parameter name="adapter">
-<parameter_description> a #GstAdapter
+<parameter name="structure">
+<parameter_description> a #GstStructure
 </parameter_description>
 </parameter>
-<parameter name="mask">
-<parameter_description> mask to apply to data before matching against @pattern
-</parameter_description>
-</parameter>
-<parameter name="pattern">
-<parameter_description> pattern to match (after mask is applied)
-</parameter_description>
-</parameter>
-<parameter name="offset">
-<parameter_description> offset into the adapter data from which to start scanning, returns
-the last scanned position.
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> number of bytes to scan from offset
+<parameter name="fieldname">
+<parameter_description> the name of the field to remove
 </parameter_description>
 </parameter>
 </parameters>
-<return> offset of the first match, or -1 if no match was found.
-
-Example:
-&lt;programlisting&gt;
-// Assume the adapter contains 0x00 0x01 0x02 ... 0xfe 0xff
-
-gst_adapter_masked_scan_uint32 (adapter, 0xffffffff, 0x00010203, 0, 256);
-// -&gt; returns 0
-gst_adapter_masked_scan_uint32 (adapter, 0xffffffff, 0x00010203, 1, 255);
-// -&gt; returns -1
-gst_adapter_masked_scan_uint32 (adapter, 0xffffffff, 0x01020304, 1, 255);
-// -&gt; returns 1
-gst_adapter_masked_scan_uint32 (adapter, 0xffff, 0x0001, 0, 256);
-// -&gt; returns -1
-gst_adapter_masked_scan_uint32 (adapter, 0xffff, 0x0203, 0, 256);
-// -&gt; returns 0
-gst_adapter_masked_scan_uint32 (adapter, 0xffff0000, 0x02030000, 0, 256);
-// -&gt; returns 2
-gst_adapter_masked_scan_uint32 (adapter, 0xffff0000, 0x02030000, 0, 4);
-// -&gt; returns -1
-&lt;/programlisting&gt;
-
-Since: 0.10.24
-</return>
+<return></return>
 </function>
 
 <function name="gst_navigation_query_new_commands">
@@ -9509,6 +9763,26 @@ This prints the caps in human readble form.
 </return>
 </function>
 
+<function name="gst_event_new_sink_message">
+<description>
+Create a new sink-message event. The purpose of the sink-message event is
+to instruct a sink to post the message contained in the event synchronized
+with the stream.
+
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> The #GstMessage to be posted
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstEvent
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_tag_list_get_boolean">
 <description>
 Copies the contents for the given tag into the value, merging multiple values
@@ -9557,6 +9831,30 @@ Gets the value for this #GstControlSource at a given timestamp.
 </parameters>
 <return> FALSE if the value couldn't be returned, TRUE otherwise.
 </return>
+</function>
+
+<function name="gst_util_fraction_to_double">
+<description>
+Transforms a #gdouble to a fraction and simplifies the result.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="src_n">
+<parameter_description> Fraction numerator as #gint
+</parameter_description>
+</parameter>
+<parameter name="src_d">
+<parameter_description> Fraction denominator #gint
+</parameter_description>
+</parameter>
+<parameter name="dest">
+<parameter_description> pointer to a #gdouble for the result
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_rtsp_range_free">
@@ -9911,6 +10209,39 @@ ids to writer descriptions.
 <return></return>
 </function>
 
+<function name="gst_util_uint64_scale_round">
+<description>
+Scale @val by the rational number @num / @denom, avoiding overflows and
+underflows and without loss of precision.
+
+This function can potentially be very slow if val and num are both
+greater than G_MAXUINT32.
+
+
+</description>
+<parameters>
+<parameter name="val">
+<parameter_description> the number to scale
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> the numerator of the scale ratio
+</parameter_description>
+</parameter>
+<parameter name="denom">
+<parameter_description> the denominator of the scale ratio
+</parameter_description>
+</parameter>
+</parameters>
+<return> @val * @num / @denom.  In the case of an overflow, this
+function returns G_MAXUINT64.  If the result is not exactly
+representable as an integer, it is rounded to the nearest integer
+(half-way cases are rounded up).  See also gst_util_uint64_scale(),
+gst_util_uint64_scale_ceil(), gst_util_uint64_scale_int(),
+gst_util_uint64_scale_int_round(), gst_util_uint64_scale_int_ceil().
+</return>
+</function>
+
 <function name="gst_base_audio_src_create_ringbuffer">
 <description>
 Create and return the #GstRingBuffer for @src. This function will call the
@@ -10246,6 +10577,28 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_byte_writer_put_string_utf8">
+<description>
+Writes a null-terminated UTF8 string to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> UTF8 string to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_element_make_from_uri">
 <description>
 Creates an element for handling the given URI.
@@ -10464,6 +10817,19 @@ Since: 0.10.22
 </return>
 </function>
 
+<function name="GstVideoSink">
+<description>
+Whether to show video frames during preroll. If set to #FALSE, video
+frames will only be rendered in PLAYING state.
+
+Since: 0.10.25
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_message_new_state_changed">
 <description>
 Create a state change message. This message is posted whenever an element
@@ -10640,6 +11006,37 @@ the max MTU is exceeded or the number of report blocks is greater than
 </return>
 </function>
 
+<function name="gst_base_rtp_audio_payload_flush">
+<description>
+Create an RTP buffer and store @payload_len bytes of the adapter as the
+payload. Set the timestamp on the new buffer to @timestamp before pushing
+the buffer downstream.
+
+If @payload_len is -1, all pending bytes will be flushed. If @timestamp is
+-1, the timestamp will be calculated automatically.
+
+
+</description>
+<parameters>
+<parameter name="baseaudiopayload">
+<parameter_description> a #GstBaseRTPPayload
+</parameter_description>
+</parameter>
+<parameter name="payload_len">
+<parameter_description> length of payload
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> a #GstClockTime
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn
+
+Since: 0.10.25
+</return>
+</function>
+
 <function name="gst_debug_set_active">
 <description>
 If activated, debugging messages are sent to the debugging
@@ -10692,6 +11089,28 @@ Since: 0.10.23
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_int64_le">
+<description>
+Writes a signed little endian 64 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_plugin_feature_list_free">
@@ -10938,14 +11357,17 @@ Removes all registered instances of log functions with the given user data.
 
 <function name="gst_caps_set_simple_valist">
 <description>
-Sets fields in a simple #GstCaps.  A simple #GstCaps is one that
-only has one structure.  The arguments must be passed in the same
+Sets fields in a #GstCaps.  The arguments must be passed in the same
 manner as gst_structure_set(), and be NULL-terminated.
+&lt;note&gt;Prior to GStreamer version 0.10.26, this function failed when
+@caps was not simple. If your code needs to work with those versions 
+of GStreamer, you may only call this function when GST_CAPS_IS_SIMPLE()
+is %TRUE for @caps.&lt;/note&gt;
 
 </description>
 <parameters>
 <parameter name="caps">
-<parameter_description> the #GstCaps to copy
+<parameter_description> the #GstCaps to set
 </parameter_description>
 </parameter>
 <parameter name="field">
@@ -10972,6 +11394,42 @@ Get the total number of live registered alloc trace objects.
 </return>
 </function>
 
+<function name="gst_rtsp_connection_create_from_fd">
+<description>
+Create a new #GstRTSPConnection for handling communication on the existing
+file descriptor @fd. The @initial_buffer contains any data already read from
+@fd which should be used before starting to read new data.
+
+
+</description>
+<parameters>
+<parameter name="fd">
+<parameter_description> a file descriptor
+</parameter_description>
+</parameter>
+<parameter name="ip">
+<parameter_description> the IP address of the other end
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> the port used by the other end
+</parameter_description>
+</parameter>
+<parameter name="initial_buffer">
+<parameter_description> data already read from @fd
+</parameter_description>
+</parameter>
+<parameter name="conn">
+<parameter_description> storage for a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_RTSP_OK when @conn contains a valid connection.
+
+Since: 0.10.25
+</return>
+</function>
+
 <function name="gst_event_new_flush_start">
 <description>
 Allocate a new flush start event. The flush start event can be sent
@@ -10994,6 +11452,29 @@ in the pipeline so that the new media is played as soon as possible.
 <parameters>
 </parameters>
 <return> A new flush start event.
+</return>
+</function>
+
+<function name="gst_byte_writer_ensure_free_space">
+<description>
+Checks if enough free space from the current write cursor is
+available and reallocates if necessary.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Number of bytes that should be available
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if at least @size bytes are still available
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -11026,6 +11507,28 @@ gst_element_set_start_time().
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_int32_be">
+<description>
+Writes a signed big endian 32 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_static_pad_template_get_caps">
@@ -11245,6 +11748,50 @@ Looks up the vorbiscomment tag for a GStreamer tag.
 </return>
 </function>
 
+<function name="gst_byte_writer_put_float_be">
+<description>
+Writes a big endian 32 bit float to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
+<function name="gst_byte_writer_put_int24_le">
+<description>
+Writes a signed little endian 24 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_rtsp_find_method">
 <description>
 Convert @method to a #GstRTSPMethod.
@@ -11264,7 +11811,7 @@ method is unknown.
 
 <function name="gst_query_parse_formats_nth">
 <description>
-Parse the format query and retrieve the @nth format from it into 
+Parse the format query and retrieve the @nth format from it into
 @format. If the list contains less elements than @nth, @format will be
 set to GST_FORMAT_UNDEFINED.
 
@@ -11394,7 +11941,7 @@ Will ref the target.
 Determines if intersecting two values will produce a valid result.
 Two values will produce a valid intersection if they have the same
 type, or if there is a method (registered by
-gst_value_register_intersection_func()) to calculate the intersection.
+gst_value_register_intersect_func()) to calculate the intersection.
 
 
 </description>
@@ -11578,6 +12125,8 @@ Since: 0.10.14
 <description>
 Join a task and/or return it to the pool. @id is the id obtained from 
 gst_task_pool_push().
+
+Since: 0.10.24
 
 </description>
 <parameters>
@@ -12402,15 +12951,28 @@ This function is mainly for use in plugins.
 </return>
 </function>
 
-<function name="gst_fft_f32_free">
+<function name="gst_fft_s32_inverse_fft">
 <description>
-This frees the memory allocated for @self.
+This performs the inverse FFT on @freqdata and puts the result in @timedata.
+
+@freqdata must have @len/2 + 1 samples, where @len is the parameter specified
+while allocating the #GstFFTS32 instance with gst_fft_s32_new().
+
+@timedata must be large enough to hold @len time domain samples.
 
 
 </description>
 <parameters>
 <parameter name="self">
-<parameter_description> #GstFFTF32 instance for this call
+<parameter_description> #GstFFTS32 instance for this call
+</parameter_description>
+</parameter>
+<parameter name="freqdata">
+<parameter_description> Buffer of the samples in the frequency domain
+</parameter_description>
+</parameter>
+<parameter name="timedata">
+<parameter_description> Target buffer for the samples in the time domain
 </parameter_description>
 </parameter>
 </parameters>
@@ -12476,6 +13038,29 @@ Since: 0.10.16
 </parameters>
 <return> the FOURCC corresponding to @format
 </return>
+</function>
+
+<function name="gst_navigation_send_key_event">
+<description>
+
+</description>
+<parameters>
+<parameter name="navigation">
+<parameter_description> The navigation interface instance
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> The type of the key event. Recognised values are &quot;key-press&quot; and
+&quot;key-release&quot;
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> Character representation of the key. This is typically as produced
+by XKeysymToString.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_pad_set_element_private">
@@ -12560,7 +13145,7 @@ A helper function you can use that sets the
 pad. This way the function will always return the negotiated caps
 or in case the pad is not negotiated, the padtemplate caps.
 
-Use this function on a pad that, once _set_caps() has been called
+Use this function on a pad that, once gst_pad_set_caps() has been called
 on it, cannot be renegotiated to something else.
 
 </description>
@@ -12668,6 +13253,32 @@ Gets the number of pad_templates in this factory.
 </parameter>
 </parameters>
 <return> the number of pad_templates
+</return>
+</function>
+
+<function name="gst_byte_writer_new_with_buffer">
+<description>
+Creates a new #GstByteWriter instance with the given
+buffer. If @initialized is %TRUE it is possible to
+read the complete buffer from the #GstByteWriter from the beginning.
+
+&lt;note&gt;@buffer must be writable&lt;/note&gt;
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> Buffer used for writing
+</parameter_description>
+</parameter>
+<parameter name="initialized">
+<parameter_description> If %TRUE the complete data can be read from the beginning
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstByteWriter instance
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -12785,7 +13396,8 @@ indexfactory with the given name.
 
 <function name="gst_tuner_set_norm">
 <description>
-Changes the video norm on this tuner to the given norm.
+Changes the video norm on this tuner to the given norm, which should be
+one of the norms returned by gst_tuner_list_norms().
 
 </description>
 <parameters>
@@ -13029,7 +13641,7 @@ Adds a codec tag describing the format specified by @caps to @taglist.
 <function name="gst_net_client_clock_new">
 <description>
 Create a new #GstNetClientClock that will report the time
-provided by the #GstNetClockProvider on @remote_address and 
+provided by the #GstNetTimeProvider on @remote_address and 
 @remote_port.
 
 
@@ -13164,7 +13776,6 @@ be freed.
 <function name="gst_base_rtp_audio_payload_set_sample_options">
 <description>
 Sets the options for sample based audio codecs.
-
 
 </description>
 <parameters>
@@ -13302,9 +13913,42 @@ Set the media transport protocol of @media to @proto.
 </return>
 </function>
 
+<function name="gst_clock_id_wait_async">
+<description>
+Register a callback on the given #GstClockID @id with the given
+function and user_data. When passing a #GstClockID with an invalid
+time to this function, the callback will be called immediately
+with  a time set to GST_CLOCK_TIME_NONE. The callback will
+be called when the time of @id has been reached.
+
+The callback @func can be invoked from any thread, either provided by the
+core or from a streaming thread. The application should be prepared for this.
+
+
+</description>
+<parameters>
+<parameter name="id">
+<parameter_description> a #GstClockID to wait on
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> The callback function
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data passed in the callback
+</parameter_description>
+</parameter>
+</parameters>
+<return> the result of the non blocking wait.
+
+MT safe.
+</return>
+</function>
+
 <function name="gst_adapter_take_buffer">
 <description>
-Returns: a #GstBuffer containing the first @nbytes of the adapter, 
+Returns: a #GstBuffer containing the first @nbytes of the adapter,
 
 </description>
 <parameters>
@@ -13317,7 +13961,7 @@ Returns: a #GstBuffer containing the first @nbytes of the adapter,
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstBuffer containing the first @nbytes of the adapter, 
+<return> a #GstBuffer containing the first @nbytes of the adapter,
 or #NULL if @nbytes bytes are not available
 </return>
 </function>
@@ -13345,7 +13989,7 @@ See also: gst_adapter_peek().
 
 <function name="gst_byte_reader_peek_float32_be">
 <description>
-Read a 32 bit big endian integer into @val
+Read a 32 bit big endian floating point value into @val
 but keep the current position.
 
 
@@ -13882,7 +14526,7 @@ Free the given packetizer.
 
 <function name="gst_query_parse_buffering_range">
 <description>
-Parse an available query, writing the format into @format, and 
+Parse an available query, writing the format into @format, and
 other results into the passed parameters, if the respective parameters
 are non-NULL
 
@@ -13942,9 +14586,11 @@ FALSE otherwise.
 
 <function name="gst_util_uint64_scale">
 <description>
-Scale @val by @num / @denom, trying to avoid overflows.
+Scale @val by the rational number @num / @denom, avoiding overflows and
+underflows and without loss of precision.
 
-This function can potentially be very slow if denom &gt; G_MAXUINT32.
+This function can potentially be very slow if val and num are both
+greater than G_MAXUINT32.
 
 
 </description>
@@ -13962,8 +14608,12 @@ This function can potentially be very slow if denom &gt; G_MAXUINT32.
 </parameter_description>
 </parameter>
 </parameters>
-<return> @val * @num / @denom, trying to avoid overflows.
-In the case of an overflow, this function returns G_MAXUINT64.
+<return> @val * @num / @denom.  In the case of an overflow, this
+function returns G_MAXUINT64.  If the result is not exactly
+representable as an integer it is truncated.  See also
+gst_util_uint64_scale_round(), gst_util_uint64_scale_ceil(),
+gst_util_uint64_scale_int(), gst_util_uint64_scale_int_round(),
+gst_util_uint64_scale_int_ceil().
 </return>
 </function>
 
@@ -14056,7 +14706,7 @@ returning NULL.
 
 <function name="gst_value_register_union_func">
 <description>
-Registers a union function that can create a union between GValues
+Registers a union function that can create a union between #GValue items
 of the type @type1 and @type2.
 
 Union functions should be registered at startup before any pipelines are
@@ -14161,24 +14811,6 @@ parameters.
 </return>
 </function>
 
-<function name="gst_preset_get_property_names">
-<description>
-Get a the names of the GObject properties that can be used for presets.
-
-
-</description>
-<parameters>
-<parameter name="preset">
-<parameter_description> a #GObject that implements #GstPreset
-</parameter_description>
-</parameter>
-</parameters>
-<return> an array of property names which should be freed with g_strfreev() after use.
-
-Since: 0.10.20
-</return>
-</function>
-
 <function name="gst_debug_construct_win_color">
 <description>
 Constructs an integer that can be used for getting the desired color in
@@ -14247,7 +14879,6 @@ maximum size of @mtu.
 <description>
 Tells #GstBaseRTPAudioPayload that the child element is for a frame based
 audio codec
-
 
 </description>
 <parameters>
@@ -14475,7 +15106,7 @@ playback. This property has no effect anymore since 0.10.15.
 
 <function name="gst_query_type_iterate_definitions">
 <description>
-Get a #GstIterator of all the registered query types. The definitions 
+Get a #GstIterator of all the registered query types. The definitions
 iterated over are read only.
 
 
@@ -14617,33 +15248,50 @@ Gets the #GstCaps associated with a typefind factory.
 </return>
 </function>
 
-<function name="gst_tag_list_get_double_index">
+<function name="gst_type_find_helper_get_range_ext">
 <description>
-Gets the value that is at the given index for the given tag in the given
-list.
+Utility function to do pull-based typefinding. Unlike gst_type_find_helper()
+however, this function will use the specified function @func to obtain the
+data needed by the typefind functions, rather than operating on a given
+source pad. This is useful mostly for elements like tag demuxers which
+strip off data at the beginning and/or end of a file and want to typefind
+the stripped data stream before adding their own source pad (the specified
+callback can then call the upstream peer pad with offsets adjusted for the
+tag size, for example).
 
+When @extension is not NULL, this function will first try the typefind
+functions for the given extension, which might speed up the typefinding
+in many cases.
+
+Returns #NULL if no #GstCaps matches the data stream.
 
 </description>
 <parameters>
-<parameter name="list">
-<parameter_description> a #GstTagList to get the tag from
+<parameter name="obj">
+<parameter_description> A #GstObject that will be passed as first argument to @func
 </parameter_description>
 </parameter>
-<parameter name="tag">
-<parameter_description> tag to read out
+<parameter name="func">
+<parameter_description> A generic #GstTypeFindHelperGetRangeFunction that will be used
+to access data at random offsets when doing the typefinding
 </parameter_description>
 </parameter>
-<parameter name="index">
-<parameter_description> number of entry to read out
+<parameter name="size">
+<parameter_description> The length in bytes
 </parameter_description>
 </parameter>
-<parameter name="value">
-<parameter_description> location for the result
+<parameter name="extension">
+<parameter_description> extenstion of the media
+</parameter_description>
+</parameter>
+<parameter name="prob">
+<parameter_description> location to store the probability of the found caps, or #NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE, if a value was copied, FALSE if the tag didn't exist in the
-given list.
+<return>#NULL if no #GstCaps matches the data stream.
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -14901,6 +15549,20 @@ but keep the current position.
 <return> %TRUE if successful, %FALSE otherwise.
 
 Since: 0.10.22
+</return>
+</function>
+
+<function name="gst_byte_writer_new">
+<description>
+Creates a new, empty #GstByteWriter instance
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new, empty #GstByteWriter instance
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -15208,7 +15870,7 @@ utility function that wraps the above functions.
 <function name="gst_query_new_seeking">
 <description>
 Constructs a new query object for querying seeking properties of
-the stream. 
+the stream.
 
 
 </description>
@@ -15395,7 +16057,7 @@ The list must be terminated with NULL.
 
 <function name="gst_value_union">
 <description>
-Creates a GValue cooresponding to the union of @value1 and @value2.
+Creates a GValue corresponding to the union of @value1 and @value2.
 
 
 </description>
@@ -15436,7 +16098,7 @@ Get a printable name for the given event type. Do not modify or free.
 <function name="gst_event_new_flush_stop">
 <description>
 Allocate a new flush stop event. The flush stop event can be sent
-upstream and downstream and travels out-of-bounds with the dataflow.
+upstream and downstream and travels serialized with the dataflow.
 It is typically sent after sending a FLUSH_START event to make the
 pads accept data again.
 
@@ -15647,33 +16309,22 @@ Since: 0.10.23
 <return></return>
 </function>
 
-<function name="gst_bus_add_signal_watch_full">
+<function name="gst_preset_get_property_names">
 <description>
-Adds a bus signal watch to the default main context with the given priority.
-After calling this statement, the bus will emit the &quot;message&quot; signal for each
-message posted on the bus when the main loop is running.
+Get a the names of the GObject properties that can be used for presets.
 
-This function may be called multiple times. To clean up, the caller is
-responsible for calling gst_bus_remove_signal_watch() as many times as this
-function is called.
-
-There can only be a single bus watch per bus, you most remove all signal watch
-before you can set another type of watch.
-
-MT safe.
 
 </description>
 <parameters>
-<parameter name="bus">
-<parameter_description> a #GstBus on which you want to receive the &quot;message&quot; signal
-</parameter_description>
-</parameter>
-<parameter name="priority">
-<parameter_description> The priority of the watch.
+<parameter name="preset">
+<parameter_description> a #GObject that implements #GstPreset
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> an array of property names which should be freed with g_strfreev() after use.
+
+Since: 0.10.20
+</return>
 </function>
 
 <function name="gst_interpolation_control_source_unset">
@@ -16126,23 +16777,76 @@ Since: 0.10.22
 </return>
 </function>
 
+<function name="gst_util_double_to_fraction">
+<description>
+Transforms a #gdouble to a fraction and simplifies
+the result.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> #gdouble to transform
+</parameter_description>
+</parameter>
+<parameter name="dest_n">
+<parameter_description> pointer to a #gint to hold the result numerator
+</parameter_description>
+</parameter>
+<parameter name="dest_d">
+<parameter_description> pointer to a #gint to hold the result denominator
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_video_event_parse_still_frame">
+<description>
+Parse a #GstEvent, identify if it is a Still Frame event, and
+return the still-frame state from the event if it is.
+If the event represents the start of a still frame, the in_still
+variable will be set to TRUE, otherwise FALSE. It is OK to pass NULL for the
+in_still variable order to just check whether the event is a valid still-frame
+event.
+
+Create a still frame event using gst_video_event_new_still_frame()
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to parse
+</parameter_description>
+</parameter>
+<parameter name="in_still">
+<parameter_description> A boolean to receive the still-frame status from the event, or NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the event is a valid still-frame event. %FALSE if not
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_type_register_static_full">
 <description>
-Helper function which constructs a #GTypeInfo structure and registers a 
-GType, but which generates less linker overhead than a static const 
+Helper function which constructs a #GTypeInfo structure and registers a
+GType, but which generates less linker overhead than a static const
 #GTypeInfo structure. For further details of the parameters, please see
 #GTypeInfo in the GLib documentation.
 
-Registers type_name as the name of a new static type derived from 
-parent_type. The value of flags determines the nature (e.g. abstract or 
-not) of the type. It works by filling a GTypeInfo struct and calling 
-g_type_info_register_static().
+Registers type_name as the name of a new static type derived from
+parent_type. The value of flags determines the nature (e.g. abstract or
+not) of the type. It works by filling a GTypeInfo struct and calling
+g_type_register_static().
 
 
 </description>
 <parameters>
 <parameter name="parent_type">
-<parameter_description> The GType of the parent type the newly registered type will 
+<parameter_description> The GType of the parent type the newly registered type will
 derive from
 </parameter_description>
 </parameter>
@@ -16163,14 +16867,14 @@ derive from
 </parameter_description>
 </parameter>
 <parameter name="class_init">
-<parameter_description> Location of the class initialization function for class types 
-Location of the default vtable inititalization function for interface 
+<parameter_description> Location of the class initialization function for class types
+Location of the default vtable inititalization function for interface
 types. (optional)
 </parameter_description>
 </parameter>
 <parameter name="class_finalize">
 <parameter_description> Location of the class finalization function for class types.
-Location of the default vtable finalization function for interface types. 
+Location of the default vtable finalization function for interface types.
 (optional)
 </parameter_description>
 </parameter>
@@ -16179,23 +16883,23 @@ Location of the default vtable finalization function for interface types.
 </parameter_description>
 </parameter>
 <parameter name="instance_size">
-<parameter_description> Size of the instance (object) structure (required for 
+<parameter_description> Size of the instance (object) structure (required for
 instantiatable types only).
 </parameter_description>
 </parameter>
 <parameter name="n_preallocs">
-<parameter_description> The number of pre-allocated (cached) instances to reserve 
+<parameter_description> The number of pre-allocated (cached) instances to reserve
 memory for (0 indicates no caching). Ignored on recent GLib's.
 </parameter_description>
 </parameter>
 <parameter name="instance_init">
-<parameter_description> Location of the instance initialization function (optional, 
+<parameter_description> Location of the instance initialization function (optional,
 for instantiatable types only).
 </parameter_description>
 </parameter>
 <parameter name="value_table">
-<parameter_description> A GTypeValueTable function table for generic handling of 
-GValues of this type (usually only useful for fundamental types). 
+<parameter_description> A GTypeValueTable function table for generic handling of
+GValues of this type (usually only useful for fundamental types).
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -16357,7 +17061,7 @@ Add the bandwidth information with @bwtype and @bandwidth to @media.
 <description>
 Gets the extensions associated with a #GstTypeFindFactory. The returned
 array should not be changed. If you need to change stuff in it, you should
-copy it using g_stdupv().  This function may return NULL to indicate
+copy it using g_strdupv().  This function may return NULL to indicate
 a 0-length list.
 
 
@@ -16499,6 +17203,34 @@ this track.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_new_with_data">
+<description>
+Creates a new #GstByteWriter instance with the given
+memory area. If @initialized is %TRUE it is possible to
+read @size bytes from the #GstByteWriter from the beginning.
+
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> Memory area for writing
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Size of @data in bytes
+</parameter_description>
+</parameter>
+<parameter name="initialized">
+<parameter_description> If %TRUE the complete data can be read from the beginning
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstByteWriter instance
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_flow_to_quark">
@@ -16660,12 +17392,12 @@ Queries an element for the total stream duration.
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> a pointer to the #GstFormat asked for.
+<parameter_description> (inout): a pointer to the #GstFormat asked for.
 On return contains the #GstFormat used.
 </parameter_description>
 </parameter>
 <parameter name="duration">
-<parameter_description> A location in which to store the total duration, or NULL.
+<parameter_description> (out): A location in which to store the total duration, or NULL.
 </parameter_description>
 </parameter>
 </parameters>
@@ -16715,6 +17447,25 @@ Read an unsigned 8 bit integer into @val and update the current position.
 <return> %TRUE if successful, %FALSE otherwise.
 
 Since: 0.10.22
+</return>
+</function>
+
+<function name="gst_byte_writer_free_and_get_data">
+<description>
+Frees @writer and all memory allocated by it except
+the current data, which is returned.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current data. g_free() after usage.
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -17444,13 +18195,13 @@ is unloaded.
 Query the sink for the latency parameters. The latency will be queried from
 the upstream elements. @live will be TRUE if @sink is configured to
 synchronize against the clock. @upstream_live will be TRUE if an upstream
-element is live. 
+element is live.
 
 If both @live and @upstream_live are TRUE, the sink will want to compensate
 for the latency introduced by the upstream elements by setting the
 @min_latency to a strictly possitive value.
 
-This function is mostly used by subclasses. 
+This function is mostly used by subclasses.
 
 
 </description>
@@ -18050,25 +18801,23 @@ Looks up the GStreamer tag for a ID3v2 tag.
 </return>
 </function>
 
-<function name="gst_element_get_pad_from_template">
+<function name="gst_message_new_state_dirty">
 <description>
-Gets a pad from @element described by @templ. If the presence of @templ is
-#GST_PAD_REQUEST, requests a new pad. Can return %NULL for #GST_PAD_SOMETIMES
-templates.
+Create a state dirty message. This message is posted whenever an element
+changed its state asynchronously and is used internally to update the
+states of container objects.
 
 
 </description>
 <parameters>
-<parameter name="element">
-<parameter_description> a #GstElement.
-</parameter_description>
-</parameter>
-<parameter name="templ">
-<parameter_description> a #GstPadTemplate belonging to @element.
+<parameter name="src">
+<parameter_description> the object originating the message
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GstPad, or NULL if one could not be found or created.
+<return> The new state dirty message.
+
+MT safe.
 </return>
 </function>
 
@@ -18230,6 +18979,19 @@ Gets the #GstEventTypeFlags associated with @type.
 </return>
 </function>
 
+<function name="GstBaseAudioSink">
+<description>
+Controls the amount of time in milliseconds that timestamps or clocks are allowed
+to drift before resynchronisation happens.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_query_new_position">
 <description>
 Constructs a new query stream position query object. Use gst_query_unref()
@@ -18251,7 +19013,7 @@ of playback in the streams, in some format.
 <function name="gst_data_queue_is_full">
 <description>
 Queries if @queue is full. This check will be done using the
-#GstDataQueueCheckFullCallback registered with @queue.
+#GstDataQueueCheckFullFunction registered with @queue.
 MT safe.
 
 
@@ -18356,7 +19118,7 @@ is not #NULL, makes sure that the caps of the link is a subset of @caps.
 Increase the reference count of the mini-object.
 
 Note that the refcount affects the writeability
-of @mini-object, see gst_mini_object_is_writable(). It is 
+of @mini-object, see gst_mini_object_is_writable(). It is
 important to note that keeping additional references to
 GstMiniObject instances can potentially increase the number
 of memcpy operations in a pipeline, especially if the miniobject
@@ -18372,6 +19134,23 @@ is a #GstBuffer.
 </parameters>
 <return> the mini-object.
 </return>
+</function>
+
+<function name="gst_byte_writer_reset">
+<description>
+Resets @writer and frees the data if it's
+owned by @writer.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_uri_handler_get_uri_type">
@@ -18569,7 +19348,7 @@ Deprecated: use a #GstDPPacketizer
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> the #GDPHeaderFlags to create the header with
+<parameter_description> the #GstDPHeaderFlag to create the header with
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -18586,6 +19365,28 @@ Deprecated: use a #GstDPPacketizer
 </parameter>
 </parameters>
 <return> %TRUE if the packet was successfully created.
+</return>
+</function>
+
+<function name="gst_byte_writer_put_int16_be">
+<description>
+Writes a signed big endian 16 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -18730,6 +19531,28 @@ ranges) value.
 </return>
 </function>
 
+<function name="gst_byte_writer_put_uint64_be">
+<description>
+Writes a unsigned big endian 64 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_tag_parse_extended_comment">
 <description>
 Convenience function to parse a GST_TAG_EXTENDED_COMMENT string and
@@ -18839,6 +19662,28 @@ tracing enabled.
 </return>
 </function>
 
+<function name="gst_byte_writer_put_uint16_le">
+<description>
+Writes a unsigned little endian 16 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_byte_reader_get_uint24_le">
 <description>
 Read an unsigned 24 bit little endian integer into @val
@@ -18875,10 +19720,36 @@ should be handled.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if there are messages on the bus to be handled, FALSE 
+<return> TRUE if there are messages on the bus to be handled, FALSE
 otherwise.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_structure_id_has_field_typed">
+<description>
+Check if @structure contains a field named @field and with GType @type.
+
+
+</description>
+<parameters>
+<parameter name="structure">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+<parameter name="field">
+<parameter_description> #GQuark of the field name
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> the type of a value
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the structure contains a field with the given name and type
+
+Since: 0.10.16
 </return>
 </function>
 
@@ -18972,27 +19843,19 @@ MT safe.
 <return></return>
 </function>
 
-<function name="gst_cdda_base_src_add_track">
+<function name="gst_structure_free">
 <description>
-CDDA sources use this function from their start vfunc to announce the
-available data and audio tracks to the base source class. The caller
-should allocate @track on the stack, the base source will do a shallow
-copy of the structure (and take ownership of the taglist if there is one).
-
+Frees a #GstStructure and all its fields and values. The structure must not
+have a parent when this function is called.
 
 </description>
 <parameters>
-<parameter name="src">
-<parameter_description> a #GstCddaBaseSrc
-</parameter_description>
-</parameter>
-<parameter name="track">
-<parameter_description> address of #GstCddaBaseSrcTrack to add
+<parameter name="structure">
+<parameter_description> the #GstStructure to free
 </parameter_description>
 </parameter>
 </parameters>
-<return> FALSE on error, otherwise TRUE.
-</return>
+<return></return>
 </function>
 
 <function name="gst_rtsp_url_get_request_uri">
@@ -19236,6 +20099,25 @@ Since: 0.10.11
 </return>
 </function>
 
+<function name="gst_pad_peer_get_caps_reffed">
+<description>
+Gets the capabilities of the peer connected to this pad. Preferred function
+if one only wants to read or intersect the caps.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a  #GstPad to get the capabilities of.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the caps of the pad with incremented ref-count.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_iterator_push">
 <description>
 Pushes @other iterator onto @it. All calls performed on @it are
@@ -19473,11 +20355,11 @@ by the read size by this function.
 </parameter>
 <parameter name="chunk_data">
 <parameter_description> buffer (returned by the function) containing the
-chunk data.
+chunk data, which may be NULL if chunksize == 0
 </parameter_description>
 </parameter>
 </parameters>
-<return> the fourcc tag of this chunk, or FALSE on error
+<return> FALSE on error, TRUE otherwise
 </return>
 </function>
 
@@ -19497,32 +20379,6 @@ called from the task function.
 </parameters>
 <return> a TRUE if the task could be paused or FALSE when the pad
 has no task.
-</return>
-</function>
-
-<function name="gst_bin_get_by_interface">
-<description>
-Looks for an element inside the bin that implements the given
-interface. If such an element is found, it returns the element.
-You can cast this element to the given interface afterwards.  If you want
-all elements that implement the interface, use
-gst_bin_iterate_all_by_interface(). This function recurses into child bins.
-
-MT safe.  Caller owns returned reference.
-
-
-</description>
-<parameters>
-<parameter name="bin">
-<parameter_description> a #GstBin
-</parameter_description>
-</parameter>
-<parameter name="iface">
-<parameter_description> the #GType of an interface
-</parameter_description>
-</parameter>
-</parameters>
-<return> A #GstElement inside the bin implementing the interface
 </return>
 </function>
 
@@ -19708,32 +20564,32 @@ gst_pad_add_data_probe() for more information.
 </return>
 </function>
 
-<function name="gst_fft_f32_inverse_fft">
+<function name="gst_buffer_list_get">
 <description>
-This performs the inverse FFT on @freqdata and puts the result in @timedata.
+Get the buffer at @idx in @group.
 
-@freqdata must have @len/2 + 1 samples, where @len is the parameter specified
-while allocating the #GstFFTF32 instance with gst_fft_f32_new().
-
-@timedata must be large enough to hold @len time domain samples.
+Note that this function is not efficient for iterating over the entire list.
+Use an iterator or gst_buffer_list_foreach() instead.
 
 
 </description>
 <parameters>
-<parameter name="self">
-<parameter_description> #GstFFTF32 instance for this call
+<parameter name="list">
+<parameter_description> a #GstBufferList
 </parameter_description>
 </parameter>
-<parameter name="freqdata">
-<parameter_description> Buffer of the samples in the frequency domain
+<parameter name="group">
+<parameter_description> the group
 </parameter_description>
 </parameter>
-<parameter name="timedata">
-<parameter_description> Target buffer for the samples in the time domain
+<parameter name="idx">
+<parameter_description> the index in @group
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the buffer at @idx in @group or NULL when there is no buffer. The
+buffer remains valid as long as @list is valid.
+</return>
 </function>
 
 <function name="gst_uri_has_protocol">
@@ -19822,7 +20678,7 @@ Deprecated: use a #GstDPPacketizer
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> the #GDPHeaderFlags to create the header with
+<parameter_description> the #GstDPHeaderFlag to create the header with
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -20280,9 +21136,9 @@ buffers, and unrefs the original source buffers.
 If the buffers point to contiguous areas of memory, the buffer
 is created without copying the data.
 
-This is a convenience function for C programmers. See also 
-gst_buffer_merge(), which does the same thing without 
-unreffing the input parameters. Language bindings without 
+This is a convenience function for C programmers. See also
+gst_buffer_merge(), which does the same thing without
+unreffing the input parameters. Language bindings without
 explicit reference counting should not wrap this function.
 
 
@@ -20361,18 +21217,19 @@ Since: 0.10.15
 
 <function name="gst_registry_fork_is_enabled">
 <description>
-By default GStreamer will perform a fork() when scanning and rebuilding the
-registry file. 
+By default GStreamer will perform scanning and rebuilding of the
+registry file using a helper child process.
 
 Applications might want to disable this behaviour with the
-gst_registry_fork_set_enabled() function. 
+gst_registry_fork_set_enabled() function, in which case new plugins
+are scanned (and loaded) into the application process.
 
 
 </description>
 <parameters>
 </parameters>
-<return> %TRUE if GStreamer will use fork() when rebuilding the registry. On
-platforms without fork(), this function will always return %FALSE.
+<return> %TRUE if GStreamer will use the child helper process when
+rebuilding the registry.
 
 Since: 0.10.10
 </return>
@@ -20688,7 +21545,7 @@ element stores the buffer so that it has access to it outside of the bounds
 of its chain function, the buffer will have an invalid data pointer after
 your element flushes the bytes. In that case you should use
 gst_adapter_take(), which returns a freshly-allocated buffer that you can set
-as #GstBuffer malloc_data or the potentially more performant 
+as #GstBuffer malloc_data or the potentially more performant
 gst_adapter_take_buffer().
 
 Returns: a pointer to the first @size bytes of data, or NULL.
@@ -20924,7 +21781,7 @@ Deprecated: use a #GstDPPacketizer
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> the #GDPHeaderFlags to create the header with
+<parameter_description> the #GstDPHeaderFlag to create the header with
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -20950,7 +21807,7 @@ Create a new structure change message. This message is posted when the
 structure of a pipeline is in the process of being changed, for example
 when pads are linked or unlinked.
 
-@src should be the srcpad that unlinked or linked.
+@src should be the sinkpad that unlinked or linked.
 
 
 </description>
@@ -21007,6 +21864,28 @@ Since: 0.10.5
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_video_event_new_still_frame">
+<description>
+Creates a new Still Frame event. If @in_still is %TRUE, then the event
+represents the start of a still frame sequence. If it is %FALSE, then
+the event ends a still frame sequence.
+
+To parse an event created by gst_video_event_new_still_frame() use
+gst_video_event_parse_still_frame().
+
+
+</description>
+<parameters>
+<parameter name="in_still">
+<parameter_description> boolean value for the still-frame state of the event.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new GstEvent
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_fft_f64_inverse_fft">
@@ -21066,7 +21945,7 @@ Sets the default format of the source. This will be the format used
 for sending NEW_SEGMENT events and for performing seeks.
 
 If a format of GST_FORMAT_BYTES is set, the element will be able to
-operate in pull mode if the #GstBaseSrc::is_seekable returns TRUE.
+operate in pull mode if the #GstBaseSrc.is_seekable() returns TRUE.
 
 Since: 0.10.1
 
@@ -21540,6 +22419,34 @@ Set the payload type of the RTP packet in @buffer to @payload_type.
 </parameter>
 <parameter name="payload_type">
 <parameter_description> the new type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_byte_writer_init_with_buffer">
+<description>
+Initializes @writer with the given
+buffer. If @initialized is %TRUE it is possible to
+read the complete buffer from the #GstByteWriter from the beginning.
+
+&lt;note&gt;@buffer must be writable&lt;/note&gt;
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> Buffer used for writing
+</parameter_description>
+</parameter>
+<parameter name="initialized">
+<parameter_description> If %TRUE the complete data can be read from the beginning
 </parameter_description>
 </parameter>
 </parameters>
@@ -22069,6 +22976,28 @@ Since: 0.10.22
 <return></return>
 </function>
 
+<function name="gst_byte_writer_put_uint32_le">
+<description>
+Writes a unsigned little endian 32 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_plugin_feature_check_version">
 <description>
 Checks whether the given plugin feature is at least
@@ -22142,28 +23071,72 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_structure_remove_field">
+<function name="gst_adapter_masked_scan_uint32">
 <description>
-Removes the field with the given name.  If the field with the given
-name does not exist, the structure is unchanged.
+Scan for pattern @pattern with applied mask @mask in the adapter data,
+starting from offset @offset.
+
+The bytes in @pattern and @mask are interpreted left-to-right, regardless
+of endianness.  All four bytes of the pattern must be present in the
+adapter for it to match, even if the first or last bytes are masked out.
+
+It is an error to call this function without making sure that there is
+enough data (offset+size bytes) in the adapter.
+
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> a #GstStructure
+<parameter name="adapter">
+<parameter_description> a #GstAdapter
 </parameter_description>
 </parameter>
-<parameter name="fieldname">
-<parameter_description> the name of the field to remove
+<parameter name="mask">
+<parameter_description> mask to apply to data before matching against @pattern
+</parameter_description>
+</parameter>
+<parameter name="pattern">
+<parameter_description> pattern to match (after mask is applied)
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> offset into the adapter data from which to start scanning, returns
+the last scanned position.
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> number of bytes to scan from offset
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> offset of the first match, or -1 if no match was found.
+
+Example:
+&lt;programlisting&gt;
+// Assume the adapter contains 0x00 0x01 0x02 ... 0xfe 0xff
+
+gst_adapter_masked_scan_uint32 (adapter, 0xffffffff, 0x00010203, 0, 256);
+// -&gt; returns 0
+gst_adapter_masked_scan_uint32 (adapter, 0xffffffff, 0x00010203, 1, 255);
+// -&gt; returns -1
+gst_adapter_masked_scan_uint32 (adapter, 0xffffffff, 0x01020304, 1, 255);
+// -&gt; returns 1
+gst_adapter_masked_scan_uint32 (adapter, 0xffff, 0x0001, 0, 256);
+// -&gt; returns -1
+gst_adapter_masked_scan_uint32 (adapter, 0xffff, 0x0203, 0, 256);
+// -&gt; returns 0
+gst_adapter_masked_scan_uint32 (adapter, 0xffff0000, 0x02030000, 0, 256);
+// -&gt; returns 2
+gst_adapter_masked_scan_uint32 (adapter, 0xffff0000, 0x02030000, 0, 4);
+// -&gt; returns -1
+&lt;/programlisting&gt;
+
+Since: 0.10.24
+</return>
 </function>
 
 <function name="gst_base_audio_sink_set_slave_method">
 <description>
-Controls how clock slaving will be performed in @sink. 
+Controls how clock slaving will be performed in @sink.
 
 Since: 0.10.16
 
@@ -22234,6 +23207,13 @@ Since: 0.10.24
 Initializes the GStreamer library, setting up internal path lists,
 registering built-in elements, and loading standard plugins.
 
+Unless the plugin registry is disabled at compile time, the registry will be
+loaded. By default this will also check if the registry cache needs to be
+updated and rescan all plugins if needed. See gst_update_registry() for
+details and section
+&lt;link linkend=&quot;gst-running&quot;&gt;Running GStreamer Applications&lt;/link&gt;
+for how to disable automatic registry updates.
+
 This function should be called before calling any other GLib functions. If
 this is not an option, your program must initialise the GLib thread system
 using g_thread_init() before any other GLib functions are called.
@@ -22252,15 +23232,37 @@ abort program execution.
 </description>
 <parameters>
 <parameter name="argc">
-<parameter_description> pointer to application's argc
+<parameter_description> (inout): pointer to application's argc
 </parameter_description>
 </parameter>
 <parameter name="argv">
-<parameter_description> pointer to application's argv
+<parameter_description> (inout) (array length=argc) (allow-none): pointer to application's argv
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_double_be">
+<description>
+Writes a big endian 64 bit float to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_buffer_get_caps">
@@ -22294,6 +23296,22 @@ Returns: a newly-allocated description string, or NULL on error. Free
 </parameters>
 <return> a newly-allocated description string, or NULL on error. Free
 string with g_free() when not needed any longer.
+</return>
+</function>
+
+<function name="gst_stream_volume_get_mute">
+<description>
+
+</description>
+<parameters>
+<parameter name="volume">
+<parameter_description> #GstStreamVolume that should be used
+</parameter_description>
+</parameter>
+</parameters>
+<return> Returns %TRUE if the stream is muted
+
+Since: 0.10.25
 </return>
 </function>
 
@@ -22370,6 +23388,41 @@ See #GstBufferListDoFunction for more details.
 </parameters>
 <return> the return value from @do_func
 </return>
+</function>
+
+<function name="gst_check_element_push_buffer_list">
+<description>
+Create an @element with the factory with the name and push the buffers in
+@buffer_in to this element. The element should create the buffers equal to
+the buffers in @buffer_out. We only check the caps, size and the data of the
+buffers. This function unrefs the buffers in the two lists.
+The last_flow_return parameter indicates the expected flow return value from
+pushing the final buffer in the list.
+This can be used to set up a test which pushes some buffers and then an
+invalid buffer, when the final buffer is expected to fail, for example.
+
+Since: 0.10.18
+
+</description>
+<parameters>
+<parameter name="element">
+<parameter_description> name of the element that needs to be created
+</parameter_description>
+</parameter>
+<parameter name="buffer_in">
+<parameter_description> a list of buffers that needs to be puched to the element
+</parameter_description>
+</parameter>
+<parameter name="buffer_out">
+<parameter_description> a list of buffers that we expect from the element
+</parameter_description>
+</parameter>
+<parameter name="last_flow_return">
+<parameter_description> the last buffer push needs to give this GstFlowReturn
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_pad_add_buffer_probe_full">
@@ -22461,7 +23514,7 @@ Returns: the list of categories
 <function name="gst_query_new_formats">
 <description>
 Constructs a new query object for querying formats of
-the stream. 
+the stream.
 
 
 </description>
@@ -23078,6 +24131,27 @@ of the existing field.
 </return>
 </function>
 
+<function name="gst_video_orientation_set_vcenter">
+<description>
+Set the vertical centering offset for the given object.
+
+Since: 0.10.11
+
+</description>
+<parameters>
+<parameter name="video_orientation">
+<parameter_description> #GstVideoOrientation interface of a #GstElement
+</parameter_description>
+</parameter>
+<parameter name="center">
+<parameter_description> centering offset
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE in case the element supports centering
+</return>
+</function>
+
 <function name="gst_object_get_value_array">
 <description>
 Function to be able to get an array of values for one element properties
@@ -23187,7 +24261,7 @@ Since: 0.10.20
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description> a buffering mode 
+<parameter_description> a buffering mode
 </parameter_description>
 </parameter>
 <parameter name="avg_in">
@@ -23553,6 +24627,51 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_structure_id_has_field">
+<description>
+Check if @structure contains a field named @field.
+
+
+</description>
+<parameters>
+<parameter name="structure">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+<parameter name="field">
+<parameter_description> #GQuark of the field name
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the structure contains a field with the given name
+
+Since: 0.10.26
+</return>
+</function>
+
+<function name="gst_caps_can_intersect">
+<description>
+Tries intersecting @caps1 and @caps2 and reports wheter the result would not
+be empty
+
+
+</description>
+<parameters>
+<parameter name="caps1">
+<parameter_description> a #GstCaps to intersect
+</parameter_description>
+</parameter>
+<parameter name="caps2">
+<parameter_description> a #GstCaps to intersect
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if intersection would be not empty
+
+Since: 0.10.25
+</return>
+</function>
+
 <function name="gst_buffer_list_iterator_take">
 <description>
 Replaces the last buffer returned by gst_buffer_list_iterator_next() with
@@ -23691,7 +24810,7 @@ If the values are equal, GST_VALUE_EQUAL is returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GstValueCompareType value
+<return> comparison result
 </return>
 </function>
 
@@ -23860,12 +24979,12 @@ Queries a pad for the stream position.
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> a pointer to the #GstFormat asked for.
+<parameter_description> (inout): a pointer to the #GstFormat asked for.
 On return contains the #GstFormat used.
 </parameter_description>
 </parameter>
 <parameter name="cur">
-<parameter_description> A location in which to store the current position, or NULL.
+<parameter_description> (out): A location in which to store the current position, or NULL.
 </parameter_description>
 </parameter>
 </parameters>
@@ -24054,6 +25173,23 @@ after calling this function.
 <return> a #GstFlowReturn from the peer pad.
 
 MT safe.
+</return>
+</function>
+
+<function name="gst_rtsp_connection_close">
+<description>
+Close the connected @conn. After this call, the connection is in the same
+state as when it was first created.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_RTSP_OK on success.
 </return>
 </function>
 
@@ -24301,6 +25437,23 @@ Since: 0.10.22
 <return></return>
 </function>
 
+<function name="gst_bit_reader_get_size">
+<description>
+Returns: The total number of bits of @reader instance.
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> The total number of bits of @reader instance.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_message_parse_clock_lost">
 <description>
 Extracts the lost clock from the GstMessage.
@@ -24320,6 +25473,81 @@ MT safe.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_uint24_le">
+<description>
+Writes a unsigned little endian 24 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
+<function name="gst_byte_writer_put_float_le">
+<description>
+Writes a little endian 32 bit float to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
+<function name="gst_rtsp_watch_send_message">
+<description>
+Send a @message using the connection of the @watch. If it cannot be sent
+immediately, it will be queued for transmission in @watch. The contents of
+@message will then be serialized and transmitted when the connection of the
+@watch becomes writable. In case the @message is queued, the ID returned in
+@id will be non-zero and used as the ID argument in the message_sent
+callback.
+
+
+</description>
+<parameters>
+<parameter name="watch">
+<parameter_description> a #GstRTSPWatch
+</parameter_description>
+</parameter>
+<parameter name="message">
+<parameter_description> a #GstRTSPMessage
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> location for a message ID or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_RTSP_OK on success.
+
+Since: 0.10.25
+</return>
 </function>
 
 <function name="gst_xml_write">
@@ -24462,7 +25690,7 @@ NULL the target will be cleared.
 </description>
 <parameters>
 <parameter name="gpad">
-<parameter_description> the #GstGhostpad
+<parameter_description> the #GstGhostPad
 </parameter_description>
 </parameter>
 <parameter name="newtarget">
@@ -24839,6 +26067,26 @@ Converts a #GstStaticCaps to a #GstCaps.
 <return> A pointer to the #GstCaps. Unref after usage. Since the
 core holds an additional ref to the returned caps,
 use gst_caps_make_writable() on the returned caps to modify it.
+</return>
+</function>
+
+<function name="gst_stream_volume_get_volume">
+<description>
+
+</description>
+<parameters>
+<parameter name="volume">
+<parameter_description> #GstStreamVolume that should be used
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> #GstStreamVolumeFormat which should be returned
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current stream volume as linear factor
+
+Since: 0.10.25
 </return>
 </function>
 
@@ -25232,6 +26480,22 @@ MT safe.
 <return></return>
 </function>
 
+<function name="gst_byte_writer_init">
+<description>
+Initializes @writer to an empty instance
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_x_overlay_got_xwindow_id">
 <description>
 This will post a &quot;have-xwindow-id&quot; element message on the bus.
@@ -25387,7 +26651,7 @@ exactly in that case depends on how the tag was registered and if a
 merge function was supplied and if so which one.
 
 Two default merge functions are provided: gst_tag_merge_use_first() and
-gst_tag_merge_strings_with_commas().
+gst_tag_merge_strings_with_comma().
 
 </description>
 <parameters>
@@ -26025,6 +27289,30 @@ Since: 0.10.24
 <return></return>
 </function>
 
+<function name="gst_stream_volume_convert_volume">
+<description>
+
+</description>
+<parameters>
+<parameter name="from">
+<parameter_description> #GstStreamVolumeFormat to convert from
+</parameter_description>
+</parameter>
+<parameter name="to">
+<parameter_description> #GstStreamVolumeFormat to convert to
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Volume in @from format that should be converted
+</parameter_description>
+</parameter>
+</parameters>
+<return> the converted volume
+
+Since: 0.10.25
+</return>
+</function>
+
 <function name="gst_video_calculate_display_ratio">
 <description>
 Given the Pixel Aspect Ratio and size of an input video frame, and the 
@@ -26440,6 +27728,29 @@ MT safe. Grabs and releases the LOCK of each object in the list.
 </return>
 </function>
 
+<function name="gst_util_greatest_common_divisor">
+<description>
+Calculates the greatest common divisor of @a
+and @b.
+
+
+</description>
+<parameters>
+<parameter name="a">
+<parameter_description> First value as #gint
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> Second value as #gint
+</parameter_description>
+</parameter>
+</parameters>
+<return> Greatest common divisor of @a and @b
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_audio_fixate_channel_positions">
 <description>
 Custom fixate function. Elements that implement some sort of
@@ -26635,9 +27946,28 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_pad_get_caps_reffed">
+<description>
+Gets the capabilities this pad can produce or consume. Preferred function if
+one only wants to read or intersect the caps.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a  #GstPad to get the capabilities of.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the caps of the pad with incremented ref-count.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_byte_reader_get_float64_be">
 <description>
-Read a 64 bit big endian integer into @val
+Read a 64 bit big endian floating point value into @val
 and update the current position.
 
 
@@ -26743,7 +28073,6 @@ MT safe.
 Tells #GstBaseRTPAudioPayload that the child element is for a sample based
 audio codec
 
-
 </description>
 <parameters>
 <parameter name="basertpaudiopayload">
@@ -26782,23 +28111,52 @@ The pad needs to have negotiated caps containing width and height properties.
 </return>
 </function>
 
-<function name="gst_data_queue_new">
+<function name="gst_rtcp_packet_set_rb">
 <description>
+Set the @nth new report block in @packet with the given values.
+
+Note: Not implemented.
 
 </description>
 <parameters>
-<parameter name="checkfull">
-<parameter_description> the callback used to tell if the element considers the queue full
-or not.
+<parameter name="packet">
+<parameter_description> a valid SR or RR #GstRTCPPacket
 </parameter_description>
 </parameter>
-<parameter name="checkdata">
-<parameter_description> a #gpointer that will be given in the @checkfull callback.
+<parameter name="nth">
+<parameter_description> the nth report block to set
+</parameter_description>
+</parameter>
+<parameter name="ssrc">
+<parameter_description> data source being reported
+</parameter_description>
+</parameter>
+<parameter name="fractionlost">
+<parameter_description> fraction lost since last SR/RR
+</parameter_description>
+</parameter>
+<parameter name="packetslost">
+<parameter_description> the cumululative number of packets lost
+</parameter_description>
+</parameter>
+<parameter name="exthighestseq">
+<parameter_description> the extended last sequence number received
+</parameter_description>
+</parameter>
+<parameter name="jitter">
+<parameter_description> the interarrival jitter
+</parameter_description>
+</parameter>
+<parameter name="lsr">
+<parameter_description> the last SR packet from this source
+</parameter_description>
+</parameter>
+<parameter name="dlsr">
+<parameter_description> the delay since last SR packet
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GstDataQueue.
-</return>
+<return></return>
 </function>
 
 <function name="gst_filter_run">
@@ -26841,7 +28199,7 @@ unreferenced or freed).
 
 <function name="gst_byte_reader_peek_float32_le">
 <description>
-Read a 32 bit little endian integer into @val
+Read a 32 bit little endian floating point value into @val
 but keep the current position.
 
 
@@ -26864,7 +28222,7 @@ Since: 0.10.22
 
 <function name="gst_query_new_latency">
 <description>
-Constructs a new latency query object. 
+Constructs a new latency query object.
 Use gst_query_unref() when done with it. A latency query is usually performed
 by sinks to compensate for additional latency introduced by elements in the
 pipeline.
@@ -26876,6 +28234,24 @@ pipeline.
 <return> A #GstQuery
 
 Since: 0.10.12
+</return>
+</function>
+
+<function name="gst_rtsp_header_allow_multiple">
+<description>
+Check whether @field may appear multiple times in a message.
+
+
+</description>
+<parameters>
+<parameter name="field">
+<parameter_description> a #GstRTSPHeaderField
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if multiple headers are allowed.
+
+Since: 0.10.25
 </return>
 </function>
 
@@ -27168,7 +28544,7 @@ gst_basertppayload_push() or gst_basertppayload_set_outcaps().
 </parameter_description>
 </parameter>
 <parameter name="encoding_name">
-<parameter_description> the encoding name 
+<parameter_description> the encoding name
 </parameter_description>
 </parameter>
 <parameter name="clock_rate">
@@ -27270,11 +28646,11 @@ no alloc tracer was registered with that name.
 <function name="gst_base_src_set_live">
 <description>
 If the element listens to a live source, @live should
-be set to %TRUE. 
+be set to %TRUE.
 
 A live source will not produce data in the PAUSED state and
 will therefore not be able to participate in the PREROLL phase
-of a pipeline. To signal this fact to the application and the 
+of a pipeline. To signal this fact to the application and the
 pipeline, the state change return value of the live source will
 be GST_STATE_CHANGE_NO_PREROLL.
 
@@ -27410,7 +28786,7 @@ This function deals correctly with passing NULL for any of the caps.
 Instructs GStreamer to emit the &quot;sync-message&quot; signal after running the bus's
 sync handler. This function is here so that code can ensure that they can
 synchronously receive messages without having to affect what the bin's sync
-handler is. 
+handler is.
 
 This function may be called multiple times. To clean up, the caller is
 responsible for calling gst_bus_disable_sync_message_emission() as many times
@@ -27629,6 +29005,36 @@ the pipeline goes from READY to NULL state
 <return></return>
 </function>
 
+<function name="gst_byte_writer_init_with_data">
+<description>
+Initializes @writer with the given
+memory area. If @initialized is %TRUE it is possible to
+read @size bytes from the #GstByteWriter from the beginning.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> Memory area for writing
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Size of @data in bytes
+</parameter_description>
+</parameter>
+<parameter name="initialized">
+<parameter_description> If %TRUE the complete data can be read from the beginning
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtsp_connection_free">
 <description>
 Close and free @conn.
@@ -27649,6 +29055,9 @@ Close and free @conn.
 <description>
 Gets the list of all registered typefind factories. You must free the
 list using gst_plugin_feature_list_free.
+
+The returned factories are sorted by highest rank first, and then by
+factory name. (behaviour change since 0.10.26)
 
 
 </description>
@@ -28000,6 +29409,28 @@ MT safe.
 <parameters>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_uint32_be">
+<description>
+Writes a unsigned big endian 32 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_bus_add_watch">
@@ -28461,13 +29892,13 @@ MT Safe.
 
 <function name="gst_ghost_pad_get_target">
 <description>
-Get the target pad of #gpad. Unref target pad after usage.
+Get the target pad of @gpad. Unref target pad after usage.
 
 
 </description>
 <parameters>
 <parameter name="gpad">
-<parameter_description> the #GstGhostpad
+<parameter_description> the #GstGhostPad
 </parameter_description>
 </parameter>
 </parameters>
@@ -28864,24 +30295,25 @@ Get the name of the given field number, counting from 0 onwards.
 </return>
 </function>
 
-<function name="gst_video_orientation_set_vcenter">
+<function name="gst_bit_reader_skip">
 <description>
-Set the vertical centering offset for the given object.
+Skips @nbits bits of the #GstBitReader instance.
 
-Since: 0.10.11
 
 </description>
 <parameters>
-<parameter name="video_orientation">
-<parameter_description> #GstVideoOrientation interface of a #GstElement
+<parameter name="reader">
+<parameter_description> a #GstBitReader instance
 </parameter_description>
 </parameter>
-<parameter name="center">
-<parameter_description> centering offset
+<parameter name="nbits">
+<parameter_description> the number of bits to skip
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE in case the element supports centering
+<return> %TRUE if @nbits bits could be skipped, %FALSE otherwise.
+
+Since: 0.10.22
 </return>
 </function>
 
@@ -29153,6 +30585,31 @@ gst_fft_next_fast_length().
 </return>
 </function>
 
+<function name="gst_collect_pads_set_clip_function">
+<description>
+Install a clipping function that is called right after a buffer is received
+on a pad managed by @pads. See #GstCollectDataClipFunction for more info.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="clipfunc">
+<parameter_description> clip function to install
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @clip_func
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_pad_chain">
 <description>
 Chain a buffer to @pad.
@@ -29235,23 +30692,64 @@ Since: 0.10.22
 </return>
 </function>
 
-<function name="gst_message_new_state_dirty">
+<function name="gst_element_get_pad_from_template">
 <description>
-Create a state dirty message. This message is posted whenever an element
-changed its state asynchronously and is used internally to update the
-states of container objects.
+Gets a pad from @element described by @templ. If the presence of @templ is
+#GST_PAD_REQUEST, requests a new pad. Can return %NULL for #GST_PAD_SOMETIMES
+templates.
 
 
 </description>
 <parameters>
-<parameter name="src">
-<parameter_description> the object originating the message
+<parameter name="element">
+<parameter_description> a #GstElement.
+</parameter_description>
+</parameter>
+<parameter name="templ">
+<parameter_description> a #GstPadTemplate belonging to @element.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The new state dirty message.
+<return> the #GstPad, or NULL if one could not be found or created.
+</return>
+</function>
 
-MT safe.
+<function name="gst_util_fraction_add">
+<description>
+Adds the fractions @a_n/@a_d and @b_n/@b_d and stores
+the result in @res_n and @res_d.
+
+
+</description>
+<parameters>
+<parameter name="a_n">
+<parameter_description> Numerator of first value
+</parameter_description>
+</parameter>
+<parameter name="a_d">
+<parameter_description> Denominator of first value
+</parameter_description>
+</parameter>
+<parameter name="b_n">
+<parameter_description> Numerator of second value
+</parameter_description>
+</parameter>
+<parameter name="b_d">
+<parameter_description> Denominator of second value
+</parameter_description>
+</parameter>
+<parameter name="res_n">
+<parameter_description> Pointer to #gint to hold the result numerator
+</parameter_description>
+</parameter>
+<parameter name="res_d">
+<parameter_description> Pointer to #gint to hold the result denominator
+</parameter_description>
+</parameter>
+</parameters>
+<return> %FALSE on overflow, %TRUE otherwise.
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -29374,27 +30872,30 @@ Free the memory used by @msg.
 </return>
 </function>
 
-<function name="gst_base_sink_set_max_lateness">
+<function name="gst_byte_writer_put_data">
 <description>
-Sets the new max lateness value to @max_lateness. This value is
-used to decide if a buffer should be dropped or not based on the
-buffer timestamp and the current clock time. A value of -1 means
-an unlimited time.
+Writes @size bytes of @data to @writer.
 
-Since: 0.10.4
 
 </description>
 <parameters>
-<parameter name="sink">
-<parameter_description> the sink
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
 </parameter_description>
 </parameter>
-<parameter name="max_lateness">
-<parameter_description> the new max lateness value.
+<parameter name="data">
+<parameter_description> Data to write
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Size of @data in bytes
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_dp_init">
@@ -29594,19 +31095,22 @@ is deprecated and maps to cubic interpolation.&lt;/para&gt;&lt;/note&gt;
 </return>
 </function>
 
-<function name="gst_pad_set_activatepush_function">
+<function name="gst_structure_set_valist">
 <description>
-Sets the given activate_push function for the pad. An activate_push function
-prepares the element for pushing. See XXX part-activation.txt for details.
+va_list form of gst_structure_set().
 
 </description>
 <parameters>
-<parameter name="pad">
-<parameter_description> a #GstPad.
+<parameter name="structure">
+<parameter_description> a #GstStructure
 </parameter_description>
 </parameter>
-<parameter name="activatepush">
-<parameter_description> the #GstPadActivateModeFunction to set.
+<parameter name="fieldname">
+<parameter_description> the name of the field to set
+</parameter_description>
+</parameter>
+<parameter name="varargs">
+<parameter_description> variable arguments
 </parameter_description>
 </parameter>
 </parameters>
@@ -29765,7 +31269,7 @@ Removes the given object properties from the controller
 
 <function name="gst_byte_reader_get_float32_be">
 <description>
-Read a 32 bit big endian integer into @val
+Read a 32 bit big endian floating point value into @val
 and update the current position.
 
 
@@ -30108,36 +31612,25 @@ Must be a sink pad.
 </return>
 </function>
 
-<function name="gst_clock_id_wait_async">
+<function name="gst_byte_writer_put_uint24_be">
 <description>
-Register a callback on the given #GstClockID @id with the given
-function and user_data. When passing a #GstClockID with an invalid
-time to this function, the callback will be called immediately
-with  a time set to GST_CLOCK_TIME_NONE. The callback will
-be called when the time of @id has been reached.
-
-The callback @func can be invoked from any thread, either provided by the
-core or from a streaming thread. The application should be prepared for this.
+Writes a unsigned big endian 24 bit integer to @writer.
 
 
 </description>
 <parameters>
-<parameter name="id">
-<parameter_description> a #GstClockID to wait on
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
 </parameter_description>
 </parameter>
-<parameter name="func">
-<parameter_description> The callback function
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> User data passed in the callback
+<parameter name="val">
+<parameter_description> Value to write
 </parameter_description>
 </parameter>
 </parameters>
-<return> the result of the non blocking wait.
+<return> %TRUE if the value could be written
 
-MT safe.
+Since: 0.10.26
 </return>
 </function>
 
@@ -30161,7 +31654,7 @@ Creates a new #GParamSpec instance that hold #GstMiniObject references.
 </parameter_description>
 </parameter>
 <parameter name="object_type">
-<parameter_description> the #GstMiniObjectType for the property
+<parameter_description> the #GstMiniObject #GType for the property
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -30301,7 +31794,8 @@ getting back this string later on using gst_value_deserialize().
 
 <function name="gst_tuner_set_channel">
 <description>
-Tunes the object to the given channel.
+Tunes the object to the given channel, which should be one of the
+channels returned by gst_tuner_list_channels().
 
 </description>
 <parameters>
@@ -30348,8 +31842,8 @@ From this point on, until the caller calls gst_caps_unref() or
 gst_caps_make_writable(), it is guaranteed that the caps object will not
 change. This means its structures won't change, etc. To use a #GstCaps
 object, you must always have a refcount on it -- either the one made
-implicitly by gst_caps_new(), or via taking one explicitly with this
-function.
+implicitly by e.g. gst_caps_new_simple(), or via taking one explicitly with
+this function.
 
 
 </description>
@@ -30389,7 +31883,7 @@ FALSE if a copy would be required.
 
 <function name="gst_query_parse_seeking">
 <description>
-Parse a seeking query, writing the format into @format, and 
+Parse a seeking query, writing the format into @format, and
 other results into the passed parameters, if the respective parameters
 are non-NULL
 
@@ -30522,7 +32016,7 @@ again, use gst_rtsp_message_unset().
 
 <function name="gst_element_class_set_details_simple">
 <description>
-Sets the detailed information for a #GstElementClass. Simpler version of 
+Sets the detailed information for a #GstElementClass. Simpler version of
 gst_element_class_set_details() that generates less linker overhead.
 &lt;note&gt;This function is for use in _base_init functions only.&lt;/note&gt;
 
@@ -30548,12 +32042,12 @@ for more details and common types. E.g: &quot;Sink/File&quot;
 </parameter_description>
 </parameter>
 <parameter name="description">
-<parameter_description> Sentence describing the purpose of the element. 
+<parameter_description> Sentence describing the purpose of the element.
 E.g: &quot;Write stream to a file&quot;
 </parameter_description>
 </parameter>
 <parameter name="author">
-<parameter_description> Name and contact details of the author(s). Use \n to separate 
+<parameter_description> Name and contact details of the author(s). Use \n to separate
 multiple author details. E.g: &quot;Joe Bloggs &lt;joe.blogs at foo.com&gt;&quot;
 </parameter_description>
 </parameter>
@@ -30685,9 +32179,12 @@ given list.
 
 <function name="gst_caps_set_simple">
 <description>
-Sets fields in a simple #GstCaps.  A simple #GstCaps is one that
-only has one structure.  The arguments must be passed in the same
+Sets fields in a #GstCaps.  The arguments must be passed in the same
 manner as gst_structure_set(), and be NULL-terminated.
+&lt;note&gt;Prior to GStreamer version 0.10.26, this function failed when
+@caps was not simple. If your code needs to work with those versions
+of GStreamer, you may only call this function when GST_CAPS_IS_SIMPLE()
+is %TRUE for @caps.&lt;/note&gt;
 
 </description>
 <parameters>
@@ -30982,34 +32479,6 @@ Since: 0.10.20
 </return>
 </function>
 
-<function name="gst_buffer_list_get">
-<description>
-Get the buffer at @idx in @group.
-
-Note that this function is not efficient for iterating over the entire list.
-Use an iterator or gst_buffer_list_foreach() instead.
-
-
-</description>
-<parameters>
-<parameter name="list">
-<parameter_description> a #GstBufferList
-</parameter_description>
-</parameter>
-<parameter name="group">
-<parameter_description> the group
-</parameter_description>
-</parameter>
-<parameter name="idx">
-<parameter_description> the index in @group
-</parameter_description>
-</parameter>
-</parameters>
-<return> the buffer at @idx in @group or NULL when there is no buffer. The
-buffer remains valid as long as @list is valid.
-</return>
-</function>
-
 <function name="gst_value_list_get_value">
 <description>
 Gets the value that is a member of the list contained in @value and
@@ -31070,26 +32539,31 @@ MT safe.
 </return>
 </function>
 
-<function name="gst_bin_iterate_sinks">
+<function name="gst_mixer_message_parse_option_changed">
 <description>
-Gets an iterator for all elements in the bin that have the
-#GST_ELEMENT_IS_SINK flag set.
+Extracts the GstMixerOptions and new value from a option-changed bus notification
+message.
 
-Each element yielded by the iterator will have its refcount increased, so
-unref after use.
+The options and value returned remain valid until the message is freed.
 
-MT safe.  Caller owns returned value.
-
+Since: 0.10.14
 
 </description>
 <parameters>
-<parameter name="bin">
-<parameter_description> a #GstBin
+<parameter name="message">
+<parameter_description> A volume-changed change notification message.
+</parameter_description>
+</parameter>
+<parameter name="options">
+<parameter_description> Pointer to hold a GstMixerOptions object, or NULL.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> Result location to receive the new options value, or NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GstIterator of #GstElement, or NULL
-</return>
+<return></return>
 </function>
 
 <function name="gst_navigation_query_set_angles">
@@ -31125,6 +32599,9 @@ the second tunnel connection, link the two connections together so that
 After this call, @conn2 cannot be used anymore and must be freed with
 gst_rtsp_connection_free().
 
+If @conn2 is %NULL then only the base64 decoding context will be setup for
+@conn.
+
 
 </description>
 <parameters>
@@ -31133,7 +32610,7 @@ gst_rtsp_connection_free().
 </parameter_description>
 </parameter>
 <parameter name="conn2">
-<parameter_description> a #GstRTSPConnection
+<parameter_description> a #GstRTSPConnection or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -31333,28 +32810,39 @@ Since: 0.9
 </return>
 </function>
 
-<function name="gst_element_query_position">
+<function name="gst_plugin_feature_list_copy">
 <description>
-Queries an element for the stream position.
+Copies the list of features. Caller should call @gst_plugin_feature_list_free
+when done with the list.
 
 
 </description>
 <parameters>
-<parameter name="element">
-<parameter_description> a #GstElement to invoke the position query on.
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> a pointer to the #GstFormat asked for.
-On return contains the #GstFormat used.
-</parameter_description>
-</parameter>
-<parameter name="cur">
-<parameter_description> A location in which to store the current position, or NULL.
+<parameter name="list">
+<parameter_description> list of #GstPluginFeature
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the query could be performed.
+<return> a copy of @list, with each feature's reference count incremented.
+
+Since: 0.10.26
+</return>
+</function>
+
+<function name="gst_registry_get_feature_list_cookie">
+<description>
+Returns: the feature list cookie.
+
+</description>
+<parameters>
+<parameter name="registry">
+<parameter_description> the registry
+</parameter_description>
+</parameter>
+</parameters>
+<return> the feature list cookie.
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -31477,6 +32965,29 @@ Creates a new, empty #GstStructure with the given name as a GQuark.
 </parameter>
 </parameters>
 <return> a new, empty #GstStructure
+</return>
+</function>
+
+<function name="gst_byte_writer_new_with_size">
+<description>
+Creates a new #GstByteWriter instance with the given
+initial data size.
+
+
+</description>
+<parameters>
+<parameter name="size">
+<parameter_description> Initial size of data
+</parameter_description>
+</parameter>
+<parameter name="fixed">
+<parameter_description> If %TRUE the data can't be reallocated
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstByteWriter instance
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -31752,6 +33263,32 @@ MT safe.
 <return></return>
 </function>
 
+<function name="gst_caps_set_value">
+<description>
+Sets the given @field on all structures of @caps to the given @value.
+This is a convenience function for calling gst_structure_set_value() on
+all structures of @caps.
+
+Since: 0.10.26
+
+</description>
+<parameters>
+<parameter name="caps">
+<parameter_description> a writable caps
+</parameter_description>
+</parameter>
+<parameter name="field">
+<parameter_description> name of the field to set
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> value to set the field to
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_object_get_parent">
 <description>
 Returns: parent of @object, this can be NULL if @object has no
@@ -31840,6 +33377,37 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_data_queue_new_full">
+<description>
+Creates a new #GstDataQueue. The difference with @gst_data_queue_new is that it will
+not emit the 'full' and 'empty' signals, but instead calling directly @fullcallback
+or @emptycallback.
+
+
+</description>
+<parameters>
+<parameter name="checkfull">
+<parameter_description> the callback used to tell if the element considers the queue full
+or not.
+</parameter_description>
+</parameter>
+<parameter name="fullcallback">
+<parameter_description> the callback which will be called when the queue is considered full.
+</parameter_description>
+</parameter>
+<parameter name="emptycallback">
+<parameter_description> the callback which will be called when the queue is considered empty.
+</parameter_description>
+</parameter>
+<parameter name="checkdata">
+<parameter_description> a #gpointer that will be given in the @checkfull callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstDataQueue.
+</return>
+</function>
+
 <function name="gst_task_pool_push">
 <description>
 Start the execution of a new thread from @pool.
@@ -31867,6 +33435,8 @@ Start the execution of a new thread from @pool.
 <return> a pointer that should be used for the gst_task_pool_join
 function. This pointer can be NULL, you must check @error to detect
 errors.
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -32039,7 +33609,7 @@ Since: 0.10.24
 
 <function name="gst_byte_reader_peek_float64_le">
 <description>
-Read a 64 bit little endian integer into @val
+Read a 64 bit little endian floating point value into @val
 but keep the current position.
 
 
@@ -32230,6 +33800,28 @@ of the #GstTunerChannel.
 <return></return>
 </function>
 
+<function name="gst_byte_writer_put_uint16_be">
+<description>
+Writes a unsigned big endian 16 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_rtcp_buffer_validate_data">
 <description>
 Check if the @data and @size point to the data of a valid RTCP (compound)
@@ -32411,6 +34003,34 @@ allocated with gst_sdp_media_new().
 </parameters>
 <return> a #GstSDPResult.
 </return>
+</function>
+
+<function name="gst_fft_f32_inverse_fft">
+<description>
+This performs the inverse FFT on @freqdata and puts the result in @timedata.
+
+@freqdata must have @len/2 + 1 samples, where @len is the parameter specified
+while allocating the #GstFFTF32 instance with gst_fft_f32_new().
+
+@timedata must be large enough to hold @len time domain samples.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> #GstFFTF32 instance for this call
+</parameter_description>
+</parameter>
+<parameter name="freqdata">
+<parameter_description> Buffer of the samples in the frequency domain
+</parameter_description>
+</parameter>
+<parameter name="timedata">
+<parameter_description> Target buffer for the samples in the time domain
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_base_sink_set_ts_offset">
@@ -32619,6 +34239,37 @@ Set the session name in @msg.
 </parameter>
 </parameters>
 <return> a #GstSDPResult.
+</return>
+</function>
+
+<function name="gst_util_uint64_scale_int_ceil">
+<description>
+Scale @val by the rational number @num / @denom, avoiding overflows and
+underflows and without loss of precision.  @num must be non-negative and
+@denom must be positive.
+
+
+</description>
+<parameters>
+<parameter name="val">
+<parameter_description> guint64 (such as a #GstClockTime) to scale.
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> numerator of the scale factor.
+</parameter_description>
+</parameter>
+<parameter name="denom">
+<parameter_description> denominator of the scale factor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> @val * @num / @denom.  In the case of an overflow, this
+function returns G_MAXUINT64.  If the result is not exactly
+representable as an integer, it is rounded up.  See also
+gst_util_uint64_scale_int(), gst_util_uint64_scale_int_round(),
+gst_util_uint64_scale(), gst_util_uint64_scale_round(),
+gst_util_uint64_scale_ceil().
 </return>
 </function>
 
@@ -33838,6 +35489,8 @@ GThreadPool for threads.
 <parameters>
 </parameters>
 <return> a new #GstTaskPool. gst_object_unref() after usage.
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -33866,22 +35519,37 @@ Since: 0.10.22
 
 <function name="gst_registry_fork_set_enabled">
 <description>
-Applications might want to disable/enable the usage of fork() when rebuilding
-the registry. See gst_registry_fork_is_enabled() for more information.
-
-On platforms without fork(), this function will have no effect on the return
-value of gst_registry_fork_is_enabled().
+Applications might want to disable/enable spawning of a child helper process
+when rebuilding the registry. See gst_registry_fork_is_enabled() for more
+information.
 
 Since: 0.10.10
 
 </description>
 <parameters>
 <parameter name="enabled">
-<parameter_description> whether rebuilding the registry may fork
+<parameter_description> whether rebuilding the registry can use a temporary child helper process.
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_get_remaining">
+<description>
+Returns: the remaining size of data that can still be written
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> the remaining size of data that can still be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_tuner_signal_strength">
@@ -34047,10 +35715,9 @@ Since: 0.10.20
 
 <function name="gst_util_uint64_scale_int">
 <description>
-Scale a guint64 by a factor expressed as a fraction (num/denom), avoiding
-overflows and loss of precision.
-
-@num and @denom must be positive integers. @denom cannot be 0.
+Scale @val by the rational number @num / @denom, avoiding overflows and
+underflows and without loss of precision.  @num must be non-negative and
+@denom must be positive.
 
 
 </description>
@@ -34068,8 +35735,51 @@ overflows and loss of precision.
 </parameter_description>
 </parameter>
 </parameters>
-<return> @val * @num / @denom, avoiding overflow and loss of precision.
-In the case of an overflow, this function returns G_MAXUINT64.
+<return> @val * @num / @denom.  In the case of an overflow, this
+function returns G_MAXUINT64.  If the result is not exactly
+representable as an integer, it is truncated.  See also
+gst_util_uint64_scale_int_round(), gst_util_uint64_scale_int_ceil(),
+gst_util_uint64_scale(), gst_util_uint64_scale_round(),
+gst_util_uint64_scale_ceil().
+</return>
+</function>
+
+<function name="gst_util_fraction_multiply">
+<description>
+Multiplies the fractions @a_n/@a_d and @b_n/@b_d and stores
+the result in @res_n and @res_d.
+
+
+</description>
+<parameters>
+<parameter name="a_n">
+<parameter_description> Numerator of first value
+</parameter_description>
+</parameter>
+<parameter name="a_d">
+<parameter_description> Denominator of first value
+</parameter_description>
+</parameter>
+<parameter name="b_n">
+<parameter_description> Numerator of second value
+</parameter_description>
+</parameter>
+<parameter name="b_d">
+<parameter_description> Denominator of second value
+</parameter_description>
+</parameter>
+<parameter name="res_n">
+<parameter_description> Pointer to #gint to hold the result numerator
+</parameter_description>
+</parameter>
+<parameter name="res_d">
+<parameter_description> Pointer to #gint to hold the result denominator
+</parameter_description>
+</parameter>
+</parameters>
+<return> %FALSE on overflow, %TRUE otherwise.
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -34337,6 +36047,28 @@ Logs the given message using the currently registered debugging handlers.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_int32_le">
+<description>
+Writes a signed little endian 32 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_tag_list_get_date_index">
@@ -34613,7 +36345,7 @@ Since: 0.10.22.
 Makes the element free the previously requested pad as obtained
 with gst_element_get_request_pad().
 
-This does not unref the pad. If the pad was created by using 
+This does not unref the pad. If the pad was created by using
 gst_element_get_request_pad(), gst_element_release_request_pad() needs to be
 followed by gst_object_unref() to free the @pad.
 
@@ -34649,67 +36381,27 @@ or NULL if none is used.
 </return>
 </function>
 
-<function name="gst_structure_free">
+<function name="gst_cdda_base_src_add_track">
 <description>
-Frees a #GstStructure and all its fields and values. The structure must not
-have a parent when this function is called.
+CDDA sources use this function from their start vfunc to announce the
+available data and audio tracks to the base source class. The caller
+should allocate @track on the stack, the base source will do a shallow
+copy of the structure (and take ownership of the taglist if there is one).
+
 
 </description>
 <parameters>
-<parameter name="structure">
-<parameter_description> the #GstStructure to free
+<parameter name="src">
+<parameter_description> a #GstCddaBaseSrc
+</parameter_description>
+</parameter>
+<parameter name="track">
+<parameter_description> address of #GstCddaBaseSrcTrack to add
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
-</function>
-
-<function name="gst_rtcp_packet_set_rb">
-<description>
-Set the @nth new report block in @packet with the given values.
-
-Note: Not implemented.
-
-</description>
-<parameters>
-<parameter name="packet">
-<parameter_description> a valid SR or RR #GstRTCPPacket
-</parameter_description>
-</parameter>
-<parameter name="nth">
-<parameter_description> the nth report block to set
-</parameter_description>
-</parameter>
-<parameter name="ssrc">
-<parameter_description> data source being reported
-</parameter_description>
-</parameter>
-<parameter name="fractionlost">
-<parameter_description> fraction lost since last SR/RR
-</parameter_description>
-</parameter>
-<parameter name="packetslost">
-<parameter_description> the cumululative number of packets lost
-</parameter_description>
-</parameter>
-<parameter name="exthighestseq">
-<parameter_description> the extended last sequence number received
-</parameter_description>
-</parameter>
-<parameter name="jitter">
-<parameter_description> the interarrival jitter
-</parameter_description>
-</parameter>
-<parameter name="lsr">
-<parameter_description> the last SR packet from this source
-</parameter_description>
-</parameter>
-<parameter name="dlsr">
-<parameter_description> the delay since last SR packet
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
+<return> FALSE on error, otherwise TRUE.
+</return>
 </function>
 
 <function name="gst_pad_remove_data_probe">
@@ -34776,7 +36468,7 @@ Since: 0.10.22
 
 <function name="gst_base_audio_sink_set_provide_clock">
 <description>
-Controls whether @sink will provide a clock or not. If @provide is %TRUE, 
+Controls whether @sink will provide a clock or not. If @provide is %TRUE,
 gst_element_provide_clock() will return a clock that reflects the datarate
 of @sink. If @provide is %FALSE, gst_element_provide_clock() will return NULL.
 
@@ -35788,7 +37480,7 @@ and has the correct type.
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a pointer to a #GstFourcc to set
+<parameter_description> a pointer to a gdouble to set
 </parameter_description>
 </parameter>
 </parameters>
@@ -35841,7 +37533,7 @@ from events
 
 <function name="gst_query_set_buffering_range">
 <description>
-Set the available query result fields in @query. 
+Set the available query result fields in @query.
 
 Since: 0.10.20
 
@@ -36183,7 +37875,7 @@ configured as a live source. @min_latency will be set to the difference
 between the running time and the timestamp of the first buffer.
 @max_latency is always the undefined value of -1.
 
-This function is mostly used by subclasses. 
+This function is mostly used by subclasses.
 
 
 </description>
@@ -36284,6 +37976,23 @@ created or when it is cleared.
 <return> The previously seen timestamp.
 
 Since: 0.10.24
+</return>
+</function>
+
+<function name="gst_byte_reader_get_size">
+<description>
+Returns: The total number of bytes of @reader instance.
+
+</description>
+<parameters>
+<parameter name="reader">
+<parameter_description> a #GstByteReader instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> The total number of bytes of @reader instance.
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -36416,6 +38125,35 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_fft_f64_fft">
+<description>
+This performs the FFT on @timedata and puts the result in @freqdata.
+
+@timedata must have as many samples as specified with the @len parameter while
+allocating the #GstFFTF64 instance with gst_fft_f64_new().
+
+@freqdata must be large enough to hold @len/2 + 1 #GstFFTF64Complex frequency
+domain samples.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> #GstFFTF64 instance for this call
+</parameter_description>
+</parameter>
+<parameter name="timedata">
+<parameter_description> Buffer of the samples in the time domain
+</parameter_description>
+</parameter>
+<parameter name="freqdata">
+<parameter_description> Target buffer for the samples in the frequency domain
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_bit_reader_init">
 <description>
 Initializes a #GstBitReader instance to read from @data. This function
@@ -36435,6 +38173,21 @@ Since: 0.10.22
 </parameter>
 <parameter name="size">
 <parameter_description> Size of @data in bytes
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_fft_f32_free">
+<description>
+This frees the memory allocated for @self.
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> #GstFFTF32 instance for this call
 </parameter_description>
 </parameter>
 </parameters>
@@ -36559,6 +38312,28 @@ Convert @header to a #GstRTSPHeaderField.
 </parameters>
 <return> a #GstRTSPHeaderField for @header or #GST_RTSP_HDR_INVALID if the
 header field is unknown.
+</return>
+</function>
+
+<function name="gst_byte_writer_put_int16_le">
+<description>
+Writes a signed little endian 16 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -36717,6 +38492,28 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_byte_writer_put_uint64_le">
+<description>
+Writes a unsigned little endian 64 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_structure_remove_all_fields">
 <description>
 Removes all fields in a GstStructure.
@@ -36865,6 +38662,29 @@ Since: 0.10.14
 <parameter name="disabled">
 <parameter_description> boolean that specifies whether to disable the controller
 or not.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_base_sink_set_max_lateness">
+<description>
+Sets the new max lateness value to @max_lateness. This value is
+used to decide if a buffer should be dropped or not based on the
+buffer timestamp and the current clock time. A value of -1 means
+an unlimited time.
+
+Since: 0.10.4
+
+</description>
+<parameters>
+<parameter name="sink">
+<parameter_description> the sink
+</parameter_description>
+</parameter>
+<parameter name="max_lateness">
+<parameter_description> the new max lateness value.
 </parameter_description>
 </parameter>
 </parameters>
@@ -37231,23 +39051,22 @@ Since: 0.10.22
 <return></return>
 </function>
 
-<function name="gst_registry_binary_write_cache">
+<function name="gst_data_queue_new">
 <description>
-Write the @registry to a cache to file at given @location.
-
 
 </description>
 <parameters>
-<parameter name="registry">
-<parameter_description> a #GstRegistry
+<parameter name="checkfull">
+<parameter_description> the callback used to tell if the element considers the queue full
+or not.
 </parameter_description>
 </parameter>
-<parameter name="location">
-<parameter_description> a filename
+<parameter name="checkdata">
+<parameter_description> a #gpointer that will be given in the @checkfull callback.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE on success.
+<return> a new #GstDataQueue.
 </return>
 </function>
 
@@ -37257,6 +39076,8 @@ Wait for all tasks to be stopped. This is mainly used internally
 to ensure proper cleanup of internal data structures in test suites.
 
 MT safe.
+
+Since: 0.10.24
 
 </description>
 <parameters>
@@ -37448,7 +39269,8 @@ Signals that a new object has been deserialized.
 
 <function name="gst_pad_peer_get_caps">
 <description>
-Gets the capabilities of the peer connected to this pad.
+Gets the capabilities of the peer connected to this pad. Similar to
+gst_pad_get_caps().
 
 
 </description>
@@ -37458,8 +39280,8 @@ Gets the capabilities of the peer connected to this pad.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GstCaps of the peer pad. This function returns a new caps, so
-use gst_caps_unref to get rid of it. this function returns NULL if there is
+<return> a newly allocated copy of the #GstCaps of the peer pad. Use
+gst_caps_unref() to get rid of it. This function returns %NULL if there is
 no peer pad.
 </return>
 </function>
@@ -37487,7 +39309,7 @@ Calculate length in nanoseconds of audio buffer @buf based on capabilities of
 
 <function name="gst_byte_reader_peek_float64_be">
 <description>
-Read a 64 bit big endian integer into @val
+Read a 64 bit big endian floating point value into @val
 but keep the current position.
 
 
@@ -37561,7 +39383,7 @@ need to be processed.
 </parameter_description>
 </parameter>
 <parameter name="dispatch">
-<parameter_description> the #GstDispatcherFunction to call.
+<parameter_description> the #GstPadDispatcherFunction to call.
 </parameter_description>
 </parameter>
 <parameter name="data">
@@ -37689,7 +39511,7 @@ timestamp to a valid GStreamer clock time.
 
 <function name="gst_collect_pads_take_buffer">
 <description>
-Get a subbuffer of @size bytes from the given pad @data. Flushes the amount
+Get a buffer of @size bytes from the given pad @data. Flushes the amount
 of read bytes.
 
 This function should be called with @pads LOCK held, such as in the callback.
@@ -37712,7 +39534,7 @@ Since: 0.10.18
 </parameter_description>
 </parameter>
 </parameters>
-<return> A sub buffer. The size of the buffer can be less that requested.
+<return> A #GstBuffer. The size of the buffer can be less that requested.
 A return of NULL signals that the pad is end-of-stream.
 Unref the buffer after use.
 
@@ -37897,27 +39719,30 @@ e.g. &quot;videoscale&quot; or &quot;cdparanoiasrc&quot;
 </return>
 </function>
 
-<function name="gst_fft_s32_window">
+<function name="gst_bin_get_by_interface">
 <description>
-This calls the window function @window on the @timedata sample buffer.
+Looks for an element inside the bin that implements the given
+interface. If such an element is found, it returns the element.
+You can cast this element to the given interface afterwards.  If you want
+all elements that implement the interface, use
+gst_bin_iterate_all_by_interface(). This function recurses into child bins.
+
+MT safe.  Caller owns returned reference.
 
 
 </description>
 <parameters>
-<parameter name="self">
-<parameter_description> #GstFFTS32 instance for this call
+<parameter name="bin">
+<parameter_description> a #GstBin
 </parameter_description>
 </parameter>
-<parameter name="timedata">
-<parameter_description> Time domain samples
-</parameter_description>
-</parameter>
-<parameter name="window">
-<parameter_description> Window function to apply
+<parameter name="iface">
+<parameter_description> the #GType of an interface
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> A #GstElement inside the bin implementing the interface
+</return>
 </function>
 
 <function name="gst_app_sink_pull_preroll">
@@ -39046,6 +40871,30 @@ Since: 0.10.24
 <return></return>
 </function>
 
+<function name="GstTuner">
+<description>
+Reports that the signal strength has changed.
+
+See Also: gst_tuner_signal_strength()
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> The element providing the GstTuner interface
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The current #GstTunerChannel
+</parameter_description>
+</parameter>
+<parameter name="signal">
+<parameter_description> The new signal strength (an integer)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_query_new_application">
 <description>
 Constructs a new custom application query object. Use gst_query_unref()
@@ -39171,6 +41020,28 @@ Since: 0.10.15
 </return>
 </function>
 
+<function name="gst_stream_volume_set_volume">
+<description>
+Since: 0.10.25
+
+</description>
+<parameters>
+<parameter name="volume">
+<parameter_description> #GstStreamVolume that should be used
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> #GstStreamVolumeFormat of @val
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Linear volume factor that should be set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_rtsp_connection_send">
 <description>
 Attempt to send @message to the connected @conn, blocking up to
@@ -39236,7 +41107,7 @@ Be sure to use G_GNUC_NO_INSTRUMENT on that function, it is needed.
 
 <function name="gst_query_new_duration">
 <description>
-Constructs a new stream duration query object to query in the given format. 
+Constructs a new stream duration query object to query in the given format.
 Use gst_query_unref() when done with it. A duration query will give the
 total length of the stream.
 
@@ -39549,6 +41420,37 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_util_uint64_scale_int_round">
+<description>
+Scale @val by the rational number @num / @denom, avoiding overflows and
+underflows and without loss of precision.  @num must be non-negative and
+@denom must be positive.
+
+
+</description>
+<parameters>
+<parameter name="val">
+<parameter_description> guint64 (such as a #GstClockTime) to scale.
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> numerator of the scale factor.
+</parameter_description>
+</parameter>
+<parameter name="denom">
+<parameter_description> denominator of the scale factor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> @val * @num / @denom.  In the case of an overflow, this
+function returns G_MAXUINT64.  If the result is not exactly
+representable as an integer, it is rounded to the nearest integer
+(half-way cases are rounded up).  See also gst_util_uint64_scale_int(),
+gst_util_uint64_scale_int_ceil(), gst_util_uint64_scale(),
+gst_util_uint64_scale_round(), gst_util_uint64_scale_ceil().
+</return>
+</function>
+
 <function name="gst_base_rtp_depayload_push">
 <description>
 Push @out_buf to the peer of @filter. This function takes ownership of
@@ -39607,31 +41509,48 @@ Set the given query type function for the pad.
 <return></return>
 </function>
 
-<function name="gst_mixer_message_parse_option_changed">
+<function name="gst_byte_writer_put_double_le">
 <description>
-Extracts the GstMixerOptions and new value from a option-changed bus notification
-message.
+Writes a little endian 64 bit float to @writer.
 
-The options and value returned remain valid until the message is freed.
-
-Since: 0.10.14
 
 </description>
 <parameters>
-<parameter name="message">
-<parameter_description> A volume-changed change notification message.
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
 </parameter_description>
 </parameter>
-<parameter name="options">
-<parameter_description> Pointer to hold a GstMixerOptions object, or NULL.
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> Result location to receive the new options value, or NULL.
+<parameter name="val">
+<parameter_description> Value to write
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
+<function name="gst_bin_iterate_sinks">
+<description>
+Gets an iterator for all elements in the bin that have the
+#GST_ELEMENT_IS_SINK flag set.
+
+Each element yielded by the iterator will have its refcount increased, so
+unref after use.
+
+MT safe.  Caller owns returned value.
+
+
+</description>
+<parameters>
+<parameter name="bin">
+<parameter_description> a #GstBin
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstIterator of #GstElement, or NULL
+</return>
 </function>
 
 <function name="gst_audio_clock_adjust">
@@ -39769,9 +41688,9 @@ This is a utility method for elements. Applications should use the
 
 <function name="gst_base_sink_wait_preroll">
 <description>
-If the #GstBaseSinkClass::render method performs its own synchronisation against
-the clock it must unblock when going from PLAYING to the PAUSED state and call
-this method before continuing to render the remaining data.
+If the #GstBaseSinkClass.render() method performs its own synchronisation
+against the clock it must unblock when going from PLAYING to the PAUSED state
+and call this method before continuing to render the remaining data.
 
 This function will block until a state change to PLAYING happens (in which
 case this function returns #GST_FLOW_OK) or the processing must be stopped due
@@ -40061,6 +41980,24 @@ Get the sequence number of the RTP packet in @buffer.
 </return>
 </function>
 
+<function name="gst_stream_volume_set_mute">
+<description>
+Since: 0.10.25
+
+</description>
+<parameters>
+<parameter name="volume">
+<parameter_description> #GstStreamVolume that should be used
+</parameter_description>
+</parameter>
+<parameter name="mute">
+<parameter_description> Mute state that should be set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_app_src_get_caps">
 <description>
 Get the configured caps on @appsrc.
@@ -40204,6 +42141,39 @@ Since: 0.10.22
 <return></return>
 </function>
 
+<function name="gst_iterator_new_single">
+<description>
+This #GstIterator is a convenient iterator for the common
+case where a #GstIterator needs to be returned but only
+a single object has to be considered. This happens often
+for the #GstPadIterIntLinkFunction.
+
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> #GType of the passed object
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> object that this iterator should return
+</parameter_description>
+</parameter>
+<parameter name="copy">
+<parameter_description> Function that returns a copy of @object or increases its refcount
+</parameter_description>
+</parameter>
+<parameter name="free">
+<parameter_description> Function to be called for freeing @object
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GstIterator for @object.
+
+Since: 0.10.25
+</return>
+</function>
+
 <function name="gst_sdp_media_get_media">
 <description>
 Get the media description of @media.
@@ -40239,7 +42209,7 @@ Check if the marker bit is set on the RTP packet in @buffer.
 <function name="gst_audio_clock_get_time">
 <description>
 Report the time as returned by the #GstAudioClockGetTimeFunc without applying
-any offsets. 
+any offsets.
 
 
 </description>
@@ -40307,7 +42277,7 @@ after gst_init().
 
 <function name="gst_query_parse_formats_length">
 <description>
-Parse the number of formats in the formats @query. 
+Parse the number of formats in the formats @query.
 
 Since: 0.10.4
 
@@ -40358,6 +42328,25 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_byte_writer_free_and_get_buffer">
+<description>
+Frees @writer and all memory allocated by it except
+the current data, which is returned as #GstBuffer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> the current data as buffer. gst_buffer_unref() after usage.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_poll_wait">
 <description>
 Wait for activity on the file descriptors in @set. This function waits up to
@@ -40388,6 +42377,41 @@ activity was detected after @timeout. If an error occurs, -1 is returned
 and errno is set.
 
 Since: 0.10.18
+</return>
+</function>
+
+<function name="gst_base_src_new_seamless_segment">
+<description>
+Prepare a new seamless segment for emission downstream. This function must
+only be called by derived sub-classes, and only from the create() function,
+as the stream-lock needs to be held.
+
+The format for the new segment will be the current format of the source, as
+configured with gst_base_src_set_format()
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> The source
+</parameter_description>
+</parameter>
+<parameter name="start">
+<parameter_description> The new start value for the segment
+</parameter_description>
+</parameter>
+<parameter name="stop">
+<parameter_description> Stop value for the new segment
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> The position value for the new segent
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if preparation of the seamless segment succeeded.
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -40585,7 +42609,7 @@ same element as @pad, and returns the intersection of the results.
 
 This function is useful as a default getcaps function for an element
 that can handle any stream format, but requires all its pads to have
-the same caps.  Two such elements are tee and aggregator.
+the same caps.  Two such elements are tee and adder.
 
 
 </description>
@@ -40599,33 +42623,24 @@ the same caps.  Two such elements are tee and aggregator.
 </return>
 </function>
 
-<function name="gst_fft_f64_fft">
+<function name="gst_registry_binary_write_cache">
 <description>
-This performs the FFT on @timedata and puts the result in @freqdata.
-
-@timedata must have as many samples as specified with the @len parameter while
-allocating the #GstFFTF64 instance with gst_fft_f64_new().
-
-@freqdata must be large enough to hold @len/2 + 1 #GstFFTF64Complex frequency
-domain samples.
+Write the @registry to a cache to file at given @location.
 
 
 </description>
 <parameters>
-<parameter name="self">
-<parameter_description> #GstFFTF64 instance for this call
+<parameter name="registry">
+<parameter_description> a #GstRegistry
 </parameter_description>
 </parameter>
-<parameter name="timedata">
-<parameter_description> Buffer of the samples in the time domain
-</parameter_description>
-</parameter>
-<parameter name="freqdata">
-<parameter_description> Target buffer for the samples in the frequency domain
+<parameter name="location">
+<parameter_description> a filename
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE on success.
+</return>
 </function>
 
 <function name="gst_uri_protocol_is_valid">
@@ -41000,28 +43015,26 @@ MT safe.
 </return>
 </function>
 
-<function name="GstTuner">
+<function name="gst_byte_writer_put_string_utf32">
 <description>
-Reports that the signal strength has changed.
+Writes a null-terminated UTF32 string to @writer.
 
-See Also: gst_tuner_signal_strength()
 
 </description>
 <parameters>
-<parameter name="tuner">
-<parameter_description> The element providing the GstTuner interface
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
 </parameter_description>
 </parameter>
-<parameter name="channel">
-<parameter_description> The current #GstTunerChannel
-</parameter_description>
-</parameter>
-<parameter name="signal">
-<parameter_description> The new signal strength (an integer)
+<parameter name="data">
+<parameter_description> UTF32 string to write
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_collect_pads_add_pad">
@@ -41030,6 +43043,10 @@ Add a pad to the collection of collect pads. The pad has to be
 a sinkpad. The refcount of the pad is incremented. Use
 gst_collect_pads_remove_pad() to remove the pad from the collection
 again.
+
+This function will override the chain and event functions of the pad
+along with the element_private data, which is used to store private
+information for the collectpads.
 
 You specify a size for the returned #GstCollectData structure
 so that you can use it to store additional information.
@@ -41221,8 +43238,9 @@ returned. Likewise, if synchronisation is disabled in the element or there
 is no clock, no synchronisation is done and #GST_CLOCK_BADTIME is returned.
 
 This function should only be called with the PREROLL_LOCK held, like when
-receiving an EOS event in the ::event vmethod or when receiving a buffer in
-the ::render vmethod.
+receiving an EOS event in the #GstBaseSinkClass.event() vmethod or when
+receiving a buffer in
+the #GstBaseSinkClass.render() vmethod.
 
 The @time argument should be the running_time of when this method should
 return and is not adjusted with any latency or offset configured in the
@@ -41253,7 +43271,7 @@ Since 0.10.20
 <function name="gst_adapter_available_fast">
 <description>
 Gets the maximum number of bytes that are immediately available without
-requiring any expensive operations (like copying the data into a 
+requiring any expensive operations (like copying the data into a
 temporary buffer).
 
 
@@ -41264,7 +43282,7 @@ temporary buffer).
 </parameter_description>
 </parameter>
 </parameters>
-<return> number of bytes that are available in @adapter without expensive 
+<return> number of bytes that are available in @adapter without expensive
 operations
 </return>
 </function>
@@ -41287,6 +43305,31 @@ gst_poll_restart() and gst_poll_set_flushing() respectively.
 gst_poll_free().
 
 Since: 0.10.18
+</return>
+</function>
+
+<function name="gst_element_query_position">
+<description>
+Queries an element for the stream position.
+
+
+</description>
+<parameters>
+<parameter name="element">
+<parameter_description> a #GstElement to invoke the position query on.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> a pointer to the #GstFormat asked for.
+On return contains the #GstFormat used.
+</parameter_description>
+</parameter>
+<parameter name="cur">
+<parameter_description> A location in which to store the current position, or NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the query could be performed.
 </return>
 </function>
 
@@ -41402,6 +43445,28 @@ event is unreffed.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_byte_writer_put_int24_be">
+<description>
+Writes a signed big endian 24 bit integer to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_task_set_pool">
