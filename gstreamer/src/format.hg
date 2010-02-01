@@ -30,8 +30,8 @@ class IteratorBasic;
 
 _WRAP_ENUM(Format, GstFormat)
 
-/** A format definition is used to get details of a Gst::Format by
- * Gst::get_details().
+/** A class to store the details of a Gst::Format retrieved by
+ * Gst::get_format_details().
  */
 class FormatDefinition
 {
@@ -63,14 +63,14 @@ public:
 namespace Enums
 {
 
-/** Get a printable name for the given format. Do not modify or free.
+/** Gets a printable name for the given format. Do not modify or free.
  * 
  * @param format A Gst::Format.
  * @return The name of the format or an empty string if the format is unknown.
  */
 Glib::ustring get_name(Format format);
 
-/** Get the unique quark for the given format.
+/** Gets the unique quark for the given format.
  *
  * @param format A Gst::Format.
  * @return The quark associated with the format or 0 if the format is unknown. 
@@ -79,8 +79,8 @@ Glib::QueryQuark get_quark(Format format);
 
 } //namespace Enums
 
-/** Create a new Gst::Format based on the nick or return an already registered
- * format with that nick.
+/** Creates a new Gst::Format based on the nick or return an already
+ * registered format with that nick.
  *
  * @param nick The nick of the new format.
  * @param description The description of the new format.
@@ -90,7 +90,7 @@ Glib::QueryQuark get_quark(Format format);
 Format register_format(const Glib::ustring& nick, const Glib::ustring&
 description);
 
-/** Return the format registered with the given nick.
+/** Returns the format registered with the given nick.
  *
  * @param nick The nick of the format.
  * @return The format with nick or Gst::FORMAT_UNDEFINED if the format was not
@@ -98,7 +98,7 @@ description);
  */
 Format get_format(const Glib::ustring& nick);
 
-/** See if the given format is inside the array of formats.
+/** Sees if the given format is inside the array of formats.
  *
  * @param formats The array of formats to search.
  * @param format The format to find.
@@ -106,7 +106,7 @@ Format get_format(const Glib::ustring& nick);
  */
 bool formats_contain(const Glib::ArrayHandle<Format>& formats, Format format);
 
-/** Get details about the given format.
+/** Gets details about the given format.
  *
  * @param format The format to get details of.
  * @param def The Gst::FormatDefinition in which to store the details of
@@ -115,7 +115,8 @@ bool formats_contain(const Glib::ArrayHandle<Format>& formats, Format format);
  */
 bool get_format_details(Format format, FormatDefinition& def);
 
-/** Iterate all the registered formats.  The format definitions are read only.
+/** Iterates all the registered formats.  The format definitions are read
+ * only.
  * @return a Gst::IteratorBasic of Gst::FormatDefinition.
  */
 IteratorBasic<const FormatDefinition> iterate_format_definitions();

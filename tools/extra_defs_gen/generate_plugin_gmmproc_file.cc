@@ -655,7 +655,7 @@ static void generate_hg_file(const std::string& includeMacroCalls,
   if(!enumWrapStatements.empty())
     std::cout << enumWrapStatements;
 
-  std::cout << "/** " << nmspace << "::" << cppTypeName << " - " << pluginName << " plugin." << std::endl;
+  std::cout << "/** A Wrapper for the " << pluginName << " plugin." << std::endl;
   std::cout << " * Please note that, though using the underlying GObject is "
     "fine, using its C\n * <B>type</B> is not guaranteed to be API stable "
     "across releases because it is\n * not guaranteed to always remain the "
@@ -798,10 +798,10 @@ int main(int argc, char** argv)
   static const GOptionEntry optionEntries[] =
   {
     {"hg", 'h', 0, G_OPTION_ARG_NONE, &hgFile, "Generate preliminary .hg file.", 0 },
-    {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate .ccg file.", 0 },
-    {"confirm-existence", 'e', 0, G_OPTION_ARG_NONE, &confirmExistence, "Return success if the plugin exists, failure otherwise.", 0 },
+    {"ccg", 'c', 0, G_OPTION_ARG_NONE, &ccgFile, "Generate preliminary .ccg file.", 0 },
+    {"confirm-existence", 'e', 0, G_OPTION_ARG_NONE, &confirmExistence, "Returns success if the plugin exists.", 0 },
     {"namespace", 'n', 0, G_OPTION_ARG_STRING, &nmspace, "The namespace of the plugin.", "namespace" },
-    {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main defs file without .defs extension.", "def" },
+    {"main-defs", 'm', 0, G_OPTION_ARG_STRING, &defsFile, "The main defs file (no .defs extension).", "def" },
     {"target", 't', 0, G_OPTION_ARG_STRING, &target, "The .h and .cc target directory.", "directory" },
     { 0, '\0', 0, G_OPTION_ARG_NONE, 0, 0, 0 }
   };
@@ -810,10 +810,12 @@ int main(int argc, char** argv)
     g_option_context_new("<plugin-name> [CppPluginClassName]");
   g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's "
     "gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  "
-    "Use the same syntax for plugin-name as in gst-inspect\nand supply the "
-    "desired C++ class name unless the --confirm-existence option is\nused.  "
-    "The .hg file is a preliminary .hg file that needs to be run through "
-    "m4\nincluding the macros in the plugingen*.m4 files.");
+    "Use the same syntax for the plugin name as in\ngst-inspect and supply "
+    "the desired C++ class name unless the\n--confirm-existence option is "
+    "used.  The generated files are preliminary\nfiles that need to be run "
+    "through m4 including the macros in the\nplugingen*.m4 files to get the "
+    "final .hg or .ccg file."
+  );
 
   g_option_context_add_main_entries(gContext, optionEntries, 0);
   g_option_context_add_group(gContext, gst_init_get_option_group());
