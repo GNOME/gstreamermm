@@ -1,3 +1,32 @@
+2010-02-04  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	MiniObject: Lay the foundation for virtual methods in derived classes.
+
+	* gstreamer/gstreamermm/miniobject.cc (class_init_function): Modified
+	method to override the GstMiniObject virtual methods.
+	(MiniObject): Added new constructor designed to be used to initialize
+	the Glib::Class sort of as what is done with the ConstructParams
+	Glib::Object constructor.
+	(copy_vfunc_callback):
+	(copy_vfunc):
+	(finalize_vfunc_callback):
+	(finalize_vfunc):  Wrote out first attempt at the two GstMiniObject
+	virtual functions.
+	* gstreamer/gstreamermm/miniobject.h (MiniObject): Declared new
+	constructor.
+	(copy_vfunc):
+	(finalize_vfunc): Declared virtual functions.
+	* gstreamer/gstreamermm/private/miniobject_p.h (copy_vfunc_callback):
+	(finalize_vfunc_callback): Declared virtual function callbacks.
+	* tools/m4/class_gstminiobject.m4 (_MINI_CTOR_DEFAULT): Added default
+	constructor wrapping macro for Gst::MiniObject derived classes.  The
+	default constructor will use the Glib::Class initializing parent
+	constructor sort of as what happens with the ConstructParams
+	Glib::Object constructor.
+	(_PH_MINIOBJECTCLASS_DECLARATION): Added a section which includes the
+	virtual function declarations.
+	* gstreamer/src/element.hg (~ElementInterfaced): Code formatting.
+
 2010-02-02  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	Correct constant declarations in header files.
@@ -18,7 +47,6 @@
 	* gstreamer/src/tagsetter.hg: Code formatting.
 
 	* gstreamer/gstreamermm/gst_wrap_init.h: Typo.
-
 
 2010-02-01  José Alburquerque  <jaalburqu@svn.gnome.org>
 

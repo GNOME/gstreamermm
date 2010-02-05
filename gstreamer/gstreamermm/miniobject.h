@@ -25,6 +25,9 @@
 #include <glibmm/value.h>
 #include <gstreamermm/wrap.h>
 
+namespace Glib
+{ class Class; }
+
 namespace Gst
 {
 
@@ -53,8 +56,8 @@ private:
 
 protected:
   MiniObject();
+  explicit MiniObject(const Glib::Class& mini_object_class);
   explicit MiniObject(GstMiniObject* castitem, bool take_copy = false);
-  virtual ~MiniObject();
   
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -63,6 +66,8 @@ public:
 #endif
 
 public:
+  virtual ~MiniObject();
+
   //Note that we don't add a constructor for gst_mini_object_new()
   //because it's just an equivalent for g_object_new(), 
   //which is just an equivalent for C++'s new(). 
@@ -122,6 +127,18 @@ public:
   GstMiniObject* gobj_copy();
 
   // static void replace(Glib::RefPtr<Gst::MiniObject> & olddata, Glib::RefPtr<Gst::MiniObject> & newdata);
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function called when the Gst::MiniObject needs to be copied.
+   */
+  virtual Glib::RefPtr<Gst::MiniObject> copy_vfunc() const;
+
+  /** Virtual function called when the Gst::MiniObject is about to be
+   * finalized.
+   */
+  virtual void finalize_vfunc();
+#endif //GLIBMM_VFUNCS_ENABLED
+
 
 protected:
   void swap(MiniObject& other);

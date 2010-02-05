@@ -39,6 +39,14 @@ public:
   static void class_init_function(void* g_class, void* class_data);
 
   static Gst::MiniObject* wrap_new(GstMiniObject*);
+
+protected:
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
+  static void finalize_vfunc_callback(GstMiniObject* self);
+#endif //GLIBMM_VFUNCS_ENABLED
+
 };
 
 

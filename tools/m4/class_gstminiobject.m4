@@ -1,5 +1,19 @@
 dnl Copyright 2008 The gstreamermm Development Team
 
+dnl Declares and implements the default constructor
+dnl
+m4_define(`_MINI_CTOR_DEFAULT',`dnl
+__CPPNAME__`'();
+_PUSH(SECTION_CC)
+__CPPNAME__::__CPPNAME__`'()
+:
+  __CPPPARENT__`'(__BASE__`'_class_.init())
+{
+  _IMPORT(SECTION_CC_INITIALIZE_CLASS_EXTRA)
+}
+
+_POP()')
+
 define(`_CLASS_GSTMINIOBJECT',`dnl
 _PUSH()
 dnl
@@ -128,6 +142,13 @@ ifdef(`__BOOL_NO_DERIVED_CLASS__',`dnl
 ')dnl
 
   static Gst::MiniObject* wrap_new(GstMiniObject*);
+
+protected:
+
+  //Callbacks (virtual functions):
+#ifdef GLIBMM_VFUNCS_ENABLED
+_IMPORT(SECTION_PH_VFUNCS)
+#endif //GLIBMM_VFUNCS_ENABLED
 };
 ')
 

@@ -37,10 +37,15 @@ const Glib::Class& MiniObject_Class::init()
   return *this;
 }
 
-// gst_mini_object_base_[init|finalize]() don't do anything so those don't
-// have to be called from here.
-void MiniObject_Class::class_init_function(void*, void*)
-{}
+void MiniObject_Class::class_init_function(void* g_class, void* /*class_data*/)
+{
+  BaseClassType* const klass = static_cast<BaseClassType*>(g_class);
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  klass->copy = &copy_vfunc_callback;
+  klass->finalize = &finalize_vfunc_callback;
+#endif //GLIBMM_VFUNCS_ENABLED
+}
 
 MiniObject* MiniObject_Class::wrap_new(GstMiniObject* object)
 {
@@ -55,6 +60,10 @@ MiniObject::CppClassType MiniObject::mini_object_class_;
 
 MiniObject::MiniObject()
 : gobject_(0)
+{}
+
+MiniObject::MiniObject(const Glib::Class& mini_object_class)
+: gobject_(gst_mini_object_new(mini_object_class.get_type()))
 {}
 
 MiniObject::MiniObject(GstMiniObject* castitem, bool take_copy)
@@ -134,6 +143,52 @@ Glib::RefPtr<Gst::MiniObject> MiniObject::create_writable()
 {
   return Gst::wrap(gst_mini_object_make_writable(gobject_));
 }
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+GstMiniObject* MiniObject_Class::copy_vfunc_callback(const GstMiniObject* self)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->copy)
+    return (*base->copy)(self);
+
+  return static_cast<GstMiniObject*>(0);
+}
+Glib::RefPtr<Gst::MiniObject> Gst::MiniObject::copy_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->copy)
+    return Gst::wrap((*base->copy)(gobj()));
+
+  return Glib::RefPtr<Gst::MiniObject>(0);
+}
+void MiniObject_Class::finalize_vfunc_callback(GstMiniObject* self)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->finalize)
+    (*base->finalize)(self);
+
+}
+void Gst::MiniObject::finalize_vfunc() 
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->finalize)
+    (*base->finalize)(gobj());
+}
+#endif //GLIBMM_VFUNCS_ENABLED
 
 } //namespace Gst
 
