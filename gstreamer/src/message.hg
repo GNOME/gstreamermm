@@ -73,9 +73,9 @@ class TagList;
  */
 class Message : public Gst::MiniObject
 {
-protected:
- _CLASS_GSTMINIOBJECT(Message, GstMessage, GST_MESSAGE, Gst::MiniObject, GstMiniObject)
- _IGNORE(gst_message_ref, gst_message_unref)
+  _CLASS_GSTMINIOBJECT(Message, GstMessage, GST_MESSAGE, Gst::MiniObject, GstMiniObject)
+  _IGNORE(gst_message_ref, gst_message_unref)
+
 public:
   /** Wrap a GstMessage* in a C++ instance, creating an instance of a
    *  derived Gst::Message.  Gst::wrap() would just create a Gst::Message
@@ -109,6 +109,21 @@ public:
   /** Get the object that posted the message.
    */
   _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function called when the Gst::Message is about to be finalized.
+   */
+  virtual void finalize_vfunc();
+#endif //GLIBMM_VFUNCS_ENABLED
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  GST_MINI_OBJECT_CLASS(klass)->finalize = &finalize_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static void finalize_vfunc_callback(GstMiniObject* self);
+  _POP()
+#m4end
 };
 
 //TODO: Modify create methods of derived Message classes to return

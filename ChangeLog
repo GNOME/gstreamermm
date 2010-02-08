@@ -1,3 +1,17 @@
+2010-02-07  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Message: Modify create() method so that wrappers are not leaked.
+
+	* gstreamer/src/message.ccg:
+	* gstreamer/src/message.hg: Wrapped the finalize virtual function of
+	GstMiniObject.  Modified the create() method so that the C++ wrapper
+	is stored in the structure of the message.  Hooked into the
+	GstMiniObject finalize virtual function so that wrappers can be
+	deleted before final message destruction.
+	* gstreamer/src/gst_vfuncs.defs: Defined GstMessage finalize vfunc.
+
+	Partly fixes bug #608702 (Massimiliano).
+
 2010-02-04  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	MiniObject: Lay the foundation for virtual methods in derived classes.
