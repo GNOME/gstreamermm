@@ -46,7 +46,7 @@ Glib::QueryQuark get_quark(MessageType t)
 
 Glib::RefPtr<Gst::Message> Message::create_writable()
 {
-  return Gst::wrap(gst_message_make_writable(gobj()));
+  return wrap(gst_message_make_writable(gobj()));
 }
 
 MessageEos::MessageEos(GstMessage* castitem)
@@ -1140,7 +1140,7 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
 
   result = Glib::RefPtr<Gst::Message>(wrapper);
 
-  if(result && take_copy)
+  if(take_copy)
     result->reference();
 
   // Hook into the GstMessage finalize function.
@@ -1156,7 +1156,41 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   return result;
 }
 
+Gst::MiniObject* Message_Class::wrap_new(GstMiniObject* object)
+{
+  // Use the Gst::Message wrap() method to get the right type of Message class
+  // and return the underlying object in the refptr.
+  return Gst::Message::wrap((GstMessage*)object, true).operator->();
+}
+
 #ifdef GLIBMM_VFUNCS_ENABLED
+GstMiniObject* Message_Class::copy_vfunc_callback(const GstMiniObject* self)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
+    return (*GST_MINI_OBJECT_CLASS(base)->copy)(self);
+
+  return 0;
+}
+Glib::RefPtr<Gst::MiniObject> Message::copy_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
+  {
+    return Gst::Message::wrap(
+      GST_MESSAGE((*GST_MINI_OBJECT_CLASS(base)->copy)(
+        GST_MINI_OBJECT(gobj()))));
+  }
+
+  return Glib::RefPtr<Gst::MiniObject>(0);
+}
 void Message_Class::finalize_vfunc_callback(GstMiniObject* self)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
@@ -1166,9 +1200,8 @@ void Message_Class::finalize_vfunc_callback(GstMiniObject* self)
   // Call the original underlying C function:
   if(base && GST_MINI_OBJECT_CLASS(base)->finalize)
     (*GST_MINI_OBJECT_CLASS(base)->finalize)(self);
-
 }
-void Message::finalize_vfunc() 
+void Message::finalize_vfunc()
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
@@ -1178,6 +1211,5 @@ void Message::finalize_vfunc()
     (*GST_MINI_OBJECT_CLASS(base)->finalize)(GST_MINI_OBJECT(gobj()));
 }
 #endif //GLIBMM_VFUNCS_ENABLED
-
 
 } //namespace Gst
