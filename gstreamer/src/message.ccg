@@ -1159,7 +1159,9 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
 Gst::MiniObject* Message_Class::wrap_new(GstMiniObject* object)
 {
   // Use the Gst::Message wrap() method to get the right type of Message class
-  // and return the underlying object in the refptr.
+  // and return the underlying object in the refptr.  The extra reference is
+  // needed so that the object does not loose a reference when the local
+  // refptr is destroyed.
   return Gst::Message::wrap((GstMessage*)object, true).operator->();
 }
 
