@@ -961,33 +961,6 @@ Glib::RefPtr<Gst::Element> MessageStreamStatus::parse_owner() const
   return Glib::wrap(gst_element, true);
 }
 
-namespace
-{
-
-static GstMiniObjectFinalizeFunction original_gst_message_finalize_function = 0;
-
-static void gstreamermm_gst_message_finalize_hook_function(GstMiniObject* mini_object)
-{
-  gpointer wrapper = 0;
-
-  GstStructure* structure = const_cast<GstStructure*>(
-    gst_message_get_structure(GST_MESSAGE(mini_object)));
-
-  if(structure && gst_structure_get(structure, "cpp_wrapper", G_TYPE_POINTER,
-    &wrapper, static_cast<void*>(0)))
-  {
-    gst_structure_remove_field(structure, "cpp_wrapper");
-    // An extra ref is needed for the unref in the Gst::MiniObject destructor.
-    gst_mini_object_ref(mini_object);
-    delete static_cast<Gst::Message*>(wrapper);
-  }
-
-  // Call the original finalize function.
-  original_gst_message_finalize_function(mini_object);
-}
-
-}
-
 Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
 {
   Gst::Message* wrapper = 0;
@@ -996,162 +969,122 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   if(!message)
     return result;
 
-  // Attempt to get an existing wrapper before creating a new one.  The
-  // current wrapper is stored in the GstStructure of the message.  If the
-  // message does not have a structure (some don't), it is given one in which
-  // the wrapper can be stored.
-
-  GstStructure* structure =
-    const_cast<GstStructure*>(gst_message_get_structure(message));
-
-  if(!structure)
+  if(gst_mixer_message_get_type(message) == GST_MIXER_MESSAGE_INVALID)
   {
-    // Add a structure to a message that does not have one.  The lines are
-    // adapted from gst_message_new_custom().
-    structure = gst_structure_empty_new("wrapper");
-    gst_structure_set_parent_refcount (structure, &message->mini_object.refcount);
-    message->structure = structure;
+    switch(GST_MESSAGE_TYPE(message))
+    {
+      case GST_MESSAGE_EOS:
+        wrapper = new Gst::MessageEos(message);
+        break;
+      case GST_MESSAGE_ERROR:
+        wrapper = new Gst::MessageError(message);
+        break;
+      case GST_MESSAGE_WARNING:
+        wrapper = new Gst::MessageWarning(message);
+        break;
+      case GST_MESSAGE_INFO:
+        wrapper = new Gst::MessageInfo(message);
+        break;
+      case GST_MESSAGE_TAG:
+        wrapper = new Gst::MessageTag(message);
+        break;
+      case GST_MESSAGE_BUFFERING:
+        wrapper = new Gst::MessageBuffering(message);
+        break;
+      case GST_MESSAGE_STATE_CHANGED:
+        wrapper = new Gst::MessageStateChanged(message);
+        break;
+      case GST_MESSAGE_STATE_DIRTY:
+        wrapper = new Gst::MessageStateDirty(message);
+        break;
+      case GST_MESSAGE_STEP_DONE:
+        wrapper = new Gst::MessageStepDone(message);
+        break;
+      case GST_MESSAGE_CLOCK_PROVIDE:
+        wrapper = new Gst::MessageClockProvide(message);
+        break;
+      case GST_MESSAGE_CLOCK_LOST:
+        wrapper = new Gst::MessageClockLost(message);
+        break;
+      case GST_MESSAGE_NEW_CLOCK:
+        wrapper = new Gst::MessageNewClock(message);
+        break;
+      case GST_MESSAGE_APPLICATION:
+        wrapper = new Gst::MessageApplication(message);
+        break;
+      case GST_MESSAGE_ELEMENT:
+        wrapper = new Gst::MessageElement(message);
+        break;
+      case GST_MESSAGE_SEGMENT_START:
+        wrapper = new Gst::MessageSegmentStart(message);
+        break;
+      case GST_MESSAGE_SEGMENT_DONE:
+        wrapper = new Gst::MessageSegmentDone(message);
+        break;
+      case GST_MESSAGE_DURATION:
+        wrapper = new Gst::MessageDuration(message);
+        break;
+      case GST_MESSAGE_LATENCY:
+        wrapper = new Gst::MessageLatency(message);
+        break;
+      case GST_MESSAGE_ASYNC_START:
+        wrapper = new Gst::MessageAsyncStart(message);
+        break;
+      case GST_MESSAGE_ASYNC_DONE:
+        wrapper = new Gst::MessageAsyncDone(message);
+        break;
+      case GST_MESSAGE_STEP_START:
+        wrapper = new Gst::MessageStepStart(message);
+        break;
+      case GST_MESSAGE_STRUCTURE_CHANGE:
+        wrapper = new Gst::MessageStructureChange(message);
+        break;
+      case GST_MESSAGE_REQUEST_STATE:
+        wrapper = new Gst::MessageRequestState(message);
+        break;
+      case GST_MESSAGE_STREAM_STATUS:
+        wrapper = new Gst::MessageStreamStatus(message);
+        break;
+      case GST_MESSAGE_UNKNOWN:
+      case GST_MESSAGE_ANY:
+        wrapper = new Gst::Message(message);
+        break;
+        /* The rest of the message types are custom ones */
+      default:
+        wrapper = new Gst::MessageCustom(message);
+    }
   }
-
-  gst_structure_get(structure, "cpp_wrapper", G_TYPE_POINTER, &wrapper,
-    static_cast<void*>(0));
-
-  if(!wrapper)
+  else
   {
-    // In this case there is no pre-existing wrapper so create one which will
-    // then be stored for later usage and then deletion on message
-    // finalization.
-    if(gst_mixer_message_get_type(message) == GST_MIXER_MESSAGE_INVALID)
+    switch(GST_MESSAGE_TYPE(message))
     {
-      switch(GST_MESSAGE_TYPE(message))
-      {
-        case GST_MESSAGE_EOS:
-          wrapper = new Gst::MessageEos(message);
-          break;
-        case GST_MESSAGE_ERROR:
-          wrapper = new Gst::MessageError(message);
-          break;
-        case GST_MESSAGE_WARNING:
-          wrapper = new Gst::MessageWarning(message);
-          break;
-        case GST_MESSAGE_INFO:
-          wrapper = new Gst::MessageInfo(message);
-          break;
-        case GST_MESSAGE_TAG:
-          wrapper = new Gst::MessageTag(message);
-          break;
-        case GST_MESSAGE_BUFFERING:
-          wrapper = new Gst::MessageBuffering(message);
-          break;
-        case GST_MESSAGE_STATE_CHANGED:
-          wrapper = new Gst::MessageStateChanged(message);
-          break;
-        case GST_MESSAGE_STATE_DIRTY:
-          wrapper = new Gst::MessageStateDirty(message);
-          break;
-        case GST_MESSAGE_STEP_DONE:
-          wrapper = new Gst::MessageStepDone(message);
-          break;
-        case GST_MESSAGE_CLOCK_PROVIDE:
-          wrapper = new Gst::MessageClockProvide(message);
-          break;
-        case GST_MESSAGE_CLOCK_LOST:
-          wrapper = new Gst::MessageClockLost(message);
-          break;
-        case GST_MESSAGE_NEW_CLOCK:
-          wrapper = new Gst::MessageNewClock(message);
-          break;
-        case GST_MESSAGE_APPLICATION:
-          wrapper = new Gst::MessageApplication(message);
-          break;
-        case GST_MESSAGE_ELEMENT:
-          wrapper = new Gst::MessageElement(message);
-          break;
-        case GST_MESSAGE_SEGMENT_START:
-          wrapper = new Gst::MessageSegmentStart(message);
-          break;
-        case GST_MESSAGE_SEGMENT_DONE:
-          wrapper = new Gst::MessageSegmentDone(message);
-          break;
-        case GST_MESSAGE_DURATION:
-          wrapper = new Gst::MessageDuration(message);
-          break;
-        case GST_MESSAGE_LATENCY:
-          wrapper = new Gst::MessageLatency(message);
-          break;
-        case GST_MESSAGE_ASYNC_START:
-          wrapper = new Gst::MessageAsyncStart(message);
-          break;
-        case GST_MESSAGE_ASYNC_DONE:
-          wrapper = new Gst::MessageAsyncDone(message);
-          break;
-        case GST_MESSAGE_STEP_START:
-          wrapper = new Gst::MessageStepStart(message);
-          break;
-        case GST_MESSAGE_STRUCTURE_CHANGE:
-          wrapper = new Gst::MessageStructureChange(message);
-          break;
-        case GST_MESSAGE_REQUEST_STATE:
-          wrapper = new Gst::MessageRequestState(message);
-          break;
-        case GST_MESSAGE_STREAM_STATUS:
-          wrapper = new Gst::MessageStreamStatus(message);
-          break;
-        case GST_MESSAGE_UNKNOWN:
-        case GST_MESSAGE_ANY:
-          wrapper = new Gst::Message(message);
-          break;
-          /* The rest of the message types are custom ones */
-        default:
-          wrapper = new Gst::MessageCustom(message);
-      }
+      case GST_MIXER_MESSAGE_MUTE_TOGGLED:
+        wrapper = new Gst::MessageMixerMuteToggled(message);
+        break;
+      case GST_MIXER_MESSAGE_RECORD_TOGGLED:
+        wrapper = new Gst::MessageMixerRecordToggled(message);
+        break;
+      case GST_MIXER_MESSAGE_VOLUME_CHANGED:
+        wrapper = new Gst::MessageMixerVolumeChanged(message);
+        break;
+      case GST_MIXER_MESSAGE_OPTION_CHANGED:
+        wrapper = new Gst::MessageMixerOptionChanged(message);
+        break;
+      case GST_MIXER_MESSAGE_OPTIONS_LIST_CHANGED:
+        wrapper = new Gst::MessageMixerOptionsListChanged(message);
+        break;
+      case GST_MIXER_MESSAGE_MIXER_CHANGED:
+        wrapper = new Gst::MessageMixerChanged(message);
+        break;
+      default:
+        wrapper = new Gst::MessageCustom(message);
     }
-    else
-    {
-      switch(GST_MESSAGE_TYPE(message))
-      {
-        case GST_MIXER_MESSAGE_MUTE_TOGGLED:
-          wrapper = new Gst::MessageMixerMuteToggled(message);
-          break;
-        case GST_MIXER_MESSAGE_RECORD_TOGGLED:
-          wrapper = new Gst::MessageMixerRecordToggled(message);
-          break;
-        case GST_MIXER_MESSAGE_VOLUME_CHANGED:
-          wrapper = new Gst::MessageMixerVolumeChanged(message);
-          break;
-        case GST_MIXER_MESSAGE_OPTION_CHANGED:
-          wrapper = new Gst::MessageMixerOptionChanged(message);
-          break;
-        case GST_MIXER_MESSAGE_OPTIONS_LIST_CHANGED:
-          wrapper = new Gst::MessageMixerOptionsListChanged(message);
-          break;
-        case GST_MIXER_MESSAGE_MIXER_CHANGED:
-          wrapper = new Gst::MessageMixerChanged(message);
-          break;
-        default:
-          wrapper = new Gst::MessageCustom(message);
-      }
-    }
-
-    // Store the current wrapper in the structure of the message.
-    gst_structure_set(structure, "cpp_wrapper", G_TYPE_POINTER, wrapper,
-      static_cast<void*>(0));
   }
 
   result = Glib::RefPtr<Gst::Message>(wrapper);
 
   if(take_copy)
     result->reference();
-
-  // Hook into the GstMessage finalize function.
-  if(!original_gst_message_finalize_function)
-  {
-    original_gst_message_finalize_function =
-      GST_MINI_OBJECT_GET_CLASS(message)->finalize;
-
-    GST_MINI_OBJECT_GET_CLASS(message)->finalize =
-      gstreamermm_gst_message_finalize_hook_function;
-  }
 
   return result;
 }
