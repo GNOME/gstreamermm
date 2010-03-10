@@ -109,8 +109,9 @@ _IGNORE(gst_query_type_to_quark)
  */
 class Query : public MiniObject
 {
-protected:
   _CLASS_GSTMINIOBJECT(Query, GstQuery, GST_QUERY, Gst::MiniObject, GstMiniObject)
+  _IGNORE(gst_query_ref, qgst_query_unref)
+  _CUSTOM_WRAP_NEW
 
 public:
   /** Wrap a GstQuery* in a C++ instance, creating an instance of a derived
@@ -150,6 +151,29 @@ public:
   _IGNORE(gst_query_type_get_details)
 
   _WRAP_METHOD(static Gst::IteratorBasic<const Gst::QueryTypeDefinition> iterate_definitions(), gst_query_type_iterate_definitions)
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function called when the Gst::Query needs to be copied.
+   */
+  virtual Glib::RefPtr<Gst::MiniObject> copy_vfunc() const;
+#endif //GLIBMM_VFUNCS_ENABLED
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function called when the Gst::Query is about to be finalized.
+   */
+  virtual void finalize_vfunc();
+#endif //GLIBMM_VFUNCS_ENABLED
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  GST_MINI_OBJECT_CLASS(klass)->copy = &copy_vfunc_callback;
+  GST_MINI_OBJECT_CLASS(klass)->finalize = &finalize_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
+  static void finalize_vfunc_callback(GstMiniObject* self);
+  _POP()
+#m4end
 };
 
 //TODO: Modify create methods of derived Query classes to return

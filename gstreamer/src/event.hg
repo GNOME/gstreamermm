@@ -116,8 +116,9 @@ EventTypeFlags get_flags(EventType type);
  */
 class Event : public MiniObject
 {
-protected:
   _CLASS_GSTMINIOBJECT(Event, GstEvent, GST_EVENT, Gst::MiniObject, GstMiniObject)
+  _IGNORE(gst_event_ref, gst_event_unref)
+  _CUSTOM_WRAP_NEW
 
 public:
   /** Wrap a GstEvent* in a C++ instance, creating an instance of a derived
@@ -166,6 +167,29 @@ public:
   /** The source Gst::Object that generated this event.
    */
   _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function called when the Gst::Event needs to be copied.
+   */
+  virtual Glib::RefPtr<Gst::MiniObject> copy_vfunc() const;
+#endif //GLIBMM_VFUNCS_ENABLED
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+  /** Virtual function called when the Gst::Event is about to be finalized.
+   */
+  virtual void finalize_vfunc();
+#endif //GLIBMM_VFUNCS_ENABLED
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  GST_MINI_OBJECT_CLASS(klass)->copy = &copy_vfunc_callback;
+  GST_MINI_OBJECT_CLASS(klass)->finalize = &finalize_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
+  static void finalize_vfunc_callback(GstMiniObject* self);
+  _POP()
+#m4end
 };
 
 //TODO: Modify create methods of derived Event classes to return

@@ -547,6 +547,7 @@ gint64 QueryBuffering::parse_total_time() const
 
 Glib::RefPtr<Gst::Query> Query::wrap(GstQuery* query, bool take_copy)
 {
+  Gst::Query* wrapper = 0;
   Glib::RefPtr<Gst::Query> result;
 
   if(!query)
@@ -555,42 +556,101 @@ Glib::RefPtr<Gst::Query> Query::wrap(GstQuery* query, bool take_copy)
   switch(GST_QUERY_TYPE(query))
   {
     case GST_QUERY_POSITION:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QueryPosition(query) );
+      wrapper = new Gst::QueryPosition(query);
       break;
     case GST_QUERY_DURATION:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QueryDuration(query) );
+      wrapper = new Gst::QueryDuration(query);
       break;
     case GST_QUERY_LATENCY:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QueryLatency(query) );
+      wrapper = new Gst::QueryLatency(query);
       break;
     case GST_QUERY_SEEKING:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QuerySeeking(query) );
+      wrapper = new Gst::QuerySeeking(query);
       break;
     case GST_QUERY_SEGMENT:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QuerySegment(query) );
+      wrapper = new Gst::QuerySegment(query);
       break;
     case GST_QUERY_CONVERT:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QueryConvert(query) );
+      wrapper = new Gst::QueryConvert(query);
       break;
     case GST_QUERY_FORMATS:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QueryFormats(query) );
+      wrapper = new Gst::QueryFormats(query);
       break;
     case GST_QUERY_BUFFERING:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QueryBuffering(query) );
+      wrapper = new Gst::QueryBuffering(query);
       break;
     case GST_QUERY_NONE:
     case GST_QUERY_JITTER:
-      result = Gst::wrap(query, false);
+      wrapper = new Gst::Query(query);
       break;
-	/* The rest of the query types are custom ones */
+        /* The rest of the query types are custom ones */
     default:
-      result = Glib::RefPtr<Gst::Query>( new Gst::QueryApplication(query) );
+      wrapper = new Gst::QueryApplication(query);
   }
 
-  if(result && take_copy)
+  result = Glib::RefPtr<Gst::Query>(wrapper);
+
+  if(take_copy)
     result->reference();
 
   return result;
 }
+
+Gst::MiniObject* Query_Class::wrap_new(GstMiniObject* object)
+{
+  // Use the Gst::Query wrap() method to get the right type of Query class
+  // and return the underlying object in the refptr.  The extra reference is
+  // needed so that the object does not loose a reference when the local refptr
+  // is destroyed.
+  return Gst::Query::wrap((GstQuery*)object, true).operator->();
+}
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+GstMiniObject* Query_Class::copy_vfunc_callback(const GstMiniObject* self)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
+    return (*GST_MINI_OBJECT_CLASS(base)->copy)(self);
+
+  return 0;
+}
+Glib::RefPtr<Gst::MiniObject> Query::copy_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
+  {
+    return Gst::Query::wrap(GST_QUERY((*GST_MINI_OBJECT_CLASS(base)->copy)(
+        GST_MINI_OBJECT(gobj()))));
+  }
+
+  return Glib::RefPtr<Gst::MiniObject>(0);
+}
+void Query_Class::finalize_vfunc_callback(GstMiniObject* self)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && GST_MINI_OBJECT_CLASS(base)->finalize)
+    (*GST_MINI_OBJECT_CLASS(base)->finalize)(self);
+}
+void Query::finalize_vfunc()
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && GST_MINI_OBJECT_CLASS(base)->finalize)
+    (*GST_MINI_OBJECT_CLASS(base)->finalize)(GST_MINI_OBJECT(gobj()));
+}
+#endif //GLIBMM_VFUNCS_ENABLED
 
 } //namesapce Gst

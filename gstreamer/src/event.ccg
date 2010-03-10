@@ -450,6 +450,7 @@ bool EventStep::parse_intermediate() const
 
 Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)
 {
+  Gst::Event* wrapper = 0;
   Glib::RefPtr<Gst::Event> result;
 
   if(!event)
@@ -458,46 +459,105 @@ Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)
   switch(GST_EVENT_TYPE(event))
   {
     case GST_EVENT_FLUSH_START:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventFlushStart(event) );
+      wrapper = new Gst::EventFlushStart(event);
       break;
     case GST_EVENT_FLUSH_STOP:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventFlushStop(event) );
+      wrapper = new Gst::EventFlushStop(event);
       break;
     case GST_EVENT_EOS:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventEos(event) );
+      wrapper = new Gst::EventEos(event);
       break;
     case GST_EVENT_NEWSEGMENT:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventNewSegment(event) );
+      wrapper = new Gst::EventNewSegment(event);
       break;
     case GST_EVENT_TAG:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventTag(event) );
+      wrapper = new Gst::EventTag(event);
       break;
     case GST_EVENT_BUFFERSIZE:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventBufferSize(event) );
+      wrapper = new Gst::EventBufferSize(event);
       break;
     case GST_EVENT_QOS:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventQos(event) );
+      wrapper = new Gst::EventQos(event);
       break;
     case GST_EVENT_SEEK:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventSeek(event) );
+      wrapper = new Gst::EventSeek(event);
       break;
     case GST_EVENT_NAVIGATION:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventNavigation(event) );
+      wrapper = new Gst::EventNavigation(event);
       break;
     case GST_EVENT_LATENCY:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventLatency(event) );
+      wrapper = new Gst::EventLatency(event);
       break;
     case GST_EVENT_STEP:
-      result = Glib::RefPtr<Gst::Event>( new Gst::EventStep(event) );
+      wrapper = new Gst::EventStep(event);
       break;
     default:
-      result = Gst::wrap(event, false);
+      wrapper = new Gst::Event(event);
   }
 
-  if(result && take_copy)
+  result = Glib::RefPtr<Gst::Event>(wrapper);
+
+  if(take_copy)
     result->reference();
 
   return result;
 }
+
+Gst::MiniObject* Event_Class::wrap_new(GstMiniObject* object)
+{
+  // Use the Gst::Event wrap() method to get the right type of Event class
+  // and return the underlying object in the refptr.  The extra reference is
+  // needed so that the object does not loose a reference when the local refptr
+  // is destroyed.
+  return Gst::Event::wrap((GstEvent*)object, true).operator->();
+}
+
+#ifdef GLIBMM_VFUNCS_ENABLED
+GstMiniObject* Event_Class::copy_vfunc_callback(const GstMiniObject* self)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
+    return (*GST_MINI_OBJECT_CLASS(base)->copy)(self);
+
+  return 0;
+}
+Glib::RefPtr<Gst::MiniObject> Event::copy_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
+  {
+    return Gst::Event::wrap(GST_EVENT((*GST_MINI_OBJECT_CLASS(base)->copy)(
+        GST_MINI_OBJECT(gobj()))));
+  }
+
+  return Glib::RefPtr<Gst::MiniObject>(0);
+}
+void Event_Class::finalize_vfunc_callback(GstMiniObject* self)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && GST_MINI_OBJECT_CLASS(base)->finalize)
+    (*GST_MINI_OBJECT_CLASS(base)->finalize)(self);
+}
+void Event::finalize_vfunc()
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && GST_MINI_OBJECT_CLASS(base)->finalize)
+    (*GST_MINI_OBJECT_CLASS(base)->finalize)(GST_MINI_OBJECT(gobj()));
+}
+#endif //GLIBMM_VFUNCS_ENABLED
 
 } //namespace Gst
