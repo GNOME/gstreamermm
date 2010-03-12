@@ -3366,6 +3366,15 @@
   (construct-only #f)
 )
 
+(define-property buffer-list
+  (of-object "GstBaseRTPAudioPayload")
+  (prop-type "GParamBoolean")
+  (docs "Use Buffer Lists")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstBaseRTPDepayload
 
 (define-property name
@@ -3643,6 +3652,46 @@
 )
 
 ;; From GstMixer
+
+(define-signal record-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal mute-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal volume-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gpointer" "p1")
+  )
+)
+
+(define-signal option-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerOptions*" "p0")
+    '("const-gchar*" "p1")
+  )
+)
 
 ;; From GstMixerTrack
 
@@ -4376,6 +4425,15 @@
   (of-object "GstAppSrc")
   (prop-type "GParamBoolean")
   (docs "Emit new-preroll and new-buffer signals")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property min-percent
+  (of-object "GstAppSrc")
+  (prop-type "GParamUInt")
+  (docs "Emit need-data when queued bytes drops below this percent of max-bytes")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -6969,6 +7027,15 @@
   (construct-only #f)
 )
 
+(define-property subtitle-encoding
+  (of-object "GstSubtitleOverlay")
+  (prop-type "GParamString")
+  (docs "Encoding to assume if input subtitles are not in UTF-8 encoding. If not set, the GST_SUBTITLE_ENCODING environment variable will be checked for an encoding to use. If that is not set either, ISO-8859-15 will be assumed.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstTCPClientSrc
 
 (define-property name
@@ -7916,6 +7983,51 @@
   (of-object "GstTheoraEnc")
   (prop-type "GParamInt")
   (docs "Controls the amount of motion vector searching done while encoding.  This property requires libtheora version >= 1.0")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property vp3-compatible
+  (of-object "GstTheoraEnc")
+  (prop-type "GParamBoolean")
+  (docs "Disables non-VP3 compatible features.  This property requires libtheora version >= 1.1")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property drop-frames
+  (of-object "GstTheoraEnc")
+  (prop-type "GParamBoolean")
+  (docs "Allow or disallow frame dropping.  This property requires libtheora version >= 1.1")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property cap-overflow
+  (of-object "GstTheoraEnc")
+  (prop-type "GParamBoolean")
+  (docs "Enable capping of bit reservoir overflows.  This property requires libtheora version >= 1.1")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property cap-underflow
+  (of-object "GstTheoraEnc")
+  (prop-type "GParamBoolean")
+  (docs "Enable capping of bit reservoir underflows.  This property requires libtheora version >= 1.1")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property rate-buffer
+  (of-object "GstTheoraEnc")
+  (prop-type "GParamInt")
+  (docs "Sets the size of the rate control buffer, in units of frames.  The default value of 0 instructs the encoder to automatically select an appropriate value.  This property requires libtheora version >= 1.1")
   (readable #t)
   (writable #t)
   (construct-only #f)
