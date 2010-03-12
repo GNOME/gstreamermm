@@ -90,6 +90,7 @@ alsamixer=AlsaMixer \
 alsasink=AlsaSink \
 alsasrc=AlsaSrc \
 audioconvert=AudioConvert \
+audiorate=AudioRate \
 audioresample=AudioResample \
 audiotestsrc=AudioTestSrc \
 capsfilter=CapsFilter \
