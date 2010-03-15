@@ -698,6 +698,8 @@ owner of a reference to @list while the returned iterator is in use.
 </parameters>
 <return> a new #GstBufferListIterator of the buffers in @list.
 gst_buffer_list_iterator_free() after usage
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -1847,6 +1849,25 @@ You must have previously called gst_buffer_straw_start_pipeline() on
 </return>
 </function>
 
+<function name="gst_tag_get_language_code_iso_639_2T">
+<description>
+Returns: three-letter ISO-639-2 language code string that maps to @lang_code,
+
+</description>
+<parameters>
+<parameter name="lang_code">
+<parameter_description> ISO-639 language code (e.g. &quot;deu&quot; or &quot;ger&quot; or &quot;de&quot;)
+</parameter_description>
+</parameter>
+</parameters>
+<return> three-letter ISO-639-2 language code string that maps to @lang_code,
+or NULL if no mapping is known. The returned string must not be
+modified or freed.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_iterator_fold">
 <description>
 Folds @func over the elements of @iter. That is to say, @func will be called
@@ -1909,6 +1930,25 @@ this might deadlock the dispose function.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_tag_get_language_code_iso_639_2B">
+<description>
+Returns: three-letter ISO-639-2 language code string that maps to @lang_code,
+
+</description>
+<parameters>
+<parameter name="lang_code">
+<parameter_description> ISO-639 language code (e.g. &quot;deu&quot; or &quot;ger&quot; or &quot;de&quot;)
+</parameter_description>
+</parameter>
+</parameters>
+<return> three-letter ISO-639-2 language code string that maps to @lang_code,
+or NULL if no mapping is known. The returned string must not be
+modified or freed.
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_fft_f32_window">
@@ -4636,6 +4676,28 @@ prepares the element for pushing. See XXX part-activation.txt for details.
 <return></return>
 </function>
 
+<function name="gst_byte_writer_put_float32_be">
+<description>
+Writes a big endian 32 bit float to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_segment_to_stream_time">
 <description>
 Translate @position to stream time using the currently configured 
@@ -5370,6 +5432,28 @@ MT safe.
 </parameter>
 </parameters>
 <return> TRUE, if the element's state is locked.
+</return>
+</function>
+
+<function name="gst_byte_writer_put_float32_le">
+<description>
+Writes a little endian 32 bit float to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
 </return>
 </function>
 
@@ -6584,6 +6668,8 @@ have been called on @it before this function is called. This function can
 only be called once per call to gst_buffer_list_iterator_next().
 
 The removed buffer is unreffed.
+
+Since: 0.10.24
 
 </description>
 <parameters>
@@ -9112,6 +9198,8 @@ gst_buffer_list_iterator_next_group(). A subsequent call to
 gst_buffer_list_iterator_next_group() will advance the iterator to the group
 after the inserted group, if any.
 
+Since: 0.10.24
+
 </description>
 <parameters>
 <parameter name="it">
@@ -9330,6 +9418,8 @@ called repeatedly to iterate through the groups in a buffer list.
 </parameters>
 <return> TRUE if the iterator could be advanced to the next group, FALSE if
 the iterator was already at the last group
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -9646,6 +9736,32 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_byte_writer_fill">
+<description>
+Writes @size bytes containing @value to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> Value to be writen
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> Number of bytes to be writen
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_rtsp_method_as_text">
 <description>
 Convert @method to a string.
@@ -9952,6 +10068,8 @@ Call @func with @data for each buffer in @list.
 @func can modify the passed buffer pointer or its contents. The return value
 of @func define if this function returns or if the remaining buffers in a
 group should be skipped.
+
+Since: 0.10.24
 
 </description>
 <parameters>
@@ -11698,6 +11816,28 @@ by the query and will therefore be freed when the query is unreffed.
 </return>
 </function>
 
+<function name="gst_byte_writer_put_float64_le">
+<description>
+Writes a little endian 64 bit float to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_index_add_object">
 <description>
 Add the given object to the index with the given key.
@@ -11745,28 +11885,6 @@ Looks up the vorbiscomment tag for a GStreamer tag.
 </parameter>
 </parameters>
 <return> The corresponding vorbiscomment tag or NULL if none exists.
-</return>
-</function>
-
-<function name="gst_byte_writer_put_float_be">
-<description>
-Writes a big endian 32 bit float to @writer.
-
-
-</description>
-<parameters>
-<parameter name="writer">
-<parameter_description> #GstByteWriter instance
-</parameter_description>
-</parameter>
-<parameter name="val">
-<parameter_description> Value to write
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the value could be written
-
-Since: 0.10.26
 </return>
 </function>
 
@@ -12369,6 +12487,28 @@ Sets the values for the given tags using the specified mode.
 <return></return>
 </function>
 
+<function name="gst_byte_writer_put_float64_be">
+<description>
+Writes a big endian 64 bit float to @writer.
+
+
+</description>
+<parameters>
+<parameter name="writer">
+<parameter_description> #GstByteWriter instance
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> Value to write
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value could be written
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_buffer_list_iterator_n_buffers">
 <description>
 Returns: the number of buffers left to iterate in the current group
@@ -12381,6 +12521,8 @@ Returns: the number of buffers left to iterate in the current group
 </parameter>
 </parameters>
 <return> the number of buffers left to iterate in the current group
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -13803,6 +13945,8 @@ Returns: the number of groups in the buffer list
 </parameter>
 </parameters>
 <return> the number of groups in the buffer list
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -14240,6 +14384,26 @@ of the array in the given structure.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_tag_get_language_name">
+<description>
+Returns: language name in UTF-8 format, or NULL if @language_code could
+
+</description>
+<parameters>
+<parameter name="language_code">
+<parameter_description> two or three-letter ISO-639 language code
+</parameter_description>
+</parameter>
+</parameters>
+<return> language name in UTF-8 format, or NULL if @language_code could
+not be mapped to a language name. The returned string must not be
+modified and does not need to freed; it will stay valid until the
+application is terminated.
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_rtsp_connection_get_writefd">
@@ -16729,11 +16893,11 @@ Returns: %GST_STATE_CHANGE_SUCCESS if the element has no more pending state
 </parameter_description>
 </parameter>
 <parameter name="state">
-<parameter_description> a pointer to #GstState to hold the state. Can be %NULL.
+<parameter_description> (out): a pointer to #GstState to hold the state. Can be %NULL.
 </parameter_description>
 </parameter>
 <parameter name="pending">
-<parameter_description> a pointer to #GstState to hold the pending state.
+<parameter_description> (out): a pointer to #GstState to hold the pending state.
 Can be %NULL.
 </parameter_description>
 </parameter>
@@ -20589,6 +20753,8 @@ Use an iterator or gst_buffer_list_foreach() instead.
 </parameters>
 <return> the buffer at @idx in @group or NULL when there is no buffer. The
 buffer remains valid as long as @list is valid.
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -20890,6 +21056,25 @@ Since: 0.10.18
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_rtcp_sdes_type_to_name">
+<description>
+Converts @type to the string equivalent. The string is typically used as a
+key in a #GstStructure containing SDES items.
+
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> a #GstRTCPSDESType
+</parameter_description>
+</parameter>
+</parameters>
+<return> the string equivalent of @type
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_sdp_media_get_proto">
@@ -21947,6 +22132,8 @@ for sending NEW_SEGMENT events and for performing seeks.
 If a format of GST_FORMAT_BYTES is set, the element will be able to
 operate in pull mode if the #GstBaseSrc.is_seekable() returns TRUE.
 
+This function must only be called in states &lt; %GST_STATE_PAUSED.
+
 Since: 0.10.1
 
 </description>
@@ -22058,6 +22245,8 @@ depending on the type of the pad.
 <function name="GstBufferList">
 <description>
 Opaque list of grouped buffers.
+
+Since: 0.10.24
 
 </description>
 <parameters>
@@ -22212,6 +22401,8 @@ the implicit cursor, a subsequent call to gst_buffer_list_iterator_next()
 will return the buffer after the inserted buffer, if any.
 
 This function takes ownership of @buffer.
+
+Since: 0.10.24
 
 </description>
 <parameters>
@@ -22404,6 +22595,8 @@ the state of the iterator @it or the list.
 </parameter>
 </parameters>
 <return> a new #GstBuffer, gst_buffer_unref() after usage, or NULL
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -22952,6 +23145,8 @@ Returns: the next buffer in the current group of the buffer list, or NULL
 </parameter>
 </parameters>
 <return> the next buffer in the current group of the buffer list, or NULL
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -23243,28 +23438,6 @@ abort program execution.
 <return></return>
 </function>
 
-<function name="gst_byte_writer_put_double_be">
-<description>
-Writes a big endian 64 bit float to @writer.
-
-
-</description>
-<parameters>
-<parameter name="writer">
-<parameter_description> #GstByteWriter instance
-</parameter_description>
-</parameter>
-<parameter name="val">
-<parameter_description> Value to write
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the value could be written
-
-Since: 0.10.26
-</return>
-</function>
-
 <function name="gst_buffer_get_caps">
 <description>
 Gets the media type of the buffer. This can be NULL if there
@@ -23387,6 +23560,8 @@ See #GstBufferListDoFunction for more details.
 </parameter>
 </parameters>
 <return> the return value from @do_func
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -23405,7 +23580,7 @@ Since: 0.10.18
 
 </description>
 <parameters>
-<parameter name="element">
+<parameter name="element_name">
 <parameter_description> name of the element that needs to be created
 </parameter_description>
 </parameter>
@@ -24684,6 +24859,8 @@ This function unrefs the replaced buffer if it has not been stolen with
 gst_buffer_list_iterator_steal() and takes ownership of @buffer (i.e. the
 refcount of @buffer is not increased).
 
+Since: 0.10.24
+
 </description>
 <parameters>
 <parameter name="it">
@@ -25478,28 +25655,6 @@ MT safe.
 <function name="gst_byte_writer_put_uint24_le">
 <description>
 Writes a unsigned little endian 24 bit integer to @writer.
-
-
-</description>
-<parameters>
-<parameter name="writer">
-<parameter_description> #GstByteWriter instance
-</parameter_description>
-</parameter>
-<parameter name="val">
-<parameter_description> Value to write
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the value could be written
-
-Since: 0.10.26
-</return>
-</function>
-
-<function name="gst_byte_writer_put_float_le">
-<description>
-Writes a little endian 32 bit float to @writer.
 
 
 </description>
@@ -26432,6 +26587,25 @@ Since: 0.10.22
 </return>
 </function>
 
+<function name="gst_tag_get_language_code_iso_639_1">
+<description>
+Returns: two-letter ISO-639-1 language code string that maps to @lang_code,
+
+</description>
+<parameters>
+<parameter name="lang_code">
+<parameter_description> ISO-639 language code (e.g. &quot;deu&quot; or &quot;ger&quot; or &quot;de&quot;)
+</parameter_description>
+</parameter>
+</parameters>
+<return> two-letter ISO-639-1 language code string that maps to @lang_code,
+or NULL if no mapping is known. The returned string must not be
+modified or freed.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_video_format_get_component_width">
 <description>
 Calculates the width of the component.  See
@@ -27068,6 +27242,8 @@ the returned #GstBufferList.
 <parameters>
 </parameters>
 <return> the new #GstBufferList. gst_buffer_list_unref() after usage.
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -28445,6 +28621,8 @@ Returns: the last buffer returned by gst_buffer_list_iterator_next()
 </parameter>
 </parameters>
 <return> the last buffer returned by gst_buffer_list_iterator_next()
+
+Since: 0.10.24
 </return>
 </function>
 
@@ -35953,6 +36131,7 @@ Since: 0.10.24
 <description>
 Convenience function to read a string with unknown character encoding. If
 the string is already in UTF-8 encoding, it will be returned right away.
+If not it tries to detect byte-order-mark for UTF-16/32 cases and use that.
 Otherwise, the environment will be searched for a number of environment
 variables (whose names are specified in the NULL-terminated string array
 @env_vars) containing a list of character encodings to try/use. If none
@@ -36948,15 +37127,19 @@ gst_bin_add() before trying to link them.
 <description>
 Set just the address bytes stored in @naddr into @address.
 
-Note that @port must be expressed in network byte order, use g_htons() to convert
-it to network byte order order. IP4 address bytes must also be stored in
-network byte order.
+Note that @port must be expressed in network byte order, use g_htons() to
+convert it to network byte order order. IP4 address bytes must also be
+stored in network byte order.
 
 
 </description>
 <parameters>
 <parameter name="naddr">
 <parameter_description> a network address
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> the address type (IPv4 or IPV6)
 </parameter_description>
 </parameter>
 <parameter name="address">
@@ -39485,9 +39668,10 @@ MT safe.
 Push @out_buf to the peer of @filter. This function takes ownership of
 @out_buf.
 
-Unlike gst_base_rtp_depayload_push(), this function will apply @timestamp
-on the outgoing buffer, using the configured clock_rate to convert the
-timestamp to a valid GStreamer clock time.
+Unlike gst_base_rtp_depayload_push(), this function will by default apply
+the last incomming timestamp on the outgoing buffer when it didn't have a
+timestamp already. The set_get_timestamp vmethod can be overwritten to change
+this behaviour (and take, for example, @timestamp into account).
 
 
 </description>
@@ -39694,6 +39878,26 @@ or NULL
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_rtcp_sdes_name_to_type">
+<description>
+Convert @name into a @GstRTCPSDESType. @name is typically a key in a
+#GstStructure containing SDES items.
+
+
+</description>
+<parameters>
+<parameter name="name">
+<parameter_description> a SDES name
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstRTCPSDESType for @name or #GST_RTCP_SDES_PRIV when @name
+is a private sdes item.
+
+Since: 0.10.26
+</return>
 </function>
 
 <function name="gst_missing_element_message_new">
@@ -41256,6 +41460,20 @@ MT safe.
 </return>
 </function>
 
+<function name="gst_tag_get_language_codes">
+<description>
+Returns: NULL-terminated string array with two-letter language codes. Free
+
+</description>
+<parameters>
+</parameters>
+<return> NULL-terminated string array with two-letter language codes. Free
+with g_strfreev() when no longer needed.
+
+Since: 0.10.26
+</return>
+</function>
+
 <function name="gst_fft_s16_free">
 <description>
 This frees the memory allocated for @self.
@@ -41457,7 +41675,8 @@ Push @out_buf to the peer of @filter. This function takes ownership of
 @out_buf.
 
 Unlike gst_base_rtp_depayload_push_ts(), this function will not apply
-any timestamp on the outgoing buffer.
+any timestamp on the outgoing buffer. Subclasses should therefore timestamp
+outgoing buffers themselves.
 
 
 </description>
@@ -41507,28 +41726,6 @@ Set the given query type function for the pad.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gst_byte_writer_put_double_le">
-<description>
-Writes a little endian 64 bit float to @writer.
-
-
-</description>
-<parameters>
-<parameter name="writer">
-<parameter_description> #GstByteWriter instance
-</parameter_description>
-</parameter>
-<parameter name="val">
-<parameter_description> Value to write
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the value could be written
-
-Since: 0.10.26
-</return>
 </function>
 
 <function name="gst_bin_iterate_sinks">
@@ -41743,6 +41940,8 @@ Get the number of time zone information entries in @msg.
 <function name="gst_buffer_list_iterator_free">
 <description>
 Free the iterator.
+
+Since: 0.10.24
 
 </description>
 <parameters>
@@ -42440,6 +42639,8 @@ the max MTU is exceeded or the number of sources blocks is greater than
 <function name="GstBufferListIterator">
 <description>
 Opaque iterator for a #GstBufferList.
+
+Since: 0.10.24
 
 </description>
 <parameters>

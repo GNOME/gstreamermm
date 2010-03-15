@@ -11964,9 +11964,9 @@
   (return-type "guint8*")
 )
 
-(define-method reset_and_get_data_as_buffer
+(define-method reset_and_get_buffer
   (of-object "GstByteWriter")
-  (c-name "gst_byte_writer_reset_and_get_data_as_buffer")
+  (c-name "gst_byte_writer_reset_and_get_buffer")
   (return-type "GstBuffer*")
 )
 
@@ -12141,36 +12141,36 @@
   )
 )
 
-(define-method put_float_be
+(define-method put_float32_be
   (of-object "GstByteWriter")
-  (c-name "gst_byte_writer_put_float_be")
+  (c-name "gst_byte_writer_put_float32_be")
   (return-type "gboolean")
   (parameters
     '("gfloat" "val")
   )
 )
 
-(define-method put_float_le
+(define-method put_float32_le
   (of-object "GstByteWriter")
-  (c-name "gst_byte_writer_put_float_le")
+  (c-name "gst_byte_writer_put_float32_le")
   (return-type "gboolean")
   (parameters
     '("gfloat" "val")
   )
 )
 
-(define-method put_double_be
+(define-method put_float64_be
   (of-object "GstByteWriter")
-  (c-name "gst_byte_writer_put_double_be")
+  (c-name "gst_byte_writer_put_float64_be")
   (return-type "gboolean")
   (parameters
     '("gdouble" "val")
   )
 )
 
-(define-method put_double_le
+(define-method put_float64_le
   (of-object "GstByteWriter")
-  (c-name "gst_byte_writer_put_double_le")
+  (c-name "gst_byte_writer_put_float64_le")
   (return-type "gboolean")
   (parameters
     '("gdouble" "val")
@@ -12183,6 +12183,16 @@
   (return-type "gboolean")
   (parameters
     '("const-guint8*" "data")
+    '("guint" "size")
+  )
+)
+
+(define-method fill
+  (of-object "GstByteWriter")
+  (c-name "gst_byte_writer_fill")
+  (return-type "gboolean")
+  (parameters
+    '("const-guint8" "value")
     '("guint" "size")
   )
 )
@@ -12948,7 +12958,7 @@
   (return-type "gboolean")
   (parameters
     '("GstClockTime" "timestamp")
-    '("GValue*" "value")
+    '("const-GValue*" "value")
   )
 )
 
@@ -12957,7 +12967,7 @@
   (c-name "gst_interpolation_control_source_set_from_list")
   (return-type "gboolean")
   (parameters
-    '("GSList*" "timedvalues")
+    '("const-GSList*" "timedvalues")
   )
 )
 
@@ -17798,6 +17808,20 @@
   )
 )
 
+(define-method to_name
+  (of-object "GstRTCPSDESType")
+  (c-name "gst_rtcp_sdes_type_to_name")
+  (return-type "const-gchar*")
+)
+
+(define-function gst_rtcp_sdes_name_to_type
+  (c-name "gst_rtcp_sdes_name_to_type")
+  (return-type "GstRTCPSDESType")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
 
 
 ;; From gstrtpbuffer.h
@@ -20000,6 +20024,43 @@
 (define-function gst_tag_register_musicbrainz_tags
   (c-name "gst_tag_register_musicbrainz_tags")
   (return-type "none")
+)
+
+(define-function gst_tag_get_language_codes
+  (c-name "gst_tag_get_language_codes")
+  (return-type "gchar**")
+)
+
+(define-function gst_tag_get_language_name
+  (c-name "gst_tag_get_language_name")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "language_code")
+  )
+)
+
+(define-function gst_tag_get_language_code_iso_639_1
+  (c-name "gst_tag_get_language_code_iso_639_1")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "lang_code")
+  )
+)
+
+(define-function gst_tag_get_language_code_iso_639_2B
+  (c-name "gst_tag_get_language_code_iso_639_2B")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "lang_code")
+  )
+)
+
+(define-function gst_tag_get_language_code_iso_639_2T
+  (c-name "gst_tag_get_language_code_iso_639_2T")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "lang_code")
+  )
 )
 
 

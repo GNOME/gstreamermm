@@ -1,277 +1,457 @@
-0a1,2
-> ;; Apply gst_enums.defs.patch after regenerating.
-> 
-16c18,27
-<     '("y" "GST_BUFFER_FLAG_READONLY" "#error")
----
->     '("readonly" "GST_BUFFER_FLAG_READONLY" "GST_MINI_OBJECT_FLAG_READONLY")
->     '("preroll" "GST_BUFFER_FLAG_PREROLL" "GST_MINI_OBJECT_FLAG_LAST << 0")
->     '("discont" "GST_BUFFER_FLAG_DISCONT" "GST_MINI_OBJECT_FLAG_LAST << 1")
->     '("in-caps" "GST_BUFFER_FLAG_IN_CAPS" "GST_MINI_OBJECT_FLAG_LAST << 2")
->     '("gap" "GST_BUFFER_FLAG_GAP" "GST_MINI_OBJECT_FLAG_LAST << 3")
->     '("delta-unit" "GST_BUFFER_FLAG_DELTA_UNIT" "GST_MINI_OBJECT_FLAG_LAST << 4")
->     '("media1" "GST_BUFFER_FLAG_MEDIA1" "GST_MINI_OBJECT_FLAG_LAST << 5")
->     '("media2" "GST_BUFFER_FLAG_MEDIA2" "GST_MINI_OBJECT_FLAG_LAST << 6")
->     '("media3" "GST_BUFFER_FLAG_MEDIA3" "GST_MINI_OBJECT_FLAG_LAST << 7")
->     '("last" "GST_BUFFER_FLAG_LAST" "GST_MINI_OBJECT_FLAG_LAST << 8")
-47a59,60
->     '("flushing" "GST_BUS_FLUSHING" "GST_OBJECT_FLAG_LAST << 0")
->     '("last" "GST_BUS_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 1")
-99a113,119
->     '("can-do-single-sync" "GST_CLOCK_FLAG_CAN_DO_SINGLE_SYNC" "GST_OBJECT_FLAG_LAST << 0")
->     '("can-do-single-async" "GST_CLOCK_FLAG_CAN_DO_SINGLE_ASYNC" "GST_OBJECT_FLAG_LAST << 1")
->     '("can-do-periodic-sync" "GST_CLOCK_FLAG_CAN_DO_PERIODIC_SYNC" "GST_OBJECT_FLAG_LAST << 2")
->     '("can-do-periodic-async" "GST_CLOCK_FLAG_CAN_DO_PERIODIC_ASYNC" "GST_OBJECT_FLAG_LAST << 3")
->     '("can-set-resolution" "GST_CLOCK_FLAG_CAN_SET_RESOLUTION" "GST_OBJECT_FLAG_LAST << 4")
->     '("can-set-master" "GST_CLOCK_FLAG_CAN_SET_MASTER" "GST_OBJECT_FLAG_LAST << 5")
->     '("last" "GST_CLOCK_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 8")
-140a161,162
-> ;; TODO: See why gmmproc reports errors when values of following enum are
-> ;; commented in.
-144a167,172
-> ;;    '("null-to-ready" "GST_STATE_CHANGE_NULL_TO_READY" "(GST_STATE_NULL<<3) | GST_STATE_READY")
-> ;;    '("ready-to-paused" "GST_STATE_CHANGE_READY_TO_PAUSED" "(GST_STATE_READY<<3) | GST_STATE_PAUSED")
-> ;;    '("paused-to-playing" "GST_STATE_CHANGE_PAUSED_TO_PLAYING" "(GST_STATE_PAUSED<<3) | GST_STATE_PLAYING")
-> ;;    '("playing-to-paused" "GST_STATE_CHANGE_PLAYING_TO_PAUSED" "(GST_STATE_PLAYING<<3) | GST_STATE_PAUSED")
-> ;;    '("paused-to-ready" "GST_STATE_CHANGE_PAUSED_TO_READY" "(GST_STATE_PAUSED<<3) | GST_STATE_READY")
-> ;;    '("ready-to-null" "GST_STATE_CHANGE_READY_TO_NULL" "(GST_STATE_READY<<3) | GST_STATE_NULL")
-151a180,183
->     '("locked-state" "GST_ELEMENT_LOCKED_STATE" "GST_OBJECT_FLAG_LAST << 0")
->     '("is-sink" "GST_ELEMENT_IS_SINK" "GST_OBJECT_FLAG_LAST << 1")
->     '("unparenting" "GST_ELEMENT_UNPARENTING" "GST_OBJECT_FLAG_LAST << 2")
->     '("flag-set" "GST_ELEMENT_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 16")
-248,281d279
-< (define-enum-extended EventType
-<   (in-module "Gst")
-<   (c-name "GstEventType")
-<   (values
-<     '("gst-event-unknown" "GST_EVENT_UNKNOWN" "#error")
-<     '("0)" "0)" "1")
-<     '("gst-event-flush-start" "GST_EVENT_FLUSH_START" "2")
-<     '("flag(both))" "FLAG(BOTH))" "3")
-<     '("gst-event-flush-stop" "GST_EVENT_FLUSH_STOP" "4")
-<     '("gst-event-eos" "GST_EVENT_EOS" "6")
-<     '("gst-event-newsegment" "GST_EVENT_NEWSEGMENT" "8")
-<     '("gst-event-tag" "GST_EVENT_TAG" "10")
-<     '("gst-event-buffersize" "GST_EVENT_BUFFERSIZE" "12")
-<     '("gst-event-qos" "GST_EVENT_QOS" "14")
-<     '("flag(upstream))" "FLAG(UPSTREAM))" "15")
-<     '("gst-event-seek" "GST_EVENT_SEEK" "16")
-<     '("flag(upstream))" "FLAG(UPSTREAM))" "17")
-<     '("gst-event-navigation" "GST_EVENT_NAVIGATION" "18")
-<     '("flag(upstream))" "FLAG(UPSTREAM))" "19")
-<     '("gst-event-latency" "GST_EVENT_LATENCY" "20")
-<     '("flag(upstream))" "FLAG(UPSTREAM))" "21")
-<     '("gst-event-step" "GST_EVENT_STEP" "22")
-<     '("flag(upstream))" "FLAG(UPSTREAM))" "23")
-<     '("gst-event-custom-upstream" "GST_EVENT_CUSTOM_UPSTREAM" "24")
-<     '("flag(upstream))" "FLAG(UPSTREAM))" "25")
-<     '("gst-event-custom-downstream" "GST_EVENT_CUSTOM_DOWNSTREAM" "26")
-<     '("gst-event-custom-downstream-oob" "GST_EVENT_CUSTOM_DOWNSTREAM_OOB" "28")
-<     '("flag(downstream))" "FLAG(DOWNSTREAM))" "29")
-<     '("gst-event-custom-both" "GST_EVENT_CUSTOM_BOTH" "30")
-<     '("gst-event-custom-both-oob" "GST_EVENT_CUSTOM_BOTH_OOB" "32")
-<     '("flag(both))" "FLAG(BOTH))" "33")
-<   )
-< )
-< 
-378a377,379
->     '("writable" "GST_INDEX_WRITABLE" "GST_OBJECT_FLAG_LAST << 0")
->     '("readable" "GST_INDEX_READABLE" "GST_OBJECT_FLAG_LAST << 1")
->     '("last" "GST_INDEX_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 8")
-479c480
-<     '("any" "GST_MESSAGE_ANY" "0xFFFFFFFFFFFFFFFF")
----
->     '("any" "GST_MESSAGE_ANY" "~0")
-585a587,592
->     '("blocked" "GST_PAD_BLOCKED" "GST_OBJECT_FLAG_LAST << 0")
->     '("flushing" "GST_PAD_FLUSHING" "GST_OBJECT_FLAG_LAST << 1")
->     '("in-getcaps" "GST_PAD_IN_GETCAPS" "GST_OBJECT_FLAG_LAST << 2")
->     '("in_setcaps" "GST_PAD_IN_SETCAPS" "GST_OBJECT_FLAG_LAST << 3")
->     '("blocking" "GST_PAD_BLOCKING" "GST_OBJECT_FLAG_LAST << 4")
->     '("last" "GST_PAD_FLAG_LAST" "GST_OBJECT_FLAG_LAST << 8")
-604a612,613
->     '("fixed" "GST_PAD_TEMPLATE_FIXED" "GST_OBJECT_FLAG_LAST << 0")
->     '("last" "GST_PAD_TEMPLATE_LAST" "GST_OBJECT_FLAG_LAST << 4")
-997,1003c1006,1012
-<     '("none" "FAKE_SINK_STATE_ERROR_NONE" "0")
-<     '("null-ready" "FAKE_SINK_STATE_ERROR_NULL_READY" "1")
-<     '("ready-paused" "FAKE_SINK_STATE_ERROR_READY_PAUSED" "2")
-<     '("paused-playing" "FAKE_SINK_STATE_ERROR_PAUSED_PLAYING" "3")
-<     '("playing-paused" "FAKE_SINK_STATE_ERROR_PLAYING_PAUSED" "4")
-<     '("paused-ready" "FAKE_SINK_STATE_ERROR_PAUSED_READY" "5")
-<     '("ready-null" "FAKE_SINK_STATE_ERROR_READY_NULL" "6")
----
->     '("none" "GST_FAKE_SINK_STATE_ERROR_NONE" "0")
->     '("null-ready" "GST_FAKE_SINK_STATE_ERROR_NULL_READY" "1")
->     '("ready-paused" "GST_FAKE_SINK_STATE_ERROR_READY_PAUSED" "2")
->     '("paused-playing" "GST_FAKE_SINK_STATE_ERROR_PAUSED_PLAYING" "3")
->     '("playing-paused" "GST_FAKE_SINK_STATE_ERROR_PLAYING_PAUSED" "4")
->     '("paused-ready" "GST_FAKE_SINK_STATE_ERROR_PAUSED_READY" "5")
->     '("ready-null" "GST_FAKE_SINK_STATE_ERROR_READY_NULL" "6")
-1013,1020c1022,1029
-<     '("first-last-loop" "FAKE_SRC_FIRST_LAST_LOOP" "1")
-<     '("last-first-loop" "FAKE_SRC_LAST_FIRST_LOOP" "2")
-<     '("ping-pong" "FAKE_SRC_PING_PONG" "3")
-<     '("ordered-random" "FAKE_SRC_ORDERED_RANDOM" "4")
-<     '("random" "FAKE_SRC_RANDOM" "5")
-<     '("pattern-loop" "FAKE_SRC_PATTERN_LOOP" "6")
-<     '("ping-pong-pattern" "FAKE_SRC_PING_PONG_PATTERN" "7")
-<     '("get-always-suceeds" "FAKE_SRC_GET_ALWAYS_SUCEEDS" "8")
----
->     '("first-last-loop" "GST_FAKE_SRC_FIRST_LAST_LOOP" "1")
->     '("last-first-loop" "GST_FAKE_SRC_LAST_FIRST_LOOP" "2")
->     '("ping-pong" "GST_FAKE_SRC_PING_PONG" "3")
->     '("ordered-random" "GST_FAKE_SRC_ORDERED_RANDOM" "4")
->     '("random" "GST_FAKE_SRC_RANDOM" "5")
->     '("pattern-loop" "GST_FAKE_SRC_PATTERN_LOOP" "6")
->     '("ping-pong-pattern" "GST_FAKE_SRC_PING_PONG_PATTERN" "7")
->     '("get-always-suceeds" "GST_FAKE_SRC_GET_ALWAYS_SUCEEDS" "8")
-1028,1029c1037,1038
-<     '("allocate" "FAKE_SRC_DATA_ALLOCATE" "1")
-<     '("subbuffer" "FAKE_SRC_DATA_SUBBUFFER" "2")
----
->     '("allocate" "GST_FAKE_SRC_DATA_ALLOCATE" "1")
->     '("subbuffer" "GST_FAKE_SRC_DATA_SUBBUFFER" "2")
-1037,1039c1046,1048
-<     '("empty" "FAKE_SRC_SIZETYPE_EMPTY" "1")
-<     '("fixed" "FAKE_SRC_SIZETYPE_FIXED" "2")
-<     '("random" "FAKE_SRC_SIZETYPE_RANDOM" "3")
----
->     '("empty" "GST_FAKE_SRC_SIZETYPE_EMPTY" "1")
->     '("fixed" "GST_FAKE_SRC_SIZETYPE_FIXED" "2")
->     '("random" "GST_FAKE_SRC_SIZETYPE_RANDOM" "3")
-1047,1051c1056,1072
-<     '("nothing" "FAKE_SRC_FILLTYPE_NOTHING" "1")
-<     '("zero" "FAKE_SRC_FILLTYPE_ZERO" "2")
-<     '("random" "FAKE_SRC_FILLTYPE_RANDOM" "3")
-<     '("pattern" "FAKE_SRC_FILLTYPE_PATTERN" "4")
-<     '("pattern-cont" "FAKE_SRC_FILLTYPE_PATTERN_CONT" "5")
----
->     '("nothing" "GST_FAKE_SRC_FILLTYPE_NOTHING" "1")
->     '("zero" "GST_FAKE_SRC_FILLTYPE_ZERO" "2")
->     '("random" "GST_FAKE_SRC_FILLTYPE_RANDOM" "3")
->     '("pattern" "GST_FAKE_SRC_FILLTYPE_PATTERN" "4")
->     '("pattern-cont" "GST_FAKE_SRC_FILLTYPE_PATTERN_CONT" "5")
->   )
-> )
-> 
-> ;; Handwritten for the filesink plug-in (Gst::FileSink).
-> (define-enum-extended FileSinkBufferMode
->   (in-module "Gst")
->   (c-name "GstFileSinkBufferMode")
->   (values
->     '("default" "GST_FILE_SINK_BUFFER_MODE_DEFAULT" "-1")
->     '("full" "GST_FILE_SINK_BUFFER_MODE_FULL" "0")
->     '("line" "GST_FILE_SINK_BUFFER_MODE_LINE" "1")
->     '("unbuffered" "GST_FILE_SINK_BUFFER_MODE_UNBUFFERED" "2")
-1077a1099,1109
-> ;; Handwritten for the queue plug-in (Gst::Queue).
-> (define-enum-extended QueueLeaky
->   (in-module "Gst")
->   (c-name "GstQueueLeaky")
->   (values
->     '("no" "GST_QUEUE_LEAKY_NONE" "0")
->     '("upstream" "GST_QUEUE_LEAKY_UPSTREAM" "1")
->     '("downstream" "GST_QUEUE_LEAKY_DOWNSTREAM" "2")
->   )
-> )
-> 
-1920,1923c1952,1955
-<     '("none" "DITHER_NONE" "0")
-<     '("rpdf" "DITHER_RPDF" "1")
-<     '("tpdf" "DITHER_TPDF" "2")
-<     '("tpdf-hf" "DITHER_TPDF_HF" "3")
----
->     '("none" "GST_AUDIO_CONVERT_DITHER_NONE" "0")
->     '("rpdf" "GST_AUDIO_CONVERT_DITHER_RPDF" "1")
->     '("tpdf" "GST_AUDIO_CONVERT_DITHER_TPDF" "2")
->     '("tpdf-hf" "GST_AUDIO_CONVERT_DITHER_TPDF_HF" "3")
-1931,1935c1963,1967
-<     '("none" "NOISE_SHAPING_NONE" "0")
-<     '("error-feedback" "NOISE_SHAPING_ERROR_FEEDBACK" "1")
-<     '("simple" "NOISE_SHAPING_SIMPLE" "2")
-<     '("medium" "NOISE_SHAPING_MEDIUM" "3")
-<     '("high" "NOISE_SHAPING_HIGH" "4")
----
->     '("none" "GST_AUDIO_CONVERT_NOISE_SHAPING_NONE" "0")
->     '("error-feedback" "GST_AUDIO_CONVERT_NOISE_SHAPING_ERROR_FEEDBACK" "1")
->     '("simple" "GST_AUDIO_CONVERT_NOISE_SHAPING_SIMPLE" "2")
->     '("medium" "GST_AUDIO_CONVERT_NOISE_SHAPING_MEDIUM" "3")
->     '("high" "GST_AUDIO_CONVERT_NOISE_SHAPING_HIGH" "4")
-2260,2268d2291
-< (define-enum-extended 
-<   (in-module "Gst")
-<   (c-name "")
-<   (values
-<     '("control" "GST_OGG_PAD_STATE_CONTROL" "0")
-<     '("data" "GST_OGG_PAD_STATE_DATA" "1")
-<   )
-< )
-< 
-2296,2298c2319,2321
-<     '("word" "GST_TEXT_OVERLAY_WRAP_MODE_WORD" "#error")
-<     '("char" "GST_TEXT_OVERLAY_WRAP_MODE_CHAR" "#error")
-<     '("word-char" "GST_TEXT_OVERLAY_WRAP_MODE_WORD_CHAR" "#error")
----
->     '("word" "GST_TEXT_OVERLAY_WRAP_MODE_WORD" "0")
->     '("char" "GST_TEXT_OVERLAY_WRAP_MODE_CHAR" "1")
->     '("word-char" "GST_TEXT_OVERLAY_WRAP_MODE_WORD_CHAR" "2")
-2306,2308c2329,2331
-<     '("left" "GST_TEXT_OVERLAY_LINE_ALIGN_LEFT" "#error")
-<     '("center" "GST_TEXT_OVERLAY_LINE_ALIGN_CENTER" "#error")
-<     '("right" "GST_TEXT_OVERLAY_LINE_ALIGN_RIGHT" "#error")
----
->     '("left" "GST_TEXT_OVERLAY_LINE_ALIGN_LEFT" "0")
->     '("center" "GST_TEXT_OVERLAY_LINE_ALIGN_CENTER" "1")
->     '("right" "GST_TEXT_OVERLAY_LINE_ALIGN_RIGHT" "2")
-2338,2340c2361,2363
-<     '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "#error")
-<     '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "#error")
-<     '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "#error")
----
->     '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "0")
->     '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "1")
->     '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "2")
-2346c2369
-< (define-enum-extended 
----
-> (define-enum-extended TheoraEncBorderMode
-2348c2371
-<   (c-name "")
----
->   (c-name "GstTheoraEncBorderMode")
-2350,2352c2373,2375
-<     '("none" "BORDER_NONE" "0")
-<     '("black" "BORDER_BLACK" "1")
-<     '("mirror" "BORDER_MIRROR" "2")
----
->     '("none" "GST_THEORA_ENC_BORDER_NONE" "0")
->     '("black" "GST_THEORA_ENC_BORDER_BLACK" "1")
->     '("mirror" "GST_THEORA_ENC_BORDER_MIRROR" "2")
-2355a2379,2403
-> ;; Handwritten for CdParanoiaSrc plugin (values taken from output of
-> ;; `gst-inspect cdparanoiasrc' -- "paranoia-mode" property information)
-> (define-enum-extended GstCdParanoiaSrc
->   (in-module "Gst")
->   (c-name "GstCdParanoiaMode")
->   (values
->     '("disable" "GST_PARANOIA_MODE_DISABLE" "1<<0")
->     '("fragment" "GST_PARANOIA_MODE_FRAGMENT" "1<<1")
->     '("overlap" "GST_PARANOIA_MODE_OVERLAP" "1<<2")
->     '("scratch" "GST_PARANOIA_MODE_SCRATCH" "1<<3")
->     '("repair" "GST_PARANOIA_MODE_REPAIR" "1<<4")
->     '("full" "GST_PARANOIA_MODE_FULL" "0xff")
->   )
-> )
-> 
-> ;; Handwritten for MultiFdSink plugin (taken from gstmultifdsink.c):
-> (define-enum-extended FDSetMode
->   (in-module "Gst")
->   (c-name "GstFDSetMode")
->   (values
->     '("select" "GST_FD_SET_MODE_SELECT" "0")
->     '("poll" "GST_FD_SET_MODE_POLL" "1")
->     '("epoll" "GST_FD_SET_MODE_EPOLL" "2")
->   )
-> )
+--- gst_enums.defs	2010-03-15 17:06:39.000000000 -0400
++++ gst_enums.defs.new	2010-03-15 17:15:41.000000000 -0400
+@@ -1,10 +1,12 @@
++;; Apply gst_enums.defs.patch after regenerating.
++
+ ;; From gstbin.h
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;   /* padding */
+ ;;   GST_BIN_FLAG_LAST		= (GST_ELEMENT_FLAG_LAST << 5)
+ ;; } GstBinFlags;
+ 
+ (define-flags-extended BinFlags
+   (in-module "Gst")
+@@ -478,90 +480,20 @@
+   (c-name "GstEventTypeFlags")
+   (values
+     '("upstream" "GST_EVENT_TYPE_UPSTREAM" "1 << 0")
+     '("downstream" "GST_EVENT_TYPE_DOWNSTREAM" "1 << 1")
+     '("serialized" "GST_EVENT_TYPE_SERIALIZED" "1 << 2")
+   )
+ )
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+-;;   GST_EVENT_UNKNOWN               = GST_EVENT_MAKE_TYPE (0, 0),
+-;;   /* bidirectional events */
+-;;   GST_EVENT_FLUSH_START           = GST_EVENT_MAKE_TYPE (1, FLAG(BOTH)),
+-;;   GST_EVENT_FLUSH_STOP            = GST_EVENT_MAKE_TYPE (2, FLAG(BOTH) | FLAG(SERIALIZED)),
+-;;   /* downstream serialized events */
+-;;   GST_EVENT_EOS                   = GST_EVENT_MAKE_TYPE (5, FLAG(DOWNSTREAM) | FLAG(SERIALIZED)),
+-;;   GST_EVENT_NEWSEGMENT            = GST_EVENT_MAKE_TYPE (6, FLAG(DOWNSTREAM) | FLAG(SERIALIZED)),
+-;;   GST_EVENT_TAG                   = GST_EVENT_MAKE_TYPE (7, FLAG(DOWNSTREAM) | FLAG(SERIALIZED)),
+-;;   GST_EVENT_BUFFERSIZE            = GST_EVENT_MAKE_TYPE (8, FLAG(DOWNSTREAM) | FLAG(SERIALIZED)),
+-;;   GST_EVENT_SINK_MESSAGE          = GST_EVENT_MAKE_TYPE (9, FLAG(DOWNSTREAM) | FLAG(SERIALIZED)),
+-;;   /* upstream events */
+-;;   GST_EVENT_QOS                   = GST_EVENT_MAKE_TYPE (15, FLAG(UPSTREAM)),
+-;;   GST_EVENT_SEEK                  = GST_EVENT_MAKE_TYPE (16, FLAG(UPSTREAM)),
+-;;   GST_EVENT_NAVIGATION            = GST_EVENT_MAKE_TYPE (17, FLAG(UPSTREAM)),
+-;;   GST_EVENT_LATENCY               = GST_EVENT_MAKE_TYPE (18, FLAG(UPSTREAM)),
+-;;   GST_EVENT_STEP                  = GST_EVENT_MAKE_TYPE (19, FLAG(UPSTREAM)),
+-;; 
+-;;   /* custom events start here */
+-;;   GST_EVENT_CUSTOM_UPSTREAM       = GST_EVENT_MAKE_TYPE (32, FLAG(UPSTREAM)),
+-;;   GST_EVENT_CUSTOM_DOWNSTREAM     = GST_EVENT_MAKE_TYPE (32, FLAG(DOWNSTREAM) | FLAG(SERIALIZED)),
+-;;   GST_EVENT_CUSTOM_DOWNSTREAM_OOB = GST_EVENT_MAKE_TYPE (32, FLAG(DOWNSTREAM)),
+-;;   GST_EVENT_CUSTOM_BOTH           = GST_EVENT_MAKE_TYPE (32, FLAG(BOTH) | FLAG(SERIALIZED)),
+-;;   GST_EVENT_CUSTOM_BOTH_OOB       = GST_EVENT_MAKE_TYPE (32, FLAG(BOTH))
+-;; } GstEventType;
+-
+-(define-flags-extended EventType
+-  (in-module "Gst")
+-  (c-name "GstEventType")
+-  (values
+-    '("gst-event-unknown" "GST_EVENT_UNKNOWN" "GST_EVENT_MAKE_TYPE (0")
+-    '("0)" "0)" "(GST_EVENT_MAKE_TYPE (0) + 1")
+-    '("gst-event-flush-start" "GST_EVENT_FLUSH_START" "GST_EVENT_MAKE_TYPE (1")
+-    '("flag(both))" "FLAG(BOTH))" "(GST_EVENT_MAKE_TYPE (1) + 1")
+-    '("gst-event-flush-stop" "GST_EVENT_FLUSH_STOP" "GST_EVENT_MAKE_TYPE (2")
+-    '("flag(both)" "FLAG(BOTH)" "| FLAG(SERIALIZED))")
+-    '("gst-event-eos" "GST_EVENT_EOS" "GST_EVENT_MAKE_TYPE (5")
+-    '("flag(downstream)" "FLAG(DOWNSTREAM)" "| FLAG(SERIALIZED))")
+-    '("gst-event-newsegment" "GST_EVENT_NEWSEGMENT" "GST_EVENT_MAKE_TYPE (6")
+-    '("flag(downstream)" "FLAG(DOWNSTREAM)" "| FLAG(SERIALIZED))")
+-    '("gst-event-tag" "GST_EVENT_TAG" "GST_EVENT_MAKE_TYPE (7")
+-    '("flag(downstream)" "FLAG(DOWNSTREAM)" "| FLAG(SERIALIZED))")
+-    '("gst-event-buffersize" "GST_EVENT_BUFFERSIZE" "GST_EVENT_MAKE_TYPE (8")
+-    '("flag(downstream)" "FLAG(DOWNSTREAM)" "| FLAG(SERIALIZED))")
+-    '("gst-event-sink-message" "GST_EVENT_SINK_MESSAGE" "GST_EVENT_MAKE_TYPE (9")
+-    '("flag(downstream)" "FLAG(DOWNSTREAM)" "| FLAG(SERIALIZED))")
+-    '("gst-event-qos" "GST_EVENT_QOS" "GST_EVENT_MAKE_TYPE (15")
+-    '("flag(upstream))" "FLAG(UPSTREAM))" "(GST_EVENT_MAKE_TYPE (15) + 1")
+-    '("gst-event-seek" "GST_EVENT_SEEK" "GST_EVENT_MAKE_TYPE (16")
+-    '("flag(upstream))" "FLAG(UPSTREAM))" "(GST_EVENT_MAKE_TYPE (16) + 1")
+-    '("gst-event-navigation" "GST_EVENT_NAVIGATION" "GST_EVENT_MAKE_TYPE (17")
+-    '("flag(upstream))" "FLAG(UPSTREAM))" "(GST_EVENT_MAKE_TYPE (17) + 1")
+-    '("gst-event-latency" "GST_EVENT_LATENCY" "GST_EVENT_MAKE_TYPE (18")
+-    '("flag(upstream))" "FLAG(UPSTREAM))" "(GST_EVENT_MAKE_TYPE (18) + 1")
+-    '("gst-event-step" "GST_EVENT_STEP" "GST_EVENT_MAKE_TYPE (19")
+-    '("flag(upstream))" "FLAG(UPSTREAM))" "(GST_EVENT_MAKE_TYPE (19) + 1")
+-    '("gst-event-custom-upstream" "GST_EVENT_CUSTOM_UPSTREAM" "GST_EVENT_MAKE_TYPE (32")
+-    '("flag(upstream))" "FLAG(UPSTREAM))" "(GST_EVENT_MAKE_TYPE (32) + 1")
+-    '("gst-event-custom-downstream" "GST_EVENT_CUSTOM_DOWNSTREAM" "GST_EVENT_MAKE_TYPE (32")
+-    '("flag(downstream)" "FLAG(DOWNSTREAM)" "| FLAG(SERIALIZED))")
+-    '("gst-event-custom-downstream-oob" "GST_EVENT_CUSTOM_DOWNSTREAM_OOB" "GST_EVENT_MAKE_TYPE (32")
+-    '("flag(downstream))" "FLAG(DOWNSTREAM))" "(GST_EVENT_MAKE_TYPE (32) + 1")
+-    '("gst-event-custom-both" "GST_EVENT_CUSTOM_BOTH" "GST_EVENT_MAKE_TYPE (32")
+-    '("flag(both)" "FLAG(BOTH)" "| FLAG(SERIALIZED))")
+-    '("gst-event-custom-both-oob" "GST_EVENT_CUSTOM_BOTH_OOB" "GST_EVENT_MAKE_TYPE (32")
+-    '("flag(both))" "FLAG(BOTH))" "(GST_EVENT_MAKE_TYPE (32) + 1")
+-  )
+-)
+-
+-;; Original typedef:
+-;; typedef enum {
+ ;;   /* one of these */
+ ;;   GST_SEEK_TYPE_NONE            = 0,
+ ;;   GST_SEEK_TYPE_CUR             = 1,
+ ;;   GST_SEEK_TYPE_SET             = 2,
+ ;;   GST_SEEK_TYPE_END             = 3
+ ;; } GstSeekType;
+ 
+ (define-enum-extended SeekType
+   (in-module "Gst")
+   (c-name "GstSeekType")
+@@ -1855,27 +1787,27 @@
+ ;;   FAKE_SINK_STATE_ERROR_PAUSED_PLAYING,
+ ;;   FAKE_SINK_STATE_ERROR_PLAYING_PAUSED,
+ ;;   FAKE_SINK_STATE_ERROR_PAUSED_READY,
+ ;;   FAKE_SINK_STATE_ERROR_READY_NULL
+ ;; } GstFakeSinkStateError;
+ 
+ (define-enum-extended FakeSinkStateError
+   (in-module "Gst")
+   (c-name "GstFakeSinkStateError")
+   (values
+-    '("none" "FAKE_SINK_STATE_ERROR_NONE" "0")
+-    '("null-ready" "FAKE_SINK_STATE_ERROR_NULL_READY" "1")
+-    '("ready-paused" "FAKE_SINK_STATE_ERROR_READY_PAUSED" "2")
+-    '("paused-playing" "FAKE_SINK_STATE_ERROR_PAUSED_PLAYING" "3")
+-    '("playing-paused" "FAKE_SINK_STATE_ERROR_PLAYING_PAUSED" "4")
+-    '("paused-ready" "FAKE_SINK_STATE_ERROR_PAUSED_READY" "5")
+-    '("ready-null" "FAKE_SINK_STATE_ERROR_READY_NULL" "6")
++    '("none" "GST_FAKE_SINK_STATE_ERROR_NONE" "0")
++    '("null-ready" "GST_FAKE_SINK_STATE_ERROR_NULL_READY" "1")
++    '("ready-paused" "GST_FAKE_SINK_STATE_ERROR_READY_PAUSED" "2")
++    '("paused-playing" "GST_FAKE_SINK_STATE_ERROR_PAUSED_PLAYING" "3")
++    '("playing-paused" "GST_FAKE_SINK_STATE_ERROR_PLAYING_PAUSED" "4")
++    '("paused-ready" "GST_FAKE_SINK_STATE_ERROR_PAUSED_READY" "5")
++    '("ready-null" "GST_FAKE_SINK_STATE_ERROR_READY_NULL" "6")
+   )
+ )
+ 
+ ;; From gstfakesrc.h
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;   FAKE_SRC_FIRST_LAST_LOOP = 1,
+ ;;   FAKE_SRC_LAST_FIRST_LOOP,
+ ;;   FAKE_SRC_PING_PONG,
+@@ -1883,81 +1815,93 @@
+ ;;   FAKE_SRC_RANDOM,
+ ;;   FAKE_SRC_PATTERN_LOOP,
+ ;;   FAKE_SRC_PING_PONG_PATTERN,
+ ;;   FAKE_SRC_GET_ALWAYS_SUCEEDS
+ ;; } GstFakeSrcOutputType;
+ 
+ (define-enum-extended FakeSrcOutputType
+   (in-module "Gst")
+   (c-name "GstFakeSrcOutputType")
+   (values
+-    '("first-last-loop" "FAKE_SRC_FIRST_LAST_LOOP" "1")
+-    '("last-first-loop" "FAKE_SRC_LAST_FIRST_LOOP" "2")
+-    '("ping-pong" "FAKE_SRC_PING_PONG" "3")
+-    '("ordered-random" "FAKE_SRC_ORDERED_RANDOM" "4")
+-    '("random" "FAKE_SRC_RANDOM" "5")
+-    '("pattern-loop" "FAKE_SRC_PATTERN_LOOP" "6")
+-    '("ping-pong-pattern" "FAKE_SRC_PING_PONG_PATTERN" "7")
+-    '("get-always-suceeds" "FAKE_SRC_GET_ALWAYS_SUCEEDS" "8")
++    '("first-last-loop" "GST_FAKE_SRC_FIRST_LAST_LOOP" "1")
++    '("last-first-loop" "GST_FAKE_SRC_LAST_FIRST_LOOP" "2")
++    '("ping-pong" "GST_FAKE_SRC_PING_PONG" "3")
++    '("ordered-random" "GST_FAKE_SRC_ORDERED_RANDOM" "4")
++    '("random" "GST_FAKE_SRC_RANDOM" "5")
++    '("pattern-loop" "GST_FAKE_SRC_PATTERN_LOOP" "6")
++    '("ping-pong-pattern" "GST_FAKE_SRC_PING_PONG_PATTERN" "7")
++    '("get-always-suceeds" "GST_FAKE_SRC_GET_ALWAYS_SUCEEDS" "8")
+   )
+ )
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;   FAKE_SRC_DATA_ALLOCATE = 1,
+ ;;   FAKE_SRC_DATA_SUBBUFFER
+ ;; } GstFakeSrcDataType;
+ 
+ (define-enum-extended FakeSrcDataType
+   (in-module "Gst")
+   (c-name "GstFakeSrcDataType")
+   (values
+-    '("allocate" "FAKE_SRC_DATA_ALLOCATE" "1")
+-    '("subbuffer" "FAKE_SRC_DATA_SUBBUFFER" "2")
++    '("allocate" "GST_FAKE_SRC_DATA_ALLOCATE" "1")
++    '("subbuffer" "GST_FAKE_SRC_DATA_SUBBUFFER" "2")
+   )
+ )
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;   FAKE_SRC_SIZETYPE_EMPTY = 1,
+ ;;   FAKE_SRC_SIZETYPE_FIXED,
+ ;;   FAKE_SRC_SIZETYPE_RANDOM
+ ;; } GstFakeSrcSizeType;
+ 
+ (define-enum-extended FakeSrcSizeType
+   (in-module "Gst")
+   (c-name "GstFakeSrcSizeType")
+   (values
+-    '("empty" "FAKE_SRC_SIZETYPE_EMPTY" "1")
+-    '("fixed" "FAKE_SRC_SIZETYPE_FIXED" "2")
+-    '("random" "FAKE_SRC_SIZETYPE_RANDOM" "3")
++    '("empty" "GST_FAKE_SRC_SIZETYPE_EMPTY" "1")
++    '("fixed" "GST_FAKE_SRC_SIZETYPE_FIXED" "2")
++    '("random" "GST_FAKE_SRC_SIZETYPE_RANDOM" "3")
+   )
+ )
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;   FAKE_SRC_FILLTYPE_NOTHING = 1,
+ ;;   FAKE_SRC_FILLTYPE_ZERO,
+ ;;   FAKE_SRC_FILLTYPE_RANDOM,
+ ;;   FAKE_SRC_FILLTYPE_PATTERN,
+ ;;   FAKE_SRC_FILLTYPE_PATTERN_CONT
+ ;; } GstFakeSrcFillType;
+ 
+ (define-enum-extended FakeSrcFillType
+   (in-module "Gst")
+   (c-name "GstFakeSrcFillType")
+   (values
+-    '("nothing" "FAKE_SRC_FILLTYPE_NOTHING" "1")
+-    '("zero" "FAKE_SRC_FILLTYPE_ZERO" "2")
+-    '("random" "FAKE_SRC_FILLTYPE_RANDOM" "3")
+-    '("pattern" "FAKE_SRC_FILLTYPE_PATTERN" "4")
+-    '("pattern-cont" "FAKE_SRC_FILLTYPE_PATTERN_CONT" "5")
++    '("nothing" "GST_FAKE_SRC_FILLTYPE_NOTHING" "1")
++    '("zero" "GST_FAKE_SRC_FILLTYPE_ZERO" "2")
++    '("random" "GST_FAKE_SRC_FILLTYPE_RANDOM" "3")
++    '("pattern" "GST_FAKE_SRC_FILLTYPE_PATTERN" "4")
++    '("pattern-cont" "GST_FAKE_SRC_FILLTYPE_PATTERN_CONT" "5")
++  )
++)
++
++;; Handwritten for the filesink plug-in (Gst::FileSink).
++(define-enum-extended FileSinkBufferMode
++  (in-module "Gst")
++  (c-name "GstFileSinkBufferMode")
++  (values
++    '("default" "GST_FILE_SINK_BUFFER_MODE_DEFAULT" "-1")
++    '("full" "GST_FILE_SINK_BUFFER_MODE_FULL" "0")
++    '("line" "GST_FILE_SINK_BUFFER_MODE_LINE" "1")
++    '("unbuffered" "GST_FILE_SINK_BUFFER_MODE_UNBUFFERED" "2")
+   )
+ )
+ 
+ ;; From gsttee.h
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;   GST_TEE_PULL_MODE_NEVER,
+ ;;   GST_TEE_PULL_MODE_SINGLE,
+ ;; } GstTeePullMode;
+@@ -2009,20 +1953,31 @@
+   (values
+     '("rate" "GST_AUDIO_FIELD_RATE" "(1 << 0)")
+     '("channels" "GST_AUDIO_FIELD_CHANNELS" "(1 << 1)")
+     '("endianness" "GST_AUDIO_FIELD_ENDIANNESS" "(1 << 2)")
+     '("width" "GST_AUDIO_FIELD_WIDTH" "(1 << 3)")
+     '("depth" "GST_AUDIO_FIELD_DEPTH" "(1 << 4)")
+     '("signed" "GST_AUDIO_FIELD_SIGNED" "(1 << 5)")
+   )
+ )
+ 
++;; Handwritten for the queue plug-in (Gst::Queue).
++(define-enum-extended QueueLeaky
++  (in-module "Gst")
++  (c-name "GstQueueLeaky")
++  (values
++    '("no" "GST_QUEUE_LEAKY_NONE" "0")
++    '("upstream" "GST_QUEUE_LEAKY_UPSTREAM" "1")
++    '("downstream" "GST_QUEUE_LEAKY_DOWNSTREAM" "2")
++  )
++)
++
+ ;; From gstbaseaudiosink.h
+ 
+ ;; Original typedef:
+ ;; typedef enum
+ ;; {
+ ;;   GST_BASE_AUDIO_SINK_SLAVE_RESAMPLE,
+ ;;   GST_BASE_AUDIO_SINK_SLAVE_SKEW,
+ ;;   GST_BASE_AUDIO_SINK_SLAVE_NONE
+ ;; } GstBaseAudioSinkSlaveMethod;
+ 
+@@ -3596,46 +3551,46 @@
+ ;;   DITHER_NONE = 0,
+ ;;   DITHER_RPDF,
+ ;;   DITHER_TPDF,
+ ;;   DITHER_TPDF_HF
+ ;; } GstAudioConvertDithering;
+ 
+ (define-enum-extended AudioConvertDithering
+   (in-module "Gst")
+   (c-name "GstAudioConvertDithering")
+   (values
+-    '("none" "DITHER_NONE" "0")
+-    '("rpdf" "DITHER_RPDF" "1")
+-    '("tpdf" "DITHER_TPDF" "2")
+-    '("tpdf-hf" "DITHER_TPDF_HF" "3")
++    '("none" "GST_AUDIO_CONVERT_DITHER_NONE" "0")
++    '("rpdf" "GST_AUDIO_CONVERT_DITHER_RPDF" "1")
++    '("tpdf" "GST_AUDIO_CONVERT_DITHER_TPDF" "2")
++    '("tpdf-hf" "GST_AUDIO_CONVERT_DITHER_TPDF_HF" "3")
+   )
+ )
+ 
+ ;; Original typedef:
+ ;; typedef enum
+ ;; {
+ ;;   NOISE_SHAPING_NONE = 0,
+ ;;   NOISE_SHAPING_ERROR_FEEDBACK,
+ ;;   NOISE_SHAPING_SIMPLE,
+ ;;   NOISE_SHAPING_MEDIUM,
+ ;;   NOISE_SHAPING_HIGH
+ ;; } GstAudioConvertNoiseShaping;
+ 
+ (define-enum-extended AudioConvertNoiseShaping
+   (in-module "Gst")
+   (c-name "GstAudioConvertNoiseShaping")
+   (values
+-    '("none" "NOISE_SHAPING_NONE" "0")
+-    '("error-feedback" "NOISE_SHAPING_ERROR_FEEDBACK" "1")
+-    '("simple" "NOISE_SHAPING_SIMPLE" "2")
+-    '("medium" "NOISE_SHAPING_MEDIUM" "3")
+-    '("high" "NOISE_SHAPING_HIGH" "4")
++    '("none" "GST_AUDIO_CONVERT_NOISE_SHAPING_NONE" "0")
++    '("error-feedback" "GST_AUDIO_CONVERT_NOISE_SHAPING_ERROR_FEEDBACK" "1")
++    '("simple" "GST_AUDIO_CONVERT_NOISE_SHAPING_SIMPLE" "2")
++    '("medium" "GST_AUDIO_CONVERT_NOISE_SHAPING_MEDIUM" "3")
++    '("high" "GST_AUDIO_CONVERT_NOISE_SHAPING_HIGH" "4")
+   )
+ )
+ 
+ ;; From gstaudiotestsrc.h
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;   GST_AUDIO_TEST_SRC_WAVE_SINE,
+ ;;   GST_AUDIO_TEST_SRC_WAVE_SQUARE,
+ ;;   GST_AUDIO_TEST_SRC_WAVE_SAW,
+@@ -4473,40 +4428,40 @@
+ ;;     GST_TEXT_OVERLAY_WRAP_MODE_WORD = PANGO_WRAP_WORD,
+ ;;     GST_TEXT_OVERLAY_WRAP_MODE_CHAR = PANGO_WRAP_CHAR,
+ ;;     GST_TEXT_OVERLAY_WRAP_MODE_WORD_CHAR = PANGO_WRAP_WORD_CHAR
+ ;; } GstTextOverlayWrapMode;
+ 
+ (define-enum-extended TextOverlayWrapMode
+   (in-module "Gst")
+   (c-name "GstTextOverlayWrapMode")
+   (values
+     '("none" "GST_TEXT_OVERLAY_WRAP_MODE_NONE" "-1")
+-    '("word" "GST_TEXT_OVERLAY_WRAP_MODE_WORD" "PANGO_WRAP_WORD")
+-    '("char" "GST_TEXT_OVERLAY_WRAP_MODE_CHAR" "PANGO_WRAP_CHAR")
+-    '("word-char" "GST_TEXT_OVERLAY_WRAP_MODE_WORD_CHAR" "PANGO_WRAP_WORD_CHAR")
++    '("word" "GST_TEXT_OVERLAY_WRAP_MODE_WORD" "0")
++    '("char" "GST_TEXT_OVERLAY_WRAP_MODE_CHAR" "1")
++    '("word-char" "GST_TEXT_OVERLAY_WRAP_MODE_WORD_CHAR" "2")
+   )
+ )
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;     GST_TEXT_OVERLAY_LINE_ALIGN_LEFT = PANGO_ALIGN_LEFT,
+ ;;     GST_TEXT_OVERLAY_LINE_ALIGN_CENTER = PANGO_ALIGN_CENTER,
+ ;;     GST_TEXT_OVERLAY_LINE_ALIGN_RIGHT = PANGO_ALIGN_RIGHT
+ ;; } GstTextOverlayLineAlign;
+ 
+ (define-flags-extended TextOverlayLineAlign
+   (in-module "Gst")
+   (c-name "GstTextOverlayLineAlign")
+   (values
+-    '("left" "GST_TEXT_OVERLAY_LINE_ALIGN_LEFT" "PANGO_ALIGN_LEFT")
+-    '("center" "GST_TEXT_OVERLAY_LINE_ALIGN_CENTER" "PANGO_ALIGN_CENTER")
+-    '("right" "GST_TEXT_OVERLAY_LINE_ALIGN_RIGHT" "PANGO_ALIGN_RIGHT")
++    '("left" "GST_TEXT_OVERLAY_LINE_ALIGN_LEFT" "0")
++    '("center" "GST_TEXT_OVERLAY_LINE_ALIGN_CENTER" "1")
++    '("right" "GST_TEXT_OVERLAY_LINE_ALIGN_RIGHT" "2")
+   )
+ )
+ 
+ ;; From gsttextrender.h
+ 
+ ;; Original typedef:
+ ;; typedef enum {
+ ;;     GST_TEXT_RENDER_VALIGN_BASELINE,
+ ;;     GST_TEXT_RENDER_VALIGN_BOTTOM,
+ ;;     GST_TEXT_RENDER_VALIGN_TOP
+@@ -4543,37 +4498,62 @@
+ ;; typedef enum {
+ ;;     GST_TEXT_RENDER_LINE_ALIGN_LEFT = PANGO_ALIGN_LEFT,
+ ;;     GST_TEXT_RENDER_LINE_ALIGN_CENTER = PANGO_ALIGN_CENTER,
+ ;;     GST_TEXT_RENDER_LINE_ALIGN_RIGHT = PANGO_ALIGN_RIGHT
+ ;; } GstTextRenderLineAlign;
+ 
+ (define-flags-extended TextRenderLineAlign
+   (in-module "Gst")
+   (c-name "GstTextRenderLineAlign")
+   (values
+-    '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "PANGO_ALIGN_LEFT")
+-    '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "PANGO_ALIGN_CENTER")
+-    '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "PANGO_ALIGN_RIGHT")
++    '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "0")
++    '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "1")
++    '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "2")
+   )
+ )
+ 
+ ;; From gsttheoraenc.h
+ 
+ ;; Original typedef:
+ ;; typedef enum
+ ;; {
+ ;;   BORDER_NONE,
+ ;;   BORDER_BLACK,
+ ;;   BORDER_MIRROR
+ ;; }
+ ;; GstTheoraEncBorderMode;
+ 
+ (define-enum-extended TheoraEncBorderMode
+   (in-module "Gst")
+   (c-name "GstTheoraEncBorderMode")
+   (values
+-    '("none" "BORDER_NONE" "0")
+-    '("black" "BORDER_BLACK" "1")
+-    '("mirror" "BORDER_MIRROR" "2")
++    '("none" "GST_THEORA_ENC_BORDER_NONE" "0")
++    '("black" "GST_THEORA_ENC_BORDER_BLACK" "1")
++    '("mirror" "GST_THEORA_ENC_BORDER_MIRROR" "2")
++  )
++)
++
++;; Handwritten for CdParanoiaSrc plugin (values taken from output of
++;; `gst-inspect cdparanoiasrc' -- "paranoia-mode" property information)
++(define-enum-extended GstCdParanoiaSrc
++  (in-module "Gst")
++  (c-name "GstCdParanoiaMode")
++  (values
++    '("disable" "GST_PARANOIA_MODE_DISABLE" "1<<0")
++    '("fragment" "GST_PARANOIA_MODE_FRAGMENT" "1<<1")
++    '("overlap" "GST_PARANOIA_MODE_OVERLAP" "1<<2")
++    '("scratch" "GST_PARANOIA_MODE_SCRATCH" "1<<3")
++    '("repair" "GST_PARANOIA_MODE_REPAIR" "1<<4")
++    '("full" "GST_PARANOIA_MODE_FULL" "0xff")
+   )
+ )
+ 
++;; Handwritten for MultiFdSink plugin (taken from gstmultifdsink.c):
++(define-enum-extended FDSetMode
++  (in-module "Gst")
++  (c-name "GstFDSetMode")
++  (values
++    '("select" "GST_FD_SET_MODE_SELECT" "0")
++    '("poll" "GST_FD_SET_MODE_POLL" "1")
++    '("epoll" "GST_FD_SET_MODE_EPOLL" "2")
++  )
++)
