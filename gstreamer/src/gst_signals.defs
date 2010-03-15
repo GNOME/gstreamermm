@@ -3838,19 +3838,19 @@
 
 ;; From GstStreamVolume
 
-(define-property volume
+(define-property mute
   (of-object "GstStreamVolume")
-  (prop-type "GParamDouble")
-  (docs "Linear volume factor, 1.0=100%")
+  (prop-type "GParamBoolean")
+  (docs "Mute the audio channel without changing the volume")
   (readable #t)
   (writable #t)
   (construct-only #f)
 )
 
-(define-property mute
+(define-property volume
   (of-object "GstStreamVolume")
-  (prop-type "GParamBoolean")
-  (docs "Mute the audio channel without changing the volume")
+  (prop-type "GParamDouble")
+  (docs "Linear volume factor, 1.0=100%")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4651,6 +4651,71 @@
   (of-object "GstAudioConvert")
   (prop-type "GParamEnum")
   (docs "Selects between different noise shaping methods.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstAudioRate
+
+(define-property name
+  (of-object "GstAudioRate")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property in
+  (of-object "GstAudioRate")
+  (prop-type "GParamUInt64")
+  (docs "Number of input samples")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property out
+  (of-object "GstAudioRate")
+  (prop-type "GParamUInt64")
+  (docs "Number of output samples")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property add
+  (of-object "GstAudioRate")
+  (prop-type "GParamUInt64")
+  (docs "Number of added samples")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property drop
+  (of-object "GstAudioRate")
+  (prop-type "GParamUInt64")
+  (docs "Number of dropped samples")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property silent
+  (of-object "GstAudioRate")
+  (prop-type "GParamBoolean")
+  (docs "Don't emit notify for dropped and duplicated frames")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property tolerance
+  (of-object "GstAudioRate")
+  (prop-type "GParamUInt64")
+  (docs "Only act if timestamp jitter/imperfection exceeds indicated tolerance (ns)")
   (readable #t)
   (writable #t)
   (construct-only #f)
