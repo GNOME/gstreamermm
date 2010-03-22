@@ -691,24 +691,24 @@ MessageDuration::MessageDuration(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageDuration::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position)
+Glib::RefPtr<Gst::Message> MessageDuration::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 duration)
 {
   GstMessage* message = gst_message_new_duration(Glib::unwrap(src),
-    static_cast<GstFormat>(format), position);
+    static_cast<GstFormat>(format), duration);
   return Gst::Message::wrap(message, false);
 }
 
-void MessageDuration::parse(Format& format, gint64& position) const
+void MessageDuration::parse(Format& format, gint64& duration) const
 {
   gst_message_parse_duration(const_cast<GstMessage*>(gobj()),
-    reinterpret_cast<GstFormat*>(&format), &position);
+    reinterpret_cast<GstFormat*>(&format), &duration);
 }
 
 gint64 MessageDuration::parse() const
 {
-  gint64 position = 0;
-  gst_message_parse_duration(const_cast<GstMessage*>(gobj()), 0, &position);
-  return position;
+  gint64 duration = 0;
+  gst_message_parse_duration(const_cast<GstMessage*>(gobj()), 0, &duration);
+  return duration;
 }
 
 Format MessageDuration::parse_format() const
