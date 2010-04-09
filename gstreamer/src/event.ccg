@@ -18,6 +18,8 @@
  */
 
 #include <gst/gstenumtypes.h>
+#include <gst/gstutils.h>
+#include <gstreamermm/message.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/taglist.h>
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
@@ -448,6 +450,30 @@ bool EventStep::parse_intermediate() const
   return gst_intermediate;
 }
 
+EventSinkMessage::EventSinkMessage(GstEvent* castitem) :
+Event(castitem)
+{}
+
+Glib::RefPtr<Gst::Event> EventSinkMessage::create(const Glib::RefPtr<Gst::Message>& msg)
+{
+  GstEvent* event = gst_event_new_sink_message(msg->gobj());
+  return Gst::Event::wrap(event, false);
+}
+
+Glib::RefPtr<Gst::Message> EventSinkMessage::parse()
+{
+  GstMessage* gst_msg = 0;
+  gst_event_parse_sink_message(gobj(), &gst_msg);
+  return Gst::wrap(gst_msg);
+}
+
+Glib::RefPtr<const Gst::Message> EventSinkMessage::parse() const
+{
+  GstMessage* gst_msg = 0;
+  gst_event_parse_sink_message(const_cast<GstEvent*>(gobj()), &gst_msg);
+  return Gst::wrap(gst_msg);
+}
+
 Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)
 {
   Gst::Event* wrapper = 0;
@@ -475,6 +501,9 @@ Glib::RefPtr<Gst::Event> Event::wrap(GstEvent* event, bool take_copy)
       break;
     case GST_EVENT_BUFFERSIZE:
       wrapper = new Gst::EventBufferSize(event);
+      break;
+    case GST_EVENT_SINK_MESSAGE:
+      wrapper = new Gst::EventSinkMessage(event);
       break;
     case GST_EVENT_QOS:
       wrapper = new Gst::EventQos(event);

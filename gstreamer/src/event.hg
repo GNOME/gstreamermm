@@ -57,6 +57,7 @@ _WRAP_ENUM(SeekType, GstSeekType)
 _WRAP_ENUM(SeekFlags, GstSeekFlags)
 _WRAP_ENUM(EventTypeFlags, GstEventTypeFlags)
 
+class Message;
 class Structure;
 class TagList;
 
@@ -790,6 +791,34 @@ public:
    * @return The intermediate flag.
    */
   bool parse_intermediate() const;
+};
+
+/** A sink-message event.  See create() for more details.
+ */
+class EventSinkMessage : public Event
+{
+public:
+  explicit EventSinkMessage(GstEvent* event);
+
+  /** Create a new sink-message event.  The purpose of the sink-message event
+   * is to instruct a sink to post the message contained in the event
+   * synchronized with the stream.
+   *
+   * @param msg The message to be posted.
+   * @return A new Gst::EventSinkMessage.
+   */
+  static Glib::RefPtr<Gst::Event> create(const Glib::RefPtr<Gst::Message>& message);
+
+  /** Parse the sink-message event.
+   * @return the sink-messge's event message.
+   */
+  Glib::RefPtr<Gst::Message> parse();
+  _IGNORE(gst_event_parse_sink_message)
+
+  /** Parse the sink-message event.
+   * @return the sink-messge's event message.
+   */
+  Glib::RefPtr<const Gst::Message> parse() const;
 };
 
 } //namespace Gst
