@@ -164,8 +164,11 @@ public:
   _WRAP_METHOD(bool unlink(const Glib::RefPtr<Gst::Pad>& sink_pad), gst_pad_unlink)
   _WRAP_METHOD(bool is_linked() const, gst_pad_is_linked)
   _WRAP_METHOD(bool can_link(const Glib::RefPtr<const Gst::Pad>& other_pad) const, gst_pad_can_link)
+
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_pad_get_caps)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_caps() const, gst_pad_get_caps, constversion)
+  _IGNORE(gst_pad_get_caps_reffed)
+
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_allowed_caps(), gst_pad_get_allowed_caps)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_allowed_caps() const, gst_pad_get_allowed_caps, constversion)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_negotiated_caps(), gst_pad_get_negotiated_caps)
@@ -182,8 +185,11 @@ public:
   _WRAP_METHOD(bool set_caps(const Glib::RefPtr<Gst::Caps>& caps), gst_pad_set_caps)
   _WRAP_METHOD(Glib::RefPtr<Gst::Pad> get_peer(), gst_pad_get_peer)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Pad> get_peer() const, gst_pad_get_peer, constversion)
+
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> peer_get_caps(), gst_pad_peer_get_caps)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> peer_get_caps() const, gst_pad_peer_get_caps, constversion)
+  _IGNORE(gst_pad_peer_get_caps_reffed)
+
   _WRAP_METHOD(void use_fixed_caps(), gst_pad_use_fixed_caps)
   _WRAP_METHOD(bool is_active() const, gst_pad_is_active)
   _WRAP_METHOD(bool set_blocked(bool blocked = true), gst_pad_set_blocked)
@@ -204,7 +210,7 @@ public:
    * pad was already in the requested state. MT safe.
    */
   bool set_blocked_async(const SlotBlock& slot, bool blocked = true);
-  _IGNORE(gst_pad_set_blocked_async)
+  _IGNORE( gst_pad_set_blocked_async, gst_pad_set_blocked_async_full)
 
   _WRAP_METHOD(bool is_blocked() const, gst_pad_is_blocked)
   _WRAP_METHOD(bool is_blocking() const, gst_pad_is_blocking)
@@ -481,23 +487,27 @@ public:
   _WRAP_METHOD(bool set_active(bool active = true), gst_pad_set_active)
 
     //C API specific pad callback setting functions are ignored.
-    _IGNORE(gst_pad_set_bufferalloc_function,
-            gst_pad_set_activatepush_function,
-	    gst_pad_set_acceptcaps_function,
-            gst_pad_set_event_function,
-	    gst_pad_set_getrange_function,
-            gst_pad_set_unlink_function,
-	    gst_pad_set_activate_function,
-            gst_pad_set_getcaps_function,
-	    gst_pad_set_setcaps_function,
-            gst_pad_set_activatepull_function,
-	    gst_pad_set_query_type_function,
-            gst_pad_set_checkgetrange_function,
-	    gst_pad_set_link_function,
-            gst_pad_set_query_function,
-	    gst_pad_set_fixatecaps_function,
-            gst_pad_set_chain_function,
-	    gst_pad_set_internal_link_function)
+    _IGNORE(
+      gst_pad_set_acceptcaps_function,
+      gst_pad_set_activate_function,
+      gst_pad_set_activatepull_function,
+      gst_pad_set_activatepush_function,
+      gst_pad_set_bufferalloc_function,
+      gst_pad_set_chain_function,
+      gst_pad_set_chain_list_function,
+      gst_pad_set_checkgetrange_function,
+      gst_pad_set_event_function,
+      gst_pad_set_fixatecaps_function,
+      gst_pad_set_getcaps_function,
+      gst_pad_set_getrange_function,
+      gst_pad_set_internal_link_function,
+      gst_pad_set_iterate_internal_links_function,
+      gst_pad_set_link_function,
+      gst_pad_set_query_function,
+      gst_pad_set_query_type_function,
+      gst_pad_set_setcaps_function,
+      gst_pad_set_unlink_function,
+    )
 
   //C API helper function gst_pad_get_fixed_caps_func ignored.
   _IGNORE(gst_pad_get_fixed_caps_func)
