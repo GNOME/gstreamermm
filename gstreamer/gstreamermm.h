@@ -100,6 +100,7 @@
 #include <gstreamermm/alsasink.h>
 #include <gstreamermm/alsasrc.h>
 #include <gstreamermm/audioconvert.h>
+#include <gstreamermm/audiorate.h>
 #include <gstreamermm/audioresample.h>
 #include <gstreamermm/audiotestsrc.h>
 #include <gstreamermm/cdparanoiasrc.h>
