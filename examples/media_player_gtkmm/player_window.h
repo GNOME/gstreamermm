@@ -78,7 +78,7 @@ protected:
   sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;
-  gulong x_window_id;
+  gulong m_x_window_id;
   gulong m_pad_probe_id;
 };
 
