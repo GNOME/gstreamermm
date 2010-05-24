@@ -1,6 +1,53 @@
 #ifndef _GSTREAMERMM_H_
 #define _GSTREAMERMM_H_
 
+/** @mainpage gstreamermm Reference Manual
+ *
+ * @section description Description
+ *
+ * gstreamermm provides C++ bindings for the <a
+ * href="http://gstreamer.freedesktop.org">GStreamer streaming multimedia
+ * library</a>.  With gstreamermm it is possible to develop applications that
+ * work with multimedia in C++.
+ *
+ * @section features Features
+ *
+ * gstreamermm is developed over <a
+ * href="http://www.gtkmm.org/index.shtml">glibmm</a>, <a
+ * href="http://libsigc.sourceforge.net/">libsigc++</a> and <a
+ * href="http://libxmlplusplus.sourceforge.net/">libxml++</a> and the
+ * functionalities they provide.  This means that, among other things,
+ * referencing and unreferencing of GObjects is handled automatically via
+ * glibmm's automatic pointer class, Glib:RefPtr<>, and libsigc++'s slots are
+ * used for callbacks and signals.
+ *
+ * @section basics Basic Usage
+ *
+ * Include the gstreamermm header:
+ * @code
+ * #include <gstreamermm.h>
+ * @endcode
+ * (You may include individual headers, such as @c gstreamermm/pipeline.h
+ * instead.)
+ *
+ * If your source file is @c program.cc, you can compile it with:
+ * @code
+ * g++ program.cc -o program  `pkg-config --cflags --libs gstreamermm-0.10`
+ * @endcode
+ *
+ * Alternatively, if using autoconf, use the following in @c configure.ac:
+ * @code
+ * PKG_CHECK_MODULES([GSTREAMERMM], [gstreamermm-0.10])
+ * @endcode
+ * Then use the generated @c GSTREAMERMM_CFLAGS and @c GSTREAMERMM_LIBS
+ * variables in the
+ * project @c Makefile.am files. For example:
+ * @code
+ * program_CPPFLAGS = $(GSTREAMERMM_CFLAGS)
+ * program_LDADD = $(GSTREAMERMM_LIBS)
+ * @endcode
+ */
+
 #include <gstreamermm/init.h>
 #include <gstreamermm/version.h>
 
