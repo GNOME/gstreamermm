@@ -3,32 +3,42 @@
 
 /** @mainpage gstreamermm Reference Manual
  *
- * @section description Description
+ * @section Description Description
  *
  * gstreamermm provides C++ bindings for the <a
  * href="http://gstreamer.freedesktop.org">GStreamer streaming multimedia
  * library</a>.  With gstreamermm it is possible to develop applications that
- * work with multimedia in C++.
+ * work with multimedia in C++.  For instance, see Gst::Element, Gst::Bin and
+ * Gst::Pipeline.
  *
- * @section features Features
+ * @section Features Features
  *
- * gstreamermm is developed over <a
+ * - gstreamermm is developed over <a
  * href="http://www.gtkmm.org/index.shtml">glibmm</a>, <a
  * href="http://libsigc.sourceforge.net/">libsigc++</a> and <a
  * href="http://libxmlplusplus.sourceforge.net/">libxml++</a> and the
- * functionalities they provide.  This means that, among other things,
- * referencing and unreferencing of GObjects is handled automatically via
- * glibmm's automatic pointer class, Glib:RefPtr<>, and libsigc++'s slots are
- * used for callbacks and signals.
+ * functionalities they provide.
+ * - Referencing and unreferencing of GObjects is handled automatically via
+ *  glibmm's automatic pointer class, Glib::RefPtr.
+ * - libsigc++'s slots are used for callbacks and signals.
+ * - Many of the GStreamer core and base plug-ins are wrapped.
  *
- * @section basics Basic Usage
+ * @section Basics Basic Usage
  *
- * Include the gstreamermm header:
+ * To use the library, some form of the Gst::init() method must be called
+ * before using its classes, functions, etc.  To get a deeper understanding of
+ * how to set up pipelines, deal with elements, pads, etc., see the <a
+ * href="http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/index.html">GStreamer
+ * Application Development Manual</a>.
+ *
+ * The following includes the gstreamermm header:
  * @code
  * #include <gstreamermm.h>
  * @endcode
  * (You may include individual headers, such as @c gstreamermm/pipeline.h
  * instead.)
+ *
+ * @section Compiling Compiling
  *
  * If your source file is @c program.cc, you can compile it with:
  * @code
