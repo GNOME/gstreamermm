@@ -240,9 +240,42 @@ public:
 /***************** Gst::IteratorBase<CppType> ************************/
 
 template<class CppType>
+IteratorBase<CppType>::IteratorBase()
+: current(0),
+  current_result(Gst::ITERATOR_OK),
+  cobject_(0),
+  take_ownership(true)
+{}
+
+template<class CppType>
+IteratorBase<CppType>::IteratorBase(const IteratorBase<CppType>& other)
+  : current(other.current),
+    current_result(other.current_result),
+    cobject_(const_cast<GstIterator*>(other.cobj())),
+    take_ownership((other.cobj()) ? false : true)
+{}
+
+template<class CppType>
+IteratorBase<CppType>::IteratorBase(GstIterator* castitem, bool take_ownership)
+: current(0),
+  current_result(Gst::ITERATOR_OK),
+  cobject_(castitem),
+  take_ownership(take_ownership)
+{}
+
+template<class CppType>
+IteratorBase<CppType>& IteratorBase<CppType>::operator=(const IteratorBase<CppType>& other)
+{
+  IteratorBase temp(other);
+  swap(temp);
+  return *this;
+}
+
+template<class CppType>
 IteratorResult IteratorBase<CppType>::next()
 {
-  current_result = (Gst::IteratorResult) gst_iterator_next(cobj(), &current);
+  current_result =
+    static_cast<Gst::IteratorResult>(gst_iterator_next(cobj(), &current));
 
   // Set current to null if iterator is done:
   if(current_result == Gst::ITERATOR_DONE)
@@ -275,37 +308,6 @@ template<class CppType>
 IteratorBase<CppType>::operator bool() const
 {
   return (current != 0);
-}
-template<class CppType>
-IteratorBase<CppType>::IteratorBase()
-: current(0),
-  current_result(Gst::ITERATOR_OK),
-  cobject_(0),
-  take_ownership(true)
-{}
-
-template<class CppType>
-IteratorBase<CppType>::IteratorBase(const IteratorBase<CppType>& other)
-  : current(other.current),
-    current_result(other.current_result),
-    cobject_(const_cast<GstIterator*>(other.cobj())),
-    take_ownership((other.cobj()) ? false : true)
-{}
-
-template<class CppType>
-IteratorBase<CppType>::IteratorBase(GstIterator* castitem, bool take_ownership)
-: current(0),
-  current_result(Gst::ITERATOR_OK),
-  cobject_(castitem),
-  take_ownership(take_ownership)
-{}
-
-template<class CppType>
-IteratorBase<CppType>& IteratorBase<CppType>::operator=(const IteratorBase<CppType>& other)
-{
-  IteratorBase temp(other);
-  swap(temp);
-  return *this;
 }
 
 template<class CppType>
@@ -347,7 +349,8 @@ IteratorBasic<CppType>::IteratorBasic()
 {}
 
 template <class CppType>
-IteratorBasic<CppType>::IteratorBasic(GstIterator* castitem, bool take_ownership)
+IteratorBasic<CppType>::IteratorBasic(GstIterator* castitem,
+  bool take_ownership)
   : IteratorBase<CppType>(castitem, take_ownership)
 {}
 
@@ -364,7 +367,7 @@ CppType IteratorBasic<CppType>::operator*() const
   typedef typename CppType::BaseObjectType CType;
 
   if(this->current)
-    return CppType((CType*)(this->current));
+    return CppType(static_cast<CType*>(this->current));
   else
     return CppType();
 }
@@ -380,7 +383,7 @@ CppType* IteratorBasic<CppType>::operator->() const
     return &result;
   }
   else
-    return (CppType*) 0;
+    return static_cast<CppType*>(0);
 }
 
 template<class CppType>
@@ -423,8 +426,8 @@ IteratorResult Iterator<CppType>::next()
   const IteratorResult result = IteratorBasic<CppType>::next();
 
   // Remove extra reference that gst_iterator_next() takes because references
-  // are taken when using Gst::Iterator<CppType> dereferencing operators (* and
-  // ->).
+  // are taken when using Gst::Iterator<CppType> dereferencing operators (*
+  // and ->).
   if(this->current)
     g_object_unref(this->current);
 
@@ -440,7 +443,7 @@ Glib::RefPtr<CppType> Iterator<CppType>::operator*() const
   {
     //Take extra reference when dereferencing.  The reference will disappear
     //when Glib::RefPtr<> is destroyed.
-    return Glib::wrap((CType*)(this->current), true);
+    return Glib::wrap(static_cast<CType*>(this->current), true);
   }
   else
     return Glib::RefPtr<CppType>(0);
@@ -455,11 +458,12 @@ CppType* Iterator<CppType>::operator->() const
   {
     //Take extra reference when dereferencing.  The reference will disappear
     //when Glib::RefPtr<> is destroyed.
-    return Glib::wrap((CType*)(this->current), true).operator->();
+    return Glib::wrap(static_cast<CType*>(this->current), true).operator->();
   }
   else
-    return (CppType*) 0;
+    return static_cast<CppType*>(0);
 }
+
 template<class CppType>
 Iterator<CppType>& Iterator<CppType>::operator++()
 {
