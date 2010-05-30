@@ -107,11 +107,11 @@ dnl IndexFactory
 _CONVERSION(`GstIndexFactory*',`Glib::RefPtr<Gst::IndexFactory>',`Glib::wrap($3)')
 
 dnl Iterator
-_CONVERSION(`GstIterator*',`Gst::Iterator<Gst::Element>',`Gst::Iterator<Gst::Element>::Iterator($3)')
-_CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Element>',`Gst::Iterator<const Gst::Element>::Iterator($3)')
-_CONVERSION(`GstIterator*',`Gst::Iterator<Gst::Pad>',`Gst::Iterator<Gst::Pad>::Iterator($3)')
-_CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Pad>',`Gst::Iterator<const Gst::Pad>::Iterator($3)')
-_CONVERSION(`GstIterator*',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>::IteratorBasic($3)')
+_CONVERSION(`GstIterator*',`Gst::Iterator<Gst::Element>',`Gst::Iterator<Gst::Element>($3)')
+_CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Element>',`Gst::Iterator<const Gst::Element>($3)')
+_CONVERSION(`GstIterator*',`Gst::Iterator<Gst::Pad>',`Gst::Iterator<Gst::Pad>($3)')
+_CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Pad>',`Gst::Iterator<const Gst::Pad>($3)')
+_CONVERSION(`GstIterator*',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>($3)')
 
 dnl Message
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Gst::Message::wrap($3)')
