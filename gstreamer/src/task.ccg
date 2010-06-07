@@ -39,18 +39,14 @@ static void Task_Task_gstreamermm_callback(void* data)
 {
   Gst::Task::SlotTask* the_slot = static_cast<Gst::Task::SlotTask*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*the_slot)();
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static void Task_Enter_gstreamermm_callback(GstTask* task, GThread* thread, gpointer user_data)
@@ -58,18 +54,14 @@ static void Task_Enter_gstreamermm_callback(GstTask* task, GThread* thread, gpoi
   TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(user_data);
   Gst::Task::SlotEnter* the_slot = callbacks->slot_enter;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*the_slot)(Glib::wrap(task, true), Glib::wrap(thread));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static void Task_Leave_gstreamermm_callback(GstTask *task, GThread *thread, gpointer user_data)
@@ -77,18 +69,14 @@ static void Task_Leave_gstreamermm_callback(GstTask *task, GThread *thread, gpoi
   TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(user_data);
   Gst::Task::SlotLeave* the_slot = callbacks->slot_leave;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*the_slot)(Glib::wrap(task, true), Glib::wrap(thread));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 static void Task_Callbacks_gstreamermm_callback_destroy(void* data)

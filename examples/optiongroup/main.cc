@@ -54,7 +54,6 @@ int main(int argc, char** argv)
   Glib::OptionGroup m_GstOptiongroup = Gst::get_option_group();
   m_OptionContext.add_group(m_GstOptiongroup);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     m_OptionContext.parse(argc, argv);
@@ -64,15 +63,6 @@ int main(int argc, char** argv)
     std::cout << "Failed to initialize: " << error.what() << std::endl;
     return 1;
   }
-#else
-  std::auto_ptr<Glib::Error> ex;
-  m_OptionContext.parse(argc, argv, ex);
-  if (ex.get())
-  {
-    std::cout << "Failed to initialize" << ex->what() << std::endl;
-    return 1;
-  }
-#endif
 
   std::cout << "Run me with --help to see the Application options appended.\n";
   return 0;

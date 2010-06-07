@@ -30,19 +30,15 @@ static void TaskPool_Push_gstreamermm_callback(void* data)
 {
   Gst::TaskPool::SlotPush* the_slot = static_cast<Gst::TaskPool::SlotPush*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*the_slot)();
     delete the_slot;
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 } // extern "C"
@@ -52,11 +48,7 @@ static void TaskPool_Push_gstreamermm_callback(void* data)
 namespace Gst
 {
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 gpointer TaskPool::push(const SlotPush& slot)
-#else
-gpointer TaskPool::push(const SlotPush& slot, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   SlotPush* slot_copy = new SlotPush(slot);
@@ -64,18 +56,12 @@ gpointer TaskPool::push(const SlotPush& slot, std::auto_ptr<Glib::Error>& error)
   gpointer ret_val = gst_task_pool_push(gobj(),
     &TaskPool_Push_gstreamermm_callback, slot_copy, &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return ret_val;
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 void TaskPool_Class::prepare_vfunc_callback(GstTaskPool* self, GError** error)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -91,28 +77,17 @@ void TaskPool_Class::prepare_vfunc_callback(GstTaskPool* self, GError** error)
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
-        #ifdef GLIBMM_EXCEPTIONS_ENABLED
         obj->prepare_vfunc();
-        #else
-        std::auto_ptr<Glib::Error> cpp_error(0);
-        obj->prepare_vfunc(cpp_error);
-        if (cpp_error.get())
-          *error = g_error_copy(cpp_error->gobj());
-        #endif //GLIBMM_EXCEPTIONS_ENABLED
 
         return;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -125,11 +100,7 @@ void TaskPool_Class::prepare_vfunc_callback(GstTaskPool* self, GError** error)
     (*base->prepare)(self, error);
 
 }
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void Gst::TaskPool::prepare_vfunc() 
-#else
-void Gst::TaskPool::prepare_vfunc(std::auto_ptr<Glib::Error>& error) 
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -140,13 +111,8 @@ void Gst::TaskPool::prepare_vfunc(std::auto_ptr<Glib::Error>& error)
     GError* gerror = 0;
     (*base->prepare)(gobj(),&gerror);
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     if(gerror)
       ::Glib::Error::throw_exception(gerror);
-    #else
-    if(gerror)
-      error = ::Glib::Error::throw_exception(gerror);
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 }
 gpointer TaskPool_Class::push_vfunc_callback(GstTaskPool* self, GstTaskPoolFunction func, gpointer user_data, GError** error)
@@ -164,31 +130,19 @@ gpointer TaskPool_Class::push_vfunc_callback(GstTaskPool* self, GstTaskPoolFunct
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         Gst::TaskPool::SlotPush* slot =
           static_cast<Gst::TaskPool::SlotPush*>(user_data);
 
-        #ifdef GLIBMM_EXCEPTIONS_ENABLED
         return obj->push_vfunc(*slot);
-        #else
-        std::auto_ptr<Glib::Error> cpp_error(0);
-        gpointer result = obj->push_vfunc(*slot, cpp_error);
-        if (cpp_error.get())
-          *error = g_error_copy(cpp_error->gobj());
-        return result;
-        #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -204,12 +158,7 @@ gpointer TaskPool_Class::push_vfunc_callback(GstTaskPool* self, GstTaskPoolFunct
   typedef gpointer RType;
   return RType();
 }
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 gpointer Gst::TaskPool::push_vfunc(const SlotPush& slot) 
-#else
-gpointer Gst::TaskPool::push_vfunc(const SlotPush& slot,
-  std::auto_ptr<Glib::Error>& error) 
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -222,13 +171,8 @@ gpointer Gst::TaskPool::push_vfunc(const SlotPush& slot,
       &TaskPool_Push_gstreamermm_callback, const_cast<SlotPush*>(&slot),
         &gerror);
 
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     if(gerror)
       ::Glib::Error::throw_exception(gerror);
-    #else
-    if(gerror)
-      error = ::Glib::Error::throw_exception(gerror);
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
 
     return result;
   }
@@ -236,6 +180,5 @@ gpointer Gst::TaskPool::push_vfunc(const SlotPush& slot,
   typedef gpointer RType;
   return RType();
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } //namespace Gst

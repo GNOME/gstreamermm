@@ -62,7 +62,6 @@ const xmlpp::Node* Object::save(const xmlpp::Node* parent) const
   return parent;
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 GstXmlNodePtr Object_Class::save_thyself_vfunc_callback(GstObject* self, GstXmlNodePtr parent)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -78,21 +77,17 @@ GstXmlNodePtr Object_Class::save_thyself_vfunc_callback(GstObject* self, GstXmlN
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         xmlpp::Node xmlpp_parent(parent);
         // Call the virtual member method, which derived classes might override.
         (void) obj->save_vfunc(&xmlpp_parent);
         return parent;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -123,21 +118,17 @@ void Object_Class::restore_thyself_vfunc_callback(GstObject* self, GstXmlNodePtr
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         xmlpp::Node xmlpp_node(self_node);
         obj->restore_vfunc(&xmlpp_node);
         return;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -173,6 +164,5 @@ void Gst::Object::restore_vfunc(xmlpp::Node* self_node)
   if(base && base->restore_thyself)
     (*base->restore_thyself)(gobj(),self_node->cobj());
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } // namespace Gst

@@ -22,9 +22,6 @@
 
 #include <glibmm/ustring.h>
 #include <stdexcept>
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-#include <iostream>
-#endif
 
 namespace Gst
 {

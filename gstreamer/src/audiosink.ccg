@@ -23,7 +23,6 @@ _PINCLUDE(gstreamermm/private/baseaudiosink_p.h)
 namespace Gst
 {
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstRingBufferSpec* spec)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -39,21 +38,17 @@ gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstRingBuff
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         Gst::RingBufferSpec cpp_spec(*spec);
 
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->prepare_vfunc(cpp_spec));
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -96,19 +91,15 @@ guint AudioSink_Class::write_vfunc_callback(GstAudioSink* self, gpointer data, g
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return obj->write_vfunc(data, length);
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -136,6 +127,5 @@ guint Gst::AudioSink::write_vfunc(const void* data, guint length)
   typedef guint RType;
   return RType();
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } // namespace Gst

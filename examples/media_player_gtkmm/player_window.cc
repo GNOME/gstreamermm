@@ -373,11 +373,7 @@ void PlayerWindow::on_button_open()
     working_dir = chooser.get_current_folder();
 
     // Set uri property on the playbin.
-#ifdef GLIBMM_PROPERTIES_ENABLED
     m_play_bin->property_uri() = chooser.get_uri();
-#else
-    m_play_bin->set_property("uri", chooser.get_uri());
-#endif
 
     // Resize m_video_area and window to minimum when opening a file
     m_video_area.set_size_request(0, 0);

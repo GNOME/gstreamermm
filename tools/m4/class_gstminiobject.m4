@@ -146,9 +146,7 @@ ifdef(`__BOOL_NO_DERIVED_CLASS__',`dnl
 protected:
 
   //Callbacks (virtual functions):
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PH_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 };
 ')
 

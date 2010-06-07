@@ -50,7 +50,6 @@ FlowReturn BaseSink::wait_eos(ClockTime time)
   return static_cast<FlowReturn>(gst_base_sink_wait_eos(const_cast<GstBaseSink*>(gobj()), static_cast<GstClockTime>(time), 0));
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 GstFlowReturn BaseSink_Class::buffer_alloc_vfunc_callback(GstBaseSink* self, guint64 offset, guint size, GstCaps* caps, GstBuffer** buf)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -66,10 +65,8 @@ GstFlowReturn BaseSink_Class::buffer_alloc_vfunc_callback(GstBaseSink* self, gui
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         Glib::RefPtr<Gst::Buffer> cpp_buffer;
         // Call the virtual member method, which derived classes might override.
         const GstFlowReturn result =
@@ -77,13 +74,11 @@ GstFlowReturn BaseSink_Class::buffer_alloc_vfunc_callback(GstBaseSink* self, gui
           Glib::wrap(caps, true), cpp_buffer));
         *buf = cpp_buffer->gobj_copy();
         return result;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -117,5 +112,5 @@ FlowReturn Gst::BaseSink::buffer_alloc_vfunc(guint64 offset, guint size, const G
   typedef FlowReturn RType;
   return RType();
 }
-#endif //GLIBMM_VFUNCS_ENABLED
+
 } // namespace Gst

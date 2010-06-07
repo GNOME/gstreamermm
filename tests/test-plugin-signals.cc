@@ -82,12 +82,9 @@ int main(int argc, char** argv)
   }
 
   // Put all elements in a bin:
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-#endif
     pipeline->add(source)->add(sink);
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const Glib::Error& ex)
   {
@@ -96,7 +93,6 @@ int main(int argc, char** argv)
 
     return 1;
   }
-#endif
 
   // Link together:
   source->link(sink);
@@ -105,18 +101,10 @@ int main(int argc, char** argv)
   pipeline->get_bus()->add_watch(sigc::ptr_fun(&on_bus_message));
 
   // Set number of buffers fakesink creates to low number:
-#ifdef GLIBMM_PROPERTIES_ENABLED
   source->property_num_buffers() = 5;
-#else
-  source->set_property("num_buffers", 5);
-#endif
 
   // Enable the fakesink handoff signal emition and connect slot:
-#ifdef GLIBMM_PROPERTIES_ENABLED
   sink->property_signal_handoffs() = true;
-#else
-  sink->set_property("signal_handoffs", true);
-#endif
   sink->signal_handoff().connect(sigc::ptr_fun(on_handoff));
 
   // Now set to playing and iterate:

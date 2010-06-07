@@ -69,11 +69,7 @@ void init()
   }
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool init_check(int& argc, char**& argv)
-#else
-bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   static bool s_init = false;
   static bool result = false;
@@ -85,13 +81,8 @@ bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
     GError* gerror = 0;
     result = gst_init_check(&argc, &argv, &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     if(gerror)
       ::Glib::Error::throw_exception(gerror);
-#else
-    if(gerror)
-      error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
     initialize_wrap_system();
     s_init = true;
@@ -100,11 +91,7 @@ bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error)
   return result;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool init_check()
-#else
-bool init_check(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   static bool s_init = false;
   static bool result = false;
@@ -116,13 +103,8 @@ bool init_check(std::auto_ptr<Glib::Error>& error)
     GError* gerror = 0;
     result = gst_init_check(0, 0, &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     if(gerror)
       ::Glib::Error::throw_exception(gerror);
-#else
-    if(gerror)
-      error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
     initialize_wrap_system();
     s_init = true;

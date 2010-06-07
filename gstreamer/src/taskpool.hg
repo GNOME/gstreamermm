@@ -64,42 +64,25 @@ public:
    * can be 0, you must check error to detect errors.
    * @throw Glib::Error.
    */
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   gpointer push(const SlotPush& slot);
-#else
-  gpointer push(const SlotPush& slot, std::auto_ptr<Glib::Error>& error);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(gst_task_pool_push)
 
   _WRAP_METHOD(void join(gpointer id), gst_task_pool_join)
   _WRAP_METHOD(void cleanup(), gst_task_pool_cleanup)
 
-#ifdef GLIBMM_VFUNCS_ENABLED
   /** Virtual function which prepares the thread pool.
    * @throw Glib::Error.
    */
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   virtual void prepare_vfunc();
-  #else
-  virtual void prepare_vfunc(std::auto_ptr<Glib::Error>& error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-#endif //GLIBMM_VFUNCS_ENABLED
 
   /** Virtual function to cleanup the thread pool.
    */
   _WRAP_VFUNC(void cleanup(), "cleanup")
 
-#ifdef GLIBMM_VFUNCS_ENABLED
   /** Virtual function which starts a new thread.
    * @throw Glib::Error.
    */
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   virtual gpointer push_vfunc(const SlotPush& slot);
-  #else
-  virtual gpointer push_vfunc(const SlotPush& slot,
-    std::auto_ptr<Glib::Error>& error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-#endif //GLIBMM_VFUNCS_ENABLED
 
   /** Virtual function to join a thread.
    */

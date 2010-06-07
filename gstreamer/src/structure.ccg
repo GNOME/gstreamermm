@@ -43,18 +43,14 @@ Structure_Foreach_gstreamermm_callback(GQuark field_id, const GValue *value, voi
 {
   Gst::Structure::SlotForeach* slot = static_cast<Gst::Structure::SlotForeach*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (*slot)(quark_to_ustring(field_id), *reinterpret_cast<const Glib::ValueBase*>(value));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return false;
 }
@@ -64,19 +60,15 @@ Structure_Map_gstreamermm_callback(GQuark field_id, GValue *value, void* data)
 {
   Gst::Structure::SlotMap* slot = static_cast<Gst::Structure::SlotMap*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     bool result = (*slot)(quark_to_ustring(field_id), *reinterpret_cast<Glib::ValueBase*>(value));
     return result;
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return false;
 }

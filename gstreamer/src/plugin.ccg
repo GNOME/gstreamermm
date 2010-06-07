@@ -32,20 +32,16 @@ gboolean Plugin_Init_gstreamermm_callback(GstPlugin* plugin, void* data)
   Gst::Plugin::SlotInit* the_slot = static_cast<Gst::Plugin::SlotInit*>(data);
   bool result = false;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     result = (*the_slot)(Glib::wrap(plugin, true));
     delete the_slot;
     return result;
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return false;
 }

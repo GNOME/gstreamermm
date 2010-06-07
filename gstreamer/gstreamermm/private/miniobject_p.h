@@ -42,10 +42,8 @@ public:
 
 protected:
 
-#ifdef GLIBMM_VFUNCS_ENABLED
   static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
   static void finalize_vfunc_callback(GstMiniObject* self);
-#endif //GLIBMM_VFUNCS_ENABLED
 
 };
 

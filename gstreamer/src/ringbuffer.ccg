@@ -32,19 +32,15 @@ static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer*, guint8* data, g
 {
   Gst::RingBuffer::SlotFill& slot_fill = *static_cast<Gst::RingBuffer::SlotFill*>(user_data);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
-#endif
   {
     Glib::ArrayHandle<guint8> cpp_data(data, len, Glib::OWNERSHIP_NONE);
     slot_fill(cpp_data, len);
   }
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   catch (...)
   {
     Glib::exception_handlers_invoke();
   }
-#endif
 }
 
 } // extern "C"
@@ -212,7 +208,6 @@ bool RingBuffer::prepare_read(int& segment, std::vector<guint8>& readptr,
   return result;
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBufferSpec* spec)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -228,22 +223,18 @@ gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBu
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         Gst::RingBufferSpec cpp_spec(*spec);
 
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->acquire_vfunc(cpp_spec));
 
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -286,10 +277,8 @@ guint RingBuffer_Class::commit_vfunc_callback(GstRingBuffer* self, guint64* samp
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // This formula is obtained from the definition of the data_end
         // variable in the default_commit() function of the C API
         // gstringbuffer.c file.
@@ -300,13 +289,11 @@ guint RingBuffer_Class::commit_vfunc_callback(GstRingBuffer* self, guint64* samp
         // Call the virtual member method, which derived classes might override.
         return obj->commit_vfunc(*(sample), cpp_data, in_samples, out_samples,
           *(accum));
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -334,6 +321,5 @@ guint Gst::RingBuffer::commit_vfunc(guint64& sample, const Glib::ArrayHandle<guc
   typedef guint RType;
   return RType();
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } // namespace Gst

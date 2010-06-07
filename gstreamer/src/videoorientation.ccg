@@ -41,7 +41,6 @@ bool VideoOrientation::get_vflip(bool& flip) const
   return result;
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 gboolean VideoOrientation_Class::get_hflip_vfunc_callback(GstVideoOrientation* self, gboolean* flip)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -57,23 +56,19 @@ gboolean VideoOrientation_Class::get_hflip_vfunc_callback(GstVideoOrientation* s
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         bool cpp_flip = false;
         const gboolean result =
           static_cast<int>(obj->get_hflip_vfunc(cpp_flip));
         *flip = cpp_flip;
         return result;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -125,23 +120,19 @@ gboolean VideoOrientation_Class::get_vflip_vfunc_callback(GstVideoOrientation* s
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         bool cpp_flip = false;
         const gboolean result =
           static_cast<int>(obj->get_vflip_vfunc(cpp_flip));
         *flip = cpp_flip;
         return result;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -178,5 +169,4 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
   typedef bool RType;
   return RType();
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 } // namespace Gst

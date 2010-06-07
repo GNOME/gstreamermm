@@ -81,11 +81,7 @@ int main(int argc, char** argv)
 
   // Create elements:
   Glib::RefPtr<Gst::FileSrc> element_source = Gst::FileSrc::create();
-#ifdef GLIBMM_PROPERTIES_ENABLED
   element_source->property_location() = filename;
-#else
-  element_source->set_property("location", filename);
-#endif /* GLIBMM_PROPERTIES_ENABLED */
 
   //If using an MP3 file, this should provide more Caps information from typefind.
   //Glib::RefPtr<Gst::Element> element_id3demux = Gst::ElementFactory::create_element("id3demux");
@@ -97,36 +93,28 @@ int main(int argc, char** argv)
   Glib::RefPtr<Gst::Element> element_sink = Gst::FakeSink::create();
 
   // We must add the elements to the pipeline before linking them:
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-#endif
     pipeline->add(element_source)->add(element_typefind)->add(element_sink);
     //pipeline->add(element_source)->add(element_id3demux)->add(element_typefind)->add(element_sink);
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch (std::runtime_error& ex)
   {
     std::cerr << "Exception while adding: " << ex.what() << std::endl;
     return 1;
   }
-#endif
 
   // Link the elements together:
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-#endif
     //element_source->link(element_id3demux)->link(element_typefind)->link(element_sink);
     element_source->link(element_typefind)->link(element_sink);
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const std::runtime_error& error)
   {
     std::cerr << "Exception while linking: " << error.what() << std::endl;
     return 1;
   }
-#endif
 
   // Now set the whole pipeline to playing and start the main loop:
   std::cout << "Setting pipeline to PLAYING." << std::endl;

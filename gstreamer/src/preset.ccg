@@ -32,7 +32,6 @@ bool Preset::get_meta(const Glib::ustring& name, const Glib::ustring& tag,
   return result;
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 gchar** Preset_Class::get_preset_names_vfunc_callback(GstPreset* self)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -48,19 +47,15 @@ gchar** Preset_Class::get_preset_names_vfunc_callback(GstPreset* self)
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return const_cast<gchar**>((obj->get_preset_names_vfunc()).data());
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -92,19 +87,15 @@ gchar** Preset_Class::get_property_names_vfunc_callback(GstPreset* self)
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return const_cast<gchar**>((obj->get_property_names_vfunc()).data());
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -136,23 +127,19 @@ gboolean Preset_Class::get_meta_vfunc_callback(GstPreset* self, const gchar* nam
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         Glib::ustring cpp_value;
         // Call the virtual member method, which derived classes might override.
         const gboolean result = static_cast<int>(obj->get_meta_vfunc(Glib::convert_const_gchar_ptr_to_ustring(name)
 , Glib::convert_const_gchar_ptr_to_ustring(tag) , cpp_value));
         *value = g_strdup(cpp_value.c_str());
         return result;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -214,6 +201,5 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
   typedef bool RType;
   return RType();
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 }

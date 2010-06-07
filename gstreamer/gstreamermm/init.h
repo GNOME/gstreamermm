@@ -105,11 +105,7 @@ void init();
  * @return true if GStreamer could be initialized.
  * @throw Glib::Error
  */
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool init_check(int& argc, char**& argv);
-#else
-  bool init_check(int& argc, char**& argv, std::auto_ptr<Glib::Error>& error);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 /** Initializes gstreamermm gracefully without parsing command line arguments.
  *
@@ -134,11 +130,7 @@ void init();
  * @return true if GStreamer could be initialized.
  * @throw Glib::Error
  */
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool init_check();
-#else
-  bool init_check(std::auto_ptr<Glib::Error>& error);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 /** Returns a Glib::OptionGroup with GStreamer's argument specifications. The
  * group is set up to use standard GOption callbacks, so when using this group

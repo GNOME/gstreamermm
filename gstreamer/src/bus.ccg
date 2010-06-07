@@ -31,18 +31,14 @@ static gboolean Bus_Message_gstreamermm_callback(GstBus* bus, GstMessage* messag
 {
   Gst::Bus::SlotMessage* the_slot = static_cast<Gst::Bus::SlotMessage*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (*the_slot)(Glib::wrap(bus, true), Gst::Message::wrap(message, true));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return false;
 }
@@ -56,18 +52,14 @@ static GstBusSyncReply Bus_Message_Sync_gstreamermm_callback(GstBus* bus, GstMes
 {
   Gst::Bus::SlotMessageSync* the_slot = static_cast<Gst::Bus::SlotMessageSync*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return static_cast<GstBusSyncReply>((*the_slot)(Glib::wrap(bus, true), Gst::Message::wrap(message, true)));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return GST_BUS_PASS;
 }

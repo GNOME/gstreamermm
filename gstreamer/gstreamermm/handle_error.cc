@@ -24,11 +24,7 @@ namespace Gst
 
 void gstreamermm_handle_error(const Glib::ustring& message)
 {
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     throw std::runtime_error(message);
-#else
-      std::cerr << "gstreamermm: " << message << std::endl;
-#endif
 }
 
 }

@@ -100,25 +100,19 @@ int main(int argc, char** argv)
 
 
   // Put all elements in a pipeline:
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-#endif
     pipeline->add(source)->add(parser)->add(decoder)->add(conv)->add(sink);
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const std::runtime_error& ex)
   {
     std::cerr << "Error while adding elements to the pipeline: " << ex.what() << std::endl;
     return 1;
   }
-#endif
 
   // Link the elements together:
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-#endif
     source->link(parser);
 
     // We cannot link the parser and decoder yet, 
@@ -127,13 +121,11 @@ int main(int argc, char** argv)
     parser->signal_pad_added().connect( sigc::ptr_fun(&on_parser_pad_added) );
 
     decoder->link(conv)->link(sink);
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const std::runtime_error& ex)
   {
     std::cout << "Exception while linking elements: " << ex.what() << std::endl;
   }
-#endif
 
   // Create our window and show it:
   PlayerWindow mainWindow(source, pipeline);

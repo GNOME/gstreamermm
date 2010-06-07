@@ -128,7 +128,6 @@ public:
 
   // static void replace(Glib::RefPtr<Gst::MiniObject> & olddata, Glib::RefPtr<Gst::MiniObject> & newdata);
 
-#ifdef GLIBMM_VFUNCS_ENABLED
   /** Virtual function called when the Gst::MiniObject needs to be copied.
    */
   virtual Glib::RefPtr<Gst::MiniObject> copy_vfunc() const;
@@ -137,7 +136,6 @@ public:
    * finalized.
    */
   virtual void finalize_vfunc();
-#endif //GLIBMM_VFUNCS_ENABLED
 
 
 protected:

@@ -40,7 +40,6 @@ bool CddaBaseSrc::add_track(guint num, guint start, guint end, bool is_audio,
   return gst_cdda_base_src_add_track(gobj(), &track);
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 gboolean CddaBaseSrc_Class::open_vfunc_callback(GstCddaBaseSrc* self, const gchar* device)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -56,20 +55,16 @@ gboolean CddaBaseSrc_Class::open_vfunc_callback(GstCddaBaseSrc* self, const gcha
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         std::string cpp_device(device);
         return static_cast<int>(obj->open_vfunc(cpp_device));
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -112,19 +107,15 @@ gchar** CddaBaseSrc_Class::probe_devices_vfunc_callback(GstCddaBaseSrc* self)
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return const_cast<gchar**>(obj->probe_devices_vfunc().data());
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -152,6 +143,5 @@ Glib::ArrayHandle<std::string> Gst::CddaBaseSrc::probe_devices_vfunc()
   typedef Glib::ArrayHandle<std::string> RType;
   return RType(0, Glib::OWNERSHIP_NONE);
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } // namespace Gst

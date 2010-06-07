@@ -41,10 +41,8 @@ void MiniObject_Class::class_init_function(void* g_class, void* /*class_data*/)
 {
   BaseClassType* const klass = static_cast<BaseClassType*>(g_class);
 
-#ifdef GLIBMM_VFUNCS_ENABLED
   klass->copy = &copy_vfunc_callback;
   klass->finalize = &finalize_vfunc_callback;
-#endif //GLIBMM_VFUNCS_ENABLED
 }
 
 MiniObject* MiniObject_Class::wrap_new(GstMiniObject* object)
@@ -144,7 +142,6 @@ Glib::RefPtr<Gst::MiniObject> MiniObject::create_writable()
   return Gst::wrap(gst_mini_object_make_writable(gobject_));
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 GstMiniObject* MiniObject_Class::copy_vfunc_callback(const GstMiniObject* self)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
@@ -188,7 +185,6 @@ void Gst::MiniObject::finalize_vfunc()
   if(base && base->finalize)
     (*base->finalize)(gobj());
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } //namespace Gst
 

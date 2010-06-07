@@ -31,18 +31,14 @@ static gboolean Index_Filter_gstreamermm_callback(GstIndex* index, GstIndexEntry
   Gst::Index::SlotFilter * the_slot =
     static_cast<Gst::Index::SlotFilter*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (*the_slot)(Glib::wrap(index, true), Glib::wrap(entry, true));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return false;
 }
@@ -59,10 +55,8 @@ static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *
   Gst::Index::SlotResolver * the_slot =
     static_cast<Gst::Index::SlotResolver*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Glib::ustring cpp_writer_string;
 
     const gboolean result =
@@ -73,13 +67,11 @@ static gboolean Index_Resolver_gstreamermm_callback(GstIndex *index, GstObject *
       *writer_string = g_strdup(cpp_writer_string.c_str());
 
     return result;
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return false;
 }
@@ -141,7 +133,6 @@ void Index::set_resolver(const SlotResolver& slot)
   gst_index_set_resolver_full(gobj(), &Index_Resolver_gstreamermm_callback, slot_copy, &Index_Resolver_gstreamermm_callback_destroy);
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 void Index_Class::add_entry_vfunc_callback(GstIndex* self, GstIndexEntry* entry)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -157,21 +148,17 @@ void Index_Class::add_entry_vfunc_callback(GstIndex* self, GstIndexEntry* entry)
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         Gst::IndexEntry wrappedEntry(entry, true);
         // Call the virtual member method, which derived classes might override.
         obj->add_entry_vfunc(wrappedEntry);
         return;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -193,6 +180,5 @@ void Gst::Index::add_entry_vfunc(Gst::IndexEntry& entry)
   if(base && base->add_entry)
     (*base->add_entry)(gobj(),(entry).gobj_copy()); // use gobj_copy() so the copy is permanent to the GstIndex.
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } //namespace Gst

@@ -127,7 +127,6 @@ bool Element::send_event(const Glib::RefPtr<Gst::Event>& event)
   return gst_element_send_event(gobj(), Gst::unwrap(event));
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 gboolean Element_Class::set_clock_vfunc_callback(GstElement* self, GstClock* clock)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -143,20 +142,16 @@ gboolean Element_Class::set_clock_vfunc_callback(GstElement* self, GstClock* clo
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->set_clock_vfunc(Glib::wrap(clock, true)
 ));
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -200,19 +195,15 @@ const GstQueryType* Element_Class::get_query_types_vfunc_callback(GstElement* se
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return reinterpret_cast<const GstQueryType*>((obj->get_query_types_vfunc()).data());
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -240,6 +231,5 @@ Glib::ArrayHandle<QueryType> Gst::Element::get_query_types_vfunc() const
   typedef Glib::ArrayHandle<QueryType> RType;
   return RType(0, 0, Glib::OWNERSHIP_NONE);
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } //namespace Gst

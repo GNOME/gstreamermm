@@ -24,7 +24,6 @@ _PINCLUDE(gstreamermm/private/basetransform_p.h)
 namespace Gst
 {
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 gboolean AudioFilter_Class::setup_vfunc_callback(GstAudioFilter* self, GstRingBufferSpec* format)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -40,21 +39,17 @@ gboolean AudioFilter_Class::setup_vfunc_callback(GstAudioFilter* self, GstRingBu
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         Gst::RingBufferSpec spec(*format);
 
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->setup_vfunc(spec));
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -82,6 +77,5 @@ bool Gst::AudioFilter::setup_vfunc(Gst::RingBufferSpec& format)
   typedef bool RType;
   return RType();
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } // namespace Gst

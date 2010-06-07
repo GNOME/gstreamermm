@@ -22,7 +22,6 @@
 
 int main(int, char**)
 {
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     bool success = Gst::init_check();
@@ -39,16 +38,6 @@ int main(int, char**)
     std::cout << "Error initializing gstreamermm." << std::endl;
     return 1;
   }
-#else
-  std::auto_ptr<Glib::Error> error;
-  bool success = Gst::init_check(error);
-  if(!success)
-  {
-    std::cout << "Error initializing gstreamermm." << std::endl;
-    if(error.get())
-      std::cout << "Error: " << error->what() << std::endl;
-  }
-#endif
   Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element("ximagesink", "videosink");
 
   if(element)

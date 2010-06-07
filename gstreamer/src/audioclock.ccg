@@ -31,18 +31,14 @@ static GstClockTime AudioClock_GetTime_gstreamermm_callback(GstClock* clock, voi
 {
   Gst::AudioClock::SlotGetTime* the_slot = static_cast<Gst::AudioClock::SlotGetTime*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (*the_slot)(Glib::wrap(clock, true));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return 0; // arbitrary value
 }

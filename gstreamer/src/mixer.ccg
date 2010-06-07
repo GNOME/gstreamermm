@@ -205,7 +205,6 @@ Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<const Gst::MixerTrac
     Glib::OWNERSHIP_DEEP);
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 // This vfunc wrapper is manually written, because we want the C++ vfunc to
 // return the result instead of passing in a pointer in which to store it.
 
@@ -221,10 +220,8 @@ void Mixer_Class::get_volume_vfunc_callback(GstMixer* self, GstMixerTrack* track
   // being overridden:
   if(obj && obj->is_derived_())
   {
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try // Trap C++ exceptions which would normally be lost because this is a C callback.
     {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
       // Call the virtual member method, which derived classes might override.
       Glib::ArrayHandle<int> result = obj->get_volume_vfunc(Glib::wrap(track, true));
       const int* result_data = result.data();
@@ -232,13 +229,11 @@ void Mixer_Class::get_volume_vfunc_callback(GstMixer* self, GstMixerTrack* track
       {
         volumes[i] = result_data[i];
       }
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
       Glib::exception_handlers_invoke();
     }
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
   else
   {
@@ -286,19 +281,15 @@ const GList* Mixer_Class::list_tracks_vfunc_callback(GstMixer* self)
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return (obj->list_tracks_vfunc()).data();
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   
@@ -328,6 +319,5 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
   typedef Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > RType;
   return RType(0, Glib::OWNERSHIP_NONE);
 }
-#endif //GLIBMM_VFUNCS_ENABLED
 
 } // namespace Gst
