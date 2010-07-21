@@ -49,7 +49,7 @@ AC_SUBST([GSTREAMERMM_MODULES],
          ['giomm-2.4 >= 2.21.1 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
          [[], [-base], [-controller], [-dataprotocol], [-net], [-plugins-base],
               [-audio], [-cdda], [-interfaces], [-netbuffer], [-rtp], [-video]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.28])'])
+         [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.30])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-2.4 >= 2.12],
