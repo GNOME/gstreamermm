@@ -222,12 +222,9 @@ public:
   _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps() const, "get_caps")
 
 #m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3, true)')
-  //TODO: Some boolean vfuncs cause strange incorrect functionality when their
-  //callbacks return false with the last "return RType()" line.  Make sure this
-  //one doesn't cause problems and implement later.
-  ///** Notify subclass of changed caps.
-   //*/
-  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& caps), "set_caps")
+  /** Notify subclass of changed caps.
+   */
+   virtual bool set_caps_vfunc(const Glib::RefPtr<Gst::Caps>& caps);
 
   /** Allocate a new buffer with given caps. */
   virtual FlowReturn buffer_alloc_vfunc(guint64 offset, guint size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer);
@@ -239,35 +236,23 @@ public:
    */
   _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end) const, "get_times")
 
-  //TODO: Some boolean vfuncs cause strange incorrect functionality when their
-  //callbacks return false with the last "return RType()" line.  Make sure this
-  //one doesn't cause problems and implement later.
-  ///** Start processing. Ideal for opening resources in the subclass.
-   //*/
-  //_WRAP_VFUNC(bool start(), "start")
+  /** Start processing. Ideal for opening resources in the subclass.
+   */
+    virtual bool start_vfunc();
 
-  //TODO: Some boolean vfuncs cause strange incorrect functionality when their
-  //callbacks return false with the last "return RType()" line.  Make sure this
-  //one doesn't cause problems and implement later.
-  ///** Stop processing. Subclasses should use this to close resources.
-   //*/
-  //_WRAP_VFUNC(bool stop(), "stop")
+  /** Stop processing. Subclasses should use this to close resources.
+   */
+    virtual bool stop_vfunc();
 
-  //TODO: Some boolean vfuncs cause strange incorrect functionality when their
-  //callbacks return false with the last "return RType()" line.  Make sure this
-  //one doesn't cause problems and implement later.
-  ///** Unlock any pending access to the resource. Subclasses should unblock any
-   //* blocked function ASAP.
-   //*/
-  //_WRAP_VFUNC(bool unlock(), "unlock")
+  /** Unlock any pending access to the resource. Subclasses should unblock any
+   * blocked function ASAP.
+   */
+    virtual bool unlock_vfunc();
 
 #m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Gst::wrap($3, true)')
-  //TODO: Some boolean vfuncs cause strange incorrect functionality when their
-  //callbacks return false with the last "return RType()" line.  Make sure this
-  //one doesn't cause problems and implement later.
-  ///** Override this to handle events arriving on the sink pad.
-   //*/
-  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event")
+  /** Override this to handle events arriving on the sink pad.
+   */
+    virtual bool event_vfunc(const Glib::RefPtr<Gst::Event>& event);
 
   /** Called to present the preroll buffer if desired.
    */
@@ -284,16 +269,13 @@ public:
    */
   _WRAP_VFUNC(StateChangeReturn async_play(), "async_play")
 
-  //TODO: Some boolean vfuncs cause strange incorrect functionality when their
-  //callbacks return false with the last "return RType()" line.  Make sure this
-  //one doesn't cause problems and implement later.
-  ///** Subclasses should override this when they can provide an alternate method
-   //* of spawning a thread to drive the pipeline in pull mode. Should start or
-   //* stop the pulling thread, depending on the value of the "active" argument.
-   //* Called after actually activating the sink pad in pull mode. The default
-   //* implementation starts a task on the sink pad. 
-   //*/
-  //_WRAP_VFUNC(bool activate_pull(bool active), "activate_pull")
+  /** Subclasses should override this when they can provide an alternate method
+   * of spawning a thread to drive the pipeline in pull mode. Should start or
+   * stop the pulling thread, depending on the value of the "active" argument.
+   * Called after actually activating the sink pad in pull mode. The default
+   * implementation starts a task on the sink pad. 
+   */
+    virtual bool activate_pull_vfunc(bool active);
 
   /** Only useful in pull mode, this vmethod will be called in response to
    * Gst::Pad::fixate_caps() being called on the sink pad. Implement if you
@@ -302,20 +284,32 @@ public:
    */
   _WRAP_VFUNC(void fixate(const Glib::RefPtr<Gst::Caps>& caps), "fixate")
 
-  //TODO: Some boolean vfuncs cause strange incorrect functionality when their
-  //callbacks return false with the last "return RType()" line.  Make sure this
-  //one doesn't cause problems and implement later.
-  ///** Clear the previous unlock request. Subclasses should clear any state they
-   //* set during unlock_vfunc(), such as clearing command queues.
-   //*/
-  //_WRAP_VFUNC(bool unlock_stop(), "unlock_stop")
+  /** Clear the previous unlock request. Subclasses should clear any state they
+   * set during unlock_vfunc(), such as clearing command queues.
+   */
+    virtual bool unlock_stop_vfunc();
+
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->buffer_alloc = &buffer_alloc_vfunc_callback;
+  klass->set_caps = &set_caps_vfunc_callback;
+  klass->start = &start_vfunc_callback;
+  klass->stop = &stop_vfunc_callback;
+  klass->unlock = &unlock_vfunc_callback;
+  klass->event = &event_vfunc_callback;
+  klass->activate_pull = &activate_pull_vfunc_callback;
+  klass->unlock_stop = &unlock_stop_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static GstFlowReturn buffer_alloc_vfunc_callback(GstBaseSink* self,
     guint64 offset, guint size, GstCaps* caps, GstBuffer** buf);
+  static gboolean set_caps_vfunc_callback(GstBaseSink* self, GstCaps* caps);
+  static gboolean start_vfunc_callback(GstBaseSink* self);
+  static gboolean stop_vfunc_callback(GstBaseSink* self);
+  static gboolean unlock_vfunc_callback(GstBaseSink* self);
+  static gboolean event_vfunc_callback(GstBaseSink* self, GstEvent* event);
+  static gboolean activate_pull_vfunc_callback(GstBaseSink* self, gboolean active);
+  static gboolean unlock_stop_vfunc_callback(GstBaseSink* self);
   _POP()
 #m4end
 };
