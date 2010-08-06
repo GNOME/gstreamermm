@@ -969,7 +969,10 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   if(!message)
     return result;
 
-  if(gst_mixer_message_get_type(message) == GST_MIXER_MESSAGE_INVALID)
+  GstMixerMessageType const mixer_message_type =
+    gst_mixer_message_get_type(message);
+
+  if(mixer_message_type == GST_MIXER_MESSAGE_INVALID)
   {
     switch(GST_MESSAGE_TYPE(message))
     {
@@ -1056,7 +1059,7 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   }
   else
   {
-    switch(GST_MESSAGE_TYPE(message))
+    switch(mixer_message_type)
     {
       case GST_MIXER_MESSAGE_MUTE_TOGGLED:
         wrapper = new Gst::MessageMixerMuteToggled(message);
