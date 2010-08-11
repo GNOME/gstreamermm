@@ -1,3 +1,21 @@
+2010-08-10  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	BaseTransform: Wrap virtual functions.
+
+	* gstreamer/src/basetransform.hg: Uncomment the virtual functions so
+	that they are wrapped.  Wrapped the new "accept_caps" virtual
+	function.  The boolean virtual functions here don't seem to cause
+	problems if they don't return true as the BaseSink ones do.  The
+	ogg_player_gtkmm example works fine even if it uses the AudioConvert
+	element which derives from BaseTransform.
+	
+	The media_player_gtkmm example, on the other hand, crashes if the
+	BaseSink boolean virtual functions do not return true because it uses
+	the XimageSink element which derives from BaseSink.
+
+	* gstreamer/src/gst_vfuncs.defs: Added the BaseTransform "accept_caps"
+	virtual function.
+
 2010-08-06  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	BaseSink: Wrap remaining virtual functions.
