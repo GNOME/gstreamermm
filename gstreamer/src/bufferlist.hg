@@ -1,0 +1,100 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008-2009 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gstbufferlist.h>
+#include <gstreamermm/miniobject.h>
+#include <gstreamermm/wrap.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+_WRAP_ENUM(BufferListItem, GstBufferListItem, NO_GTYPE)
+
+class Buffer;
+
+/** A grouped scatter data buffer type for data-passing.
+ * Buffer lists are units of grouped scatter/gather data transfer in GStreamer.
+ *
+ * Buffer lists are created with create() and filled with data using a
+ * Gst::BufferListIterator. The iterator has no current buffer; its cursor
+ * position lies between buffers, immediately before the buffer that would be
+ * returned by next(). After iterating to the end of a group the iterator must
+ * be advanced to the next group by a call to
+ * Gst::BufferListIterator::next_group() before any further calls to
+ * Gst::BufferListIterator::next() can return buffers again. The cursor
+ * position of a newly created iterator lies before the first group; a call to
+ * Gst::BufferListIterator::next_group() is necessary before calls to
+ * Gst::BufferListIterator::next() can return buffers.
+ *
+ * For more details, see the C API docs.
+ */
+class BufferList : public MiniObject
+{
+  _CLASS_GSTMINIOBJECT(BufferList, GstBufferList, GST_BUFFER_LIST, Gst::MiniObject, GstMiniObject)
+
+public:
+  /** For example,
+   * Glib::RefPtr<Gst::Buffer> on_buffer(const Glib::RefPtr<Gst::Buffer>&
+   * buffer);.
+   * A slot for processing the last buffer returned by
+   * Gst::BufferListIterator::next(). The slot can leave the buffer in the
+   * list, replace the buffer in the list or remove the buffer from the list,
+   * depending on the return value. If the slot returns 0, the buffer will be
+   * removed from the list, otherwise the buffer will be replaced with the
+   * returned buffer.
+   *
+   * The last buffer returned by Gst::BufferListIterator::next() will be
+   * replaced with the buffer returned from the function. If 0 is returned, the
+   * buffer will be removed from the list. The list must be writable.
+   */
+  typedef sigc::slot< Glib::RefPtr<Gst::Buffer>, const
+    Glib::RefPtr<Gst::Buffer>& > SlotBuffer;
+
+  /** For example,
+   * Gst::BufferListItem on_foreach(Glib::RefPtr<Gst::Buffer> buffer, guint
+   * group, guint idx);.
+   * A slot that will be called from foreach(). The buffer field will be a
+   * reference to the buffer at idx in group.
+   *
+   * When this function returns Gst::BUFFER_LIST_CONTINUE, the next buffer will
+   * be returned. When Gst::BUFFER_LIST_SKIP_GROUP is returned, all remaining
+   * buffers in the current group will be skipped and the first buffer of the
+   * next group is returned (if any). When Gst::BUFFER_LIST_END is returned,
+   * foreach() will return.
+   *
+   * When the buffer is set to 0, the item will be removed from the bufferlist.
+   * When the buffer has been made writable, the new buffer reference can be
+   * assigned to the buffer.
+   */
+  typedef sigc::slot< Gst::BufferListItem, Glib::RefPtr<Gst::Buffer>&, guint, guint> SlotForeach;
+
+public:
+
+};
+
+/** An opaque iterator for a Gst::BufferList.
+ */
+class BufferListIterator
+{
+  _CLASS_GENERIC(BufferListIterator, GstBufferListIterator)
+};
+
+} // namespace Gst
