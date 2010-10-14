@@ -182,7 +182,8 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
   typedef Glib::StringArrayHandle RType;
   return Glib::StringArrayHandle(0, Glib::OWNERSHIP_NONE);
 }
-bool Gst::Preset::get_meta_vfunc(const Glib::ustring& name, const Glib::ustring& tag, Glib::ustring& value) 
+bool Gst::Preset::get_meta_vfunc(const Glib::ustring& name,
+  const Glib::ustring& tag, Glib::ustring& value) const
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
@@ -192,7 +193,7 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
   if(base && base->get_meta)
   {
     gchar* gst_value;
-    const bool result = (*base->get_meta)(gobj(),((name).c_str()),((tag).c_str()), &gst_value);
+    const bool result = (*base->get_meta)(const_cast<GstPreset*>(gobj()),((name).c_str()),((tag).c_str()), &gst_value);
     value = gst_value;
     g_free(gst_value);
     return result;
