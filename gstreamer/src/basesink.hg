@@ -27,6 +27,8 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+class BufferList;
+
 /** The base class for sink elements.
  * Gst::BaseSink is the base class for sink elements in GStreamer, such as
  * xvimagesink or filesink. It is a layer on top of Gst::Element that provides
@@ -287,7 +289,11 @@ public:
   /** Clear the previous unlock request. Subclasses should clear any state they
    * set during unlock_vfunc(), such as clearing command queues.
    */
-    virtual bool unlock_stop_vfunc();
+  virtual bool unlock_stop_vfunc();
+
+#m4 _CONVERSION(`GstBufferList*', `const Glib::RefPtr<Gst::BufferList>&', `Gst::wrap($3, true)')
+  /// Render a BufferList.
+  _WRAP_VFUNC(FlowReturn render_list(const Glib::RefPtr<Gst::BufferList>& buffer_list), render_list)
 
 protected:
 #m4begin
