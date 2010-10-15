@@ -1,5 +1,19 @@
 2010-10-15  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	Audio[Sink,Src], BaseSrc, BaseTransform: Comment out bool vfuncs.
+
+	* gstreamer/src/audiosink.hg:
+	* gstreamer/src/audiosrc.hg:
+	* gstreamer/src/basesrc.hg:
+	* gstreamer/src/basetransform.hg: Comment out the wrapped boolean
+	virtual functions because in fact they still do cause problems with
+	the execution of applications.  The ogg_player_gtkmm example, for
+	example, does not run correctly with the virtual functions wrapped.
+	These vfuncs will have to be handwritten (at least the ones that cause
+	the problems) to make sure they return true by default.
+
+2010-10-15  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	Tests: Add simple buffer list iterator test.
 
 	* tests/Makefile.am:
