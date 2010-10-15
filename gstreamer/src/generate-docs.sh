@@ -14,7 +14,7 @@ fi
 PREFIX="$JHBUILD_SOURCES"
 DIR=`dirname "$0"`
 
-PARAMS="-s $PREFIX/gstreamer/gst/ -s $PREFIX/gst-plugins-base/docs/libs/tmpl"
+PARAMS="-s $PREFIX/gstreamer/gst/"
 
 for dir in "$PREFIX"/gstreamer/libs/gst/{base,controller,dataprotocol,net,\
 check} "$PREFIX"/gst-plugins-base/gst-libs/gst/{app,audio,cdda,fft,floatcast,\
