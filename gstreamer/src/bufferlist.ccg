@@ -30,12 +30,29 @@ static GstBufferListItem BufferList_Foreach_gstreamermm_callback(GstBuffer** buf
 
   try
   {
+    // First wrap the original buffer.
     Glib::RefPtr<Gst::Buffer> temp = Gst::wrap(*buffer, true);
 
+    // Call the slot which can modify the buffer (ie. set it to a new one or
+    // clear it altogether).
     GstBufferListItem const result =
       static_cast<GstBufferListItem>((*the_slot)(temp, group, idx));
 
-    *buffer = temp->gobj_copy();
+    // Set the reference to the buffer according to how the temp buffer has
+    // been altered.
+    if(!temp)
+    {
+      // Clear the reference to the original buffer also.
+      *buffer = 0;
+    }
+    else if(*buffer != temp->gobj())
+    {
+      // The temp buffer has been set to a new one so make the reference point
+      // to it and take an extra reference for when the temp wrapper is
+      // destroyed (I think that's right).
+      *buffer = temp->gobj();
+      temp->reference();
+    }
 
     return result;
   }
@@ -96,6 +113,11 @@ void BufferList::foreach(const SlotForeach& slot)
     const_cast<SlotForeach*>(&slot));
 }
 
+void BufferList::iterate(BufferListIterator& result)
+{
+  result.set_gobject(gst_buffer_list_iterate(gobj()));
+}
+
 BufferListIterator::BufferListIterator()
 : gobject_(0),
   take_ownership(false)
@@ -107,6 +129,16 @@ BufferListIterator::BufferListIterator(GstBufferListIterator* castitem,
 : gobject_(castitem),
   take_ownership(take_ownership)
 {
+}
+
+void BufferListIterator::set_gobject(GstBufferListIterator* castitem,
+  bool take_ownership)
+{
+  if(gobject_ && take_ownership)
+    gst_buffer_list_iterator_free(gobject_);
+
+  gobject_ = castitem;
+  this->take_ownership = take_ownership;
 }
 
 BufferListIterator::~BufferListIterator()

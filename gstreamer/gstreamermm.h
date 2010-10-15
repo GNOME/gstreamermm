@@ -64,6 +64,7 @@
 // Core includes
 #include <gstreamermm/bin.h>
 #include <gstreamermm/buffer.h>
+#include <gstreamermm/bufferlist.h>
 #include <gstreamermm/bus.h>
 #include <gstreamermm/caps.h>
 #include <gstreamermm/childproxy.h>

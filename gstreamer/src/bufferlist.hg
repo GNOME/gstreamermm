@@ -29,6 +29,7 @@ namespace Gst
 _WRAP_ENUM(BufferListItem, GstBufferListItem, NO_GTYPE)
 
 class Buffer;
+class BufferListIterator;
 
 /** A grouped scatter data buffer type for data-passing.
  * Buffer lists are units of grouped scatter/gather data transfer in GStreamer.
@@ -110,7 +111,11 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> get(guint group, guint idx), gst_buffer_list_get)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Buffer> get(guint group, guint idx) const, gst_buffer_list_get, constversion)
 
-  //TODO: _WRAP_METHOD(BufferListIterator& iterate(), gst_buffer_list_iterate)
+  /** Iterate the buffers in the buffer list.
+   * @param result A place in which to store the iterator.
+   * Sine 0.10.24.
+   */
+  void iterate(BufferListIterator& result);
 };
 
 /** An opaque iterator for a Gst::BufferList.
@@ -146,6 +151,8 @@ private:
 // noncopyable
   BufferListIterator(const BufferListIterator& other);
   BufferListIterator& operator=(const BufferListIterator& other);
+
+  friend class BufferList;
 
 public:
   /** For example,
@@ -194,6 +201,10 @@ public:
 protected:
   GstBufferListIterator* gobject_;      // The C object.
   bool take_ownership;                  // Bool signaling ownership.
+
+protected:
+  // So that Gst::BufferList::iterate() can set the C object.
+  void set_gobject(GstBufferListIterator* castitem, bool take_ownership = true);
 };
 
 } // namespace Gst
