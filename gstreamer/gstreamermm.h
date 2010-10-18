@@ -21,13 +21,13 @@
  * - Referencing and unreferencing of GObjects is handled automatically via
  *  glibmm's automatic pointer class, Glib::RefPtr.
  * - libsigc++'s slots are used for callbacks and signals.
- * - Many of the GStreamer core and base plug-ins are wrapped.
+ * - Most of the GStreamer core and base plug-ins are wrapped.
  *
  * @section Basics Basic Usage
  *
- * To use the library, some form of the Gst::init() method must be called
- * before using its classes, functions, etc.  To get a deeper understanding of
- * how to set up pipelines, deal with elements, pads, etc., see the <a
+ * Some form of the Gst::init() method must be called before using the
+ * library's classes, functions, etc.  To get a deeper understanding of how to
+ * set up pipelines, deal with elements, pads, etc., see the <a
  * href="http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/index.html">GStreamer
  * Application Development Manual</a>.
  *
