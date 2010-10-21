@@ -181,44 +181,36 @@ public:
    */
   _WRAP_VFUNC(void fixate_caps(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, const Glib::RefPtr<Gst::Caps>& othercaps), "fixate_caps")
 
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Optional. Given the size of a buffer in the given direction with the
-   //* given caps, calculate the size in bytes of a buffer on the other pad with
-   //* the given other caps. The default implementation uses
-   //* get_unit_size_vfunc() and keeps the number of units the same.
-   //*/
-  //_WRAP_VFUNC(bool transform_size(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, guint size, const Glib::RefPtr<Gst::Caps>& othercaps, guint& othersize), "transform_size")
+  /** Optional. Given the size of a buffer in the given direction with the
+   * given caps, calculate the size in bytes of a buffer on the other pad with
+   * the given other caps. The default implementation uses
+   * get_unit_size_vfunc() and keeps the number of units the same.
+   */
+  virtual bool transform_size_vfunc(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, guint size, const Glib::RefPtr<Gst::Caps>& othercaps, guint& othersize); 
 
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Required if the transform is not in-place. Get the size in bytes of one
-   //* unit for the given caps.
-   //*/
-  //_WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Gst::Caps>& caps, guint& size) const, "get_unit_size")
+  /** Required if the transform is not in-place. Get the size in bytes of one
+   * unit for the given caps.
+   */
+  virtual bool get_unit_size_vfunc(const Glib::RefPtr<Gst::Caps>& caps, guint& size) const;
 
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Allows the subclass to be notified of the actual caps set.
-   //*/
-  //_WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps), "set_caps")
+  /** Allows the subclass to be notified of the actual caps set.
+   */
+  virtual bool set_caps_vfunc(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps);
 
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Optional. Called when the element starts processing. Allows opening
-   //* external resources.
-   //*/
-  //_WRAP_VFUNC(bool start(), "start")
+  /** Optional. Called when the element starts processing. Allows opening
+   * external resources.
+   */
+  virtual bool start_vfunc();
 
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Optional. Called when the element stops processing. Allows closing
-   //* external resources.
-   //*/
-  //_WRAP_VFUNC(bool stop(), "stop")
+  /** Optional. Called when the element stops processing. Allows closing
+   * external resources.
+   */
+  virtual bool stop_vfunc();
 
-#m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Gst::wrap($3, true)')
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Optional. Event handler on the sink pad. This function should return TRUE
-  ///* Optional. Event handler on the sink pad. This function should return
-   //* <tt>true</tt> if the base class should forward the event.
-   //*/
-  //_WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event")
+  /* Optional. Event handler on the sink pad. This function should return
+   * <tt>true</tt> if the base class should forward the event.
+   */
+  virtual bool event_vfunc(const Glib::RefPtr<Gst::Event>& event);
 
 #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Gst::wrap($3, true)')
   /** Required if the element does not operate in-place. Transforms one
@@ -239,10 +231,9 @@ public:
    */
   virtual FlowReturn prepare_output_buffer_vfunc(const Glib::RefPtr<Gst::Buffer>& input, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer);
 
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Optional. Event handler on the source pad.
-   //*/
-  //_WRAP_VFUNC(bool src_event(const Glib::RefPtr<Gst::Event>& event), "src_event")
+  /** Optional. Event handler on the source pad.
+   */
+  virtual bool src_event_vfunc(const Glib::RefPtr<Gst::Event>& event);
 
   /** Optional. Since 0.10.22 This method is called right before the base class
    * will start processing. Dynamic properties or other delayed configuration
@@ -250,21 +241,34 @@ public:
    */
   _WRAP_VFUNC(void before_transform(const Glib::RefPtr<Gst::Buffer>& buffer), "before_transform")
 
-#m4 _CONVERSION(`GstCaps*',`const Glib::RefPtr<const Gst::Caps>&',`Glib::wrap($3, true)')
-  //TODO: Make sure this bool vfunc does not cause execution problems.
-  ///** Optional. Since 0.10.30 Subclasses can override this method to check if
-   //* the caps can be handled by the element. The default implementation might
-   //* not be the most optimal way to check this in all cases.
-   //*/
-  //_WRAP_VFUNC(bool accept_caps(PadDirection direction,
-    //const Glib::RefPtr<const Gst::Caps>& caps), "accept_caps")
+  /** Optional. Since 0.10.30 Subclasses can override this method to check if
+   * the caps can be handled by the element. The default implementation might
+   * not be the most optimal way to check this in all cases.
+   */
+  virtual bool accept_caps_vfunc(PadDirection direction, const Glib::RefPtr<const Gst::Caps>& caps);
 
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->prepare_output_buffer = &prepare_output_buffer_vfunc_callback;
+  klass->transform_size = &transform_size_vfunc_callback;
+  klass->get_unit_size = &get_unit_size_vfunc_callback;
+  klass->set_caps = &set_caps_vfunc_callback;
+  klass->start = &start_vfunc_callback;
+  klass->stop = &stop_vfunc_callback;
+  klass->event = &event_vfunc_callback;
+  klass->src_event = &src_event_vfunc_callback;
+  klass->accept_caps = &accept_caps_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, gint size, GstCaps* caps, GstBuffer** buf);
+  static gboolean transform_size_vfunc_callback(GstBaseTransform* self, GstPadDirection direction, GstCaps* caps, guint size, GstCaps* othercaps, guint* othersize);
+  static gboolean get_unit_size_vfunc_callback(GstBaseTransform* self, GstCaps* caps, guint* size);
+  static gboolean set_caps_vfunc_callback(GstBaseTransform* self, GstCaps* incaps, GstCaps* outcaps);
+  static gboolean start_vfunc_callback(GstBaseTransform* self);
+  static gboolean stop_vfunc_callback(GstBaseTransform* self);
+  static gboolean event_vfunc_callback(GstBaseTransform* self, GstEvent* event);
+  static gboolean src_event_vfunc_callback(GstBaseTransform* self, GstEvent* event);
+  static gboolean accept_caps_vfunc_callback(GstBaseTransform* self, GstPadDirection direction, GstCaps* caps);
   _POP()
 #m4end
 };
