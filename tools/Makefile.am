@@ -44,7 +44,7 @@ local_lib = extra_defs_gen/libgstreamermm_get_plugin_defs-$(GSTREAMERMM_API_VERS
 
 extra_defs_gen_generate_plugin_gmmproc_file_SOURCES = \
 	extra_defs_gen/generate_plugin_gmmproc_file.cc
-extra_defs_gen_generate_plugin_gmmproc_file_LDADD = $(local_lib)
+extra_defs_gen_generate_plugin_gmmproc_file_LDADD = $(GSTREAMERMM_LIBS) $(local_lib)
 
 extra_defs_gen_generate_defs_gst_SOURCES = extra_defs_gen/generate_defs_gst.cc
 extra_defs_gen_generate_defs_gst_LDADD = \
