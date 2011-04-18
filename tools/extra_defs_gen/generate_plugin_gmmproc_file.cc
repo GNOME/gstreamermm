@@ -806,21 +806,18 @@ int main(int argc, char** argv)
     { 0, '\0', 0, G_OPTION_ARG_NONE, 0, 0, 0 }
   };
 
-  GOptionContext* gContext =
-    g_option_context_new("<plugin-name> [CppPluginClassName]");
-  g_option_context_set_summary(gContext, "Outputs a GStreamer plugin's "
-    "gmmproc files to be processed by gmmproc for\nwrapping in gstreamermm.  "
-    "Use the same syntax for the plugin name as in\ngst-inspect and supply "
-    "the desired C++ class name unless the\n--confirm-existence option is "
-    "used.  The generated files are preliminary\nfiles that need to be run "
-    "through m4 including the macros in the\nplugingen*.m4 files to get the "
-    "final .hg or .ccg file."
+  Glib::OptionContext optionContext("<plugin-name> [CppPluginClassName]");
+  optionContext.set_summary(
+    "Outputs a GStreamer plugin's gmmproc files to be processed by gmmproc "
+    "for\nwrapping in gstreamermm.  Use the same syntax for the plugin name "
+    "as in\ngst-inspect and supply the desired C++ class name unless "
+    "the\n--confirm-existence option is used.  The generated files are "
+    "preliminary\nfiles that need to be run through m4 including the macros "
+    "in the\nplugingen*.m4 files to get the final .hg or .ccg file."
   );
 
-  g_option_context_add_main_entries(gContext, optionEntries, 0);
-  g_option_context_add_group(gContext, gst_init_get_option_group());
-
-  Glib::OptionContext optionContext(gContext, true);
+  g_option_context_add_main_entries(optionContext.gobj(), optionEntries, 0);
+  g_option_context_add_group(optionContext.gobj(), gst_init_get_option_group());
 
   try
   {
