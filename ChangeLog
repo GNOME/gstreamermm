@@ -1,3 +1,30 @@
+2011-04-18  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Plugins: Wrap new core plugins.
+
+	* configure.ac: Modify the format of the plugin definitions to include
+	the target .hg basename along with the plugin name because some
+	plugins (like the new input-selector and output-selector plugins) use
+	dashes in the plugin name while the target .hg filename generally does
+	not.
+	* gstreamer/src/filelist.am: Add the new funnel, inpput-selector,
+	output-selector and valve core plugins.
+	* gstreamer/src/Makefile.am: Adapt to the above change.
+
+	* gstreamer/src/gst_enums.defs:
+	* gstreamer/src/gst_enums.defs.patch: Update the enum defs patch and
+	regenerate the enum defs file for the enums of the new plugins.
+
+	* tools/extra_defs_gen/generate_defs_gst.cc:
+	* gstreamer/src/gst_signals.defs: Add the new plugins to the extra
+	defs generation utility and regenerate the extra defs file for the
+	properties and signals of the new plugins.
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc: Modified so
+	that there are no build errors if a signal name of a plugin happens to
+	be a C++ keyword (such as the "switch" signal of the input-selector
+	plugin).
+
 2011-04-17  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	Plugin Generator: Use Glib::OptionContext instead of GOptionContext.

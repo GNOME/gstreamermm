@@ -432,7 +432,7 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
         signalMethodName + '(';
 
       cClassSignalDeclarations += "  " + returnCType + " (*" +
-        signalMethodName + ") (" + cTypeName + "* element";
+        signalMethodName + "_signal) (" + cTypeName + "* element";
 
       //Loop through the list of parameters:
       const GType* pParameters = signalQuery.param_types;
@@ -542,7 +542,7 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
         }
       }
 
-      wrapStatement += "), \"" + signalName + "\")\n";
+      wrapStatement += "), \"" + signalName + "\", no_default_handler)\n";
 
       // Finish off the action signal declaration and definition if this
       // is an action signal.

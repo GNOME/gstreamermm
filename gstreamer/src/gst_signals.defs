@@ -29,6 +29,15 @@
   (construct-only #f)
 )
 
+(define-property enable-async
+  (of-object "GstBus")
+  (prop-type "GParamBoolean")
+  (docs "Enable async message delivery for bus watches and gst_bus_pop()")
+  (readable #f)
+  (writable #t)
+  (construct-only #t)
+)
+
 ;; From GstBin
 
 (define-signal element-added
@@ -832,6 +841,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstBaseSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstBaseTransform
 
 (define-property name
@@ -1543,6 +1561,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstFakeSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property state-error
   (of-object "GstFakeSink")
   (prop-type "GParamEnum")
@@ -1711,6 +1738,15 @@
   (of-object "GstFdSink")
   (prop-type "GParamUInt64")
   (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property throttle-time
+  (of-object "GstFdSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1992,6 +2028,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstFileSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property location
   (of-object "GstFileSink")
   (prop-type "GParamString")
@@ -2023,6 +2068,17 @@
   (of-object "GstFileSink")
   (prop-type "GParamBoolean")
   (docs "Append to an already existing file")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstFunnel
+
+(define-property name
+  (of-object "GstFunnel")
+  (prop-type "GParamString")
+  (docs "The name of the object")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2174,6 +2230,52 @@
   (construct-only #f)
 )
 
+;; From GstInputSelector
+
+(define-signal block
+  (of-object "GstInputSelector")
+  (return-type "gint64")
+  (when "last")
+)
+
+(define-signal switch
+  (of-object "GstInputSelector")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstPad*" "p0")
+    '("gint64" "p1")
+    '("gint64" "p2")
+  )
+)
+
+(define-property name
+  (of-object "GstInputSelector")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property n-pads
+  (of-object "GstInputSelector")
+  (prop-type "GParamUInt")
+  (docs "The number of sink pads")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property active-pad
+  (of-object "GstInputSelector")
+  (prop-type "GParamObject")
+  (docs "The currently active sink pad")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstMultiQueue
 
 (define-signal underrun
@@ -2273,6 +2375,44 @@
   (of-object "GstMultiQueue")
   (prop-type "GParamInt")
   (docs "High threshold for buffering to finish")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstOutputSelector
+
+(define-property name
+  (of-object "GstOutputSelector")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property active-pad
+  (of-object "GstOutputSelector")
+  (prop-type "GParamObject")
+  (docs "Currently active src pad")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property resend-latest
+  (of-object "GstOutputSelector")
+  (prop-type "GParamBoolean")
+  (docs "Resend latest buffer after a switch to a new pad")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property pad-negotiation-mode
+  (of-object "GstOutputSelector")
+  (prop-type "GParamEnum")
+  (docs "The mode to be used for pad negotiation")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2498,7 +2638,7 @@
 (define-property low-percent
   (of-object "GstQueue2")
   (prop-type "GParamInt")
-  (docs "Low threshold for buffering to start")
+  (docs "Low threshold for buffering to start. Only used if use-buffering is True")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2507,7 +2647,7 @@
 (define-property high-percent
   (of-object "GstQueue2")
   (prop-type "GParamInt")
-  (docs "High threshold for buffering to finish")
+  (docs "High threshold for buffering to finish. Only used if use-buffering is True")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2543,7 +2683,7 @@
 (define-property ring-buffer-max-size
   (of-object "GstQueue2")
   (prop-type "GParamUInt64")
-  (docs "Max. amount of data in the ring buffer (bytes, 0 = disabled")
+  (docs "Max. amount of data in the ring buffer (bytes, 0 = disabled)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2675,6 +2815,26 @@
   (of-object "GstTypeFindElement")
   (prop-type "GParamBoxed")
   (docs "force caps without doing a typefind")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstValve
+
+(define-property name
+  (of-object "GstValve")
+  (prop-type "GParamString")
+  (docs "The name of the object")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property drop
+  (of-object "GstValve")
+  (prop-type "GParamBoolean")
+  (docs "Whether to drop buffers and events or let them through")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2852,6 +3012,15 @@
   (of-object "GstBaseAudioSink")
   (prop-type "GParamUInt64")
   (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property throttle-time
+  (of-object "GstBaseAudioSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -3108,6 +3277,15 @@
   (of-object "GstAudioSink")
   (prop-type "GParamUInt64")
   (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property throttle-time
+  (of-object "GstAudioSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -3716,6 +3894,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstVideoSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property show-preroll-frame
   (of-object "GstVideoSink")
   (prop-type "GParamBoolean")
@@ -4184,6 +4371,15 @@
   (of-object "GstAlsaSink")
   (prop-type "GParamUInt64")
   (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property throttle-time
+  (of-object "GstAlsaSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4726,6 +4922,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstAppSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property caps
   (of-object "GstAppSink")
   (prop-type "GParamBoxed")
@@ -4747,7 +4952,7 @@
 (define-property emit-signals
   (of-object "GstAppSink")
   (prop-type "GParamBoolean")
-  (docs "Emit new-preroll and new-buffer signals")
+  (docs "Emit new-preroll, new-buffer and new-buffer-list signals")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4869,6 +5074,15 @@
   (of-object "GstAudioRate")
   (prop-type "GParamUInt64")
   (docs "Only act if timestamp jitter/imperfection exceeds indicated tolerance (ns)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property skip-to-first
+  (of-object "GstAudioRate")
+  (prop-type "GParamBoolean")
+  (docs "Don't produce buffers before the first one we receive")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -5467,6 +5681,17 @@
   )
 )
 
+(define-signal autoplug-sort
+  (of-object "GstDecodeBin2")
+  (return-type "GValueArray*")
+  (when "last")
+  (parameters
+    '("GstPad*" "p0")
+    '("GstCaps*" "p1")
+    '("GValueArray*" "p2")
+  )
+)
+
 (define-signal autoplug-select
   (of-object "GstDecodeBin2")
   (return-type "GstAutoplugSelectResult")
@@ -5500,17 +5725,6 @@
   (when "last")
   (parameters
     '("GstPad*" "p0")
-  )
-)
-
-(define-signal autoplug-sort
-  (of-object "GstDecodeBin2")
-  (return-type "GValueArray*")
-  (when "last")
-  (parameters
-    '("GstPad*" "p0")
-    '("GstCaps*" "p1")
-    '("GValueArray*" "p2")
   )
 )
 
@@ -5810,6 +6024,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstGioSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property location
   (of-object "GstGioSink")
   (prop-type "GParamString")
@@ -5994,6 +6217,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstGioStreamSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property stream
   (of-object "GstGioStreamSink")
   (prop-type "GParamObject")
@@ -6056,253 +6288,6 @@
   (docs "Stream to read from")
   (readable #t)
   (writable #t)
-  (construct-only #f)
-)
-
-;; From GstGnomeVFSSink
-
-(define-signal allow-overwrite
-  (of-object "GstGnomeVFSSink")
-  (return-type "gboolean")
-  (when "unknown")
-  (parameters
-    '("GnomeVFSURI*" "p0")
-  )
-)
-
-(define-property name
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamString")
-  (docs "The name of the object")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property preroll-queue-len
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamUInt")
-  (docs "Number of buffers to queue during preroll")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property sync
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamBoolean")
-  (docs "Sync on the clock")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property max-lateness
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamInt64")
-  (docs "Maximum number of nanoseconds that a buffer can be late before it is dropped (-1 unlimited)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property qos
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamBoolean")
-  (docs "Generate Quality-of-Service events upstream")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property async
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamBoolean")
-  (docs "Go asynchronously to PAUSED")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property ts-offset
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamInt64")
-  (docs "Timestamp offset in nanoseconds")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property enable-last-buffer
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamBoolean")
-  (docs "Enable the last-buffer property")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property last-buffer
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamSpecMiniObject")
-  (docs "The last buffer received in the sink")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property blocksize
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamUInt")
-  (docs "Size in bytes to pull per buffer (0 = default)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property render-delay
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamUInt64")
-  (docs "Additional render delay of the sink in nanoseconds")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property location
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamString")
-  (docs "Location of the file to write")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property uri
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamBoxed")
-  (docs "URI for GnomeVFS")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property handle
-  (of-object "GstGnomeVFSSink")
-  (prop-type "GParamBoxed")
-  (docs "Handle for GnomeVFS")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-;; From GstGnomeVFSSrc
-
-(define-property name
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamString")
-  (docs "The name of the object")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property blocksize
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamULong")
-  (docs "Size in bytes to read per buffer (-1 = default)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property num-buffers
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamInt")
-  (docs "Number of buffers to output before sending EOS (-1 = unlimited)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property typefind
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamBoolean")
-  (docs "Run typefind before negotiating")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property do-timestamp
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamBoolean")
-  (docs "Apply current stream time to buffers")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property handle
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamBoxed")
-  (docs "Handle for GnomeVFS")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property location
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamString")
-  (docs "Location of the file to read")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property iradio-mode
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamBoolean")
-  (docs "Enable internet radio mode (extraction of shoutcast/icecast metadata)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property iradio-name
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamString")
-  (docs "Name of the stream")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property iradio-genre
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamString")
-  (docs "Genre of the stream")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property iradio-url
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamString")
-  (docs "Homepage URL for radio stream")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property iradio-title
-  (of-object "GstGnomeVFSSrc")
-  (prop-type "GParamString")
-  (docs "Name of currently playing song")
-  (readable #t)
-  (writable #f)
   (construct-only #f)
 )
 
@@ -6486,6 +6471,15 @@
   (of-object "GstMultiFdSink")
   (prop-type "GParamUInt64")
   (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property throttle-time
+  (of-object "GstMultiFdSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -6957,6 +6951,15 @@
 )
 
 ;; From GstPlayBin2
+
+(define-signal source-setup
+  (of-object "GstPlayBin2")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstElement*" "p0")
+  )
+)
 
 (define-signal about-to-finish
   (of-object "GstPlayBin2")
@@ -7564,6 +7567,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstTCPClientSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property host
   (of-object "GstTCPClientSink")
   (prop-type "GParamString")
@@ -7761,6 +7773,15 @@
   (of-object "GstTCPServerSink")
   (prop-type "GParamUInt64")
   (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property throttle-time
+  (of-object "GstTCPServerSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -8380,7 +8401,7 @@
 (define-property speed-level
   (of-object "GstTheoraEnc")
   (prop-type "GParamInt")
-  (docs "Controls the amount of motion vector searching done while encoding.  This property requires libtheora version >= 1.0")
+  (docs "Controls the amount of analysis performed when encoding. Higher values trade compression quality for speed. This property requires libtheora version >= 1.0, and the maximum value may vary based on encoder version.")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -8389,7 +8410,7 @@
 (define-property vp3-compatible
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Disables non-VP3 compatible features.  This property requires libtheora version >= 1.1")
+  (docs "Disables non-VP3 compatible features")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -8398,7 +8419,7 @@
 (define-property drop-frames
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Allow or disallow frame dropping.  This property requires libtheora version >= 1.1")
+  (docs "Allow or disallow frame dropping")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -8407,7 +8428,7 @@
 (define-property cap-overflow
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Enable capping of bit reservoir overflows.  This property requires libtheora version >= 1.1")
+  (docs "Enable capping of bit reservoir overflows")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -8416,7 +8437,7 @@
 (define-property cap-underflow
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Enable capping of bit reservoir underflows.  This property requires libtheora version >= 1.1")
+  (docs "Enable capping of bit reservoir underflows")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -8425,7 +8446,7 @@
 (define-property rate-buffer
   (of-object "GstTheoraEnc")
   (prop-type "GParamInt")
-  (docs "Sets the size of the rate control buffer, in units of frames.  The default value of 0 instructs the encoder to automatically select an appropriate value.  This property requires libtheora version >= 1.1")
+  (docs "Sets the size of the rate control buffer, in units of frames.  The default value of 0 instructs the encoder to automatically select an appropriate value")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -8692,6 +8713,17 @@
   )
 )
 
+(define-signal autoplug-sort
+  (of-object "GstURIDecodeBin")
+  (return-type "GValueArray*")
+  (when "last")
+  (parameters
+    '("GstPad*" "p0")
+    '("GstCaps*" "p1")
+    '("GValueArray*" "p2")
+  )
+)
+
 (define-signal autoplug-select
   (of-object "GstURIDecodeBin")
   (return-type "GstAutoplugSelectResult")
@@ -8707,6 +8739,15 @@
   (of-object "GstURIDecodeBin")
   (return-type "void")
   (when "last")
+)
+
+(define-signal source-setup
+  (of-object "GstURIDecodeBin")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstElement*" "p0")
+  )
 )
 
 (define-property name
@@ -9411,6 +9452,15 @@
   (construct-only #f)
 )
 
+(define-property throttle-time
+  (of-object "GstXImageSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property show-preroll-frame
   (of-object "GstXImageSink")
   (prop-type "GParamBoolean")
@@ -9471,6 +9521,24 @@
   (docs "When enabled, the current frame will always be drawn in response to X Expose events")
   (readable #t)
   (writable #t)
+  (construct-only #f)
+)
+
+(define-property window-width
+  (of-object "GstXImageSink")
+  (prop-type "GParamUInt64")
+  (docs "Width of the window")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property window-height
+  (of-object "GstXImageSink")
+  (prop-type "GParamUInt64")
+  (docs "Height of the window")
+  (readable #t)
+  (writable #f)
   (construct-only #f)
 )
 
@@ -9570,6 +9638,15 @@
   (of-object "GstXvImageSink")
   (prop-type "GParamUInt64")
   (docs "Additional render delay of the sink in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property throttle-time
+  (of-object "GstXvImageSink")
+  (prop-type "GParamUInt64")
+  (docs "The time to keep between rendered buffers (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -9725,6 +9802,24 @@
   (docs "Draw black borders to fill unused area in force-aspect-ratio mode")
   (readable #t)
   (writable #t)
+  (construct-only #f)
+)
+
+(define-property window-width
+  (of-object "GstXvImageSink")
+  (prop-type "GParamUInt64")
+  (docs "Width of the window")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property window-height
+  (of-object "GstXvImageSink")
+  (prop-type "GParamUInt64")
+  (docs "Height of the window")
+  (readable #t)
+  (writable #f)
   (construct-only #f)
 )
 

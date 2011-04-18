@@ -33,8 +33,8 @@ generate_plugin_dependencies = \
 	$(codegen_srcdir)/extra_defs_gen/generate_plugin_gmmproc_file.cc \
 	$(addprefix $(codegen_m4_srcdir)/,$(files_plugin_m4))
 
-target_plugin     = $(patsubst %element,%,$(basename $(notdir $@)))
-target_plugin_def = $(subst =, ,$(filter $(target_plugin)=%,$(GSTREAMERMM_PLUGIN_DEFS)))
+target_hg_basename = $(basename $(notdir $@))
+target_plugin_and_classname  = $(wordlist 2,3,$(subst |, ,$(filter $(target_hg_basename)|%,$(GSTREAMERMM_PLUGIN_DEFS))))
 
 $(binding_outputdir)/gst_wrap_init.cc: $(generate_gst_wrap_init) $(binding_relfiles_hg)
 	$(AM_V_GEN)$(PERL) -- $(generate_gst_wrap_init) $(wrap_init_flags) \
@@ -44,12 +44,14 @@ $(binding_outputdir)/gst_wrap_init.cc: $(generate_gst_wrap_init) $(binding_relfi
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
 # the final .ccg file.
 $(addprefix $(srcdir)/,$(plugins_ccg)): $(generate_plugin_dependencies)
-	$(AM_V_GEN)$(generate_plugin_gmmproc_file) --ccg $(target_plugin_def) \
-	 | $(M4) -I $(codegen_m4_srcdir) >$@
+	$(AM_V_GEN)$(generate_plugin_gmmproc_file) --ccg \
+	  $(target_plugin_and_classname) | $(M4) -I $(codegen_m4_srcdir) >$@
 
 # This is to generate plugin .hg files.  The generated .hg file is piped
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
 # the final .hg file.
 $(addprefix $(srcdir)/,$(plugins_hg)): %.hg: %.ccg $(generate_plugin_dependencies)
-	$(AM_V_GEN)$(generate_plugin_gmmproc_file) --hg $(target_plugin_def) \
-	 | $(M4) -I $(codegen_m4_srcdir) >$@
+	@echo Plugin def: $(target_plugin_and_classname)
+	$(AM_V_GEN)$(generate_plugin_gmmproc_file) \
+	  --hg $(target_plugin_and_classname) | $(M4) -I $(codegen_m4_srcdir) \
+	  >$@

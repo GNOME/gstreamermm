@@ -77,78 +77,73 @@ MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 #########################################################################
 
 # To add a plugin, add the plugin definition, in the form of
-# "plugin=CppClassName" to the space-separated list of definitions below.
-# (Where "plugin" is the plugin name as recognized by gst-inspect and
-# "CppClassName" is the desired name of the C++ class.)
-#
-# Also add the target .hg file name to the plugins_hg variable in the
-# gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
-# in lowercase with a .hg extension).
-#
-# TODO: Include appsink and appsrc plug-ins in list below if they indeed are
-# plug-ins (see gst-plugins-base docs for details) and when they don't cause
-# gstreamermm initialization errors.
+# "hgfilebasename|plugin|CppClassName" to the space-separated list of
+# definitions below.  (Where "hgfilebasename" is the basename of the .hg file
 
 AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
-adder=Adder \
-alsamixer=AlsaMixer \
-alsasink=AlsaSink \
-alsasrc=AlsaSrc \
-audioconvert=AudioConvert \
-audiorate=AudioRate \
-audioresample=AudioResample \
-audiotestsrc=AudioTestSrc \
-capsfilter=CapsFilter \
-cdparanoiasrc=CdParanoiaSrc \
-clockoverlay=ClockOverlay \
-decodebin2=DecodeBin2 \
-decodebin=DecodeBin \
-fakesink=FakeSink \
-fakesrc=FakeSrc \
-fdsink=FdSink \
-fdsrc=FdSrc \
-ffmpegcolorspace=FfmpegColorSpace \
-filesink=FileSink \
-filesrc=FileSrc \
-gdpdepay=GDPDepay \
-gdppay=GDPPay \
-giosink=GioSink \
-giosrc=GioSrc \
-giostreamsink=GioStreamSink \
-giostreamsrc=GioStreamSrc \
-identity=Identity \
-multifdsink=MultiFdSink \
-multiqueue=MultiQueue \
-oggdemux=OggDemux \
-oggmux=OggMux \
-playbin2=PlayBin2 \
-playbin=PlayBin \
-queue=Queue \
-queue2=Queue2 \
-subtitleoverlay=SubtitleOverlay \
-tcpclientsink=TCPClientSink \
-tcpclientsrc=TCPClientSrc \
-tcpserversink=TcpServerSink \
-tcpserversrc=TCPServerSrc \
-tee=Tee \
-textoverlay=TextOverlay \
-textrender=TextRender \
-theoradec=TheoraDec \
-theoraenc=TheoraEnc \
-theoraparse=TheoraParse \
-timeoverlay=TimeOverlay \
-typefind=TypeFindElement \
-uridecodebin=UriDecodeBin \
-videorate=VideoRate \
-videoscale=VideoScale \
-videotestsrc=VideoTestSrc \
-volume=Volume \
-vorbisdec=VorbisDec \
-vorbisenc=VorbisEnc \
-vorbisparse=VorbisParse \
-vorbistag=VorbisTag \
-ximagesink=XImageSink \
-xvimagesink=XvImageSink
+adder|adder|Adder \
+alsamixer|alsamixer|AlsaMixer \
+alsasink|alsasink|AlsaSink \
+alsasrc|alsasrc|AlsaSrc \
+audioconvert|audioconvert|AudioConvert \
+audiorate|audiorate|AudioRate \
+audioresample|audioresample|AudioResample \
+audiotestsrc|audiotestsrc|AudioTestSrc \
+capsfilter|capsfilter|CapsFilter \
+cdparanoiasrc|cdparanoiasrc|CdParanoiaSrc \
+clockoverlay|clockoverlay|ClockOverlay \
+decodebin2|decodebin2|DecodeBin2 \
+decodebin|decodebin|DecodeBin \
+fakesink|fakesink|FakeSink \
+fakesrc|fakesrc|FakeSrc \
+fdsink|fdsink|FdSink \
+fdsrc|fdsrc|FdSrc \
+ffmpegcolorspace|ffmpegcolorspace|FfmpegColorSpace \
+filesink|filesink|FileSink \
+filesrc|filesrc|FileSrc \
+funnel|funnel|Funnel \
+gdpdepay|gdpdepay|GDPDepay \
+gdppay|gdppay|GDPPay \
+giosink|giosink|GioSink \
+giosrc|giosrc|GioSrc \
+giostreamsink|giostreamsink|GioStreamSink \
+giostreamsrc|giostreamsrc|GioStreamSrc \
+identity|identity|Identity \
+inputselector|input-selector|InputSelector \
+multifdsink|multifdsink|MultiFdSink \
+multiqueue|multiqueue|MultiQueue \
+oggdemux|oggdemux|OggDemux \
+oggmux|oggmux|OggMux \
+outputselector|output-selector|OutputSelector \
+playbin2|playbin2|PlayBin2 \
+playbin|playbin|PlayBin \
+queue|queue|Queue \
+queue2|queue2|Queue2 \
+subtitleoverlay|subtitleoverlay|SubtitleOverlay \
+tcpclientsink|tcpclientsink|TCPClientSink \
+tcpclientsrc|tcpclientsrc|TCPClientSrc \
+tcpserversink|tcpserversink|TcpServerSink \
+tcpserversrc|tcpserversrc|TCPServerSrc \
+tee|tee|Tee \
+textoverlay|textoverlay|TextOverlay \
+textrender|textrender|TextRender \
+theoradec|theoradec|TheoraDec \
+theoraenc|theoraenc|TheoraEnc \
+theoraparse|theoraparse|TheoraParse \
+timeoverlay|timeoverlay|TimeOverlay \
+typefindelement|typefind|TypeFindElement \
+uridecodebin|uridecodebin|UriDecodeBin \
+valve|valve|Valve \
+videorate|videorate|VideoRate \
+videoscale|videoscale|VideoScale \
+videotestsrc|videotestsrc|VideoTestSrc \
+volume|volume|Volume \
+vorbisdec|vorbisdec|VorbisDec \
+vorbisenc|vorbisenc|VorbisEnc \
+vorbisparse|vorbisparse|VorbisParse \
+vorbistag|vorbistag|VorbisTag \
+ximagesink|ximagesink|XImageSink \
+xvimagesink|xvimagesink|XvImageSink
 "])
 
 # Check for the existence of the plug-ins.  Note that this check doesn't
@@ -164,7 +159,7 @@ AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
   do
     # Extract plugin name and run gst-inspect to check whether the plugin
     # is installed on the build system.
-    gstmm_plugin_name=`[expr "X$gstmm_plugin_def" : 'X\([^=]*\)' 2>&]AS_MESSAGE_LOG_FD`
+    gstmm_plugin_name=`[expr "X$gstmm_plugin_def" : 'X[a-z][a-z0-9]\+|\([^|]*\)' 2>&]AS_MESSAGE_LOG_FD`
     AS_IF([$GST_INSPECT "$gstmm_plugin_name" >/dev/null 2>&AS_MESSAGE_LOG_FD],,
           [AC_MSG_FAILURE([[The gstreamer plug-in '$gstmm_plugin_name' does not exist.
 If you built gst-plugins-base from source code then you might need to
