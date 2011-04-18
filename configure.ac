@@ -78,7 +78,17 @@ MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 
 # To add a plugin, add the plugin definition, in the form of
 # "hgfilebasename|plugin|CppClassName" to the space-separated list of
-# definitions below.  (Where "hgfilebasename" is the basename of the .hg file
+# definitions below.  (Where "hgfilebasename" is the basename of the .hg file,
+# "plugin" is the plugin name as recognized by gst-inspect and "CppClassName"
+# is the desired name of the C++ class.)
+#
+# Also add the target .hg file name to the plugins_hg variable in the
+# gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
+# in lowercase with a .hg extension).
+#
+# TODO: Include appsink and appsrc plug-ins in list below if they indeed are
+# plug-ins (see gst-plugins-base docs for details) and when they don't cause
+# gstreamermm initialization errors.
 
 AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
 adder|adder|Adder \
