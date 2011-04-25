@@ -23,7 +23,7 @@ AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h])
 
-MM_PREREQ([0.9.3])
+MM_PREREQ([0.9.5])
 MM_INIT_MODULE([gstreamermm-0.10])
 
 # Copy the mm-common .pl scripts into docs/,
@@ -102,8 +102,8 @@ audiotestsrc|audiotestsrc|AudioTestSrc \
 capsfilter|capsfilter|CapsFilter \
 cdparanoiasrc|cdparanoiasrc|CdParanoiaSrc \
 clockoverlay|clockoverlay|ClockOverlay \
-decodebin2|decodebin2|DecodeBin2 \
 decodebin|decodebin|DecodeBin \
+decodebin2|decodebin2|DecodeBin2 \
 fakesink|fakesink|FakeSink \
 fakesrc|fakesrc|FakeSrc \
 fdsink|fdsink|FdSink \
@@ -125,8 +125,8 @@ multiqueue|multiqueue|MultiQueue \
 oggdemux|oggdemux|OggDemux \
 oggmux|oggmux|OggMux \
 outputselector|output-selector|OutputSelector \
-playbin2|playbin2|PlayBin2 \
 playbin|playbin|PlayBin \
+playbin2|playbin2|PlayBin2 \
 queue|queue|Queue \
 queue2|queue2|Queue2 \
 subtitleoverlay|subtitleoverlay|SubtitleOverlay \
