@@ -169,7 +169,7 @@ AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
   do
     # Extract plugin name and run gst-inspect to check whether the plugin
     # is installed on the build system.
-    gstmm_plugin_name=`[expr "X$gstmm_plugin_def" : 'X[a-z][a-z0-9]\+|\([^|]*\)' 2>&]AS_MESSAGE_LOG_FD`
+    gstmm_plugin_name=`[expr "X$gstmm_plugin_def" : 'X.*|\([^|]*\)|.*$' 2>&]AS_MESSAGE_LOG_FD`
     AS_IF([$GST_INSPECT "$gstmm_plugin_name" >/dev/null 2>&AS_MESSAGE_LOG_FD],,
           [AC_MSG_FAILURE([[The gstreamer plug-in '$gstmm_plugin_name' does not exist.
 If you built gst-plugins-base from source code then you might need to
