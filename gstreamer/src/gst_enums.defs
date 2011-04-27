@@ -21,7 +21,6 @@
 ;; Original typedef:
 ;; typedef enum {
 ;;   GST_BUFFER_FLAG_READONLY   = GST_MINI_OBJECT_FLAG_READONLY,
-;;   GST_BUFFER_FLAG_MEDIA4     = GST_MINI_OBJECT_FLAG_RESERVED1,
 ;;   GST_BUFFER_FLAG_PREROLL    = (GST_MINI_OBJECT_FLAG_LAST << 0),
 ;;   GST_BUFFER_FLAG_DISCONT    = (GST_MINI_OBJECT_FLAG_LAST << 1),
 ;;   GST_BUFFER_FLAG_IN_CAPS    = (GST_MINI_OBJECT_FLAG_LAST << 2),
@@ -38,7 +37,6 @@
   (c-name "GstBufferFlag")
   (values
     '("readonly" "GST_BUFFER_FLAG_READONLY" "GST_MINI_OBJECT_FLAG_READONLY")
-    '("media4" "GST_BUFFER_FLAG_MEDIA4" "GST_MINI_OBJECT_FLAG_RESERVED1")
     '("preroll" "GST_BUFFER_FLAG_PREROLL" "(GST_MINI_OBJECT_FLAG_LAST << 0)")
     '("discont" "GST_BUFFER_FLAG_DISCONT" "(GST_MINI_OBJECT_FLAG_LAST << 1)")
     '("in-caps" "GST_BUFFER_FLAG_IN_CAPS" "(GST_MINI_OBJECT_FLAG_LAST << 2)")
@@ -135,21 +133,6 @@
   (c-name "GstCapsFlags")
   (values
     '("any" "GST_CAPS_FLAGS_ANY" "(1 << 0)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_CAPS_INTERSECT_ZIG_ZAG            =  0,
-;;   GST_CAPS_INTERSECT_FIRST              =  1
-;; } GstCapsIntersectMode;
-
-(define-enum-extended CapsIntersectMode
-  (in-module "Gst")
-  (c-name "GstCapsIntersectMode")
-  (values
-    '("zig-zag" "GST_CAPS_INTERSECT_ZIG_ZAG" "0")
-    '("first" "GST_CAPS_INTERSECT_FIRST" "1")
   )
 )
 
@@ -549,23 +532,6 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   GST_QOS_TYPE_OVERFLOW        = 0,
-;;   GST_QOS_TYPE_UNDERFLOW       = 1,
-;;   GST_QOS_TYPE_THROTTLE        = 2
-;; } GstQOSType;
-
-(define-enum-extended QOSType
-  (in-module "Gst")
-  (c-name "GstQOSType")
-  (values
-    '("overflow" "GST_QOS_TYPE_OVERFLOW" "0")
-    '("underflow" "GST_QOS_TYPE_UNDERFLOW" "1")
-    '("throttle" "GST_QOS_TYPE_THROTTLE" "2")
-  )
-)
-
 ;; From gstformat.h
 
 ;; Original typedef:
@@ -856,7 +822,6 @@
 ;;   GST_MESSAGE_REQUEST_STATE     = (1 << 22),
 ;;   GST_MESSAGE_STEP_START        = (1 << 23),
 ;;   GST_MESSAGE_QOS               = (1 << 24),
-;;   GST_MESSAGE_PROGRESS          = (1 << 25),
 ;;   GST_MESSAGE_ANY               = ~0
 ;; } GstMessageType;
 
@@ -890,7 +855,6 @@
     '("request-state" "GST_MESSAGE_REQUEST_STATE" "(1 << 22)")
     '("step-start" "GST_MESSAGE_STEP_START" "(1 << 23)")
     '("qos" "GST_MESSAGE_QOS" "(1 << 24)")
-    '("progress" "GST_MESSAGE_PROGRESS" "(1 << 25)")
     '("any" "GST_MESSAGE_ANY" "0x0")
   )
 )
@@ -936,34 +900,12 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   GST_PROGRESS_TYPE_START    = 0,
-;;   GST_PROGRESS_TYPE_CONTINUE = 1,
-;;   GST_PROGRESS_TYPE_COMPLETE = 2,
-;;   GST_PROGRESS_TYPE_CANCELED = 3,
-;;   GST_PROGRESS_TYPE_ERROR    = 4,
-;; } GstProgressType;
-
-(define-enum-extended ProgressType
-  (in-module "Gst")
-  (c-name "GstProgressType")
-  (values
-    '("start" "GST_PROGRESS_TYPE_START" "0")
-    '("continue" "GST_PROGRESS_TYPE_CONTINUE" "1")
-    '("complete" "GST_PROGRESS_TYPE_COMPLETE" "2")
-    '("canceled" "GST_PROGRESS_TYPE_CANCELED" "3")
-    '("error" "GST_PROGRESS_TYPE_ERROR" "4")
-  )
-)
-
 ;; From gstminiobject.h
 
 ;; Original typedef:
 ;; typedef enum
 ;; {
 ;;   GST_MINI_OBJECT_FLAG_READONLY = (1<<0),
-;;   GST_MINI_OBJECT_FLAG_RESERVED1 = (1<<1),
 ;;   /* padding */
 ;;   GST_MINI_OBJECT_FLAG_LAST = (1<<4)
 ;; } GstMiniObjectFlags;
@@ -973,7 +915,6 @@
   (c-name "GstMiniObjectFlags")
   (values
     '("readonly" "GST_MINI_OBJECT_FLAG_READONLY" "(1<<0)")
-    '("reserved1" "GST_MINI_OBJECT_FLAG_RESERVED1" "(1<<1)")
     '("last" "GST_MINI_OBJECT_FLAG_LAST" "(1<<4)")
   )
 )
@@ -1429,13 +1370,8 @@
 ;;   GST_QUARK_PROCESSED = 98,
 ;;   GST_QUARK_DROPPED = 99,
 ;;   GST_QUARK_BUFFERING_RANGES = 100,
-;;   GST_QUARK_MESSAGE_PROGRESS = 101,
-;;   GST_QUARK_CODE = 102,
-;;   GST_QUARK_TEXT = 103,
-;;   GST_QUARK_PERCENT = 104,
-;;   GST_QUARK_TIMEOUT = 105,
 ;; 
-;;   GST_QUARK_MAX = 106
+;;   GST_QUARK_MAX = 101
 ;; } GstQuarkId;
 
 (define-enum-extended QuarkId
@@ -1543,12 +1479,7 @@
     '("processed" "GST_QUARK_PROCESSED" "98")
     '("dropped" "GST_QUARK_DROPPED" "99")
     '("buffering-ranges" "GST_QUARK_BUFFERING_RANGES" "100")
-    '("message-progress" "GST_QUARK_MESSAGE_PROGRESS" "101")
-    '("code" "GST_QUARK_CODE" "102")
-    '("text" "GST_QUARK_TEXT" "103")
-    '("percent" "GST_QUARK_PERCENT" "104")
-    '("timeout" "GST_QUARK_TIMEOUT" "105")
-    '("max" "GST_QUARK_MAX" "106")
+    '("max" "GST_QUARK_MAX" "101")
   )
 )
 
@@ -1772,25 +1703,6 @@
     '("exact" "GST_SEARCH_MODE_EXACT" "0")
     '("before" "GST_SEARCH_MODE_BEFORE" "1")
     '("after" "GST_SEARCH_MODE_AFTER" "2")
-  )
-)
-
-;; From gstbaseparse.h
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_BASE_PARSE_FRAME_FLAG_NONE         = 0,
-;;   GST_BASE_PARSE_FRAME_FLAG_NO_FRAME     = (1 << 0),
-;;   GST_BASE_PARSE_FRAME_FLAG_CLIP         = (1 << 1)
-;; } GstBaseParseFrameFlags;
-
-(define-flags-extended BaseParseFrameFlags
-  (in-module "Gst")
-  (c-name "GstBaseParseFrameFlags")
-  (values
-    '("none" "GST_BASE_PARSE_FRAME_FLAG_NONE" "0x0")
-    '("no-frame" "GST_BASE_PARSE_FRAME_FLAG_NO_FRAME" "(1 << 0)")
-    '("clip" "GST_BASE_PARSE_FRAME_FLAG_CLIP" "(1 << 1)")
   )
 )
 
@@ -3671,10 +3583,7 @@
 ;;   GST_VIDEO_FORMAT_RGB8_PALETTED,
 ;;   GST_VIDEO_FORMAT_YUV9,
 ;;   GST_VIDEO_FORMAT_YVU9,
-;;   GST_VIDEO_FORMAT_IYU1,
-;;   GST_VIDEO_FORMAT_ARGB64,
-;;   GST_VIDEO_FORMAT_AYUV64,
-;;   GST_VIDEO_FORMAT_r210
+;;   GST_VIDEO_FORMAT_IYU1
 ;; } GstVideoFormat;
 
 (define-enum-extended VideoFormat
@@ -3721,9 +3630,6 @@
     '("yuv9" "GST_VIDEO_FORMAT_YUV9" "37")
     '("yvu9" "GST_VIDEO_FORMAT_YVU9" "38")
     '("iyu1" "GST_VIDEO_FORMAT_IYU1" "39")
-    '("argb64" "GST_VIDEO_FORMAT_ARGB64" "40")
-    '("ayuv64" "GST_VIDEO_FORMAT_AYUV64" "41")
-    '("r210" "GST_VIDEO_FORMAT_r210" "42")
   )
 )
 
@@ -4604,8 +4510,7 @@
 ;;     GST_TEXT_OVERLAY_VALIGN_BASELINE,
 ;;     GST_TEXT_OVERLAY_VALIGN_BOTTOM,
 ;;     GST_TEXT_OVERLAY_VALIGN_TOP,
-;;     GST_TEXT_OVERLAY_VALIGN_POS,
-;;     GST_TEXT_OVERLAY_VALIGN_CENTER
+;;     GST_TEXT_OVERLAY_VALIGN_POS
 ;; } GstTextOverlayVAlign;
 
 (define-enum-extended TextOverlayVAlign
@@ -4616,7 +4521,6 @@
     '("bottom" "GST_TEXT_OVERLAY_VALIGN_BOTTOM" "1")
     '("top" "GST_TEXT_OVERLAY_VALIGN_TOP" "2")
     '("pos" "GST_TEXT_OVERLAY_VALIGN_POS" "3")
-    '("center" "GST_TEXT_OVERLAY_VALIGN_CENTER" "4")
   )
 )
 
@@ -4625,7 +4529,7 @@
 ;;     GST_TEXT_OVERLAY_HALIGN_LEFT,
 ;;     GST_TEXT_OVERLAY_HALIGN_CENTER,
 ;;     GST_TEXT_OVERLAY_HALIGN_RIGHT,
-;;     GST_TEXT_OVERLAY_HALIGN_UNUSED,
+;;     GST_TEXT_OVERLAY_HALIGN_TOP,
 ;;     GST_TEXT_OVERLAY_HALIGN_POS
 ;; } GstTextOverlayHAlign;
 
@@ -4636,7 +4540,7 @@
     '("left" "GST_TEXT_OVERLAY_HALIGN_LEFT" "0")
     '("center" "GST_TEXT_OVERLAY_HALIGN_CENTER" "1")
     '("right" "GST_TEXT_OVERLAY_HALIGN_RIGHT" "2")
-    '("unused" "GST_TEXT_OVERLAY_HALIGN_UNUSED" "3")
+    '("top" "GST_TEXT_OVERLAY_HALIGN_TOP" "3")
     '("pos" "GST_TEXT_OVERLAY_HALIGN_POS" "4")
   )
 )

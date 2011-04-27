@@ -54,7 +54,7 @@ AC_SUBST([GSTREAMERMM_MODULES],
          ['giomm-2.4 >= 2.26.0 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
          [[], [-base], [-controller], [-dataprotocol], [-net], [-plugins-base],
               [-audio], [-cdda], [-interfaces], [-netbuffer], [-rtp], [-video]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.30])'])
+         [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.32])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-2.4 >= 2.12],
@@ -111,7 +111,6 @@ fdsrc|fdsrc|FdSrc \
 ffmpegcolorspace|ffmpegcolorspace|FfmpegColorSpace \
 filesink|filesink|FileSink \
 filesrc|filesrc|FileSrc \
-funnel|funnel|Funnel \
 gdpdepay|gdpdepay|GDPDepay \
 gdppay|gdppay|GDPPay \
 giosink|giosink|GioSink \
