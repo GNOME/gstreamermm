@@ -18,6 +18,7 @@
  */
 
 #include <gstreamermm/mixeroptions.h>
+#include <glibmm/vectorutils.h>
 
 namespace Gst
 {
@@ -98,10 +99,8 @@ MessageMixerVolumeChanged::MessageMixerVolumeChanged(GstMessage* castitem)
 : Message(castitem)
 {}
 
-//TODO: Include when = operator is available for Glib::ArrayHandle<>.
-/*
 void MessageMixerVolumeChanged::parse(Glib::RefPtr<Gst::MixerTrack>& track,
-  Glib::ArrayHandle<int>& volumes) const
+  std::vector<int>& volumes) const
 {
   GstMixerTrack* gst_track = 0;
   gint* gst_volumes = 0;
@@ -109,11 +108,12 @@ void MessageMixerVolumeChanged::parse(Glib::RefPtr<Gst::MixerTrack>& track,
 
   gst_mixer_message_parse_volume_changed(const_cast<GstMessage*>(gobj()),
     &gst_track, &gst_volumes, &gst_num_channels);
+
   track = Glib::wrap(gst_track);
-  //TODO: = is private for Glib::ArrayHandle:
-  //volumes = Glib::ArrayHandle<int>(gst_volumes, gst_num_channels, Glib::OWNERSHIP_DEEP);
+
+  volumes = Glib::ArrayHandler<int>::array_to_vector(gst_volumes,
+    gst_num_channels, Glib::OWNERSHIP_DEEP);
 }
-*/
 
 Glib::RefPtr<Gst::MixerTrack> MessageMixerVolumeChanged::parse()
 {
@@ -127,13 +127,16 @@ Glib::RefPtr<const Gst::MixerTrack> MessageMixerVolumeChanged::parse() const
   return parse();
 }
 
-Glib::ArrayHandle<int> MessageMixerVolumeChanged::parse_volumes() const
+std::vector<int> MessageMixerVolumeChanged::parse_volumes() const
 {
   gint* gst_volumes = 0;
   gint gst_num_channels = 0;
+
   gst_mixer_message_parse_volume_changed(const_cast<GstMessage*>(gobj()),
     0, &gst_volumes, &gst_num_channels);
-  return Glib::ArrayHandle<int>(gst_volumes, gst_num_channels, Glib::OWNERSHIP_DEEP);
+
+  return Glib::ArrayHandle<int>(gst_volumes, gst_num_channels,
+    Glib::OWNERSHIP_DEEP);
 }
 
 MessageMixerOptionChanged::MessageMixerOptionChanged(GstMessage* castitem)
@@ -193,7 +196,7 @@ MessageMixerChanged::MessageMixerChanged(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::ArrayHandle<int> Mixer::get_volume(const Glib::RefPtr<const Gst::MixerTrack>& track) const
+std::vector<int> Mixer::get_volume(const Glib::RefPtr<const Gst::MixerTrack>& track) const
 {
   const guint32 num_channels = track->get_num_channels();
   int* volumes = g_new(int, num_channels);
@@ -222,11 +225,10 @@ void Mixer_Class::get_volume_vfunc_callback(GstMixer* self, GstMixerTrack* track
     try // Trap C++ exceptions which would normally be lost because this is a C callback.
     {
       // Call the virtual member method, which derived classes might override.
-      Glib::ArrayHandle<int> result = obj->get_volume_vfunc(Glib::wrap(track, true));
-      const int* result_data = result.data();
+      std::vector<int> result = obj->get_volume_vfunc(Glib::wrap(track, true));
       for(guint i = 0; i < result.size(); i++)
       {
-        volumes[i] = result_data[i];
+        volumes[i] = result[i];
       }
     }
     catch(...)
@@ -246,7 +248,7 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Ge
       return (*base->get_volume)(self, track, volumes);
   }
 }
-Glib::ArrayHandle<int> Gst::Mixer::get_volume_vfunc(const Glib::RefPtr<const Gst::MixerTrack>& track) const
+std::vector<int> Gst::Mixer::get_volume_vfunc(const Glib::RefPtr<const Gst::MixerTrack>& track) const
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
@@ -256,9 +258,11 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
   if(base && base->get_volume)
   {
     const guint32 num_channels = track->get_num_channels();
+
     int* volumes = new int[num_channels];
     (*base->get_volume)(const_cast<GstMixer*>(gobj()),
       const_cast<GstMixerTrack*>(Glib::unwrap(track)), volumes);
+
     return Glib::ArrayHandle<int>(volumes, num_channels, Glib::OWNERSHIP_DEEP);
   }
 
@@ -283,7 +287,9 @@ const GList* Mixer_Class::list_tracks_vfunc_callback(GstMixer* self)
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
-        return (obj->list_tracks_vfunc()).data();
+        return
+          Glib::ListHandler< Glib::RefPtr<Gst::MixerTrack> >::vector_to_list(
+          obj->list_tracks_vfunc()).data();
       }
       catch(...)
       {
@@ -305,7 +311,7 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Ge
   typedef const GList* RType;
   return RType();
 }
-Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > Gst::Mixer::list_tracks_vfunc() const
+std::vector< Glib::RefPtr<Gst::MixerTrack> > Gst::Mixer::list_tracks_vfunc()
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).

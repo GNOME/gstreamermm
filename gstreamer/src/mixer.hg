@@ -43,25 +43,25 @@ class Mixer : public Glib::Interface
   _CLASS_INTERFACE(Mixer, GstMixer, GST_MIXER, GstMixerClass)
 
 public:
-#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+#m4 _CONVERSION(`const GList*', `std::vector< Glib::RefPtr<Gst::MixerTrack> >', `Glib::ListHandler< Glib::RefPtr<Gst::MixerTrack> >::list_to_vector(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
   /** Returns a list of available tracks for this mixer/element. Note that it
    * is allowed for sink (output) elements to only provide the output tracks
    * in this list. Likewise, for sources (inputs), it is allowed to only
    * provide input elements in this list.
    *
-   * @return A Glib::ListHandle<> consisting of zero or more Gst::MixerTrack. 
+   * @return A std::vector<> consisting of zero or more Gst::MixerTrack. 
    */
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > list_tracks(), gst_mixer_list_tracks)
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Gst::MixerTrack> > list_tracks(), gst_mixer_list_tracks)
 
-#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::MixerTrack> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+#m4 _CONVERSION(`const GList*', `std::vector< Glib::RefPtr<const Gst::MixerTrack> >', `Glib::ListHandler< Glib::RefPtr<const Gst::MixerTrack> >::list_to_vector(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
   /** Returns a list of available tracks for this mixer/element. Note that it
    * is allowed for sink (output) elements to only provide the output tracks
    * in this list. Likewise, for sources (inputs), it is allowed to only
    * provide input elements in this list.
    *
-   * @return A Glib::ListHandle<> consisting of zero or more Gst::MixerTrack. 
+   * @return A std::vector<> consisting of zero or more Gst::MixerTrack. 
    */
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::MixerTrack> > list_tracks() const, gst_mixer_list_tracks)
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const Gst::MixerTrack> > list_tracks() const, gst_mixer_list_tracks)
 
   /** Get the current volume(s) on the given track.
    *
@@ -69,18 +69,18 @@ public:
    * @return an array of integers (of size track->num_channels) to with the
    * current volume of each channel in the given track. 
    */
-  Glib::ArrayHandle<int> get_volume(const Glib::RefPtr<const Gst::MixerTrack>& track) const;
+  std::vector<int> get_volume(const Glib::RefPtr<const Gst::MixerTrack>& track) const;
   _IGNORE(gst_mixer_get_volume)
 
-#m4 _CONVERSION(`const Glib::ArrayHandle<int>&', `gint*', `const_cast<int*>(($3).data())')
-  _WRAP_METHOD(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), gst_mixer_set_volume)
+#m4 _CONVERSION(`const std::vector<int>&', `gint*', `Glib::ArrayHandler<int>::vector_to_array($3).data()')
+  _WRAP_METHOD(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const std::vector<int>& volumes), gst_mixer_set_volume)
 
   _WRAP_METHOD(void set_mute(const Glib::RefPtr<Gst::MixerTrack>& track, bool mute), gst_mixer_set_mute)
   _WRAP_METHOD(void set_record(const Glib::RefPtr<Gst::MixerTrack>& track, bool record), gst_mixer_set_record)
   _WRAP_METHOD(void set_option(const Glib::RefPtr<Gst::MixerOptions>& opts, const Glib::ustring& value), gst_mixer_set_option)
   _WRAP_METHOD(void mute_toggled(const Glib::RefPtr<Gst::MixerTrack>& track, bool mute), gst_mixer_mute_toggled)
   _WRAP_METHOD(void record_toggled(const Glib::RefPtr<Gst::MixerTrack>& track, bool record), gst_mixer_record_toggled)
-  _WRAP_METHOD(void volume_changed(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), gst_mixer_volume_changed)
+  _WRAP_METHOD(void volume_changed(const Glib::RefPtr<Gst::MixerTrack>& track, const std::vector<int>& volumes), gst_mixer_volume_changed)
   _WRAP_METHOD(void option_changed(const Glib::RefPtr<Gst::MixerOptions>& opts, const Glib::ustring& value), gst_mixer_option_changed)
   _WRAP_METHOD(void options_list_changed(const Glib::RefPtr<Gst::MixerOptions>& opts), gst_mixer_options_list_changed)
   _WRAP_METHOD(Glib::ustring get_option(const Glib::RefPtr<const Gst::MixerOptions>& opts) const, gst_mixer_get_option)
@@ -94,13 +94,14 @@ public:
   // Gst::MessageMixer* classes):
   _IGNORE_SIGNAL(mute_toggled, record_toggled, volume_changed, option_changed)
 
-  virtual Glib::ArrayHandle<int> get_volume_vfunc(const Glib::RefPtr<const Gst::MixerTrack>& track) const;
-  virtual Glib::ListHandle< Glib::RefPtr<Gst::MixerTrack> > list_tracks_vfunc() const;
+  virtual std::vector<int> get_volume_vfunc(const Glib::RefPtr<const Gst::MixerTrack>& track) const;
+
+  virtual std::vector< Glib::RefPtr<Gst::MixerTrack> > list_tracks_vfunc();
 
 #m4 _CONVERSION(`GstMixerTrack*',`const Glib::RefPtr<Gst::MixerTrack>&', `Glib::wrap(($3), true)')
 
-#m4 _CONVERSION(`gint*', `const Glib::ArrayHandle<int>&', `Glib::ArrayHandle<int>(($3), Glib::OWNERSHIP_NONE)')
-  _WRAP_VFUNC(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const Glib::ArrayHandle<int>& volumes), "set_volume")
+#m4 _CONVERSION(`gint*', `const std::vector<int>&', `Glib::ArrayHandler<int>::array_to_vector(($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_VFUNC(void set_volume(const Glib::RefPtr<Gst::MixerTrack>& track, const std::vector<int>& volumes), "set_volume")
 
   _WRAP_VFUNC(void set_mute(const Glib::RefPtr<Gst::MixerTrack>& track, bool mute), "set_mute")
   _WRAP_VFUNC(void set_record(const Glib::RefPtr<Gst::MixerTrack>& track, bool record), "set_record")
@@ -226,20 +227,18 @@ class MessageMixerVolumeChanged : public Message
 public:
   explicit MessageMixerVolumeChanged(GstMessage* castitem);
 
-  //TODO: Include when = operator is available for Glib::ArrayHandle<>.
-  ///** Parses a volume-changed notification message and extracts the track
-   //* object it refers to, as well as an array of volumes and the size of the
-   //* volumes array.
-   //*
-   //* The track object remains valid until the message is freed.
-   //*
-   //* @param track A reference to hold a Gst::MixerTrack object.
-   //* @param volumes A reference to receive an array of int values.
-   //*
-   //* Since 0.10.14.
-   //*/
-  //void parse(Glib::RefPtr<Gst::MixerTrack>& track,
-    //Glib::ArrayHandle<int>& volumes) const;
+  /** Parses a volume-changed notification message and extracts the track
+   * object it refers to, as well as an array of volumes and the size of the
+   * volumes array.
+   *
+   * The track object remains valid until the message is freed.
+   *
+   * @param track A reference to hold a Gst::MixerTrack object.
+   * @param volumes A reference to receive an array of int values.
+   *
+   * Since 0.10.14.
+   */
+  void parse(Glib::RefPtr<Gst::MixerTrack>& track, std::vector<int>& volumes) const;
   _IGNORE(gst_mixer_message_parse_volume_changed)
 
   /** Parses a volume-changed notification message and extracts the track
@@ -265,7 +264,7 @@ public:
    *
    * @return The array of volume int values.
    */
-  Glib::ArrayHandle<int> parse_volumes() const;
+  std::vector<int> parse_volumes() const;
 };
 
 /** An option-changed Gst::Mixer message.
