@@ -28,7 +28,7 @@ check_PROGRAMS = test-caps test-create-element test-pipeline-add-element \
                  test-ghost-pad test-init-check test-init \
                  test-init-check-noargs test-init-noargs test-iterator \
                  test-property-caps test-plugin-gen test-plugin-signals \
-                 test-buffer-list-iterator
+                 test-buffer-list-iterator test-base-src
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
@@ -59,3 +59,4 @@ test_property_caps_SOURCES		= test-property-caps.cc
 test_plugin_gen_SOURCES			= test-plugin-gen.cc
 test_plugin_signals_SOURCES		= test-plugin-signals.cc
 test_buffer_list_iterator_SOURCES	= test-buffer-list-iterator.cc
+test_base_src_SOURCES			= test-base-src.cc
