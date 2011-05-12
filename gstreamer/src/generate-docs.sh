@@ -22,4 +22,4 @@ interfaces,netbuffer,riff,rtp,rtsp,sdp,tag,pbutils,video}; do
   PARAMS="$PARAMS -s $dir"
 done
 
-docextract_to_xml.py $PARAMS > "$DIR/gst_docs.xml"
+docextract_to_xml.py --no-since $PARAMS > "$DIR/gst_docs.xml"
