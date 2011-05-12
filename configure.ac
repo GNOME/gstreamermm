@@ -111,6 +111,7 @@ fdsrc|fdsrc|FdSrc \
 ffmpegcolorspace|ffmpegcolorspace|FfmpegColorSpace \
 filesink|filesink|FileSink \
 filesrc|filesrc|FileSrc \
+funnel|funnel|Funnel \
 gdpdepay|gdpdepay|GDPDepay \
 gdppay|gdppay|GDPPay \
 giosink|giosink|GioSink \
