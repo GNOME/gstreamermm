@@ -26,6 +26,8 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+_WRAP_ENUM(CapsIntersectMode, GstCapsIntersectMode, NO_GTYPE)
+
 struct Structure;
 
 /** A class that describes sets of media formats.
@@ -109,16 +111,21 @@ public:
   void merge_structure(Structure& structure);
   _IGNORE(gst_caps_merge_structure)
 
+#m4 _CONVERSION(`GstStructure*', `const Structure', `Glib::wrap($3, true)')
   /** Finds the structure in caps that has the index @a idx, and returns it.
    *
    * @param index The index of the structure.
    * @return The Gst::Structure corresponding to index.
    */
-  const Structure get_structure(guint idx) const;
-  _IGNORE(gst_caps_get_structure)
+  _WRAP_METHOD(const Structure get_structure(guint idx) const, gst_caps_get_structure)
 
   _WRAP_METHOD(void remove_structure(guint idx), gst_caps_remove_structure)
   _WRAP_METHOD(guint size() const, gst_caps_get_size)
+
+// There's no need to take an extra reference because we are stealing the
+// structure.
+#m4 _CONVERSION(`GstStructure*', `Structure', `Glib::wrap($3)')
+  _WRAP_METHOD(Structure steal_structure(guint index), gst_caps_steal_structure)
 
   /** Sets fields in a simple Gst::Caps. A simple Gst::Caps is one that only
    * has one structure. This method, like the Gst::Structure::set_field()
@@ -175,6 +182,9 @@ public:
 
   //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_intersect(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_intersect)
+
+  //This is const (returns a non const) because it always creates a new instance:
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_intersect(const Glib::RefPtr<const Gst::Caps>& other_caps, CapsIntersectMode) const, gst_caps_intersect_full)
 
   //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_union(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_union)

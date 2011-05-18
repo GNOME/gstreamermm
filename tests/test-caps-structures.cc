@@ -47,7 +47,7 @@ int main(int argc, char** argv)
   Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create();
   add_structures(caps);
 
-  for(int i = 0; i < 2; i++) {
+  for(int i = 0; i < 3; i++) {
     Glib::ustring str;
     const Gst::Structure s = caps->get_structure(i);
     if(s)
@@ -57,11 +57,26 @@ int main(int argc, char** argv)
     }
   }
 
-  caps->remove_structure(1);
+  std::cout << "Removing cap's structure at index 0" << std::endl;
 
-  const Gst::Structure structure = caps->get_structure(1);
+  caps->remove_structure(0);
+
+  Gst::Structure structure = caps->get_structure(0);
   if(structure)
-    std::cout << "Caps structure index 1 = " << structure.get_name() << std::endl;
+    std::cout << "Cap's structure at index 0 = " << structure.get_name() <<
+      std::endl;
+
+  std::cout << "Stealing cap's structure at index 0" << std::endl;
+
+  Gst::Structure stolen_struct = caps->steal_structure(0);
+  if(stolen_struct)
+    std::cout << "Cap's stolen structure at indext 0 = " <<
+      stolen_struct.get_name() << std::endl;
+
+  structure = caps->get_structure(0);
+  if(structure)
+    std::cout << "Cap's structure at index 0 = " << structure.get_name() <<
+      std::endl;
 
   return 0;
 }

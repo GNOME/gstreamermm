@@ -68,15 +68,6 @@ void Caps::merge_structure(Structure& structure)
   gst_caps_merge_structure(gobj(), copy);
 }
 
-const Structure Caps::get_structure(guint idx) const
-{
-  GstStructure* structure = gst_caps_get_structure(gobj(), idx);
-  if(structure)
-    return Structure(structure, true /* take_copy */);
-  else
-    return Structure(); //Use operator bool() to detect this.
-}
-
 //TODO: Want to return RefPtr to Caps but using RefPtr in expressions such
 // as 'caps->set_simple(name1, value1)->set_simple(name2, value2)' a
 // causes gstreamer Structure immutability warnings because the Caps is
