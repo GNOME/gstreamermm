@@ -86,14 +86,12 @@ Caps::set_simple(const Glib::ustring& name, const Glib::ValueBase& value)
   g_return_if_fail((gobj()->structs->len == 1)); // Not simple
   g_return_if_fail (g_atomic_int_get(&(gobj())->refcount) == 1); // IS_WRITABLE(caps) fails
 
-  //Use Gst::Structure so gstremermm GTypes like Gst::Value<Gst::IntRange> are
-  //converted to GStreamer types when they are stored in structure
-
-  //The result of gst_caps_get_structure() should not be modified, according to its documentation,
-  //but we are reimplementing gst_caps_set_simple() which does that:
+  //The result of gst_caps_get_structure() should not be modified, according to
+  //its documentation, but we are reimplementing gst_caps_set_simple() which
+  //does that:
   GstStructure* structure = gst_caps_get_structure(gobj(), 0);
   if(structure)
-    Structure::_set_gstructure_field(structure, name, value);
+    gst_structure_set_value(structure, name.c_str(), value.gobj());
 
   //return Glib::wrap(gobj(), true);
 }

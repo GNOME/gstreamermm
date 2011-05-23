@@ -95,9 +95,10 @@ void Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) con
   value.init(gst_structure_get_value(gobj(), name.c_str()));
 }
 
-void Structure::set_field(const Glib::ustring& fieldname, const Glib::ValueBase& value)
+void Structure::set_field(const Glib::ustring& fieldname,
+  const Glib::ValueBase& value)
 {
-  _set_gstructure_field(gobj(), fieldname, value);
+  gst_structure_set_value(gobj(), fieldname.c_str(), value.gobj());
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, bool value)
@@ -176,80 +177,6 @@ void Structure::set_field(const Glib::ustring& fieldname, const Gst::FractionRan
 {
   gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION_RANGE,
     value.min.num, value.min.denom, value.max.num, value.max.denom, (void*)0);
-}
-
-
-
-void Structure::_set_gstructure_field(GstStructure* cstructure, const Glib::ustring& fieldname, const Glib::ValueBase& value)
-{
-  const GType type = G_VALUE_TYPE(value.gobj());
-
-  //The series of if statements below is designed to convert the GTypes of
-  //Glib::Value<> enclosing gstreamermm types (such as Gst::Fourcc) to
-  //GStreamer GTypes (e.g. a Glib::Value<Gst::Fourcc> is converted to the
-  //GST_TYPE_FOURCC GType).
-
-  if(type == Glib::Value<Fourcc>::value_type())
-  {
-     const Glib::Value<Fourcc>* fourcc =
-        static_cast< const Glib::Value<Fourcc>* >(&value);
-
-     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_FOURCC,
-        fourcc->get().get_fourcc(), (void*)0);
-  }
-  else if(type == Glib::Value<IntRange>::value_type())
-  {
-     const Glib::Value<IntRange>* range =
-        static_cast< const Glib::Value<IntRange>* >(&value);
-
-     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_INT_RANGE,
-        range->get().min, range->get().max, (void*)0);
-  }
-  else if(type == Glib::Value<DoubleRange>::value_type())
-  {
-     const Glib::Value<DoubleRange>* range =
-        static_cast< const Glib::Value<DoubleRange>* >(&value);
-
-     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_DOUBLE_RANGE,
-        range->get().min, range->get().max, (void*)0);
-  }
-  else if(type == Glib::Value<Fraction>::value_type())
-  {
-     const Glib::Value<Fraction>* fract =
-        static_cast< const Glib::Value<Fraction>* >(&value);
-
-     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_FRACTION,
-        fract->get().num, fract->get().denom, (void*)0);
-  }
-  else if(type == Glib::Value<FractionRange>::value_type())
-  {
-     const Glib::Value<FractionRange>* range =
-        static_cast< const Glib::Value<FractionRange>* >(&value);
-
-     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_FRACTION_RANGE,
-         range->get().min.num, range->get().min.denom, range->get().max.num,
-             range->get().max.denom, (void*)0);
-  }
-  else if(type == Glib::Value<Glib::Date>::value_type())
-  {
-     const Glib::Value<Glib::Date>* date =
-        static_cast< const Glib::Value<Glib::Date>* >(&value);
-
-     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_DATE,
-         date->get().gobj(), (void*)0);
-  }
-  else if(type == Glib::Value<Structure>::value_type())
-  {
-     const Glib::Value<Structure>* obj =
-        static_cast< const Glib::Value<Structure>* >(&value);
-
-     gst_structure_set(cstructure, fieldname.c_str(), GST_TYPE_STRUCTURE,
-        obj->get().gobj(), (void*)0);
-  }
-  else
-  {
-    gst_structure_set_value(cstructure, fieldname.c_str(), value.gobj());
-  }
 }
 
 void Structure::remove_field(const Glib::ustring& fieldname)

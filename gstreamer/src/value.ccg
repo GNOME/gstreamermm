@@ -265,3 +265,89 @@ FractionRange::FractionRange(const GValue& value)
 }
 
 } //namespace Gst
+
+namespace Glib
+{
+
+// static
+GType Value<Gst::Fourcc>::value_type()
+{
+  return GST_TYPE_FOURCC;
+}
+
+void Value<Gst::Fourcc>::set(const Gst::Fourcc& data)
+{
+  gst_value_set_fourcc(&gobject_, data.get_fourcc());
+}
+
+Gst::Fourcc Value<Gst::Fourcc>::get() const
+{
+  return Gst::Fourcc(gobject_);
+}
+
+// static
+GType Value<Gst::IntRange>::value_type()
+{
+  return GST_TYPE_INT_RANGE;
+}
+
+void Value<Gst::IntRange>::set(const Gst::IntRange& data)
+{
+  gst_value_set_int_range(&gobject_, data.min, data.max);
+}
+
+Gst::IntRange Value<Gst::IntRange>::get() const
+{
+  return Gst::IntRange(gobject_);
+}
+
+// static
+GType Value<Gst::DoubleRange>::value_type()
+{
+  return GST_TYPE_DOUBLE_RANGE;
+}
+
+void Value<Gst::DoubleRange>::set(const Gst::DoubleRange& data)
+{
+  gst_value_set_double_range(&gobject_, data.min, data.max);
+}
+
+Gst::DoubleRange Value<Gst::DoubleRange>::get() const
+{
+  return Gst::DoubleRange(gobject_);
+}
+
+// static
+GType Value<Gst::Fraction>::value_type()
+{
+  return GST_TYPE_FRACTION;
+}
+
+void Value<Gst::Fraction>::set(const Gst::Fraction& data)
+{
+  gst_value_set_fraction(&gobject_, data.num, data.denom);
+}
+
+Gst::Fraction Value<Gst::Fraction>::get() const
+{
+  return Gst::Fraction(gobject_);
+}
+
+// static
+GType Value<Gst::FractionRange>::value_type()
+{
+  return GST_TYPE_FRACTION_RANGE;
+}
+
+void Value<Gst::FractionRange>::set(const Gst::FractionRange& data)
+{
+  gst_value_set_fraction_range_full(&gobject_, data.min.num, data.min.denom,
+    data.max.num, data.max.denom);
+}
+
+Gst::FractionRange Value<Gst::FractionRange>::get() const
+{
+  return Gst::FractionRange(gobject_);
+}
+
+} // namespace Glib
