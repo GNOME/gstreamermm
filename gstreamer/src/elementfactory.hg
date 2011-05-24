@@ -18,12 +18,39 @@
  */
 
 #include <gst/gstelement.h>
+#include <gstreamermm/pad.h>
 #include <gstreamermm/pluginfeature.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
+
+enum ElementFactoryListType
+{
+  ELEMENT_FACTORY_TYPE_ANY,
+  ELEMENT_FACTORY_TYPE_AUDIOVIDEO_SINKS,
+  ELEMENT_FACTORY_TYPE_AUDIO_ENCODER,
+  ELEMENT_FACTORY_TYPE_DECODABLE,
+  ELEMENT_FACTORY_TYPE_DECODER,
+  ELEMENT_FACTORY_TYPE_DEMUXER,
+  ELEMENT_FACTORY_TYPE_DEPAYLOADER,
+  ELEMENT_FACTORY_TYPE_ENCODER,
+  ELEMENT_FACTORY_TYPE_FORMATTER,
+  ELEMENT_FACTORY_TYPE_MAX_ELEMENTS,
+  ELEMENT_FACTORY_TYPE_MEDIA_AUDIO,
+  ELEMENT_FACTORY_TYPE_MEDIA_IMAGE,
+  ELEMENT_FACTORY_TYPE_MEDIA_METADATA,
+  ELEMENT_FACTORY_TYPE_MEDIA_SUBTITLE,
+  ELEMENT_FACTORY_TYPE_MEDIA_VIDEO,
+  ELEMENT_FACTORY_TYPE_MEDIA_ANY,
+  ELEMENT_FACTORY_TYPE_MUXER,
+  ELEMENT_FACTORY_TYPE_PARSER,
+  ELEMENT_FACTORY_TYPE_PAYLOADER,
+  ELEMENT_FACTORY_TYPE_SINK,
+  ELEMENT_FACTORY_TYPE_SRC,
+  ELEMENT_FACTORY_TYPE_VIDEO_ENCODER
+};
 
 class Caps;
 class Element;
@@ -118,6 +145,15 @@ public:
 
 #m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::PadTemplate> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::PadTemplate> > get_static_pad_templates() const, gst_element_factory_get_static_pad_templates)
+
+#m4 _CONVERSION(`GList*', `std::vector< Glib::RefPtr<Gst::ElementFactory> >', `Glib::ListHandler< Glib::RefPtr<Gst::ElementFactory> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+#m4 _CONVERSION(`const std::vector< Glib::RefPtr<Gst::ElementFactory> >&', `GList*', `Glib::ListHandler< Glib::RefPtr<Gst::ElementFactory> >::vector_to_list($3).data()')
+  _WRAP_METHOD(static std::vector< Glib::RefPtr<Gst::ElementFactory> > filter(const std::vector< Glib::RefPtr<Gst::ElementFactory> >& list, const Glib::RefPtr<const Gst::Caps>& caps, PadDirection direction, bool subsetonly), gst_element_factory_list_filter)
+
+#m4 _CONVERSION(`ElementFactoryListType', `GstElementFactoryListType', `_list_types[$3]')
+
+  _WRAP_METHOD(static std::vector< Glib::RefPtr<Gst::ElementFactory> > get_elements(ElementFactoryListType type, Rank minrank), gst_element_factory_list_get_elements)
+  _WRAP_METHOD(bool is_type(ElementFactoryListType type) const, gst_element_factory_list_is_type)
 };
 
 } // namespace Gst
