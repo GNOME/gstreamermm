@@ -27,6 +27,7 @@ _CONV_ENUM(Gst,MixerFlags)
 _CONV_ENUM(Gst,MixerType)
 _CONV_ENUM(Gst,NavigationCommand)
 _CONV_ENUM(Gst,PadDirection)
+_CONV_ENUM(Gst,PadLinkCheck)
 _CONV_ENUM(Gst,PadLinkReturn)
 _CONV_ENUM(Gst,PadPresence)
 _CONV_ENUM(Gst,PluginDependencyFlags)
@@ -150,6 +151,7 @@ _CONVERSION(`const Glib::RefPtr<const Gst::Pad>&',`GstPad*',`const_cast<GstPad*>
 
 dnl PadTemplate
 _CONVERSION(`GstPadTemplate*',`Glib::RefPtr<Gst::PadTemplate>', `Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::PadTemplate>&',`GstPadTemplate*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>(Glib::unwrap($3))')
 
 dnl Plugin
