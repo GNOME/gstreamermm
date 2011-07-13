@@ -119,6 +119,7 @@
 #include <gstreamermm/baseaudiosink.h>
 #include <gstreamermm/baseaudiosrc.h>
 #include <gstreamermm/cddabasesrc.h>
+#include <gstreamermm/discoverer.h>
 #include <gstreamermm/ringbuffer.h>
 #include <gstreamermm/videosink.h>
 
@@ -145,12 +146,16 @@
 #include <gstreamermm/fdsrc.h>
 #include <gstreamermm/filesrc.h>
 #include <gstreamermm/filesink.h>
+#include <gstreamermm/funnel.h>
 #include <gstreamermm/identity.h>
+#include <gstreamermm/inputselector.h>
 #include <gstreamermm/multiqueue.h>
+#include <gstreamermm/outputselector.h>
 #include <gstreamermm/queue.h>
 #include <gstreamermm/queue2.h>
 #include <gstreamermm/tee.h>
 #include <gstreamermm/typefindelement.h>
+#include <gstreamermm/valve.h>
 
 // Plug-in base includes
 #include <gstreamermm/adder.h>
