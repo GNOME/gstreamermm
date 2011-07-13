@@ -35,7 +35,7 @@ local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GS
 
 AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(examples_cppflags)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
-LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
+LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgstpbutils-0.10
 
 element_link_example_SOURCES 		= element_link/element_link.cc
 media_player_gtkmm_example_SOURCES 	= media_player_gtkmm/main.cc \
