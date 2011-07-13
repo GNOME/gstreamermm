@@ -51,7 +51,7 @@ AC_PROG_SED
 # The format below is used so that the requirements appear nicely in the .pc
 # file.
 AC_SUBST([GSTREAMERMM_MODULES],
-         ['giomm-2.4 >= 2.26.0 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
+         ['giomm-2.4 >= 2.28.0 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
          [[], [-base], [-controller], [-dataprotocol], [-net], [-plugins-base],
               [-audio], [-cdda], [-interfaces], [-netbuffer], [-rtp], [-video]],
          [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.32])'])
