@@ -243,6 +243,7 @@ dnl C++ Conversions
 _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 
 dnl Glibmm Conversions
+_CONVERSION(`const Glib::Error&', `const GError*', `$3.gobj()')
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
 _CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`$3.gobj()')
