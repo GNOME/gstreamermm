@@ -1358,6 +1358,15 @@
   (construct-only #f)
 )
 
+(define-property sync-streams
+  (of-object "GstInputSelector")
+  (prop-type "GParamBoolean")
+  (docs "Synchronize inactive streams to the running time of the active stream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstMultiQueue
 
 (define-signal underrun
@@ -1448,6 +1457,15 @@
   (of-object "GstMultiQueue")
   (prop-type "GParamInt")
   (docs "High threshold for buffering to finish")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync-by-running-time
+  (of-object "GstMultiQueue")
+  (prop-type "GParamBoolean")
+  (docs "Synchronize deactivated or not-linked streams by running time")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1863,6 +1881,10 @@
 
 ;; From GstAudioFilter
 
+;; From GstAudioSink
+
+;; From GstAudioSrc
+
 ;; From GstBaseAudioSink
 
 (define-property buffer-time
@@ -1974,43 +1996,6 @@
   (writable #t)
   (construct-only #f)
 )
-
-;; From GstAudioSink
-
-;; From GstAudioSrc
-
-;; From GstRingBuffer
-
-;; From GstCddaBaseSrc
-
-(define-property mode
-  (of-object "GstCddaBaseSrc")
-  (prop-type "GParamEnum")
-  (docs "Mode")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property device
-  (of-object "GstCddaBaseSrc")
-  (prop-type "GParamString")
-  (docs "CD device location")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property track
-  (of-object "GstCddaBaseSrc")
-  (prop-type "GParamUInt")
-  (docs "Track")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-;; From GstNetBuffer
 
 ;; From GstBaseRTPAudioPayload
 
@@ -2135,7 +2120,75 @@
   (construct-only #f)
 )
 
+;; From GstCddaBaseSrc
+
+(define-property mode
+  (of-object "GstCddaBaseSrc")
+  (prop-type "GParamEnum")
+  (docs "Mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property device
+  (of-object "GstCddaBaseSrc")
+  (prop-type "GParamString")
+  (docs "CD device location")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property track
+  (of-object "GstCddaBaseSrc")
+  (prop-type "GParamUInt")
+  (docs "Track")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstDiscoverer
+
+(define-signal finished
+  (of-object "GstDiscoverer")
+  (return-type "void")
+  (when "last")
+)
+
+(define-signal starting
+  (of-object "GstDiscoverer")
+  (return-type "void")
+  (when "last")
+)
+
+(define-signal discovered
+  (of-object "GstDiscoverer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstDiscovererInfo*" "p0")
+    '("const-GError*" "p1")
+  )
+)
+
+(define-property timeout
+  (of-object "GstDiscoverer")
+  (prop-type "GParamUInt64")
+  (docs "Timeout")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstNetBuffer
+
+;; From GstRingBuffer
+
 ;; From GstTagDemux
+
+;; From GstVideoFilter
 
 ;; From GstVideoSink
 
@@ -2147,8 +2200,6 @@
   (writable #t)
   (construct-only #f)
 )
-
-;; From GstVideoFilter
 
 ;; From GstColorBalance
 
@@ -2174,46 +2225,6 @@
 )
 
 ;; From GstMixer
-
-(define-signal record-toggled
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gboolean" "p1")
-  )
-)
-
-(define-signal mute-toggled
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gboolean" "p1")
-  )
-)
-
-(define-signal volume-changed
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gpointer" "p1")
-  )
-)
-
-(define-signal option-changed
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerOptions*" "p0")
-    '("const-gchar*" "p1")
-  )
-)
 
 ;; From GstMixerTrack
 
@@ -3573,6 +3584,15 @@
   (construct-only #f)
 )
 
+(define-property max-tolerance
+  (of-object "GstOggMux")
+  (prop-type "GParamUInt64")
+  (docs "Maximum timestamp difference for maintaining perfect granules")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstPlayBin
 
 (define-property audio-sink
@@ -4288,6 +4308,24 @@
   (construct-only #f)
 )
 
+(define-property shadow
+  (of-object "GstTextOverlay")
+  (prop-type "GParamBoolean")
+  (docs "Whether to create a shadow of the letters under the text")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property outline-color
+  (of-object "GstTextOverlay")
+  (prop-type "GParamUInt")
+  (docs "Color to use for outline the text (big-endian ARGB).")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstTextRender
 
 (define-property halignment
@@ -4778,6 +4816,24 @@
   (of-object "GstVideoRate")
   (prop-type "GParamBoolean")
   (docs "Don't produce buffers before the first one we receive")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property drop-only
+  (of-object "GstVideoRate")
+  (prop-type "GParamBoolean")
+  (docs "Only drop frames, no duplicates are produced")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property average-period
+  (of-object "GstVideoRate")
+  (prop-type "GParamUInt64")
+  (docs "Period over which to average the framerate (in ns) (0 = disabled)")
   (readable #t)
   (writable #t)
   (construct-only #f)

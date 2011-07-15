@@ -90,6 +90,10 @@ dnl ColorBalanceChannel
 _CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>(Glib::unwrap($3))')
 
+dnl DiscovererInfo
+_CONVERSION(`GstDiscovererInfo*',`Glib::RefPtr<DiscovererInfo>',`Gst::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<DiscovererInfo>&',`GstDiscovererInfo*',`Gst::unwrap($3)')
+
 dnl Element
 _CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `Glib::unwrap($3)')
 _CONVERSION(`GstElement*',`Glib::RefPtr<Gst::Element>',`Glib::wrap($3)')

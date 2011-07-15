@@ -47,6 +47,7 @@
 #include <gst/audio/gstringbuffer.h>
 #include <gst/cdda/gstcddabasesrc.h>
 #include <gst/netbuffer/gstnetbuffer.h>
+#include <gst/pbutils/pbutils.h>
 #include <gst/rtp/gstbasertpaudiopayload.h>
 #include <gst/rtp/gstbasertpdepayload.h>
 #include <gst/rtp/gstbasertppayload.h>
@@ -150,19 +151,20 @@ int main (int argc, char *argv[])
   // gst-plugins-base (GStreamer base) types:
             << get_defs(GST_TYPE_AUDIO_CLOCK, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_AUDIO_FILTER, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_BASE_AUDIO_SINK, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_BASE_AUDIO_SRC, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_AUDIO_SINK, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_AUDIO_SRC, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_RING_BUFFER, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_CDDA_BASE_SRC, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_NETBUFFER, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_BASE_AUDIO_SINK, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_BASE_AUDIO_SRC, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_BASE_RTP_AUDIO_PAYLOAD, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_BASE_RTP_DEPAYLOAD, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_BASE_RTP_PAYLOAD, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_CDDA_BASE_SRC, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_DISCOVERER, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_NETBUFFER, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_RING_BUFFER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_TAG_DEMUX, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_VIDEO_SINK, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_VIDEO_FILTER, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_VIDEO_SINK, gst_type_is_a_pointer)
 
   // gst-plugins-base (GStreamer base) interfaces:
             << get_defs(GST_TYPE_COLOR_BALANCE, gst_type_is_a_pointer)
