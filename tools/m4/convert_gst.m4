@@ -14,6 +14,7 @@ _CONV_ENUM(Gst,ClockEntryType)
 _CONV_ENUM(Gst,ClockReturn)
 _CONV_ENUM(Gst,ClockTime)
 _CONV_ENUM(Gst,ColorBalanceType)
+_CONV_ENUM(Gst,DiscovererResult)
 _CONV_ENUM(Gst,EventType)
 _CONV_ENUM(Gst,FlowReturn)
 _CONV_ENUM(Gst,Format)
@@ -93,6 +94,9 @@ _CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceCha
 dnl DiscovererInfo
 _CONVERSION(`GstDiscovererInfo*',`Glib::RefPtr<DiscovererInfo>',`Gst::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<DiscovererInfo>&',`GstDiscovererInfo*',`Gst::unwrap($3)')
+
+dnl DiscovererStreamInfo
+_CONVERSION(`GstDiscovererStreamInfo*', `Glib::RefPtr<DiscovererStreamInfo>', `Gst::wrap($3)')
 
 dnl Element
 _CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `Glib::unwrap($3)')
@@ -184,7 +188,6 @@ _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
 
 dnl TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')
-_CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap_taglist($3)')
 _CONVERSION(`Gst::TagList&',`GstTagList*',`$3.gobj()')
 _CONVERSION(`Gst::TagList',`GstTagList*',`$3.gobj()')
 

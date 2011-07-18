@@ -18,16 +18,44 @@
  */
 
 #include <gstreamermm/miniobject.h>
+#include <gstreamermm/clock.h>
 
 _DEFS(gstreamermm,gst)
-
-namespace Gst
-{
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GstDiscovererInfo GstDiscovererInfo;
 typedef GstMiniObjectClass GstDiscovererInfoClass;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GstDiscovererStreamInfo GstDiscovererStreamInfo;
+typedef GstMiniObjectClass GstDiscovererStreamInfoClass;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GstDiscovererContainerInfo GstDiscovererContainerInfo;
+typedef GstMiniObjectClass GstDiscovererContainerInfoClass;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GstDiscovererAudioInfo GstDiscovererAudioInfo;
+typedef GstMiniObjectClass GstDiscovererAudioInfoClass;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GstDiscovererVideoInfo GstDiscovererVideoInfo;
+typedef GstMiniObjectClass GstDiscovererVideoInfoClass;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gst
+{
+
+_WRAP_ENUM(DiscovererResult, GstDiscovererResult)
+
+class Caps;
+class DiscovererStreamInfo;
+class Structure;
+class TagList;
 
 /** DiscovererInfo - Class containing the information of a URI analyzed by
  * Gst::Discoverer.
@@ -39,6 +67,130 @@ class DiscovererInfo : public MiniObject
   _IGNORE(gst_discoverer_info_ref, gst_discoverer_info_unref)
 
 public:
+  _WRAP_METHOD(ClockTime get_duration() const, gst_discoverer_info_get_duration) 
+#m4 _CONVERSION(`const GstStructure*', `Structure', `Glib::wrap(const_cast<GstStructure*>($3), true)')
+
+  _WRAP_METHOD(Structure get_misc() const, gst_discoverer_info_get_misc) 
+  _WRAP_METHOD(DiscovererResult get_result() const, gst_discoverer_info_get_result) 
+
+  _WRAP_METHOD(Glib::RefPtr<DiscovererStreamInfo> get_stream_info(), gst_discoverer_info_get_stream_info) 
+  _WRAP_METHOD(Glib::RefPtr<const DiscovererStreamInfo> get_stream_info() const, gst_discoverer_info_get_stream_info, constversion) 
+
+#m4 _CONVERSION(`GList*', `std::vector< Glib::RefPtr<DiscovererStreamInfo> >', `Glib::ListHandler< Glib::RefPtr<DiscovererStreamInfo> >::list_to_vector(const_cast<GList*>($3), Glib::OWNERSHIP_DEEP)')
+#m4 _CONVERSION(`GList*', `std::vector< Glib::RefPtr<const DiscovererStreamInfo> >', `Glib::ListHandler< Glib::RefPtr<const DiscovererStreamInfo> >::list_to_vector(const_cast<GList*>($3), Glib::OWNERSHIP_DEEP)')
+
+  _WRAP_METHOD(std::vector< Glib::RefPtr<DiscovererStreamInfo> > get_stream_list(), gst_discoverer_info_get_stream_list) 
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const DiscovererStreamInfo> > get_stream_list() const, gst_discoverer_info_get_stream_list) 
+
+#m4 _CONVERSION(`const GstTagList*',`TagList',`Glib::wrap_taglist(const_cast<GstTagList*>($3), true)')
+
+  _WRAP_METHOD(TagList get_tags() const, gst_discoverer_info_get_tags) 
+
+  _WRAP_METHOD(Glib::ustring get_uri() const, gst_discoverer_info_get_uri) 
+  _WRAP_METHOD(bool get_seekable() const, gst_discoverer_info_get_seekable) 
+
+  _WRAP_METHOD(std::vector< Glib::RefPtr<DiscovererStreamInfo> > get_audio_streams(), gst_discoverer_info_get_audio_streams) 
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const DiscovererStreamInfo> > get_audio_streams() const, gst_discoverer_info_get_audio_streams) 
+
+  _WRAP_METHOD(std::vector< Glib::RefPtr<DiscovererStreamInfo> > get_container_streams(), gst_discoverer_info_get_container_streams) 
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const DiscovererStreamInfo> > get_container_streams() const, gst_discoverer_info_get_container_streams) 
+
+  _WRAP_METHOD(std::vector< Glib::RefPtr<DiscovererStreamInfo> > get_streams(GType streamtype), gst_discoverer_info_get_streams) 
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const DiscovererStreamInfo> > get_streams(GType streamtype) const, gst_discoverer_info_get_streams) 
+
+  _WRAP_METHOD(std::vector< Glib::RefPtr<DiscovererStreamInfo> > get_video_streams(), gst_discoverer_info_get_video_streams)
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const DiscovererStreamInfo> > get_video_streams() const, gst_discoverer_info_get_video_streams)
+};
+
+/** DiscovererStreamInfo - Base class for information concerning a media
+ * stream.
+ * Depending on the stream type, one can find more media-specific information
+ * in Gst::DiscovererAudioInfo, Gst::DiscovererVideoInfo, and
+ * Gst::DiscovererContainerInfo.
+ *
+ * The Gst::DiscovererStreamInfo represents the topology of the stream.
+ * Siblings can be iterated over with get_next() and get_previous(). Children
+ * (sub-streams) of a stream can be accessed using the
+ * Gst::DiscovererContainerInfo API.
+ *
+ * As a simple example, if you run Gst::Discoverer on an AVI file with one
+ * audio and one video stream, you will get a Gst::DiscovererContainerInfo
+ * corresponding to the AVI container, which in turn will have a
+ * Gst::DiscovererAudioInfo sub-stream and a Gst::DiscovererVideoInfo
+ * sub-stream for the audio and video streams respectively.
+ */
+class DiscovererStreamInfo : public MiniObject
+{
+  _STRUCT_NOT_HIDDEN
+  _CLASS_GSTMINIOBJECT(DiscovererStreamInfo, GstDiscovererStreamInfo, GST_DISCOVERER_STREAM_INFO, MiniObject, GstMiniObject)
+  _IGNORE(gst_discoverer_stream_info_ref, gst_discoverer_stream_info_unref)
+
+public:
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_discoverer_stream_info_get_caps)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_caps() const, gst_discoverer_stream_info_get_caps, constversion)
+
+  _WRAP_METHOD(Structure get_misc() const, gst_discoverer_stream_info_get_misc)
+
+  _WRAP_METHOD(Glib::RefPtr<DiscovererStreamInfo> get_next(), gst_discoverer_stream_info_get_next)
+  _WRAP_METHOD(Glib::RefPtr<const DiscovererStreamInfo> get_next() const, gst_discoverer_stream_info_get_next, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<DiscovererStreamInfo> get_previous(), gst_discoverer_stream_info_get_previous)
+  _WRAP_METHOD(Glib::RefPtr<DiscovererStreamInfo> get_previous() const, gst_discoverer_stream_info_get_previous, constversion)
+
+  _WRAP_METHOD(TagList get_tags() const, gst_discoverer_stream_info_get_tags)
+
+  _WRAP_METHOD(Glib::ustring get_stream_type_nick() const, gst_discoverer_stream_info_get_stream_type_nick)
+};
+
+/** DiscovererContainerInfo - Gst::DiscovererStreamInfo specific to container
+ * streams. 
+ */
+class DiscovererContainerInfo : public DiscovererStreamInfo
+{
+  _STRUCT_NOT_HIDDEN
+  _CLASS_GSTMINIOBJECT(DiscovererContainerInfo, GstDiscovererContainerInfo, GST_DISCOVERER_CONTAINER_INFO, DiscovererStreamInfo, GstDiscovererStreamInfo)
+
+public:
+  _WRAP_METHOD(std::vector< Glib::RefPtr<DiscovererStreamInfo> > get_streams(), gst_discoverer_container_info_get_streams)
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const DiscovererStreamInfo> > get_streams() const, gst_discoverer_container_info_get_streams)
+};
+
+
+/** DiscovererAudioInfo - Gst::DiscovererStreamInfo specific to audio streams. 
+ */
+class DiscovererAudioInfo : public DiscovererStreamInfo
+{
+  _STRUCT_NOT_HIDDEN
+  _CLASS_GSTMINIOBJECT(DiscovererAudioInfo, GstDiscovererAudioInfo, GST_DISCOVERER_AUDIO_INFO, DiscovererStreamInfo, GstDiscovererStreamInfo)
+
+public:
+  _WRAP_METHOD(guint get_bitrate() const, gst_discoverer_audio_info_get_bitrate)
+  _WRAP_METHOD(guint get_channels() const, gst_discoverer_audio_info_get_channels)
+  _WRAP_METHOD(guint get_depth() const, gst_discoverer_audio_info_get_depth)
+  _WRAP_METHOD(guint get_max_bitrate() const, gst_discoverer_audio_info_get_max_bitrate)
+  _WRAP_METHOD(guint get_sample_rate() const, gst_discoverer_audio_info_get_sample_rate)
+};
+
+/** DiscovererVideoInfo - Gst::DiscovererStreamInfo specific to video streams
+ * (this includes images). 
+ */
+class DiscovererVideoInfo : public DiscovererStreamInfo
+{
+  _STRUCT_NOT_HIDDEN
+  _CLASS_GSTMINIOBJECT(DiscovererVideoInfo, GstDiscovererVideoInfo, GST_DISCOVERER_VIDEO_INFO, DiscovererStreamInfo, GstDiscovererStreamInfo)
+
+public:
+  _WRAP_METHOD(guint get_bitrate() const, gst_discoverer_video_info_get_bitrate)
+  _WRAP_METHOD(guint get_depth() const, gst_discoverer_video_info_get_depth)
+  _WRAP_METHOD(guint get_framerate_denom() const, gst_discoverer_video_info_get_framerate_denom)
+  _WRAP_METHOD(guint get_framerate_num() const, gst_discoverer_video_info_get_framerate_num)
+  _WRAP_METHOD(guint get_height() const, gst_discoverer_video_info_get_height)
+  _WRAP_METHOD(bool is_interlaced() const, gst_discoverer_video_info_is_interlaced)
+  _WRAP_METHOD(bool is_image() const, gst_discoverer_video_info_is_image)
+  _WRAP_METHOD(guint get_max_bitrate() const, gst_discoverer_video_info_get_max_bitrate)
+  _WRAP_METHOD(guint get_par_denom() const, gst_discoverer_video_info_get_par_denom)
+  _WRAP_METHOD(guint get_par_num() const, gst_discoverer_video_info_get_par_num)
+  _WRAP_METHOD(guint get_width() const, gst_discoverer_video_info_get_width)
 };
 
 } //namespace Gst
