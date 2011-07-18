@@ -273,9 +273,10 @@ void PlayerWindow::on_button_open()
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 
-  Gtk::FileFilter filter;
-  filter.add_mime_type("application/ogg");
-  filter.set_name("Ogg files");
+  Glib::RefPtr<Gtk::FileFilter> filter = Gtk::FileFilter::create();
+
+  filter->add_mime_type("application/ogg");
+  filter->set_name("Ogg files");
   chooser.set_filter(filter);
   
   chooser.set_current_folder(working_dir);

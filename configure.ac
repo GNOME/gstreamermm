@@ -58,7 +58,7 @@ AC_SUBST([GSTREAMERMM_MODULES],
          [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.32])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
-PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-2.4 >= 2.12],
+PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
                   [gstmm_enable_gui_examples=yes], [gstmm_enable_gui_examples=no])
 AS_IF([test "x$gstmm_enable_gui_examples" != xyes],
       [AC_MSG_WARN([gtkmm not available: GUI examples will not be built.])])
