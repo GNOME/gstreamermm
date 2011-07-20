@@ -120,6 +120,7 @@
 #include <gstreamermm/baseaudiosrc.h>
 #include <gstreamermm/cddabasesrc.h>
 #include <gstreamermm/discoverer.h>
+#include <gstreamermm/discovererinfo.h>
 #include <gstreamermm/ringbuffer.h>
 #include <gstreamermm/videosink.h>
 
