@@ -25,6 +25,7 @@ endif
 
 noinst_PROGRAMS =			\
 	element_link/example		\
+	hello_world/example		\
 	ogg_player/example		\
 	optiongroup/example		\
 	typefind/example		\
@@ -38,6 +39,7 @@ AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
 
 element_link_example_SOURCES 		= element_link/element_link.cc
+hello_world_example_SOURCES 		= hello_world/main.cc
 media_player_gtkmm_example_SOURCES 	= media_player_gtkmm/main.cc \
 					  media_player_gtkmm/player_window.cc \
 					  media_player_gtkmm/player_window.h
