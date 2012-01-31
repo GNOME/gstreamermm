@@ -17,6 +17,7 @@
  */
 
 #include <gstreamermm.h>
+#include <glibmm.h>
 #include <iostream>
 #include <stdlib.h>
 
@@ -107,7 +108,7 @@ int main(int argc, char** argv)
   mainloop->run();
 
   // Clean up nicely:
-  std::cout << "Returned. Stopping playback." << std::endl;
+  std::cout << "Returned. Setting state to NULL." << std::endl;
   playbin->set_state(Gst::STATE_NULL);
 
   return EXIT_SUCCESS;

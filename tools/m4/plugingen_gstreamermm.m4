@@ -22,6 +22,7 @@ _TRANSLATION(`GstBuffer*',`Gst::Buffer',`const Glib::RefPtr<Gst::Buffer>&',`Glib
 _TRANSLATION(`GstCaps*',`Gst::Caps',`const Glib::RefPtr<Gst::Caps>&',`Glib::RefPtr<Gst::Caps>',`<gstreamermm/caps.h>')
 _TRANSLATION(`GstElement*',`Gst::Element',`const Glib::RefPtr<Gst::Element>&',`Glib::RefPtr<Gst::Element>',`<gstreamermm/element.h>')
 _TRANSLATION(`GstElementFactory*',`Gst::ElementFactory',`const Glib::RefPtr<Gst::ElementFactory>&',`Glib::RefPtr<Gst::ElementFactory>',`<gstreamermm/elementfactory.h>')
+_TRANSLATION(`GstFraction',`Gst::Fraction',`const Gst::Fraction&',`Gst::Fraction',`<gstreamermm/value.h>')
 _TRANSLATION(`GstPad*',`Gst::Pad',`const Glib::RefPtr<Gst::Pad>&',`Glib::RefPtr<Gst::Pad>',`<gstreamermm/pad.h>')
 _TRANSLATION(`GstTagList*',`Gst::TagList',`const Gst::TagList&',`Gst::TagList',`<gstreamermm/taglist.h>')
 

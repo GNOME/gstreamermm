@@ -17,6 +17,7 @@
  */
 
 #include <gstreamermm.h>
+#include <glibmm.h>
 #include <iostream>
 #include <iomanip>
 

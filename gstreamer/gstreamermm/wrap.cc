@@ -20,16 +20,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gtypes.h>
-#include <glib/gmacros.h>
-
-#include <vector>
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/wrap.h>
+#include <glib.h>
+#include <vector>
 
 #include <glibmmconfig.h>
 GLIBMM_USING_STD(vector)
-
 
 namespace
 {

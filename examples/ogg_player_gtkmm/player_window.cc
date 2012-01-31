@@ -23,6 +23,8 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/query.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
