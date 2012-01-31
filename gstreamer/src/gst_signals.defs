@@ -1358,6 +1358,15 @@
   (construct-only #f)
 )
 
+(define-property sync-streams
+  (of-object "GstInputSelector")
+  (prop-type "GParamBoolean")
+  (docs "Synchronize inactive streams to the running time of the active stream")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstMultiQueue
 
 (define-signal underrun
@@ -1448,6 +1457,15 @@
   (of-object "GstMultiQueue")
   (prop-type "GParamInt")
   (docs "High threshold for buffering to finish")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sync-by-running-time
+  (of-object "GstMultiQueue")
+  (prop-type "GParamBoolean")
+  (docs "Synchronize deactivated or not-linked streams by running time")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1914,10 +1932,28 @@
   (construct-only #f)
 )
 
+(define-property alignment-threshold
+  (of-object "GstBaseAudioSink")
+  (prop-type "GParamUInt64")
+  (docs "Timestamp alignment threshold in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 (define-property drift-tolerance
   (of-object "GstBaseAudioSink")
   (prop-type "GParamInt64")
-  (docs "Tolerance for timestamp and clock drift in microseconds")
+  (docs "Tolerance for clock drift in microseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property discont-wait
+  (of-object "GstBaseAudioSink")
+  (prop-type "GParamUInt64")
+  (docs "Window of time in nanoseconds to wait before creating a discontinuity")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2207,46 +2243,6 @@
 )
 
 ;; From GstMixer
-
-(define-signal record-toggled
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gboolean" "p1")
-  )
-)
-
-(define-signal mute-toggled
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gboolean" "p1")
-  )
-)
-
-(define-signal volume-changed
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerTrack*" "p0")
-    '("gpointer" "p1")
-  )
-)
-
-(define-signal option-changed
-  (of-object "GstMixer")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstMixerOptions*" "p0")
-    '("const-gchar*" "p1")
-  )
-)
 
 ;; From GstMixerTrack
 
@@ -3606,6 +3602,24 @@
   (construct-only #f)
 )
 
+(define-property max-tolerance
+  (of-object "GstOggMux")
+  (prop-type "GParamUInt64")
+  (docs "Maximum timestamp difference for maintaining perfect granules")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property skeleton
+  (of-object "GstOggMux")
+  (prop-type "GParamBoolean")
+  (docs "Whether to include a Skeleton track")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstPlayBin
 
 (define-property audio-sink
@@ -4321,6 +4335,24 @@
   (construct-only #f)
 )
 
+(define-property shadow
+  (of-object "GstTextOverlay")
+  (prop-type "GParamBoolean")
+  (docs "Whether to create a shadow of the letters under the text")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property outline-color
+  (of-object "GstTextOverlay")
+  (prop-type "GParamUInt")
+  (docs "Color to use for outline the text (big-endian ARGB).")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstTextRender
 
 (define-property halignment
@@ -4565,6 +4597,15 @@
   (of-object "GstTheoraEnc")
   (prop-type "GParamEnum")
   (docs "Single pass or first/second pass")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property dup-on-gap
+  (of-object "GstTheoraEnc")
+  (prop-type "GParamBoolean")
+  (docs "Allow codec to handle frames with GAP flag as duplicates of previous frame. This is good to work with variable frame rate stabilized by videorate element. It will add variable latency with maximal size of keyframe distance, this way it is a bad idea to use with live streams.")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4816,6 +4857,42 @@
   (construct-only #f)
 )
 
+(define-property drop-only
+  (of-object "GstVideoRate")
+  (prop-type "GParamBoolean")
+  (docs "Only drop frames, no duplicates are produced")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property average-period
+  (of-object "GstVideoRate")
+  (prop-type "GParamUInt64")
+  (docs "Period over which to average the framerate (in ns) (0 = disabled)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-rate
+  (of-object "GstVideoRate")
+  (prop-type "GParamInt")
+  (docs "Maximum framerate allowed to pass through (in frames per second, implies drop-only)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property force-fps
+  (of-object "GstVideoRate")
+  (prop-type "GstParamFraction")
+  (docs "Force output framerate (negative means negotiate via caps)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstVideoScale
 
 (define-property method
@@ -4831,6 +4908,42 @@
   (of-object "GstVideoScale")
   (prop-type "GParamBoolean")
   (docs "Add black borders if necessary to keep the display aspect ratio")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sharpness
+  (of-object "GstVideoScale")
+  (prop-type "GParamDouble")
+  (docs "Sharpness of filter")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sharpen
+  (of-object "GstVideoScale")
+  (prop-type "GParamDouble")
+  (docs "Sharpening")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property dither
+  (of-object "GstVideoScale")
+  (prop-type "GParamBoolean")
+  (docs "Add dither (only used for Lanczos method)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property envelope
+  (of-object "GstVideoScale")
+  (prop-type "GParamDouble")
+  (docs "Size of filter envelope")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -5114,7 +5227,7 @@
 (define-property synchronous
   (of-object "GstXImageSink")
   (prop-type "GParamBoolean")
-  (docs "When enabled, runs the X display in synchronous mode. (used only for debugging)")
+  (docs "When enabled, runs the X display in synchronous mode. (unrelated to A/V sync, used only for debugging)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -5224,7 +5337,7 @@
 (define-property synchronous
   (of-object "GstXvImageSink")
   (prop-type "GParamBoolean")
-  (docs "When enabled, runs the X display in synchronous mode. (used only for debugging)")
+  (docs "When enabled, runs the X display in synchronous mode. (unrelated to A/V sync, used only for debugging)")
   (readable #t)
   (writable #t)
   (construct-only #f)
