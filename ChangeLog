@@ -1,3 +1,22 @@
+2012-02-19  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Allow the build to succeed for MinGW32.
+
+	* configure.ac: Add logic to define the GSTREAMERMM_STATIC_LIB macro
+	if the --enable-static option is passed to configure.
+	* gstreamer/gstreamermmconfig.h.in: Add logic to decide how to build
+	certain constants in Windows.
+	* gstreamer/src/clock.ccg:
+	* gstreamer/src/clock.hg: Correct the declaration and definition of
+	the ClockTime constants so that it uses the above logic (namely the
+	GSTREAMERMM_API macro) to decide how these constants should be linked
+	when building in Windows.  Also correct the use of 'static' in the
+	declaration.
+	* gstreamer/gstreamermm/wrap.h: Use the new GSTREAMERMM_API macro here
+	also.
+
+	Bug #669045 (Joao Paulo Pizani Flor).
+
 2012-01-31  José Alburquerque  <jaalburquerque@gmail.com>
 
 	Regenerate signals and properties.
@@ -6,7 +25,7 @@
 	of plugins.
 	* gstreamer/src/gst_signals.defs.patch: Update the patch file to
 	include a fix for the "discovered" signal of GstDiscoverer.
-
+S
 2012-01-16  José Alburquerque  <jaalburquerque@gmail.com>
 
 	Fix the build with the latest GStreamer sources and glibmm.

@@ -48,6 +48,12 @@ AC_PROG_LIBTOOL
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 AC_PROG_SED
 
+# TODO: This makes no sense. --danielk
+AS_IF([test "x$enable_static" = xyes],
+[
+  AC_DEFINE([GSTREAMERMM_STATIC_LIB], [1], [Define if gstreamermm is built as a static library])
+])
+
 # The format below is used so that the requirements appear nicely in the .pc
 # file.
 AC_SUBST([GSTREAMERMM_MODULES],

@@ -24,6 +24,7 @@
 
 #include <gst/gstminiobject.h>
 #include <glibmm/refptr.h>
+#include <gstreamermmconfig.h>
 
 namespace Gst
 {
@@ -156,8 +157,8 @@ const typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<const T>& ptr)
   return (ptr) ? ptr->gobj_copy() : 0;
 }
 
-extern GLIBMM_API GQuark quark_;
-extern GLIBMM_API GQuark quark_cpp_wrapper_deleted_;
+extern GSTREAMERMM_API GQuark quark_;
+extern GSTREAMERMM_API GQuark quark_cpp_wrapper_deleted_;
 
 } // namespace Gst
 
