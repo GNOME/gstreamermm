@@ -667,7 +667,7 @@ static void generate_hg_file(const std::string& includeMacroCalls,
 
   std::cout << '{' << std::endl;
   std::cout << "  _CLASS_GOBJECT(" << cppTypeName << ", " << cTypeName <<
-    ", " << castMacro << ", " << parentNameSpace << "::" <<
+    ", " << castMacro << "_GSTREAMERMM, " << parentNameSpace << "::" <<
     cppParentTypeName << ", " << cParentTypeName << ')' << std::endl;
 
   if(!interfaceMacros.empty())
@@ -711,7 +711,7 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
   std::cout << "_PINCLUDE(" << parentInclude << "/private/" <<
     to_lowercase(cppParentTypeName) << "_p.h)" << std::endl << std::endl;
 
-  std::string getTypeName = to_lowercase(castMacro) + "_get_type";
+  std::string getTypeName = to_lowercase(castMacro) + "_gstreamermm_get_type";
 
   std::cout << "extern \"C\"" << std::endl;
   std::cout << '{' << std::endl << std::endl;

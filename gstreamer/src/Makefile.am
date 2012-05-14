@@ -51,7 +51,6 @@ $(addprefix $(srcdir)/,$(plugins_ccg)): $(generate_plugin_dependencies)
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
 # the final .hg file.
 $(addprefix $(srcdir)/,$(plugins_hg)): %.hg: %.ccg $(generate_plugin_dependencies)
-	@echo Plugin def: $(target_plugin_and_classname)
 	$(AM_V_GEN)$(generate_plugin_gmmproc_file) \
 	  --hg $(target_plugin_and_classname) | $(M4) -I $(codegen_m4_srcdir) \
 	  >$@
