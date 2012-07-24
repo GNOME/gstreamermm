@@ -349,7 +349,7 @@ void PlayerWindow::on_button_forward()
     Glib::RefPtr<Gst::EventSeek> seekEvent =
       Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
 
-    if(m_play_bin->send_event(seekEvent))
+    if(Glib::RefPtr<Gst::Element>::cast_static(m_play_bin)->send_event(event))
     {
       m_progress_scale.set_value(double(newPos) / m_duration);
       display_label_progress(newPos, m_duration);
