@@ -70,7 +70,7 @@ class Plugin;
  * @code
  *  #include <gstreamermm.h>
  *  #include <iostream>
-
+ *
  *  int main (int argc, char *argc[])
  *  {
  *    Glib::RefPtr<Gst::Element> src;
@@ -103,6 +103,8 @@ class ElementFactory : public PluginFeature
   _CLASS_GOBJECT(ElementFactory, GstElementFactory, GST_ELEMENT_FACTORY, PluginFeature, GstPluginFeature)
 
 public:
+  _WRAP_METHOD(static bool register_element(const Glib::RefPtr<Gst::Plugin>& plugin, const Glib::ustring& name, guint rank, GType type), gst_element_register)
+
   _WRAP_METHOD(static Glib::RefPtr<Gst::ElementFactory> find(const Glib::ustring& name), gst_element_factory_find)
 
   //Note that name can't be null here, though it seems like gstreamer should allow that as for gst_element_factory_make().
