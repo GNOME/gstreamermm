@@ -20,6 +20,7 @@
 #include <gst/gstobject.h>
 #include <glibmm/object.h>
 #include <glibmm/listhandle.h>
+#include <glibmm/threads.h>
 #include <libxml++/nodes/node.h>
 
 _DEFS(gstreamermm,gst)
@@ -64,7 +65,10 @@ public:
    */
   _MEMBER_GET(flags, flags, guint32, guint32)
 
-  //TODO: _MEMBER_GET(lock, lock, Glib::Mutex, GMutex)
+//TODO: These conversions should probably be in the glibmm conversion files.
+#m4 _CONVERSION(`GMutex*',`Glib::Threads::Mutex*',`Glib::Threads::wrap($3)')
+#m4 _CONVERSION(`GMutex*',`const Glib::Threads::Mutex*',`Glib::Threads::wrap($3)')
+  _MEMBER_GET_PTR(lock, lock, Glib::Threads::Mutex*, GMutex*)
 
   _WRAP_METHOD(bool set_name(const Glib::ustring& name), gst_object_set_name)
   _WRAP_METHOD(Glib::ustring get_name() const, gst_object_get_name)

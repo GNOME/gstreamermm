@@ -19,6 +19,7 @@
 
 #include <gst/gsttask.h>
 #include <gstreamermm/object.h>
+#include <glibmm/threads.h>
 #include <glibmm/thread.h>
 #include <memory>
 
@@ -72,18 +73,22 @@ public:
   typedef sigc::slot<void> SlotTask;
 
   /** For example,
-   * void on_enter(const Glib::RefPtr<Gst::Task>& task, Glib::Thread& thread);.
+   * void on_enter(const Glib::RefPtr<Gst::Task>& task, Glib::Threads::Thread&
+   * thread);.
    * A thread is entered, this slot is called when the new thread enters its
    * function.
    */
-  typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&, Glib::Thread*> SlotEnter;
+  typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&,
+    Glib::Threads::Thread*> SlotEnter;
 
   /** For example,
-   * void on_leave(const Glib::RefPtr<Gst::Task>& task, Glib::Thread& thread);.
+   * void on_leave(const Glib::RefPtr<Gst::Task>& task, Glib::Threads::Thread&
+   * thread);.
    * A thread is exiting, this is called when the thread is about to leave its
    * function.
    */
-    typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&, Glib::Thread*> SlotLeave;
+    typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&,
+      Glib::Threads::Thread*> SlotLeave;
 
 protected:
   explicit Task(const SlotTask& task_slot);
@@ -112,7 +117,7 @@ public:
    * By default a thread for the task will be created from a default thread
    * pool.
    *
-   * Objects can use custom Glib::Threads or can perform additional
+   * Objects can use custom Glib::Threads::Thread or can perform additional
    * configuration of the threads (such as changing the thread priority) by
    * installing slots.
    *
