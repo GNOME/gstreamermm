@@ -19,12 +19,9 @@
 #include <gtkmm/main.h>
 #include <gstreamermm/init.h>
 #include <gstreamermm/element.h>
-#include <gstreamermm/pad.h>
-#include <gstreamermm/pipeline.h>
 
 // Plug-ins:
 #include <gstreamermm/playbin2.h>
-#include <gstreamermm/ximagesink.h>
 
 #include <iostream>
 #include "player_window.h"
@@ -46,21 +43,8 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  // Create a video sink where video (if any) will be drawn:
-  Glib::RefPtr<Gst::XImageSink> video_sink =
-                        Gst::XImageSink::create("ximagesink");
-  if(!video_sink)
-  {
-    std::cerr << "The ximagesink could not be created." << std::endl;
-    return 1;
-  }
-
-  // Set the playbin's video-sink property so that our video sink is used
-  // for video display:
-  playbin->property_video_sink() = video_sink;
-
   //Create our player window and give it the pipeline and video sink:
-  PlayerWindow mainWindow(playbin, video_sink);
+  PlayerWindow mainWindow(playbin);
   kit.run(mainWindow);
 
   // Clean up nicely:

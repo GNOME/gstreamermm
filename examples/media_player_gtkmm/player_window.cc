@@ -18,7 +18,14 @@
 
 #include <gtkmm/stock.h>
 #include <gtkmm/filechooserdialog.h>
+
+#ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
+#endif
+#ifdef GDK_WINDOWING_WIN32
+#include <gdk/gdkwin32.h>
+#endif
+
 #include <gstreamermm/bus.h>
 #include <gstreamermm/caps.h>
 #include <gstreamermm/clock.h>
@@ -36,8 +43,7 @@
 #include <iomanip>
 #include "player_window.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin,
-  const Glib::RefPtr<Gst::Element>& video_sink)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button(Gtk::Stock::MEDIA_PLAY),
@@ -108,8 +114,10 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin,
   m_rewind_button.set_sensitive(false);
   m_forward_button.set_sensitive(false);
 
-  m_play_bin = playbin;
-  m_video_sink = video_sink;
+  m_playbin = playbin;
+
+  m_playbin->signal_video_changed().connect(
+    sigc::mem_fun(*this, &PlayerWindow::on_video_changed) );
 
   show_all_children();
   m_pause_button.hide();
@@ -120,7 +128,12 @@ void PlayerWindow::on_video_area_realize()
   // When the video area (the drawing area) is realized, Get its X Window
   // ID and save it for when the Gst::XOverlay is ready to accept an ID in
   // which to draw the video.
+#ifdef GDK_WINDOWING_X11
   m_x_window_id = GDK_WINDOW_XID(m_video_area.get_window()->gobj());
+#endif
+#ifdef GDK_WINDOWING_WIN32
+  m_x_window_id = GDK_WINDOW_HWND(m_video_area.get_window()->gobj());
+#endif
 }
 
 // This function is used to receive asynchronous messages from mainPipeline's
@@ -183,6 +196,20 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
   return true;
 }
 
+void PlayerWindow::on_video_changed()
+{
+  Glib::RefPtr<Gst::Pad> pad = m_playbin->get_video_pad(0);
+  if(pad)
+  {
+    // Add a buffer probe to the video sink pad which will be removed after
+    // the first buffer is received in the on_video_pad_got_buffer method.
+    // When the first buffer arrives, the video size can be extracted.
+    m_pad_probe_id = pad->add_buffer_probe(
+      sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
+    std::cout << "There is no pad available." << std::endl;
+  }
+}
+
 bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
     const Glib::RefPtr<Gst::MiniObject>& data)
 {
@@ -236,7 +263,7 @@ void PlayerWindow::on_button_play()
     sigc::mem_fun(*this, &PlayerWindow::on_timeout), 200);
 
   // set the pipeline to play mode:
-  m_play_bin->set_state(Gst::STATE_PLAYING);
+  m_playbin->set_state(Gst::STATE_PLAYING);
 }
  
 void PlayerWindow::on_button_pause()
@@ -251,7 +278,7 @@ void PlayerWindow::on_button_pause()
   m_timeout_connection.disconnect();
   
   // Set the pipeline to pause mode:
-  m_play_bin->set_state(Gst::STATE_PAUSED);
+  m_playbin->set_state(Gst::STATE_PAUSED);
 }
  
 void PlayerWindow::on_button_stop()
@@ -271,27 +298,18 @@ void PlayerWindow::on_button_stop()
   m_timeout_connection.disconnect();
 
   // Set the pipeline to inactive mode:
-  m_play_bin->set_state(Gst::STATE_NULL);
+  m_playbin->set_state(Gst::STATE_NULL);
 
   // Reset the display:
   display_label_progress(0, m_duration);
   m_progress_scale.set_value(0);
-
-  // Remove video sink pad buffer probe if after playing, probe id is
-  // not zero (means probe was not removed because media had no video and
-  // video_pad_got_buffer method never got a chance to remove probe)
-  if(m_pad_probe_id != 0)
-  {
-    m_video_sink->get_static_pad("sink")->remove_buffer_probe(m_pad_probe_id);
-    m_pad_probe_id  = 0;
-  }
 }
 
 bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
   const gint64 newPos = gint64(value * m_duration);
 
-  if(m_play_bin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+  if(m_playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
   {
     display_label_progress(newPos, m_duration);
     return true;
@@ -310,11 +328,11 @@ void PlayerWindow::on_button_rewind()
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;
 
-  if(m_play_bin->query_position(fmt, pos))
+  if(m_playbin->query_position(fmt, pos))
   {
     gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
 
-    if(m_play_bin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+    if(m_playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
     {
       m_progress_scale.set_value(double(newPos) / m_duration);
       display_label_progress(newPos, m_duration);
@@ -332,7 +350,7 @@ void PlayerWindow::on_button_forward()
 
   Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
 
-  if(m_play_bin->query(query))
+  if(m_playbin->query(query))
   {
     Glib::RefPtr<Gst::QueryPosition> posQuery =
       Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
@@ -349,7 +367,7 @@ void PlayerWindow::on_button_forward()
     Glib::RefPtr<Gst::EventSeek> seekEvent =
       Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
 
-    if(Glib::RefPtr<Gst::Element>::cast_static(m_play_bin)->send_event(event))
+    if(Glib::RefPtr<Gst::Element>::cast_static(m_playbin)->send_event(event))
     {
       m_progress_scale.set_value(double(newPos) / m_duration);
       display_label_progress(newPos, m_duration);
@@ -376,19 +394,11 @@ void PlayerWindow::on_button_open()
     working_dir = chooser.get_current_folder();
 
     // Set uri property on the playbin.
-    m_play_bin->property_uri() = chooser.get_uri();
+    m_playbin->property_uri() = chooser.get_uri();
 
     // Resize m_video_area and window to minimum when opening a file
     m_video_area.set_size_request(0, 0);
     resize(1, 1);
-
-    // Add buffer probe to video sink pad when file is opened which will
-    // be removed after first buffer is received in on_video_pad_got_buffer
-    // method (if there's video).  When first buffer arrives, video
-    // size can be extracted.  If there's no video, probe will be
-    // removed when media stops in on_button_stop method
-    m_pad_probe_id = m_video_sink->get_static_pad("sink")->add_buffer_probe(
-      sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
 
     set_title( Glib::filename_display_basename(chooser.get_filename()) );
 
@@ -402,8 +412,8 @@ bool PlayerWindow::on_timeout()
   Gst::Format fmt = Gst::FORMAT_TIME;
   gint64 pos = 0;
 
-  if(m_play_bin->query_position(fmt, pos)
-    && m_play_bin->query_duration(fmt, m_duration))
+  if(m_playbin->query_position(fmt, pos)
+    && m_playbin->query_duration(fmt, m_duration))
   {
     m_progress_scale.set_value(double(pos) / m_duration);
     display_label_progress(pos, m_duration);
@@ -434,5 +444,5 @@ void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
 
 PlayerWindow::~PlayerWindow()
 {
-  m_play_bin->get_bus()->remove_watch(m_watch_id);
+  m_playbin->get_bus()->remove_watch(m_watch_id);
 }

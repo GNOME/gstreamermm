@@ -35,9 +35,8 @@ class PlayerWindow : public Gtk::Window
 public:
   /**
    * @param playbin The pipeline that can play media files.
-   * @param video_sink The video sink to use to display stream video (if any).
    */
-  PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin, const Glib::RefPtr<Gst::Element>& video_sink);
+  PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin);
   virtual ~PlayerWindow();
 
 protected:
@@ -46,6 +45,7 @@ protected:
   void on_video_area_realize();
   void on_bus_message_sync(const Glib::RefPtr<Gst::Message>& message);
   bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
+  void on_video_changed();
   bool on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad, const Glib::RefPtr<Gst::MiniObject>& buffer);
 
   void on_button_play();
@@ -72,8 +72,7 @@ protected:
   Gtk::Button m_forward_button;
   Gtk::Button m_open_button;
 
-  Glib::RefPtr<Gst::PlayBin2> m_play_bin;
-  Glib::RefPtr<Gst::Element> m_video_sink;
+  Glib::RefPtr<Gst::PlayBin2> m_playbin;
   sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;
