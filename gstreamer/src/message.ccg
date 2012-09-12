@@ -25,6 +25,25 @@
 #include <gstreamermm/structure.h>
 #include <gstreamermm/taglist.h>
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
+#include <iostream>
+
+namespace
+{
+
+extern "C"
+{
+
+static void Message_gstreamermm_callback_destroy(void* data,
+  GstMiniObject* /* where_the_object_was */)
+{
+  // This works for any of the Gst::Message derived classes because none of
+  // them have member variables so in essence they are all the same size.
+  delete static_cast<Gst::Message*>(data);
+}
+
+}
+
+}
 
 namespace Gst
 {
@@ -1085,6 +1104,9 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   }
 
   result = Glib::RefPtr<Gst::Message>(wrapper);
+
+  // Ensure that the wrapper is freed when the message (mini object) is freed.
+  gst_mini_object_weak_ref(GST_MINI_OBJECT(message), &Message_gstreamermm_callback_destroy, wrapper);
 
   if(take_copy)
     result->reference();

@@ -78,7 +78,11 @@ GstMiniObject* MiniObject::gobj_copy()
 
 MiniObject::~MiniObject()
 {
-  if(gobject_)
+  // The value of the reference count is checked so that if this mini object is
+  // being destroyed as a result of weak reference notification no
+  // unreferencing is done and thus no error is issued on unreferencing a mini
+  // object with a reference of 0.
+  if(gobject_ && GST_MINI_OBJECT_REFCOUNT_VALUE(gobject_) > 0)
     gst_mini_object_unref(gobject_);
 }
 

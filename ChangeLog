@@ -1,3 +1,32 @@
+2012-09-11  José Alburquerque  <jaalburquerque@gmail.com>
+
+	MiniObject derived classes: Correct wrapper memory leak.
+
+	* gstreamer/src/buffer.{ccg,hg}:
+	* gstreamer/src/bufferlist.{ccg,hg}:
+	* gstreamer/src/discovererinfo.{ccg,hg}: Add custom wrap_new()
+	functions to the Gst::MiniObject derived classes in these files so
+	that when the C objects are wrapped, a weak reference is added to the
+	miniobject and the newly created wrapper can be destroyed in the
+	specified callbacks.  Also add the callbacks that destroy the wrappers
+	on weak referencing notification.  Use the _CUSTOM_WRAP_NEW macro in
+	the class declarations to ensure that gmmproc knows that these classes
+	have custom wrap_new() functions.
+
+	* gstreamer/src/event.ccg:
+	* gstreamer/src/message.ccg:
+	* gstreamer/src/query.ccg: Modify the custom class wrap() methods to
+	add weak reference notification on the newly given GstMiniObject.  Add
+	the callbacks which destroy the wrapper on weak reference
+	notification.
+
+	* gstreamer/gstreamermm/miniobject.cc (~MiniObject): Ensure that the
+	destructor does not try to unreference an object that is being
+	destroyed because of a weak reference (when the reference is already
+	zero).
+
+	Bug #608702 (Massimiliano).
+
 2012-09-07  José Alburquerque  <jaalburquerque@gmail.com>
 
 	Query: Correct the docs usage example so that its lines compile.

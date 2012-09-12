@@ -23,6 +23,22 @@
 
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
 
+namespace
+{
+
+extern "C"
+{
+
+static void Buffer_gstreamermm_callback_destroy(void* data,
+  GstMiniObject* /* where_the_object_was */)
+{
+  delete static_cast<Gst::Buffer*>(data);
+}
+
+}
+
+}
+
 namespace Gst
 {
 
@@ -34,6 +50,16 @@ Glib::RefPtr<Gst::Buffer> Buffer::copy() const
 Glib::RefPtr<Gst::Buffer> Buffer::create_writable()
 {
   return Gst::wrap(gst_buffer_make_writable(gobj()));
+}
+
+Gst::MiniObject* Buffer_Class::wrap_new(GstMiniObject* object)
+{
+  // Use this wrap_new() method to ensure that the wrapper is destroyed
+  // when the miniobject loses its last reference.
+
+  Gst::Buffer* wrapper = new Gst::Buffer((GstBuffer*)(object));
+  gst_mini_object_weak_ref(object, &Buffer_gstreamermm_callback_destroy, wrapper);
+  return wrapper;
 }
 
 } // namespace Gst
