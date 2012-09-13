@@ -38,5 +38,20 @@ int main(int argc, char** argv)
   if(structure)
     std::cout << "Event structure name: '" << structure.get_name() << "'" << std::endl;
 
+  // Test the creation of an event.
+  Glib::RefPtr<Gst::EventFlushStart> flush_start =
+    Gst::EventFlushStart::create();
+
+  if(!flush_start)
+  {
+    std::cout << "The custom flush start event could not be created" <<
+      std::endl;
+  }
+  else
+  {
+    std::cout << "The custom flush start event was successfully created" <<
+      std::endl;
+  }
+
   return 0;
 }

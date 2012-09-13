@@ -1,3 +1,26 @@
+2012-09-12  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Event, Message, Query: Have create() methods return derived types.
+
+	* gstreamer/src/event.{ccg,hg}:
+	* gstreamer/src/message.{ccg,hg}:
+	* gstreamer/src/query.{ccg,hg}: Modify the create() methods of all the
+	Event, Message and Query derived classes so that the methods return
+	a reference pointer to the derived type and not to the base type.  Add
+	protected templated inline wrap() methods to the base types (Event,
+	Message and Query) which convert a derived type wrapped as a reference
+	pointer to the  base type to a reference pointer to the derived type
+	using a reference pointer dynamic cast and use the methods in the
+	derived classes create() methods for the conversions.
+
+	* tests/test-event-wrap.cc:
+	* tests/test-message-wrap.cc:
+	* tests/test-query-wrap.cc: Modify the event, message and query
+	wrapping tests to create an Event, Message and Query to ensure that
+	the new create() methods work.
+
+	Bug #683580 (kangaba@yandex.ru)
+
 2012-09-11  José Alburquerque  <jaalburquerque@gmail.com>
 
 	MiniObject derived classes: Correct wrapper memory leak.

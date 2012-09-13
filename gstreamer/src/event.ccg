@@ -32,7 +32,7 @@ extern "C"
 {
 
 static void Event_gstreamermm_callback_destroy(void* data,
-  GstMiniObject* where_the_object_was)
+  GstMiniObject* /* where_the_object_was */)
 {
   // This works for any of the Gst::Event derived classes because none of
   // them have member variables so in essence they are all the same size.
@@ -91,43 +91,43 @@ EventFlushStart::EventFlushStart(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventFlushStart::create()
+Glib::RefPtr<Gst::EventFlushStart> EventFlushStart::create()
 {
   GstEvent* event = gst_event_new_flush_start();
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventFlushStart>(event, false);
 }
 
 EventFlushStop::EventFlushStop(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventFlushStop::create()
+Glib::RefPtr<Gst::EventFlushStop> EventFlushStop::create()
 {
   GstEvent* event = gst_event_new_flush_stop();
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventFlushStop>(event, false);
 }
 
 EventEos::EventEos(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventEos::create()
+Glib::RefPtr<Gst::EventEos> EventEos::create()
 {
   GstEvent* event = gst_event_new_eos();
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventEos>(event, false);
 }
 
 EventNewSegment::EventNewSegment(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventNewSegment::create(bool update, double rate,
-  Format format, gint64 start, gint64 stop, gint64 position,
-  double applied_rate)
+Glib::RefPtr<Gst::EventNewSegment>
+  EventNewSegment::create(bool update, double rate, Format format,
+  gint64 start, gint64 stop, gint64 position, double applied_rate)
 {
   GstEvent* event = gst_event_new_new_segment_full(update, rate, applied_rate,
     GstFormat(format), start, stop, position);
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventNewSegment>(event, false);
 }
 
 void EventNewSegment::parse(bool& update, double& rate, Format& format,
@@ -192,12 +192,12 @@ EventTag::EventTag(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventTag::create(const Gst::TagList& taglist)
+Glib::RefPtr<Gst::EventTag> EventTag::create(const Gst::TagList& taglist)
 {
   //We create a copy because gst_event_new_tag() takes ownership:
   GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
   GstEvent* event = gst_event_new_tag(c_taglist);
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventTag>(event, false);
 }
 
 Gst::TagList EventTag::parse() const
@@ -211,12 +211,13 @@ EventBufferSize::EventBufferSize(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventBufferSize::create(Format format, gint64 minsize,
-  gint64 maxsize, bool async)
+Glib::RefPtr<Gst::EventBufferSize>
+  EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize,
+  bool async)
 {
   GstEvent* event = gst_event_new_buffer_size(GstFormat(format), minsize,
     maxsize, async);
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventBufferSize>(event, false);
 }
 
 void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize,
@@ -263,12 +264,12 @@ EventQos::EventQos(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventQos::create(double proportion,
+Glib::RefPtr<Gst::EventQos> EventQos::create(double proportion,
   ClockTimeDiff diff, ClockTime timestamp)
 {
   GstEvent* event = gst_event_new_qos(proportion, GstClockTimeDiff(diff),
     GstClockTime(timestamp));
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventQos>(event, false);
 }
 
 void EventQos::parse(double& proportion, ClockTimeDiff& diff,
@@ -303,7 +304,7 @@ EventSeek::EventSeek(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventSeek::create(double rate, Format format,
+Glib::RefPtr<Gst::EventSeek> EventSeek::create(double rate, Format format,
   SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type,
   gint64 stop)
 {
@@ -311,7 +312,7 @@ Glib::RefPtr<Gst::Event> EventSeek::create(double rate, Format format,
     GstSeekFlags(flags), GstSeekType(start_type), start,
     GstSeekType(stop_type), stop);
 
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventSeek>(event, false);
 }
 
 void EventSeek::parse(double& rate, Format& format, SeekFlags& flags,
@@ -382,22 +383,23 @@ EventNavigation::EventNavigation(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventNavigation::create(Gst::Structure& structure)
+Glib::RefPtr<Gst::EventNavigation>
+  EventNavigation::create(Gst::Structure& structure)
 {
   // Make copy because event takes ownership of structure:
   GstStructure* copy = gst_structure_copy(structure.gobj());
   GstEvent* event = gst_event_new_navigation(copy);
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventNavigation>(event, false);
 }
 
 EventLatency::EventLatency(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventLatency::create(ClockTime time)
+Glib::RefPtr<Gst::EventLatency> EventLatency::create(ClockTime time)
 {
   GstEvent* event = gst_event_new_latency(GstClockTime(time));
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventLatency>(event, false);
 }
 
 ClockTime EventLatency::parse() const
@@ -411,12 +413,13 @@ EventStep::EventStep(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventStep::create(Gst::Format format, guint64 amount,
-  double rate, bool flush, bool intermediate)
+Glib::RefPtr<Gst::EventStep>
+  EventStep::create(Gst::Format format, guint64 amount, double rate,
+  bool flush, bool intermediate)
 {
   GstEvent* event = gst_event_new_step(static_cast<GstFormat>(format),
     amount, rate, flush, intermediate);
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventStep>(event, false);
 }
 
 void EventStep::parse(Gst::Format& format, guint64& amount, double& rate,
@@ -473,10 +476,11 @@ EventSinkMessage::EventSinkMessage(GstEvent* castitem) :
 Event(castitem)
 {}
 
-Glib::RefPtr<Gst::Event> EventSinkMessage::create(const Glib::RefPtr<Gst::Message>& msg)
+Glib::RefPtr<Gst::EventSinkMessage>
+  EventSinkMessage::create(const Glib::RefPtr<Gst::Message>& msg)
 {
   GstEvent* event = gst_event_new_sink_message(msg->gobj());
-  return Gst::Event::wrap(event, false);
+  return Gst::Event::wrap<EventSinkMessage>(event, false);
 }
 
 Glib::RefPtr<Gst::Message> EventSinkMessage::parse()

@@ -38,5 +38,17 @@ int main(int argc, char** argv)
   if(structure)
     std::cout << "Query structure name: '" << structure.get_name() << "'" << std::endl;
 
+  // Test the creation of a query.
+  Glib::RefPtr<Gst::QueryLatency> latency = Gst::QueryLatency::create();
+  if(!latency)
+  {
+    std::cout << "The custom latency query could not be created" << std::endl;
+  }
+  else
+  {
+    std::cout << "The custom latency query was successfully created" <<
+      std::endl;
+  }
+
   return 0;
 }

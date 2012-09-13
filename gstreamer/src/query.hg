@@ -171,6 +171,13 @@ protected:
   static void finalize_vfunc_callback(GstMiniObject* self);
   _POP()
 #m4end
+
+protected:
+  // This method is used in the create() methods to convert a wrapped GstQuery
+  // to one of the more specific Gst::Query types.
+  template <class QueryType>
+    static inline Glib::RefPtr<QueryType> wrap(GstQuery* query,
+    bool take_copy = false);
 };
 
 //TODO: Modify create methods of derived Query classes to return
@@ -194,7 +201,8 @@ public:
    * @param structure A structure for the query.
    * @return The new Gst::QueryApplication.
    */
-  static Glib::RefPtr<Gst::Query> create(QueryType type, Gst::Structure& structure);
+  static Glib::RefPtr<Gst::QueryApplication>
+    create(QueryType type, Gst::Structure& structure);
 };
 
 /** A convert query object.  See create() for more details.
@@ -211,7 +219,8 @@ public:
    * @param dest_format The target Gst::Format.
    * @return The new Gst::QueryConvert.
    */
-  static Glib::RefPtr<Gst::Query> create(Format src_format, gint64 value, Format dest_format);
+  static Glib::RefPtr<Gst::QueryConvert>
+    create(Format src_format, gint64 value, Format dest_format);
 
   /** Answer a convert query by setting the requested values.
    * @param src_format The source Gst::Format.
@@ -274,7 +283,7 @@ public:
    * @param format The default Gst::Format for the new query.
    * @return The new Gst::QueryPosition.
    */
-  static Glib::RefPtr<Gst::Query> create(Format format);
+  static Glib::RefPtr<Gst::QueryPosition> create(Format format);
 
   /** Answer a position query by setting the requested value in the given
    * format.
@@ -314,7 +323,7 @@ public:
    * @param format The Gst::Format for this duration query.
    * @return The new Gst::QueryDuration.
    */
-  static Glib::RefPtr<Gst::Query> create(Format format);
+  static Glib::RefPtr<Gst::QueryDuration> create(Format format);
 
   /** Answer a duration query by setting the requested value in the given
    * format.
@@ -354,7 +363,7 @@ public:
    * elements in the pipeline.
    * @return The new Gst::QueryLatency.
    */
-  static Glib::RefPtr<Gst::Query> create();
+  static Glib::RefPtr<Gst::QueryLatency> create();
 
   /** Answer a latency query by setting the requested values in the given
    * format.
@@ -400,7 +409,7 @@ public:
    * @param format The default Gst::Format for the new query.
    * @return The new Gst::QuerySeeking.
    */
-  static Glib::RefPtr<Gst::Query> create(Format format);
+  static Glib::RefPtr<Gst::QuerySeeking> create(Format format);
 
   /** Set the seeking query result fields in query.
    * @param format The format to set for @a the segment_start and
@@ -452,7 +461,7 @@ public:
   /** Constructs a new query object for querying formats of the stream.
    * @return The new Gst::QueryFormats.
    */
-  static Glib::RefPtr<Gst::Query> create();
+  static Glib::RefPtr<Gst::QueryFormats> create();
 
   /** Set the formats query result fields. All the formats in the array are
    * used.
@@ -495,7 +504,7 @@ public:
    * @param format The Gst::Format for the new query.
    * @return The new Gst::QuerySegment.
    */
-  static Glib::RefPtr<Gst::Query> create(Format format);
+  static Glib::RefPtr<Gst::QuerySegment> create(Format format);
 
   /** Answer a segment query by setting the requested values. The normal
    * playback segment of a pipeline is 0 to duration at the default rate of
@@ -564,7 +573,7 @@ public:
    * @param format The default Gst::Format for the new query.
    * @return The new Gst::QueryBuffering.
    */
-  static Glib::RefPtr<Gst::Query> create(Format format);
+  static Glib::RefPtr<Gst::QueryBuffering> create(Format format);
 
   /** Set the percentage of buffered data. This is a value between 0 and 100.
    * The @a busy indicator is true when the buffering is in progress.
@@ -671,5 +680,14 @@ public:
    */
   gint64 parse_total_time() const;
 };
+
+/****************************** Gst::Query **************************/
+
+template <class QueryType>
+  Glib::RefPtr<QueryType> Query::wrap(GstQuery* query, bool take_copy)
+{
+  Glib::RefPtr<Gst::Query> result = wrap(query, take_copy);
+  return Glib::RefPtr<QueryType>::cast_dynamic(result);
+}
 
 } //namespace Gst

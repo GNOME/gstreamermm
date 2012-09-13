@@ -30,7 +30,7 @@ extern "C"
 {
 
 static void Query_gstreamermm_callback_destroy(void* data,
-  GstMiniObject* where_the_object_was)
+  GstMiniObject* /* where_the_object_was */)
 {
   // This works for any of the Gst::Query derived classes because none of
   // them have member variables so in essence they are all the same size.
@@ -100,24 +100,26 @@ QueryApplication::QueryApplication(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QueryApplication::create(QueryType type, Gst::Structure& structure)
+Glib::RefPtr<Gst::QueryApplication>
+  QueryApplication::create(QueryType type, Gst::Structure& structure)
 {
   // Create copy because query takes ownership of structure:
   GstStructure* copy_struct = gst_structure_copy(structure.gobj());
   GstQuery* query = gst_query_new_application(GstQueryType(type),
     copy_struct); 
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QueryApplication>(query);
 }
 
 QueryConvert::QueryConvert(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QueryConvert::create(Format src_format, gint64 value, Format dest_format)
+Glib::RefPtr<Gst::QueryConvert>
+  QueryConvert::create(Format src_format, gint64 value, Format dest_format)
 {
   GstQuery* query = gst_query_new_convert(GstFormat(src_format), value,
     GstFormat(dest_format));
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QueryConvert>(query);
 }
 
 void QueryConvert::set(Format src_format, gint64 src_value, Format dest_format, gint64 dest_value)
@@ -174,10 +176,10 @@ QueryPosition::QueryPosition(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QueryPosition::create(Format format)
+Glib::RefPtr<Gst::QueryPosition> QueryPosition::create(Format format)
 {
   GstQuery* query = gst_query_new_position(GstFormat(format));
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QueryPosition>(query);
 }
 
 void QueryPosition::set(Format format, gint64 position)
@@ -210,10 +212,10 @@ QueryDuration::QueryDuration(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QueryDuration::create(Format format)
+Glib::RefPtr<Gst::QueryDuration> QueryDuration::create(Format format)
 {
   GstQuery* query = gst_query_new_duration(GstFormat(format));
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QueryDuration>(query);
 }
 
 void QueryDuration::set(Format format, gint64 duration)
@@ -246,10 +248,10 @@ QueryLatency::QueryLatency(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QueryLatency::create()
+Glib::RefPtr<Gst::QueryLatency> QueryLatency::create()
 {
   GstQuery* query = gst_query_new_latency();
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QueryLatency>(query);
 }
 
 void QueryLatency::set(bool live, ClockTime min_latency, ClockTime max_latency)
@@ -293,10 +295,10 @@ QuerySeeking::QuerySeeking(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QuerySeeking::create(Format format)
+Glib::RefPtr<Gst::QuerySeeking> QuerySeeking::create(Format format)
 {
   GstQuery* query = gst_query_new_seeking(GstFormat(format));
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QuerySeeking>(query);
 }
 
 void QuerySeeking::set(Format format, bool seekable, gint64 segment_start, gint64 segment_end)
@@ -349,10 +351,10 @@ QueryFormats::QueryFormats(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QueryFormats::create()
+Glib::RefPtr<Gst::QueryFormats> QueryFormats::create()
 {
   GstQuery* query = gst_query_new_formats();
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QueryFormats>(query);
 }
 
 void QueryFormats::set(const Glib::ArrayHandle<Format>& formats)
@@ -386,10 +388,10 @@ QuerySegment::QuerySegment(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QuerySegment::create(Format format)
+Glib::RefPtr<Gst::QuerySegment> QuerySegment::create(Format format)
 {
   GstQuery* query = gst_query_new_segment(GstFormat(format));
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QuerySegment>(query);
 }
 
 void QuerySegment::set(double rate, Format format, gint64 start_value, gint64 stop_value)
@@ -440,10 +442,10 @@ QueryBuffering::QueryBuffering(GstQuery* castitem) :
 Query(castitem)
 {}
 
-Glib::RefPtr<Gst::Query> QueryBuffering::create(Format format)
+Glib::RefPtr<Gst::QueryBuffering> QueryBuffering::create(Format format)
 {
   GstQuery* query = gst_query_new_buffering(GstFormat(format));
-  return Gst::Query::wrap(query);
+  return Gst::Query::wrap<QueryBuffering>(query);
 }
 
 void QueryBuffering::set(bool busy, int percent)

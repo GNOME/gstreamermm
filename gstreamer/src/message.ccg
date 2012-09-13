@@ -72,21 +72,24 @@ MessageEos::MessageEos(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageEos::create(const Glib::RefPtr<Gst::Object>& src)
+Glib::RefPtr<Gst::MessageEos>
+  MessageEos::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_eos(Glib::unwrap(src));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageEos>(message, false);
 }
 
 MessageError::MessageError(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageError::create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug)
+Glib::RefPtr<Gst::MessageError>
+  MessageError::create(const Glib::RefPtr<Gst::Object>& src,
+  Glib::Error& error, const std::string& debug)
 {
   GstMessage* message = gst_message_new_error(Glib::unwrap(src), error.gobj(),
     reinterpret_cast<const gchar*>(debug.c_str()));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageError>(message, false);
 }
 
 void MessageError::parse(Glib::Error& error, std::string& debug) const
@@ -132,11 +135,13 @@ MessageWarning::MessageWarning(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageWarning::create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug)
+Glib::RefPtr<Gst::MessageWarning>
+  MessageWarning::create(const Glib::RefPtr<Gst::Object>& src,
+  Glib::Error& error, const std::string& debug)
 {
   GstMessage* message = gst_message_new_warning(Glib::unwrap(src),
     error.gobj(), reinterpret_cast<const gchar*>(debug.c_str()));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageWarning>(message, false);
 }
 
 void MessageWarning::parse(Glib::Error& error, std::string& debug) const
@@ -183,11 +188,13 @@ MessageInfo::MessageInfo(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageInfo::create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error, const std::string& debug)
+Glib::RefPtr<Gst::MessageInfo>
+  MessageInfo::create(const Glib::RefPtr<Gst::Object>& src,
+  Glib::Error& error, const std::string& debug)
 {
   GstMessage* message = gst_message_new_info(Glib::unwrap(src), error.gobj(),
     reinterpret_cast<const gchar*>(debug.c_str()));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageInfo>(message, false);
 }
 
 
@@ -234,17 +241,17 @@ MessageTag::MessageTag(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageTag>
   MessageTag::create(const Glib::RefPtr<Gst::Object>& src,
   const Gst::TagList& taglist)
 {
   //We create a copy because gst_message_new_tag() takes ownership:
   GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
   GstMessage* message = gst_message_new_tag(Glib::unwrap(src), c_taglist);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageTag>(message, false);
 }
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageTag>
   MessageTag::create(const Glib::RefPtr<Gst::Object>& src,
   const Glib::RefPtr<Gst::Pad>& pad, const Gst::TagList& taglist)
 {
@@ -252,7 +259,7 @@ Glib::RefPtr<Gst::Message>
   GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
   GstMessage* message = gst_message_new_tag_full(Glib::unwrap(src),
     Glib::unwrap(pad), c_taglist);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageTag>(message, false);
 }
 
 void MessageTag::parse(Glib::RefPtr<Gst::Pad>& pad, Gst::TagList& tag_list)
@@ -288,10 +295,11 @@ MessageBuffering::MessageBuffering(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageBuffering::create(const Glib::RefPtr<Gst::Object>& src, int percent)
+Glib::RefPtr<Gst::MessageBuffering>
+  MessageBuffering::create(const Glib::RefPtr<Gst::Object>& src, int percent)
 {
   GstMessage* message = gst_message_new_buffering(Glib::unwrap(src), percent);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageBuffering>(message, false);
 }
 
 int MessageBuffering::parse() const
@@ -356,12 +364,14 @@ MessageStateChanged::MessageStateChanged(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageStateChanged::create(const Glib::RefPtr<Gst::Object>& src, State oldstate, State newstate, State pending)
+Glib::RefPtr<Gst::MessageStateChanged>
+  MessageStateChanged::create(const Glib::RefPtr<Gst::Object>& src,
+  State oldstate, State newstate, State pending)
 {
   GstMessage* message = gst_message_new_state_changed(Glib::unwrap(src),
     static_cast<GstState>(oldstate), static_cast<GstState>(newstate),
     static_cast<GstState>(pending));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageStateChanged>(message, false);
 }
 
 void MessageStateChanged::parse(State& oldstate, State& newstate,
@@ -403,18 +413,18 @@ MessageStateDirty::MessageStateDirty(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageStateDirty>
   MessageStateDirty::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_state_dirty(Glib::unwrap(src));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageStateDirty>(message, false);
 }
 
 MessageStepDone::MessageStepDone(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageStepDone>
   MessageStepDone::create(const Glib::RefPtr<Gst::Object>& src,
   Gst::Format format, guint64 amount, double rate, bool flush,
   bool intermediate, guint64 duration, bool eos)
@@ -422,7 +432,7 @@ Glib::RefPtr<Gst::Message>
   GstMessage* message = gst_message_new_step_done(Glib::unwrap(src),
     static_cast<GstFormat>(format), amount, rate, flush, intermediate,
     duration, eos);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageStepDone>(message, false);
 }
 
 void MessageStepDone::parse(Gst::Format& format, guint64& amount, double& rate,
@@ -502,11 +512,13 @@ MessageClockProvide::MessageClockProvide(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageClockProvide::create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock, bool ready)
+Glib::RefPtr<Gst::MessageClockProvide>
+  MessageClockProvide::create(const Glib::RefPtr<Gst::Object>& src,
+  const Glib::RefPtr<Gst::Clock>& clock, bool ready)
 {
   GstMessage* message = gst_message_new_clock_provide(Glib::unwrap(src),
     Glib::unwrap(clock), ready);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageClockProvide>(message, false);
 }
 
 void MessageClockProvide::parse(Glib::RefPtr<Gst::Clock>& clock, bool& ready) const
@@ -543,11 +555,13 @@ MessageClockLost::MessageClockLost(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageClockLost::create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock)
+Glib::RefPtr<Gst::MessageClockLost>
+  MessageClockLost::create(const Glib::RefPtr<Gst::Object>& src,
+  const Glib::RefPtr<Gst::Clock>& clock)
 {
   GstMessage* message = gst_message_new_clock_lost(Glib::unwrap(src),
     Glib::unwrap(clock));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageClockLost>(message, false);
 }
 
 Glib::RefPtr<Gst::Clock> MessageClockLost::parse()
@@ -566,11 +580,13 @@ MessageNewClock::MessageNewClock(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageNewClock::create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock)
+Glib::RefPtr<Gst::MessageNewClock>
+  MessageNewClock::create(const Glib::RefPtr<Gst::Object>& src,
+  const Glib::RefPtr<Gst::Clock>& clock)
 {
   GstMessage* message = gst_message_new_new_clock(Glib::unwrap(src),
     Glib::unwrap(clock));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageNewClock>(message, false);
 }
 
 Glib::RefPtr<Gst::Clock> MessageNewClock::parse()
@@ -589,66 +605,77 @@ MessageApplication::MessageApplication(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageApplication::create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure)
+Glib::RefPtr<Gst::MessageApplication>
+  MessageApplication::create(const Glib::RefPtr<Gst::Object>& src,
+  Gst::Structure& structure)
 {
   GstStructure* copy_struct = gst_structure_copy(structure.gobj());
   GstMessage* message = gst_message_new_application(Glib::unwrap(src),
     copy_struct);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageApplication>(message, false);
 }
 
-Glib::RefPtr<Gst::Message> MessageApplication::create(const Glib::RefPtr<Gst::Object>& src)
+Glib::RefPtr<Gst::MessageApplication>
+  MessageApplication::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_application(Glib::unwrap(src), 0);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageApplication>(message, false);
 }
 
 MessageElement::MessageElement(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageElement::create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure)
+Glib::RefPtr<Gst::MessageElement>
+  MessageElement::create(const Glib::RefPtr<Gst::Object>& src,
+  Gst::Structure& structure)
 {
   GstStructure* copy_struct = gst_structure_copy(structure.gobj());
   GstMessage* message = gst_message_new_element(Glib::unwrap(src),
     copy_struct);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageElement>(message, false);
 }
 
-Glib::RefPtr<Gst::Message> MessageElement::create(const Glib::RefPtr<Gst::Object>& src)
+Glib::RefPtr<Gst::MessageElement>
+  MessageElement::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_element(Glib::unwrap(src), 0);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageElement>(message, false);
 }
 
 MessageCustom::MessageCustom(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageCustom::create(MessageType type, const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure)
+Glib::RefPtr<Gst::MessageCustom>
+  MessageCustom::create(MessageType type, const Glib::RefPtr<Gst::Object>& src,
+  Gst::Structure& structure)
 {
   GstStructure* copy_struct = gst_structure_copy(structure.gobj());
   GstMessage* message = gst_message_new_custom(GstMessageType(type),
     Glib::unwrap(src), copy_struct);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageCustom>(message, false);
 }
 
-Glib::RefPtr<Gst::Message> MessageCustom::create(MessageType type, const Glib::RefPtr<Gst::Object>& src)
+Glib::RefPtr<Gst::MessageCustom>
+  MessageCustom::create(MessageType type, const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_custom(GstMessageType(type),
     Glib::unwrap(src), 0);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageCustom>(message, false);
 }
 
 MessageSegmentStart::MessageSegmentStart(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageSegmentStart::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position)
+Glib::RefPtr<Gst::MessageSegmentStart>
+  MessageSegmentStart::create(const Glib::RefPtr<Gst::Object>& src,
+  Format format, gint64 position)
 {
   GstMessage* message = gst_message_new_segment_start(Glib::unwrap(src),
     static_cast<GstFormat>(format), position);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageSegmentStart>(message, false);
 }
 
 void MessageSegmentStart::parse(Format& format, gint64& position) const
@@ -677,11 +704,13 @@ MessageSegmentDone::MessageSegmentDone(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageSegmentDone::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position)
+Glib::RefPtr<Gst::MessageSegmentDone>
+  MessageSegmentDone::create(const Glib::RefPtr<Gst::Object>& src,
+  Format format, gint64 position)
 {
   GstMessage* message = gst_message_new_segment_done(Glib::unwrap(src),
     static_cast<GstFormat>(format), position);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageSegmentDone>(message, false);
 }
 
 void MessageSegmentDone::parse(Format& format, gint64& position) const
@@ -710,11 +739,13 @@ MessageDuration::MessageDuration(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageDuration::create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 duration)
+Glib::RefPtr<Gst::MessageDuration>
+  MessageDuration::create(const Glib::RefPtr<Gst::Object>& src, Format format,
+  gint64 duration)
 {
   GstMessage* message = gst_message_new_duration(Glib::unwrap(src),
     static_cast<GstFormat>(format), duration);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageDuration>(message, false);
 }
 
 void MessageDuration::parse(Format& format, gint64& duration) const
@@ -742,21 +773,24 @@ MessageLatency::MessageLatency(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageLatency::create(const Glib::RefPtr<Gst::Object>& src)
+Glib::RefPtr<Gst::MessageLatency>
+  MessageLatency::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_latency(Glib::unwrap(src));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageLatency>(message, false);
 }
 
 MessageAsyncStart::MessageAsyncStart(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageAsyncStart::create(const Glib::RefPtr<Gst::Object>& src, bool new_base_time)
+Glib::RefPtr<Gst::MessageAsyncStart>
+  MessageAsyncStart::create(const Glib::RefPtr<Gst::Object>& src,
+  bool new_base_time)
 {
   GstMessage* message = gst_message_new_async_start(Glib::unwrap(src),
     new_base_time);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageAsyncStart>(message, false);
 }
 
 bool MessageAsyncStart::parse() const
@@ -771,24 +805,25 @@ MessageAsyncDone::MessageAsyncDone(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message> MessageAsyncDone::create(const Glib::RefPtr<Gst::Object>& src)
+Glib::RefPtr<Gst::MessageAsyncDone>
+  MessageAsyncDone::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_async_done(Glib::unwrap(src));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageAsyncDone>(message, false);
 }
 
 MessageStepStart::MessageStepStart(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageStepStart>
   MessageStepStart::create(const Glib::RefPtr<Gst::Object>& src,
   bool active, Gst::Format format, guint64 amount, double rate, bool flush,
   bool intermediate)
 {
   GstMessage* message = gst_message_new_step_start(Glib::unwrap(src),
     active, static_cast<GstFormat>(format), amount, rate, flush, intermediate);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageStepStart>(message, false);
 }
 
 void MessageStepStart::parse(bool& active, Gst::Format& format,
@@ -859,14 +894,14 @@ MessageStructureChange::MessageStructureChange(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageStructureChange>
   MessageStructureChange::create(const Glib::RefPtr<Gst::Object>& src,
   Gst::StructureChangeType type, const Glib::RefPtr<Gst::Element>& owner,
   bool busy)
 {
   GstMessage* message = gst_message_new_structure_change(Glib::unwrap(src),
     static_cast<GstStructureChangeType>(type), Glib::unwrap(owner), busy);
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageStructureChange>(message, false);
 }
 
 void MessageStructureChange::parse(Gst::StructureChangeType& type,
@@ -908,13 +943,13 @@ MessageRequestState::MessageRequestState(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageRequestState>
   MessageRequestState::create(const Glib::RefPtr<Gst::Object>& src,
   Gst::State state)
 {
   GstMessage* message = gst_message_new_request_state(Glib::unwrap(src),
     static_cast<GstState>(state));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageRequestState>(message, false);
 }
 
 Gst::State MessageRequestState::parse() const
@@ -929,13 +964,13 @@ MessageStreamStatus::MessageStreamStatus(GstMessage* castitem)
 : Message(castitem)
 {}
 
-Glib::RefPtr<Gst::Message>
+Glib::RefPtr<Gst::MessageStreamStatus>
   MessageStreamStatus::create(const Glib::RefPtr<Gst::Object>& src,
   Gst::StreamStatusType type, const Glib::RefPtr<Gst::Element>& owner)
 {
   GstMessage* message = gst_message_new_stream_status(Glib::unwrap(src),
     static_cast<GstStreamStatusType>(type), Glib::unwrap(owner));
-  return Gst::Message::wrap(message, false);
+  return Gst::Message::wrap<MessageStreamStatus>(message, false);
 }
 
 void MessageStreamStatus::set_object(const Glib::RefPtr<Gst::Object>& object)
@@ -1106,7 +1141,8 @@ Glib::RefPtr<Gst::Message> Message::wrap(GstMessage* message, bool take_copy)
   result = Glib::RefPtr<Gst::Message>(wrapper);
 
   // Ensure that the wrapper is freed when the message (mini object) is freed.
-  gst_mini_object_weak_ref(GST_MINI_OBJECT(message), &Message_gstreamermm_callback_destroy, wrapper);
+  gst_mini_object_weak_ref(GST_MINI_OBJECT(message),
+    &Message_gstreamermm_callback_destroy, wrapper);
 
   if(take_copy)
     result->reference();

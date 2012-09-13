@@ -42,5 +42,13 @@ int main(int argc, char** argv)
   if(structure)
     std::cout << "Message structure name: '" << structure.get_name() << "'" << std::endl;
 
+  // Test the creation of a message.
+  Glib::RefPtr<Gst::Bin> bin = Glib::wrap(GST_BIN(cobject));
+  Glib::RefPtr<Gst::MessageEos> eos = Gst::MessageEos::create(bin);
+  if(!eos)
+    std::cout << "The custom eos message could not be created" << std::endl;
+  else
+    std::cout << "The custom eos message was successfully created" << std::endl;
+
   return 0;
 }
