@@ -1,3 +1,25 @@
+2012-09-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Plug-ins: Speed up initialization by avoiding their loading on startup.
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc
+	(generate_hg_file): Use the new _NO_WRAP_INIT_REGISTRATION macro to
+	signal that the plug-ins should not be registered on startup by the
+	wrap_init() function.  Also use the new _CUSTOM_WRAP_FUNCTION in order
+	to implement a custom Glib::wrap() function for plug-ins that ensures
+	the registration of the wrap_new() function before calling
+	Glib::wrap_auto() to wrap a C object.
+	(generate_ccg_file): Modify the generation of the plug-in *_get_type()
+	functions so that when an object of the plug-in type is first created,
+	the plug-in's wrap_new() function is registered with the wrapping
+	system using the type obtained when the plug-in is first loaded.  Also
+	generate a custom Glib::wrap() function that ensures the registration
+	of the plug-in's wrap_new() function before calling Glib::wrap_auto().
+	This ensures that even if there is a C type of the plug-in, that even
+	that object can be properly wrapped.
+
+	Bug #684006.
+
 2012-09-12  José Alburquerque  <jaalburquerque@gmail.com>
 
 	Event, Message, Query: Have create() methods return derived types.

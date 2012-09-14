@@ -648,12 +648,9 @@ static void generate_hg_file(const std::string& includeMacroCalls,
     std::cout << enumWrapStatements;
 
   std::cout << "/** A Wrapper for the " << pluginName << " plugin." << std::endl;
-  std::cout << " * Please note that, though using the underlying GObject is "
-    "fine, using its C\n * <B>type</B> is not guaranteed to be API stable "
-    "across releases because it is\n * not guaranteed to always remain the "
-    "same.  Also, not all plug-ins are\n * available on all systems so care "
-    "must be taken that they exist before they\n * are used, otherwise there "
-    "will be errors and possibly a crash." << std::endl;
+  std::cout << " * Please note that not all plug-ins are available on all "
+    "systems so care\n * must be taken that they exist before they are used "
+    "otherwise there will\n * be errors and possibly a crash." << std::endl;
   std::cout << " *" << std::endl;
   std::cout << " * @ingroup " << nmspace << "Plugins" << std::endl;
   std::cout << " */" << std::endl;
@@ -673,7 +670,9 @@ static void generate_hg_file(const std::string& includeMacroCalls,
   if(!interfaceMacros.empty())
     std::cout << interfaceMacros << std::endl;
 
-  std::cout << "  _IS_GSTREAMERMM_PLUGIN" << std::endl << std::endl;
+  std::cout << "  _IS_GSTREAMERMM_PLUGIN" << std::endl;
+  std::cout << "  _NO_WRAP_INIT_REGISTRATION" << std::endl;
+  std::cout << "  _CUSTOM_WRAP_FUNCTION" << std::endl << std::endl;
 
   std::cout << "protected:" << std::endl;
   std::cout << "  " << cppTypeName << "();" << std::endl;
@@ -739,6 +738,9 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
   std::cout << "      factory = GST_ELEMENT_FACTORY(feature);" << std::endl;
   std::cout << "      type = gst_element_factory_get_element_type(factory);" << std::endl;
   std::cout << "      g_object_unref(factory);" << std::endl;
+  std::cout << std::endl;
+  std::cout << "      // Register the new type with wrapping system" << std::endl;
+  std::cout << "      Glib::wrap_register(type, &" << nmspace << "::" << cppTypeName << "_Class::wrap_new);" << std::endl;
   std::cout << "    }" << std::endl;
   std::cout << "  }" << std::endl << std::endl;
 
@@ -762,6 +764,26 @@ static void generate_ccg_file(const std::string& enumGTypeFunctionDefinitions,
   if(!actionSignalsMethodDefinitions.empty())
     std::cout << actionSignalsMethodDefinitions;
 
+  std::cout << '}' << std::endl;
+
+  // Generate the custom Glib::wrap() function that pre-registers the
+  // wrap_new() function before calling Glib::wrap_auto().
+  std::string returnType = "Glib::RefPtr<" + (std::string) nmspace + "::" + cppTypeName + ">";
+
+  std::cout << "namespace Glib" << std::endl;
+  std::cout << '{' << std::endl << std::endl;
+  std::cout << returnType << " wrap(" << cTypeName << "* object, bool take_copy)" << std::endl;
+  std::cout << '{' << std::endl;
+  std::cout << "  static bool registered_wrap_new = false;" << std::endl;
+  std::cout << "  if(!registered_wrap_new)" << std::endl;
+  std::cout << "  {" << std::endl;
+  std::cout << "    // Call get *_get_type() function which does the registration." << std::endl;
+  std::cout << "    " << getTypeName << "();" << std::endl;
+  std::cout << "    registered_wrap_new = true;" << std::endl;
+  std::cout << "  }" << std::endl;
+  std::cout << std::endl;
+  std::cout << "  return " << returnType << "( dynamic_cast<" << nmspace << "::" << cppTypeName << "*> (Glib::wrap_auto ((GObject*)(object), take_copy)) );" << std::endl;
+  std::cout << '}' << std::endl << std::endl;
   std::cout << '}' << std::endl;
 }
 
