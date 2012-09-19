@@ -1129,7 +1129,7 @@
 (define-property sequential
   (of-object "GstFileSrc")
   (prop-type "GParamBoolean")
-  (docs "Whether to use madvise to hint to the kernel that access to mmap pages will be sequential (deprecated; non-functional)")
+  (docs "Whether to use madvise to hint to the kernel that access to mmap pages will be sequential")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1147,7 +1147,7 @@
 (define-property use-mmap
   (of-object "GstFileSrc")
   (prop-type "GParamBoolean")
-  (docs "Whether to use mmap() instead of read() (deprecated)")
+  (docs "Whether to use mmap() instead of read()")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1361,25 +1361,7 @@
 (define-property sync-streams
   (of-object "GstInputSelector")
   (prop-type "GParamBoolean")
-  (docs "Synchronize inactive streams to the running time of the active stream or to the current clock")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property sync-mode
-  (of-object "GstInputSelector")
-  (prop-type "GParamEnum")
-  (docs "Behavior in sync-streams mode")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property cache-buffers
-  (of-object "GstInputSelector")
-  (prop-type "GParamBoolean")
-  (docs "Cache buffers for active-pad")
+  (docs "Synchronize inactive streams to the running time of the active stream")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2262,6 +2244,46 @@
 
 ;; From GstMixer
 
+(define-signal record-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal mute-toggled
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gboolean" "p1")
+  )
+)
+
+(define-signal volume-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerTrack*" "p0")
+    '("gpointer" "p1")
+  )
+)
+
+(define-signal option-changed
+  (of-object "GstMixer")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstMixerOptions*" "p0")
+    '("const-gchar*" "p1")
+  )
+)
+
 ;; From GstMixerTrack
 
 (define-property label
@@ -2948,7 +2970,7 @@
 (define-property read-speed
   (of-object "GstCdParanoiaSrc")
   (prop-type "GParamInt")
-  (docs "Read from device at specified speed (-1 and 0 = full speed)")
+  (docs "Read from device at specified speed")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -3214,15 +3236,6 @@
   (of-object "GstDecodeBin2")
   (prop-type "GParamBoolean")
   (docs "Expose all streams, including those of unknown type or that don't match the 'caps' property")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property connection-speed
-  (of-object "GstDecodeBin2")
-  (prop-type "GParamUInt")
-  (docs "Network connection speed in kbps (0 = unknown)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -3957,7 +3970,7 @@
 (define-property text-sink
   (of-object "GstPlayBin2")
   (prop-type "GParamObject")
-  (docs "the text output element to use (NULL = default subtitleoverlay)")
+  (docs "the text output element to use (NULL = default textoverlay)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4039,15 +4052,6 @@
   (of-object "GstPlayBin2")
   (prop-type "GParamUInt64")
   (docs "Max. amount of data in the ring buffer (bytes, 0 = ring buffer disabled)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property force-aspect-ratio
-  (of-object "GstPlayBin2")
-  (prop-type "GParamBoolean")
-  (docs "When enabled, scaling will respect original aspect ratio")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4569,7 +4573,7 @@
 (define-property speed-level
   (of-object "GstTheoraEnc")
   (prop-type "GParamInt")
-  (docs "Controls the amount of motion vector searching done while encoding.  This property requires libtheora version >= 1.0")
+  (docs "Controls the amount of analysis performed when encoding. Higher values trade compression quality for speed. This property requires libtheora version >= 1.0, and the maximum value may vary based on encoder version.")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4578,7 +4582,7 @@
 (define-property vp3-compatible
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Disables non-VP3 compatible features.  This property requires libtheora version >= 1.1")
+  (docs "Disables non-VP3 compatible features")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4587,7 +4591,7 @@
 (define-property drop-frames
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Allow or disallow frame dropping.  This property requires libtheora version >= 1.1")
+  (docs "Allow or disallow frame dropping")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4596,7 +4600,7 @@
 (define-property cap-overflow
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Enable capping of bit reservoir overflows.  This property requires libtheora version >= 1.1")
+  (docs "Enable capping of bit reservoir overflows")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4605,7 +4609,7 @@
 (define-property cap-underflow
   (of-object "GstTheoraEnc")
   (prop-type "GParamBoolean")
-  (docs "Enable capping of bit reservoir underflows.  This property requires libtheora version >= 1.1")
+  (docs "Enable capping of bit reservoir underflows")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -4614,7 +4618,7 @@
 (define-property rate-buffer
   (of-object "GstTheoraEnc")
   (prop-type "GParamInt")
-  (docs "Sets the size of the rate control buffer, in units of frames.  The default value of 0 instructs the encoder to automatically select an appropriate value.  This property requires libtheora version >= 1.1")
+  (docs "Sets the size of the rate control buffer, in units of frames.  The default value of 0 instructs the encoder to automatically select an appropriate value")
   (readable #t)
   (writable #t)
   (construct-only #f)

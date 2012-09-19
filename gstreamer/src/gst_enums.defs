@@ -537,11 +537,7 @@
 ;;   GST_SEEK_FLAG_ACCURATE        = (1 << 1),
 ;;   GST_SEEK_FLAG_KEY_UNIT        = (1 << 2),
 ;;   GST_SEEK_FLAG_SEGMENT         = (1 << 3),
-;;   GST_SEEK_FLAG_SKIP            = (1 << 4),
-;;   GST_SEEK_FLAG_SNAP_BEFORE     = (1 << 5),
-;;   GST_SEEK_FLAG_SNAP_AFTER      = (1 << 6),
-;;   GST_SEEK_FLAG_SNAP_NEAREST    = GST_SEEK_FLAG_SNAP_BEFORE | GST_SEEK_FLAG_SNAP_AFTER,
-;;   /* Careful to restart next flag with 1<<7 here */
+;;   GST_SEEK_FLAG_SKIP            = (1 << 4)
 ;; } GstSeekFlags;
 
 (define-flags-extended SeekFlags
@@ -554,9 +550,6 @@
     '("key-unit" "GST_SEEK_FLAG_KEY_UNIT" "(1 << 2)")
     '("segment" "GST_SEEK_FLAG_SEGMENT" "(1 << 3)")
     '("skip" "GST_SEEK_FLAG_SKIP" "(1 << 4)")
-    '("snap-before" "GST_SEEK_FLAG_SNAP_BEFORE" "(1 << 5)")
-    '("snap-after" "GST_SEEK_FLAG_SNAP_AFTER" "(1 << 6)")
-    '("snap-nearest" "GST_SEEK_FLAG_SNAP_NEAREST" "0x60")
   )
 )
 
@@ -953,7 +946,7 @@
 ;;   GST_PROGRESS_TYPE_CONTINUE = 1,
 ;;   GST_PROGRESS_TYPE_COMPLETE = 2,
 ;;   GST_PROGRESS_TYPE_CANCELED = 3,
-;;   GST_PROGRESS_TYPE_ERROR    = 4
+;;   GST_PROGRESS_TYPE_ERROR    = 4,
 ;; } GstProgressType;
 
 (define-enum-extended ProgressType
@@ -1445,6 +1438,7 @@
 ;;   GST_QUARK_TEXT = 103,
 ;;   GST_QUARK_PERCENT = 104,
 ;;   GST_QUARK_TIMEOUT = 105,
+;; 
 ;;   GST_QUARK_MAX = 106
 ;; } GstQuarkId;
 
@@ -2074,23 +2068,6 @@
   )
 )
 
-;; From gstinputselector.h
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_INPUT_SELECTOR_SYNC_MODE_ACTIVE_SEGMENT,
-;;   GST_INPUT_SELECTOR_SYNC_MODE_CLOCK
-;; } GstInputSelectorSyncMode;
-
-(define-enum-extended InputSelectorSyncMode
-  (in-module "Gst")
-  (c-name "GstInputSelectorSyncMode")
-  (values
-    '("active-segment" "GST_INPUT_SELECTOR_SYNC_MODE_ACTIVE_SEGMENT" "0")
-    '("clock" "GST_INPUT_SELECTOR_SYNC_MODE_CLOCK" "1")
-  )
-)
-
 ;; From gstqueue.h
 
 ;; Original typedef:
@@ -2594,7 +2571,8 @@
 ;;    * are defined or all positions are undefined, but can't mix'n'match  */
 ;;   GST_AUDIO_CHANNEL_POSITION_NONE,
 ;; 
-;;   /* don't use - counter (private) */
+;;   /*< private >*/
+;;   /* don't use - counter */
 ;;   GST_AUDIO_CHANNEL_POSITION_NUM
 ;; } GstAudioChannelPosition;
 
@@ -3301,6 +3279,7 @@
 
 ;; Original typedef:
 ;; typedef enum {
+;;   /*< protected >*/
 ;;   GST_RTSP_HDR_INVALID,
 ;; 
 ;;   /*
@@ -3500,6 +3479,7 @@
 
 ;; Original typedef:
 ;; typedef enum {
+;;   /*< protected >*/
 ;;   GST_RTSP_STS_INVALID                              = 0,
 ;;   GST_RTSP_STS_CONTINUE                             = 100,
 ;;   GST_RTSP_STS_OK                                   = 200,
@@ -3923,34 +3903,6 @@
   )
 )
 
-;; From gstvideoutils.h
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   GST_VIDEO_CODEC_FRAME_FLAG_DECODE_ONLY            = (1<<0),
-;;   GST_VIDEO_CODEC_FRAME_FLAG_SYNC_POINT             = (1<<1),
-;;   GST_VIDEO_CODEC_FRAME_FLAG_FORCE_KEYFRAME         = (1<<2),
-;;   GST_VIDEO_CODEC_FRAME_FLAG_FORCE_KEYFRAME_HEADERS = (1<<3),
-;;   GST_VIDEO_CODEC_FRAME_FLAG_TFF                    = (1<<4),
-;;   GST_VIDEO_CODEC_FRAME_FLAG_RFF                    = (1<<5),
-;;   GST_VIDEO_CODEC_FRAME_FLAG_ONEFIELD               = (1<<6)
-;; } GstVideoCodecFrameFlags;
-
-(define-flags-extended VideoCodecFrameFlags
-  (in-module "Gst")
-  (c-name "GstVideoCodecFrameFlags")
-  (values
-    '("decode-only" "GST_VIDEO_CODEC_FRAME_FLAG_DECODE_ONLY" "(1<<0)")
-    '("sync-point" "GST_VIDEO_CODEC_FRAME_FLAG_SYNC_POINT" "(1<<1)")
-    '("force-keyframe" "GST_VIDEO_CODEC_FRAME_FLAG_FORCE_KEYFRAME" "(1<<2)")
-    '("force-keyframe-headers" "GST_VIDEO_CODEC_FRAME_FLAG_FORCE_KEYFRAME_HEADERS" "(1<<3)")
-    '("tff" "GST_VIDEO_CODEC_FRAME_FLAG_TFF" "(1<<4)")
-    '("rff" "GST_VIDEO_CODEC_FRAME_FLAG_RFF" "(1<<5)")
-    '("onefield" "GST_VIDEO_CODEC_FRAME_FLAG_ONEFIELD" "(1<<6)")
-  )
-)
-
 ;; From video.h
 
 ;; Original typedef:
@@ -3997,8 +3949,7 @@
 ;;   GST_VIDEO_FORMAT_IYU1,
 ;;   GST_VIDEO_FORMAT_ARGB64,
 ;;   GST_VIDEO_FORMAT_AYUV64,
-;;   GST_VIDEO_FORMAT_r210,
-;;   GST_VIDEO_FORMAT_ENCODED
+;;   GST_VIDEO_FORMAT_r210
 ;; } GstVideoFormat;
 
 (define-enum-extended VideoFormat
@@ -4048,191 +3999,6 @@
     '("argb64" "GST_VIDEO_FORMAT_ARGB64" "40")
     '("ayuv64" "GST_VIDEO_FORMAT_AYUV64" "41")
     '("r210" "GST_VIDEO_FORMAT_r210" "42")
-    '("encoded" "GST_VIDEO_FORMAT_ENCODED" "43")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   GST_VIDEO_FORMAT_FLAG_YUV      = (1 << 0),
-;;   GST_VIDEO_FORMAT_FLAG_RGB      = (1 << 1),
-;;   GST_VIDEO_FORMAT_FLAG_GRAY     = (1 << 2),
-;;   GST_VIDEO_FORMAT_FLAG_ALPHA    = (1 << 3),
-;;   GST_VIDEO_FORMAT_FLAG_LE       = (1 << 4),
-;;   GST_VIDEO_FORMAT_FLAG_PALETTE  = (1 << 5),
-;;   GST_VIDEO_FORMAT_FLAG_COMPLEX  = (1 << 6)
-;; } GstVideoFormatFlags;
-
-(define-flags-extended VideoFormatFlags
-  (in-module "Gst")
-  (c-name "GstVideoFormatFlags")
-  (values
-    '("yuv" "GST_VIDEO_FORMAT_FLAG_YUV" "(1 << 0)")
-    '("rgb" "GST_VIDEO_FORMAT_FLAG_RGB" "(1 << 1)")
-    '("gray" "GST_VIDEO_FORMAT_FLAG_GRAY" "(1 << 2)")
-    '("alpha" "GST_VIDEO_FORMAT_FLAG_ALPHA" "(1 << 3)")
-    '("le" "GST_VIDEO_FORMAT_FLAG_LE" "(1 << 4)")
-    '("palette" "GST_VIDEO_FORMAT_FLAG_PALETTE" "(1 << 5)")
-    '("complex" "GST_VIDEO_FORMAT_FLAG_COMPLEX" "(1 << 6)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_VIDEO_INTERLACE_MODE_PROGRESSIVE = 0,
-;;   GST_VIDEO_INTERLACE_MODE_INTERLEAVED,
-;;   GST_VIDEO_INTERLACE_MODE_MIXED
-;; } GstVideoInterlaceMode;
-
-(define-enum-extended VideoInterlaceMode
-  (in-module "Gst")
-  (c-name "GstVideoInterlaceMode")
-  (values
-    '("progressive" "GST_VIDEO_INTERLACE_MODE_PROGRESSIVE" "0")
-    '("interleaved" "GST_VIDEO_INTERLACE_MODE_INTERLEAVED" "1")
-    '("mixed" "GST_VIDEO_INTERLACE_MODE_MIXED" "2")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_VIDEO_FLAG_NONE         = 0,
-;;   GST_VIDEO_FLAG_VARIABLE_FPS = (1 << 1)
-;; } GstVideoFlags;
-
-(define-flags-extended VideoFlags
-  (in-module "Gst")
-  (c-name "GstVideoFlags")
-  (values
-    '("none" "GST_VIDEO_FLAG_NONE" "0x0")
-    '("variable-fps" "GST_VIDEO_FLAG_VARIABLE_FPS" "(1 << 1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_VIDEO_CHROMA_SITE_UNKNOWN   =  0,
-;;   GST_VIDEO_CHROMA_SITE_NONE      = (1 << 0),
-;;   GST_VIDEO_CHROMA_SITE_H_COSITED = (1 << 1),
-;;   GST_VIDEO_CHROMA_SITE_V_COSITED = (1 << 2),
-;;   GST_VIDEO_CHROMA_SITE_ALT_LINE  = (1 << 3),
-;;   /* some common chroma cositing */
-;;   GST_VIDEO_CHROMA_SITE_COSITED   = (GST_VIDEO_CHROMA_SITE_H_COSITED | GST_VIDEO_CHROMA_SITE_V_COSITED),
-;;   GST_VIDEO_CHROMA_SITE_JPEG      = (GST_VIDEO_CHROMA_SITE_NONE),
-;;   GST_VIDEO_CHROMA_SITE_MPEG2     = (GST_VIDEO_CHROMA_SITE_H_COSITED),
-;;   GST_VIDEO_CHROMA_SITE_DV        = (GST_VIDEO_CHROMA_SITE_COSITED | GST_VIDEO_CHROMA_SITE_ALT_LINE),
-;; } GstVideoChromaSite;
-
-(define-flags-extended VideoChromaSite
-  (in-module "Gst")
-  (c-name "GstVideoChromaSite")
-  (values
-    '("unknown" "GST_VIDEO_CHROMA_SITE_UNKNOWN" "0x0")
-    '("none" "GST_VIDEO_CHROMA_SITE_NONE" "(1 << 0)")
-    '("h-cosited" "GST_VIDEO_CHROMA_SITE_H_COSITED" "(1 << 1)")
-    '("v-cosited" "GST_VIDEO_CHROMA_SITE_V_COSITED" "(1 << 2)")
-    '("alt-line" "GST_VIDEO_CHROMA_SITE_ALT_LINE" "(1 << 3)")
-    '("cosited" "GST_VIDEO_CHROMA_SITE_COSITED" "0x6")
-    '("jpeg" "GST_VIDEO_CHROMA_SITE_JPEG" "0x1")
-    '("mpeg2" "GST_VIDEO_CHROMA_SITE_MPEG2" "0x2")
-    '("dv" "GST_VIDEO_CHROMA_SITE_DV" "0xE")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_VIDEO_COLOR_RANGE_UNKNOWN = 0,
-;;   GST_VIDEO_COLOR_RANGE_0_255,
-;;   GST_VIDEO_COLOR_RANGE_16_235
-;; } GstVideoColorRange;
-
-(define-enum-extended VideoColorRange
-  (in-module "Gst")
-  (c-name "GstVideoColorRange")
-  (values
-    '("unknown" "GST_VIDEO_COLOR_RANGE_UNKNOWN" "0")
-    '("0-255" "GST_VIDEO_COLOR_RANGE_0_255" "1")
-    '("16-235" "GST_VIDEO_COLOR_RANGE_16_235" "2")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_VIDEO_COLOR_MATRIX_UNKNOWN = 0,
-;;   GST_VIDEO_COLOR_MATRIX_RGB,
-;;   GST_VIDEO_COLOR_MATRIX_FCC,
-;;   GST_VIDEO_COLOR_MATRIX_BT709,
-;;   GST_VIDEO_COLOR_MATRIX_BT601,
-;;   GST_VIDEO_COLOR_MATRIX_SMPTE240M
-;; } GstVideoColorMatrix;
-
-(define-enum-extended VideoColorMatrix
-  (in-module "Gst")
-  (c-name "GstVideoColorMatrix")
-  (values
-    '("unknown" "GST_VIDEO_COLOR_MATRIX_UNKNOWN" "0")
-    '("rgb" "GST_VIDEO_COLOR_MATRIX_RGB" "1")
-    '("fcc" "GST_VIDEO_COLOR_MATRIX_FCC" "2")
-    '("bt709" "GST_VIDEO_COLOR_MATRIX_BT709" "3")
-    '("bt601" "GST_VIDEO_COLOR_MATRIX_BT601" "4")
-    '("smpte240m" "GST_VIDEO_COLOR_MATRIX_SMPTE240M" "5")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_VIDEO_TRANSFER_UNKNOWN = 0,
-;;   GST_VIDEO_TRANSFER_GAMMA10,
-;;   GST_VIDEO_TRANSFER_GAMMA18,
-;;   GST_VIDEO_TRANSFER_GAMMA20,
-;;   GST_VIDEO_TRANSFER_GAMMA22,
-;;   GST_VIDEO_TRANSFER_BT709,
-;;   GST_VIDEO_TRANSFER_SMPTE240M,
-;;   GST_VIDEO_TRANSFER_SRGB,
-;;   GST_VIDEO_TRANSFER_GAMMA28,
-;;   GST_VIDEO_TRANSFER_LOG100,
-;;   GST_VIDEO_TRANSFER_LOG316
-;; } GstVideoTransferFunction;
-
-(define-enum-extended VideoTransferFunction
-  (in-module "Gst")
-  (c-name "GstVideoTransferFunction")
-  (values
-    '("unknown" "GST_VIDEO_TRANSFER_UNKNOWN" "0")
-    '("gamma10" "GST_VIDEO_TRANSFER_GAMMA10" "1")
-    '("gamma18" "GST_VIDEO_TRANSFER_GAMMA18" "2")
-    '("gamma20" "GST_VIDEO_TRANSFER_GAMMA20" "3")
-    '("gamma22" "GST_VIDEO_TRANSFER_GAMMA22" "4")
-    '("bt709" "GST_VIDEO_TRANSFER_BT709" "5")
-    '("smpte240m" "GST_VIDEO_TRANSFER_SMPTE240M" "6")
-    '("srgb" "GST_VIDEO_TRANSFER_SRGB" "7")
-    '("gamma28" "GST_VIDEO_TRANSFER_GAMMA28" "8")
-    '("log100" "GST_VIDEO_TRANSFER_LOG100" "9")
-    '("log316" "GST_VIDEO_TRANSFER_LOG316" "10")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_VIDEO_COLOR_PRIMARIES_UNKNOWN = 0,
-;;   GST_VIDEO_COLOR_PRIMARIES_BT709,
-;;   GST_VIDEO_COLOR_PRIMARIES_BT470M,
-;;   GST_VIDEO_COLOR_PRIMARIES_BT470BG,
-;;   GST_VIDEO_COLOR_PRIMARIES_SMPTE170M,
-;;   GST_VIDEO_COLOR_PRIMARIES_SMPTE240M
-;; } GstVideoColorPrimaries;
-
-(define-enum-extended VideoColorPrimaries
-  (in-module "Gst")
-  (c-name "GstVideoColorPrimaries")
-  (values
-    '("unknown" "GST_VIDEO_COLOR_PRIMARIES_UNKNOWN" "0")
-    '("bt709" "GST_VIDEO_COLOR_PRIMARIES_BT709" "1")
-    '("bt470m" "GST_VIDEO_COLOR_PRIMARIES_BT470M" "2")
-    '("bt470bg" "GST_VIDEO_COLOR_PRIMARIES_BT470BG" "3")
-    '("smpte170m" "GST_VIDEO_COLOR_PRIMARIES_SMPTE170M" "4")
-    '("smpte240m" "GST_VIDEO_COLOR_PRIMARIES_SMPTE240M" "5")
   )
 )
 
@@ -4240,9 +4006,7 @@
 
 ;; Original typedef:
 ;; typedef enum {
-;;   GST_VIDEO_OVERLAY_FORMAT_FLAG_NONE = 0,
-;;   GST_VIDEO_OVERLAY_FORMAT_FLAG_PREMULTIPLIED_ALPHA = 1,
-;;   GST_VIDEO_OVERLAY_FORMAT_FLAG_GLOBAL_ALPHA = 2
+;;   GST_VIDEO_OVERLAY_FORMAT_FLAG_NONE = 0
 ;; } GstVideoOverlayFormatFlags;
 
 (define-flags-extended VideoOverlayFormatFlags
@@ -4250,8 +4014,6 @@
   (c-name "GstVideoOverlayFormatFlags")
   (values
     '("none" "GST_VIDEO_OVERLAY_FORMAT_FLAG_NONE" "0x0")
-    '("premultiplied-alpha" "GST_VIDEO_OVERLAY_FORMAT_FLAG_PREMULTIPLIED_ALPHA" "0x1")
-    '("global-alpha" "GST_VIDEO_OVERLAY_FORMAT_FLAG_GLOBAL_ALPHA" "0x2")
   )
 )
 
@@ -4431,8 +4193,7 @@
 ;;   GST_PLAY_FLAG_NATIVE_VIDEO  = (1 << 6),
 ;;   GST_PLAY_FLAG_DOWNLOAD      = (1 << 7),
 ;;   GST_PLAY_FLAG_BUFFERING     = (1 << 8),
-;;   GST_PLAY_FLAG_DEINTERLACE   = (1 << 9),
-;;   GST_PLAY_FLAG_SOFT_COLORBALANCE = (1 << 10)
+;;   GST_PLAY_FLAG_DEINTERLACE   = (1 << 9)
 ;; } GstPlayFlags;
 
 (define-flags-extended PlayFlags
@@ -4449,7 +4210,6 @@
     '("download" "GST_PLAY_FLAG_DOWNLOAD" "(1 << 7)")
     '("buffering" "GST_PLAY_FLAG_BUFFERING" "(1 << 8)")
     '("deinterlace" "GST_PLAY_FLAG_DEINTERLACE" "(1 << 9)")
-    '("soft-colorbalance" "GST_PLAY_FLAG_SOFT_COLORBALANCE" "(1 << 10)")
   )
 )
 
@@ -5078,6 +4838,24 @@
     '("extended-gamut" "SCHRO_TRANSFER_CHAR_EXTENDED_GAMUT" "1")
     '("linear" "SCHRO_TRANSFER_CHAR_LINEAR" "2")
     '("dci-gamma" "SCHRO_TRANSFER_CHAR_DCI_GAMMA" "3")
+  )
+)
+
+;; From gstoggdemux.h
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   GST_OGG_PAD_MODE_INIT,        /* we are feeding our internal decoder to get info */
+;;   GST_OGG_PAD_MODE_STREAMING,   /* we are streaming buffers to the outside */
+;; } GstOggPadMode;
+
+(define-enum-extended OggPadMode
+  (in-module "Gst")
+  (c-name "GstOggPadMode")
+  (values
+    '("init" "GST_OGG_PAD_MODE_INIT" "0")
+    '("streaming" "GST_OGG_PAD_MODE_STREAMING" "1")
   )
 )
 
