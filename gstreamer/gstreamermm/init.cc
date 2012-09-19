@@ -113,6 +113,16 @@ bool init_check()
   return result;
 }
 
+bool is_initialized()
+{
+  return static_cast<bool>(gst_is_initialized());
+}
+
+void deinit()
+{
+  gst_deinit();
+}
+
 Glib::OptionGroup get_option_group()
 {
   return Glib::OptionGroup(gst_init_get_option_group());

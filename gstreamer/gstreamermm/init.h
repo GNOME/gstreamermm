@@ -105,7 +105,7 @@ void init();
  * @return true if GStreamer could be initialized.
  * @throw Glib::Error
  */
-  bool init_check(int& argc, char**& argv);
+bool init_check(int& argc, char**& argv);
 
 /** Initializes gstreamermm gracefully without parsing command line arguments.
  *
@@ -130,7 +130,25 @@ void init();
  * @return true if GStreamer could be initialized.
  * @throw Glib::Error
  */
-  bool init_check();
+bool init_check();
+
+/** Use this function to check if GStreamer has been initialized.
+ * @return <tt>true</tt> if initialization has been done, <tt>false</tt>
+ * otherwise.
+ */
+bool is_initialized(void);
+
+/**  Clean up any resources created by GStreamer upon initialization.
+ *
+ * It is normally not needed to call this function in a normal application as
+ * the resources will automatically be freed when the program terminates.
+ * This function is therefore mostly used by testsuites and other memory
+ * profiling tools.
+ *
+ * After this call GStreamer (including this method) should not be used
+ * anymore. 
+ */
+void deinit();
 
 /** Returns a Glib::OptionGroup with GStreamer's argument specifications. The
  * group is set up to use standard GOption callbacks, so when using this group
