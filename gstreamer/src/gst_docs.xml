@@ -1,4 +1,1141 @@
 <root>
+<signal name="GstAppSink::eos">
+<description>
+Signal that the end-of-stream has been reached. This signal is emitted from
+the steaming thread.
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> the appsink element that emitted the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSink::new-buffer">
+<description>
+Signal that a new buffer is available.
+
+This signal is emitted from the steaming thread and only when the
+&quot;emit-signals&quot; property is %TRUE.
+
+The new buffer can be retrieved with the &quot;pull-buffer&quot; action
+signal or gst_app_sink_pull_buffer() either from this signal callback
+or from any other thread.
+
+Note that this signal is only emitted when the &quot;emit-signals&quot; property is
+set to %TRUE, which it is not by default for performance reasons.
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> the appsink element that emitted the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSink::new-buffer-list">
+<description>
+Signal that a new bufferlist is available.
+
+This signal is emitted from the steaming thread and only when the
+&quot;emit-signals&quot; property is %TRUE.
+
+The new buffer can be retrieved with the &quot;pull-buffer-list&quot; action
+signal or gst_app_sink_pull_buffer_list() either from this signal callback
+or from any other thread.
+
+Note that this signal is only emitted when the &quot;emit-signals&quot; property is
+set to %TRUE, which it is not by default for performance reasons.
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> the appsink element that emitted the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSink::new-preroll">
+<description>
+Signal that a new preroll buffer is available.
+
+This signal is emitted from the steaming thread and only when the
+&quot;emit-signals&quot; property is %TRUE.
+
+The new preroll buffer can be retrieved with the &quot;pull-preroll&quot; action
+signal or gst_app_sink_pull_preroll() either from this signal callback
+or from any other thread.
+
+Note that this signal is only emitted when the &quot;emit-signals&quot; property is
+set to %TRUE, which it is not by default for performance reasons.
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> the appsink element that emitted the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSink::pull-buffer">
+<description>
+This function blocks until a buffer or EOS becomes available or the appsink
+element is set to the READY/NULL state.
+
+This function will only return buffers when the appsink is in the PLAYING
+state. All rendered buffers will be put in a queue so that the application
+can pull buffers at its own rate.
+
+Note that when the application does not pull buffers fast enough, the
+queued buffers could consume a lot of memory, especially when dealing with
+raw video frames. It's possible to control the behaviour of the queue with
+the &quot;drop&quot; and &quot;max-buffers&quot; properties.
+
+If an EOS event was received before any buffers, this function returns
+%NULL. Use gst_app_sink_is_eos () to check for the EOS condition.
+
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> the appsink element to emit this signal on
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer or NULL when the appsink is stopped or EOS.
+</return>
+</signal>
+
+<signal name="GstAppSink::pull-buffer-list">
+<description>
+This function blocks until a buffer list or EOS becomes available or the appsink
+element is set to the READY/NULL state.
+
+This function will only return bufferlists when the appsink is in the PLAYING
+state. All rendered bufferlists will be put in a queue so that the application
+can pull bufferlists at its own rate.
+
+Note that when the application does not pull bufferlists fast enough, the
+queued bufferlists could consume a lot of memory, especially when dealing with
+raw video frames. It's possible to control the behaviour of the queue with
+the &quot;drop&quot; and &quot;max-buffers&quot; properties.
+
+If an EOS event was received before any buffers, this function returns
+%NULL. Use gst_app_sink_is_eos () to check for the EOS condition.
+
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> the appsink element to emit this signal on
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBufferList or NULL when the appsink is stopped or EOS.
+</return>
+</signal>
+
+<signal name="GstAppSink::pull-preroll">
+<description>
+Get the last preroll buffer in @appsink. This was the buffer that caused the
+appsink to preroll in the PAUSED state. This buffer can be pulled many times
+and remains available to the application even after EOS.
+
+This function is typically used when dealing with a pipeline in the PAUSED
+state. Calling this function after doing a seek will give the buffer right
+after the seek position.
+
+Note that the preroll buffer will also be returned as the first buffer
+when calling gst_app_sink_pull_buffer() or the &quot;pull-buffer&quot; action signal.
+
+If an EOS event was received before any buffers, this function returns
+%NULL. Use gst_app_sink_is_eos () to check for the EOS condition.
+
+This function blocks until a preroll buffer or EOS is received or the appsink
+element is set to the READY/NULL state.
+
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> the appsink element to emit this signal on
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer or NULL when the appsink is stopped or EOS.
+</return>
+</signal>
+
+<signal name="GstAppSrc::block">
+<description>
+When max-bytes are queued and after the enough-data signal has been emitted,
+block any further push-buffer calls until the amount of queued bytes drops
+below the max-bytes limit.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::caps">
+<description>
+The GstCaps that will negotiated downstream and will be put
+on outgoing buffers.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::emit-signals">
+<description>
+Make appsrc emit the &quot;need-data&quot;, &quot;enough-data&quot; and &quot;seek-data&quot; signals.
+This option is by default enabled for backwards compatibility reasons but
+can disabled when needed because signal emission is expensive.
+
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::empty-percent">
+<description>
+Make appsrc emit the &quot;need-data&quot; signal when the amount of bytes in the
+queue drops below this percentage of max-bytes.
+
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::end-of-stream">
+<description>
+Notify @appsrc that no more buffer are available.
+
+</description>
+<parameters>
+<parameter name="appsrc">
+<parameter_description> the appsrc
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::enough-data">
+<description>
+Signal that the source has enough data. It is recommended that the
+application stops calling push-buffer until the need-data signal is
+emitted again to avoid excessive buffer queueing.
+
+</description>
+<parameters>
+<parameter name="appsrc">
+<parameter_description> the appsrc element that emitted the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::format">
+<description>
+The format to use for segment events. When the source is producing
+timestamped buffers this property should be set to GST_FORMAT_TIME.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::is-live">
+<description>
+Instruct the source to behave like a live source. This includes that it
+will only push out buffers in the PLAYING state.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::max-bytes">
+<description>
+The maximum amount of bytes that can be queued internally.
+After the maximum amount of bytes are queued, appsrc will emit the
+&quot;enough-data&quot; signal.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::max-latency">
+<description>
+The maximum latency of the source. A value of -1 means an unlimited amout
+of latency.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::min-latency">
+<description>
+The minimum latency of the source. A value of -1 will use the default
+latency calculations of #GstBaseSrc.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::need-data">
+<description>
+Signal that the source needs more data. In the callback or from another
+thread you should call push-buffer or end-of-stream.
+
+@length is just a hint and when it is set to -1, any number of bytes can be
+pushed into @appsrc.
+
+You can call push-buffer multiple times until the enough-data signal is
+fired.
+
+</description>
+<parameters>
+<parameter name="appsrc">
+<parameter_description> the appsrc element that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the amount of bytes needed.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::push-buffer">
+<description>
+Adds a buffer to the queue of buffers that the appsrc element will
+push to its source pad. This function does not take ownership of the
+buffer so the buffer needs to be unreffed after calling this function.
+
+When the block property is TRUE, this function can block until free space
+becomes available in the queue.
+
+</description>
+<parameters>
+<parameter name="appsrc">
+<parameter_description> the appsrc
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a buffer to push
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::seek-data">
+<description>
+Seek to the given offset. The next push-buffer should produce buffers from
+the new @offset.
+This callback is only called for seekable stream types.
+
+
+</description>
+<parameters>
+<parameter name="appsrc">
+<parameter_description> the appsrc element that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the offset to seek to
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the seek succeeded.
+</return>
+</signal>
+
+<signal name="GstAppSrc::size">
+<description>
+The total size in bytes of the data stream. If the total size is known, it
+is recommended to configure it with this property.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstAppSrc::stream-type">
+<description>
+The type of stream that this source is producing.  For seekable streams the
+application should connect to the seek-data signal.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstBaseRTPDepayload::queue-delay">
+<description>
+Control the amount of packets to buffer.
+
+Deprecated: Use a jitterbuffer or RTP session manager to delay packet
+playback. This property has no effect anymore since 0.10.15.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstBin::do-latency">
+<description>
+Will be emitted when the bin needs to perform latency calculations. This
+signal is only emited for toplevel bins or when async-handling is
+enabled.
+
+Only one signal handler is invoked. If no signals are connected, the
+default handler is invoked, which will query and distribute the lowest
+possible latency to all sinks.
+
+Connect to this signal if the default latency calculations are not
+sufficient, like when you need different latencies for different sinks in
+the same pipeline.
+
+
+</description>
+<parameters>
+<parameter name="bin">
+<parameter_description> the #GstBin
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstBin::element-added">
+<description>
+Will be emitted after the element was added to the bin.
+
+</description>
+<parameters>
+<parameter name="bin">
+<parameter_description> the #GstBin
+</parameter_description>
+</parameter>
+<parameter name="element">
+<parameter_description> the #GstElement that was added to the bin
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstBin::element-removed">
+<description>
+Will be emitted after the element was removed from the bin.
+
+</description>
+<parameters>
+<parameter name="bin">
+<parameter_description> the #GstBin
+</parameter_description>
+</parameter>
+<parameter name="element">
+<parameter_description> the #GstElement that was removed from the bin
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstBus::message">
+<description>
+A message has been posted on the bus. This signal is emitted from a
+GSource added to the mainloop. this signal will only be emitted when
+there is a mainloop running.
+
+</description>
+<parameters>
+<parameter name="bus">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="message">
+<parameter_description> the message that has been posted asynchronously
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstBus::sync-message">
+<description>
+A message has been posted on the bus. This signal is emitted from the
+thread that posted the message so one has to be careful with locking.
+
+This signal will not be emitted by default, you have to set up
+gst_bus_sync_signal_handler() as a sync handler if you want this
+signal to be emitted when a message is posted on the bus, like this:
+&lt;programlisting&gt;
+gst_bus_set_sync_handler (bus, gst_bus_sync_signal_handler, yourdata);
+&lt;/programlisting&gt;
+
+</description>
+<parameters>
+<parameter name="bus">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="message">
+<parameter_description> the message that has been posted synchronously
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstChildProxy::child-added">
+<description>
+Will be emitted after the @object was added to the @child_proxy.
+
+</description>
+<parameters>
+<parameter name="child_proxy">
+<parameter_description> the #GstChildProxy
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> the #GObject that was added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstChildProxy::child-removed">
+<description>
+Will be emitted after the @object was removed from the @child_proxy.
+
+</description>
+<parameters>
+<parameter name="child_proxy">
+<parameter_description> the #GstChildProxy
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> the #GObject that was removed
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstColorBalance::value-changed">
+<description>
+Fired when the value of the indicated channel has changed.
+
+</description>
+<parameters>
+<parameter name="colorbalance">
+<parameter_description> The GstColorBalance instance
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The #GstColorBalanceChannel
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The new value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstColorBalanceChannel::value-changed">
+<description>
+Fired when the value of the indicated channel has changed.
+
+</description>
+<parameters>
+<parameter name="channel">
+<parameter_description> The #GstColorBalanceChannel
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The new value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstDataQueue::empty">
+<description>
+Reports that the queue became empty (empty).
+A queue is empty if the total amount of visible items inside it (num-visible, time,
+size) is lower than the boundary values which can be set through the GObject
+properties.
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> the queue instance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstDataQueue::full">
+<description>
+Reports that the queue became full (full).
+A queue is full if the total amount of data inside it (num-visible, time,
+size) is higher than the boundary values which can be set through the GObject
+properties.
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> the queue instance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstDiscoverer::discovered">
+<description>
+Will be emitted when all information on a URI could be discovered.
+
+</description>
+<parameters>
+<parameter name="discoverer">
+<parameter_description> the #GstDiscoverer
+</parameter_description>
+</parameter>
+<parameter name="info">
+<parameter_description> the results #GstDiscovererInfo
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError, which will be non-NULL if an error
+occurred during discovery
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstDiscoverer::finished">
+<description>
+Will be emitted when all pending URIs have been processed.
+
+</description>
+<parameters>
+<parameter name="discoverer">
+<parameter_description> the #GstDiscoverer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstDiscoverer::starting">
+<description>
+Will be emitted when the discover starts analyzing the pending URIs
+
+</description>
+<parameters>
+<parameter name="discoverer">
+<parameter_description> the #GstDiscoverer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstElement::no-more-pads">
+<description>
+This signals that the element will not generate more dynamic pads.
+Note that this signal will usually be emitted from the context of
+the streaming thread.
+
+</description>
+<parameters>
+<parameter name="gstelement">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstElement::pad-added">
+<description>
+a new #GstPad has been added to the element. Note that this signal will
+usually be emitted from the context of the streaming thread. Also keep in
+mind that if you add new elements to the pipeline in the signal handler
+you will need to set them to the desired target state with
+gst_element_set_state() or gst_element_sync_state_with_parent().
+
+</description>
+<parameters>
+<parameter name="gstelement">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="new_pad">
+<parameter_description> the pad that has been added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstElement::pad-removed">
+<description>
+a #GstPad has been removed from the element
+
+</description>
+<parameters>
+<parameter name="gstelement">
+<parameter_description> the object which received the signal
+</parameter_description>
+</parameter>
+<parameter name="old_pad">
+<parameter_description> the pad that has been removed
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstIndex::entry-added">
+<description>
+Is emitted when a new entry is added to the index.
+
+</description>
+<parameters>
+<parameter name="gstindex">
+<parameter_description> the object which received the signal.
+</parameter_description>
+</parameter>
+<parameter name="arg1">
+<parameter_description> The entry added to the index.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstObject::deep-notify">
+<description>
+The deep notify signal is used to be notified of property changes. It is
+typically attached to the toplevel bin to receive notifications from all
+the elements contained in that bin.
+
+</description>
+<parameters>
+<parameter name="gstobject">
+<parameter_description> a #GstObject
+</parameter_description>
+</parameter>
+<parameter name="prop_object">
+<parameter_description> the object that originated the signal
+</parameter_description>
+</parameter>
+<parameter name="prop">
+<parameter_description> the property that changed
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstObject::object-saved">
+<description>
+Trigered whenever a new object is saved to XML. You can connect to this
+signal to insert custom XML tags into the core XML.
+
+</description>
+<parameters>
+<parameter name="gstobject">
+<parameter_description> a #GstObject
+</parameter_description>
+</parameter>
+<parameter name="xml_node">
+<parameter_description> the xmlNodePtr of the parent node
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstObject::parent-set">
+<description>
+Emitted when the parent of an object is set.
+
+</description>
+<parameters>
+<parameter name="gstobject">
+<parameter_description> a #GstObject
+</parameter_description>
+</parameter>
+<parameter name="parent">
+<parameter_description> the new parent
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstObject::parent-unset">
+<description>
+Emitted when the parent of an object is unset.
+
+</description>
+<parameters>
+<parameter name="gstobject">
+<parameter_description> a #GstObject
+</parameter_description>
+</parameter>
+<parameter name="parent">
+<parameter_description> the old parent
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstPad::have-data">
+<description>
+Signals that new data is available on the pad. This signal is used
+internally for implementing pad probes.
+See gst_pad_add_*_probe functions.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the pad that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="mini_obj">
+<parameter_description> new data
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE to keep the data, %FALSE to drop it
+</return>
+</signal>
+
+<signal name="GstPad::linked">
+<description>
+Signals that a pad has been linked to the peer pad.
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the pad that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="peer">
+<parameter_description> the peer pad that has been connected
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstPad::request-link">
+<description>
+Signals that a pad connection has been requested.
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the pad that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="peer">
+<parameter_description> the peer pad for which a connection is requested
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstPad::unlinked">
+<description>
+Signals that a pad has been unlinked from the peer pad.
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the pad that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="peer">
+<parameter_description> the peer pad that has been disconnected
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstPadTemplate::pad-created">
+<description>
+This signal is fired when an element creates a pad from this template.
+
+</description>
+<parameters>
+<parameter name="pad_template">
+<parameter_description> the object which received the signal.
+</parameter_description>
+</parameter>
+<parameter name="pad">
+<parameter_description> the pad that was created.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstPropertyProbe::probe-needed">
+<description>
+
+</description>
+<parameters>
+<parameter name="pspec">
+<parameter_description> #GParamSpec that needs a probe
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstRegistry::feature-added">
+<description>
+Signals that a feature has been added to the registry (possibly
+replacing a previously-added one by the same name)
+
+</description>
+<parameters>
+<parameter name="registry">
+<parameter_description> the registry that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="feature">
+<parameter_description> the feature that has been added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstRegistry::plugin-added">
+<description>
+Signals that a plugin has been added to the registry (possibly
+replacing a previously-added one by the same name)
+
+</description>
+<parameters>
+<parameter name="registry">
+<parameter_description> the registry that emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="plugin">
+<parameter_description> the plugin that has been added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstTuner::channel-changed">
+<description>
+Reports that the current #GstTunerChannel has changed.
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> The element providing the GstTuner interface
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The new configured channel.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstTuner::frequency-changed">
+<description>
+Reports that the current frequency has changed.
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> The element providing the GstTuner interface
+</parameter_description>
+</parameter>
+<parameter name="frequency">
+<parameter_description> The new frequency (an unsigned long)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstTuner::norm-changed">
+<description>
+Reports that the current #GstTunerNorm has changed.
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> The element providing the GstTuner interface
+</parameter_description>
+</parameter>
+<parameter name="norm">
+<parameter_description> The new configured norm.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstTuner::signal-changed">
+<description>
+Reports that the signal strength has changed.
+
+See Also: gst_tuner_signal_strength()
+
+</description>
+<parameters>
+<parameter name="tuner">
+<parameter_description> The element providing the GstTuner interface
+</parameter_description>
+</parameter>
+<parameter name="channel">
+<parameter_description> The current #GstTunerChannel
+</parameter_description>
+</parameter>
+<parameter name="signal">
+<parameter_description> The new signal strength (an integer)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstTunerChannel::frequency-changed">
+<description>
+Reports that the current frequency has changed.
+
+</description>
+<parameters>
+<parameter name="tunerchannel">
+<parameter_description> The #GstTunerChannel
+</parameter_description>
+</parameter>
+<parameter name="frequency">
+<parameter_description> The new frequency (an unsigned long)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstTunerChannel::signal-changed">
+<description>
+Reports that the signal strength has changed.
+
+See Also: gst_tuner_signal_strength()
+
+</description>
+<parameters>
+<parameter name="tunerchannel">
+<parameter_description> The #GstTunerChannel
+</parameter_description>
+</parameter>
+<parameter name="signal">
+<parameter_description> The new signal strength (an integer)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstURIHandler::new-uri">
+<description>
+The URI of the given @handler has changed.
+
+</description>
+<parameters>
+<parameter name="handler">
+<parameter_description> The #GstURIHandler which emitted the signal
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> The new URI, or NULL if the URI was removed
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<signal name="GstXML::object-loaded">
+<description>
+Signals that a new object has been deserialized.
+
+</description>
+<parameters>
+<parameter name="xml">
+<parameter_description> the xml persistence instance
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> the object that has been loaded
+</parameter_description>
+</parameter>
+<parameter name="xml_node">
+<parameter_description> the related xml_node pointer to the document tree
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <function name="gst_adapter_available">
 <description>
 Gets the maximum amount of bytes available, that is it returns the maximum
@@ -560,7 +1697,7 @@ Check if appsink will emit the &quot;new-preroll&quot; and &quot;new-buffer&quot
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @appsink is emiting the &quot;new-preroll&quot; and &quot;new-buffer&quot;
+<return> %TRUE if @appsink is emitting the &quot;new-preroll&quot; and &quot;new-buffer&quot;
 signals.
 
 </return>
@@ -607,7 +1744,7 @@ PLAYING state.
 <function name="gst_app_sink_pull_buffer">
 <description>
 This function blocks until a buffer or EOS becomes available or the appsink
-element is set to the READY/NULL state. 
+element is set to the READY/NULL state.
 
 This function will only return buffers when the appsink is in the PLAYING
 state. All rendered buffers will be put in a queue so that the application
@@ -616,7 +1753,7 @@ pull buffers fast enough, the queued buffers could consume a lot of memory,
 especially when dealing with raw video frames.
 
 If an EOS event was received before any buffers, this function returns
-%NULL. Use gst_app_sink_is_eos () to check for the EOS condition. 
+%NULL. Use gst_app_sink_is_eos () to check for the EOS condition.
 
 
 </description>
@@ -634,7 +1771,7 @@ If an EOS event was received before any buffers, this function returns
 <function name="gst_app_sink_pull_buffer_list">
 <description>
 This function blocks until a buffer list or EOS becomes available or the
-appsink element is set to the READY/NULL state. 
+appsink element is set to the READY/NULL state.
 
 This function will only return buffer lists when the appsink is in the
 PLAYING state. All rendered buffer lists will be put in a queue so that
@@ -644,7 +1781,7 @@ lists could consume a lot of memory, especially when dealing with raw
 video frames.
 
 If an EOS event was received before any buffer lists, this function returns
-%NULL. Use gst_app_sink_is_eos () to check for the EOS condition. 
+%NULL. Use gst_app_sink_is_eos () to check for the EOS condition.
 
 
 </description>
@@ -672,10 +1809,10 @@ Note that the preroll buffer will also be returned as the first buffer
 when calling gst_app_sink_pull_buffer().
 
 If an EOS event was received before any buffers, this function returns
-%NULL. Use gst_app_sink_is_eos () to check for the EOS condition. 
+%NULL. Use gst_app_sink_is_eos () to check for the EOS condition.
 
 This function blocks until a preroll buffer or EOS is received or the appsink
-element is set to the READY/NULL state. 
+element is set to the READY/NULL state.
 
 
 </description>
@@ -696,7 +1833,7 @@ Set callbacks which will be executed for each new preroll, new buffer and eos.
 This is an alternative to using the signals, it has lower overhead and is thus
 less expensive, but also less flexible.
 
-If callbacks are installed, no signals will be emited for performance
+If callbacks are installed, no signals will be emitted for performance
 reasons.
 
 
@@ -727,7 +1864,7 @@ reasons.
 Set the capabilities on the appsink element.  This function takes
 a copy of the caps structure. After calling this method, the sink will only
 accept caps that match @caps. If @caps is non-fixed, you must check the caps
-on the buffers to get the actual used caps. 
+on the buffers to get the actual used caps.
 
 
 </description>
@@ -854,7 +1991,7 @@ Check if appsrc will emit the &quot;new-preroll&quot; and &quot;new-buffer&quot;
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @appsrc is emiting the &quot;new-preroll&quot; and &quot;new-buffer&quot;
+<return> %TRUE if @appsrc is emitting the &quot;new-preroll&quot; and &quot;new-buffer&quot;
 signals.
 
 </return>
@@ -903,7 +2040,7 @@ Get the maximum amount of bytes that can be queued in @appsrc.
 <function name="gst_app_src_get_size">
 <description>
 Get the size of the stream in bytes. A value of -1 means that the size is
-not known. 
+not known.
 
 
 </description>
@@ -970,7 +2107,7 @@ been collected or when a seek should be performed.
 This is an alternative to using the signals, it has lower overhead and is thus
 less expensive, but also less flexible.
 
-If callbacks are installed, no signals will be emited for performance
+If callbacks are installed, no signals will be emitted for performance
 reasons.
 
 
@@ -1087,7 +2224,7 @@ After the maximum amount of bytes are queued, @appsrc will emit the
 <function name="gst_app_src_set_size">
 <description>
 Set the size of the stream in bytes. A value of -1 means that the size is
-not known. 
+not known.
 
 
 </description>
@@ -1109,7 +2246,7 @@ not known.
 Set the stream type on @appsrc. For seekable streams, the &quot;seek&quot; signal must
 be connected to.
 
-A stream_type stream 
+A stream_type stream
 
 
 </description>
@@ -1267,7 +2404,7 @@ Unref @queue and free the memory when the refcount reaches 0.
 
 <function name="gst_audio_buffer_clip">
 <description>
-Clip the the buffer to the given %GstSegment.
+Clip the buffer to the given %GstSegment.
 
 After calling this function the caller does not own a reference to 
 @buffer anymore.
@@ -1469,6 +2606,453 @@ the #GstClock object.
 <return></return>
 </function>
 
+<function name="gst_audio_decoder_finish_frame">
+<description>
+Collects decoded data and pushes it downstream.
+
+@buf may be NULL in which case the indicated number of frames
+are discarded and considered to have produced no output
+(e.g. lead-in or setup frames).
+Otherwise, source pad caps must be set when it is called with valid
+data in @buf.
+
+Note that a frame received in gst_audio_decoder_handle_frame() may be
+invalidated by a call to this function.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="buf">
+<parameter_description> decoded data
+</parameter_description>
+</parameter>
+<parameter name="frames">
+<parameter_description> number of decoded frames represented by decoded data
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn that should be escalated to caller (of caller)
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_audio_info">
+<description>
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstAudioInfo describing the input audio format
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_byte_time">
+<description>
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> currently configured byte to time conversion setting
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_delay">
+<description>
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> currently configured decoder delay
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_drainable">
+<description>
+Queries decoder drain handling.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if drainable handling is enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_latency">
+<description>
+Sets the variables pointed to by @min and @max to the currently configured
+latency.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> a pointer to storage to hold minimum latency
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> a pointer to storage to hold maximum latency
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_get_max_errors">
+<description>
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> currently configured decoder tolerated error count.
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_min_latency">
+<description>
+Queries decoder's latency aggregation.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> aggregation latency.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_needs_format">
+<description>
+Queries decoder required format handling.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if required format handling is enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_parse_state">
+<description>
+Return current parsing (sync and eos) state.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="sync">
+<parameter_description> a pointer to a variable to hold the current sync state
+</parameter_description>
+</parameter>
+<parameter name="eos">
+<parameter_description> a pointer to a variable to hold the current eos state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_get_plc">
+<description>
+Queries decoder packet loss concealment handling.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if packet loss concealment is enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_plc_aware">
+<description>
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> currently configured plc handling
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_get_tolerance">
+<description>
+Queries current audio jitter tolerance threshold.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> decoder audio jitter tolerance threshold.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_decoder_set_byte_time">
+<description>
+Allows baseclass to perform byte to time estimated conversion.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> whether to enable byte to time conversion
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_drainable">
+<description>
+Configures decoder drain handling.  If drainable, subclass might
+be handed a NULL buffer to have it return any leftover decoded data.
+Otherwise, it is not considered so capable and will only ever be passed
+real data.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_latency">
+<description>
+Sets decoder latency.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> minimum latency
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> maximum latency
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_max_errors">
+<description>
+Sets numbers of tolerated decoder errors, where a tolerated one is then only
+warned about, but more than tolerated will lead to fatal error.  Default
+is set to GST_AUDIO_DECODER_MAX_ERRORS.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> max tolerated errors
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_min_latency">
+<description>
+Sets decoder minimum aggregation latency.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> new minimum latency
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_needs_format">
+<description>
+Configures decoder format needs.  If enabled, subclass needs to be
+negotiated with format caps before it can process any data.  It will then
+never be handed any data before it has been configured.
+Otherwise, it might be handed data without having been configured and
+is then expected being able to do so either by default
+or based on the input data.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_plc">
+<description>
+Enable or disable decoder packet loss concealment, provided subclass
+and codec are capable and allow handling plc.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_plc_aware">
+<description>
+Indicates whether or not subclass handles packet loss concealment (plc).
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="plc">
+<parameter_description> new plc state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_tolerance">
+<description>
+Configures decoder audio jitter tolerance threshold.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="tolerance">
+<parameter_description> new tolerance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_audio_default_registry_mixer_filter">
 <description>
 Utility function to find audio mixer elements.
@@ -1522,6 +3106,531 @@ Calculate length in nanoseconds of audio buffer @buf based on capabilities of
 </return>
 </function>
 
+<function name="gst_audio_encoder_finish_frame">
+<description>
+Collects encoded data and pushes encoded data downstream.
+Source pad caps must be set when this is called.
+
+If @samples &lt; 0, then best estimate is all samples provided to encoder
+(subclass) so far.  @buf may be NULL, in which case next number of @samples
+are considered discarded, e.g. as a result of discontinuous transmission,
+and a discontinuity is marked.
+
+Note that samples received in gst_audio_encoder_handle_frame()
+may be invalidated by a call to this function.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> encoded data
+</parameter_description>
+</parameter>
+<parameter name="samples">
+<parameter_description> number of samples (per channel) represented by encoded data
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn that should be escalated to caller (of caller)
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_audio_info">
+<description>
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstAudioInfo describing the input audio format
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_drainable">
+<description>
+Queries encoder drain handling.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if drainable handling is enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_frame_max">
+<description>
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> currently configured maximum handled frames
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_frame_samples_min">
+<description>
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> currently maximum requested samples per frame
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_hard_min">
+<description>
+Queries encoder hard minimum handling.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if hard minimum handling is enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_hard_sync">
+<description>
+Queries encoder's hard resync setting.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if hard resync is enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_latency">
+<description>
+Sets the variables pointed to by @min and @max to the currently configured
+latency.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> a pointer to storage to hold minimum latency
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> a pointer to storage to hold maximum latency
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_get_lookahead">
+<description>
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> currently configured encoder lookahead
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_mark_granule">
+<description>
+Queries if the encoder will handle granule marking.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if granule marking is enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_perfect_timestamp">
+<description>
+Queries encoder perfect timestamp behaviour.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if perfect timestamp setting enabled.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_get_tolerance">
+<description>
+Queries current audio jitter tolerance threshold.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+</parameters>
+<return> encoder audio jitter tolerance threshold.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_merge_tags">
+<description>
+Adds tags to so-called pending tags, which will be processed
+before pushing out data downstream.
+
+Note that this is provided for convenience, and the subclass is
+not required to use this and can still do tag handling on its own,
+although it should be aware that baseclass already takes care
+of the usual CODEC/AUDIO_CODEC tags.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="tags">
+<parameter_description> a #GstTagList to merge
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> the #GstTagMergeMode to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_proxy_getcaps">
+<description>
+Returns caps that express @caps (or sink template caps if @caps == NULL)
+restricted to channel/rate combinations supported by downstream elements
+(e.g. muxers).
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> initial caps
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstCaps owned by caller
+
+</return>
+</function>
+
+<function name="gst_audio_encoder_set_drainable">
+<description>
+Configures encoder drain handling.  If drainable, subclass might
+be handed a NULL buffer to have it return any leftover encoded data.
+Otherwise, it is not considered so capable and will only ever be passed
+real data.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_frame_max">
+<description>
+Sets max number of frames accepted at once (assumed minimally 1).
+Requires @frame_samples_min and @frame_samples_max to be the equal.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> number of frames
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_frame_samples_max">
+<description>
+Sets number of samples (per channel) subclass needs to be handed,
+at most or will be handed all available if 0.
+
+If an exact number of samples is required, gst_audio_encoder_set_frame_samples_min()
+must be called with the same number.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> number of samples per frame
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_frame_samples_min">
+<description>
+Sets number of samples (per channel) subclass needs to be handed,
+at least or will be handed all available if 0.
+
+If an exact number of samples is required, gst_audio_encoder_set_frame_samples_max()
+must be called with the same number.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> number of samples per frame
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_hard_min">
+<description>
+Configures encoder hard minimum handling.  If enabled, subclass
+will never be handed less samples than it configured, which otherwise
+might occur near end-of-data handling.  Instead, the leftover samples
+will simply be discarded.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_hard_sync">
+<description>
+Sets encoder hard resync handling.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_latency">
+<description>
+Sets encoder latency.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="min">
+<parameter_description> minimum latency
+</parameter_description>
+</parameter>
+<parameter name="max">
+<parameter_description> maximum latency
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_lookahead">
+<description>
+Sets encoder lookahead (in units of input rate samples)
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="num">
+<parameter_description> lookahead
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_mark_granule">
+<description>
+Enable or disable encoder granule handling.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_perfect_timestamp">
+<description>
+Enable or disable encoder perfect output timestamp preference.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="enabled">
+<parameter_description> new state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_encoder_set_tolerance">
+<description>
+Configures encoder audio jitter tolerance threshold.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="enc">
+<parameter_description> a #GstAudioEncoder
+</parameter_description>
+</parameter>
+<parameter name="tolerance">
+<parameter_description> new tolerance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_audio_filter_class_add_pad_templates">
 <description>
 Convenience function to add pad templates to this element class, with
@@ -1566,6 +3675,42 @@ have no way to add default fixation functions for new GTypes.
 </parameters>
 <return> fixed values that the caller could use as a fixed
 set of #GstAudioChannelPosition values.
+</return>
+</function>
+
+<function name="gst_audio_format_convert">
+<description>
+Converts among various #GstFormat types.  This function handles
+GST_FORMAT_BYTES, GST_FORMAT_TIME, and GST_FORMAT_DEFAULT.  For
+raw audio, GST_FORMAT_DEFAULT corresponds to audio frames.  This
+function can be used to handle pad queries of the type GST_QUERY_CONVERT.
+
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GstAudioInfo
+</parameter_description>
+</parameter>
+<parameter name="src_format">
+<parameter_description> #GstFormat of the @src_value
+</parameter_description>
+</parameter>
+<parameter name="src_value">
+<parameter_description> value to convert
+</parameter_description>
+</parameter>
+<parameter name="dest_format">
+<parameter_description> #GstFormat of the @dest_value
+</parameter_description>
+</parameter>
+<parameter name="dest_value">
+<parameter_description> pointer to destination value
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the conversion was successful.
+
 </return>
 </function>
 
@@ -1624,6 +3769,101 @@ indeed &quot;fixed&quot; before calling this function.
 <return> a newly allocated array containing the channel
 positions as provided in the given #GstStructure. Returns
 NULL on error.
+</return>
+</function>
+
+<function name="gst_audio_iec61937_frame_size">
+<description>
+Calculated the size of the buffer expected by gst_audio_iec61937_payload() for
+payloading type from @spec.
+
+
+</description>
+<parameters>
+<parameter name="spec">
+<parameter_description> the ringbufer spec
+</parameter_description>
+</parameter>
+</parameters>
+<return> the size or 0 if the given @type is not supported or cannot be
+payloaded.
+
+</return>
+</function>
+
+<function name="gst_audio_iec61937_payload">
+<description>
+Payloads @src in the form specified by IEC 61937 for the type from @spec and
+stores the result in @dst. @src must contain exactly one frame of data and
+the frame is not checked for errors.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> a buffer containing the data to payload
+</parameter_description>
+</parameter>
+<parameter name="src_n">
+<parameter_description> size of @src in bytes
+</parameter_description>
+</parameter>
+<parameter name="dst">
+<parameter_description> the destination buffer to store the payloaded contents in. Should not
+overlap with @src
+</parameter_description>
+</parameter>
+<parameter name="dst_n">
+<parameter_description> size of @dst in bytes
+</parameter_description>
+</parameter>
+<parameter name="spec">
+<parameter_description> the ringbufer spec for @src
+</parameter_description>
+</parameter>
+</parameters>
+<return> transfer-full: %TRUE if the payloading was successful, %FALSE
+otherwise.
+
+</return>
+</function>
+
+<function name="gst_audio_info_from_caps">
+<description>
+Parse @caps and update @info.
+
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GstAudioInfo
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if @caps could be parsed
+
+</return>
+</function>
+
+<function name="gst_audio_info_to_caps">
+<description>
+Convert the values of @info into a #GstCaps.
+
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GstAudioInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GstCaps containing the
+info of @info.
+
 </return>
 </function>
 
@@ -1771,6 +4011,40 @@ buffer (see gst_object_set_parent()).
 </return>
 </function>
 
+<function name="gst_base_audio_sink_get_alignment_threshold">
+<description>
+Get the current alignment threshold, in nanoseconds, used by @sink.
+
+
+</description>
+<parameters>
+<parameter name="sink">
+<parameter_description> a #GstBaseAudioSink
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current alignment threshold used by @sink.
+
+</return>
+</function>
+
+<function name="gst_base_audio_sink_get_discont_wait">
+<description>
+Get the current discont wait, in nanoseconds, used by @sink.
+
+
+</description>
+<parameters>
+<parameter name="sink">
+<parameter_description> a #GstBaseAudioSink
+</parameter_description>
+</parameter>
+</parameters>
+<return> The current discont wait used by @sink.
+
+</return>
+</function>
+
 <function name="gst_base_audio_sink_get_drift_tolerance">
 <description>
 Get the current drift tolerance, in microseconds, used by @sink.
@@ -1821,6 +4095,44 @@ Get the current slave method used by @sink.
 <return> The current slave method used by @sink.
 
 </return>
+</function>
+
+<function name="gst_base_audio_sink_set_alignment_threshold">
+<description>
+Controls the sink's alignment threshold.
+
+
+</description>
+<parameters>
+<parameter name="sink">
+<parameter_description> a #GstBaseAudioSink
+</parameter_description>
+</parameter>
+<parameter name="alignment_threshold">
+<parameter_description> the new alignment threshold in nanoseconds
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_base_audio_sink_set_discont_wait">
+<description>
+Controls how long the sink will wait before creating a discontinuity.
+
+
+</description>
+<parameters>
+<parameter name="sink">
+<parameter_description> a #GstBaseAudioSink
+</parameter_description>
+</parameter>
+<parameter name="discont_wait">
+<parameter_description> the new discont wait in nanoseconds
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_base_audio_sink_set_drift_tolerance">
@@ -2232,6 +4544,31 @@ can be obtained following a seek.
 <return></return>
 </function>
 
+<function name="gst_base_parse_set_latency">
+<description>
+Sets the minimum and maximum (which may likely be equal) latency introduced
+by the parsing process.  If there is such a latency, which depends on the
+particular parsing of the format, it typically corresponds to 1 frame duration.
+
+
+</description>
+<parameters>
+<parameter name="parse">
+<parameter_description> a #GstBaseParse
+</parameter_description>
+</parameter>
+<parameter name="min_latency">
+<parameter_description> minimum parse latency
+</parameter_description>
+</parameter>
+<parameter name="max_latency">
+<parameter_description> maximum parse latency
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_base_parse_set_min_frame_size">
 <description>
 Subclass can use this function to tell the base class that it needs to
@@ -2259,9 +4596,9 @@ Set if the nature of the format or configuration does not allow (much)
 parsing, and the parser should operate in passthrough mode (which only
 applies when operating in push mode). That is, incoming buffers are
 pushed through unmodified, i.e. no @check_valid_frame or @parse_frame
-callbacks will be invoked, but @pre_push_buffer will still be invoked,
+callbacks will be invoked, but @pre_push_frame will still be invoked,
 so subclass can perform as much or as little is appropriate for
-passthrough semantics in @pre_push_buffer.
+passthrough semantics in @pre_push_frame.
 
 
 </description>
@@ -2821,8 +5158,8 @@ This function is mostly used by subclasses.
 <function name="gst_base_sink_set_async_enabled">
 <description>
 Configures @sink to perform all state changes asynchronusly. When async is
-disabled, the sink will immediatly go to PAUSED instead of waiting for a
-preroll buffer. This feature is usefull if the sink does not synchronize
+disabled, the sink will immediately go to PAUSED instead of waiting for a
+preroll buffer. This feature is useful if the sink does not synchronize
 against the clock or when it is dealing with sparse streams.
 
 
@@ -2951,7 +5288,7 @@ This function is usually called by subclasses.
 <function name="gst_base_sink_set_sync">
 <description>
 Configures @sink to synchronize on the clock or not. When
-@sync is FALSE, incomming samples will be played as fast as
+@sync is FALSE, incoming samples will be played as fast as
 possible. If @sync is TRUE, the timestamps of the incomming
 buffers will be used to schedule the exact render time of its
 contents.
@@ -3267,6 +5604,27 @@ sources.
 </parameter>
 <parameter name="timestamp">
 <parameter_description> enable or disable timestamping
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_base_src_set_dynamic_size">
+<description>
+If not @dynamic, size is only updated when needed, such as when trying to
+read past current tracked size.  Otherwise, size is checked for upon each
+read.
+
+
+</description>
+<parameters>
+<parameter name="src">
+<parameter_description> base source instance
+</parameter_description>
+</parameter>
+<parameter name="dynamic">
+<parameter_description> new dynamic size mode
 </parameter_description>
 </parameter>
 </parameters>
@@ -4617,6 +6975,27 @@ Returns NULL if there were no caps on this buffer.
 </return>
 </function>
 
+<function name="gst_buffer_get_qdata">
+<description>
+Get metadata structure for name quark @quark.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="quark">
+<parameter_description> name quark of data structure to find
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstStructure, or NULL if not found
+
+</return>
+</function>
+
 <function name="gst_buffer_is_metadata_writable">
 <description>
 Similar to gst_buffer_is_writable, but this only ensures that the
@@ -5186,6 +7565,34 @@ unreffed.
 <return></return>
 </function>
 
+<function name="gst_buffer_set_qdata">
+<description>
+Set metadata structure for name quark @quark to @data, or remove the
+existing metadata structure by that name in case @data is NULL.
+
+Takes ownership of @data.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="quark">
+<parameter_description> name quark of data structure to set or replace
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> a #GstStructure to store with the
+buffer, name must match @quark. Can be NULL to remove an existing
+structure. This function takes ownership of the structure passed.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_buffer_span">
 <description>
 Creates a new buffer that consists of part of buf1 and buf2.
@@ -5397,8 +7804,8 @@ This function may be called multiple times. To clean up, the caller is
 responsible for calling gst_bus_remove_signal_watch() as many times as this
 function is called.
 
-There can only be a single bus watch per bus, you most remove all signal watch
-before you can set another type of watch.
+There can only be a single bus watch per bus, you must remove any signal
+watch before you can set another type of watch.
 
 MT safe.
 
@@ -8798,6 +11205,29 @@ Examples of non-fixed types are GST_TYPE_INT_RANGE and GST_TYPE_LIST.
 </return>
 </function>
 
+<function name="gst_caps_is_strictly_equal">
+<description>
+Checks if the given caps are exactly the same set of caps.
+
+This function deals correctly with passing NULL for any of the caps.
+
+
+</description>
+<parameters>
+<parameter name="caps1">
+<parameter_description> a #GstCaps
+</parameter_description>
+</parameter>
+<parameter name="caps2">
+<parameter_description> another #GstCaps
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if both caps are strictly equal.
+
+</return>
+</function>
+
 <function name="gst_caps_is_subset">
 <description>
 Checks if all caps represented by @subset are also represented by @superset.
@@ -8817,6 +11247,28 @@ are included on one caps and omitted on the other.&lt;/note&gt;
 </parameter>
 </parameters>
 <return> %TRUE if @subset is a subset of @superset
+</return>
+</function>
+
+<function name="gst_caps_is_subset_structure">
+<description>
+Checks if @structure is a subset of @caps. See gst_caps_is_subset()
+for more information.
+
+
+</description>
+<parameters>
+<parameter name="caps">
+<parameter_description> a #GstCaps
+</parameter_description>
+</parameter>
+<parameter name="structure">
+<parameter_description> a potential #GstStructure subset of @caps
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @structure is a subset of @caps
+
 </return>
 </function>
 
@@ -8892,7 +11344,7 @@ structure is not copied; @caps becomes the owner of @structure.
 </description>
 <parameters>
 <parameter name="caps">
-<parameter_description> the #GstCaps that will the the new structure
+<parameter_description> the #GstCaps that will the new structure
 </parameter_description>
 </parameter>
 <parameter name="structure">
@@ -9216,11 +11668,11 @@ are included on one caps and omitted on the other.&lt;/note&gt;
 </description>
 <parameters>
 <parameter name="minuend">
-<parameter_description> #GstCaps to substract from
+<parameter_description> #GstCaps to subtract from
 </parameter_description>
 </parameter>
 <parameter name="subtrahend">
-<parameter_description> #GstCaps to substract
+<parameter_description> #GstCaps to subtract
 </parameter_description>
 </parameter>
 </parameters>
@@ -9289,7 +11741,7 @@ either @caps1 and @caps2.
 
 <function name="gst_caps_unref">
 <description>
-Unref a #GstCaps and and free all its structures and the
+Unref a #GstCaps and free all its structures and the
 structures' values when the refcount reaches 0.
 
 </description>
@@ -9544,7 +11996,7 @@ MT safe.
 <function name="gst_child_proxy_get_property">
 <description>
 Gets a single property using the GstChildProxy mechanism.
-You are responsible for for freeing it by calling g_value_unset()
+You are responsible for freeing it by calling g_value_unset()
 
 </description>
 <parameters>
@@ -10551,6 +13003,23 @@ same format as for gst_codec_utils_h264_get_profile().
 </return>
 </function>
 
+<function name="gst_codec_utils_h264_get_level_idc">
+<description>
+Transform a level string from the caps into the level_idc
+
+
+</description>
+<parameters>
+<parameter name="level">
+<parameter_description> A level string from caps
+</parameter_description>
+</parameter>
+</parameters>
+<return> the level_idc or 0 if the level is unknown
+
+</return>
+</function>
+
 <function name="gst_codec_utils_h264_get_profile">
 <description>
 Converts the profile indication (profile_idc) in the stream's
@@ -10660,6 +13129,691 @@ object sequence start code. Only the first byte
 </parameters>
 <return> The profile as a const string, or NULL if there is an error.
 
+</return>
+</function>
+
+<function name="gst_collect_pads2_add_pad">
+<description>
+Add a pad to the collection of collect pads. The pad has to be
+a sinkpad. The refcount of the pad is incremented. Use
+gst_collect_pads2_remove_pad() to remove the pad from the collection
+again.
+
+You specify a size for the returned #GstCollectData2 structure
+so that you can use it to store additional information.
+
+The pad will be automatically activated in push mode when @pads is
+started.
+
+This function calls gst_collect_pads2_add_pad() passing a value of NULL
+for destroy_notify and TRUE for locked.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="pad">
+<parameter_description> the pad to add
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the size of the returned #GstCollectData2 structure
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstCollectData2 to identify the new pad. Or NULL
+if wrong parameters are supplied.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_add_pad_full">
+<description>
+Add a pad to the collection of collect pads. The pad has to be
+a sinkpad. The refcount of the pad is incremented. Use
+gst_collect_pads2_remove_pad() to remove the pad from the collection
+again.
+
+You specify a size for the returned #GstCollectData2 structure
+so that you can use it to store additional information.
+
+You can also specify a #GstCollectData2DestroyNotify that will be called
+just before the #GstCollectData2 structure is freed. It is passed the
+pointer to the structure and should free any custom memory and resources
+allocated for it.
+
+Keeping a pad locked in waiting state is only relevant when using
+the default collection algorithm (providing the oldest buffer).
+It ensures a buffer must be available on this pad for a collection
+to take place.  This is of typical use to a muxer element where
+non-subtitle streams should always be in waiting state,
+e.g. to assure that caps information is available on all these streams
+when initial headers have to be written.
+
+The pad will be automatically activated in push mode when @pads is
+started.
+
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="pad">
+<parameter_description> the pad to add
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the size of the returned #GstCollectData2 structure
+</parameter_description>
+</parameter>
+<parameter name="destroy_notify">
+<parameter_description> function to be called before the returned #GstCollectData2
+structure is freed
+</parameter_description>
+</parameter>
+<parameter name="lock">
+<parameter_description> whether to lock this pad in usual waiting state
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstCollectData2 to identify the new pad. Or NULL
+if wrong parameters are supplied.
+
+MT safe.
+</return>
+</function>
+
+<function name="gst_collect_pads2_available">
+<description>
+Query how much bytes can be read from each queued buffer. This means
+that the result of this call is the maximum number of bytes that can
+be read from each of the pads.
+
+This function should be called with @pads STREAM_LOCK held, such as
+in the callback.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to query
+</parameter_description>
+</parameter>
+</parameters>
+<return> The maximum number of bytes queued on all pads. This function
+returns 0 if a pad has no queued buffer.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_collect">
+<description>
+Collect data on all pads. This function is usually called
+from a #GstTask function in an element. 
+
+This function is currently not implemented.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GstFlowReturn of the operation.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_collect_range">
+<description>
+Collect data with @offset and @length on all pads. This function
+is typically called in the getrange function of an element. 
+
+This function is currently not implemented.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the offset to collect
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length to collect
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GstFlowReturn of the operation.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_find_best_pad">
+<description>
+Find the oldest/best pad, i.e. pad holding the oldest buffer and
+and return the corresponding #GstCollectData2 and buffertime.
+
+This function should be called with STREAM_LOCK held,
+such as in the callback.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectpads to use
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> returns the collectdata for earliest data
+</parameter_description>
+</parameter>
+<parameter name="time">
+<parameter_description> returns the earliest available buffertime
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_flush">
+<description>
+Flush @size bytes from the pad @data.
+
+This function should be called with @pads STREAM_LOCK held, such as
+in the callback.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to query
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to use
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the number of bytes to flush
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of bytes flushed This can be less than @size and
+is 0 if the pad was end-of-stream.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_is_active">
+<description>
+Check if a pad is active.
+
+This function is currently not implemented.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="pad">
+<parameter_description> the pad to check
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the pad is active.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_new">
+<description>
+Create a new instance of #GstCollectsPads.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GstCollectPads2, or NULL in case of an error.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_peek">
+<description>
+Peek at the buffer currently queued in @data. This function
+should be called with the @pads STREAM_LOCK held, such as in the callback
+handler.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to peek
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to use
+</parameter_description>
+</parameter>
+</parameters>
+<return> The buffer in @data or NULL if no buffer is queued.
+should unref the buffer after usage.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_pop">
+<description>
+Pop the buffer currently queued in @data. This function
+should be called with the @pads STREAM_LOCK held, such as in the callback
+handler.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to pop
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to use
+</parameter_description>
+</parameter>
+</parameters>
+<return> The buffer in @data or NULL if no buffer was queued.
+You should unref the buffer after usage.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_read">
+<description>
+Get a pointer in @bytes where @size bytes can be read from the
+given pad data.
+
+This function should be called with @pads STREAM_LOCK held, such as
+in the callback.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to query
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to use
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> a pointer to a byte array
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the number of bytes to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of bytes available for consumption in the
+memory pointed to by @bytes. This can be less than @size and
+is 0 if the pad is end-of-stream.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_read_buffer">
+<description>
+Get a subbuffer of @size bytes from the given pad @data.
+
+This function should be called with @pads STREAM_LOCK held, such as in the
+callback.
+
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to query
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to use
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the number of bytes to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> A sub buffer. The size of the buffer can be less that requested.
+A return of NULL signals that the pad is end-of-stream.
+Unref the buffer after use.
+
+MT safe.
+</return>
+</function>
+
+<function name="gst_collect_pads2_remove_pad">
+<description>
+Remove a pad from the collection of collect pads. This function will also
+free the #GstCollectData2 and all the resources that were allocated with
+gst_collect_pads2_add_pad().
+
+The pad will be deactivated automatically when @pads is stopped.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="pad">
+<parameter_description> the pad to remove
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the pad could be removed.
+
+MT safe.
+
+</return>
+</function>
+
+<function name="gst_collect_pads2_set_buffer_function">
+<description>
+Set the callback function and user data that will be called with
+the oldest buffer when all pads have been collected.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectpads to use
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> the function to set
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_set_clip_function">
+<description>
+Install a clipping function that is called right after a buffer is received
+on a pad managed by @pads. See #GstCollectPad2ClipFunction for more info.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="clipfunc">
+<parameter_description> clip function to install
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @clip_func
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_set_compare_function">
+<description>
+Set the timestamp comparison function.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the pads to use
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> the function to set
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_set_event_function">
+<description>
+Set the event callback function and user data that will be called after
+collectpads has processed and event originating from one of the collected
+pads.  If the event being processed is a serialized one, this callback is
+called with @pads STREAM_LOCK held, otherwise not.  As this lock should be
+held when calling a number of CollectPads functions, it should be acquired
+if so (unusually) needed.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> the function to set
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_set_flushing">
+<description>
+Change the flushing state of all the pads in the collection. No pad
+is able to accept anymore data when @flushing is %TRUE. Calling this
+function with @flushing %FALSE makes @pads accept data again.
+Caller must ensure that downstream streaming (thread) is not blocked,
+e.g. by sending a FLUSH_START downstream.
+
+MT safe.
+
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="flushing">
+<parameter_description> desired state of the pads
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_set_function">
+<description>
+CollectPads provides a default collection algorithm that will determine
+the oldest buffer available on all of its pads, and then delegate
+to a configured callback.
+However, if circumstances are more complicated and/or more control
+is desired, this sets a callback that will be invoked instead when
+all the pads added to the collection have buffers queued.
+Evidently, this callback is not compatible with
+gst_collect_pads2_set_buffer_function() callback.
+If this callback is set, the former will be unset.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> the function to set
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_set_waiting">
+<description>
+Sets a pad to waiting or non-waiting mode, if at least this pad
+has not been created with locked waiting state,
+in which case nothing happens.
+
+This function should be called with @pads STREAM_LOCK held, such as
+in the callback.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to use
+</parameter_description>
+</parameter>
+<parameter name="waiting">
+<parameter_description> boolean indicating whether this pad should operate
+in waiting or non-waiting mode
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_start">
+<description>
+Starts the processing of data in the collect_pads2.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_stop">
+<description>
+Stops the processing of data in the collect_pads2. this function
+will also unblock any blocking operations.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_collect_pads2_take_buffer">
+<description>
+Get a subbuffer of @size bytes from the given pad @data. Flushes the amount
+of read bytes.
+
+This function should be called with @pads STREAM_LOCK held, such as in the
+callback.
+
+
+
+</description>
+<parameters>
+<parameter name="pads">
+<parameter_description> the collectspads to query
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to use
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the number of bytes to read
+</parameter_description>
+</parameter>
+</parameters>
+<return> A sub buffer. The size of the buffer can be less that requested.
+A return of NULL signals that the pad is end-of-stream.
+Unref the buffer after use.
+
+MT safe.
 </return>
 </function>
 
@@ -11203,8 +14357,8 @@ Get the #GstColorBalanceType of this implementation.
 Retrieve the current value of the indicated channel, between min_value
 and max_value.
 
-See Also: The #GstColorBalanceChannel::min_value and
-#GstColorBalanceChannel::max_value members of the
+See Also: The #GstColorBalanceChannel.min_value and
+#GstColorBalanceChannel.max_value members of the
 #GstColorBalanceChannel object.
 
 
@@ -11246,8 +14400,8 @@ be freed.
 Sets the current value of the channel to the passed value, which must
 be between min_value and max_value.
 
-See Also: The #GstColorBalanceChannel::min_value and
-#GstColorBalanceChannel::max_value members of the
+See Also: The #GstColorBalanceChannel.min_value and
+#GstColorBalanceChannel.max_value members of the
 #GstColorBalanceChannel object.
 
 </description>
@@ -13156,6 +16310,21 @@ After this call GStreamer (including this method) should not be used anymore.
 </return>
 </function>
 
+<function name="gst_discoverer_audio_info_get_language">
+<description>
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GstDiscovererAudioInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> the language of the stream, or NULL if unknown.
+
+</return>
+</function>
+
 <function name="gst_discoverer_audio_info_get_max_bitrate">
 <description>
 
@@ -13253,7 +16422,7 @@ afterwards.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @uri was succesfully appended to the list of pending
+<return> %TRUE if the @uri was successfully appended to the list of pending
 uris, else %FALSE
 
 </return>
@@ -13354,7 +16523,7 @@ gst_discoverer_stream_info_list_free().
 </parameter_description>
 </parameter>
 </parameters>
-<return> the wheter the URI is seekable.
+<return> the whether the URI is seekable.
 
 </return>
 </function>
@@ -13418,6 +16587,25 @@ gst_discoverer_stream_info_list_free().
 </return>
 </function>
 
+<function name="gst_discoverer_info_get_subtitle_streams">
+<description>
+Finds all the #GstDiscovererSubtitleInfo contained in @info
+
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GstDiscovererInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GList of
+matching #GstDiscovererStreamInfo. The caller should free it with
+gst_discoverer_stream_info_list_free().
+
+</return>
+</function>
+
 <function name="gst_discoverer_info_get_tags">
 <description>
 
@@ -13428,7 +16616,7 @@ gst_discoverer_stream_info_list_free().
 </parameter_description>
 </parameter>
 </parameters>
-<return> all tags contained in the %URI. If you wish to use
+<return> all tags contained in the URI. If you wish to use
 the tags after the life-time of @info, you will need to copy them.
 
 </return>
@@ -13703,6 +16891,21 @@ Decrements the reference count of @info.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_discoverer_subtitle_info_get_language">
+<description>
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GstDiscovererSubtitleInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> the language of the stream, or NULL if unknown.
+
+</return>
 </function>
 
 <function name="gst_discoverer_video_info_get_bitrate">
@@ -14315,6 +17518,27 @@ functions of classes.
 <return></return>
 </function>
 
+<function name="gst_element_class_add_static_pad_template">
+<description>
+Adds a padtemplate to an element class. This is mainly used in the _base_init
+functions of classes.
+
+
+</description>
+<parameters>
+<parameter name="klass">
+<parameter_description> the #GstElementClass to add the pad template to.
+</parameter_description>
+</parameter>
+<parameter name="templ">
+<parameter_description> a #GstStaticPadTemplate describing the pad
+to add to the element class.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_element_class_get_pad_template">
 <description>
 Retrieves a padtemplate from @element_class with the given name.
@@ -14525,7 +17749,7 @@ MT safe.
 <function name="gst_element_create_all_pads">
 <description>
 Creates a pad for each pad template that is always available.
-This function is only useful during object intialization of
+This function is only useful during object initialization of
 subclasses of #GstElement.
 
 </description>
@@ -14680,7 +17904,8 @@ their first argument.
 </parameter_description>
 </parameter>
 <parameter name="name">
-<parameter_description> name of new element
+<parameter_description> name of new element, or NULL to automatically create
+a unique name
 </parameter_description>
 </parameter>
 </parameters>
@@ -14977,7 +18202,7 @@ usage.
 
 <function name="gst_element_factory_list_is_type">
 <description>
-Check if @factory if of the given types.
+Check if @factory is of the given types.
 
 
 </description>
@@ -15011,7 +18236,8 @@ If name is given, it will be given the name supplied.
 </parameter_description>
 </parameter>
 <parameter name="name">
-<parameter_description> name of new element
+<parameter_description> name of new element, or NULL to automatically create
+a unique name
 </parameter_description>
 </parameter>
 </parameters>
@@ -15289,8 +18515,8 @@ MT safe.
 
 <function name="gst_element_get_request_pad">
 <description>
-Retrieves a pad from the element by name. This version only retrieves
-request pads. The pad should be released with
+Retrieves a pad from the element by name (e.g. &quot;src_\%d&quot;). This version only
+retrieves request pads. The pad should be released with
 gst_element_release_request_pad().
 
 This method is slow and will be deprecated in the future. New code should
@@ -15478,8 +18704,9 @@ MT safe.
 
 <function name="gst_element_iterate_pads">
 <description>
-Retrieves an iterattor of @element's pads. The iterator should
-be freed after usage.
+Retrieves an iterator of @element's pads. The iterator should
+be freed after usage. Also more specialized iterators exists such as
+gst_element_iterate_src_pads() or gst_element_iterate_sink_pads().
 
 
 </description>
@@ -15539,7 +18766,7 @@ MT safe.
 Links @src to @dest. The link must be from source to
 destination; the other direction will not be tried. The function looks for
 existing pads that aren't linked yet. It will request new pads if necessary.
-Such pads need to be released manualy when unlinking.
+Such pads need to be released manually when unlinking.
 If multiple links are possible, only one is established.
 
 Make sure you have added your elements to a bin or pipeline with
@@ -16170,6 +19397,8 @@ MT safe.
 <function name="gst_element_request_pad">
 <description>
 Retrieves a request pad from the element according to the provided template.
+Pad templates can be looked up using
+gst_element_factory_get_static_pad_templates().
 
 If the @caps are specified and the element implements thew new
 request_new_pad_full virtual method, the element will use them to select
@@ -16833,6 +20062,25 @@ Find the #GstEncodingProfile with the specified name and category.
 </return>
 </function>
 
+<function name="gst_encoding_profile_from_discoverer">
+<description>
+Creates a #GstEncodingProfile matching the formats from the given
+#GstEncodingProfile. Streams other than audio or video (eg,
+subtitles), are currently ignored.
+
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> The #GstDiscovererInfo to read from
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new #GstEncodingProfile or %NULL.
+
+</return>
+</function>
+
 <function name="gst_encoding_profile_get_description">
 <description>
 
@@ -17443,7 +20691,7 @@ you may set it to 0 (the default value).
 
 <function name="gst_encoding_video_profile_set_variableframerate">
 <description>
-If set to %TRUE, then the incoming streamm will be allowed to have non-constant
+If set to %TRUE, then the incoming stream will be allowed to have non-constant
 framerate. If set to %FALSE (default value), then the incoming stream will
 be normalized by dropping/duplicating frames in order to produce a
 constance framerate.
@@ -17496,7 +20744,7 @@ practice to make this correspondence when possible, though it is not
 required.
 
 Note that events and messages share the same sequence number incrementor;
-two events or messages will never not have the same sequence number unless
+two events or messages will never have the same sequence number unless
 that correspondence was made explicitly.
 
 
@@ -17561,7 +20809,7 @@ check the name of a custom event.
 Create a new buffersize event. The event is sent downstream and notifies
 elements that they should provide a buffer of the specified dimensions.
 
-When the @async flag is set, a thread boundary is prefered.
+When the @async flag is set, a thread boundary is preferred.
 
 
 </description>
@@ -18026,8 +21274,9 @@ Create a new step event. The purpose of the step event is to instruct a sink
 to skip @amount (expressed in @format) of media. It can be used to implement
 stepping through the video frame by frame or for doing fast trick modes.
 
-A rate of &lt;= 0.0 is not allowed, pause the pipeline or reverse the playback
-direction of the pipeline to get the same effect.
+A rate of &lt;= 0.0 is not allowed. Pause the pipeline, for the effect of rate
+= 0.0 or first reverse the direction of playback using a seek event to get
+the same effect as rate &lt; 0.0.
 
 The @flush flag will clear any pending data in the pipeline before starting
 the step operation.
@@ -19187,6 +22436,48 @@ See if the given format is inside the format array.
 </return>
 </function>
 
+<function name="gst_ghost_pad_activate_pull_default">
+<description>
+Invoke the default activate pull function of a ghost pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to activate or deactivate.
+</parameter_description>
+</parameter>
+<parameter name="active">
+<parameter_description> whether the pad should be active or not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the operation was successful.
+
+</return>
+</function>
+
+<function name="gst_ghost_pad_activate_push_default">
+<description>
+Invoke the default activate push function of a ghost pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to activate or deactivate.
+</parameter_description>
+</parameter>
+<parameter name="active">
+<parameter_description> whether the pad should be active or not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the operation was successful.
+
+</return>
+</function>
+
 <function name="gst_ghost_pad_construct">
 <description>
 Finish initialization of a newly allocated ghost pad.
@@ -19223,6 +22514,71 @@ Get the target pad of @gpad. Unref target pad after usage.
 </parameters>
 <return> the target #GstPad, can be NULL if the ghostpad
 has no target set. Unref target pad after usage.
+</return>
+</function>
+
+<function name="gst_ghost_pad_internal_activate_pull_default">
+<description>
+Invoke the default activate pull function of a proxy pad that is
+owned by a ghost pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to activate or deactivate.
+</parameter_description>
+</parameter>
+<parameter name="active">
+<parameter_description> whether the pad should be active or not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the operation was successful.
+
+</return>
+</function>
+
+<function name="gst_ghost_pad_internal_activate_push_default">
+<description>
+Invoke the default activate push function of a proxy pad that is
+owned by a ghost pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to activate or deactivate.
+</parameter_description>
+</parameter>
+<parameter name="active">
+<parameter_description> whether the pad should be active or not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the operation was successful.
+
+</return>
+</function>
+
+<function name="gst_ghost_pad_link_default">
+<description>
+Invoke the default link function of a ghost pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to link.
+</parameter_description>
+</parameter>
+<parameter name="peer">
+<parameter_description> the #GstPad peer
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GstPadLinkReturn of the operation
+
 </return>
 </function>
 
@@ -19364,6 +22720,42 @@ NULL the target will be cleared.
 <return> TRUE if the new target could be set. This function
 can return FALSE when the internal pads could not be linked.
 </return>
+</function>
+
+<function name="gst_ghost_pad_setcaps_default">
+<description>
+Invoke the default setcaps function of a ghost pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to link.
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> the #GstCaps to set
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the operation was successful
+
+</return>
+</function>
+
+<function name="gst_ghost_pad_unlink_default">
+<description>
+Invoke the default unlink function of a ghost pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to link.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_implements_interface_cast">
@@ -20943,7 +24335,7 @@ is considered good practice to make this correspondence when possible, though
 it is not required.
 
 Note that events and messages share the same sequence number incrementor;
-two events or messages will never not have the same sequence number unless
+two events or messages will never have the same sequence number unless
 that correspondence was made explicitly.
 
 
@@ -22892,7 +26284,7 @@ to stay alive).
 
 </description>
 <parameters>
-<parameter name="mini_object">
+<parameter name="object">
 <parameter_description> #GstMiniObject to reference weakly
 </parameter_description>
 </parameter>
@@ -22915,7 +26307,7 @@ Removes a weak reference callback to a mini object.
 
 </description>
 <parameters>
-<parameter name="mini_object">
+<parameter name="object">
 <parameter_description> #GstMiniObject to remove a weak reference from
 </parameter_description>
 </parameter>
@@ -23571,7 +26963,7 @@ a notification message on the bus indicating that the list of possible
 options of a given options object has changed.
 
 The new options are not contained in the message on purpose. Applications
-should call gst_mixer_option_get_values() on @opts to make @opts update
+should call gst_mixer_options_get_values() on @opts to make @opts update
 its internal state and obtain the new list of values.
 
 This function only works for GstElements that are implementing the
@@ -23879,7 +27271,7 @@ the #GstNavigationMessageType identifying the type of the message if so.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The type of the #GstNavigationMessage, or
+<return> The type of the #GstMessage, or
 #GST_NAVIGATION_MESSAGE_INVALID if the message is not a #GstNavigation
 notification.
 
@@ -24556,7 +27948,7 @@ Get the type of address stored in @naddr.
 Set just the address bytes stored in @naddr into @address.
 
 Note that @port must be expressed in network byte order, use g_htons() to
-convert it to network byte order order. IP4 address bytes must also be
+convert it to network byte order. IP4 address bytes must also be
 stored in network byte order.
 
 
@@ -25077,6 +28469,8 @@ function.
 
 Make sure not to LOCK @oldobj because it might be unreffed
 which could cause a deadlock when it is disposed.
+
+Since 0.10.36, this function operates atomically.
 
 </description>
 <parameters>
@@ -25781,7 +29175,7 @@ MT safe.
 <function name="gst_pad_can_link">
 <description>
 Checks if the source pad and the sink pad are compatible so they can be
-linked. 
+linked.
 
 
 </description>
@@ -25947,7 +29341,7 @@ Multi-sinkpad elements should implement custom event handlers.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the event was sent succesfully.
+<return> TRUE if the event was sent successfully.
 </return>
 </function>
 
@@ -26104,7 +29498,7 @@ Not MT safe.
 Deprecated: This function does not ref the pads in the list so that they
 could become invalid by the time the application accesses them. It's also
 possible that the list changes while handling the pads, which the caller of
-this function is unable to know. Use the thread-safe 
+this function is unable to know. Use the thread-safe
 gst_pad_iterate_internal_links() instead.
 
 </description>
@@ -26132,7 +29526,7 @@ The caller must free this list after use with g_list_free().
 Deprecated: This function does not ref the pads in the list so that they
 could become invalid by the time the application accesses them. It's also
 possible that the list changes while handling the pads, which the caller of
-this function is unable to know. Use the thread-safe 
+this function is unable to know. Use the thread-safe
 gst_pad_iterate_internal_links_default() instead.
 
 </description>
@@ -26290,7 +29684,7 @@ query types function.
 <function name="gst_pad_get_range">
 <description>
 When @pad is flushing this function returns #GST_FLOW_WRONG_STATE
-immediatly and @buffer is %NULL.
+immediately and @buffer is %NULL.
 
 Calls the getrange function of @pad, see #GstPadGetRangeFunction for a
 description of a getrange function. If @pad has no getrange function
@@ -26740,7 +30134,7 @@ the proxy setcaps fails. May be used only during negotiation.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if sucessful
+<return> TRUE if successful
 </return>
 </function>
 
@@ -26983,7 +30377,7 @@ Multi-sinkpad elements should implement custom query handlers.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the query was performed succesfully.
+<return> TRUE if the query was performed successfully.
 </return>
 </function>
 
@@ -27471,7 +30865,7 @@ operation succeeds
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the pad could be blocked. This function can fail if the
+<return> %TRUE if the pad could be blocked. This function can fail if the
 wrong parameters were passed or the pad was already in the requested state.
 
 MT safe.
@@ -28832,7 +32226,7 @@ codec libraries are currently installed.
 </parameter_description>
 </parameter>
 <parameter name="env_vars">
-<parameter_description> NULL-terminated array of environent variables affecting the
+<parameter_description> NULL-terminated array of environment variables affecting the
 feature set of the plugin (e.g. an environment variable containing
 paths where to look for additional modules/plugins of a library),
 or NULL. Environment variable names may be followed by a path component
@@ -28884,7 +32278,7 @@ arguments separated by predefined delimiters (see above).
 </parameter_description>
 </parameter>
 <parameter name="env_vars">
-<parameter_description> one or more environent variables (separated by ':', ';' or ','),
+<parameter_description> one or more environment variables (separated by ':', ';' or ','),
 or NULL. Environment variable names may be followed by a path component
 which will be added to the content of the environment variable, e.g.
 &quot;HOME/.mystuff/plugins:MYSTUFF_PLUGINS_PATH&quot;
@@ -30171,6 +33565,20 @@ Delete the given preset.
 </return>
 </function>
 
+<function name="gst_preset_get_app_dir">
+<description>
+Gets the directory for application specific presets if set by the
+application.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the directory or %NULL, don't free or modify the string
+
+</return>
+</function>
+
 <function name="gst_preset_get_meta">
 <description>
 Gets the @value for an existing meta data @tag. Meta data @tag names can be
@@ -30307,6 +33715,25 @@ is already a preset by this @name it will be overwritten.
 </return>
 </function>
 
+<function name="gst_preset_set_app_dir">
+<description>
+Sets an extra directory as an absolute path that should be considered when
+looking for presets. Any presets in the application dir will shadow the 
+system presets.
+
+
+</description>
+<parameters>
+<parameter name="app_dir">
+<parameter_description> the application specific preset dir
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE for success, %FALSE if the dir already has been set
+
+</return>
+</function>
+
 <function name="gst_preset_set_meta">
 <description>
 Sets a new @value for an existing meta data item or adds a new item. Meta
@@ -30396,8 +33823,8 @@ Get a list of properties for which probing is supported.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the list of properties for which probing is supported
-by this element.
+<return> the list of #GParamSpec * pointers representing 
+properties for which probing is supported by this element.
 </return>
 </function>
 
@@ -30584,6 +34011,272 @@ Runs a probe on the property specified by @name.
 <return></return>
 </function>
 
+<function name="gst_proxy_pad_acceptcaps_default">
+<description>
+Invoke the default acceptcaps function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GstPad to check
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps to check on the pad
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the pad can accept the caps.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_bufferalloc_default">
+<description>
+Invoke the default bufferalloc function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a source #GstPad
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the offset of the new buffer in the stream
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> the size of the new buffer
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> the caps of the new buffer
+</parameter_description>
+</parameter>
+<parameter name="buf">
+<parameter_description> a newly allocated buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> a result code indicating success of the operation. Any
+result code other than #GST_FLOW_OK is an error and @buf should
+not be used.
+An error can occur if the pad is not connected or when the downstream
+peer elements cannot provide an acceptable buffer.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_chain_default">
+<description>
+Invoke the default chain function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a sink #GstPad, returns GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> the #GstBuffer to send, return GST_FLOW_ERROR
+if not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn from the pad.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_chain_list_default">
+<description>
+Invoke the default chain list function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a sink #GstPad, returns GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+<parameter name="list">
+<parameter_description> the #GstBufferList to send, return GST_FLOW_ERROR
+if not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn from the pad.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_checkgetrange_default">
+<description>
+Invoke the default checkgetrange function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a src #GstPad, returns #GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gboolean from the pad.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_event_default">
+<description>
+Invoke the default event of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GstPad to push the event to.
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> the #GstEvent to send to the pad.
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the event was handled.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_fixatecaps_default">
+<description>
+Invoke the default fixatecaps function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a  #GstPad to fixate
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> the  #GstCaps to fixate
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_proxy_pad_get_internal">
+<description>
+Get the internal pad of @pad. Unref target pad after usage.
+
+The internal pad of a #GstGhostPad is the internally used
+pad of opposite direction, which is used to link to the target.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstProxyPad
+</parameter_description>
+</parameter>
+</parameters>
+<return> the target #GstProxyPad, can be NULL.
+Unref target pad after usage.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_get_range_default">
+<description>
+Invoke the default getrange function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a src #GstPad, returns #GST_FLOW_ERROR if not.
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> The start offset of the buffer
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> The length of the buffer
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a pointer to hold the #GstBuffer,
+returns #GST_FLOW_ERROR if %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn from the pad.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_getcaps_default">
+<description>
+Invoke the default getcaps function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a  #GstPad to get the capabilities of.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the caps of the pad with incremented ref-count
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_query_default">
+<description>
+Invoke the default query function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GstPad to invoke the default query on.
+</parameter_description>
+</parameter>
+<parameter name="query">
+<parameter_description> the #GstQuery to perform.
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the query could be performed.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_query_type_default">
+<description>
+Invoke the default query type handler of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GstPad.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a zero-terminated array
+of #GstQueryType.
+
+</return>
+</function>
+
 <function name="gst_proxy_pad_save_thyself">
 <description>
 Saves the ghost pad into an xml representation.
@@ -30601,6 +34294,61 @@ Saves the ghost pad into an xml representation.
 </parameter>
 </parameters>
 <return> the #xmlNodePtr representation of the pad.
+</return>
+</function>
+
+<function name="gst_proxy_pad_setcaps_default">
+<description>
+Invoke the default setcaps function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a  #GstPad to set the capabilities of.
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the caps could be set. FALSE if the caps were not fixed
+or bad parameters were provided to this function.
+
+</return>
+</function>
+
+<function name="gst_proxy_pad_unlink_default">
+<description>
+Invoke the default unlink function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GstPad to unlink
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_proyx_pad_iterate_internal_links_default">
+<description>
+Invoke the default iterate internal links function of the proxy pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> the #GstPad to get the internal links of.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstIterator of #GstPad, or NULL if @pad has no parent. Unref each
+returned pad with gst_object_unref().
+
 </return>
 </function>
 
@@ -32330,7 +36078,7 @@ should be skipped on error, but it is not fatal.
 <function name="gst_riff_parse_strf_iavs">
 <description>
 Parses a interleaved (also known as &quot;complex&quot;)  stream´s strf
-structure plus optionally some extradata from input data. This 
+structure plus optionally some extradata from input data. This
 function takes ownership of @buf.
 
 
@@ -32613,7 +36361,7 @@ MT safe.
 <description>
 Commit @in_samples samples pointed to by @data to the ringbuffer @buf. 
 
-@in_samples and @out_samples define the rate conversion to perform on the the
+@in_samples and @out_samples define the rate conversion to perform on the
 samples in @data. For negative rates, @out_samples must be negative and
 @in_samples positive.
 
@@ -33970,7 +37718,7 @@ bytes.
 
 When @type refers to a text item, @data will point to a UTF8 string. Note
 that this UTF8 string is NOT null-terminated. Use
-gst_rtcp_packet_sdes_copy_entry() to get a null-termined copy of the entry.
+gst_rtcp_packet_sdes_copy_entry() to get a null-terminated copy of the entry.
 
 
 </description>
@@ -34135,7 +37883,7 @@ Parse the SR sender info and store the values.
 </parameter_description>
 </parameter>
 <parameter name="octet_count">
-<parameter_description> result octect count
+<parameter_description> result octet count
 </parameter_description>
 </parameter>
 </parameters>
@@ -34169,7 +37917,7 @@ Set the given values in the SR packet @packet.
 </parameter_description>
 </parameter>
 <parameter name="octet_count">
-<parameter_description> the octect count
+<parameter_description> the octet count
 </parameter_description>
 </parameter>
 </parameters>
@@ -35198,7 +38946,7 @@ Set the timestamp of each RTP packet in @list to @timestamp.
 
 <function name="gst_rtp_buffer_list_validate">
 <description>
-Check if all RTP packets in the @list are valid using validate_data().
+Check if all RTP packets in the @list are valid using gst_rtp_buffer_validate_data().
 Use this function to validate an list before using the other functions in
 this module.
 
@@ -35550,7 +39298,7 @@ Set the version of the RTP packet in @buffer to @version.
 <function name="gst_rtp_buffer_validate">
 <description>
 Check if the data pointed to by @buffer is a valid RTP packet using
-validate_data().
+gst_rtp_buffer_validate_data().
 Use this function to validate a packet before using the other functions in
 this module.
 
@@ -37010,7 +40758,7 @@ Convert @options to a string.
 
 <function name="gst_rtsp_range_free">
 <description>
-Free the memory alocated by @range.
+Free the memory allocated by @range.
 
 </description>
 <parameters>
@@ -37127,8 +40875,7 @@ Free the memory used by @transport.
 
 <function name="gst_rtsp_transport_get_manager">
 <description>
-Get the #GStreamer element that can handle the buffers transported over
-@trans.
+Get the #GstElement that can handle the buffers transported over @trans.
 
 It is possible that there are several managers available, use @option to
 selected one.
@@ -37252,10 +40999,10 @@ Make a copy of @url.
 Splits the path of @url on '/' boundaries, decoding the resulting components,
 
 The decoding performed by this routine is &quot;URI decoding&quot;, as defined in RFC
-3986, commonly known as percent-decoding. For example, a string &quot;foo%2fbar&quot;
-will decode to &quot;foo/bar&quot; -- the %2f being replaced by the corresponding byte
+3986, commonly known as percent-decoding. For example, a string &quot;foo\%2fbar&quot;
+will decode to &quot;foo/bar&quot; -- the \%2f being replaced by the corresponding byte
 with hex value 0x2f. Note that there is no guarantee that the resulting byte
-sequence is valid in any given encoding. As a special case, %00 is not
+sequence is valid in any given encoding. As a special case, \%00 is not
 unescaped to NUL, as that would prematurely terminate the string.
 
 Also note that since paths usually start with a slash, the first component
@@ -38280,7 +42027,7 @@ Add @email to the list of emails in @msg.
 <description>
 Adds @media to the array of medias in @msg. This function takes ownership of
 the contents of @media so that @media will have to be reinitialized with
-gst_media_init() before it can be used again.
+gst_sdp_media_init() before it can be used again.
 
 
 </description>
@@ -39774,6 +43521,28 @@ on the returned caps to modify it.
 <return></return>
 </function>
 
+<function name="gst_structure_can_intersect">
+<description>
+Tries intersecting @struct1 and @struct2 and reports whether the result
+would not be empty.
+
+
+</description>
+<parameters>
+<parameter name="struct1">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+<parameter name="struct2">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if intersection would not be empty
+
+</return>
+</function>
+
 <function name="gst_structure_copy">
 <description>
 Duplicates a #GstStructure and all its fields and values.
@@ -40016,10 +43785,10 @@ Variable arguments should be in the form field name, field type
 (as a GType), pointer(s) to a variable(s) to hold the return value(s).
 The last variable argument should be NULL.
 
-For refcounted (mini)objects you will acquire your own reference which
+For refcounted (mini)objects you will receive a new reference which
 you must release with a suitable _unref() when no longer needed. For
-strings and boxed types you will acquire a copy which you will need to
-release with either g_free() or the suiteable function for the boxed type.
+strings and boxed types you will receive a copy which you will need to
+release with either g_free() or the suitable function for the boxed type.
 
 
 </description>
@@ -40566,10 +44335,10 @@ This function is just like gst_structure_get() only that it is slightly
 more efficient since it saves the string-to-quark lookup in the global
 quark hashtable.
 
-For refcounted (mini)objects you will acquire your own reference which
+For refcounted (mini)objects you will receive a new reference which
 you must release with a suitable _unref() when no longer needed. For
-strings and boxed types you will acquire a copy which you will need to
-release with either g_free() or the suiteable function for the boxed type.
+strings and boxed types you will receive a copy which you will need to
+release with either g_free() or the suitable function for the boxed type.
 
 
 </description>
@@ -40817,6 +44586,71 @@ value is replaced and freed.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_structure_intersect">
+<description>
+Interesects @struct1 and @struct2 and returns the intersection.
+
+
+</description>
+<parameters>
+<parameter name="struct1">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+<parameter name="struct2">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+</parameters>
+<return> Intersection of @struct1 and @struct2
+
+</return>
+</function>
+
+<function name="gst_structure_is_equal">
+<description>
+Tests if the two #GstStructure are equal.
+
+
+</description>
+<parameters>
+<parameter name="structure1">
+<parameter_description> a #GstStructure.
+</parameter_description>
+</parameter>
+<parameter name="structure2">
+<parameter_description> a #GstStructure.
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the two structures have the same name and field.
+
+</return>
+</function>
+
+<function name="gst_structure_is_subset">
+<description>
+Checks if @subset is a subset of @superset, i.e. has the same
+structure name and for all fields that are existing in @superset,
+@subset has a value that is a subset of the value in @superset.
+
+
+</description>
+<parameters>
+<parameter name="subset">
+<parameter_description> a #GstStructure
+</parameter_description>
+</parameter>
+<parameter name="superset">
+<parameter_description> a potentially greater #GstStructure
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @subset is a subset of @superset
+
+</return>
 </function>
 
 <function name="gst_structure_map_in_place">
@@ -41331,6 +45165,24 @@ Gets the flag of @tag.
 </return>
 </function>
 
+<function name="gst_tag_get_id3v2_tag_size">
+<description>
+Determines size of an ID3v2 tag on buffer containing at least ID3v2 header,
+i.e. at least #GST_TAG_ID3V2_HEADER_SIZE (10) bytes;
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> buffer holding ID3v2 tag (or at least the start of one)
+</parameter_description>
+</parameter>
+</parameters>
+<return> Size of tag, or 0 if header is invalid or too small.
+
+</return>
+</function>
+
 <function name="gst_tag_get_language_code_iso_639_1">
 <description>
 Returns two-letter ISO-639-1 language code given a three-letter ISO-639-2
@@ -41446,6 +45298,145 @@ Language codes are case-sensitive and expected to be lower case.
 not be mapped to a language name. The returned string must not be
 modified and does not need to freed; it will stay valid until the
 application is terminated.
+
+</return>
+</function>
+
+<function name="gst_tag_get_license_description">
+<description>
+Get the description of a license, which is a translated description
+of the license's main features.
+
+
+</description>
+<parameters>
+<parameter name="license_ref">
+<parameter_description> a license reference string in form of a URI,
+e.g. &quot;http://creativecommons.org/licenses/by-nc-nd/2.0/&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> the description of the license, or NULL if the license is unknown
+or a description is not available.
+
+</return>
+</function>
+
+<function name="gst_tag_get_license_flags">
+<description>
+Get the flags of a license, which describe most of the features of
+a license in their most general form.
+
+
+</description>
+<parameters>
+<parameter name="license_ref">
+<parameter_description> a license reference string in form of a URI,
+e.g. &quot;http://creativecommons.org/licenses/by-nc-nd/2.0/&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> the flags of the license, or 0 if the license is unknown
+
+</return>
+</function>
+
+<function name="gst_tag_get_license_jurisdiction">
+<description>
+Get the jurisdiction code of a license. This is usually a two-letter
+ISO 3166-1 alpha-2 code, but there is also the special case of Scotland,
+for which no code exists and which is thus represented as &quot;scotland&quot;.
+
+Known jurisdictions: ar, at, au, be, bg, br, ca, ch, cl, cn, co, de,
+dk, es, fi, fr, hr, hu, il, in, it, jp, kr, mk, mt, mx, my, nl, pe, pl,
+pt, scotland, se, si, tw, uk, us, za.
+
+
+</description>
+<parameters>
+<parameter name="license_ref">
+<parameter_description> a license reference string in form of a URI,
+e.g. &quot;http://creativecommons.org/licenses/by-nc-nd/2.0/&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> the jurisdiction code of the license, or NULL if the license is
+unknown or is not specific to a particular jurisdiction.
+
+</return>
+</function>
+
+<function name="gst_tag_get_license_nick">
+<description>
+Get the nick name of a license, which is a short (untranslated) string
+such as e.g. &quot;CC BY-NC-ND 2.0 UK&quot;.
+
+
+</description>
+<parameters>
+<parameter name="license_ref">
+<parameter_description> a license reference string in form of a URI,
+e.g. &quot;http://creativecommons.org/licenses/by-nc-nd/2.0/&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> the nick name of the license, or NULL if the license is unknown
+
+</return>
+</function>
+
+<function name="gst_tag_get_license_title">
+<description>
+Get the title of a license, which is a short translated description
+of the license's features (generally not very pretty though).
+
+
+</description>
+<parameters>
+<parameter name="license_ref">
+<parameter_description> a license reference string in form of a URI,
+e.g. &quot;http://creativecommons.org/licenses/by-nc-nd/2.0/&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> the title of the license, or NULL if the license is unknown or
+no title is available.
+
+</return>
+</function>
+
+<function name="gst_tag_get_license_version">
+<description>
+Get the version of a license.
+
+
+</description>
+<parameters>
+<parameter name="license_ref">
+<parameter_description> a license reference string in form of a URI,
+e.g. &quot;http://creativecommons.org/licenses/by-nc-nd/2.0/&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> the version of the license, or NULL if the license is not known or
+has no version
+
+</return>
+</function>
+
+<function name="gst_tag_get_licenses">
+<description>
+Returns a list of known license references (in form of URIs). This is
+useful for UIs to build a list of available licenses for tagging purposes
+(e.g. to tag an audio track appropriately in a video or audio editor, or
+an image in a camera application).
+
+
+</description>
+<parameters>
+</parameters>
+<return> NULL-terminated array of license strings. Free with g_strfreev()
+when no longer needed.
 
 </return>
 </function>
@@ -41864,6 +45855,25 @@ Parses the exif tags starting with a tiff header structure.
 </parameter>
 </parameters>
 <return> The taglist
+
+</return>
+</function>
+
+<function name="gst_tag_list_from_id3v2_tag">
+<description>
+Creates a new tag list that contains the information parsed out of a
+ID3 tag.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> buffer to convert
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GstTagList with all tags that could be extracted from the
+given vorbiscomment buffer or NULL on error.
 
 </return>
 </function>
@@ -42938,6 +46948,27 @@ Checks if the given taglist is empty.
 </return>
 </function>
 
+<function name="gst_tag_list_is_equal">
+<description>
+Checks if the two given taglists are equal.
+
+
+</description>
+<parameters>
+<parameter name="list1">
+<parameter_description> a #GstTagList.
+</parameter_description>
+</parameter>
+<parameter name="list2">
+<parameter_description> a #GstTagList.
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the taglists are equal, otherwise FALSE
+
+</return>
+</function>
+
 <function name="gst_tag_list_merge">
 <description>
 Merges the two given lists into a new list. If one of the lists is NULL, a
@@ -42993,6 +47024,23 @@ parsed data.
 </parameter>
 </parameters>
 <return> A new tag list or NULL if the data was not an ID3v1 tag.
+</return>
+</function>
+
+<function name="gst_tag_list_new_from_string">
+<description>
+Deserializes a tag list.
+
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a string created with gst_tag_list_to_string()
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstTagList, or NULL in case of an error.
+
 </return>
 </function>
 
@@ -43139,6 +47187,24 @@ is put in the beginning of the buffer.
 </parameter>
 </parameters>
 <return> A GstBuffer containing the data
+
+</return>
+</function>
+
+<function name="gst_tag_list_to_string">
+<description>
+Serializes a tag list to a string.
+
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GstTagList
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated string, or NULL in case of an error. The
+string must be freed with g_free() when no longer needed.
 
 </return>
 </function>
@@ -43627,7 +47693,7 @@ vorbiscomment packet.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GList of newly-allowcated key=value strings. Free with
+<return> A #GList of newly-allocated key=value strings. Free with
 g_list_foreach (list, (GFunc) g_free, NULL) plus g_list_free (list)
 </return>
 </function>
@@ -45032,7 +49098,7 @@ derive from
 </parameter>
 <parameter name="class_init">
 <parameter_description> Location of the class initialization function for class types
-Location of the default vtable inititalization function for interface
+Location of the default vtable initialization function for interface
 types. (optional)
 </parameter_description>
 </parameter>
@@ -45561,7 +49627,7 @@ Transforms a fraction to a #gdouble.
 
 <function name="gst_util_get_timestamp">
 <description>
-Get a timestamp as GstClockTime to be used for interval meassurements.
+Get a timestamp as GstClockTime to be used for interval measurements.
 The timestamp should not be interpreted in any other way.
 
 
@@ -46425,15 +50491,15 @@ the contents from source to target.
 <description>
 Calculates the intersection of two values.  If the values have
 a non-empty intersection, the value representing the intersection
-is placed in @dest.  If the intersection is non-empty, @dest is
-not modified.
+is placed in @dest, unless NULL.  If the intersection is non-empty,
+@dest is not modified.
 
 
 </description>
 <parameters>
 <parameter name="dest">
 <parameter_description> a uninitialized #GValue that will hold the calculated
-intersection value
+intersection value. May be NULL if the resulting set if not needed.
 </parameter_description>
 </parameter>
 <parameter name="value1">
@@ -46683,7 +50749,7 @@ be used at the same time as gst_value_union() or gst_value_can_union().
 </parameter_description>
 </parameter>
 <parameter name="func">
-<parameter_description> a function that implments creating a union between the two types
+<parameter_description> a function that implements creating a union between the two types
 </parameter_description>
 </parameter>
 </parameters>
@@ -46730,7 +50796,7 @@ provided @caps will be taken by the @value.
 
 <function name="gst_value_set_date">
 <description>
-Sets the contents of @value to coorespond to @date.  The actual
+Sets the contents of @value to correspond to @date.  The actual
 #GDate structure is copied before it is used.
 
 </description>
@@ -46958,7 +51024,8 @@ Note that this means subtraction as in sets, not as in mathematics.
 <parameters>
 <parameter name="dest">
 <parameter_description> the destination value for the result if the
-subtraction is not empty
+subtraction is not empty. May be NULL, in which case the resulting set
+will not be computed, which can give a fair speedup.
 </parameter_description>
 </parameter>
 <parameter name="minuend">
@@ -47059,10 +51126,54 @@ of GStreamer.
 </return>
 </function>
 
+<function name="gst_video_buffer_get_overlay_composition">
+<description>
+Get the overlay composition that has previously been attached to a buffer
+with gst_video_buffer_get_overlay_composition(), usually by another element
+upstream.
+
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstVideoOverlayComposition attached to
+this buffer, or NULL. Does not return a reference to the composition,
+caller must obtain her own ref via gst_video_overlay_composition_ref()
+if needed.
+
+</return>
+</function>
+
+<function name="gst_video_buffer_set_overlay_composition">
+<description>
+Sets an overlay composition on a buffer. The buffer will obtain its own
+reference to the composition, meaning this function does not take ownership
+of @comp.
+
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition, or NULL to clear a
+previously-set composition
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_video_calculate_display_ratio">
 <description>
-Given the Pixel Aspect Ratio and size of an input video frame, and the 
-pixel aspect ratio of the intended display device, calculates the actual 
+Given the Pixel Aspect Ratio and size of an input video frame, and the
+pixel aspect ratio of the intended display device, calculates the actual
 display ratio the video will be rendered with.
 
 
@@ -47101,9 +51212,9 @@ display ratio the video will be rendered with.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A boolean indicating success and a calculated Display Ratio in the 
-dar_n and dar_d parameters. 
-The return value is FALSE in the case of integer overflow or other error. 
+<return> A boolean indicating success and a calculated Display Ratio in the
+dar_n and dar_d parameters.
+The return value is FALSE in the case of integer overflow or other error.
 
 </return>
 </function>
@@ -47132,7 +51243,7 @@ The width, height and pixel-aspect-ratio can also be specified in the output cap
 <parameter_description> the maximum amount of time allowed for the processing.
 </parameter_description>
 </parameter>
-<parameter name="err">
+<parameter name="error">
 <parameter_description> pointer to a #GError. Can be %NULL.
 </parameter_description>
 </parameter>
@@ -47179,12 +51290,72 @@ anymore.
 <parameter_description> %GstVideoConvertFrameCallback that will be called after conversion.
 </parameter_description>
 </parameter>
+<parameter name="user_data">
+<parameter_description> extra data that will be passed to the @callback
+</parameter_description>
+</parameter>
 <parameter name="destroy_notify">
 <parameter_description> %GDestroyNotify to be called after @user_data is not needed anymore
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_video_event_is_force_key_unit">
+<description>
+Checks if an event is a force key unit event. Returns true for both upstream
+and downstream force key unit events.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to check
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the event is a valid force key unit event
+</return>
+</function>
+
+<function name="gst_video_event_new_downstream_force_key_unit">
+<description>
+Creates a new downstream force key unit event. A downstream force key unit
+event can be sent down the pipeline to request downstream elements to produce
+a key unit. A downstream force key unit event must also be sent when handling
+an upstream force key unit event to notify downstream that the latter has been
+handled.
+
+To parse an event created by gst_video_event_new_downstream_force_key_unit() use
+gst_video_event_parse_downstream_force_key_unit().
+
+
+</description>
+<parameters>
+<parameter name="timestamp">
+<parameter_description> the timestamp of the buffer that starts a new key unit
+</parameter_description>
+</parameter>
+<parameter name="stream_time">
+<parameter_description> the stream_time of the buffer that starts a new key unit
+</parameter_description>
+</parameter>
+<parameter name="running_time">
+<parameter_description> the running_time of the buffer that starts a new key unit
+</parameter_description>
+</parameter>
+<parameter name="all_headers">
+<parameter_description> %TRUE to produce headers when starting a new key unit
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> integer that can be used to number key units
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new GstEvent
+</return>
 </function>
 
 <function name="gst_video_event_new_still_frame">
@@ -47205,6 +51376,76 @@ gst_video_event_parse_still_frame().
 </parameter>
 </parameters>
 <return> The new GstEvent
+</return>
+</function>
+
+<function name="gst_video_event_new_upstream_force_key_unit">
+<description>
+Creates a new upstream force key unit event. An upstream force key unit event
+can be sent to request upstream elements to produce a key unit. 
+
+@running_time can be set to request a new key unit at a specific
+running_time. If set to GST_CLOCK_TIME_NONE, upstream elements will produce a
+new key unit as soon as possible.
+
+To parse an event created by gst_video_event_new_downstream_force_key_unit() use
+gst_video_event_parse_downstream_force_key_unit().
+
+
+</description>
+<parameters>
+<parameter name="running_time">
+<parameter_description> the running_time at which a new key unit should be produced
+</parameter_description>
+</parameter>
+<parameter name="all_headers">
+<parameter_description> %TRUE to produce headers when starting a new key unit
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> integer that can be used to number key units
+</parameter_description>
+</parameter>
+</parameters>
+<return> The new GstEvent
+</return>
+</function>
+
+<function name="gst_video_event_parse_downstream_force_key_unit">
+<description>
+Get timestamp, stream-time, running-time, all-headers and count in the force
+key unit event. See gst_video_event_new_downstream_force_key_unit() for a
+full description of the downstream force key unit event.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to parse
+</parameter_description>
+</parameter>
+<parameter name="timestamp">
+<parameter_description> A pointer to the timestamp in the event
+</parameter_description>
+</parameter>
+<parameter name="stream_time">
+<parameter_description> A pointer to the stream-time in the event
+</parameter_description>
+</parameter>
+<parameter name="running_time">
+<parameter_description> A pointer to the running-time in the event
+</parameter_description>
+</parameter>
+<parameter name="all_headers">
+<parameter_description> A pointer to the all_headers flag in the event
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> A pointer to the count field of the event
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the event is a valid downstream force key unit event.
 </return>
 </function>
 
@@ -47232,6 +51473,38 @@ Create a still frame event using gst_video_event_new_still_frame()
 </parameter>
 </parameters>
 <return> %TRUE if the event is a valid still-frame event. %FALSE if not
+</return>
+</function>
+
+<function name="gst_video_event_parse_upstream_force_key_unit">
+<description>
+Get running-time, all-headers and count in the force key unit event. See
+gst_video_event_new_upstream_force_key_unit() for a full description of the
+upstream force key unit event.
+
+Create an upstream force key unit event using  gst_video_event_new_upstream_force_key_unit()
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> A #GstEvent to parse
+</parameter_description>
+</parameter>
+<parameter name="running_time">
+<parameter_description> A pointer to the running_time in the event
+</parameter_description>
+</parameter>
+<parameter name="all_headers">
+<parameter_description> A pointer to the all_headers flag in the event
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> A pointer to the count field in the event
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the event is a valid upstream force-key-unit event. %FALSE if not
 </return>
 </function>
 
@@ -47309,7 +51582,7 @@ If the FOURCC cannot be represented by #GstVideoFormat,
 <function name="gst_video_format_get_component_depth">
 <description>
 Returns the number of bits used to encode an individual pixel of
-a given component.  Typically this is 8, although higher and lower
+a given @component.  Typically this is 8, although higher and lower
 values are possible for some formats.
 
 
@@ -47318,6 +51591,10 @@ values are possible for some formats.
 <parameters>
 <parameter name="format">
 <parameter_description> a #GstVideoFormat
+</parameter_description>
+</parameter>
+<parameter name="component">
+<parameter_description> the video component (e.g. 0 for 'R' in RGB)
 </parameter_description>
 </parameter>
 </parameters>
@@ -47673,8 +51950,10 @@ range.
 Determines the #GstVideoFormat of @caps and places it in the location
 pointed to by @format.  Extracts the size of the video and places it
 in the location pointed to by @width and @height.  If @caps does not
-represent one of the raw video formats listed in #GstVideoFormat, the
-function will fail and return FALSE.
+represent a video format or does not contain height and width, the
+function will fail and return FALSE. If @caps does not represent a raw
+video format listed in #GstVideoFormat, but still contains video caps,
+this function will return TRUE and set @format to #GST_VIDEO_FORMAT_UNKNOWN.
 
 
 
@@ -47788,6 +52067,28 @@ The pad needs to have negotiated caps containing width and height properties.
 </parameters>
 <return> TRUE if the width and height could be retrieved.
 
+</return>
+</function>
+
+<function name="gst_video_get_size_from_caps">
+<description>
+Calculates the total number of bytes in the raw video format for the given
+caps.  This number should be used when allocating a buffer for raw video.
+
+
+
+</description>
+<parameters>
+<parameter name="caps">
+<parameter_description> a pointer to #GstCaps
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> a pointer to a gint that will be assigned the size (in bytes) of a video frame with the given caps
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the size could be calculated from the caps
 </return>
 </function>
 
@@ -47949,6 +52250,418 @@ Set the vertical flipping state (%TRUE for flipped) for the given object.
 </parameters>
 <return> %TRUE in case the element supports flipping
 </return>
+</function>
+
+<function name="gst_video_overlay_composition_add_rectangle">
+<description>
+Adds an overlay rectangle to an existing overlay composition object. This
+must be done right after creating the overlay composition.
+
+
+</description>
+<parameters>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition
+</parameter_description>
+</parameter>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle to add to the
+composition
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_video_overlay_composition_blend">
+<description>
+Blends the overlay rectangles in @comp on top of the raw video data
+contained in @video_buf. The data in @video_buf must be writable. If
+needed, use gst_buffer_make_writable() before calling this function to
+ensure a buffer is writable. @video_buf must also have valid raw video
+caps set on it.
+
+
+</description>
+<parameters>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition
+</parameter_description>
+</parameter>
+<parameter name="video_buf">
+<parameter_description> a #GstBuffer containing raw video data in a supported format
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_video_overlay_composition_copy">
+<description>
+Makes a copy of @comp and all contained rectangles, so that it is possible
+to modify the composition and contained rectangles (e.g. add additional
+rectangles or change the render co-ordinates or render dimension). The
+actual overlay pixel data buffers contained in the rectangles are not
+copied.
+
+
+</description>
+<parameters>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition to copy
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstVideoOverlayComposition equivalent
+to @comp.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_composition_get_rectangle">
+<description>
+Returns the @n-th #GstVideoOverlayRectangle contained in @comp.
+
+
+</description>
+<parameters>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition
+</parameter_description>
+</parameter>
+<parameter name="n">
+<parameter_description> number of the rectangle to get
+</parameter_description>
+</parameter>
+</parameters>
+<return> the @n-th rectangle, or NULL if @n is out of
+bounds. Will not return a new reference, the caller will need to
+obtain her own reference using gst_video_overlay_rectangle_ref()
+if needed.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_composition_get_seqnum">
+<description>
+Returns the sequence number of this composition. Sequence numbers are
+monotonically increasing and unique for overlay compositions and rectangles
+(meaning there will never be a rectangle with the same sequence number as
+a composition).
+
+
+</description>
+<parameters>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition
+</parameter_description>
+</parameter>
+</parameters>
+<return> the sequence number of @comp
+
+</return>
+</function>
+
+<function name="gst_video_overlay_composition_make_writable">
+<description>
+Takes ownership of @comp and returns a version of @comp that is writable
+(i.e. can be modified). Will either return @comp right away, or create a
+new writable copy of @comp and unref @comp itself. All the contained
+rectangles will also be copied, but the actual overlay pixel data buffers
+contained in the rectangles are not copied.
+
+
+</description>
+<parameters>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition to copy
+</parameter_description>
+</parameter>
+</parameters>
+<return> a writable #GstVideoOverlayComposition
+equivalent to @comp.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_composition_n_rectangles">
+<description>
+Returns the number of #GstVideoOverlayRectangle&lt;!-- --&gt;s contained in @comp.
+
+
+</description>
+<parameters>
+<parameter name="comp">
+<parameter_description> a #GstVideoOverlayComposition
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of rectangles
+
+</return>
+</function>
+
+<function name="gst_video_overlay_composition_new">
+<description>
+Creates a new video overlay composition object to hold one or more
+overlay rectangles.
+
+
+</description>
+<parameters>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle to add to the
+composition
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstVideoOverlayComposition. Unref with
+gst_video_overlay_composition_unref() when no longer needed.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_rectangle_copy">
+<description>
+Makes a copy of @rectangle, so that it is possible to modify it
+(e.g. to change the render co-ordinates or render dimension). The
+actual overlay pixel data buffers contained in the rectangle are not
+copied.
+
+
+</description>
+<parameters>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle to copy
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstVideoOverlayRectangle equivalent
+to @rectangle.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_rectangle_get_pixels_argb">
+<description>
+
+</description>
+<parameters>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle
+</parameter_description>
+</parameter>
+<parameter name="stride">
+<parameter_description> address of guint variable where to store the
+row stride of the ARGB pixel data in the buffer
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags (unused)
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer holding the ARGB pixel data with
+row stride @stride and width and height of the render dimensions as per
+gst_video_overlay_rectangle_get_render_rectangle(). This function does
+not return a reference, the caller should obtain a reference of her own
+with gst_buffer_ref() if needed.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_rectangle_get_pixels_unscaled_argb">
+<description>
+Retrieves the pixel data as it is. This is useful if the caller can
+do the scaling itself when handling the overlaying. The rectangle will
+need to be scaled to the render dimensions, which can be retrieved using
+gst_video_overlay_rectangle_get_render_rectangle().
+
+
+</description>
+<parameters>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> address where to store the width of the unscaled
+rectangle in pixels
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> address where to store the height of the unscaled
+rectangle in pixels
+</parameter_description>
+</parameter>
+<parameter name="stride">
+<parameter_description> address of guint variable where to store the row
+stride of the ARGB pixel data in the buffer
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags for future use (unused)
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer holding the ARGB pixel data with
+row stride @stride. This function does not return a reference, the caller
+should obtain a reference of her own with gst_buffer_ref() if needed.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_rectangle_get_render_rectangle">
+<description>
+Retrieves the render position and render dimension of the overlay
+rectangle on the video.
+
+
+</description>
+<parameters>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle
+</parameter_description>
+</parameter>
+<parameter name="render_x">
+<parameter_description> address where to store the X render offset
+</parameter_description>
+</parameter>
+<parameter name="render_y">
+<parameter_description> address where to store the Y render offset
+</parameter_description>
+</parameter>
+<parameter name="render_width">
+<parameter_description> address where to store the render width
+</parameter_description>
+</parameter>
+<parameter name="render_height">
+<parameter_description> address where to store the render height
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if valid render dimensions were retrieved.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_rectangle_get_seqnum">
+<description>
+Returns the sequence number of this rectangle. Sequence numbers are
+monotonically increasing and unique for overlay compositions and rectangles
+(meaning there will never be a rectangle with the same sequence number as
+a composition).
+
+
+</description>
+<parameters>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle
+</parameter_description>
+</parameter>
+</parameters>
+<return> the sequence number of @rectangle
+
+</return>
+</function>
+
+<function name="gst_video_overlay_rectangle_new_argb">
+<description>
+Creates a new video overlay rectangle with ARGB pixel data. The layout
+of the components in memory is B-G-R-A on little-endian platforms
+(corresponding to #GST_VIDEO_FORMAT_BGRA) and A-R-G-B on big-endian
+platforms (corresponding to #GST_VIDEO_FORMAT_ARGB). In other words,
+pixels are treated as 32-bit words and the lowest 8 bits then contain
+the blue component value and the highest 8 bits contain the alpha
+component value. The RGB values are non-premultiplied. This is the
+format that is used by most hardware, and also many rendering libraries
+such as Cairo, for example.
+
+
+</description>
+<parameters>
+<parameter name="pixels">
+<parameter_description> a #GstBuffer pointing to the pixel memory
+</parameter_description>
+</parameter>
+<parameter name="width">
+<parameter_description> the width of the rectangle in @pixels
+</parameter_description>
+</parameter>
+<parameter name="height">
+<parameter_description> the height of the rectangle in @pixels
+</parameter_description>
+</parameter>
+<parameter name="stride">
+<parameter_description> the stride of the rectangle in @pixels in bytes (&gt;= 4*width)
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> the X co-ordinate on the video where the top-left corner of this
+overlay rectangle should be rendered to
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> the Y co-ordinate on the video where the top-left corner of this
+overlay rectangle should be rendered to
+</parameter_description>
+</parameter>
+<parameter name="render_width">
+<parameter_description> the render width of this rectangle on the video
+</parameter_description>
+</parameter>
+<parameter name="render_height">
+<parameter_description> the render height of this rectangle on the video
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags (currently unused)
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstVideoOverlayRectangle. Unref with
+gst_video_overlay_rectangle_unref() when no longer needed.
+
+</return>
+</function>
+
+<function name="gst_video_overlay_rectangle_set_render_rectangle">
+<description>
+Sets the render position and dimensions of the rectangle on the video.
+This function is mainly for elements that modify the size of the video
+in some way (e.g. through scaling or cropping) and need to adjust the
+details of any overlays to match the operation that changed the size.
+
+@rectangle must be writable, meaning its refcount must be 1. You can
+make the rectangles inside a #GstVideoOverlayComposition writable using
+gst_video_overlay_composition_make_writable() or
+gst_video_overlay_composition_copy().
+
+
+</description>
+<parameters>
+<parameter name="rectangle">
+<parameter_description> a #GstVideoOverlayRectangle
+</parameter_description>
+</parameter>
+<parameter name="render_x">
+<parameter_description> render X position of rectangle on video
+</parameter_description>
+</parameter>
+<parameter name="render_y">
+<parameter_description> render Y position of rectangle on video
+</parameter_description>
+</parameter>
+<parameter name="render_width">
+<parameter_description> render width of rectangle
+</parameter_description>
+</parameter>
+<parameter name="render_height">
+<parameter_description> render height of rectangle
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_video_parse_caps_chroma_site">
@@ -48180,7 +52893,7 @@ Deprecated: Use gst_x_overlay_got_window_handle() instead.
 </parameter_description>
 </parameter>
 <parameter name="xwindow_id">
-<parameter_description> a #XID referencing the XWindow.
+<parameter_description> a XID referencing the XWindow.
 </parameter_description>
 </parameter>
 </parameters>
@@ -48190,7 +52903,7 @@ Deprecated: Use gst_x_overlay_got_window_handle() instead.
 <function name="gst_x_overlay_handle_events">
 <description>
 Tell an overlay that it should handle events from the window system. These
-events are forwared upstream as navigation events. In some window system,
+events are forwarded upstream as navigation events. In some window system,
 events are not propagated in the window hierarchy if a client is listening
 for them. This method allows you to disable events handling completely
 from the XOverlay.
@@ -48213,7 +52926,7 @@ from the XOverlay.
 <function name="gst_x_overlay_prepare_xwindow_id">
 <description>
 This will post a &quot;prepare-xwindow-id&quot; element message on the bus
-to give applications an opportunity to call 
+to give applications an opportunity to call
 gst_x_overlay_set_xwindow_id() before a plugin creates its own
 window.
 
@@ -48275,18 +52988,18 @@ do not support subwindows.
 <description>
 This will call the video overlay's set_window_handle method. You
 should use this method to tell to a XOverlay to display video output to a
-specific XWindow. Passing 0 as the xwindow_id will tell the overlay to
-stop using that window and create an internal one.
+specific window (e.g. an XWindow on X11). Passing 0 as the  @handle will
+tell the overlay to stop using that window and create an internal one.
 
 
 </description>
 <parameters>
 <parameter name="overlay">
-<parameter_description> a #GstXOverlay to set the XWindow on.
+<parameter_description> a #GstXOverlay to set the window on.
 </parameter_description>
 </parameter>
-<parameter name="xwindow_id">
-<parameter_description> a #XID referencing the XWindow.
+<parameter name="handle">
+<parameter_description> a handle referencing the window.
 </parameter_description>
 </parameter>
 </parameters>
@@ -48297,7 +53010,7 @@ stop using that window and create an internal one.
 <description>
 This will call the video overlay's set_xwindow_id method. You should
 use this method to tell to a XOverlay to display video output to a
-specific XWindow. Passing 0 as the xwindow_id will tell the overlay to
+specific XWindow. Passing 0 as the @xwindow_id will tell the overlay to
 stop using that window and create an internal one.
 
 Deprecated: Use gst_x_overlay_set_window_handle() instead.
@@ -48305,11 +53018,11 @@ Deprecated: Use gst_x_overlay_set_window_handle() instead.
 </description>
 <parameters>
 <parameter name="overlay">
-<parameter_description> a #GstXOverlay to set the XWindow on.
+<parameter_description> a #GstXOverlay to set the window on.
 </parameter_description>
 </parameter>
 <parameter name="xwindow_id">
-<parameter_description> a #XID referencing the XWindow.
+<parameter_description> a XID referencing the XWindow.
 </parameter_description>
 </parameter>
 </parameters>
@@ -48589,34 +53302,6 @@ Hashes @key in a case-insensitive manner.
 </parameter>
 </parameters>
 <return> the hash code.
-</return>
-</function>
-
-<function name="validate_data">
-<description>
-Checks if @data is a valid RTP packet.
-
-
-</description>
-<parameters>
-<parameter name="data">
-<parameter_description> the data to validate
-</parameter_description>
-</parameter>
-<parameter name="len">
-<parameter_description> the length of @data to validate
-</parameter_description>
-</parameter>
-<parameter name="payload">
-<parameter_description> the payload if @data represents the header only
-</parameter_description>
-</parameter>
-<parameter name="payload_len">
-<parameter_description> the len of the payload
-</parameter_description>
-</parameter>
-</parameters>
-<return> TRUE if @data is a valid RTP packet
 </return>
 </function>
 

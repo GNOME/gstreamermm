@@ -206,7 +206,6 @@ void PlayerWindow::on_video_changed()
     // When the first buffer arrives, the video size can be extracted.
     m_pad_probe_id = pad->add_buffer_probe(
       sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
-    std::cout << "There is no pad available." << std::endl;
   }
 }
 
