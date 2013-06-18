@@ -24,52 +24,20 @@
 #include <gst/gst.h>
 
 // Core library includes
-#include <gst/base/gstbasesrc.h>
-#include <gst/base/gstbasesink.h>
-#include <gst/base/gstbasetransform.h>
-#include <gst/base/gstpushsrc.h>
-#include <gst/base/gstadapter.h>
-#include <gst/base/gstcollectpads.h>
-#include <gst/base/gstdataqueue.h>
-#include <gst/controller/gstcontroller.h>
-#include <gst/controller/gstcontrolsource.h>
-#include <gst/controller/gstinterpolationcontrolsource.h>
-#include <gst/controller/gstlfocontrolsource.h>
-#include <gst/net/gstnet.h>
+#include <gst/base/base.h>
+#include <gst/controller/controller.h>
+#include <gst/net/net.h>
 
 // Base library includes
-#include <gst/audio/gstaudioclock.h>
-#include <gst/audio/gstaudiofilter.h>
-#include <gst/audio/gstbaseaudiosink.h>
-#include <gst/audio/gstbaseaudiosrc.h>
-#include <gst/audio/gstaudiosink.h>
-#include <gst/audio/gstaudiosrc.h>
-#include <gst/audio/gstringbuffer.h>
-#include <gst/cdda/gstcddabasesrc.h>
-#include <gst/netbuffer/gstnetbuffer.h>
+#include <gst/audio/audio.h>
 #include <gst/pbutils/pbutils.h>
-#include <gst/rtp/gstbasertpaudiopayload.h>
-#include <gst/rtp/gstbasertpdepayload.h>
-#include <gst/rtp/gstbasertppayload.h>
-#include <gst/tag/gsttagdemux.h>
-#include <gst/video/gstvideosink.h>
-#include <gst/video/gstvideofilter.h>
-
-// Base interface includes
-#include <gst/interfaces/colorbalance.h>
-#include <gst/interfaces/colorbalancechannel.h>
-#include <gst/interfaces/mixer.h>
-#include <gst/interfaces/navigation.h>
-#include <gst/interfaces/propertyprobe.h>
-#include <gst/interfaces/streamvolume.h>
-#include <gst/interfaces/tuner.h>
-#include <gst/interfaces/videoorientation.h>
-#include <gst/interfaces/xoverlay.h>
+#include <gst/rtp/rtp.h>
+#include <gst/tag/tag.h>
+#include <gst/video/video.h>
 
 bool gst_type_is_a_pointer(GType gtype)
 {
-  return (gtype_is_a_pointer(gtype) || g_type_is_a(gtype,
-GST_TYPE_MINI_OBJECT));
+  return (gtype_is_a_pointer(gtype));
 }
 
 int main (int argc, char *argv[])
@@ -87,13 +55,8 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_ELEMENT_FACTORY, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_EVENT, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_FORMAT, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_G_ERROR, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_GHOST_PAD, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_IMPLEMENTS_INTERFACE, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_INDEX, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_INDEX_FACTORY, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_MESSAGE, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_MINI_OBJECT, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_OBJECT, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_PAD, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_PAD_TEMPLATE, gst_type_is_a_pointer)
@@ -111,7 +74,6 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_TYPE_FIND, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_TYPE_FIND_FACTORY, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_URI_HANDLER, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_XML, gst_type_is_a_pointer)
 
   // GStreamer core library types:
             << get_defs(GST_TYPE_BASE_SRC, gst_type_is_a_pointer)
@@ -121,7 +83,6 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_ADAPTER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_COLLECT_PADS, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_DATA_QUEUE, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_CONTROLLER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_CONTROL_SOURCE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_INTERPOLATION_CONTROL_SOURCE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_LFO_CONTROL_SOURCE, gst_type_is_a_pointer)
@@ -149,19 +110,18 @@ int main (int argc, char *argv[])
             << get_plugin_defs("valve", gst_type_is_a_pointer)
 
   // gst-plugins-base (GStreamer base) types:
+            << get_defs(GST_TYPE_AUDIO_BASE_SINK, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_AUDIO_BASE_SRC, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_AUDIO_CD_SRC, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_AUDIO_CLOCK, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_AUDIO_FILTER, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_AUDIO_RING_BUFFER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_AUDIO_SINK, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_AUDIO_SRC, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_BASE_AUDIO_SINK, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_BASE_AUDIO_SRC, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_BASE_RTP_AUDIO_PAYLOAD, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_BASE_RTP_DEPAYLOAD, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_BASE_RTP_PAYLOAD, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_CDDA_BASE_SRC, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_DISCOVERER, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_NETBUFFER, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_RING_BUFFER, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_RTP_BASE_AUDIO_PAYLOAD, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_RTP_BASE_DEPAYLOAD, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_RTP_BASE_PAYLOAD, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_TAG_DEMUX, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_VIDEO_FILTER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_VIDEO_SINK, gst_type_is_a_pointer)
@@ -169,21 +129,13 @@ int main (int argc, char *argv[])
   // gst-plugins-base (GStreamer base) interfaces:
             << get_defs(GST_TYPE_COLOR_BALANCE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_COLOR_BALANCE_CHANNEL, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_MIXER, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_MIXER_TRACK, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_MIXER_OPTIONS, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_NAVIGATION, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_PROPERTY_PROBE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_STREAM_VOLUME, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_TUNER, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_TUNER_CHANNEL, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_TUNER_NORM, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_VIDEO_ORIENTATION, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_X_OVERLAY, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_VIDEO_OVERLAY, gst_type_is_a_pointer)
 
   // gst-plugins-base (GStreamer base) plugin types:
             << get_plugin_defs("adder", gst_type_is_a_pointer)
-            << get_plugin_defs("alsamixer", gst_type_is_a_pointer)
             << get_plugin_defs("alsasink", gst_type_is_a_pointer)
             << get_plugin_defs("alsasrc", gst_type_is_a_pointer)
             << get_plugin_defs("appsrc", gst_type_is_a_pointer)
@@ -195,10 +147,6 @@ int main (int argc, char *argv[])
             << get_plugin_defs("cdparanoiasrc", gst_type_is_a_pointer)
             << get_plugin_defs("clockoverlay", gst_type_is_a_pointer)
             << get_plugin_defs("decodebin", gst_type_is_a_pointer)
-            << get_plugin_defs("decodebin2", gst_type_is_a_pointer)
-            << get_plugin_defs("ffmpegcolorspace", gst_type_is_a_pointer)
-            << get_plugin_defs("gdpdepay", gst_type_is_a_pointer)
-            << get_plugin_defs("gdppay", gst_type_is_a_pointer)
             << get_plugin_defs("giosink", gst_type_is_a_pointer)
             << get_plugin_defs("giosrc", gst_type_is_a_pointer)
             << get_plugin_defs("giostreamsink", gst_type_is_a_pointer)
@@ -209,7 +157,6 @@ int main (int argc, char *argv[])
             << get_plugin_defs("oggdemux", gst_type_is_a_pointer)
             << get_plugin_defs("oggmux", gst_type_is_a_pointer)
             << get_plugin_defs("playbin", gst_type_is_a_pointer)
-            << get_plugin_defs("playbin2", gst_type_is_a_pointer)
             << get_plugin_defs("subtitleoverlay", gst_type_is_a_pointer)
             << get_plugin_defs("tcpclientsrc", gst_type_is_a_pointer)
             << get_plugin_defs("tcpclientsink", gst_type_is_a_pointer)

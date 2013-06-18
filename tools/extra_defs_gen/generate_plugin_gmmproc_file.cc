@@ -16,8 +16,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gst.h>
 #include <glibmm.h>
+#include <gst/gst.h>
 #include <algorithm>
 #include <iostream>
 
@@ -62,8 +62,7 @@ static const char *const wrappedBaseClasses[] =
 static bool gst_type_is_a_pointer(GType gtype)
 {
   return (g_type_is_a(gtype, G_TYPE_OBJECT) ||
-    g_type_is_a(gtype, G_TYPE_BOXED) ||
-    g_type_is_a(gtype, GST_TYPE_MINI_OBJECT));
+    g_type_is_a(gtype, G_TYPE_BOXED));
 }
 
 static std::string to_lowercase(const std::string& str)
@@ -255,6 +254,36 @@ static std::string get_c_enum_definition_macro(GType enumGType,
   return result;
 }
 
+static bool is_a_mini_object(const std::string& cType)
+{
+  // Add the mini object types to this array.  Keep a final null member so the
+  // loop that tests for the types knows when to stop iterating through the
+  // types.
+  static const char *const mini_object_types[] =
+  {
+    "GstBuffer",
+    "GstBufferList",
+    "GstEvent",
+    "GstMessage",
+    "GstMiniObject",
+    "GstQuery",
+    0
+  };
+
+  // Note that if the C type is a mini object, it would be a pointer so remove
+  // the last character (the '*') so the comparison with the above types works.
+  const std::string cTypeName = cType.substr(0, cType.size() - 1);
+
+  for(const char* const* type = mini_object_types; *type != 0; type++)
+  {
+    if(cTypeName == *type)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
                                               std::string& cEnumDefinitions,
                                               std::string& enumWrapStatements,
@@ -395,6 +424,13 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
             convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', _LQ()" +
               returnCTypeTranslation + "_RQ(), ``Glib::wrap_taglist($3)'')\n";
           }
+          else if(is_a_mini_object(returnCType))
+          {
+            // Dealing with a mini object (which are boxed types).
+            convertMacros += "#m4 _CONVERSION(``" + returnCType +
+              "'', _LQ()" + returnCTypeTranslation + "_RQ(), " +
+              "``Gst::wrap($3)'')\n";
+          }
           else
           {
             // Dealing with a regular boxed type return.
@@ -409,9 +445,8 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
           // needed in the global convert file.  (An unwrapping conversion will
           // already probably be included in the global convert file).
           convertMacros += "#m4 _CONVERSION(``" + returnCType +
-            "'', _LQ()" + returnCTypeTranslation + "_RQ(), ";
-          convertMacros += g_type_is_a(returnGType, GST_TYPE_MINI_OBJECT) ?
-            "``Gst::wrap($3)'')\n" : "``Glib::wrap($3)'')\n";
+            "'', _LQ()" + returnCTypeTranslation + "_RQ(), " +
+            "``Glib::wrap($3)'')\n";
         }
       }
 
@@ -508,13 +543,19 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
                 "_LQ()" + paramCTypeTranslation + "_RQ(), "
                 "``Glib::wrap_taglist($3, true)'')\n";
             }
+            else if(is_a_mini_object(paramCType))
+            {
+              // Dealing with a mini object (which are boxed types).
+              convertMacros += "#m4 _CONVERSION(``" + paramCType +
+                "'', _LQ()" + paramCTypeTranslation + "_RQ(), " +
+                "``Gst::wrap($3, true)'')\n";
+            }
             else
             {
               // Dealing with reference counted parameter or a boxed type.
               convertMacros += "#m4 _CONVERSION(``" + paramCType +
-                "'', _LQ()" + paramCTypeTranslation + "_RQ(), ";
-              convertMacros += g_type_is_a(paramGType, GST_TYPE_MINI_OBJECT) ?
-                "``Gst::wrap($3, true)'')\n" : "``Glib::wrap($3, true)'')\n";
+                "'', _LQ()" + paramCTypeTranslation + "_RQ(), " +
+                "``Glib::wrap($3, true)'')\n";
             }
           }
 
@@ -794,9 +835,6 @@ int main(int argc, char** argv)
   gboolean hgFile = false;
   gboolean ccgFile = false;
   gboolean confirmExistence = false;
-
-  if(!Glib::thread_supported())
-    Glib::thread_init();
 
   static const GOptionEntry optionEntries[] =
   {

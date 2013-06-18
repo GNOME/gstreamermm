@@ -1,3 +1,54 @@
+2013-06-18  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Begin the transition to GStreamer-1.1.1.
+
+	* configure.ac (AC_INIT): Change the gstreamermm version (for a future
+	release) to 0.11.0.
+	(MM_PREREQ): Require mm-common 0.9.6.
+	(MM_INIT_MODULE): Use 1.0 for the module version.
+	(GSTREAMERMM_SO_VERSION): Reset to 0.0.0.
+	(GSTREAMERMM_MODULES): Require glibmm-2.36.  Add all the GStreamer
+	modules and require version 1.1.1 of those modules.
+	(GSTREAMERMM_PLUGIN_DEFS): Add the app[sink|src] plug-ins.  Remove the
+	decodebin2 and playbin2 plug-ins (which are removed in GStreamer-1.0
+	also).  Rename the ffmpegcolorspace plug-in to videoconvert because
+	it's been renamed.  Remove plug-ins that are not found but leave TODOs
+	to possibly re-add the gdpdepay and gdppay plug-ins which the
+	GStreamer porting docs seems to suggest still exist.
+	(GST_INSPECT): Require version 1.0.
+	(Plugin Processing): Add AC_MSG_CHECKING() and AC_MSG_RESULT() macros
+	to report that required plug-ins are being checked for and found when
+	the process is successful.
+
+	* gstreamer/src/filelist.am: Add the app[sink|src] plug-ins.
+
+	* tools/extra_defs_gen/generate_defs_gst.cc: Simplify the includes
+	because since version 1.1.1 GStreamer has moved to single includes --
+	see https://bugzilla.gnome.org/show_bug.cgi?id=701812.
+	(gst_type_is_a_pointer): Don't test for the GST_TYPE_MINI_OBJECT
+	because it is now just a boxed type according to the GStreamer porting
+	guide.
+	Remove the GTypes that don't exist and rename ones that have been
+	changed (like the GST_TYPE_BASE_AUDIO_* types, the GST_TYPE_BASE_RTP_*
+	types, the GST_TYPE_RING_BUFFER type and GST_TYPE_X_OVERLAY type)
+	since GStreamer-1.0.
+	Also change the plug-ins as in the configure.ac file.
+
+	* tools/extra_defs_gen/generate_plugin_gmmproc_file.cc
+	(gst_type_is_a_pointer): Don't test for the GST_TYPE_MINI_OBJECT
+	because miniobjects are now boxed types.
+	(is_a_mini_object): Add this function that tests if a given C type
+	is a miniobject.
+	(get_signal_wrap_statements): When dealing with a boxed type return,
+	check to see if it is a miniobject (using the above function) so that
+	a correct Gst::wrap() function is generated.  Do the same for boxed
+	type parameters.  Also, don't check for miniobjects using
+	GST_TYPE_MINI_OBJECT when dealing with a Glib::RefPtr<> type any more
+	because miniobjects are checked for when dealing with boexed types.
+	* tools/m4/plugingen_gstreamermm.m4: Add translations which the
+	plug-ins now require and modify the GstXOverlay because GstXOverlay
+	has been renamed to GstVideoOverlay.
+
 2013-06-10  José Alburquerque  <jaalburquerque@gmail.com>
 
 	Move the generation scripts to the tools/gen_scripts directory.

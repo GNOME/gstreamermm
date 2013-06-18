@@ -20,10 +20,14 @@ _TRANSLATION(`GValueArray*',`Glib::ValueArray',`const Glib::ValueArray&',`Glib::
 dnl gstreamermm
 _TRANSLATION(`GstBuffer*',`Gst::Buffer',`const Glib::RefPtr<Gst::Buffer>&',`Glib::RefPtr<Gst::Buffer>',`<gstreamermm/buffer.h>')
 _TRANSLATION(`GstCaps*',`Gst::Caps',`const Glib::RefPtr<Gst::Caps>&',`Glib::RefPtr<Gst::Caps>',`<gstreamermm/caps.h>')
+_TRANSLATION(`GstChildProxy*',`Gst::ChildProxy',`const Glib::RefPtr<Gst::ChildProxy>&',`Glib::RefPtr<Gst::ChildProxy>',`<gstreamermm/childproxy.h>')
 _TRANSLATION(`GstElement*',`Gst::Element',`const Glib::RefPtr<Gst::Element>&',`Glib::RefPtr<Gst::Element>',`<gstreamermm/element.h>')
 _TRANSLATION(`GstElementFactory*',`Gst::ElementFactory',`const Glib::RefPtr<Gst::ElementFactory>&',`Glib::RefPtr<Gst::ElementFactory>',`<gstreamermm/elementfactory.h>')
 _TRANSLATION(`GstFraction',`Gst::Fraction',`const Gst::Fraction&',`Gst::Fraction',`<gstreamermm/value.h>')
 _TRANSLATION(`GstPad*',`Gst::Pad',`const Glib::RefPtr<Gst::Pad>&',`Glib::RefPtr<Gst::Pad>',`<gstreamermm/pad.h>')
+_TRANSLATION(`GstQuery*',`Gst::Query',`const Glib::RefPtr<Gst::Query>&',`Glib::RefPtr<Gst::Query>',`<gstreamermm/query.h>')
+_TRANSLATION(`GstSample*',`Gst::Sample',`const Glib::RefPtr<Gst::Sample>&',`Glib::RefPtr<Gst::Sample>',`<gstreamermm/sample.h>')
+_TRANSLATION(`GstStructure*',`Gst::Structure',`const Gst::Structure&',`Gst::Structure',`<gstreamermm/structure.h>')
 _TRANSLATION(`GstTagList*',`Gst::TagList',`const Gst::TagList&',`Gst::TagList',`<gstreamermm/taglist.h>')
 
 dnl Interfaces
@@ -36,7 +40,7 @@ _TRANSLATION(`GstPropertyProbe*',`Gst::PropertyProbe',`const Glib::RefPtr<Gst::P
 _TRANSLATION(`GstStreamVolume*',`Gst::StreamVolume',`const Glib::RefPtr<Gst::StreamVolume>&',`Glib::RefPtr<Gst::StreamVolume>',`<gstreamermm/streamvolume.h>')
 _TRANSLATION(`GstTagSetter*',`Gst::TagSetter',`const Glib::RefPtr<Gst::TagSetter>&',`Glib::RefPtr<Gst::TagSetter>',`<gstreamermm/tagsetter.h>')
 _TRANSLATION(`GstURIHandler*',`Gst::URIHandler',`const Glib::RefPtr<Gst::URIHandler>&',`Glib::RefPtr<Gst::URIHandler>',`<gstreamermm/urihandler.h>')
-_TRANSLATION(`GstXOverlay*',`Gst::XOverlay',`const Glib::RefPtr<Gst::XOverlay>&',`Glib::RefPtr<Gst::XOverlay>',`<gstreamermm/xoverlay.h>')
+_TRANSLATION(`GstVideoOverlay*',`Gst::VideoOverlay',`const Glib::RefPtr<Gst::VideoOverlay>&',`Glib::RefPtr<Gst::VideoOverlay>',`<gstreamermm/videooverlay.h>')
 
 dnl Wrapped enums:
 dnl One should be included for each enum wrapped outside of plug-ins so that

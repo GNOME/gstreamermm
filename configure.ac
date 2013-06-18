@@ -13,7 +13,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gstreamermm], [0.10.11],
+AC_INIT([gstreamermm], [0.11.0],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gstreamermm],
         [gstreamermm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -23,8 +23,8 @@ AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h])
 
-MM_PREREQ([0.9.5])
-MM_INIT_MODULE([gstreamermm-0.10])
+MM_PREREQ([0.9.6])
+MM_INIT_MODULE([gstreamermm-1.0])
 
 # Copy the mm-common .pl scripts into docs/,
 # and use them from there,
@@ -32,7 +32,7 @@ MM_INIT_MODULE([gstreamermm-0.10])
 MM_CONFIG_DOCTOOL_DIR([docs])
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-AC_SUBST([GSTREAMERMM_SO_VERSION], [2:1:0])
+AC_SUBST([GSTREAMERMM_SO_VERSION], [0:0:0])
 
 AM_INIT_AUTOMAKE([1.9 -Wno-portability check-news dist-bzip2 no-define nostdinc tar-ustar])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
@@ -57,11 +57,11 @@ AS_IF([test "x$enable_static" = xyes],
 # The format below is used so that the requirements appear nicely in the .pc
 # file.
 AC_SUBST([GSTREAMERMM_MODULES],
-         ['giomm-2.4 >= 2.28.0 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
-         [[], [-base], [-controller], [-dataprotocol], [-net], [-plugins-base],
-              [-audio], [-cdda], [-interfaces], [-netbuffer], [-rtp], [-video],
-              [-pbutils]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-0.10 >= 0.10.36])'])
+         ['giomm-2.4 >= 2.36.0 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
+         [[], [-allocators], [-app], [-audio], [-base], [-check],
+           [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
+           [-riff], [-rtp], [-sdp], [-tag], [-video]],
+         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.1.1])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
@@ -92,16 +92,16 @@ MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 # Also add the target .hg file name to the plugins_hg variable in the
 # gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
 # in lowercase with a .hg extension).
-#
-# TODO: Include appsink and appsrc plug-ins in list below if they indeed are
-# plug-ins (see gst-plugins-base docs for details) and when they don't cause
-# gstreamermm initialization errors.
+
+#TODO (Add below? Plug-in is missing in 1.1.1): gdpdepay|gdpdepay|GDPDepay \
+#TODO (Add below? Plug-in is missing in 1.1.1): gdppay|gdppay|GDPPay \
 
 AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
 adder|adder|Adder \
-alsamixer|alsamixer|AlsaMixer \
 alsasink|alsasink|AlsaSink \
 alsasrc|alsasrc|AlsaSrc \
+appsink|appsink|AppSink \
+appsrc|appsrc|AppSrc \
 audioconvert|audioconvert|AudioConvert \
 audiorate|audiorate|AudioRate \
 audioresample|audioresample|AudioResample \
@@ -110,30 +110,23 @@ capsfilter|capsfilter|CapsFilter \
 cdparanoiasrc|cdparanoiasrc|CdParanoiaSrc \
 clockoverlay|clockoverlay|ClockOverlay \
 decodebin|decodebin|DecodeBin \
-decodebin2|decodebin2|DecodeBin2 \
 fakesink|fakesink|FakeSink \
 fakesrc|fakesrc|FakeSrc \
 fdsink|fdsink|FdSink \
 fdsrc|fdsrc|FdSrc \
-ffmpegcolorspace|ffmpegcolorspace|FfmpegColorSpace \
 filesink|filesink|FileSink \
 filesrc|filesrc|FileSrc \
 funnel|funnel|Funnel \
-gdpdepay|gdpdepay|GDPDepay \
-gdppay|gdppay|GDPPay \
 giosink|giosink|GioSink \
 giosrc|giosrc|GioSrc \
 giostreamsink|giostreamsink|GioStreamSink \
 giostreamsrc|giostreamsrc|GioStreamSrc \
 identity|identity|Identity \
-inputselector|input-selector|InputSelector \
 multifdsink|multifdsink|MultiFdSink \
 multiqueue|multiqueue|MultiQueue \
 oggdemux|oggdemux|OggDemux \
 oggmux|oggmux|OggMux \
-outputselector|output-selector|OutputSelector \
 playbin|playbin|PlayBin \
-playbin2|playbin2|PlayBin2 \
 queue|queue|Queue \
 queue2|queue2|Queue2 \
 subtitleoverlay|subtitleoverlay|SubtitleOverlay \
@@ -148,9 +141,9 @@ theoradec|theoradec|TheoraDec \
 theoraenc|theoraenc|TheoraEnc \
 theoraparse|theoraparse|TheoraParse \
 timeoverlay|timeoverlay|TimeOverlay \
-typefindelement|typefind|TypeFindElement \
 uridecodebin|uridecodebin|UriDecodeBin \
 valve|valve|Valve \
+videoconvert|videoconvert|VideoConvert \
 videorate|videorate|VideoRate \
 videoscale|videoscale|VideoScale \
 videotestsrc|videotestsrc|VideoTestSrc \
@@ -169,9 +162,10 @@ xvimagesink|xvimagesink|XvImageSink
 AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
 [
   gstmm_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-0.10 2>&AS_MESSAGE_LOG_FD`
-  AC_PATH_PROGS([GST_INSPECT], [gst-inspect-0.10 gst-inspect],,
+  AC_PATH_PROGS([GST_INSPECT], [gst-inspect-1.0],,
                 [$gstmm_toolsdir$PATH_SEPARATOR$PATH])
 
+  AC_MSG_CHECKING([the existance of required plug-ins.])
   for gstmm_plugin_def in $GSTREAMERMM_PLUGIN_DEFS
   do
     # Extract plugin name and run gst-inspect to check whether the plugin
@@ -183,6 +177,7 @@ If you built gst-plugins-base from source code then you might need to
 install the appropriate -dev or -devel packages or enable experimental
 plugins before rebuilding gst-plugins-base.]])])
   done
+  AC_MSG_RESULT([All required plug-ins found.])
 ])
 
 #########################################################################
