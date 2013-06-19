@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/audio/gstringbuffer.h>
+#include <gst/audio/audio.h>
 #include <gstreamermm/caps.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/format.h>
@@ -29,33 +29,33 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-_WRAP_ENUM(RingBufferSegState, GstRingBufferSegState)
-_WRAP_ENUM(RingBufferState, GstRingBufferState)
+_WRAP_ENUM(AudioRingBufferSegState, GstAudioRingBufferSegState)
+_WRAP_ENUM(AudioRingBufferState, GstAudioRingBufferState)
 _WRAP_ENUM(BufferFormat, GstBufferFormat)
 _WRAP_ENUM(BufferFormatType, GstBufferFormatType)
 
-/** A class containing the format specification of a Gst::RingBuffer.
- * Gst::RingBufferSpec contains the format specification of a Gst::RingBuffer.
- * The "in" members should be specified by the caller of the
- * Gst::RingBuffer::acquire() method while the "in/out" members may be set by
- * the caller but are also modifiable by Gst::RingBuffer::acquire().  The
- * "out" members are generated as a result of the call to
- * Gst::RingBuffer::acquire().
- * @see Gst::RingBuffer::acquire().
+/** A class containing the format specification of a Gst::AudioRingBuffer.
+ * Gst::AudioRingBufferSpec contains the format specification of a
+ * Gst::AudioRingBuffer.  The "in" members should be specified by the caller of
+ * the Gst::AudioRingBuffer::acquire() method while the "in/out" members may be
+ * set by the caller but are also modifiable by
+ * Gst::AudioRingBuffer::acquire().  The "out" members are generated as a
+ * result of the call to Gst::AudioRingBuffer::acquire().
+ * @see Gst::AudioRingBuffer::acquire().
  */
-class RingBufferSpec
+class AudioRingBufferSpec
 {
-    _CLASS_GENERIC(RingBufferSpec, GstRingBufferSpec)
+    _CLASS_GENERIC(AudioRingBufferSpec, GstAudioRingBufferSpec)
 public:
   /** Default constructor.
    * @throw std::runtime_error if memory is unavailable for the new
-   * Gst::RingBufferSpec.
+   * Gst::AudioRingBufferSpec.
    */
-  RingBufferSpec();
+  AudioRingBufferSpec();
 
-  /** Fully construct a Gst::RingBufferSpec.  Only the "(in)" parameters are
-   * required.  The "(in/out)" parameters are optional and may be modified by
-   * the call to the Gst::RingBuffer::acquire() method.
+  /** Fully construct a Gst::AudioRingBufferSpec.  Only the "(in)" parameters
+   * are required.  The "(in/out)" parameters are optional and may be modified
+   * by the call to the Gst::AudioRingBuffer::acquire() method.
    * @param caps The caps of the buffer (in).
    * @param type The sample type (in/out).
    * @param format The sample format (in/out).
@@ -73,39 +73,39 @@ public:
    * defaults to @a segtotal in the C API (in/out).
    *
    * @throw std::runtime_error if memory is unavailable for the new
-   * Gst::RingBufferSpec.
+   * Gst::AudioRingBufferSpec.
    */
-  RingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
+  AudioRingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
     Gst::BufferFormatType type = Gst::BUFTYPE_LINEAR,
     Gst::BufferFormat format = Gst::UNKNOWN, bool sign = false,
     bool bigend = false, int width = 0, int depth = 0, int rate = 0,
     int channels = 0, guint64 latency_time = 0, guint64 buffer_time = 0,
     int segsize = 0, int segtotal = 0, int seglatency = 0);
 
-  /// Construct a Gst::RingBufferSpec from a GstRingBufferSpec.
-  explicit RingBufferSpec(GstRingBufferSpec& castitem,
+  /// Construct a Gst::AudioRingBufferSpec from a GstAudioRingBufferSpec.
+  explicit AudioRingBufferSpec(GstAudioRingBufferSpec& castitem,
     bool take_ownership = false);
 
   /** Copy constructor.
    *
    * @throw std::runtime_error if memory is unavailable for the new
-   * Gst::RingBufferSpec.
+   * Gst::AudioRingBufferSpec.
    */
-  RingBufferSpec(const RingBufferSpec& other);
+  AudioRingBufferSpec(const AudioRingBufferSpec& other);
 
   /// Assignment operator.
-  RingBufferSpec& operator=(const RingBufferSpec& other);
+  AudioRingBufferSpec& operator=(const AudioRingBufferSpec& other);
 
   /// Destructor.
-  virtual ~RingBufferSpec();
+  virtual ~AudioRingBufferSpec();
 
-  void swap(RingBufferSpec& other);
-
-  /// Gets the underlying gobject.
-  GstRingBufferSpec* gobj() { return m_spec; };
+  void swap(AudioRingBufferSpec& other);
 
   /// Gets the underlying gobject.
-  const GstRingBufferSpec* gobj() const { return m_spec; };
+  GstAudioRingBufferSpec* gobj() { return m_spec; };
+
+  /// Gets the underlying gobject.
+  const GstAudioRingBufferSpec* gobj() const { return m_spec; };
 
   /** Get the caps of the buffer (in). */
   _MEMBER_GET_GOBJECT(caps, caps, Gst::Caps, GstCaps*)
@@ -220,33 +220,33 @@ public:
   _MEMBER_SET(seglatency, seglatency, int, gint)
 
   /** Get the number of bytes of one sample (out).  This is set by the call to
-   * Gst::RingBuffer::acquire().
+   * Gst::AudioRingBuffer::acquire().
    */
   _MEMBER_GET(bytes_per_sample, bytes_per_sample, int, gint)
 
   /** Set the number of bytes of one sample (out).  This is set by the call to
-   * Gst::RingBuffer::acquire() and should probably not be set.
+   * Gst::AudioRingBuffer::acquire() and should probably not be set.
    */
   _MEMBER_SET(bytes_per_sample, bytes_per_sample, int, gint)
 
 // This constant is obtained from the "silence_sample" member in the
-// GstRingBufferSpec structure definition.
+// GstAudioRingBufferSpec structure definition.
 #define GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE 32
 
 #m4 _CONVERSION(`guint8*', `Glib::ArrayHandle<guint8>', `Glib::ArrayHandle<guint8>($3, GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE, Glib::OWNERSHIP_NONE)')
   /** Get the bytes representing one sample of silence (out).  This is set by
-   * the call to Gst::RingBuffer::acquire().
+   * the call to Gst::AudioRingBuffer::acquire().
    */
   _MEMBER_GET(silence_sample, silence_sample, Glib::ArrayHandle<guint8>, guint8*)
 
   /** Sets the bytes representing one sample of silence (out).  This is set by
-   * the call to Gst::RingBuffer::acquire() and probably should not be set.
+   * the call to Gst::AudioRingBuffer::acquire() and probably should not be set.
    */
   void set_silence_sample(const Glib::ArrayHandle<guint8>& silence_sample);
 
 protected:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GstRingBufferSpec* m_spec;
+  GstAudioRingBufferSpec* m_spec;
   // Tells whether the m_spec member should be freed upon destruction.
   bool take_ownership;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
@@ -264,13 +264,13 @@ protected:
  * Last reviewed on 2006-02-02 (0.10.4).
  * @ingroup GstBaseClasses
  */
-class RingBuffer : public Gst::Object
+class AudioRingBuffer : public Gst::Object
 {
-  _CLASS_GOBJECT(RingBuffer, GstRingBuffer, GST_RING_BUFFER, Gst::Object, GstObject)
+  _CLASS_GOBJECT(AudioRingBuffer, GstAudioRingBuffer, GST_RING_BUFFER, Gst::Object, GstObject)
 
 public:
   /** For example,
-   * bool on_fill(const Glib::RefPtr<Gst::RingBuffer>& rbuf,
+   * bool on_fill(const Glib::RefPtr<Gst::AudioRingBuffer>& rbuf,
    * const std::vector<guint8>& data, guint len);.
    * This slot is set with set_fill_slot() and is called to fill the memory at
    * data with len bytes of samples.
@@ -287,40 +287,40 @@ public:
    * @param slot The fill slot to set.
    */
   void set_fill_slot(const SlotFill& slot);
-  _IGNORE(gst_ring_buffer_set_callback)
+  _IGNORE(gst_audio_ring_buffer_set_callback)
 
-  _WRAP_METHOD(bool acquire(Gst::RingBufferSpec& spec), gst_ring_buffer_acquire)
-  _WRAP_METHOD(bool release(), gst_ring_buffer_release)
-  _WRAP_METHOD(bool is_acquired() const, gst_ring_buffer_is_acquired)
-  _WRAP_METHOD(bool activate(bool active), gst_ring_buffer_activate)
-  _WRAP_METHOD(bool is_active() const, gst_ring_buffer_is_active)
-  _WRAP_METHOD(bool start(), gst_ring_buffer_start)
-  _WRAP_METHOD(bool pause(), gst_ring_buffer_pause)
-  _WRAP_METHOD(bool stop(), gst_ring_buffer_stop)
-  _WRAP_METHOD(guint get_delay() const, gst_ring_buffer_delay)
-  _WRAP_METHOD(guint64 get_samples_done() const, gst_ring_buffer_samples_done)
-  _WRAP_METHOD(void set_sample(guint64 sample), gst_ring_buffer_set_sample)
+  _WRAP_METHOD(bool acquire(Gst::AudioRingBufferSpec& spec), gst_audio_ring_buffer_acquire)
+  _WRAP_METHOD(bool release(), gst_audio_ring_buffer_release)
+  _WRAP_METHOD(bool is_acquired() const, gst_audio_ring_buffer_is_acquired)
+  _WRAP_METHOD(bool activate(bool active), gst_audio_ring_buffer_activate)
+  _WRAP_METHOD(bool is_active() const, gst_audio_ring_buffer_is_active)
+  _WRAP_METHOD(bool start(), gst_audio_ring_buffer_start)
+  _WRAP_METHOD(bool pause(), gst_audio_ring_buffer_pause)
+  _WRAP_METHOD(bool stop(), gst_audio_ring_buffer_stop)
+  _WRAP_METHOD(guint get_delay() const, gst_audio_ring_buffer_delay)
+  _WRAP_METHOD(guint64 get_samples_done() const, gst_audio_ring_buffer_samples_done)
+  _WRAP_METHOD(void set_sample(guint64 sample), gst_audio_ring_buffer_set_sample)
 
-#m4 _CONVERSION(`const Glib::ArrayHandle<guchar>&', `guchar*', `const_cast<guchar*>($3.data())')
-  _WRAP_METHOD(guint commit(guint64 sample, const Glib::ArrayHandle<guchar>& data, guint len), gst_ring_buffer_commit)
-  _WRAP_METHOD(guint commit(guint64& sample, const Glib::ArrayHandle<guchar>& data, int in_samples, int out_samples, int& accum), gst_ring_buffer_commit_full)
+#m4 _CONVERSION(`const std::vector<guint8>&', `guint8*', `Glib::ArrayHandler<guint8>::vector_to_array($3).data()')
 
-  _WRAP_METHOD(bool convert(Gst::Format src_fmt, gint64 src_val, Gst::Format dest_fmt, gint64& dest_val) const, gst_ring_buffer_convert)
+  _WRAP_METHOD(guint commit(guint64& sample, const std::vector<guint8>& data, int in_samples, int out_samples, int& accum), gst_audio_ring_buffer_commit)
 
-  _WRAP_METHOD_DOCS_ONLY(gst_ring_buffer_prepare_read)
+  _WRAP_METHOD(bool convert(Gst::Format src_fmt, gint64 src_val, Gst::Format dest_fmt, gint64& dest_val) const, gst_audio_ring_buffer_convert)
+
+  _WRAP_METHOD_DOCS_ONLY(gst_audio_ring_buffer_prepare_read)
   bool prepare_read(int& segment, std::vector<guint8>& readptr, int& len);
 
-  _WRAP_METHOD(guint read(guint64 sample, const Glib::ArrayHandle<guchar>& data, guint len), gst_ring_buffer_read)
+  _WRAP_METHOD(guint read(guint64 sample, const std::vector<guint8>& data, guint len, ClockTime& timestamp), gst_audio_ring_buffer_read)
 
-  _WRAP_METHOD(void clear(int segment), gst_ring_buffer_clear)
-  _WRAP_METHOD(void clear_all(), gst_ring_buffer_clear_all)
-  _WRAP_METHOD(void advance(guint advance), gst_ring_buffer_advance)
-  _WRAP_METHOD(bool close_device(), gst_ring_buffer_close_device)
-  _WRAP_METHOD(bool open_device(), gst_ring_buffer_open_device)
-  _WRAP_METHOD(bool device_is_open() const, gst_ring_buffer_device_is_open)
-  _WRAP_METHOD(void set_may_start(bool allowed), gst_ring_buffer_may_start)
-  _WRAP_METHOD(static bool parse_caps(Gst::RingBufferSpec&, const Glib::RefPtr<Gst::Caps>& caps), gst_ring_buffer_parse_caps)
-  _WRAP_METHOD(void set_flushing(bool flushing), gst_ring_buffer_set_flushing)
+  _WRAP_METHOD(void clear(int segment), gst_audio_ring_buffer_clear)
+  _WRAP_METHOD(void clear_all(), gst_audio_ring_buffer_clear_all)
+  _WRAP_METHOD(void advance(guint advance), gst_audio_ring_buffer_advance)
+  _WRAP_METHOD(bool close_device(), gst_audio_ring_buffer_close_device)
+  _WRAP_METHOD(bool open_device(), gst_audio_ring_buffer_open_device)
+  _WRAP_METHOD(bool device_is_open() const, gst_audio_ring_buffer_device_is_open)
+  _WRAP_METHOD(void set_may_start(bool allowed), gst_audio_ring_buffer_may_start)
+  _WRAP_METHOD(static bool parse_caps(Gst::AudioRingBufferSpec&, const Glib::RefPtr<Gst::Caps>& caps), gst_audio_ring_buffer_parse_caps)
+  _WRAP_METHOD(void set_flushing(bool flushing), gst_audio_ring_buffer_set_flushing)
 
   /** Virtual function to open the device.  Don't set any params or allocate
    * anything.
@@ -330,7 +330,7 @@ public:
   /** Virtual function to allocate the resources for the ring buffer using the
    * given spec.
    */
-  virtual bool acquire_vfunc(Gst::RingBufferSpec& spec);
+  virtual bool acquire_vfunc(Gst::AudioRingBufferSpec& spec);
 
   /** Virtual function to free resources of the ring buffer.
    */
@@ -367,7 +367,8 @@ public:
 
   /** Virtual function to write samples into the ring buffer.
    */
-  virtual guint commit_vfunc(guint64& sample, const Glib::ArrayHandle<guchar>& data, int in_samples, int out_samples, int& accum);
+  virtual guint commit_vfunc(guint64& sample, const std::vector<guint8>& data,
+    int in_samples, int out_samples, int& accum);
 
   /** Virtual function to clear the entire ringbuffer Since 0.10.24.
    */
@@ -379,8 +380,8 @@ protected:
   klass->acquire = &acquire_vfunc_callback;
   klass->commit = &commit_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
-  static gboolean acquire_vfunc_callback(GstRingBuffer* self, GstRingBufferSpec* spec);
-  static guint commit_vfunc_callback(GstRingBuffer* self, guint64* sample, guchar* data, gint in_samples, gint out_samples, gint* accum);
+  static gboolean acquire_vfunc_callback(GstAudioRingBuffer* self, GstAudioRingBufferSpec* spec);
+  static guint commit_vfunc_callback(GstAudioRingBuffer* self, guint64* sample, guchar* data, gint in_samples, gint out_samples, gint* accum);
   _POP()
 #m4end
 

@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/audio/audio-enumtypes.h>
 #include <gstreamermm/handle_error.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
@@ -27,10 +26,11 @@ namespace
 extern "C"
 {
 
-static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer*, guint8* data, guint len,
-                                                 gpointer user_data)
+static void AudioRingBuffer_Fill_gstreamermm_callback(GstAudioRingBuffer*,
+  guint8* data, guint len, gpointer user_data)
 {
-  Gst::RingBuffer::SlotFill& slot_fill = *static_cast<Gst::RingBuffer::SlotFill*>(user_data);
+  Gst::AudioRingBuffer::SlotFill& slot_fill =
+    *static_cast<Gst::AudioRingBuffer::SlotFill*>(user_data);
 
   try
   {
@@ -50,35 +50,36 @@ static void RingBuffer_Fill_gstreamermm_callback(GstRingBuffer*, guint8* data, g
 namespace Gst
 {
 
-RingBufferSpec::RingBufferSpec()
-: m_spec(g_try_new(GstRingBufferSpec, 1)),
+AudioRingBufferSpec::AudioRingBufferSpec()
+: m_spec(g_try_new(GstAudioRingBufferSpec, 1)),
   take_ownership(true)
 {
   // Handle possible memory allocation failure.
   if(!m_spec)
   {
-    gstreamermm_handle_error("Failed to allocate a new Gst::RingBufferSpec.");
+    gstreamermm_handle_error(
+      "Failed to allocate a new Gst::AudioRingBufferSpec.");
     return;
   }
 }
 
-RingBufferSpec::RingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
+AudioRingBufferSpec::AudioRingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
   Gst::BufferFormatType type, Gst::BufferFormat format, bool sign,
   bool bigend, int width, int depth, int rate, int channels,
   guint64 latency_time, guint64 buffer_time, int segsize, int segtotal,
   int seglatency)
-: m_spec(g_try_new(GstRingBufferSpec, 1)),
+: m_spec(g_try_new(GstAudioRingBufferSpec, 1)),
   take_ownership(true)
   
 {
   // Handle possible memory allocation failure.
   if(!m_spec)
   {
-    gstreamermm_handle_error("Failed to allocate a new Gst::RingBufferSpec.");
+    gstreamermm_handle_error("Failed to allocate a new Gst::AudioRingBufferSpec.");
     return;
   }
 
-  GstRingBufferSpec* spec = gobj();
+  GstAudioRingBufferSpec* spec = gobj();
 
   spec->caps = Glib::unwrap(caps);
 
@@ -102,7 +103,7 @@ RingBufferSpec::RingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
 }
 
 
-RingBufferSpec::RingBufferSpec(GstRingBufferSpec& castitem, bool take_ownership)
+AudioRingBufferSpec::AudioRingBufferSpec(GstAudioRingBufferSpec& castitem, bool take_ownership)
 : m_spec(&castitem),
   take_ownership(take_ownership)
 {
@@ -111,14 +112,14 @@ RingBufferSpec::RingBufferSpec(GstRingBufferSpec& castitem, bool take_ownership)
       gst_caps_ref(castitem.caps);
 }
 
-RingBufferSpec::RingBufferSpec(const RingBufferSpec& other)
-: m_spec(g_try_new(GstRingBufferSpec, 1)),
+AudioRingBufferSpec::AudioRingBufferSpec(const AudioRingBufferSpec& other)
+: m_spec(g_try_new(GstAudioRingBufferSpec, 1)),
   take_ownership(true)
 {
   // Handle possible memory allocation failure.
   if(!m_spec)
   {
-    gstreamermm_handle_error("Failed to allocate a new Gst::RingBufferSpec.");
+    gstreamermm_handle_error("Failed to allocate a new Gst::AudioRingBufferSpec.");
     return;
   }
 
@@ -146,14 +147,14 @@ RingBufferSpec::RingBufferSpec(const RingBufferSpec& other)
   std::copy(other.m_spec->silence_sample, other.m_spec->silence_sample + GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE, m_spec->silence_sample);
 }
 
-RingBufferSpec& RingBufferSpec::operator=(const RingBufferSpec& other)
+AudioRingBufferSpec& AudioRingBufferSpec::operator=(const AudioRingBufferSpec& other)
 {
-  RingBufferSpec temp(other);
+  AudioRingBufferSpec temp(other);
   swap(temp);
   return *this;
 }
 
-RingBufferSpec::~RingBufferSpec()
+AudioRingBufferSpec::~AudioRingBufferSpec()
 {
   // Unref existing reference to caps.
   if(m_spec->caps)
@@ -164,9 +165,9 @@ RingBufferSpec::~RingBufferSpec()
     g_free(m_spec);
 }
 
-void RingBufferSpec::swap(RingBufferSpec& other)
+void AudioRingBufferSpec::swap(AudioRingBufferSpec& other)
 {
-  GstRingBufferSpec* spec_temp = m_spec;
+  GstAudioRingBufferSpec* spec_temp = m_spec;
   m_spec = other.m_spec;
   other.m_spec = spec_temp;
 
@@ -175,31 +176,32 @@ void RingBufferSpec::swap(RingBufferSpec& other)
   other.take_ownership = take_temp;
 }
 
-void RingBufferSpec::set_silence_sample(const Glib::ArrayHandle<guint8>& silence_sample)
+void AudioRingBufferSpec::set_silence_sample(const Glib::ArrayHandle<guint8>& silence_sample)
 {
   std::copy(silence_sample.data(),
     silence_sample.data() + GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE,
     m_spec->silence_sample);
 }
 
-void RingBuffer::set_fill_slot(const SlotFill& slot)
+void AudioRingBuffer::set_fill_slot(const SlotFill& slot)
 {
   // The slot is dynamically allocated because according to the
-  // gst_ring_buffer_set_callback() docs, the slot may be called several times.
+  // gst_audio_ring_buffer_set_callback() docs, the slot may be called several
+  // times.
   // A copy is hence created to avoid losing the slot.  The copy is kept in an
   // auto_ptr<> so that is released upon the ring buffer's destruction.
   m_slot.reset(new SlotFill(slot));
 
-  gst_ring_buffer_set_callback(gobj(), &RingBuffer_Fill_gstreamermm_callback,
+  gst_audio_ring_buffer_set_callback(gobj(), &AudioRingBuffer_Fill_gstreamermm_callback,
     m_slot.get());
 }
 
-bool RingBuffer::prepare_read(int& segment, std::vector<guint8>& readptr,
+bool AudioRingBuffer::prepare_read(int& segment, std::vector<guint8>& readptr,
   int& len)
 {
   guint8* c_readptr = 0;
 
-  const bool result = static_cast<bool>(gst_ring_buffer_prepare_read(gobj(), &segment, &c_readptr, &len));
+  const bool result = static_cast<bool>(gst_audio_ring_buffer_prepare_read(gobj(), &segment, &c_readptr, &len));
   readptr.assign(c_readptr, c_readptr + len);
 
   if (c_readptr)
@@ -208,7 +210,7 @@ bool RingBuffer::prepare_read(int& segment, std::vector<guint8>& readptr,
   return result;
 }
 
-gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBufferSpec* spec)
+gboolean AudioRingBuffer_Class::acquire_vfunc_callback(GstAudioRingBuffer* self, GstAudioRingBufferSpec* spec)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -225,7 +227,7 @@ gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBu
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-        Gst::RingBufferSpec cpp_spec(*spec);
+        Gst::AudioRingBufferSpec cpp_spec(*spec);
 
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->acquire_vfunc(cpp_spec));
@@ -250,7 +252,7 @@ gboolean RingBuffer_Class::acquire_vfunc_callback(GstRingBuffer* self, GstRingBu
   typedef gboolean RType;
   return RType();
 }
-bool Gst::RingBuffer::acquire_vfunc(Gst::RingBufferSpec& spec) 
+bool Gst::AudioRingBuffer::acquire_vfunc(Gst::AudioRingBufferSpec& spec) 
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -262,7 +264,7 @@ bool Gst::RingBuffer::acquire_vfunc(Gst::RingBufferSpec& spec)
   typedef bool RType;
   return RType();
 }
-guint RingBuffer_Class::commit_vfunc_callback(GstRingBuffer* self, guint64* sample, guchar* data, gint in_samples, gint out_samples, gint* accum)
+guint AudioRingBuffer_Class::commit_vfunc_callback(GstAudioRingBuffer* self, guint64* sample, guchar* data, gint in_samples, gint out_samples, gint* accum)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -287,8 +289,7 @@ guint RingBuffer_Class::commit_vfunc_callback(GstRingBuffer* self, guint64* samp
         // Declare the ArrayHandle for the C++ vfunc.
         Glib::ArrayHandle<guchar> cpp_data(data, data_length, Glib::OWNERSHIP_NONE);
         // Call the virtual member method, which derived classes might override.
-        return obj->commit_vfunc(*(sample), cpp_data, in_samples, out_samples,
-          *(accum));
+        return obj->commit_vfunc(*(sample), Glib::ArrayHandler<guint8>::array_to_vector(data, data_length, Glib::OWNERSHIP_NONE), in_samples, out_samples, *(accum));
       }
       catch(...)
       {
@@ -309,14 +310,14 @@ guint RingBuffer_Class::commit_vfunc_callback(GstRingBuffer* self, guint64* samp
   typedef guint RType;
   return RType();
 }
-guint Gst::RingBuffer::commit_vfunc(guint64& sample, const Glib::ArrayHandle<guchar>& data, int in_samples, int out_samples, int& accum) 
+guint Gst::AudioRingBuffer::commit_vfunc(guint64& sample, const std::vector<guint8>& data, int in_samples, int out_samples, int& accum) 
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
   );
 
   if(base && base->commit)
-    return (*base->commit)(gobj(),&sample,const_cast<guchar*>(data.data()),in_samples,out_samples,&accum);
+    return (*base->commit)(gobj(),&sample,Glib::ArrayHandler<guint8>::vector_to_array(data).data(),,in_samples,out_samples,&accum);
 
   typedef guint RType;
   return RType();

@@ -17,17 +17,18 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/audio/gstringbuffer.h>
+#include <gst/audio/audio.h>
 #include <gstreamermm/basesink.h>
+_PINCLUDE(gstreamermm/private/basesink_p.h)
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-class RingBuffer;
+class AudioRingBuffer;
 
-_WRAP_ENUM(BaseAudioSinkSlaveMethod, GstBaseAudioSinkSlaveMethod)
+_WRAP_ENUM(AudioBaseSinkSlaveMethod, GstAudioBaseSinkSlaveMethod)
 
 /** The base class for audio sinks.
  * This is the base class for audio sinks. Subclasses need to implement the
@@ -38,24 +39,24 @@ _WRAP_ENUM(BaseAudioSinkSlaveMethod, GstBaseAudioSinkSlaveMethod)
  *
  * @ingroup GstBaseClasses
  */
-class BaseAudioSink : public Gst::BaseSink
+class AudioBaseSink : public Gst::BaseSink
 {
-  _CLASS_GOBJECT(BaseAudioSink, GstBaseAudioSink, GST_BASE_AUDIO_SINK, Gst::BaseSink, GstBaseSink)
+  _CLASS_GOBJECT(AudioBaseSink, GstAudioBaseSink, GST_AUDIO_BASE_SINK, Gst::BaseSink, GstBaseSink)
 
 public:
-  /** Get the Gst::Clock of the Gst::BaseAudioSink.
+  /** Get the Gst::Clock of the Gst::AudioBaseSink.
    */
   _MEMBER_GET_GOBJECT(provided_clock, provided_clock, Gst::Clock, GstClock*)
 
-  _WRAP_METHOD(Glib::RefPtr<Gst::RingBuffer> create_ring_buffer(), gst_base_audio_sink_create_ringbuffer)
-  _WRAP_METHOD(void set_provide_clock(bool provide), gst_base_audio_sink_set_provide_clock)
-  _WRAP_METHOD(bool get_provide_clock() const, gst_base_audio_sink_get_provide_clock)
+  _WRAP_METHOD(Glib::RefPtr<Gst::AudioRingBuffer> create_ring_buffer(), gst_audio_base_sink_create_ringbuffer)
+  _WRAP_METHOD(void set_provide_clock(bool provide), gst_audio_base_sink_set_provide_clock)
+  _WRAP_METHOD(bool get_provide_clock() const, gst_audio_base_sink_get_provide_clock)
 
-  _WRAP_METHOD(void set_slave_method(Gst::BaseAudioSinkSlaveMethod method), gst_base_audio_sink_set_slave_method)
-  _WRAP_METHOD(Gst::BaseAudioSinkSlaveMethod get_slave_method() const, gst_base_audio_sink_get_slave_method)
+  _WRAP_METHOD(void set_slave_method(Gst::AudioBaseSinkSlaveMethod method), gst_audio_base_sink_set_slave_method)
+  _WRAP_METHOD(Gst::AudioBaseSinkSlaveMethod get_slave_method() const, gst_audio_base_sink_get_slave_method)
 
-  _WRAP_METHOD(gint64 get_drift_tolerance() const, gst_base_audio_sink_get_drift_tolerance)
-  _WRAP_METHOD(void set_drift_tolerance(gint64 drift_tolerance), gst_base_audio_sink_set_drift_tolerance)
+  _WRAP_METHOD(gint64 get_drift_tolerance() const, gst_audio_base_sink_get_drift_tolerance)
+  _WRAP_METHOD(void set_drift_tolerance(gint64 drift_tolerance), gst_audio_base_sink_set_drift_tolerance)
 
   _WRAP_PROPERTY("alignment-threshold", guint64)
   _WRAP_PROPERTY("buffer-time", gint64)
@@ -64,11 +65,11 @@ public:
   _WRAP_PROPERTY("drift-tolerance", gint64)
   _WRAP_PROPERTY("latency-time", gint64)
   _WRAP_PROPERTY("provide-clock", bool)
-  _WRAP_PROPERTY("slave-method", Gst::BaseAudioSinkSlaveMethod)
+  _WRAP_PROPERTY("slave-method", Gst::AudioBaseSinkSlaveMethod)
 
-  /** vfunc to create and return a Gst::RingBuffer to write to.
+  /** vfunc to create and return a Gst::AudioRingBuffer to write to.
    */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::RingBuffer> create_ring_buffer(), "create_ringbuffer")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::AudioRingBuffer> create_ring_buffer(), "create_ringbuffer")
 };
 
 } // namespace Gst

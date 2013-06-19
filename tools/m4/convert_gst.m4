@@ -3,8 +3,8 @@ dnl Copyright 2008 The gstreamermm Development Team
 dnl Enums
 _CONV_ENUM(Gst,AssocFlags)
 _CONV_ENUM(Gst,AutoplugSelectResult)
-_CONV_ENUM(Gst,BaseAudioSinkSlaveMethod)
-_CONV_ENUM(Gst,BaseAudioSrcSlaveMethod)
+_CONV_ENUM(Gst,AudioBaseSinkSlaveMethod)
+_CONV_ENUM(Gst,AudioBaseSrcSlaveMethod)
 _CONV_ENUM(Gst,BufferCopyFlags)
 _CONV_ENUM(Gst,BufferFlag)
 _CONV_ENUM(Gst,BufferFormat)
@@ -176,12 +176,12 @@ _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Gst::unwrap($3)')
 dnl Registry
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')
 
-dnl RingBuffer
-_CONVERSION(`GstRingBuffer*',`Glib::RefPtr<Gst::RingBuffer>',`Glib::wrap($3)')
-_CONVERSION(`Glib::RefPtr<Gst::RingBuffer>',`GstRingBuffer*',`Glib::unwrap($3)')
+dnl AudioRingBuffer
+_CONVERSION(`GstAudioRingBuffer*',`Glib::RefPtr<Gst::AudioRingBuffer>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::AudioRingBuffer>',`GstAudioRingBuffer*',`Glib::unwrap($3)')
 
-dnl RingBufferSpec
-_CONVERSION(`Gst::RingBufferSpec&', `GstRingBufferSpec*', `$3.gobj()')
+dnl AudioRingBufferSpec
+_CONVERSION(`Gst::AudioRingBufferSpec&', `GstAudioRingBufferSpec*', `$3.gobj()')
 
 dnl Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')

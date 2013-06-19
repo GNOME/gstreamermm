@@ -17,17 +17,18 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/audio/gstringbuffer.h>
+#include <gst/audio/audio.h>
 #include <gstreamermm/pushsrc.h>
+_PINCLUDE(gstreamermm/private/pushsrc_p.h)
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-class RingBuffer;
+class AudioRingBuffer;
 
-_WRAP_ENUM(BaseAudioSrcSlaveMethod, GstBaseAudioSrcSlaveMethod)
+_WRAP_ENUM(AudioBaseSrcSlaveMethod, GstAudioBaseSrcSlaveMethod)
 
 /** The base class for audio sources.
  * This is the base class for audio sources. Subclasses need to implement the
@@ -38,21 +39,21 @@ _WRAP_ENUM(BaseAudioSrcSlaveMethod, GstBaseAudioSrcSlaveMethod)
  *
  * @ingroup GstBaseClasses
  */
-class BaseAudioSrc : public Gst::PushSrc
+class AudioBaseSrc : public Gst::PushSrc
 {
-  _CLASS_GOBJECT(BaseAudioSrc, GstBaseAudioSrc, GST_BASE_AUDIO_SRC, Gst::PushSrc, GstPushSrc)
+  _CLASS_GOBJECT(AudioBaseSrc, GstAudioBaseSrc, GST_AUDIO_BASE_SRC, Gst::PushSrc, GstPushSrc)
 
 public:
   /** Get the Gst::Clock of the Gst::AudioSrc.
    */
   _MEMBER_GET_GOBJECT(clock, clock, Gst::Clock, GstClock*)
 
-  _WRAP_METHOD(Glib::RefPtr<Gst::RingBuffer> create_ring_buffer(), gst_base_audio_src_create_ringbuffer)
+  _WRAP_METHOD(Glib::RefPtr<Gst::AudioRingBuffer> create_ring_buffer(), gst_audio_base_src_create_ringbuffer)
 
-  _WRAP_METHOD(void set_provide_clock(bool provide), gst_base_audio_src_set_provide_clock)
-  _WRAP_METHOD(bool get_provide_clock() const, gst_base_audio_src_get_provide_clock)
-  _WRAP_METHOD(void set_slave_method(Gst::BaseAudioSrcSlaveMethod method), gst_base_audio_src_set_slave_method)
-  _WRAP_METHOD(Gst::BaseAudioSrcSlaveMethod get_slave_method() const, gst_base_audio_src_get_slave_method)
+  _WRAP_METHOD(void set_provide_clock(bool provide), gst_audio_base_src_set_provide_clock)
+  _WRAP_METHOD(bool get_provide_clock() const, gst_audio_base_src_get_provide_clock)
+  _WRAP_METHOD(void set_slave_method(Gst::AudioBaseSrcSlaveMethod method), gst_audio_base_src_set_slave_method)
+  _WRAP_METHOD(Gst::AudioBaseSrcSlaveMethod get_slave_method() const, gst_audio_base_src_get_slave_method)
 
   _WRAP_PROPERTY("actual-buffer-time", gint64)
   _WRAP_PROPERTY("actual-latency-time", gint64)
@@ -60,11 +61,11 @@ public:
   _WRAP_PROPERTY("latency-time", gint64)
   _WRAP_PROPERTY("provide-clock", bool)
 
-  _WRAP_PROPERTY("slave-method", BaseAudioSrcSlaveMethod)
+  _WRAP_PROPERTY("slave-method", AudioBaseSrcSlaveMethod)
 
-  /** vfunc to create and return a Gst::RingBuffer to read from.
+  /** vfunc to create and return a Gst::AudioRingBuffer to read from.
    */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::RingBuffer> create_ring_buffer(), "create_ringbuffer")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::AudioRingBuffer> create_ring_buffer(), "create_ringbuffer")
 };
 
 } // namespace Gst
