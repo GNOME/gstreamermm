@@ -221,7 +221,6 @@ _CONVERSION(`const Glib::RefPtr<Gst::URIHandler>&',`GstURIHandler*',`Glib::unwra
 dnl ##################General Conversions############################
 
 dnl Basic General Conversions
-_CONVERSION(`gint64&',`gint64*',`&$3')
 _CONVERSION(`guint64&',`guint64*',`&$3')
 _CONVERSION(`guint*',`guint&',`*$3')
 _CONVERSION(`const guint&',`guint',`$3')
@@ -233,7 +232,6 @@ _CONVERSION(`ClockTime&',`GstClockTime*',`(GstClockTime*)(&$3)')
 _CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff($3)')
 _CONVERSION(`GstClockTimeDiff',`ClockTimeDiff',`ClockTimeDiff($3)')
 _CONVERSION(`ClockTimeDiff&',`GstClockTimeDiff*',`(GstClockTimeDiff*)(&$3)')
-_CONVERSION(`Format&',`GstFormat*',`($2)&$3')
 _CONVERSION(`GstClockTimeDiff*',`ClockTimeDiff&',`(ClockTimeDiff&)(*$3)')
 _CONVERSION(`GstMixerMessageType',`Gst::MixerMessageType',`(Gst::MixerMessageType)($3)')
 _CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
@@ -249,7 +247,7 @@ dnl Glibmm Conversions
 _CONVERSION(`const Glib::Error&', `const GError*', `$3.gobj()')
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
-_CONVERSION(`Glib::StaticRecMutex&',`GStaticRecMutex*',`$3.gobj()')
+_CONVERSION(`Glib::Threads::RecMutex&',`GRecMutex*',`$3.gobj()')
 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const char**>($3.data())')
 _CONVERSION(`const Glib::ValueArray&',`GValueArray*',`const_cast<GValueArray*>($3.gobj())')
 

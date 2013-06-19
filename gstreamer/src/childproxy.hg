@@ -46,11 +46,14 @@ class ChildProxy : public Glib::Interface
 
 public:
   _WRAP_METHOD(guint get_children_count() const, gst_child_proxy_get_children_count)
+
+#m4 _CONVERSION(`GObject*',`Glib::RefPtr<Gst::Object>',`Glib::wrap(GST_OBJECT($3))')
+
   _WRAP_METHOD(Glib::RefPtr<Gst::Object> get_child(const Glib::ustring& name), gst_child_proxy_get_child_by_name)
-  _WRAP_METHOD(Glib::RefPtr<const Gst::Object> get_child(const Glib::ustring& name) const, gst_child_proxy_get_child_by_name)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Object> get_child(const Glib::ustring& name) const, gst_child_proxy_get_child_by_name, constversion)
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Object> get_child(guint index), gst_child_proxy_get_child_by_index)
-  _WRAP_METHOD(Glib::RefPtr<const Gst::Object> get_child(guint index) const, gst_child_proxy_get_child_by_index)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Object> get_child(guint index) const, gst_child_proxy_get_child_by_index, constversion)
 
   _WRAP_METHOD_DOCS_ONLY(gst_child_proxy_lookup)
   //TODO: Maybe GParamSpec should be wrapped in glibmm?
@@ -82,22 +85,15 @@ public:
   Glib::RefPtr<Gst::ChildProxy> set_proxy_property(const Glib::ustring& name, const Glib::ValueBase& value);
   _IGNORE(gst_child_proxy_set_property, gst_child_proxy_set, gst_child_proxy_set_valist)
 
-  /** Emits the "child-added" signal.
-   * @param child The newly added child.
-   */
-  void child_added(const Glib::RefPtr<Gst::Object>& child);
-  _IGNORE(gst_child_proxy_child_added)
+#m4 _CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GObject*',`G_OBJECT(Glib::unwrap($3))')
 
-  /** Emits the "child-removed" signal.
-   * @param child The newly added child.
-   */
-  void child_removed(const Glib::RefPtr<Gst::Object>& child);
-  _IGNORE(gst_child_proxy_child_removed)
+  _WRAP_METHOD(void child_added(const Glib::RefPtr<Gst::Object>& child, const Glib::ustring& name), gst_child_proxy_child_added)
+  _WRAP_METHOD(void child_removed(const Glib::RefPtr<Gst::Object>& child, const Glib::ustring& name), gst_child_proxy_child_removed)
 
-#m4 _CONVERSION(`GstObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GObject*',`const Glib::RefPtr<Gst::Object>&',`Glib::wrap(GST_OBJECT($3), true)')
 
-  _WRAP_SIGNAL(void child_added(const Glib::RefPtr<Gst::Object>& object), "child-added")
-  _WRAP_SIGNAL(void child_removed(const Glib::RefPtr<Gst::Object>& object), "child-removed")
+  _WRAP_SIGNAL(void child_added(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name), "child-added")
+  _WRAP_SIGNAL(void child_removed(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name), "child-removed")
 
   /** Virtual method to fetch the child.
    */

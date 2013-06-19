@@ -1,5 +1,61 @@
 2013-06-18  José Alburquerque  <jaalburquerque@gmail.com>
 
+	Correct some general method parameter changes in existing source files.
+
+	* gstreamer/src/basesrc.hg ([get|set]_blocksize): Use guint instead of
+	gulong for the block size.
+	* gstreamer/src/bufferlist.hg (get): The get() methods (for getting a
+	Buffer) no longer require a 'group' parameter.
+	* gstreamer/src/bus.hg (poll): Use a ClockTime instead of a
+	ClockTimeDiff for the 'timeout' parameter.
+	* gstreamer/src/childproxy.{ccg,hg}: Move the conversions specific to
+	this file to this file from the global conversion file.  Use
+	'constversion' to wrap constant methods that have equivalent
+	non-constant ones.
+	(child_[added|removed]): These methods now require a 'name' parameter.
+	Also use _WRAP_METHOD to wrap them.
+	(signal_child_[added|removed]): These signals also require a new
+	'name' parameter.
+	* gstreamer/src/element.hg (query_convert):
+	(query_position):
+	(query_duration): The 'format' parameter is no longer passed in as a
+	reference.
+	* gstreamer/src/elementfactory.hg (get_uri_type): Now returns a
+	URIType and not an int.
+	(get_uri_protocols): Return a std::vecto<Glib::ustring> instead of a
+	Glib::StringArrayHandle.  Also correct its m4 _CONVERSION macro.
+	* gstreamer/src/pad.hg (event_default):
+	(query_default): These methods now take an optional 'parent' first
+	parameter.
+	(query_duration):
+	(query_convert): The 'format' parameters are no longer passed in as
+	references.
+	(iterate_internal_links_default): Now take an optional 'parent' first
+	parameter.
+	* gstreamer/src/query.hg (get_structure): Correct its m4 _CONVERSION
+	macro.
+	* gstreamer/src/segment.hg: Use guint64 instead of gint64 throughout
+	for the parameters.
+	* gstreamer/src/task.hg (set_lock): Use a Glib::Threads::RecMutex
+	instead of a Glib::StaticRecMutex (which has been deprecated).
+	* gstreamer/src/typefind.hg (peek): Return a std::vector<guint8>
+	instead of a Glib::ArrayHandle<guint8>.  Also correct its m4
+	_CONVERSION macro.
+	* gstreamer/src/typefindfactory.hg (get_extensions): Return a
+	std::vector<Glib::ustring> instead of a Glib::StringArrayHandle.  Also
+	correct its m4 _CONVERSION macro.
+	* gstreamer/src/urihandler.hg (make_element_from_uri): Now throws a
+	Glib::Error.
+	(get_uri_type): Returns a URIType instead of a guint.
+	(get_protocols): Return a std::vector<Glib::ustring> instead of a
+	Glib::StringArrayHandle.  Also correct its m4 _CONVERSION macro.
+	(set_uri): Now throws a Glib::Error.
+	* tools/m4/convert_gst.m4: Remove unneeded conversions because of
+	above changes.  Also correct existing ones according to the above
+	changes also.
+
+2013-06-18  José Alburquerque  <jaalburquerque@gmail.com>
+
 	gstreamer/src/filelist.am: Correct plug-ins here also.
 
 	* gstreamer/src/filelist.am: Correct the plug-in list according to the

@@ -55,15 +55,15 @@ public:
   _WRAP_METHOD(static Glib::ustring get_protocol(const Glib::ustring& uri), gst_uri_get_protocol)
   _WRAP_METHOD(static Glib::ustring get_location(const Glib::ustring& uri), gst_uri_get_location)
   _WRAP_METHOD(static Glib::ustring construct_uri(const Glib::ustring& protocol, const Glib::ustring& location), gst_uri_construct)
-  _WRAP_METHOD(static Glib::RefPtr<Gst::Element> make_element_from_uri(const URIType type, const Glib::ustring& uri, const Glib::ustring& name), gst_element_make_from_uri)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Element> make_element_from_uri(const URIType type, const Glib::ustring& uri, const Glib::ustring& name), gst_element_make_from_uri, errthrow)
 
-  _WRAP_METHOD(guint get_uri_type() const, gst_uri_handler_get_uri_type)
+  _WRAP_METHOD(URIType get_uri_type() const, gst_uri_handler_get_uri_type)
 
-#m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_NONE)')
-  _WRAP_METHOD(Glib::StringArrayHandle get_protocols() const, gst_uri_handler_get_protocols)
+#m4 _CONVERSION(`const gchar* const*',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_protocols() const, gst_uri_handler_get_protocols)
 
   _WRAP_METHOD(Glib::ustring get_uri() const, gst_uri_handler_get_uri)
-  _WRAP_METHOD(bool set_uri(const Glib::ustring& uri), gst_uri_handler_set_uri)
+  _WRAP_METHOD(bool set_uri(const Glib::ustring& uri), gst_uri_handler_set_uri, errthrow)
   _WRAP_METHOD(void new_uri(const Glib::ustring& uri), gst_uri_handler_new_uri)
 
   _WRAP_SIGNAL(void new_uri(const Glib::ustring& uri), "new-uri")
