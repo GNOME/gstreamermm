@@ -29,41 +29,30 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-//Gst::IteratorBasic<> forward declaration.
-template <class CppType>
-class IteratorBasic;
-
-_WRAP_ENUM(QueryType, GstQueryType)
 _WRAP_ENUM(BufferingMode, GstBufferingMode)
 
-/** A class to store the details of a Gst::Query retrieved by
- * Gst::Query::get_details().
- */
-class QueryTypeDefinition
+_WRAP_ENUM_DOCS_ONLY(QueryType, GstQueryType)
+enum QueryType
 {
-  _CLASS_GENERIC(QueryTypeDefinition, GstQueryTypeDefinition)
-
-public:
-  /// Default constructor.
-  QueryTypeDefinition();
-
-  /** Constructs a Gst::QueryTypeDefinition from a C GstQueryTypeDefinition
-   * type.  The @a castitem is left unaffected; its contents are simply copied.
-   * @param castitem The GstQueryTypeDefinition to copy contents from.
-   */
-  explicit QueryTypeDefinition(const GstQueryTypeDefinition* castitem);
-
-  /// The unique id of the Query type.
-  QueryType             value;
-
-  /// A short nickname for the query type.
-  Glib::ustring         nick;
-
-  /// A longer description of the query type.
-  Glib::ustring         description;
-
-  /// The quark for the nick.
-  Glib::QueryQuark      quark;
+  QUERY_UNKNOWN = GST_QUERY_UNKNOWN,
+  QUERY_POSITION = GST_QUERY_POSITION,
+  QUERY_DURATION = GST_QUERY_DURATION,
+  QUERY_LATENCY = GST_QUERY_LATENCY,
+  QUERY_JITTER = GST_QUERY_JITTER,
+  QUERY_RATE = GST_QUERY_RATE,
+  QUERY_SEEKING = GST_QUERY_SEEKING,
+  QUERY_SEGMENT = GST_QUERY_SEGMENT,
+  QUERY_CONVERT = GST_QUERY_CONVERT,
+  QUERY_FORMATS = GST_QUERY_FORMATS,
+  QUERY_BUFFERING = GST_QUERY_BUFFERING,
+  QUERY_CUSTOM = GST_QUERY_CUSTOM,
+  QUERY_URI = GST_QUERY_URI,
+  QUERY_ALLOCATION = GST_QUERY_ALLOCATION,
+  QUERY_SCHEDULING = GST_QUERY_SCHEDULING,
+  QUERY_ACCEPT_CAPS = GST_QUERY_ACCEPT_CAPS,
+  QUERY_CAPS = GST_QUERY_CAPS,
+  QUERY_DRAIN = GST_QUERY_DRAIN,
+  QUERY_CONTEXT = GST_QUERY_CONTEXT
 };
 
 namespace Enums
@@ -141,17 +130,6 @@ public:
 
 #m4 _CONVERSION(`const Glib::ArrayHandle<const QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
   _WRAP_METHOD(static bool query_types_contain(const Glib::ArrayHandle<const QueryType>& types, QueryType type), gst_query_types_contains)
-
-  /** Get details about the given Gst::QueryType.
-   *
-   * @param type A Gst::QueryType.
-   * @param def A Gst::QueryTypeDefinition in which to store the details.
-   * @return true if successful, false otherwise.
-   */
-  bool get_details(QueryType type, QueryTypeDefinition& def) const;
-  _IGNORE(gst_query_type_get_details)
-
-  _WRAP_METHOD(static Gst::IteratorBasic<const Gst::QueryTypeDefinition> iterate_definitions(), gst_query_type_iterate_definitions)
 
   /** Virtual function called when the Gst::Query needs to be copied.
    */

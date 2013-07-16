@@ -44,23 +44,6 @@ static void Query_gstreamermm_callback_destroy(void* data,
 namespace Gst
 {
 
-QueryTypeDefinition::QueryTypeDefinition()
-: value(Gst::QUERY_NONE),
-  quark(static_cast<GQuark>(0))
-{}
-
-QueryTypeDefinition::QueryTypeDefinition(const GstQueryTypeDefinition* castitem)
-: value(Gst::QUERY_NONE),
-  quark((castitem) ? castitem->quark : 0)
-{
-  if(castitem)
-  {
-    value = static_cast<QueryType>(castitem->value);
-    nick = castitem->nick;
-    description = castitem->description;
-  }
-}
-
 namespace Enums
 {
 
@@ -79,21 +62,6 @@ Glib::QueryQuark get_quark(QueryType t)
 Glib::RefPtr<Gst::Query> Query::create_writable()
 {
   return Gst::wrap(gst_query_make_writable(gobj()));
-}
-
-bool get_details(QueryType type, QueryTypeDefinition &def)
-{
-  const GstQueryTypeDefinition* gstdef = gst_query_type_get_details(GstQueryType(type));
-
-  if(!gstdef)
-    return false;
-
-  def.value = static_cast<QueryType>(gstdef->value);
-  def.nick = gstdef->nick;
-  def.description = gstdef->description;
-  def.quark = gstdef->quark;
-
-  return true;
 }
 
 QueryApplication::QueryApplication(GstQuery* castitem) :
