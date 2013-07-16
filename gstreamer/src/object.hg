@@ -21,7 +21,6 @@
 #include <glibmm/object.h>
 #include <glibmm/listhandle.h>
 #include <glibmm/threads.h>
-#include <libxml++/nodes/node.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -87,20 +86,6 @@ public:
 
   _WRAP_METHOD(bool has_ancestor(const Glib::RefPtr<const Gst::Object>& ancestor) const, gst_object_has_ancestor)
 
-  /** Saves object into the parent XML node.
-   * @param parent The parent XML node to save object into.
-   * @return The new xmlpp::Node pointer with the saved object.
-   */
-  xmlpp::Node* save(xmlpp::Node* parent);
-  _IGNORE(gst_object_save_thyself)
-
-  /** Saves object into the parent XML node.
-   * @param parent The parent XML node to save object into.
-   * @return The new xmlpp::Node pointer with the saved object.
-   */
-  const xmlpp::Node* save(const xmlpp::Node* parent) const;
-
-  _WRAP_METHOD(void restore(xmlpp::Node* self), gst_object_restore_thyself)
   _WRAP_METHOD(Glib::ustring get_path_string(), gst_object_get_path_string)
 
   _WRAP_PROPERTY("name", Glib::ustring)
@@ -109,28 +94,11 @@ public:
   //TODO: Maybe GParamSpec should be wrapped in glibmm?
   _WRAP_SIGNAL(void deep_notify(const Glib::RefPtr<Object>& prop_object, GParamSpec* prop), "deep-notify")
 
-  //TODO: Use xmlpp::Node for parameter?
-  _WRAP_SIGNAL(void object_saved(GstXmlNodePtr xml_node), "object-saved")  
-
 #m4 _CONVERSION(`GstObject*', `const Glib::RefPtr<Object>&', `Glib::wrap($3, true)')
 #m4 _CONVERSION(`const Glib::RefPtr<Object>&', `GstObject*', `Glib::unwrap($3)')
 
   _WRAP_SIGNAL(void parent_set(const Glib::RefPtr<Object>& parent), "parent-set")
   _WRAP_SIGNAL(void parent_unset(const Glib::RefPtr<Object>& parent), "parent-unset")
-
-  virtual xmlpp::Node* save_vfunc(xmlpp::Node* parent);
-  virtual void restore_vfunc(xmlpp::Node* self_node);
-
-protected:
-#m4begin
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->save_thyself = &save_thyself_vfunc_callback;
-  klass->restore_thyself = &restore_thyself_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static GstXmlNodePtr save_thyself_vfunc_callback(GstObject* self, GstXmlNodePtr parent);
-  static void restore_thyself_vfunc_callback(GstObject* self, GstXmlNodePtr self_node);
-  _POP()
-#m4end
 };
 
 } // namespace Gst

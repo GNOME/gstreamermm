@@ -114,32 +114,4 @@ Registry::get_feature_list(const PluginFeature::SlotFilter& filter,
     Glib::OWNERSHIP_DEEP);
 }
 
-#ifdef USE_BINARY_REGISTRY
-
-bool Registry::binary_read_cache(const Glib::ustring& location)
-{
-  return gst_registry_binary_read_cache(gobj(), location.c_str());
-}
-
-bool Registry::binary_write_cache(const Glib::ustring& location) const
-{
-  return gst_registry_binary_write_cache(const_cast<GstRegistry*>(gobj()),
-    location.c_str());
-}
-
-#else
-
-bool Registry::xml_read_cache(const Glib::ustring& location)
-{
-  return gst_registry_xml_read_cache(gobj(), location.c_str());
-}
-
-bool Registry::xml_write_cache(const Glib::ustring& location) const
-{
-  return gst_registry_xml_write_cache(const_cast<GstRegistry*>(gobj()),
-    location.c_str());
-}
-
-#endif
-
 } //namespace Gst
