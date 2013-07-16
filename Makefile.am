@@ -38,4 +38,5 @@ pkgconfig_DATA = gstreamer/$(GSTREAMERMM_MODULE_NAME).pc
 
 dist_noinst_SCRIPTS = autogen.sh
 
-#include $(top_srcdir)/build/dist-changelog.am
+# Auto-generate the ChangeLog file from the git log on make dist
+include $(top_srcdir)/build/dist-changelog.am
