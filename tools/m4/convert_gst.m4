@@ -23,6 +23,7 @@ _CONV_ENUM(Gst,IndexEntryType)
 _CONV_ENUM(Gst,IndexFlags)
 _CONV_ENUM(Gst,IndexLookupMethod)
 _CONV_ENUM(Gst,IndexResolverMethod)
+_CONV_ENUM(Gst,LockFlags)
 _CONV_ENUM(Gst,MessageType)
 _CONV_ENUM(Gst,MixerFlags)
 _CONV_ENUM(Gst,MixerType)
@@ -135,6 +136,7 @@ _CONVERSION(`GstMessage*',`Glib::RefPtr<const Gst::Message>',`Gst::Message::wrap
 _CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `Gst::unwrap($3)')
 
 dnl MiniObject
+_CONVERSION(`GstMiniObject*',`Glib::RefPtr<MiniObject>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`Gst::unwrap($3)')
 
 dnl Mixer

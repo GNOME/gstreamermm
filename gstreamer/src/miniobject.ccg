@@ -17,39 +17,20 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef _GSTREAMERMM_MINIOBJECT_P_H
-#define _GSTREAMERMM_MINIOBJECT_P_H
-
-#include <glibmm/class.h>
+#include <gstreamermm/miniobject.h>
+#include <gstreamermm/private/miniobject_p.h>
 
 namespace Gst
 {
 
-class MiniObject_Class : public Glib::Class
+MiniObject::~MiniObject()
 {
-public:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  typedef MiniObject       CppObjectType;
-  typedef GstMiniObject      BaseObjectType;
-  typedef GstMiniObjectClass BaseClassType;
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+  // The value of the reference count is checked so that if this mini object is
+  // being destroyed as a result of weak reference notification no
+  // unreferencing is done and thus no error is issued on unreferencing a mini
+  // object with a reference of 0.
+  if(gobject_ && GST_MINI_OBJECT_REFCOUNT_VALUE(gobject_) > 0)
+    gst_mini_object_unref(gobject_);
+}
 
-  const Glib::Class& init();
-
-  static void class_init_function(void* g_class, void* class_data);
-
-  static Gst::MiniObject* wrap_new(GstMiniObject*);
-
-protected:
-
-  static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
-  static void finalize_vfunc_callback(GstMiniObject* self);
-
-};
-
-
-} // namespace Gst
-
-
-#endif /* _GSTREAMERMM_MINIOBJECT_P_H */
-
+} //namespace Gst
