@@ -21,7 +21,7 @@ include $(srcdir)/filelist.am
 include $(top_srcdir)/tools/m4/filelist.am
 include $(top_srcdir)/build/generate-binding.am
 
-other_built_sources  += $(binding_outputdir)/gst_wrap_init.cc
+other_built_sources  += 
 MAINTAINERCLEANFILES += $(addprefix $(srcdir)/,$(plugins_ccg) $(plugins_hg))
 
 generate_gst_wrap_init = $(codegen_srcdir)/generate_gst_wrap_init.pl
@@ -35,10 +35,6 @@ generate_plugin_dependencies = \
 
 target_hg_basename = $(basename $(notdir $@))
 target_plugin_and_classname  = $(wordlist 2,3,$(subst |, ,$(filter $(target_hg_basename)|%,$(GSTREAMERMM_PLUGIN_DEFS))))
-
-$(binding_outputdir)/gst_wrap_init.cc: $(generate_gst_wrap_init) $(binding_relfiles_hg)
-	$(AM_V_GEN)$(PERL) -- $(generate_gst_wrap_init) $(wrap_init_flags) \
-	 $(binding_relfiles_hg) >$@
 
 # This is to generate plugin .ccg files.  The generated .ccg file is piped
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces

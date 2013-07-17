@@ -19,7 +19,6 @@
 
 #include <gst/gstbuffer.h>
 #include <gstreamermm/miniobject.h>
-#include <gstreamermm/wrap.h>
 #include <gstreamermm/caps.h>
 
 _DEFS(gstreamermm,gst)
@@ -44,11 +43,10 @@ _WRAP_ENUM(BufferCopyFlags, GstBufferCopyFlags)
  */
 class Buffer : public MiniObject
 {
-  _CLASS_GSTMINIOBJECT(Buffer, GstBuffer, GST_BUFFER, Gst::MiniObject, GstMiniObject)
-  _CUSTOM_WRAP_NEW
+  _CLASS_OPAQUE_REFCOUNTED(Buffer, GstBuffer, gst_buffer_new, gst_buffer_ref, gst_buffer_unref)
+  _IGNORE(gst_buffer_ref, gst_buffer_unref)
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<Gst::Buffer> create(), gst_buffer_new)
   _WRAP_METHOD(static Glib::RefPtr<Gst::Buffer> create(guint size), gst_buffer_try_new_and_alloc)
 
   /** Create a copy of the given buffer. This will also make a newly allocated

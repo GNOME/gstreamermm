@@ -86,12 +86,6 @@ static GstBuffer* BufferListIterator_Process_gstreamermm_callback(GstBuffer* buf
   return 0;
 }
 
-static void BufferList_gstreamermm_callback_destroy(void* data,
-  GstMiniObject* /* where_the_object_was */)
-{
-  delete static_cast<Gst::BufferList*>(data);
-}
-
 } // extern "C"
 
 
@@ -122,19 +116,6 @@ void BufferList::foreach(const SlotForeach& slot)
 void BufferList::iterate(BufferListIterator& result)
 {
   result.set_gobject(gst_buffer_list_iterate(gobj()));
-}
-
-Gst::MiniObject* BufferList_Class::wrap_new(GstMiniObject* object)
-{
-  // Use this wrap_new() method to ensure that the wrapper is destroyed
-  // when the miniobject loses its last reference.
-
-  Gst::BufferList* wrapper = new Gst::BufferList((GstBufferList*)(object));
-
-  gst_mini_object_weak_ref(object, &BufferList_gstreamermm_callback_destroy,
-    wrapper);
-
-  return wrapper;
 }
 
 BufferListIterator::BufferListIterator()

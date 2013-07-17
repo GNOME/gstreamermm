@@ -19,7 +19,6 @@
 
 #include <gst/gstevent.h>
 #include <gstreamermm/miniobject.h>
-#include <gstreamermm/wrap.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/clock.h>
 
@@ -129,18 +128,10 @@ EventTypeFlags get_flags(EventType type);
  */
 class Event : public MiniObject
 {
-  _CLASS_GSTMINIOBJECT(Event, GstEvent, GST_EVENT, Gst::MiniObject, GstMiniObject)
+  _CLASS_OPAQUE_REFCOUNTED(Event, GstEvent, NONE, gst_event_ref, gst_event_unref)
   _IGNORE(gst_event_ref, gst_event_unref)
-  _CUSTOM_WRAP_NEW
 
 public:
-  /** Wrap a GstEvent in a C++ instance, creating an instance of a derived
-   * Gst::Event. Gst::wrap() would just create a Gst::Event (rather than a
-   * derived one) because the derived Gst::Event classes do not correspond
-   * to GType types in the GStreamer API.
-   */
-  static Glib::RefPtr<Gst::Event> wrap(GstEvent* event, bool take_copy = false);
-
 // A copy is taken so that the original is not freed by the wrapper.
 #m4 _CONVERSION(`const GstStructure*',`Gst::Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
   _WRAP_METHOD(Gst::Structure get_structure() const, gst_event_get_structure)
@@ -180,32 +171,6 @@ public:
   /** The source Gst::Object that generated this event.
    */
   _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
-
-  /** Virtual function called when the Gst::Event needs to be copied.
-   */
-  virtual Glib::RefPtr<Gst::MiniObject> copy_vfunc() const;
-
-  /** Virtual function called when the Gst::Event is about to be finalized.
-   */
-  virtual void finalize_vfunc();
-
-protected:
-#m4begin
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  GST_MINI_OBJECT_CLASS(klass)->copy = &copy_vfunc_callback;
-  GST_MINI_OBJECT_CLASS(klass)->finalize = &finalize_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
-  static void finalize_vfunc_callback(GstMiniObject* self);
-  _POP()
-#m4end
-
-protected:
-  // This method is used in the create() methods to convert a wrapped GstEvent
-  // to one of the more specific Gst::Event types.
-  template <class EventType>
-    static inline Glib::RefPtr<EventType> wrap(GstEvent* event,
-    bool take_copy = false);
 };
 
 //TODO: Modify create methods of derived Event classes to return
@@ -836,14 +801,5 @@ public:
    */
   Glib::RefPtr<const Gst::Message> parse() const;
 };
-
-/****************************** Gst::Event **************************/
-
-template <class EventType>
-  Glib::RefPtr<EventType> Event::wrap(GstEvent* event, bool take_copy)
-{
-  Glib::RefPtr<Gst::Event> result = wrap(event, take_copy);
-  return Glib::RefPtr<EventType>::cast_dynamic(result);
-}
 
 } //namespace Gst

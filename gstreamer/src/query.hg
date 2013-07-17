@@ -20,7 +20,6 @@
 #include <gst/gstquery.h>
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/structure.h>
-#include <gstreamermm/wrap.h>
 #include <gstreamermm/format.h>
 #include <glibmm/arrayhandle.h>
 
@@ -99,18 +98,10 @@ _IGNORE(gst_query_type_to_quark)
  */
 class Query : public MiniObject
 {
-  _CLASS_GSTMINIOBJECT(Query, GstQuery, GST_QUERY, Gst::MiniObject, GstMiniObject)
-  _IGNORE(gst_query_ref, qgst_query_unref)
-  _CUSTOM_WRAP_NEW
+  _CLASS_OPAQUE_REFCOUNTED(Query, GstQuery, NONE, gst_query_ref, gst_query_unref)
+  _IGNORE(gst_query_ref, gst_query_unref)
 
 public:
-  /** Wrap a GstQuery in a C++ instance, creating an instance of a derived
-   * Gst::Query. Gst::wrap() would just create a Gst::Query (rather than a
-   * derived one) because the derived Gst::Query classes do not correspond
-   * to GType types in the GStreamer API.
-   */
-  static Glib::RefPtr<Gst::Query> wrap(GstQuery* query, bool take_copy = false);
-
    /** Makes a writable query from the given query.  Does exactly what
     * Gst::MiniObject::create_writable() does for the Gst::Query.
     * @return A Gst::Query (possibly the same pointer) that is writable.
@@ -130,25 +121,6 @@ public:
 
 #m4 _CONVERSION(`const Glib::ArrayHandle<const QueryType>&',`GstQueryType*',`(GstQueryType*)(($3).data())')
   _WRAP_METHOD(static bool query_types_contain(const Glib::ArrayHandle<const QueryType>& types, QueryType type), gst_query_types_contains)
-
-  /** Virtual function called when the Gst::Query needs to be copied.
-   */
-  virtual Glib::RefPtr<Gst::MiniObject> copy_vfunc() const;
-
-  /** Virtual function called when the Gst::Query is about to be finalized.
-   */
-  virtual void finalize_vfunc();
-
-protected:
-#m4begin
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  GST_MINI_OBJECT_CLASS(klass)->copy = &copy_vfunc_callback;
-  GST_MINI_OBJECT_CLASS(klass)->finalize = &finalize_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
-  static void finalize_vfunc_callback(GstMiniObject* self);
-  _POP()
-#m4end
 
 protected:
   // This method is used in the create() methods to convert a wrapped GstQuery
@@ -658,14 +630,5 @@ public:
    */
   gint64 parse_total_time() const;
 };
-
-/****************************** Gst::Query **************************/
-
-template <class QueryType>
-  Glib::RefPtr<QueryType> Query::wrap(GstQuery* query, bool take_copy)
-{
-  Glib::RefPtr<Gst::Query> result = wrap(query, take_copy);
-  return Glib::RefPtr<QueryType>::cast_dynamic(result);
-}
 
 } //namespace Gst

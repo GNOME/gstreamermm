@@ -19,7 +19,6 @@
 
 #include <gst/gstmessage.h>
 #include <gstreamermm/miniobject.h>
-#include <gstreamermm/wrap.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/query.h>
@@ -73,18 +72,10 @@ class TagList;
  */
 class Message : public Gst::MiniObject
 {
-  _CLASS_GSTMINIOBJECT(Message, GstMessage, GST_MESSAGE, Gst::MiniObject, GstMiniObject)
+  _CLASS_OPAQUE_REFCOUNTED(Message, GstMessage, NONE, gst_message_ref, gst_message_unref)
   _IGNORE(gst_message_ref, gst_message_unref)
-  _CUSTOM_WRAP_NEW
 
 public:
-  /** Wrap a GstMessage in a C++ instance, creating an instance of a
-   *  derived Gst::Message.  Gst::wrap() would just create a Gst::Message
-   *  (rather than a derived one) because the derived Gst::Message classes
-   *  do not correspond to GType types in the GStreamer API.
-   */
-  static Glib::RefPtr<Gst::Message> wrap(GstMessage* message, bool take_copy = false);
-
 // A copy is taken so that the original is not freed by the wrapper.
 #m4 _CONVERSION(`const GstStructure*',`Gst::Structure',`Glib::wrap(const_cast<GstStructure*>($3), true)')
   _WRAP_METHOD(Gst::Structure get_structure() const, gst_message_get_structure)
@@ -110,25 +101,6 @@ public:
   /** Get the object that posted the message.
    */
   _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
-
-  /** Virtual function called when the Gst::Message needs to be copied.
-   */
-  virtual Glib::RefPtr<Gst::MiniObject> copy_vfunc() const;
-
-  /** Virtual function called when the Gst::Message is about to be finalized.
-   */
-  virtual void finalize_vfunc();
-
-protected:
-#m4begin
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  GST_MINI_OBJECT_CLASS(klass)->copy = &copy_vfunc_callback;
-  GST_MINI_OBJECT_CLASS(klass)->finalize = &finalize_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static GstMiniObject* copy_vfunc_callback(const GstMiniObject* self);
-  static void finalize_vfunc_callback(GstMiniObject* self);
-  _POP()
-#m4end
 
 protected:
   // This method is used in the create() methods to convert a wrapped
@@ -1340,14 +1312,5 @@ public:
    */
   Glib::RefPtr<Gst::Element> parse_owner() const;
 };
-
-/****************************** Gst::Message **************************/
-
-template <class MessageType>
-  Glib::RefPtr<MessageType> Message::wrap(GstMessage* message, bool take_copy)
-{
-  Glib::RefPtr<Gst::Message> result = wrap(message, take_copy);
-  return Glib::RefPtr<MessageType>::cast_dynamic(result);
-}
 
 } //namespace Gst

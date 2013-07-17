@@ -34,11 +34,6 @@ static void initialize_wrap_system()
   {
     //For Glib::wrap(), for Glib::Object-derived classes.
     Gst::wrap_init(); 
-
-    //For Gst::wrap(), for Gst::MiniObject-derived classes.
-    Gst::wrap_register_init();
-    Gst::gst_wrap_init();
-
     s_init = true;
   }
 }
@@ -51,7 +46,6 @@ void init(int& argc, char**& argv)
     Glib::init();
     gst_init(&argc, &argv);
     initialize_wrap_system();
-
     s_init = true;
   }
 }
@@ -64,7 +58,6 @@ void init()
     Glib::init();
     gst_init(0, 0);
     initialize_wrap_system();
-
     s_init = true;
   }
 }

@@ -19,7 +19,6 @@
 
 #include <gst/gstbufferlist.h>
 #include <gstreamermm/miniobject.h>
-#include <gstreamermm/wrap.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -49,8 +48,8 @@ class BufferListIterator;
  */
 class BufferList : public MiniObject
 {
-  _CLASS_GSTMINIOBJECT(BufferList, GstBufferList, GST_BUFFER_LIST, Gst::MiniObject, GstMiniObject)
-  _CUSTOM_WRAP_NEW
+  _CLASS_OPAQUE_REFCOUNTED(BufferList, GstBufferList, gst_buffer_list_new, gst_buffer_list_ref, gst_buffer_list_unref)
+  _IGNORE(gst_buffer_list_ref, gst_buffer_list_unref)
 
 public:
   /** For example,

@@ -254,36 +254,6 @@ static std::string get_c_enum_definition_macro(GType enumGType,
   return result;
 }
 
-static bool is_a_mini_object(const std::string& cType)
-{
-  // Add the mini object types to this array.  Keep a final null member so the
-  // loop that tests for the types knows when to stop iterating through the
-  // types.
-  static const char *const mini_object_types[] =
-  {
-    "GstBuffer",
-    "GstBufferList",
-    "GstEvent",
-    "GstMessage",
-    "GstMiniObject",
-    "GstQuery",
-    0
-  };
-
-  // Note that if the C type is a mini object, it would be a pointer so remove
-  // the last character (the '*') so the comparison with the above types works.
-  const std::string cTypeName = cType.substr(0, cType.size() - 1);
-
-  for(const char* const* type = mini_object_types; *type != 0; type++)
-  {
-    if(cTypeName == *type)
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
 static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
                                               std::string& cEnumDefinitions,
                                               std::string& enumWrapStatements,
@@ -424,13 +394,6 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
             convertMacros += "#m4 _CONVERSION(``" + returnCType + "'', _LQ()" +
               returnCTypeTranslation + "_RQ(), ``Glib::wrap_taglist($3)'')\n";
           }
-          else if(is_a_mini_object(returnCType))
-          {
-            // Dealing with a mini object (which are boxed types).
-            convertMacros += "#m4 _CONVERSION(``" + returnCType +
-              "'', _LQ()" + returnCTypeTranslation + "_RQ(), " +
-              "``Gst::wrap($3)'')\n";
-          }
           else
           {
             // Dealing with a regular boxed type return.
@@ -542,13 +505,6 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
               convertMacros += "#m4 _CONVERSION(``" + paramCType + "'', "
                 "_LQ()" + paramCTypeTranslation + "_RQ(), "
                 "``Glib::wrap_taglist($3, true)'')\n";
-            }
-            else if(is_a_mini_object(paramCType))
-            {
-              // Dealing with a mini object (which are boxed types).
-              convertMacros += "#m4 _CONVERSION(``" + paramCType +
-                "'', _LQ()" + paramCTypeTranslation + "_RQ(), " +
-                "``Gst::wrap($3, true)'')\n";
             }
             else
             {

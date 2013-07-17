@@ -23,24 +23,6 @@
 _PINCLUDE(gstreamermm/private/miniobject_p.h)
 #include <iostream>
 
-namespace
-{
-
-extern "C"
-{
-
-static void Query_gstreamermm_callback_destroy(void* data,
-  GstMiniObject* /* where_the_object_was */)
-{
-  // This works for any of the Gst::Query derived classes because none of
-  // them have member variables so in essence they are all the same size.
-  delete static_cast<Gst::Query*>(data);
-}
-
-}
-
-}
-
 namespace Gst
 {
 
@@ -61,7 +43,7 @@ Glib::QueryQuark get_quark(QueryType t)
 
 Glib::RefPtr<Gst::Query> Query::create_writable()
 {
-  return Gst::wrap(gst_query_make_writable(gobj()));
+  return Glib::wrap(gst_query_make_writable(gobj()));
 }
 
 QueryApplication::QueryApplication(GstQuery* castitem) :
@@ -75,7 +57,7 @@ Glib::RefPtr<Gst::QueryApplication>
   GstStructure* copy_struct = gst_structure_copy(structure.gobj());
   GstQuery* query = gst_query_new_application(GstQueryType(type),
     copy_struct); 
-  return Gst::Query::wrap<QueryApplication>(query);
+  return Glib::wrap(query);
 }
 
 QueryConvert::QueryConvert(GstQuery* castitem) :
@@ -87,7 +69,7 @@ Glib::RefPtr<Gst::QueryConvert>
 {
   GstQuery* query = gst_query_new_convert(GstFormat(src_format), value,
     GstFormat(dest_format));
-  return Gst::Query::wrap<QueryConvert>(query);
+  return Glib::wrap(query);
 }
 
 void QueryConvert::set(Format src_format, gint64 src_value, Format dest_format, gint64 dest_value)
@@ -147,7 +129,7 @@ Query(castitem)
 Glib::RefPtr<Gst::QueryPosition> QueryPosition::create(Format format)
 {
   GstQuery* query = gst_query_new_position(GstFormat(format));
-  return Gst::Query::wrap<QueryPosition>(query);
+  return Glib::wrap(query);
 }
 
 void QueryPosition::set(Format format, gint64 position)
@@ -183,7 +165,7 @@ Query(castitem)
 Glib::RefPtr<Gst::QueryDuration> QueryDuration::create(Format format)
 {
   GstQuery* query = gst_query_new_duration(GstFormat(format));
-  return Gst::Query::wrap<QueryDuration>(query);
+  return Glib::wrap(query);
 }
 
 void QueryDuration::set(Format format, gint64 duration)
@@ -219,7 +201,7 @@ Query(castitem)
 Glib::RefPtr<Gst::QueryLatency> QueryLatency::create()
 {
   GstQuery* query = gst_query_new_latency();
-  return Gst::Query::wrap<QueryLatency>(query);
+  return Glib::wrap(query);
 }
 
 void QueryLatency::set(bool live, ClockTime min_latency, ClockTime max_latency)
@@ -266,7 +248,7 @@ Query(castitem)
 Glib::RefPtr<Gst::QuerySeeking> QuerySeeking::create(Format format)
 {
   GstQuery* query = gst_query_new_seeking(GstFormat(format));
-  return Gst::Query::wrap<QuerySeeking>(query);
+  return Glib::wrap(query);
 }
 
 void QuerySeeking::set(Format format, bool seekable, gint64 segment_start, gint64 segment_end)
@@ -322,7 +304,7 @@ Query(castitem)
 Glib::RefPtr<Gst::QueryFormats> QueryFormats::create()
 {
   GstQuery* query = gst_query_new_formats();
-  return Gst::Query::wrap<QueryFormats>(query);
+  return Glib::wrap(query);
 }
 
 void QueryFormats::set(const Glib::ArrayHandle<Format>& formats)
@@ -359,7 +341,7 @@ Query(castitem)
 Glib::RefPtr<Gst::QuerySegment> QuerySegment::create(Format format)
 {
   GstQuery* query = gst_query_new_segment(GstFormat(format));
-  return Gst::Query::wrap<QuerySegment>(query);
+  return Glib::wrap(query);
 }
 
 void QuerySegment::set(double rate, Format format, gint64 start_value, gint64 stop_value)
@@ -413,7 +395,7 @@ Query(castitem)
 Glib::RefPtr<Gst::QueryBuffering> QueryBuffering::create(Format format)
 {
   GstQuery* query = gst_query_new_buffering(GstFormat(format));
-  return Gst::Query::wrap<QueryBuffering>(query);
+  return Glib::wrap(query);
 }
 
 void QueryBuffering::set(bool busy, int percent)
@@ -532,115 +514,6 @@ gint64 QueryBuffering::parse_total_time() const
   gst_query_parse_buffering_range(const_cast<GstQuery*>(gobj()), 0,
     0, 0, &estimated_total);
   return estimated_total;
-}
-
-Glib::RefPtr<Gst::Query> Query::wrap(GstQuery* query, bool take_copy)
-{
-  Gst::Query* wrapper = 0;
-  Glib::RefPtr<Gst::Query> result;
-
-  if(!query)
-    return result;
-
-  switch(GST_QUERY_TYPE(query))
-  {
-    case GST_QUERY_POSITION:
-      wrapper = new Gst::QueryPosition(query);
-      break;
-    case GST_QUERY_DURATION:
-      wrapper = new Gst::QueryDuration(query);
-      break;
-    case GST_QUERY_LATENCY:
-      wrapper = new Gst::QueryLatency(query);
-      break;
-    case GST_QUERY_SEEKING:
-      wrapper = new Gst::QuerySeeking(query);
-      break;
-    case GST_QUERY_SEGMENT:
-      wrapper = new Gst::QuerySegment(query);
-      break;
-    case GST_QUERY_CONVERT:
-      wrapper = new Gst::QueryConvert(query);
-      break;
-    case GST_QUERY_FORMATS:
-      wrapper = new Gst::QueryFormats(query);
-      break;
-    case GST_QUERY_BUFFERING:
-      wrapper = new Gst::QueryBuffering(query);
-      break;
-    case GST_QUERY_NONE:
-    case GST_QUERY_JITTER:
-      wrapper = new Gst::Query(query);
-      break;
-        /* The rest of the query types are custom ones */
-    default:
-      wrapper = new Gst::QueryApplication(query);
-  }
-
-  result = Glib::RefPtr<Gst::Query>(wrapper);
-
-  // Ensure that the wrapper is freed when the query (mini object) is freed.
-  gst_mini_object_weak_ref(GST_MINI_OBJECT(query), &Query_gstreamermm_callback_destroy, wrapper);
-
-  if(take_copy)
-    result->reference();
-
-  return result;
-}
-
-Gst::MiniObject* Query_Class::wrap_new(GstMiniObject* object)
-{
-  // Use the Gst::Query wrap() method to get the right type of Query class
-  // and return the underlying object in the refptr.  The extra reference is
-  // needed so that the object does not loose a reference when the local refptr
-  // is destroyed.
-  return Gst::Query::wrap((GstQuery*)object, true).operator->();
-}
-
-GstMiniObject* Query_Class::copy_vfunc_callback(const GstMiniObject* self)
-{
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  // Call the original underlying C function:
-  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
-    return (*GST_MINI_OBJECT_CLASS(base)->copy)(self);
-
-  return 0;
-}
-Glib::RefPtr<Gst::MiniObject> Query::copy_vfunc() const
-{
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  if(base && GST_MINI_OBJECT_CLASS(base)->copy)
-  {
-    return Gst::Query::wrap(GST_QUERY((*GST_MINI_OBJECT_CLASS(base)->copy)(
-        GST_MINI_OBJECT(gobj()))));
-  }
-
-  return Glib::RefPtr<Gst::MiniObject>(0);
-}
-void Query_Class::finalize_vfunc_callback(GstMiniObject* self)
-{
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(GST_MINI_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  // Call the original underlying C function:
-  if(base && GST_MINI_OBJECT_CLASS(base)->finalize)
-    (*GST_MINI_OBJECT_CLASS(base)->finalize)(self);
-}
-void Query::finalize_vfunc()
-{
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobj())) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  if(base && GST_MINI_OBJECT_CLASS(base)->finalize)
-    (*GST_MINI_OBJECT_CLASS(base)->finalize)(GST_MINI_OBJECT(gobj()));
 }
 
 } //namesapce Gst
