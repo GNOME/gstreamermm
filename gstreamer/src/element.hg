@@ -50,7 +50,6 @@ class Caps;
 class Clock;
 class ElementFactory;
 class Event;
-class Index;
 class Interface;
 class Message;
 class Pad;
@@ -240,11 +239,6 @@ public:
   _WRAP_METHOD(void set_bus(const Glib::RefPtr<Gst::Bus>& bus), gst_element_set_bus)
   _WRAP_METHOD(Glib::RefPtr<Gst::Bus> get_bus(), gst_element_get_bus)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Bus> get_bus() const, gst_element_get_bus, constversion)
-  _WRAP_METHOD(void set_index(const Glib::RefPtr<Gst::Index>& index), gst_element_set_index)
-
-  //Note: gst_element_get_index provides a reference.
-  _WRAP_METHOD(Glib::RefPtr<Gst::Index> get_index(), gst_element_get_index)
-  _WRAP_METHOD(Glib::RefPtr<const Gst::Index > get_index() const, gst_element_get_index, constversion)
 
   _WRAP_METHOD(Glib::RefPtr<Gst::ElementFactory> get_factory(), gst_element_get_factory, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gst::ElementFactory> get_factory() const, gst_element_get_factory, refreturn, constversion)
@@ -399,15 +393,6 @@ public:
   /** Get the supported Gst::QueryType of this element.
    */
    virtual Glib::ArrayHandle<QueryType> get_query_types_vfunc() const;
-
-  /** Get a Gst::Index on the element.
-   */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::Index> get_index() const, "get_index")
-
-#m4 _CONVERSION(`GstIndex*',`const Glib::RefPtr<Gst::Index>&',`Glib::wrap($3, true)')
-  /** Set the Gst::Index of an element.
-   */
-  _WRAP_VFUNC(void set_index(const Glib::RefPtr<Gst::Index>& index), "set_index")
 
 #m4 _CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Gst::wrap($3, true)')
   /** Send a Gst::Event to the element.
