@@ -57,7 +57,7 @@ AS_IF([test "x$enable_static" = xyes],
 # The format below is used so that the requirements appear nicely in the .pc
 # file.
 AC_SUBST([GSTREAMERMM_MODULES],
-         ['giomm-2.4 >= 2.36.0 libxml++-2.6 >= 2.14[]m4_foreach([gstmm_mod],
+         ['giomm-2.4 >= 2.36.0[]m4_foreach([gstmm_mod],
          [[], [-allocators], [-app], [-audio], [-base], [-check],
            [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
            [-riff], [-rtp], [-sdp], [-tag], [-video]],
