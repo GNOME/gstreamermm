@@ -24,7 +24,7 @@ _PINCLUDE(gstreamermm/private/basetransform_p.h)
 namespace Gst
 {
 
-gboolean AudioFilter_Class::setup_vfunc_callback(GstAudioFilter* self, GstRingBufferSpec* format)
+gboolean AudioFilter_Class::setup_vfunc_callback(GstAudioFilter* self, GstAudioInfo* info)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -41,10 +41,11 @@ gboolean AudioFilter_Class::setup_vfunc_callback(GstAudioFilter* self, GstRingBu
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-        Gst::RingBufferSpec spec(*format);
+    	  // TODO
+        //Gst::AudioRingBufferSpec spec(*info);
 
         // Call the virtual member method, which derived classes might override.
-        return static_cast<int>(obj->setup_vfunc(spec));
+        //return static_cast<int>(obj->setup_vfunc(spec));
       }
       catch(...)
       {
@@ -59,20 +60,20 @@ gboolean AudioFilter_Class::setup_vfunc_callback(GstAudioFilter* self, GstRingBu
 
   // Call the original underlying C function:
   if(base && base->setup)
-    return (*base->setup)(self, format);
+    return (*base->setup)(self, info);
 
 
   typedef gboolean RType;
   return RType();
 }
-bool Gst::AudioFilter::setup_vfunc(Gst::RingBufferSpec& format)
+bool Gst::AudioFilter::setup_vfunc(Gst::AudioInfo& info)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
   );
 
   if(base && base->setup)
-    return static_cast<bool>((*base->setup)(gobj(), format.gobj()));
+    return static_cast<bool>((*base->setup)(gobj(), info.gobj()));
 
   typedef bool RType;
   return RType();

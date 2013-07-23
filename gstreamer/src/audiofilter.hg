@@ -18,7 +18,7 @@
  */
 
 #include <gstreamermm/basetransform.h>
-#include <gstreamermm/ringbuffer.h>
+#include <gstreamermm/audioringbuffer.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -48,14 +48,14 @@ class AudioFilter : public Gst::BaseTransform
 public:
   /** Virtual function, called whenever the format changes.
    */
-  virtual bool setup_vfunc(Gst::RingBufferSpec& format);
+  virtual bool setup_vfunc(Gst::AudioInfo& info);
 
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->setup = &setup_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
-  static gboolean setup_vfunc_callback(GstAudioFilter* self, GstRingBufferSpec* format);
+  static gboolean setup_vfunc_callback(GstAudioFilter* self, GstAudioInfo* info);
   _POP()
 #m4end
 };
