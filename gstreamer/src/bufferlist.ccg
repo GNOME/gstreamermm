@@ -23,7 +23,7 @@ _PINCLUDE(gstreamermm/private/miniobject_p.h)
 extern "C"
 {
 
-static bool BufferList_Foreach_gstreamermm_callback(GstBuffer** buffer, tguint idx, void* data)
+static gboolean BufferList_Foreach_gstreamermm_callback(GstBuffer** buffer, guint idx, void* data)
 {
   Gst::BufferList::SlotForeach* the_slot =
     static_cast<Gst::BufferList::SlotForeach*>(data);
@@ -36,7 +36,7 @@ static bool BufferList_Foreach_gstreamermm_callback(GstBuffer** buffer, tguint i
     // Call the slot which can modify the buffer (ie. set it to a new one or
     // clear it altogether).
     bool result =
-      static_cast<bool>((*the_slot)(temp, group, idx));
+      static_cast<bool>((*the_slot)(temp, idx));
 
     // Set the reference to the buffer according to how the temp buffer has
     // been altered.
@@ -61,7 +61,7 @@ static bool BufferList_Foreach_gstreamermm_callback(GstBuffer** buffer, tguint i
     Glib::exception_handlers_invoke();
   }
 
-  return GST_BUFFER_LIST_CONTINUE;
+  return true; // continue
 }
 
 } // extern "C"
