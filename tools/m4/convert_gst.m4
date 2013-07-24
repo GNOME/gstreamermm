@@ -55,15 +55,15 @@ _CONV_GLIB_ENUM(ThreadPriority)
 dnl ############### gstreamermm Class Conversions ######################
 
 dnl Buffer
-_CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Gst::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `Gst::unwrap($3)')
-_CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>(Gst::unwrap($3))')
-_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `Gst::unwrap($3)')
-_CONVERSION(`Glib::RefPtr<Gst::Buffer>',`GstBuffer*', `Gst::unwrap($3)')
+_CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>(Glib::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Buffer>',`GstBuffer*', `Glib::unwrap($3)')
 
 dnl BufferList
-_CONVERSION(`Glib::RefPtr<Gst::BufferList>',`GstBufferList*', `Gst::unwrap($3)')
-_CONVERSION(`GstBufferList*', `Glib::RefPtr<BufferList>', `Gst::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::BufferList>',`GstBufferList*', `Glib::unwrap($3)')
+_CONVERSION(`GstBufferList*', `Glib::RefPtr<BufferList>', `Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::BufferList>&', `GstBufferList*', `Glib::unwrap($3)')
 
 dnl Bus
@@ -95,11 +95,11 @@ _CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*'
 _CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>(Glib::unwrap($3))')
 
 dnl DiscovererInfo
-_CONVERSION(`GstDiscovererInfo*',`Glib::RefPtr<DiscovererInfo>',`Gst::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<DiscovererInfo>&',`GstDiscovererInfo*',`Gst::unwrap($3)')
+_CONVERSION(`GstDiscovererInfo*',`Glib::RefPtr<DiscovererInfo>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<DiscovererInfo>&',`GstDiscovererInfo*',`Glib::unwrap($3)')
 
 dnl DiscovererStreamInfo
-_CONVERSION(`GstDiscovererStreamInfo*', `Glib::RefPtr<DiscovererStreamInfo>', `Gst::wrap($3)')
+_CONVERSION(`GstDiscovererStreamInfo*', `Glib::RefPtr<DiscovererStreamInfo>', `Glib::wrap($3)')
 
 dnl Element
 _CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `Glib::unwrap($3)')
@@ -115,7 +115,7 @@ _CONVERSION(`GstElementFactory*',`Glib::RefPtr<const Gst::ElementFactory>',`Glib
 _CONVERSION(`const Glib::RefPtr<Gst::ElementFactory>&',`GstElementFactory*', `Glib::unwrap($3)')
 
 dnl Event
-_CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Gst::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Glib::unwrap($3)')
 
 dnl Index
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Gst::Index>',`Glib::wrap($3)')
@@ -135,11 +135,11 @@ _CONVERSION(`GstIterator*',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>',
 dnl Message
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Gst::Message::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<const Gst::Message>',`Gst::Message::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `Gst::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `Glib::unwrap($3)')
 
 dnl MiniObject
 _CONVERSION(`GstMiniObject*',`Glib::RefPtr<MiniObject>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`Gst::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`Glib::unwrap($3)')
 
 dnl Mixer
 _CONVERSION(`const Glib::RefPtr<Gst::MixerOptions>&',`GstMixerOptions*', `Glib::unwrap($3)')
@@ -175,7 +175,7 @@ _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<Gst::PluginFeature>',`Glib::wrap($
 _CONVERSION(`const Glib::RefPtr<Gst::PluginFeature>&',`GstPluginFeature*',`Glib::unwrap($3)')
 
 dnl Query
-_CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Gst::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Glib::unwrap($3)')
 
 dnl Registry
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')

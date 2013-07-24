@@ -41,78 +41,6 @@ bool BaseSink::query_latency(bool& live, bool& upstream_live, ClockTime& min_lat
   return result;
 }
 
-ClockReturn BaseSink::wait_clock(ClockTime time)
-{
-  return static_cast<ClockReturn>(gst_base_sink_wait_clock(const_cast<GstBaseSink*>(gobj()), static_cast<GstClockTime>(time), 0));
-}
-
-FlowReturn BaseSink::wait_eos(ClockTime time)
-{
-  return static_cast<FlowReturn>(gst_base_sink_wait_eos(const_cast<GstBaseSink*>(gobj()), static_cast<GstClockTime>(time), 0));
-}
-
-GstFlowReturn BaseSink_Class::buffer_alloc_vfunc_callback(GstBaseSink* self, guint64 offset, guint size, GstCaps* caps, GstBuffer** buf)
-{
-  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
-
-  // Non-gtkmmproc-generated custom classes implicitly call the default
-  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
-  // generated classes can use this optimisation, which avoids the unnecessary
-  // parameter conversions if there is no possibility of the virtual function
-  // being overridden:
-  if(obj_base && obj_base->is_derived_())
-  {
-    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
-    if(obj) // This can be NULL during destruction.
-    {
-      try // Trap C++ exceptions which would normally be lost because this is a C callback.
-      {
-        Glib::RefPtr<Gst::Buffer> cpp_buffer;
-        // Call the virtual member method, which derived classes might override.
-        const GstFlowReturn result =
-          static_cast<GstFlowReturn>(obj->buffer_alloc_vfunc(offset, size,
-          Glib::wrap(caps, true), cpp_buffer));
-        *buf = cpp_buffer->gobj_copy();
-        return result;
-      }
-      catch(...)
-      {
-        Glib::exception_handlers_invoke();
-      }
-    }
-  }
-  
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  // Call the original underlying C function:
-  if(base && base->buffer_alloc)
-    return (*base->buffer_alloc)(self, offset, size, caps, buf);
-
-
-  typedef GstFlowReturn RType;
-  return RType();
-}
-FlowReturn Gst::BaseSink::buffer_alloc_vfunc(guint64 offset, guint size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer)
-{
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  if(base && base->buffer_alloc)
-  {
-    GstBuffer* gst_buffer;
-    const Gst::FlowReturn result =
-      static_cast<Gst::FlowReturn>((*base->buffer_alloc)(gobj(), offset,size,Glib::unwrap(caps), &gst_buffer));
-    buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
-    return result;
-  }
-
-  typedef FlowReturn RType;
-  return RType();
-}
 gboolean BaseSink_Class::set_caps_vfunc_callback(GstBaseSink* self, GstCaps* caps)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -342,7 +270,7 @@ gboolean BaseSink_Class::event_vfunc_callback(GstBaseSink* self, GstEvent* event
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
-        return static_cast<int>(obj->event_vfunc(Gst::wrap(event, true)
+        return static_cast<int>(obj->event_vfunc(Glib::wrap(event, true)
 ));
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
@@ -371,7 +299,7 @@ bool Gst::BaseSink::event_vfunc(const Glib::RefPtr<Gst::Event>& event)
   );
 
   if(base && base->event)
-    return (*base->event)(gobj(),Gst::unwrap(event));
+    return (*base->event)(gobj(),Glib::unwrap(event));
 
   return true;
 }

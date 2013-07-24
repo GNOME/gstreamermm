@@ -109,7 +109,7 @@ gboolean BaseSrc_Class::prepare_seek_segment_vfunc_callback(GstBaseSrc* self, Gs
       {
         // Call the virtual member method, which derived classes might override.
         Gst::Segment cpp_segment(segment, true);
-        return static_cast<int>(obj->prepare_seek_segment_vfunc(Gst::wrap(seek, true) , cpp_segment));
+        return static_cast<int>(obj->prepare_seek_segment_vfunc(Glib::wrap(seek, true) , cpp_segment));
       }
       catch(...)
       {
@@ -137,7 +137,7 @@ bool Gst::BaseSrc::prepare_seek_segment_vfunc(const Glib::RefPtr<Gst::Event>& se
   );
 
   if(base && base->prepare_seek_segment)
-    return (*base->prepare_seek_segment)(gobj(),Gst::unwrap(seek),(segment).gobj());
+    return (*base->prepare_seek_segment)(gobj(),Glib::unwrap(seek),(segment).gobj());
 
   typedef bool RType;
   return RType();
@@ -195,7 +195,7 @@ FlowReturn Gst::BaseSrc::create_vfunc(guint64 offset, guint size, Glib::RefPtr<G
     GstBuffer* gst_buffer;
     Gst::FlowReturn const result =
       static_cast<FlowReturn>((*base->create)(gobj(),offset, size,&gst_buffer));
-    buffer = Gst::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
+    buffer = Glib::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
     return result;
   }
 

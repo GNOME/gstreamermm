@@ -171,7 +171,7 @@ public:
 #m4 _CONVERSION(`Glib::RefPtr<Gst::Caps>', `GstCaps*', `Glib::unwrap($3)')
   /** Called to get the caps to report.
    */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps() const, "get_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> get_caps(Glib::RefPtr<Gst::Caps> caps) const, "get_caps")
 
 #m4 _CONVERSION(`GstCaps*', `const Glib::RefPtr<Gst::Caps>&', `Glib::wrap($3, true)')
   /** Notify subclass of changed output caps.
@@ -182,10 +182,6 @@ public:
    */
   _WRAP_VFUNC(bool negotiate(), "negotiate")
 
-  /** Generate and send a new_segment event (UNUSED).
-   */
-  _WRAP_VFUNC(bool new_segment(), "newsegment")
-
   /** Start processing. Subclasses should open resources and prepare to produce
    * data.
    */
@@ -195,7 +191,7 @@ public:
    */
   _WRAP_VFUNC(bool stop(), "stop")
 
-#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Gst::wrap($3, true)')
+#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
 #m4 _CONVERSION(`GstClockTime*', `ClockTime&', `*($3)')
   /** Given a buffer, return the start and stop time when it should be pushed
    * out. The base class will sync on the clock using these times.
@@ -217,7 +213,7 @@ public:
    */
   _WRAP_VFUNC(bool unlock(), "unlock")
 
-#m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Gst::wrap($3, true)')
+#m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3, true)')
   /** Override this to implement custom event handling.
    */
   _WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event")
@@ -228,23 +224,15 @@ public:
    */
   virtual bool do_seek_vfunc(Gst::Segment& segment); 
 
-#m4 _CONVERSION(`GstQuery*', `const Glib::RefPtr<Gst::Query>&', `Gst::wrap($3, true)')
+#m4 _CONVERSION(`GstQuery*', `const Glib::RefPtr<Gst::Query>&', `Glib::wrap($3, true)')
   /** Handle a requested query.
    */
   //_WRAP_VFUNC(bool query(const Glib::RefPtr<Gst::Query>& query) const, "query")
 
-  /** Check whether the source would support pull-based operation if it were to
-   * be opened now. This vfunc is optional, but should be implemented if
-   * possible to avoid unnecessary start/stop cycles. The default
-   * implementation will open and close the resource to find out whether
-   * get_range() is supported, and that is usually undesirable.
-   */
-  _WRAP_VFUNC(bool check_get_range(), "check_get_range")
-
   /** Called during negotiation if caps need fixating. Implement instead of
    * setting a fixate function on the source pad.
    */
-  _WRAP_VFUNC(void fixate(const Glib::RefPtr<Gst::Caps>& caps), "fixate")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> fixate(const Glib::RefPtr<Gst::Caps>& caps), "fixate")
 
   /** Clear the previous unlock request. Subclasses should clear any state they
    * set during unlock_vfunc(), such as clearing command queues.
