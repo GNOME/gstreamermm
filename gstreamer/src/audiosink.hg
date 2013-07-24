@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gstreamermm/audioringbuffer.h>
 #include <gst/audio/gstaudiosink.h>
-#include <gstreamermm/baseaudiosink.h>
-#include <gstreamermm/ringbuffer.h>
+#include <gstreamermm/audiobasesink.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -47,9 +47,9 @@ namespace Gst
  *
  * @ingroup GstBaseClasses
  */
-class AudioSink : public Gst::BaseAudioSink
+class AudioSink : public Gst::AudioBaseSink
 {
-  _CLASS_GOBJECT(AudioSink, GstAudioSink, GST_AUDIO_SINK, Gst::BaseAudioSink, GstBaseAudioSink)
+  _CLASS_GOBJECT(AudioSink, GstAudioSink, GST_AUDIO_SINK, Gst::AudioBaseSink, GstAudioBaseSink)
 
 public:
   /** vfunc to open the device. No configuration needs to be done at this
@@ -59,7 +59,7 @@ public:
 
   /** vfunc to prepare the device to operate with the specified parameters.
    */
-  virtual bool prepare_vfunc(Gst::RingBufferSpec& spec);
+  virtual bool prepare_vfunc(Gst::AudioRingBufferSpec& spec);
 
   /** vfunc to undo operations done in prepare.
    */

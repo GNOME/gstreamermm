@@ -116,12 +116,12 @@
 #include <gstreamermm/audiofilter.h>
 #include <gstreamermm/audiosink.h>
 #include <gstreamermm/audiosrc.h>
-#include <gstreamermm/baseaudiosink.h>
-#include <gstreamermm/baseaudiosrc.h>
+#include <gstreamermm/audiobasesink.h>
+#include <gstreamermm/audiobasesrc.h>
 #include <gstreamermm/cddabasesrc.h>
 #include <gstreamermm/discoverer.h>
 #include <gstreamermm/discovererinfo.h>
-#include <gstreamermm/ringbuffer.h>
+#include <gstreamermm/audioringbuffer.h>
 #include <gstreamermm/videosink.h>
 
 // Base inteface includes
