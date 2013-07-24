@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   GError* cerror = g_error_new_literal(GST_CORE_ERROR, GST_CORE_ERROR_FAILED, "test error message");
   GstMessage* cmessage = gst_message_new_warning(cobject, cerror, "test debug text");
   
-  Glib::RefPtr<Gst::Message> message = Gst::Message::wrap(cmessage);
+  Glib::RefPtr<Gst::Message> message = Glib::wrap(cmessage);
 
   std::cout << "C++ message instance is !null: " << (bool)(message) << std::endl;
 

@@ -33,7 +33,7 @@ static gboolean Bus_Message_gstreamermm_callback(GstBus* bus, GstMessage* messag
 
   try
   {
-    return (*the_slot)(Glib::wrap(bus, true), Gst::Message::wrap(message, true));
+    return (*the_slot)(Glib::wrap(bus, true), Glib::wrap(message, true));
   }
   catch(...)
   {
@@ -54,7 +54,7 @@ static GstBusSyncReply Bus_Message_Sync_gstreamermm_callback(GstBus* bus, GstMes
 
   try
   {
-    return static_cast<GstBusSyncReply>((*the_slot)(Glib::wrap(bus, true), Gst::Message::wrap(message, true)));
+    return static_cast<GstBusSyncReply>((*the_slot)(Glib::wrap(bus, true), Glib::wrap(message, true)));
   }
   catch(...)
   {
@@ -92,10 +92,10 @@ void Bus::set_sync_handler(const SlotMessageSync& slot)
 
   // Clear a possibly existing sync handler by calling with 0 before setting
   // a new one (see gst_bus_set_sync_handler docs)
-  gst_bus_set_sync_handler(gobj(), 0, 0);
+  gst_bus_set_sync_handler(gobj(), 0, 0, 0);
 
   slot_copy = slot;
-  gst_bus_set_sync_handler(gobj(), &Bus_Message_Sync_gstreamermm_callback, &slot_copy);
+  gst_bus_set_sync_handler(gobj(), &Bus_Message_Sync_gstreamermm_callback, &slot_copy, &Bus_Message_gstreamermm_callback_destroy);
 }
 
 } //namespace Gst
