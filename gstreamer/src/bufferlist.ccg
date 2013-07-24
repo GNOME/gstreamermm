@@ -23,7 +23,7 @@ _PINCLUDE(gstreamermm/private/miniobject_p.h)
 extern "C"
 {
 
-static GstBufferListItem BufferList_Foreach_gstreamermm_callback(GstBuffer** buffer, guint group, guint idx, void* data)
+static bool BufferList_Foreach_gstreamermm_callback(GstBuffer** buffer, tguint idx, void* data)
 {
   Gst::BufferList::SlotForeach* the_slot =
     static_cast<Gst::BufferList::SlotForeach*>(data);
@@ -35,8 +35,8 @@ static GstBufferListItem BufferList_Foreach_gstreamermm_callback(GstBuffer** buf
 
     // Call the slot which can modify the buffer (ie. set it to a new one or
     // clear it altogether).
-    GstBufferListItem const result =
-      static_cast<GstBufferListItem>((*the_slot)(temp, group, idx));
+    bool result =
+      static_cast<bool>((*the_slot)(temp, group, idx));
 
     // Set the reference to the buffer according to how the temp buffer has
     // been altered.
@@ -64,28 +64,6 @@ static GstBufferListItem BufferList_Foreach_gstreamermm_callback(GstBuffer** buf
   return GST_BUFFER_LIST_CONTINUE;
 }
 
-static GstBuffer* BufferListIterator_Process_gstreamermm_callback(GstBuffer* buffer, void* data)
-{
-  Gst::BufferListIterator::SlotProcess* the_slot =
-    static_cast<Gst::BufferListIterator::SlotProcess*>(data);
-
-  try
-  {
-    Glib::RefPtr<Gst::Buffer> result = (*the_slot)(Gst::wrap(buffer, true));
-
-    if(result)
-      return result->gobj_copy();
-    else
-      return 0;
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-
-  return 0;
-}
-
 } // extern "C"
 
 
@@ -102,56 +80,10 @@ Glib::RefPtr<BufferList> BufferList::create_writable()
   return Gst::wrap(gst_buffer_list_make_writable(gobj()));
 }
 
-guint BufferList::n_groups() const
-{
-  return gst_buffer_list_n_groups(const_cast<GstBufferList*>(gobj()));
-}
-
 void BufferList::foreach(const SlotForeach& slot)
 {
   gst_buffer_list_foreach(gobj(), &BufferList_Foreach_gstreamermm_callback,
     const_cast<SlotForeach*>(&slot));
-}
-
-void BufferList::iterate(BufferListIterator& result)
-{
-  result.set_gobject(gst_buffer_list_iterate(gobj()));
-}
-
-BufferListIterator::BufferListIterator()
-: gobject_(0),
-  take_ownership(false)
-{
-}
-
-BufferListIterator::BufferListIterator(GstBufferListIterator* castitem,
-  bool take_ownership)
-: gobject_(castitem),
-  take_ownership(take_ownership)
-{
-}
-
-void BufferListIterator::set_gobject(GstBufferListIterator* castitem,
-  bool take_ownership)
-{
-  if(gobject_ && take_ownership)
-    gst_buffer_list_iterator_free(gobject_);
-
-  gobject_ = castitem;
-  this->take_ownership = take_ownership;
-}
-
-BufferListIterator::~BufferListIterator()
-{
-  if(take_ownership && gobject_)
-    gst_buffer_list_iterator_free(gobject_);
-}
-
-Glib::RefPtr<Gst::Buffer> BufferListIterator::process(const SlotProcess& slot)
-{
-  return Gst::wrap(gst_buffer_list_iterator_do(gobj(),
-    &BufferListIterator_Process_gstreamermm_callback,
-    const_cast<SlotProcess*>(&slot)));
 }
 
 } //namespace Gst

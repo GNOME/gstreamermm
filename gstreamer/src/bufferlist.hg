@@ -25,10 +25,7 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-_WRAP_ENUM(BufferListItem, GstBufferListItem, NO_GTYPE)
-
 class Buffer;
-class BufferListIterator;
 
 /** A grouped scatter data buffer type for data-passing.
  * Buffer lists are units of grouped scatter/gather data transfer in GStreamer.
@@ -68,12 +65,15 @@ public:
    * When the buffer has been made writable, the new buffer reference can be
    * assigned to the buffer.
    */
-  typedef sigc::slot< Gst::BufferListItem, Glib::RefPtr<Gst::Buffer>&, guint,
-    guint> SlotForeach;
+  typedef sigc::slot< bool, Glib::RefPtr<Gst::Buffer>&, guint> SlotForeach;
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<BufferList> create(), gst_buffer_list_new)
 
+_WRAP_METHOD(void remove(guint idx, guint length), gst_buffer_list_remove)
+
+_WRAP_METHOD(Glib::RefPtr<Gst::Buffer> remove(guint idx), gst_buffer_list_get)
+
+_WRAP_METHOD(void add(gint idx, const Glib::RefPtr<Gst::Buffer>& buffer), gst_buffer_list_insert)
   /** Tests if you can safely add buffers and groups into a buffer list.
    * @return <tt>true</tt> if the buffer list is writable, <tt>false</tt>
    * otherwise.
@@ -91,16 +91,6 @@ public:
    */
   Glib::RefPtr<BufferList> create_writable();
 
-  //TODO: h2def.py does not recognize the C function declaration in the
-  //header.
-  /** Returns the number of groups in list.
-   *
-   * @return The number of groups in the buffer list.
-   *
-   * Since 0.10.24
-   */
-  guint n_groups() const;
-
   /** Call @a slot for each buffer in @a list.
    *
    * @a slot can modify the passed buffer pointer or its contents. The return
@@ -116,100 +106,6 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> get(guint idx), gst_buffer_list_get)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Buffer> get(guint idx) const, gst_buffer_list_get, constversion)
 
-  /** Iterate the buffers in the buffer list.
-   * @param result A place in which to store the iterator.
-   * Sine 0.10.24.
-   */
-  void iterate(BufferListIterator& result);
-};
-
-/** An opaque iterator for a Gst::BufferList.
- */
-class BufferListIterator
-{
-  _CLASS_GENERIC(BufferListIterator, GstBufferListIterator)
-
-public:
-  /// Default constructor.
-  BufferListIterator();
-
-  /** C object constructor.
-   * @param castitem The C object.
-   * @param take_ownership Whether to destroy the C object with the wrapper or
-   * not.
-   */
-  explicit BufferListIterator(GstBufferListIterator* castitem,
-    bool take_ownership = true);
-
-  /// Destructor.
-  virtual ~BufferListIterator();
-
-  /// Provides access to the underlying C object.
-  GstBufferListIterator* gobj()
-    { return reinterpret_cast<GstBufferListIterator*>(gobject_); }
-
-  /// Provides access to the underlying C object.
-  const GstBufferListIterator* gobj() const
-    { return reinterpret_cast<GstBufferListIterator*>(gobject_); }
-
-private:
-// noncopyable
-  BufferListIterator(const BufferListIterator& other);
-  BufferListIterator& operator=(const BufferListIterator& other);
-
-  friend class BufferList;
-
-public:
-  /** For example,
-   * Glib::RefPtr<Gst::Buffer> on_process(const Glib::RefPtr<Gst::Buffer>&
-   * buffer);.
-   * A slot for processing the last buffer returned by
-   * Gst::BufferListIterator::next(). The slot can leave the buffer in the
-   * list, replace the buffer in the list or remove the buffer from the list,
-   * depending on the return value. If the slot returns 0, the buffer will be
-   * removed from the list, otherwise the buffer will be replaced with the
-   * returned buffer.
-   *
-   * The last buffer returned by Gst::BufferListIterator::next() will be
-   * replaced with the buffer returned from the function. If 0 is returned, the
-   * buffer will be removed from the list. The list must be writable.
-   */
-  typedef sigc::slot< Glib::RefPtr<Gst::Buffer>, const
-    Glib::RefPtr<Gst::Buffer>& > SlotProcess;
-
-  _WRAP_METHOD(guint n_buffers() const, gst_buffer_list_iterator_n_buffers)
-  _WRAP_METHOD(void add(const Glib::RefPtr<Gst::Buffer>& buffer), gst_buffer_list_iterator_add)
-  _WRAP_METHOD(void add_group(), gst_buffer_list_iterator_add_group)
-
-  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> next(), gst_buffer_list_iterator_next)
-  _WRAP_METHOD(Glib::RefPtr<const Gst::Buffer> next() const, gst_buffer_list_iterator_next, constversion)
-
-  _WRAP_METHOD(bool next_group(), gst_buffer_list_iterator_next_group)
-  _WRAP_METHOD(void remove(), gst_buffer_list_iterator_remove)
-
-  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> steal(), gst_buffer_list_iterator_steal)
-  _WRAP_METHOD(void take(const Glib::RefPtr<Gst::Buffer>& buffer), gst_buffer_list_iterator_take)
-
-  /** Calls the given function for the last buffer returned by next(). next()
-   * must have been called on it before this function is called. remove() and
-   * steal() must not have been called since the last call to next().
-   *
-   * See the SlotProcess docs for more details.
-   *
-   * @param slot The slot to be called.
-   * @return The return value from @a slot.
-   */
-  Glib::RefPtr<Gst::Buffer> process(const SlotProcess& slot);
-
-  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> merge_group(), gst_buffer_list_iterator_merge_group)
-
-protected:
-  GstBufferListIterator* gobject_;      // The C object.
-  bool take_ownership;                  // Bool signaling ownership.
-
-protected:
-  // So that Gst::BufferList::iterate() can set the C object.
-  void set_gobject(GstBufferListIterator* castitem, bool take_ownership = true);
 };
 
 } // namespace Gst
