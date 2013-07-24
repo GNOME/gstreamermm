@@ -24,16 +24,66 @@
 #include <gst/gst.h>
 
 // Core library includes
-#include <gst/base/base.h>
-#include <gst/controller/controller.h>
-#include <gst/net/net.h>
+#include <gst/base/gstadapter.h>
+#include <gst/base/gstbaseparse.h>
+#include <gst/base/gstbasesink.h>
+#include <gst/base/gstbasesrc.h>
+#include <gst/base/gstbasetransform.h>
+
+#include <gst/base/gstcollectpads.h>
+#include <gst/base/gstpushsrc.h>
+
+#include <gst/gstcontrolsource.h>
+#include <gst/gstcontrolbinding.h>
+
+#include <gst/controller/gstinterpolationcontrolsource.h>
+#include <gst/controller/gstlfocontrolsource.h>
+
+#include <gst/net/gstnetclientclock.h>
+#include <gst/net/gstnettimeprovider.h>
+
 
 // Base library includes
 #include <gst/audio/audio.h>
-#include <gst/pbutils/pbutils.h>
-#include <gst/rtp/rtp.h>
-#include <gst/tag/tag.h>
+#include <gst/audio/audio-enumtypes.h>
+#include <gst/audio/gstaudiobasesink.h>
+#include <gst/audio/gstaudiobasesrc.h>
+#include <gst/audio/gstaudiocdsrc.h>
+#include <gst/audio/gstaudioclock.h>
+#include <gst/audio/gstaudiodecoder.h>
+#include <gst/audio/gstaudioencoder.h>
+#include <gst/audio/gstaudiofilter.h>
+#include <gst/audio/gstaudioringbuffer.h>
+#include <gst/audio/gstaudiosink.h>
+#include <gst/audio/gstaudiosrc.h>
+#include <gst/audio/streamvolume.h>
+
+#include <gst/rtp/gstrtpbaseaudiopayload.h>
+#include <gst/rtp/gstrtpbasedepayload.h>
+#include <gst/rtp/gstrtpbasepayload.h>
+
+#include <gst/tag/gsttagdemux.h>
+
 #include <gst/video/video.h>
+#include <gst/video/gstvideodecoder.h>
+#include <gst/video/gstvideoencoder.h>
+#include <gst/video/gstvideofilter.h>
+#include <gst/video/gstvideopool.h>
+#include <gst/video/gstvideosink.h>
+#include <gst/video/gstvideoutils.h>
+#include <gst/video/videoorientation.h>
+#include <gst/video/video-overlay-composition.h>
+#include <gst/video/videooverlay.h>
+
+#include <gst/video/colorbalancechannel.h>
+#include <gst/video/colorbalance.h>
+
+#include <gst/video/navigation.h>
+
+
+#include <gst/pbutils/pbutils.h>
+#include <gst/tag/tag.h>
+
 
 bool gst_type_is_a_pointer(GType gtype)
 {
@@ -79,15 +129,15 @@ int main (int argc, char *argv[])
             << get_defs(GST_TYPE_BASE_SRC, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_BASE_SINK, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_BASE_TRANSFORM, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_BASE_PARSE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_PUSH_SRC, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_ADAPTER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_COLLECT_PADS, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_DATA_QUEUE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_CONTROL_SOURCE, gst_type_is_a_pointer)
+            << get_defs(GST_TYPE_CONTROL_BINDING, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_INTERPOLATION_CONTROL_SOURCE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_LFO_CONTROL_SOURCE, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_NET_CLIENT_CLOCK, gst_type_is_a_pointer)
-            << get_defs(GST_TYPE_NET_TIME_PROVIDER, gst_type_is_a_pointer)
             << get_defs(GST_TYPE_NET_TIME_PROVIDER, gst_type_is_a_pointer)
 
   // GStreamer core plugin types:
