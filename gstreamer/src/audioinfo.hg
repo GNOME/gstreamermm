@@ -17,22 +17,42 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gstreamermm/handle_error.h>
+#include <gstreamermm/audioformat.h>
+#include <gst/audio/audio-info.h>
+
+_DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-AudioFormatInfo::AudioFormatInfo()
-: m_info(g_try_new(GstAudioFormatInfo, 1)),
-  take_ownership(true)
+    _WRAP_ENUM(AudioFlags, GstAudioFlags)
+    _WRAP_ENUM(AudioLayout, GstAudioLayout)
+
+/**
+ * Information for an audio format.
+ */
+class AudioInfo : public Gst::AudioFormatInfo
 {
-  // Handle possible memory allocation failure.
-  if(!m_info)
-  {
-    gstreamermm_handle_error(
-      "Failed to allocate a new Gst::AudioFormatInfo.");
-    return;
-  }
-}
+    _CLASS_GENERIC(AudioInfo, GstAudioInfo)
+public:
+  explicit AudioInfo(const GstAudioInfo& castitem,
+    bool take_ownership = false);
+
+  AudioInfo(const AudioInfo& other);
+
+  virtual ~AudioInfo();
+
+  /// Gets the underlying gobject.
+  GstAudioInfo* gobj() { return m_info; };
+
+  /// Gets the underlying gobject.
+  const GstAudioInfo* gobj() const { return m_info; };
+
+protected:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GstAudioInfo* m_info;
+  bool take_ownership;
+#endif
+};
 
 }

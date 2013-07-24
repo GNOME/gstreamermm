@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <gst/audio/audio-format.h>
+
 _DEFS(gstreamermm,gst)
 
 namespace Gst
@@ -38,10 +40,9 @@ public:
   AudioFormatInfo();
 
   AudioFormatInfo(Gst::AudioFormat format = Gst::AUDIO_FORMAT_UNKNOWN,
-    const gchar* name = NULL, const gchar* description = NULL,
+    std::string name = "", std::string description = "",
     Gst::AudioFormatFlags flags = Gst::AUDIO_FORMAT_FLAG_INTEGER,
-    gint endianness = 0, gint width = 0, gint depth = 0,
-    guint8 silence[8] = {0});
+    gint endianness = 0, gint width = 0, gint depth = 0);
 
   explicit AudioFormatInfo(GstAudioFormatInfo& castitem,
     bool take_ownership = false);
@@ -51,5 +52,33 @@ public:
   AudioFormatInfo& operator=(const AudioFormatInfo& other);
 
   virtual ~AudioFormatInfo();
+
+  /// Gets the underlying gobject.
+  GstAudioFormatInfo* gobj() { return m_info; };
+
+  /// Gets the underlying gobject.
+  const GstAudioFormatInfo* gobj() const { return m_info; };
+
+  _MEMBER_GET(format, format, AudioFormat, GstAudioFormat)
+
+  _MEMBER_SET(format, format, AudioFormat, GstAudioFormat)
+
+  _MEMBER_GET(name, name, std::string, const char*)
+
+  _MEMBER_SET(name, name, std::string, const char*)
+
+  _MEMBER_GET(description, description, std::string, const char*)
+
+  _MEMBER_SET(description, description, std::string, const char*)
+
+  _MEMBER_GET(flags, flags, AudioFormatFlags, GstAudioFormatFlags)
+
+  _MEMBER_SET(flags, flags, AudioFormatFlags, GstAudioFormatFlags)
+
+protected:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GstAudioFormatInfo* m_info;
+  bool take_ownership;
+#endif
 };
 } //namespace Gst
