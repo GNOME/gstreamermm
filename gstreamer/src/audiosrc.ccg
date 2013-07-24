@@ -64,7 +64,7 @@ gboolean AudioSrc_Class::prepare_vfunc_callback(GstAudioSrc* self, GstAudioRingB
   typedef gboolean RType;
   return RType();
 }
-bool Gst::AudioSrc::prepare_vfunc(Gst::RingBufferSpec& spec)
+bool Gst::AudioSrc::prepare_vfunc(Gst::AudioRingBufferSpec& spec)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
@@ -76,7 +76,7 @@ bool Gst::AudioSrc::prepare_vfunc(Gst::RingBufferSpec& spec)
   typedef bool RType;
   return RType();
 }
-guint AudioSrc_Class::read_vfunc_callback(GstAudioSrc* self, gpointer data, guint length)
+guint AudioSrc_Class::read_vfunc_callback(GstAudioSrc* self, gpointer data, guint length, ClockTime* timestamp)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -94,7 +94,7 @@ guint AudioSrc_Class::read_vfunc_callback(GstAudioSrc* self, gpointer data, guin
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
-        return obj->read_vfunc(data, length);
+        return obj->read_vfunc(data, length, timestamp);
       }
       catch(...)
       {
@@ -109,20 +109,20 @@ guint AudioSrc_Class::read_vfunc_callback(GstAudioSrc* self, gpointer data, guin
 
   // Call the original underlying C function:
   if(base && base->read)
-    return (*base->read)(self, data, length);
+    return (*base->read)(self, data, length, timestamp);
 
 
   typedef guint RType;
   return RType();
 }
-guint Gst::AudioSrc::read_vfunc(const void* data, guint length)
+guint Gst::AudioSrc::read_vfunc(const void* data, guint length, ClockTime* timestamp)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
   );
 
   if(base && base->read)
-    return (*base->read)(gobj(),const_cast<void*>(data),length);
+    return (*base->read)(gobj(),const_cast<void*>(data),length, timestamp);
 
   typedef guint RType;
   return RType();

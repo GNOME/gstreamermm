@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
  
+#include <gstreamermm/audioringbuffer.h>
 #include <gst/audio/gstaudiosrc.h>
 #include <gstreamermm/audiobasesrc.h>
-#include <gstreamermm/audioringbuffer.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -40,16 +40,16 @@ namespace Gst
  * - close_vfunc() - Close the device.
  *
  * All scheduling of samples and timestamps is done in this base class together
- * with Gst::BaseAudioSrc using a default implementation of a
+ * with Gst::AudioBaseSrc using a default implementation of a
  * Gst::RingBuffer that uses threads.
  *
  * Last reviewed on 2006-09-27 (0.10.12)
  *
  * @ingroup GstBaseClasses
  */
-class AudioSrc : public Gst::BaseAudioSrc
+class AudioSrc : public Gst::AudioBaseSrc
 {
-  _CLASS_GOBJECT(AudioSrc, GstAudioSrc, GST_AUDIO_SRC, Gst::BaseAudioSrc, GstBaseAudioSrc)
+  _CLASS_GOBJECT(AudioSrc, GstAudioSrc, GST_AUDIO_SRC, Gst::AudioBaseSrc, GstAudioBaseSrc)
 
 public:
   /** vfunc to open the device.
@@ -70,7 +70,7 @@ public:
 
   /** vfunc to read samples to the audio device.
    */
-  virtual guint read_vfunc(const void* data, guint length);
+  virtual guint read_vfunc(const void* data, guint length, ClockTime* timestamp);
 
   /** vfunc to get the number of samples queued in the device.
    */
@@ -87,7 +87,7 @@ protected:
   klass->read = &read_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static gboolean prepare_vfunc_callback(GstAudioSrc* self, GstAudioRingBufferSpec* spec);
-  static guint read_vfunc_callback(GstAudioSrc* self, gpointer data, guint length);
+  static guint read_vfunc_callback(GstAudioSrc* self, gpointer data, guint length, ClockTime* timestamp);
   _POP()
 #m4end
 };

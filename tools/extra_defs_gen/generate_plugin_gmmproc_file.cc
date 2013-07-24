@@ -47,7 +47,7 @@ static const char *const wrappedBaseClasses[] =
   "GstAudioSink",
   "GstAudioSrc",
   "GstAudioBaseSink",
-  "GstBaseAudioSrc",
+  "GstAudioBaseSrc",
   "GstBaseSink",
   "GstBaseSrc",
   "GstBaseTransform",
@@ -905,7 +905,7 @@ int main(int argc, char** argv)
       cppParentTypeName.compare("AudioSink") == 0 ||
       cppParentTypeName.compare("AudioSrc") == 0 ||
       cppParentTypeName.compare("AudioBaseSink") == 0 ||
-      cppParentTypeName.compare("BaseAudioSrc") == 0 ||
+      cppParentTypeName.compare("AudioBaseSrc") == 0 ||
       cppParentTypeName.compare("BaseSink") == 0 ||
       cppParentTypeName.compare("BaseSrc") == 0 ||
       cppParentTypeName.compare("BaseTransform") == 0 ||
