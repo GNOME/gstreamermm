@@ -126,8 +126,6 @@ AudioRingBufferSpec::AudioRingBufferSpec(const AudioRingBufferSpec& other)
   m_spec->segsize = other.m_spec->segsize;
   m_spec->segtotal = other.m_spec->segtotal;
   m_spec->seglatency = other.m_spec->seglatency;
-
-  std::copy(other.m_spec->silence_sample, other.m_spec->silence_sample + GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE, m_spec->silence_sample);
 }
 
 AudioRingBufferSpec& AudioRingBufferSpec::operator=(const AudioRingBufferSpec& other)
@@ -157,26 +155,6 @@ void AudioRingBufferSpec::swap(AudioRingBufferSpec& other)
   const bool take_temp = take_ownership;
   take_ownership = other.take_ownership;
   other.take_ownership = take_temp;
-}
-
-void AudioRingBufferSpec::set_silence_sample(const Glib::ArrayHandle<guint8>& silence_sample)
-{
-  std::copy(silence_sample.data(),
-    silence_sample.data() + GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE,
-    m_spec->silence_sample);
-}
-
-void AudioRingBuffer::set_fill_slot(const SlotFill& slot)
-{
-  // The slot is dynamically allocated because according to the
-  // gst_audio_ring_buffer_set_callback() docs, the slot may be called several
-  // times.
-  // A copy is hence created to avoid losing the slot.  The copy is kept in an
-  // auto_ptr<> so that is released upon the ring buffer's destruction.
-  m_slot.reset(new SlotFill(slot));
-
-  gst_audio_ring_buffer_set_callback(gobj(), &AudioRingBuffer_Fill_gstreamermm_callback,
-    m_slot.get());
 }
 
 bool AudioRingBuffer::prepare_read(int& segment, std::vector<guint8>& readptr,
@@ -264,15 +242,10 @@ guint AudioRingBuffer_Class::commit_vfunc_callback(GstAudioRingBuffer* self, gui
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-        // This formula is obtained from the definition of the data_end
-        // variable in the default_commit() function of the C API
-        // gstringbuffer.c file.
-        size_t data_length = (self->spec.bytes_per_sample * in_samples);
-
         // Declare the ArrayHandle for the C++ vfunc.
-        Glib::ArrayHandle<guchar> cpp_data(data, data_length, Glib::OWNERSHIP_NONE);
+        Glib::ArrayHandle<guchar> cpp_data(data, self->size, Glib::OWNERSHIP_NONE);
         // Call the virtual member method, which derived classes might override.
-        return obj->commit_vfunc(*(sample), Glib::ArrayHandler<guint8>::array_to_vector(data, data_length, Glib::OWNERSHIP_NONE), in_samples, out_samples, *(accum));
+        return obj->commit_vfunc(*(sample), Glib::ArrayHandler<guint8>::array_to_vector(data, self->size, Glib::OWNERSHIP_NONE), in_samples, out_samples, *(accum));
       }
       catch(...)
       {
@@ -300,7 +273,7 @@ guint Gst::AudioRingBuffer::commit_vfunc(guint64& sample, const std::vector<guin
   );
 
   if(base && base->commit)
-    return (*base->commit)(gobj(),&sample,Glib::ArrayHandler<guint8>::vector_to_array(data).data(),,in_samples,out_samples,&accum);
+    return (*base->commit)(gobj(),&sample,Glib::ArrayHandler<guint8>::vector_to_array(data).data(),in_samples,out_samples,&accum);
 
   typedef guint RType;
   return RType();
