@@ -116,7 +116,7 @@ protected:
   IteratorBase<CppType>& operator=(const IteratorBase<CppType>& other);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  void* current;         // The current element the iterator is referencing.
+  GValue* current;         // The current element the iterator is referencing.
   IteratorResult current_result; // The current result of a next() call.
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -275,7 +275,7 @@ template<class CppType>
 IteratorResult IteratorBase<CppType>::next()
 {
   current_result =
-    static_cast<Gst::IteratorResult>(gst_iterator_next(cobj(), &current));
+    static_cast<Gst::IteratorResult>(gst_iterator_next(cobj(), current));
 
   // Set current to null if iterator is done:
   if(current_result == Gst::ITERATOR_DONE)

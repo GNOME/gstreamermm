@@ -47,7 +47,7 @@ Glib::RefPtr<Gst::Bin> Bin::add(const Glib::RefPtr<Gst::Element>& element)
   // bin and GStreamer complains about it.  The extra reference to the element
   // is removed when the bin is destroyed or when the element is removed from
   // the bin (see gst_bin_remove).
-  if(G_LIKELY(GST_OBJECT_IS_FLOATING(celement)))
+  if(G_LIKELY(g_object_is_floating(celement)))
     element->reference();
 
   const bool result = gst_bin_add(gobj(), celement);
