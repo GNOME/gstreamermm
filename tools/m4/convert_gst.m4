@@ -243,7 +243,7 @@ _CONVERSION(`GstState*',`State&',`*reinterpret_cast<Gst::State*>($3)')
 _CONVERSION(`GstTagFlag',`TagFlag',`(TagFlag)($3)')
 _CONVERSION(`guint64',`ClockTime',`(ClockTime)($3)')
 _CONVERSION(`const URIType',`const GstURIType',`(GstURIType)($3)')
-
+_CONVERSION(`const Gst::AudioChannelPosition&',`const GstAudioChannelPosition*',`(const GstAudioChannelPosition*)(&$3)')
 dnl C++ Conversions
 _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 

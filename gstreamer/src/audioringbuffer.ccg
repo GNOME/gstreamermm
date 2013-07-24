@@ -64,13 +64,11 @@ AudioRingBufferSpec::AudioRingBufferSpec()
 }
 
 AudioRingBufferSpec::AudioRingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
-  Gst::AudioRingBufferFormatType type, bool sign,
-  bool bigend, int width, int depth, int rate, int channels,
+  Gst::AudioRingBufferFormatType type,
   guint64 latency_time, guint64 buffer_time, int segsize, int segtotal,
   int seglatency)
 : m_spec(g_try_new(GstAudioRingBufferSpec, 1)),
   take_ownership(true)
-  
 {
   // Handle possible memory allocation failure.
   if(!m_spec)
@@ -88,12 +86,6 @@ AudioRingBufferSpec::AudioRingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
     caps->reference();
 
   spec->type = static_cast<GstAudioRingBufferFormatType>(type);
-  spec->sign = static_cast<int>(sign);
-  spec->bigend = static_cast<int>(bigend);
-  spec->width = width;
-  spec->depth = depth;
-  spec->rate = rate;
-  spec->channels = channels;
   spec->latency_time = latency_time;
   spec->buffer_time = buffer_time;
   spec->segsize = segsize;
@@ -129,18 +121,10 @@ AudioRingBufferSpec::AudioRingBufferSpec(const AudioRingBufferSpec& other)
     gst_caps_ref(m_spec->caps);
 
   m_spec->type = other.m_spec->type;
-  m_spec->format = other.m_spec->format;
-  m_spec->sign = other.m_spec->sign;
-  m_spec->bigend = other.m_spec->bigend;
-  m_spec->width = other.m_spec->width;
-  m_spec->depth = other.m_spec->depth;
-  m_spec->rate = other.m_spec->rate;
-  m_spec->channels = other.m_spec->channels;
   m_spec->latency_time = other.m_spec->latency_time;
   m_spec->buffer_time = other.m_spec->buffer_time;
   m_spec->segsize = other.m_spec->segsize;
   m_spec->segtotal = other.m_spec->segtotal;
-  m_spec->bytes_per_sample = other.m_spec->bytes_per_sample;
   m_spec->seglatency = other.m_spec->seglatency;
 
   std::copy(other.m_spec->silence_sample, other.m_spec->silence_sample + GSTREAMERMM_RING_BUFFER_SPEC_SILENCE_SAMPLE, m_spec->silence_sample);

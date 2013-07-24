@@ -28,8 +28,7 @@ _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
-
-_WRAP_ENUM(AudioRingBufferSegState, GstAudioRingBufferSegState)
+_WRAP_ENUM(AudioChannelPosition, GstAudioChannelPosition)
 _WRAP_ENUM(AudioRingBufferState, GstAudioRingBufferState)
 _WRAP_ENUM(AudioRingBufferFormatType, GstAudioRingBufferFormatType)
 
@@ -76,9 +75,8 @@ public:
    */
   AudioRingBufferSpec(const Glib::RefPtr<Gst::Caps>& caps,
     Gst::AudioRingBufferFormatType type = Gst::AUDIO_RING_BUFFER_FORMAT_TYPE_RAW,
-    bool sign = false,
-    bool bigend = false, int width = 0, int depth = 0, int rate = 0,
-    int channels = 0, guint64 latency_time = 0, guint64 buffer_time = 0,
+    guint64 latency_time = 0,
+    guint64 buffer_time = 0,
     int segsize = 0, int segtotal = 0, int seglatency = 0);
 
   /// Construct a Gst::AudioRingBufferSpec from a GstAudioRingBufferSpec.
@@ -119,57 +117,6 @@ public:
   /** Set the sample type (in/out).
    */
   _MEMBER_SET(type, type, Gst::AudioRingBufferFormatType, GstAudioRingBufferFormatType)
-
-  /** Get the sample format (in/out).
-   */
-
-  /** Get the sample sign (in/out).
-   */
-  _MEMBER_GET(sign, sign, bool, gboolean)
-
-  /** Set the sample sign (in/out).
-   */
-  _MEMBER_SET(sign, sign, bool, gboolean)
-
-  /** Get the endianness of the samples (in/out).
-   */
-  _MEMBER_GET(bigend, bigend, bool, gboolean)
-
-  /** Set the endianness of the samples (in/out).
-   */
-  _MEMBER_SET(bigend, bigend, bool, gboolean)
-
-  /** Get the width of the samples (in/out).
-   */
-  _MEMBER_GET(width, width, int, gint)
-
-  /** Set the width of the samples (in/out).
-   */
-  _MEMBER_SET(width, width, int, gint)
-
-  /** Get the depth of the samples (in/out).
-   */
-  _MEMBER_GET(depth, depth, int, gint)
-
-  /** Set the depth of the samples (in/out).
-   */
-  _MEMBER_SET(depth, depth, int, gint)
-
-  /** Get the samplerate (in/out).
-   */
-  _MEMBER_GET(rate, rate, int, gint)
-
-  /** Set the samplerate (in/out).
-   */
-  _MEMBER_SET(rate, rate, int, gint)
-
-  /** Get the number of channels (in/out).
-   */
-  _MEMBER_GET(channels, channels, int, gint)
-
-  /** Set the number of channels (in/out).
-   */
-  _MEMBER_SET(channels, channels, int, gint)
 
   /** Get the latency in microseconds (in/out).
    */
@@ -212,16 +159,6 @@ public:
    * segtotal (in/out).
    */
   _MEMBER_SET(seglatency, seglatency, int, gint)
-
-  /** Get the number of bytes of one sample (out).  This is set by the call to
-   * Gst::AudioRingBuffer::acquire().
-   */
-  _MEMBER_GET(bytes_per_sample, bytes_per_sample, int, gint)
-
-  /** Set the number of bytes of one sample (out).  This is set by the call to
-   * Gst::AudioRingBuffer::acquire() and should probably not be set.
-   */
-  _MEMBER_SET(bytes_per_sample, bytes_per_sample, int, gint)
 
 // This constant is obtained from the "silence_sample" member in the
 // GstAudioRingBufferSpec structure definition.
@@ -294,6 +231,9 @@ public:
   _WRAP_METHOD(guint get_delay() const, gst_audio_ring_buffer_delay)
   _WRAP_METHOD(guint64 get_samples_done() const, gst_audio_ring_buffer_samples_done)
   _WRAP_METHOD(void set_sample(guint64 sample), gst_audio_ring_buffer_set_sample)
+  _WRAP_METHOD(void set_channel_position(const Gst::AudioChannelPosition& position), gst_audio_ring_buffer_set_channel_positions)
+  _WRAP_METHOD(gboolean is_flushing(), gst_audio_ring_buffer_is_flushing)
+  _WRAP_METHOD(void set_timestamp(gint readseg, ClockTime timestamp), gst_audio_ring_buffer_set_timestamp)
 
 #m4 _CONVERSION(`const std::vector<guint8>&', `guint8*', `Glib::ArrayHandler<guint8>::vector_to_array($3).data()')
 
