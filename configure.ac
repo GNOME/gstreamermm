@@ -13,7 +13,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gstreamermm], [0.11.0],
+AC_INIT([gstreamermm], [1.0.0],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gstreamermm],
         [gstreamermm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -58,10 +58,10 @@ AS_IF([test "x$enable_static" = xyes],
 # file.
 AC_SUBST([GSTREAMERMM_MODULES],
          ['giomm-2.4 >= 2.36.0[]m4_foreach([gstmm_mod],
-         [[], [-allocators], [-app], [-audio], [-base], [-check],
+         [[], [-app], [-audio], [-base], [-check],
            [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
            [-riff], [-rtp], [-sdp], [-tag], [-video]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.1.1])'])
+         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.0.8])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
