@@ -40,7 +40,7 @@ gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstAudioRin
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-        Gst::RingBufferSpec cpp_spec(*spec);
+        Gst::AudioRingBufferSpec cpp_spec(*spec);
 
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->prepare_vfunc(cpp_spec));
@@ -64,7 +64,7 @@ gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstAudioRin
   typedef gboolean RType;
   return RType();
 }
-bool Gst::AudioSink::prepare_vfunc(Gst::RingBufferSpec& spec)
+bool Gst::AudioSink::prepare_vfunc(Gst::AudioRingBufferSpec& spec)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
