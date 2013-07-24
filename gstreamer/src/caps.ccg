@@ -42,7 +42,7 @@ Glib::RefPtr<Gst::Caps> Caps::create_any()
 Glib::RefPtr<Gst::Caps> Caps::create_simple(const Glib::ustring& media_type)
 {
   Glib::RefPtr<Gst::Caps> result = Glib::wrap(gst_caps_new_empty());
-  GstStructure* gst_struct = gst_structure_empty_new(media_type.c_str());
+  GstStructure* gst_struct = gst_structure_new_empty(media_type.c_str());
   gst_caps_append_structure(Glib::unwrap(result), gst_struct);
   return result;
 }
@@ -83,8 +83,7 @@ void Caps::merge_structure(Structure& structure)
 void
 Caps::set_simple(const Glib::ustring& name, const Glib::ValueBase& value)
 {
-  g_return_if_fail((this->gobj()->structs->len == 1)); // Not simple
-  g_return_if_fail (g_atomic_int_get(&(this->gobj())->refcount) == 1); // IS_WRITABLE(caps) fails
+  g_return_if_fail (g_atomic_int_get(&(this->gobj())->mini_object.refcount) == 1); // IS_WRITABLE(caps) fails
 
   //The result of gst_caps_get_structure() should not be modified, according to
   //its documentation, but we are reimplementing gst_caps_set_simple() which
