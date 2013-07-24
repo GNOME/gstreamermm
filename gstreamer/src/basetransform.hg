@@ -165,12 +165,12 @@ public:
   /** Optional. Given the pad in this direction and the given caps, what caps
    * are allowed on the other pad in this element ?
    */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> transform_caps(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps), "transform_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> transform_caps(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, const Glib::RefPtr<Gst::Caps>& filter), "transform_caps")
 
   /** Optional. Given the pad in this direction and the given caps, fixate the
    * caps on the other pad.
    */
-  _WRAP_VFUNC(void fixate_caps(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, const Glib::RefPtr<Gst::Caps>& othercaps), "fixate_caps")
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> fixate_caps(PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, const Glib::RefPtr<Gst::Caps>& othercaps), "fixate_caps")
 
   //TODO: This virtual function can't be wrapped without causing execution
   //errors with the ogg_player_gtkmm example.
@@ -184,7 +184,7 @@ public:
   /** Required if the transform is not in-place. Get the size in bytes of one
    * unit for the given caps.
    */
-  _WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Gst::Caps>& caps, guint& size) const, "get_unit_size")
+  _WRAP_VFUNC(bool get_unit_size(const Glib::RefPtr<Gst::Caps>& caps, gsize& size) const, "get_unit_size")
 
   /** Allows the subclass to be notified of the actual caps set.
    */
@@ -205,11 +205,6 @@ public:
   virtual bool stop_vfunc();
 
 #m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3, true)')
-  /* Optional. Event handler on the sink pad. This function should return
-   * <tt>true</tt> if the base class should forward the event.
-   */
-  _WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event")
-
 #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
 
   /** Required if the element does not operate in-place. Transforms one
@@ -228,7 +223,7 @@ public:
    * even just increment the reference to the input buffer (if in passthrough
    * mode).
    */
-  virtual FlowReturn prepare_output_buffer_vfunc(const Glib::RefPtr<Gst::Buffer>& input, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer);
+  virtual FlowReturn prepare_output_buffer_vfunc(const Glib::RefPtr<Gst::Buffer>& input, Glib::RefPtr<Gst::Buffer>& buffer);
 
   /** Optional. Event handler on the source pad.
    */
@@ -256,7 +251,7 @@ protected:
   _SECTION(SECTION_PH_VFUNCS)
   static gboolean start_vfunc_callback(GstBaseTransform* self);
   static gboolean stop_vfunc_callback(GstBaseTransform* self);
-  static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, gint size, GstCaps* caps, GstBuffer** buf);
+  static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer** buf);
   _POP()
 #m4end
 };

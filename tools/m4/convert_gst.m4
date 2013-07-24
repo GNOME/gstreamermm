@@ -228,6 +228,7 @@ dnl Basic General Conversions
 _CONVERSION(`guint64&',`guint64*',`&$3')
 _CONVERSION(`guint*',`guint&',`*$3')
 _CONVERSION(`const guint&',`guint',`$3')
+_CONVERSION(`gsize*',`gsize&',`*$3')
 _CONVERSION(`const guint32&',`guint32',`$3')
 _CONVERSION(`guint8*&',`guint8**',`&$3')
 
