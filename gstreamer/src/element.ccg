@@ -22,7 +22,6 @@
 #include <gstreamermm/caps.h>
 #include <gstreamermm/elementfactory.h>
 #include <gstreamermm/event.h>
-#include <gstreamermm/index.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/padtemplate.h>
 #include <gstreamermm/query.h>
@@ -107,14 +106,14 @@ void Element::post_message(int code, int line, MessageType type,
     domain, code, gst_text, gst_debug, file.c_str(), function.c_str(), line);
 }
 
-bool Element::query_position(Format& format) const
+bool Element::query_position(Gst::Format format) const
 {
-  return gst_element_query_position(const_cast<GstElement*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
+  return gst_element_query_position(const_cast<GstElement*>(gobj()), (GstFormat)format, 0);
 }
 
-bool Element::query_duration(Format& format) const
+bool Element::query_duration(Format format) const
 {
-  return gst_element_query_duration(const_cast<GstElement*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
+  return gst_element_query_duration(const_cast<GstElement*>(gobj()), (GstFormat)format, 0);
 }
 
 // This method is written manually because an extra ref is necessary. See
@@ -177,57 +176,6 @@ bool Gst::Element::set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock)
 
   typedef bool RType;
   return RType();
-}
-const GstQueryType* Element_Class::get_query_types_vfunc_callback(GstElement* self)
-{
-  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
-
-  // Non-gtkmmproc-generated custom classes implicitly call the default
-  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
-  // generated classes can use this optimisation, which avoids the unnecessary
-  // parameter conversions if there is no possibility of the virtual function
-  // being overridden:
-  if(obj_base && obj_base->is_derived_())
-  {
-    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
-    if(obj) // This can be NULL during destruction.
-    {
-      try // Trap C++ exceptions which would normally be lost because this is a C callback.
-      {
-        // Call the virtual member method, which derived classes might override.
-        return reinterpret_cast<const GstQueryType*>((obj->get_query_types_vfunc()).data());
-      }
-      catch(...)
-      {
-        Glib::exception_handlers_invoke();
-      }
-    }
-  }
-  
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  // Call the original underlying C function:
-  if(base && base->get_query_types)
-    return (*base->get_query_types)(self);
-
-
-  typedef const GstQueryType* RType;
-  return RType();
-}
-Glib::ArrayHandle<QueryType> Gst::Element::get_query_types_vfunc() const
-{
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  if(base && base->get_query_types)
-    return Glib::ArrayHandle<QueryType>(reinterpret_cast<const QueryType*>((*base->get_query_types)(const_cast<GstElement*>(gobj()))), Glib::OWNERSHIP_SHALLOW);
-
-  typedef Glib::ArrayHandle<QueryType> RType;
-  return RType(0, 0, Glib::OWNERSHIP_NONE);
 }
 
 } //namespace Gst

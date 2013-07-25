@@ -301,26 +301,26 @@ public:
   _WRAP_METHOD(Glib::ArrayHandle<QueryType> get_query_types() const, gst_element_get_query_types)
 
   _WRAP_METHOD(bool query(const Glib::RefPtr<Gst::Query>& query) const, gst_element_query)
-  _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_val, Format dest_format, gint64& dest_val) const, gst_element_query_convert)
-  _WRAP_METHOD(bool query_position(Format format, gint64& cur) const, gst_element_query_position)
+  _WRAP_METHOD(bool query_convert(Gst::Format src_format, gint64 src_val, Format dest_format, gint64& dest_val) const, gst_element_query_convert)
+  _WRAP_METHOD(bool query_position(Gst::Format format, gint64& cur) const, gst_element_query_position)
 
   /** Queries an element for the stream position.
    *
-   * @param format A pointer to the Gst::Format asked for. On return will
+   * @param format On return will
    * contain the Gst::Format used.
    * @return true if the query could be performed.
    */
-  bool query_position(Format& format) const;
+  bool query_position(Gst::Format format) const;
 
-  _WRAP_METHOD(bool query_duration(Format format, gint64& duration) const, gst_element_query_duration)
+  _WRAP_METHOD(bool query_duration(Gst::Format format, gint64& duration) const, gst_element_query_duration)
 
   /** Queries an element for the total stream duration.
    *
-   * @param format A pointer to the Gst::Format asked for. On return contains
+   * @param format On return contains
    * the Gst::Format used.
    * @return true if the query could be performed.
    */
-  bool query_duration(Format& format) const;
+  bool query_duration(Gst::Format format) const;
 
   _WRAP_METHOD(bool seek(Format format, SeekFlags seek_flags, gint64 seek_pos), gst_element_seek_simple)
   _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType cur_type, gint64 cur, SeekType stop_type, gint64 stop), gst_element_seek)
@@ -345,11 +345,6 @@ public:
 
   _WRAP_SIGNAL(void pad_added(const Glib::RefPtr<Gst::Pad>& new_pad), "pad-added")
   _WRAP_SIGNAL(void pad_removed(const Glib::RefPtr<Gst::Pad>& old_pad), "pad-removed")
-
-#m4 _CONVERSION(`GstPadTemplate*', `const Glib::RefPtr<const Gst::PadTemplate>&', `Glib::wrap(($3), true)')
-  /** Called when a new pad is requested.
-   */
-  _WRAP_VFUNC(Glib::RefPtr<Gst::Pad> request_new_pad(const Glib::RefPtr<const Gst::PadTemplate>& templ, const Glib::ustring& name), "request_new_pad")
 
   /** Called when a request pad is to be released.
    */
@@ -386,14 +381,6 @@ public:
    */
   virtual bool set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock);
 
-  // This vfunc is handwritten because the default gmmproc code produces a
-  // compile error related to tyring to use Glib::ArrayHandle<>'s default
-  // constructor when returning a default value at the end of both the callback
-  // and the vfunc.
-  /** Get the supported Gst::QueryType of this element.
-   */
-   virtual Glib::ArrayHandle<QueryType> get_query_types_vfunc() const;
-
 #m4 _CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3, true)')
   /** Send a Gst::Event to the element.
    */
@@ -408,10 +395,8 @@ protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->set_clock = &set_clock_vfunc_callback;
-  klass->get_query_types = &get_query_types_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static gboolean set_clock_vfunc_callback(GstElement* self, GstClock* clock);
-  static const GstQueryType* get_query_types_vfunc_callback(GstElement* self);
   _POP()
 #m4end
 };
