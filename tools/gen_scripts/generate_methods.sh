@@ -5,7 +5,7 @@
 # tools/gen_script directory and the defs file will be placed in
 # gstreamer/src.
 
-if [ -z "$JHBUILD_SOURCES" -o ! -x "`which h2def.py`" ]; then
+if [ -z "$JHBUILD_SOURCES" -a ! -x "`which h2def.py`" ]; then
   echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
   exit 1;
 fi
