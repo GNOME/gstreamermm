@@ -242,7 +242,6 @@ public:
   _WRAP_METHOD(void get_calibration(ClockTime& internal, ClockTime& external, ClockTime& rate_num, ClockTime& rate_denom) const, gst_clock_get_calibration)
   _WRAP_METHOD(void set_calibration(ClockTime internal, ClockTime external, ClockTime rate_num, ClockTime rate_denom), gst_clock_set_calibration)
   
-  _WRAP_PROPERTY("stats", bool)
   _WRAP_PROPERTY("timeout", guint64)
   _WRAP_PROPERTY("window-size", int)
   _WRAP_PROPERTY("window-threshold", int)
@@ -265,7 +264,7 @@ public:
   /** Perform a blocking wait for the given Gst::ClockID. Deprecated,
    * implement wait_jitter_vfunc() instead.
    */
-  _WRAP_VFUNC(ClockReturn wait(const Glib::RefPtr<Gst::ClockID>& id), "wait")
+  _WRAP_VFUNC(ClockReturn wait(const Glib::RefPtr<Gst::ClockID>& id, ClockTimeDiff& jitter), "wait")
 
   /** Perform an asynchronous wait for the given Gst::ClockID.
    */
@@ -275,10 +274,6 @@ public:
    */
   _WRAP_VFUNC(void unschedule(const Glib::RefPtr<Gst::ClockID>& id), "unschedule")
 
-  /** Perform a blocking wait on the given Gst::ClockID and return the jitter.
-   * (Since: 0.10.10)
-   */
-  _WRAP_VFUNC(ClockReturn wait_jitter(const Glib::RefPtr<Gst::ClockID>& id, ClockTimeDiff& jitter), "wait_jitter")
 };
 
 } //namespace Gst
