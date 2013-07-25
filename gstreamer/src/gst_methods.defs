@@ -3,13 +3,6 @@
 ;; Apply gst_methods.defs.patch after regenerating.
 
 ; object definitions ...
-(define-object DataQueue
-  (in-module "Gst")
-  (parent "GObject")
-  (c-name "GstDataQueue")
-  (gtype-id "GST_TYPE_DATA_QUEUE")
-)
-
 (define-object Object
   (in-module "Gst")
   (parent "GInitiallyUnowned")
@@ -241,13 +234,6 @@
   (gtype-id "GST_TYPE_TASK_POOL")
 )
 
-(define-object TestClock
-  (in-module "Gst")
-  (parent "GstClock")
-  (c-name "GstTestClock")
-  (gtype-id "GST_TYPE_TEST_CLOCK")
-)
-
 (define-object TimedValueControlSource
   (in-module "Gst")
   (parent "GstControlSource")
@@ -328,7 +314,6 @@
     '("meta" "GST_BUFFER_COPY_META")
     '("memory" "GST_BUFFER_COPY_MEMORY")
     '("merge" "GST_BUFFER_COPY_MERGE")
-    '("deep" "GST_BUFFER_COPY_DEEP")
   )
 )
 
@@ -600,18 +585,6 @@
   )
 )
 
-(define-flags StreamFlags
-  (in-module "Gst")
-  (c-name "GstStreamFlags")
-  (gtype-id "GST_TYPE_STREAM_FLAGS")
-  (values
-    '("none" "GST_STREAM_FLAG_NONE")
-    '("sparse" "GST_STREAM_FLAG_SPARSE")
-    '("select" "GST_STREAM_FLAG_SELECT")
-    '("unselect" "GST_STREAM_FLAG_UNSELECT")
-  )
-)
-
 (define-enum Format
   (in-module "Gst")
   (c-name "GstFormat")
@@ -702,8 +675,6 @@
     '("no-share" "GST_MEMORY_FLAG_NO_SHARE")
     '("zero-prefixed" "GST_MEMORY_FLAG_ZERO_PREFIXED")
     '("zero-padded" "GST_MEMORY_FLAG_ZERO_PADDED")
-    '("physically-contiguous" "GST_MEMORY_FLAG_PHYSICALLY_CONTIGUOUS")
-    '("not-mappable" "GST_MEMORY_FLAG_NOT_MAPPABLE")
     '("last" "GST_MEMORY_FLAG_LAST")
   )
 )
@@ -754,8 +725,6 @@
     '("toc" "GST_MESSAGE_TOC")
     '("reset-time" "GST_MESSAGE_RESET_TIME")
     '("stream-start" "GST_MESSAGE_STREAM_START")
-    '("need-context" "GST_MESSAGE_NEED_CONTEXT")
-    '("have-context" "GST_MESSAGE_HAVE_CONTEXT")
     '("any" "GST_MESSAGE_ANY")
   )
 )
@@ -1106,7 +1075,6 @@
   (values
     '("seekable" "GST_SCHEDULING_FLAG_SEEKABLE")
     '("sequential" "GST_SCHEDULING_FLAG_SEQUENTIAL")
-    '("bandwidth-limited" "GST_SCHEDULING_FLAG_BANDWIDTH_LIMITED")
   )
 )
 
@@ -1698,11 +1666,6 @@
   (return-type "GType")
 )
 
-(define-function gst_buffer_get_max_memory
-  (c-name "gst_buffer_get_max_memory")
-  (return-type "guint")
-)
-
 (define-function gst_buffer_new
   (c-name "gst_buffer_new")
   (is-constructor-of "GstBuffer")
@@ -1937,7 +1900,7 @@
 (define-method resize_range
   (of-object "GstBuffer")
   (c-name "gst_buffer_resize_range")
-  (return-type "gboolean")
+  (return-type "none")
   (parameters
     '("guint" "idx")
     '("gint" "length")
@@ -2009,18 +1972,6 @@
   (return-type "none")
   (parameters
     '("GstMapInfo*" "info")
-  )
-)
-
-(define-method extract_dup
-  (of-object "GstBuffer")
-  (c-name "gst_buffer_extract_dup")
-  (return-type "none")
-  (parameters
-    '("gsize" "offset")
-    '("gsize" "size")
-    '("gpointer*" "dest")
-    '("gsize*" "dest_size")
   )
 )
 
@@ -2516,198 +2467,6 @@
 
 
 
-;; From gstcapsfeatures.h
-
-(define-function gst_caps_features_get_type
-  (c-name "gst_caps_features_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_is_caps_features
-  (c-name "gst_is_caps_features")
-  (return-type "gboolean")
-  (parameters
-    '("gconstpointer" "obj")
-  )
-)
-
-(define-function gst_caps_features_new_empty
-  (c-name "gst_caps_features_new_empty")
-  (return-type "GstCapsFeatures*")
-)
-
-(define-function gst_caps_features_new_any
-  (c-name "gst_caps_features_new_any")
-  (return-type "GstCapsFeatures*")
-)
-
-(define-function gst_caps_features_new
-  (c-name "gst_caps_features_new")
-  (is-constructor-of "GstCapsFeatures")
-  (return-type "GstCapsFeatures*")
-  (parameters
-    '("const-gchar*" "feature1")
-  )
-  (varargs #t)
-)
-
-(define-function gst_caps_features_new_valist
-  (c-name "gst_caps_features_new_valist")
-  (return-type "GstCapsFeatures*")
-  (parameters
-    '("const-gchar*" "feature1")
-    '("va_list" "varargs")
-  )
-)
-
-(define-function gst_caps_features_new_id
-  (c-name "gst_caps_features_new_id")
-  (return-type "GstCapsFeatures*")
-  (parameters
-    '("GQuark" "feature1")
-  )
-  (varargs #t)
-)
-
-(define-function gst_caps_features_new_id_valist
-  (c-name "gst_caps_features_new_id_valist")
-  (return-type "GstCapsFeatures*")
-  (parameters
-    '("GQuark" "feature1")
-    '("va_list" "varargs")
-  )
-)
-
-(define-method set_parent_refcount
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_set_parent_refcount")
-  (return-type "gboolean")
-  (parameters
-    '("gint*" "refcount")
-  )
-)
-
-(define-method copy
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_copy")
-  (return-type "GstCapsFeatures*")
-)
-
-(define-method free
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_free")
-  (return-type "none")
-)
-
-(define-method to_string
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_to_string")
-  (return-type "gchar*")
-)
-
-(define-function gst_caps_features_from_string
-  (c-name "gst_caps_features_from_string")
-  (return-type "GstCapsFeatures*")
-  (parameters
-    '("const-gchar*" "features")
-  )
-)
-
-(define-method get_size
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_get_size")
-  (return-type "guint")
-)
-
-(define-method get_nth
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_get_nth")
-  (return-type "const-gchar*")
-  (parameters
-    '("guint" "i")
-  )
-)
-
-(define-method get_nth_id
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_get_nth_id")
-  (return-type "GQuark")
-  (parameters
-    '("guint" "i")
-  )
-)
-
-(define-method contains
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_contains")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "feature")
-  )
-)
-
-(define-method contains_id
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_contains_id")
-  (return-type "gboolean")
-  (parameters
-    '("GQuark" "feature")
-  )
-)
-
-(define-method is_equal
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_is_equal")
-  (return-type "gboolean")
-  (parameters
-    '("const-GstCapsFeatures*" "features2")
-  )
-)
-
-(define-method is_any
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_is_any")
-  (return-type "gboolean")
-)
-
-(define-method add
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_add")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "feature")
-  )
-)
-
-(define-method add_id
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_add_id")
-  (return-type "none")
-  (parameters
-    '("GQuark" "feature")
-  )
-)
-
-(define-method remove
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_remove")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "feature")
-  )
-)
-
-(define-method remove_id
-  (of-object "GstCapsFeatures")
-  (c-name "gst_caps_features_remove_id")
-  (return-type "none")
-  (parameters
-    '("GQuark" "feature")
-  )
-)
-
-
-
 ;; From gstcaps.h
 
 (define-method ref
@@ -2802,16 +2561,6 @@
   )
 )
 
-(define-method append_structure_full
-  (of-object "GstCaps")
-  (c-name "gst_caps_append_structure_full")
-  (return-type "none")
-  (parameters
-    '("GstStructure*" "structure")
-    '("GstCapsFeatures*" "features")
-  )
-)
-
 (define-method remove_structure
   (of-object "GstCaps")
   (c-name "gst_caps_remove_structure")
@@ -2839,16 +2588,6 @@
   )
 )
 
-(define-method merge_structure_full
-  (of-object "GstCaps")
-  (c-name "gst_caps_merge_structure_full")
-  (return-type "GstCaps*")
-  (parameters
-    '("GstStructure*" "structure")
-    '("GstCapsFeatures*" "features")
-  )
-)
-
 (define-method get_size
   (of-object "GstCaps")
   (c-name "gst_caps_get_size")
@@ -2868,25 +2607,6 @@
   (of-object "GstCaps")
   (c-name "gst_caps_steal_structure")
   (return-type "GstStructure*")
-  (parameters
-    '("guint" "index")
-  )
-)
-
-(define-method set_features
-  (of-object "GstCaps")
-  (c-name "gst_caps_set_features")
-  (return-type "none")
-  (parameters
-    '("guint" "index")
-    '("GstCapsFeatures*" "features")
-  )
-)
-
-(define-method get_features
-  (of-object "GstCaps")
-  (c-name "gst_caps_get_features")
-  (return-type "GstCapsFeatures*")
   (parameters
     '("guint" "index")
   )
@@ -2979,16 +2699,6 @@
   (return-type "gboolean")
   (parameters
     '("const-GstStructure*" "structure")
-  )
-)
-
-(define-method is_subset_structure_full
-  (of-object "GstCaps")
-  (c-name "gst_caps_is_subset_structure_full")
-  (return-type "gboolean")
-  (parameters
-    '("const-GstStructure*" "structure")
-    '("const-GstCapsFeatures*" "features")
   )
 )
 
@@ -3431,33 +3141,6 @@
 
 
 ;; From gstconfig.h
-
-
-
-;; From gstcontext.h
-
-(define-function gst_context_get_type
-  (c-name "gst_context_get_type")
-  (return-type "GType")
-)
-
-(define-method ref
-  (of-object "GstContext")
-  (c-name "gst_context_ref")
-  (return-type "GstContext*")
-)
-
-(define-method get_structure
-  (of-object "GstContext")
-  (c-name "gst_context_get_structure")
-  (return-type "const-GstStructure*")
-)
-
-(define-method writable_structure
-  (of-object "GstContext")
-  (c-name "gst_context_writable_structure")
-  (return-type "GstStructure*")
-)
 
 
 
@@ -4066,21 +3749,6 @@
   (return-type "GstBus*")
 )
 
-(define-method set_context
-  (of-object "GstElement")
-  (c-name "gst_element_set_context")
-  (return-type "none")
-  (parameters
-    '("GstContext*" "context")
-  )
-)
-
-(define-method get_context
-  (of-object "GstElement")
-  (c-name "gst_element_get_context")
-  (return-type "GstContext*")
-)
-
 (define-method add_pad
   (of-object "GstElement")
   (c-name "gst_element_add_pad")
@@ -4426,11 +4094,6 @@
 
 (define-function gst_qos_type_get_type
   (c-name "gst_qos_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_stream_flags_get_type
-  (c-name "gst_stream_flags_get_type")
   (return-type "GType")
 )
 
@@ -4811,24 +4474,6 @@
   )
 )
 
-(define-method set_stream_flags
-  (of-object "GstEvent")
-  (c-name "gst_event_set_stream_flags")
-  (return-type "none")
-  (parameters
-    '("GstStreamFlags" "flags")
-  )
-)
-
-(define-method parse_stream_flags
-  (of-object "GstEvent")
-  (c-name "gst_event_parse_stream_flags")
-  (return-type "none")
-  (parameters
-    '("GstStreamFlags*" "flags")
-  )
-)
-
 (define-function gst_event_new_flush_start
   (c-name "gst_event_new_flush_start")
   (return-type "GstEvent*")
@@ -5135,23 +4780,6 @@
   (parameters
     '("GstFormat*" "format")
     '("gint64*" "position")
-  )
-)
-
-(define-function gst_event_new_context
-  (c-name "gst_event_new_context")
-  (return-type "GstEvent*")
-  (parameters
-    '("GstContext*" "context")
-  )
-)
-
-(define-method parse_context
-  (of-object "GstEvent")
-  (c-name "gst_event_parse_context")
-  (return-type "none")
-  (parameters
-    '("GstContext**" "context")
   )
 )
 
@@ -5462,6 +5090,21 @@
   (varargs #t)
 )
 
+(define-function gst_debug_log
+  (c-name "gst_debug_log")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "category")
+    '("GstDebugLevel" "level")
+    '("const-gchar*" "file")
+    '("const-gchar*" "function")
+    '("gint" "line")
+    '("GObject*" "object")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
 (define-function gst_debug_log_valist
   (c-name "gst_debug_log_valist")
   (return-type "none")
@@ -5575,15 +5218,6 @@
   (parameters
     '("const-gchar*" "name")
     '("GstDebugLevel" "level")
-  )
-)
-
-(define-function gst_debug_set_threshold_from_string
-  (c-name "gst_debug_set_threshold_from_string")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "list")
-    '("gboolean" "reset")
   )
 )
 
@@ -5812,15 +5446,6 @@
     '("gsize" "align")
     '("gsize" "offset")
     '("gsize" "size")
-  )
-)
-
-(define-method is_type
-  (of-object "GstMemory")
-  (c-name "gst_memory_is_type")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "mem_type")
   )
 )
 
@@ -6541,57 +6166,6 @@
   )
 )
 
-(define-function gst_message_new_need_context
-  (c-name "gst_message_new_need_context")
-  (return-type "GstMessage*")
-  (parameters
-    '("GstObject*" "src")
-  )
-)
-
-(define-method add_context_type
-  (of-object "GstMessage")
-  (c-name "gst_message_add_context_type")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "context_type")
-  )
-)
-
-(define-method get_n_context_types
-  (of-object "GstMessage")
-  (c-name "gst_message_get_n_context_types")
-  (return-type "guint")
-)
-
-(define-method parse_nth_context_type
-  (of-object "GstMessage")
-  (c-name "gst_message_parse_nth_context_type")
-  (return-type "gboolean")
-  (parameters
-    '("guint" "i")
-    '("const-gchar**" "context_type")
-  )
-)
-
-(define-function gst_message_new_have_context
-  (c-name "gst_message_new_have_context")
-  (return-type "GstMessage*")
-  (parameters
-    '("GstObject*" "src")
-    '("GstContext*" "context")
-  )
-)
-
-(define-method parse_have_context
-  (of-object "GstMessage")
-  (c-name "gst_message_parse_have_context")
-  (return-type "none")
-  (parameters
-    '("GstContext**" "context")
-  )
-)
-
 
 
 ;; From gstmeta.h
@@ -7184,15 +6758,6 @@
   (of-object "GstPad")
   (c-name "gst_pad_get_pad_template")
   (return-type "GstPadTemplate*")
-)
-
-(define-method store_sticky_event
-  (of-object "GstPad")
-  (c-name "gst_pad_store_sticky_event")
-  (return-type "GstFlowReturn")
-  (parameters
-    '("GstEvent*" "event")
-  )
 )
 
 (define-method get_sticky_event
@@ -7850,12 +7415,6 @@
   (of-object "GstPluginFeature")
   (c-name "gst_plugin_feature_get_plugin")
   (return-type "GstPlugin*")
-)
-
-(define-method get_plugin_name
-  (of-object "GstPluginFeature")
-  (c-name "gst_plugin_feature_get_plugin_name")
-  (return-type "const-gchar*")
 )
 
 (define-function gst_plugin_feature_list_free
@@ -8812,15 +8371,6 @@
   )
 )
 
-(define-method remove_nth_allocation_pool
-  (of-object "GstQuery")
-  (c-name "gst_query_remove_nth_allocation_pool")
-  (return-type "none")
-  (parameters
-    '("guint" "index")
-  )
-)
-
 (define-method add_allocation_param
   (of-object "GstQuery")
   (c-name "gst_query_add_allocation_param")
@@ -8856,15 +8406,6 @@
     '("guint" "index")
     '("GstAllocator*" "allocator")
     '("const-GstAllocationParams*" "params")
-  )
-)
-
-(define-method remove_nth_allocation_param
-  (of-object "GstQuery")
-  (c-name "gst_query_remove_nth_allocation_param")
-  (return-type "none")
-  (parameters
-    '("guint" "index")
   )
 )
 
@@ -9058,54 +8599,6 @@
 (define-function gst_query_new_drain
   (c-name "gst_query_new_drain")
   (return-type "GstQuery*")
-)
-
-(define-function gst_query_new_context
-  (c-name "gst_query_new_context")
-  (return-type "GstQuery*")
-)
-
-(define-method add_context_type
-  (of-object "GstQuery")
-  (c-name "gst_query_add_context_type")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "context_type")
-  )
-)
-
-(define-method get_n_context_types
-  (of-object "GstQuery")
-  (c-name "gst_query_get_n_context_types")
-  (return-type "guint")
-)
-
-(define-method parse_nth_context_type
-  (of-object "GstQuery")
-  (c-name "gst_query_parse_nth_context_type")
-  (return-type "gboolean")
-  (parameters
-    '("guint" "i")
-    '("const-gchar**" "context_type")
-  )
-)
-
-(define-method set_context
-  (of-object "GstQuery")
-  (c-name "gst_query_set_context")
-  (return-type "none")
-  (parameters
-    '("GstContext*" "context")
-  )
-)
-
-(define-method parse_context
-  (of-object "GstQuery")
-  (c-name "gst_query_parse_context")
-  (return-type "none")
-  (parameters
-    '("GstContext**" "context")
-  )
 )
 
 
@@ -9994,12 +9487,6 @@
   )
 )
 
-(define-method fixate
-  (of-object "GstStructure")
-  (c-name "gst_structure_fixate")
-  (return-type "none")
-)
-
 (define-method is_equal
   (of-object "GstStructure")
   (c-name "gst_structure_is_equal")
@@ -10034,6 +9521,12 @@
   (parameters
     '("const-GstStructure*" "struct2")
   )
+)
+
+(define-method fixate
+  (of-object "GstStructure")
+  (c-name "gst_structure_fixate")
+  (return-type "none")
 )
 
 
@@ -11838,12 +11331,6 @@
   )
 )
 
-(define-method get_stream_id
-  (of-object "GstPad")
-  (c-name "gst_pad_get_stream_id")
-  (return-type "gchar*")
-)
-
 (define-method add_many
   (of-object "GstBin")
   (c-name "gst_bin_add_many")
@@ -12033,11 +11520,6 @@
   (return-type "GType")
 )
 
-(define-function gst_g_thread_get_type
-  (c-name "gst_g_thread_get_type")
-  (return-type "GType")
-)
-
 (define-function gst_date_time_get_type
   (c-name "gst_date_time_get_type")
   (return-type "GType")
@@ -12083,15 +11565,6 @@
   (parameters
     '("GValue*" "value")
     '("const-GValue*" "append_value")
-  )
-)
-
-(define-function gst_value_list_append_and_take_value
-  (c-name "gst_value_list_append_and_take_value")
-  (return-type "none")
-  (parameters
-    '("GValue*" "value")
-    '("GValue*" "append_value")
   )
 )
 
@@ -12147,15 +11620,6 @@
   (parameters
     '("GValue*" "value")
     '("const-GValue*" "append_value")
-  )
-)
-
-(define-function gst_value_array_append_and_take_value
-  (c-name "gst_value_array_append_and_take_value")
-  (return-type "none")
-  (parameters
-    '("GValue*" "value")
-    '("GValue*" "append_value")
   )
 )
 
@@ -12332,23 +11796,6 @@
   (parameters
     '("GValue*" "value")
     '("const-GstStructure*" "structure")
-  )
-)
-
-(define-function gst_value_get_caps_features
-  (c-name "gst_value_get_caps_features")
-  (return-type "const-GstCapsFeatures*")
-  (parameters
-    '("const-GValue*" "value")
-  )
-)
-
-(define-function gst_value_set_caps_features
-  (c-name "gst_value_set_caps_features")
-  (return-type "none")
-  (parameters
-    '("GValue*" "value")
-    '("const-GstCapsFeatures*" "features")
   )
 )
 
@@ -12564,10 +12011,6 @@
 
 
 
-;; From base.h
-
-
-
 ;; From gstadapter.h
 
 (define-function gst_adapter_get_type
@@ -12688,30 +12131,10 @@
   )
 )
 
-(define-method prev_pts_at_offset
-  (of-object "GstAdapter")
-  (c-name "gst_adapter_prev_pts_at_offset")
-  (return-type "GstClockTime")
-  (parameters
-    '("gsize" "offset")
-    '("guint64*" "distance")
-  )
-)
-
-(define-method prev_dts_at_offset
-  (of-object "GstAdapter")
-  (c-name "gst_adapter_prev_dts_at_offset")
-  (return-type "GstClockTime")
-  (parameters
-    '("gsize" "offset")
-    '("guint64*" "distance")
-  )
-)
-
 (define-method masked_scan_uint32
   (of-object "GstAdapter")
   (c-name "gst_adapter_masked_scan_uint32")
-  (return-type "gssize")
+  (return-type "gsize")
   (parameters
     '("guint32" "mask")
     '("guint32" "pattern")
@@ -12723,7 +12146,7 @@
 (define-method masked_scan_uint32_peek
   (of-object "GstAdapter")
   (c-name "gst_adapter_masked_scan_uint32_peek")
-  (return-type "gssize")
+  (return-type "gsize")
   (parameters
     '("guint32" "mask")
     '("guint32" "pattern")
@@ -12854,15 +12277,6 @@
   )
 )
 
-(define-method set_infer_ts
-  (of-object "GstBaseParse")
-  (c-name "gst_base_parse_set_infer_ts")
-  (return-type "none")
-  (parameters
-    '("gboolean" "infer_ts")
-  )
-)
-
 (define-method set_frame_rate
   (of-object "GstBaseParse")
   (c-name "gst_base_parse_set_frame_rate")
@@ -12906,15 +12320,6 @@
     '("GstClockTime" "ts")
     '("gboolean" "key")
     '("gboolean" "force")
-  )
-)
-
-(define-method set_ts_at_offset
-  (of-object "GstBaseParse")
-  (c-name "gst_base_parse_set_ts_at_offset")
-  (return-type "none")
-  (parameters
-    '("gsize" "offset")
   )
 )
 
@@ -13098,21 +12503,6 @@
 (define-method get_throttle_time
   (of-object "GstBaseSink")
   (c-name "gst_base_sink_get_throttle_time")
-  (return-type "guint64")
-)
-
-(define-method set_max_bitrate
-  (of-object "GstBaseSink")
-  (c-name "gst_base_sink_set_max_bitrate")
-  (return-type "none")
-  (parameters
-    '("guint64" "max_bitrate")
-  )
-)
-
-(define-method get_max_bitrate
-  (of-object "GstBaseSink")
-  (c-name "gst_base_sink_get_max_bitrate")
   (return-type "guint64")
 )
 
@@ -13421,15 +12811,6 @@
   (return-type "none")
 )
 
-(define-method get_bits_uint8_unchecked
-  (of-object "GstBitReader")
-  (c-name "gst_bit_reader_get_bits_uint8_unchecked")
-  (return-type "guint8")
-  (parameters
-    '("guint" "nbits")
-  )
-)
-
 (define-method peek_bits_uint8_unchecked
   (of-object "GstBitReader")
   (c-name "gst_bit_reader_peek_bits_uint8_unchecked")
@@ -13439,10 +12820,10 @@
   )
 )
 
-(define-method get_bits_uint16_unchecked
+(define-method get_bits_uint8_unchecked
   (of-object "GstBitReader")
-  (c-name "gst_bit_reader_get_bits_uint16_unchecked")
-  (return-type "guint16")
+  (c-name "gst_bit_reader_get_bits_uint8_unchecked")
+  (return-type "guint8")
   (parameters
     '("guint" "nbits")
   )
@@ -13457,10 +12838,10 @@
   )
 )
 
-(define-method get_bits_uint32_unchecked
+(define-method get_bits_uint16_unchecked
   (of-object "GstBitReader")
-  (c-name "gst_bit_reader_get_bits_uint32_unchecked")
-  (return-type "guint32")
+  (c-name "gst_bit_reader_get_bits_uint16_unchecked")
+  (return-type "guint16")
   (parameters
     '("guint" "nbits")
   )
@@ -13475,10 +12856,10 @@
   )
 )
 
-(define-method get_bits_uint64_unchecked
+(define-method get_bits_uint32_unchecked
   (of-object "GstBitReader")
-  (c-name "gst_bit_reader_get_bits_uint64_unchecked")
-  (return-type "guint64")
+  (c-name "gst_bit_reader_get_bits_uint32_unchecked")
+  (return-type "guint32")
   (parameters
     '("guint" "nbits")
   )
@@ -13487,6 +12868,15 @@
 (define-method peek_bits_uint64_unchecked
   (of-object "GstBitReader")
   (c-name "gst_bit_reader_peek_bits_uint64_unchecked")
+  (return-type "guint64")
+  (parameters
+    '("guint" "nbits")
+  )
+)
+
+(define-method get_bits_uint64_unchecked
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_get_bits_uint64_unchecked")
   (return-type "guint64")
   (parameters
     '("guint" "nbits")
@@ -15330,105 +14720,6 @@
 
 
 
-;; From gstdataqueue.h
-
-(define-function gst_data_queue_get_type
-  (c-name "gst_data_queue_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_data_queue_new
-  (c-name "gst_data_queue_new")
-  (is-constructor-of "GstDataQueue")
-  (return-type "GstDataQueue*")
-  (parameters
-    '("GstDataQueueCheckFullFunction" "checkfull")
-    '("GstDataQueueFullCallback" "fullcallback")
-    '("GstDataQueueEmptyCallback" "emptycallback")
-    '("gpointer" "checkdata")
-  )
-)
-
-(define-method push
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_push")
-  (return-type "gboolean")
-  (parameters
-    '("GstDataQueueItem*" "item")
-  )
-)
-
-(define-method pop
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_pop")
-  (return-type "gboolean")
-  (parameters
-    '("GstDataQueueItem**" "item")
-  )
-)
-
-(define-method peek
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_peek")
-  (return-type "gboolean")
-  (parameters
-    '("GstDataQueueItem**" "item")
-  )
-)
-
-(define-method flush
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_flush")
-  (return-type "none")
-)
-
-(define-method set_flushing
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_set_flushing")
-  (return-type "none")
-  (parameters
-    '("gboolean" "flushing")
-  )
-)
-
-(define-method drop_head
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_drop_head")
-  (return-type "gboolean")
-  (parameters
-    '("GType" "type")
-  )
-)
-
-(define-method is_full
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_is_full")
-  (return-type "gboolean")
-)
-
-(define-method is_empty
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_is_empty")
-  (return-type "gboolean")
-)
-
-(define-method get_level
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_get_level")
-  (return-type "none")
-  (parameters
-    '("GstDataQueueSize*" "level")
-  )
-)
-
-(define-method limits_changed
-  (of-object "GstDataQueue")
-  (c-name "gst_data_queue_limits_changed")
-  (return-type "none")
-)
-
-
-
 ;; From gstindex.h
 
 (define-function gst_index_new
@@ -15537,77 +14828,6 @@
 
 
 
-;; From gstqueuearray.h
-
-(define-function gst_queue_array_new
-  (c-name "gst_queue_array_new")
-  (is-constructor-of "GstQueueArray")
-  (return-type "GstQueueArray*")
-  (parameters
-    '("guint" "initial_size")
-  )
-)
-
-(define-method free
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_free")
-  (return-type "none")
-)
-
-(define-method pop_head
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_pop_head")
-  (return-type "gpointer")
-)
-
-(define-method peek_head
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_peek_head")
-  (return-type "gpointer")
-)
-
-(define-method push_tail
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_push_tail")
-  (return-type "none")
-  (parameters
-    '("gpointer" "data")
-  )
-)
-
-(define-method is_empty
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_is_empty")
-  (return-type "gboolean")
-)
-
-(define-method drop_element
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_drop_element")
-  (return-type "gpointer")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
-(define-method find
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_find")
-  (return-type "guint")
-  (parameters
-    '("GCompareFunc" "func")
-    '("gpointer" "data")
-  )
-)
-
-(define-method get_length
-  (of-object "GstQueueArray")
-  (c-name "gst_queue_array_get_length")
-  (return-type "guint")
-)
-
-
-
 ;; From gsttypefindhelper.h
 
 (define-function gst_type_find_helper
@@ -15661,10 +14881,6 @@
     '("GstTypeFindProbability*" "prob")
   )
 )
-
-
-
-;; From check.h
 
 
 
@@ -15878,17 +15094,6 @@
   )
 )
 
-(define-function gst_check_setup_events
-  (c-name "gst_check_setup_events")
-  (return-type "none")
-  (parameters
-    '("GstPad*" "srcpad")
-    '("GstElement*" "element")
-    '("GstCaps*" "caps")
-    '("GstFormat" "format")
-  )
-)
-
 
 
 ;; From gstconsistencychecker.h
@@ -15929,106 +15134,7 @@
 
 
 
-;; From gsttestclock.h
-
-(define-function gst_test_clock_get_type
-  (c-name "gst_test_clock_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_test_clock_new
-  (c-name "gst_test_clock_new")
-  (is-constructor-of "GstTestClock")
-  (return-type "GstClock*")
-)
-
-(define-function gst_test_clock_new_with_start_time
-  (c-name "gst_test_clock_new_with_start_time")
-  (return-type "GstClock*")
-  (parameters
-    '("GstClockTime" "start_time")
-  )
-)
-
-(define-method set_time
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_set_time")
-  (return-type "none")
-  (parameters
-    '("GstClockTime" "new_time")
-  )
-)
-
-(define-method advance_time
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_advance_time")
-  (return-type "none")
-  (parameters
-    '("GstClockTimeDiff" "delta")
-  )
-)
-
-(define-method peek_id_count
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_peek_id_count")
-  (return-type "guint")
-)
-
-(define-method has_id
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_has_id")
-  (return-type "gboolean")
-  (parameters
-    '("GstClockID" "id")
-  )
-)
-
-(define-method peek_next_pending_id
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_peek_next_pending_id")
-  (return-type "gboolean")
-  (parameters
-    '("GstClockID*" "pending_id")
-  )
-)
-
-(define-method wait_for_next_pending_id
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_wait_for_next_pending_id")
-  (return-type "none")
-  (parameters
-    '("GstClockID*" "pending_id")
-  )
-)
-
-(define-method wait_for_pending_id_count
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_wait_for_pending_id_count")
-  (return-type "none")
-  (parameters
-    '("guint" "count")
-  )
-)
-
-(define-method process_next_clock_id
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_process_next_clock_id")
-  (return-type "GstClockID")
-)
-
-(define-method get_next_entry_time
-  (of-object "GstTestClock")
-  (c-name "gst_test_clock_get_next_entry_time")
-  (return-type "GstClockTime")
-)
-
-
-
 ;; From internal-check.h
-
-
-
-;; From controller.h
 
 
 
@@ -16324,10 +15430,6 @@
     '("gint" "port")
   )
 )
-
-
-
-;; From net.h
 
 
 ;; -*- scheme -*-
@@ -16689,7 +15791,6 @@
     '("stopped" "GST_AUDIO_RING_BUFFER_STATE_STOPPED")
     '("paused" "GST_AUDIO_RING_BUFFER_STATE_PAUSED")
     '("started" "GST_AUDIO_RING_BUFFER_STATE_STARTED")
-    '("error" "GST_AUDIO_RING_BUFFER_STATE_ERROR")
   )
 )
 
@@ -16795,7 +15896,6 @@
     '("rtpfb-type-nack" "GST_RTCP_RTPFB_TYPE_NACK")
     '("rtpfb-type-tmmbr" "GST_RTCP_RTPFB_TYPE_TMMBR")
     '("rtpfb-type-tmmbn" "GST_RTCP_RTPFB_TYPE_TMMBN")
-    '("rtpfb-type-rctp-sr-req" "GST_RTCP_RTPFB_TYPE_RCTP_SR_REQ")
     '("psfb-type-pli" "GST_RTCP_PSFB_TYPE_PLI")
     '("psfb-type-sli" "GST_RTCP_PSFB_TYPE_SLI")
     '("psfb-type-rpsi" "GST_RTCP_PSFB_TYPE_RPSI")
@@ -17143,8 +16243,6 @@
     '("seconds" "GST_RTSP_TIME_SECONDS")
     '("now" "GST_RTSP_TIME_NOW")
     '("end" "GST_RTSP_TIME_END")
-    '("frames" "GST_RTSP_TIME_FRAMES")
-    '("utc" "GST_RTSP_TIME_UTC")
   )
 )
 
@@ -17180,7 +16278,6 @@
     '("udp-mcast" "GST_RTSP_LOWER_TRANS_UDP_MCAST")
     '("tcp" "GST_RTSP_LOWER_TRANS_TCP")
     '("http" "GST_RTSP_LOWER_TRANS_HTTP")
-    '("tls" "GST_RTSP_LOWER_TRANS_TLS")
   )
 )
 
@@ -17265,33 +16362,6 @@
   )
 )
 
-(define-enum VideoGLTextureType
-  (in-module "Gst")
-  (c-name "GstVideoGLTextureType")
-  (gtype-id "GST_TYPE_VIDEO_GL_TEXTURE_TYPE")
-  (values
-    '("luminance" "GST_VIDEO_GL_TEXTURE_TYPE_LUMINANCE")
-    '("luminance-alpha" "GST_VIDEO_GL_TEXTURE_TYPE_LUMINANCE_ALPHA")
-    '("rgb16" "GST_VIDEO_GL_TEXTURE_TYPE_RGB16")
-    '("rgb" "GST_VIDEO_GL_TEXTURE_TYPE_RGB")
-    '("rgba" "GST_VIDEO_GL_TEXTURE_TYPE_RGBA")
-    '("r" "GST_VIDEO_GL_TEXTURE_TYPE_R")
-    '("rg" "GST_VIDEO_GL_TEXTURE_TYPE_RG")
-  )
-)
-
-(define-enum VideoGLTextureOrientation
-  (in-module "Gst")
-  (c-name "GstVideoGLTextureOrientation")
-  (gtype-id "GST_TYPE_VIDEO_GL_TEXTURE_ORIENTATION")
-  (values
-    '("normal-y-normal" "GST_VIDEO_GL_TEXTURE_ORIENTATION_X_NORMAL_Y_NORMAL")
-    '("normal-y-flip" "GST_VIDEO_GL_TEXTURE_ORIENTATION_X_NORMAL_Y_FLIP")
-    '("flip-y-normal" "GST_VIDEO_GL_TEXTURE_ORIENTATION_X_FLIP_Y_NORMAL")
-    '("flip-y-flip" "GST_VIDEO_GL_TEXTURE_ORIENTATION_X_FLIP_Y_FLIP")
-  )
-)
-
 (define-flags VideoCodecFrameFlags
   (in-module "Gst")
   (c-name "GstVideoCodecFrameFlags")
@@ -17362,43 +16432,6 @@
     '("mouse-button-release" "GST_NAVIGATION_EVENT_MOUSE_BUTTON_RELEASE")
     '("mouse-move" "GST_NAVIGATION_EVENT_MOUSE_MOVE")
     '("command" "GST_NAVIGATION_EVENT_COMMAND")
-  )
-)
-
-(define-flags VideoChromaSite
-  (in-module "Gst")
-  (c-name "GstVideoChromaSite")
-  (gtype-id "GST_TYPE_VIDEO_CHROMA_SITE")
-  (values
-    '("unknown" "GST_VIDEO_CHROMA_SITE_UNKNOWN")
-    '("none" "GST_VIDEO_CHROMA_SITE_NONE")
-    '("h-cosited" "GST_VIDEO_CHROMA_SITE_H_COSITED")
-    '("v-cosited" "GST_VIDEO_CHROMA_SITE_V_COSITED")
-    '("alt-line" "GST_VIDEO_CHROMA_SITE_ALT_LINE")
-    '("cosited" "GST_VIDEO_CHROMA_SITE_COSITED")
-    '("jpeg" "GST_VIDEO_CHROMA_SITE_JPEG")
-    '("mpeg2" "GST_VIDEO_CHROMA_SITE_MPEG2")
-    '("dv" "GST_VIDEO_CHROMA_SITE_DV")
-  )
-)
-
-(define-enum VideoChromaMethod
-  (in-module "Gst")
-  (c-name "GstVideoChromaMethod")
-  (gtype-id "GST_TYPE_VIDEO_CHROMA_METHOD")
-  (values
-    '("nearest" "GST_VIDEO_CHROMA_METHOD_NEAREST")
-    '("linear" "GST_VIDEO_CHROMA_METHOD_LINEAR")
-  )
-)
-
-(define-flags VideoChromaFlags
-  (in-module "Gst")
-  (c-name "GstVideoChromaFlags")
-  (gtype-id "GST_TYPE_VIDEO_CHROMA_FLAGS")
-  (values
-    '("none" "GST_VIDEO_CHROMA_FLAG_NONE")
-    '("interlaced" "GST_VIDEO_CHROMA_FLAG_INTERLACED")
   )
 )
 
@@ -17512,12 +16545,23 @@
     '("i420-10le" "GST_VIDEO_FORMAT_I420_10LE")
     '("i422-10be" "GST_VIDEO_FORMAT_I422_10BE")
     '("i422-10le" "GST_VIDEO_FORMAT_I422_10LE")
-    '("y444-10be" "GST_VIDEO_FORMAT_Y444_10BE")
-    '("y444-10le" "GST_VIDEO_FORMAT_Y444_10LE")
-    '("gbr" "GST_VIDEO_FORMAT_GBR")
-    '("gbr-10be" "GST_VIDEO_FORMAT_GBR_10BE")
-    '("gbr-10le" "GST_VIDEO_FORMAT_GBR_10LE")
-    '("nv16" "GST_VIDEO_FORMAT_NV16")
+  )
+)
+
+(define-flags VideoChromaSite
+  (in-module "Gst")
+  (c-name "GstVideoChromaSite")
+  (gtype-id "GST_TYPE_VIDEO_CHROMA_SITE")
+  (values
+    '("unknown" "GST_VIDEO_CHROMA_SITE_UNKNOWN")
+    '("none" "GST_VIDEO_CHROMA_SITE_NONE")
+    '("h-cosited" "GST_VIDEO_CHROMA_SITE_H_COSITED")
+    '("v-cosited" "GST_VIDEO_CHROMA_SITE_V_COSITED")
+    '("alt-line" "GST_VIDEO_CHROMA_SITE_ALT_LINE")
+    '("cosited" "GST_VIDEO_CHROMA_SITE_COSITED")
+    '("jpeg" "GST_VIDEO_CHROMA_SITE_JPEG")
+    '("mpeg2" "GST_VIDEO_CHROMA_SITE_MPEG2")
+    '("dv" "GST_VIDEO_CHROMA_SITE_DV")
   )
 )
 
@@ -17537,14 +16581,13 @@
   )
 )
 
-(define-flags VideoPackFlags
+(define-enum VideoPackFlags
   (in-module "Gst")
   (c-name "GstVideoPackFlags")
   (gtype-id "GST_TYPE_VIDEO_PACK_FLAGS")
   (values
     '("none" "GST_VIDEO_PACK_FLAG_NONE")
     '("truncate-range" "GST_VIDEO_PACK_FLAG_TRUNCATE_RANGE")
-    '("interlaced" "GST_VIDEO_PACK_FLAG_INTERLACED")
   )
 )
 
@@ -17607,49 +16650,6 @@
     '("global-alpha" "GST_VIDEO_OVERLAY_FORMAT_FLAG_GLOBAL_ALPHA")
   )
 )
-
-
-;; From allocators.h
-
-
-
-;; From gstdmabuf.h
-
-(define-function gst_dmabuf_allocator_obtain
-  (c-name "gst_dmabuf_allocator_obtain")
-  (return-type "GstAllocator*")
-)
-
-(define-function gst_dmabuf_allocator_alloc
-  (c-name "gst_dmabuf_allocator_alloc")
-  (return-type "GstMemory*")
-  (parameters
-    '("GstAllocator*" "allocator")
-    '("gint" "fd")
-    '("gsize" "size")
-  )
-)
-
-(define-function gst_dmabuf_memory_get_fd
-  (c-name "gst_dmabuf_memory_get_fd")
-  (return-type "gint")
-  (parameters
-    '("GstMemory*" "mem")
-  )
-)
-
-(define-function gst_is_dmabuf_memory
-  (c-name "gst_is_dmabuf_memory")
-  (return-type "gboolean")
-  (parameters
-    '("GstMemory*" "mem")
-  )
-)
-
-
-
-;; From app.h
-
 
 
 ;; From gstapp-marshal.h
@@ -18145,15 +17145,6 @@
     '("gint64" "src_val")
     '("GstFormat" "dest_fmt")
     '("gint64*" "dest_val")
-  )
-)
-
-(define-method is_equal
-  (of-object "GstAudioInfo")
-  (c-name "gst_audio_info_is_equal")
-  (return-type "gboolean")
-  (parameters
-    '("const-GstAudioInfo*" "other")
   )
 )
 
@@ -19996,10 +18987,6 @@
 
 
 
-;; From fft.h
-
-
-
 ;; From gstfftf32.h
 
 (define-function gst_fft_f32_new
@@ -20803,12 +19790,6 @@
   (return-type "const-gchar*")
 )
 
-(define-method get_preset_name
-  (of-object "GstEncodingProfile")
-  (c-name "gst_encoding_profile_get_preset_name")
-  (return-type "const-gchar*")
-)
-
 (define-method set_preset
   (of-object "GstEncodingProfile")
   (c-name "gst_encoding_profile_set_preset")
@@ -20830,15 +19811,6 @@
   (return-type "none")
   (parameters
     '("guint" "presence")
-  )
-)
-
-(define-method set_preset_name
-  (of-object "GstEncodingProfile")
-  (c-name "gst_encoding_profile_set_preset_name")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "preset_name")
   )
 )
 
@@ -20875,12 +19847,6 @@
 (define-method get_type_nick
   (of-object "GstEncodingProfile")
   (c-name "gst_encoding_profile_get_type_nick")
-  (return-type "const-gchar*")
-)
-
-(define-method get_file_extension
-  (of-object "GstEncodingProfile")
-  (c-name "gst_encoding_profile_get_file_extension")
   (return-type "const-gchar*")
 )
 
@@ -21143,12 +20109,6 @@
   (of-object "GstDiscovererStreamInfo")
   (c-name "gst_discoverer_stream_info_get_toc")
   (return-type "const-GstToc*")
-)
-
-(define-method get_stream_id
-  (of-object "GstDiscovererStreamInfo")
-  (c-name "gst_discoverer_stream_info_get_stream_id")
-  (return-type "const-gchar*")
 )
 
 (define-method get_misc
@@ -21692,10 +20652,6 @@
     '("const-GstCaps*" "caps")
   )
 )
-
-
-
-;; From riff.h
 
 
 
@@ -22863,50 +21819,6 @@
 
 
 
-;; From gstrtphdrext.h
-
-(define-function gst_rtp_hdrext_set_ntp_64
-  (c-name "gst_rtp_hdrext_set_ntp_64")
-  (return-type "gboolean")
-  (parameters
-    '("gpointer" "data")
-    '("guint" "size")
-    '("guint64" "ntptime")
-  )
-)
-
-(define-function gst_rtp_hdrext_get_ntp_64
-  (c-name "gst_rtp_hdrext_get_ntp_64")
-  (return-type "gboolean")
-  (parameters
-    '("gpointer" "data")
-    '("guint" "size")
-    '("guint64*" "ntptime")
-  )
-)
-
-(define-function gst_rtp_hdrext_set_ntp_56
-  (c-name "gst_rtp_hdrext_set_ntp_56")
-  (return-type "gboolean")
-  (parameters
-    '("gpointer" "data")
-    '("guint" "size")
-    '("guint64" "ntptime")
-  )
-)
-
-(define-function gst_rtp_hdrext_get_ntp_56
-  (c-name "gst_rtp_hdrext_get_ntp_56")
-  (return-type "gboolean")
-  (parameters
-    '("gpointer" "data")
-    '("guint" "size")
-    '("guint64*" "ntptime")
-  )
-)
-
-
-
 ;; From gstrtppayloads.h
 
 (define-function gst_rtp_payload_info_for_pt
@@ -22925,10 +21837,6 @@
     '("const-gchar*" "encoding_name")
   )
 )
-
-
-
-;; From rtp.h
 
 
 
@@ -22984,15 +21892,6 @@
   (of-object "GstRTSPConnection")
   (c-name "gst_rtsp_connection_free")
   (return-type "GstRTSPResult")
-)
-
-(define-method get_tls
-  (of-object "GstRTSPConnection")
-  (c-name "gst_rtsp_connection_get_tls")
-  (return-type "GTlsConnection*")
-  (parameters
-    '("GError**" "error")
-  )
 )
 
 (define-method read
@@ -23190,21 +22089,6 @@
   )
 )
 
-(define-method set_remember_session_id
-  (of-object "GstRTSPConnection")
-  (c-name "gst_rtsp_connection_set_remember_session_id")
-  (return-type "none")
-  (parameters
-    '("gboolean" "remember")
-  )
-)
-
-(define-method get_remember_session_id
-  (of-object "GstRTSPConnection")
-  (c-name "gst_rtsp_connection_get_remember_session_id")
-  (return-type "gboolean")
-)
-
 (define-function gst_rtsp_watch_new
   (c-name "gst_rtsp_watch_new")
   (is-constructor-of "GstRtspWatch")
@@ -23235,26 +22119,6 @@
   (return-type "guint")
   (parameters
     '("GMainContext*" "context")
-  )
-)
-
-(define-method set_send_backlog
-  (of-object "GstRTSPWatch")
-  (c-name "gst_rtsp_watch_set_send_backlog")
-  (return-type "none")
-  (parameters
-    '("gsize" "bytes")
-    '("guint" "messages")
-  )
-)
-
-(define-method get_send_backlog
-  (of-object "GstRTSPWatch")
-  (c-name "gst_rtsp_watch_get_send_backlog")
-  (return-type "none")
-  (parameters
-    '("gsize*" "bytes")
-    '("guint*" "messages")
   )
 )
 
@@ -23324,14 +22188,6 @@
   (return-type "gchar*")
   (parameters
     '("GstRTSPMethod" "options")
-  )
-)
-
-(define-function gst_rtsp_options_from_text
-  (c-name "gst_rtsp_options_from_text")
-  (return-type "GstRTSPMethod")
-  (parameters
-    '("const-gchar*" "options")
   )
 )
 
@@ -23771,25 +22627,6 @@
   )
 )
 
-(define-function gst_rtsp_range_get_times
-  (c-name "gst_rtsp_range_get_times")
-  (return-type "gboolean")
-  (parameters
-    '("const-GstRTSPTimeRange*" "range")
-    '("GstClockTime*" "min")
-    '("GstClockTime*" "max")
-  )
-)
-
-(define-function gst_rtsp_range_convert_units
-  (c-name "gst_rtsp_range_convert_units")
-  (return-type "gboolean")
-  (parameters
-    '("GstRTSPTimeRange*" "range")
-    '("GstRTSPRangeUnit" "unit")
-  )
-)
-
 
 
 ;; From gstrtsptransport.h
@@ -23915,104 +22752,11 @@
 
 
 
-;; From rtsp.h
-
-
-
 ;; From gstsdp.h
 
 
 
 ;; From gstsdpmessage.h
-
-(define-method set
-  (of-object "GstSDPConnection")
-  (c-name "gst_sdp_connection_set")
-  (return-type "GstSDPResult")
-  (parameters
-    '("const-gchar*" "nettype")
-    '("const-gchar*" "addrtype")
-    '("const-gchar*" "address")
-    '("guint" "ttl")
-    '("guint" "addr_number")
-  )
-)
-
-(define-method clear
-  (of-object "GstSDPConnection")
-  (c-name "gst_sdp_connection_clear")
-  (return-type "GstSDPResult")
-)
-
-(define-method set
-  (of-object "GstSDPBandwidth")
-  (c-name "gst_sdp_bandwidth_set")
-  (return-type "GstSDPResult")
-  (parameters
-    '("const-gchar*" "bwtype")
-    '("guint" "bandwidth")
-  )
-)
-
-(define-method clear
-  (of-object "GstSDPBandwidth")
-  (c-name "gst_sdp_bandwidth_clear")
-  (return-type "GstSDPResult")
-)
-
-(define-method set
-  (of-object "GstSDPTime")
-  (c-name "gst_sdp_time_set")
-  (return-type "GstSDPResult")
-  (parameters
-    '("const-gchar*" "start")
-    '("const-gchar*" "stop")
-    '("const-gchar**" "repeat")
-  )
-)
-
-(define-method clear
-  (of-object "GstSDPTime")
-  (c-name "gst_sdp_time_clear")
-  (return-type "GstSDPResult")
-)
-
-(define-method set
-  (of-object "GstSDPZone")
-  (c-name "gst_sdp_zone_set")
-  (return-type "GstSDPResult")
-  (parameters
-    '("const-gchar*" "adj_time")
-    '("const-gchar*" "typed_time")
-  )
-)
-
-(define-method clear
-  (of-object "GstSDPZone")
-  (c-name "gst_sdp_zone_clear")
-  (return-type "GstSDPResult")
-)
-
-(define-method set
-  (of-object "GstSDPAttribute")
-  (c-name "gst_sdp_attribute_set")
-  (return-type "GstSDPResult")
-  (parameters
-    '("const-gchar*" "key")
-    '("const-gchar*" "value")
-  )
-)
-
-(define-method clear
-  (of-object "GstSDPAttribute")
-  (c-name "gst_sdp_attribute_clear")
-  (return-type "GstSDPResult")
-)
-
-(define-function gst_sdp_message_get_type
-  (c-name "gst_sdp_message_get_type")
-  (return-type "GType")
-)
 
 (define-function gst_sdp_message_new
   (c-name "gst_sdp_message_new")
@@ -24038,15 +22782,6 @@
   (of-object "GstSDPMessage")
   (c-name "gst_sdp_message_free")
   (return-type "GstSDPResult")
-)
-
-(define-method copy
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_copy")
-  (return-type "GstSDPResult")
-  (parameters
-    '("GstSDPMessage**" "copy")
-  )
 )
 
 (define-function gst_sdp_message_parse_buffer
@@ -24188,35 +22923,6 @@
   )
 )
 
-(define-method insert_email
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_insert_email")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("const-gchar*" "email")
-  )
-)
-
-(define-method replace_email
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_replace_email")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("const-gchar*" "email")
-  )
-)
-
-(define-method remove_email
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_remove_email")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
 (define-method add_email
   (of-object "GstSDPMessage")
   (c-name "gst_sdp_message_add_email")
@@ -24236,35 +22942,6 @@
   (of-object "GstSDPMessage")
   (c-name "gst_sdp_message_get_phone")
   (return-type "const-gchar*")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
-(define-method insert_phone
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_insert_phone")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("const-gchar*" "phone")
-  )
-)
-
-(define-method replace_phone
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_replace_phone")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("const-gchar*" "phone")
-  )
-)
-
-(define-method remove_phone
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_remove_phone")
-  (return-type "GstSDPResult")
   (parameters
     '("guint" "idx")
   )
@@ -24313,35 +22990,6 @@
   )
 )
 
-(define-method insert_bandwidth
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_insert_bandwidth")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("GstSDPBandwidth*" "bw")
-  )
-)
-
-(define-method replace_bandwidth
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_replace_bandwidth")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("GstSDPBandwidth*" "bw")
-  )
-)
-
-(define-method remove_bandwidth
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_remove_bandwidth")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
 (define-method add_bandwidth
   (of-object "GstSDPMessage")
   (c-name "gst_sdp_message_add_bandwidth")
@@ -24362,35 +23010,6 @@
   (of-object "GstSDPMessage")
   (c-name "gst_sdp_message_get_time")
   (return-type "const-GstSDPTime*")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
-(define-method insert_time
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_insert_time")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("GstSDPTime*" "t")
-  )
-)
-
-(define-method replace_time
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_replace_time")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("GstSDPTime*" "t")
-  )
-)
-
-(define-method remove_time
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_remove_time")
-  (return-type "GstSDPResult")
   (parameters
     '("guint" "idx")
   )
@@ -24417,35 +23036,6 @@
   (of-object "GstSDPMessage")
   (c-name "gst_sdp_message_get_zone")
   (return-type "const-GstSDPZone*")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
-(define-method insert_zone
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_insert_zone")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("GstSDPZone*" "zone")
-  )
-)
-
-(define-method replace_zone
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_replace_zone")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("GstSDPZone*" "zone")
-  )
-)
-
-(define-method remove_zone
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_remove_zone")
-  (return-type "GstSDPResult")
   (parameters
     '("guint" "idx")
   )
@@ -24508,35 +23098,6 @@
   (parameters
     '("const-gchar*" "key")
     '("guint" "nth")
-  )
-)
-
-(define-method insert_attribute
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_insert_attribute")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("GstSDPAttribute*" "attr")
-  )
-)
-
-(define-method replace_attribute
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_replace_attribute")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("GstSDPAttribute*" "attr")
-  )
-)
-
-(define-method remove_attribute
-  (of-object "GstSDPMessage")
-  (c-name "gst_sdp_message_remove_attribute")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
   )
 )
 
@@ -24604,15 +23165,6 @@
   (of-object "GstSDPMedia")
   (c-name "gst_sdp_media_free")
   (return-type "GstSDPResult")
-)
-
-(define-method copy
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_copy")
-  (return-type "GstSDPResult")
-  (parameters
-    '("GstSDPMedia**" "copy")
-  )
 )
 
 (define-method as_text
@@ -24688,35 +23240,6 @@
   )
 )
 
-(define-method insert_format
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_insert_format")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("const-gchar*" "format")
-  )
-)
-
-(define-method replace_format
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_replace_format")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("const-gchar*" "format")
-  )
-)
-
-(define-method remove_format
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_remove_format")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
 (define-method add_format
   (of-object "GstSDPMedia")
   (c-name "gst_sdp_media_add_format")
@@ -24756,35 +23279,6 @@
   )
 )
 
-(define-method insert_connection
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_insert_connection")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("GstSDPConnection*" "conn")
-  )
-)
-
-(define-method replace_connection
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_replace_connection")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("GstSDPConnection*" "conn")
-  )
-)
-
-(define-method remove_connection
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_remove_connection")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
 (define-method add_connection
   (of-object "GstSDPMedia")
   (c-name "gst_sdp_media_add_connection")
@@ -24808,35 +23302,6 @@
   (of-object "GstSDPMedia")
   (c-name "gst_sdp_media_get_bandwidth")
   (return-type "const-GstSDPBandwidth*")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
-(define-method insert_bandwidth
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_insert_bandwidth")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("GstSDPBandwidth*" "bw")
-  )
-)
-
-(define-method replace_bandwidth
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_replace_bandwidth")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("GstSDPBandwidth*" "bw")
-  )
-)
-
-(define-method remove_bandwidth
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_remove_bandwidth")
-  (return-type "GstSDPResult")
   (parameters
     '("guint" "idx")
   )
@@ -24902,35 +23367,6 @@
   )
 )
 
-(define-method insert_attribute
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_insert_attribute")
-  (return-type "GstSDPResult")
-  (parameters
-    '("gint" "idx")
-    '("GstSDPAttribute*" "attr")
-  )
-)
-
-(define-method replace_attribute
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_replace_attribute")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-    '("GstSDPAttribute*" "attr")
-  )
-)
-
-(define-method remove_attribute
-  (of-object "GstSDPMedia")
-  (c-name "gst_sdp_media_remove_attribute")
-  (return-type "GstSDPResult")
-  (parameters
-    '("guint" "idx")
-  )
-)
-
 (define-method add_attribute
   (of-object "GstSDPMedia")
   (c-name "gst_sdp_media_add_attribute")
@@ -24940,10 +23376,6 @@
     '("const-gchar*" "value")
   )
 )
-
-
-
-;; From sdp.h
 
 
 
@@ -25933,40 +24365,6 @@
   (return-type "GQuark")
 )
 
-(define-method add_video_gl_texture_upload_meta
-  (of-object "GstBuffer")
-  (c-name "gst_buffer_add_video_gl_texture_upload_meta")
-  (return-type "GstVideoGLTextureUploadMeta*")
-  (parameters
-    '("GstVideoGLTextureOrientation" "texture_orientation")
-    '("guint" "n_textures")
-    '("GstVideoGLTextureType" "texture_type[4]")
-    '("GstVideoGLTextureUpload" "upload")
-    '("gpointer" "user_data")
-    '("GBoxedCopyFunc" "user_data_copy")
-    '("GBoxedFreeFunc" "user_data_free")
-  )
-)
-
-(define-method upload
-  (of-object "GstVideoGLTextureUploadMeta")
-  (c-name "gst_video_gl_texture_upload_meta_upload")
-  (return-type "gboolean")
-  (parameters
-    '("guint" "texture_id[4]")
-  )
-)
-
-(define-function gst_video_gl_texture_upload_meta_api_get_type
-  (c-name "gst_video_gl_texture_upload_meta_api_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_video_gl_texture_upload_meta_get_info
-  (c-name "gst_video_gl_texture_upload_meta_get_info")
-  (return-type "const-GstMetaInfo*")
-)
-
 
 
 ;; From gstvideopool.h
@@ -26332,66 +24730,6 @@
 
 
 
-;; From video-chroma.h
-
-(define-function gst_video_chroma_from_string
-  (c-name "gst_video_chroma_from_string")
-  (return-type "GstVideoChromaSite")
-  (parameters
-    '("const-gchar*" "s")
-  )
-)
-
-(define-function gst_video_chroma_to_string
-  (c-name "gst_video_chroma_to_string")
-  (return-type "const-gchar*")
-  (parameters
-    '("GstVideoChromaSite" "site")
-  )
-)
-
-(define-function gst_video_chroma_resample_new
-  (c-name "gst_video_chroma_resample_new")
-  (is-constructor-of "GstVideoChromaResample")
-  (return-type "GstVideoChromaResample*")
-  (parameters
-    '("GstVideoChromaMethod" "method")
-    '("GstVideoChromaSite" "site")
-    '("GstVideoChromaFlags" "flags")
-    '("GstVideoFormat" "format")
-    '("gint" "h_factor")
-    '("gint" "v_factor")
-  )
-)
-
-(define-method free
-  (of-object "GstVideoChromaResample")
-  (c-name "gst_video_chroma_resample_free")
-  (return-type "none")
-)
-
-(define-method get_info
-  (of-object "GstVideoChromaResample")
-  (c-name "gst_video_chroma_resample_get_info")
-  (return-type "none")
-  (parameters
-    '("guint*" "n_lines")
-    '("gint*" "offset")
-  )
-)
-
-(define-method 
-  (of-object "GstVideoChromaResample")
-  (c-name "gst_video_chroma_resample")
-  (return-type "none")
-  (parameters
-    '("gpointer[]" "lines")
-    '("gint" "width")
-  )
-)
-
-
-
 ;; From video-color.h
 
 (define-method matches
@@ -26435,6 +24773,11 @@
 
 (define-function gst_video_format_get_type
   (c-name "gst_video_format_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_chroma_site_get_type
+  (c-name "gst_video_chroma_site_get_type")
   (return-type "GType")
 )
 
@@ -26500,21 +24843,6 @@
 
 (define-function gst_navigation_event_type_get_type
   (c-name "gst_navigation_event_type_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_video_chroma_site_get_type
-  (c-name "gst_video_chroma_site_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_video_chroma_method_get_type
-  (c-name "gst_video_chroma_method_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_video_chroma_flags_get_type
-  (c-name "gst_video_chroma_flags_get_type")
   (return-type "GType")
 )
 
@@ -26597,6 +24925,22 @@
 
 ;; From video-format.h
 
+(define-function gst_video_chroma_from_string
+  (c-name "gst_video_chroma_from_string")
+  (return-type "GstVideoChromaSite")
+  (parameters
+    '("const-gchar*" "s")
+  )
+)
+
+(define-function gst_video_chroma_to_string
+  (c-name "gst_video_chroma_to_string")
+  (return-type "const-gchar*")
+  (parameters
+    '("GstVideoChromaSite" "site")
+  )
+)
+
 (define-function gst_video_format_from_masks
   (c-name "gst_video_format_from_masks")
   (return-type "GstVideoFormat")
@@ -26604,10 +24948,10 @@
     '("gint" "depth")
     '("gint" "bpp")
     '("gint" "endianness")
-    '("guint" "red_mask")
-    '("guint" "green_mask")
-    '("guint" "blue_mask")
-    '("guint" "alpha_mask")
+    '("gint" "red_mask")
+    '("gint" "green_mask")
+    '("gint" "blue_mask")
+    '("gint" "alpha_mask")
   )
 )
 
@@ -26643,15 +24987,6 @@
   (of-object "GstVideoFormat")
   (c-name "gst_video_format_get_info")
   (return-type "const-GstVideoFormatInfo*")
-)
-
-(define-method get_palette
-  (of-object "GstVideoFormat")
-  (c-name "gst_video_format_get_palette")
-  (return-type "gconstpointer")
-  (parameters
-    '("gsize*" "size")
-  )
 )
 
 
