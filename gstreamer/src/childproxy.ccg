@@ -20,32 +20,32 @@
 namespace Gst
 {
 
-bool ChildProxy::lookup(const Glib::RefPtr<Gst::Object>& object,
-  const Glib::ustring& name, Glib::RefPtr<Gst::Object>& target,
+bool ChildProxy::lookup(const Glib::RefPtr<Gst::ChildProxy>& object,
+  const Glib::ustring& name, Glib::RefPtr<Glib::Object>& target,
   GParamSpec*& pspec)
 {
-  GstObject* gst_object = 0;
+  GObject* g_object = 0;
   bool const result = gst_child_proxy_lookup(Glib::unwrap(object),
-    name.c_str(), &gst_object, &pspec);
-  target = Glib::wrap(gst_object);
+    name.c_str(), &g_object, &pspec);
+  target = Glib::wrap(g_object);
   return result;
 }
 
 Glib::RefPtr<Gst::ChildProxy> ChildProxy::get_proxy_property(const Glib::ustring& name, Glib::ValueBase& value)
 {
-  gst_child_proxy_get_property(GST_OBJECT(gobj()), name.c_str(), value.gobj());
+  gst_child_proxy_get_property(const_cast<GstChildProxy*>(gobj()), name.c_str(), value.gobj());
   return Glib::wrap(gobj(), true);
 }
 
 Glib::RefPtr<const Gst::ChildProxy> ChildProxy::get_proxy_property(const Glib::ustring& name, Glib::ValueBase& value) const
 {
-  gst_child_proxy_get_property(GST_OBJECT(gobj()), name.c_str(), value.gobj());
+  gst_child_proxy_get_property(const_cast<GstChildProxy*>(gobj()), name.c_str(), value.gobj());
   return Glib::wrap(const_cast<GstChildProxy*>(gobj()), true);
 }
 
 Glib::RefPtr<Gst::ChildProxy> ChildProxy::set_proxy_property(const Glib::ustring& name, const Glib::ValueBase& value)
 {
-  gst_child_proxy_set_property(GST_OBJECT(gobj()), name.c_str(), value.gobj());
+  gst_child_proxy_set_property(const_cast<GstChildProxy*>(gobj()), name.c_str(), value.gobj());
   return Glib::wrap(gobj(), true);
 }
 
