@@ -25,6 +25,20 @@
 
 _DEFS(gstreamermm,gst)
 
+namespace Glib
+{
+    template<typename T>
+    Glib::RefPtr<T> wrap_msg_derived(GstMessage* object, bool take_copy)
+    {
+      if(take_copy && object)
+        gst_message_ref(object);
+
+      // See the comment at the top of this file, if you want to know why the cast works.
+      return Glib::RefPtr<T>(reinterpret_cast<T*>(object));
+    }
+
+}
+
 namespace Gst
 {
 
@@ -72,7 +86,7 @@ class TagList;
  */
 class Message : public Gst::MiniObject
 {
-    _CLASS_OPAQUE_COPYABLE(Message, GstMessage, NONE, gst_message_ref, gst_message_unref)
+    _CLASS_OPAQUE_REFCOUNTED(Message, GstMessage, NONE, gst_message_ref, gst_message_unref)
   _IGNORE(gst_message_ref, gst_message_unref)
 
 public:
@@ -105,8 +119,8 @@ public:
 protected:
   // This method is used in the create() methods to convert a wrapped
   // GstMessage to one of the more specific Gst::Message types.
-  template <class MessageType>
-    static inline Glib::RefPtr<MessageType> wrap(GstMessage* message,
+  template <class MsgType>
+    static inline Glib::RefPtr<MsgType> wrap(GstMessage* message,
     bool take_copy = false);
 };
 
@@ -122,8 +136,6 @@ protected:
 class MessageEos : public Message
 {
 public:
-  explicit MessageEos(GstMessage* castitem);
-
   /** Create a new eos message. This message is generated and posted in the
    * sink elements of a Gst::Bin. The bin will only forward the EOS message to
    * the application if all sinks have posted an EOS message.
@@ -141,7 +153,6 @@ public:
 class MessageError : public Message
 {
 public:
-  explicit MessageError(GstMessage* castitem);
 
   /** Create a new error message. The message will copy error and debug. This
    * message is posted by elements when a fatal event occured. The pipeline
@@ -190,7 +201,6 @@ public:
 class MessageWarning : public Message
 {
 public:
-  explicit MessageWarning(GstMessage* castitem);
 
   /** Create a new warning message. The message will make copies of error and
    * debug.
@@ -237,7 +247,6 @@ public:
 class MessageInfo : public Message
 {
 public:
-  explicit MessageInfo(GstMessage* castitem);
 
   /** Create a new info message.
    *
@@ -285,7 +294,6 @@ public:
 class MessageTag : public Message
 {
 public:
-  explicit MessageTag(GstMessage* castitem);
 
   /** Create a new tag message. The taglist will be copied.  The message is
    * posted by elements that discovered a new taglist.
@@ -297,20 +305,6 @@ public:
   static Glib::RefPtr<Gst::MessageTag>
     create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist);
 
-  /** Create a new tag message. The taglist will be copied.  The message is
-   * posted by elements that discovered a new taglist.
-   *
-   * @param src The object originating the message.
-   * @param pad The originating pad for the tag.
-   * @param tag_list The tag list for the message.
-   * @return The new tag message. MT safe.
-   * 
-   * Since 0.10.24.
-   */
-  static Glib::RefPtr<Gst::MessageTag>
-    create(const Glib::RefPtr<Gst::Object>& src,
-    const Glib::RefPtr<Gst::Pad>& pad, const Gst::TagList& taglist);
-
   /** Extracts the Gst::Pad and Gst::TagList from the Gst::MessageTag.
    *
    * MT safe.
@@ -320,7 +314,7 @@ public:
    *
    * Since 0.10.24.
    */
-  void parse(Glib::RefPtr<Gst::Pad>& pad, Gst::TagList& tag_list) const;
+  void parse(Gst::TagList& tag_list) const;
 
   /** Extracts and returns the Gst::TagList from the Gst::MessageTag.
    *
@@ -331,16 +325,6 @@ public:
   Gst::TagList parse() const;
   _IGNORE(gst_message_parse_tag)
 
-  /** Extracts and returns the Gst::Pad from the Gst::MessageTag.
-   *
-   * MT safe.
-   *
-   * @return The Gst::Pad.
-   *
-   * Since 0.10.24.
-   */
-  Glib::RefPtr<Gst::Pad> parse_pad() const;
-  _IGNORE(gst_message_parse_tag_full)
 };
 
 /** A buffering message.
@@ -349,7 +333,6 @@ public:
 class MessageBuffering : public Message
 {
 public:
-  explicit MessageBuffering(GstMessage* castitem);
 
   /** Create a new buffering message. This message can be posted by an element
    * that needs to buffer data before it can continue processing. @a percent
@@ -435,7 +418,6 @@ public:
 class MessageStateChanged : public Message
 {
 public:
-  explicit MessageStateChanged(GstMessage* castitem);
 
   /** Create a state change message. This message is posted whenever an element
    * changed its state.
@@ -493,7 +475,6 @@ public:
 class MessageStateDirty : public Message
 {
 public:
-  explicit MessageStateDirty(GstMessage* castitem);
 
   /** Create a state dirty message. This message is posted whenever an element
    * changed its state asynchronously and is used internally to update the
@@ -512,7 +493,6 @@ public:
 class MessageStepDone : public Message
 {
 public:
-  explicit MessageStepDone(GstMessage* castitem);
 
   /** Create a step done message.  This message is posted by elements when they
    * complete a part, when @a intermediate set to true, or a complete step
@@ -598,8 +578,6 @@ public:
 class MessageClockProvide : public Message
 {
 public:
-  explicit MessageClockProvide(GstMessage *message);
-
   /** Create a clock provide message. This message is posted whenever an
    * element is ready to provide a clock or lost its ability to provide a clock
    * (maybe because it paused or became EOS).
@@ -659,7 +637,6 @@ public:
 class MessageClockLost : public Message
 {
 public:
-  explicit MessageClockLost(GstMessage* castitem);
 
   /** Create a clock lost message. This message is posted whenever the clock is
    * not valid anymore.  If this message is posted by the pipeline, the
@@ -698,7 +675,6 @@ public:
 class MessageNewClock: public Message
 {
 public:
-  explicit MessageNewClock(GstMessage* castitem);
 
   /** Create a new clock message. This message is posted whenever the pipeline
    * selectes a new clock for the pipeline.
@@ -737,7 +713,6 @@ public:
 class MessageApplication : public Message
 {
 public:
-  explicit MessageApplication(GstMessage *message);
 
   /** Create a new application-typed message. GStreamer will never create these
    * messages; they are a gift from us to you. Enjoy.
@@ -767,7 +742,6 @@ public:
 class MessageElement : public Message
 {
 public:
-  explicit MessageElement(GstMessage* castitem);
 
   /** Create a new element-specific message. This is meant as a generic way of
    * allowing one-way communication from an element to an application, for
@@ -801,7 +775,6 @@ public:
 class MessageCustom : public Message
 {
 public:
-  explicit MessageCustom(GstMessage* castitem);
 
   /** Create a new custom-typed message. This can be used for anything not
    * handled by other message-specific functions to pass a message to the app.
@@ -834,7 +807,6 @@ public:
 class MessageSegmentStart : public Message
 {
 public:
-  explicit MessageSegmentStart(GstMessage* castitem);
 
   /** Create a new segment message. This message is posted by elements that
    * start playback of a segment as a result of a segment seek. This message is
@@ -883,7 +855,6 @@ public:
 class MessageSegmentDone : public Message
 {
 public:
-  explicit MessageSegmentDone(GstMessage* castitem);
 
   /** Create a new segment done message. This message is posted by elements
    * that finish playback of a segment as a result of a segment seek. This
@@ -932,7 +903,6 @@ public:
 class MessageDuration : public Message
 {
 public:
-  explicit MessageDuration(GstMessage* castitem);
 
   /** Create a new duration message. This message is posted by elements that
    * know the duration of a stream in a specific format. This message is
@@ -992,7 +962,6 @@ public:
 class MessageLatency : public Message
 {
 public:
-  explicit MessageLatency(GstMessage* castitem);
 
   /** Creates a new latency message.  This message can be posted by elements
    * when their latency requirements have changed.
@@ -1012,7 +981,6 @@ public:
 class MessageAsyncStart : public Message
 {
 public:
-  explicit MessageAsyncStart(GstMessage* castitem);
 
   /** Creates a new async message.  This message is posted by elements when
    * they start an ASYNC state change. new_base_time is set to true when the
@@ -1027,16 +995,6 @@ public:
   static Glib::RefPtr<Gst::MessageAsyncStart>
     create(const Glib::RefPtr<Gst::Object>& src, bool new_base_time);
 
-  /** Extract and return the boolean new_base_time from the async_start
-   * message.
-   *
-   * MT safe.
-   *
-   * @return The new_base_time boolean.
-   *
-   * Since 0.10.13.
-   */
-  bool parse() const;
   _IGNORE(gst_message_parse_async_start)
 };
 
@@ -1046,7 +1004,6 @@ public:
 class MessageAsyncDone : public Message
 {
 public:
-  explicit MessageAsyncDone(GstMessage* castitem);
 
   /** Create an async done message. The message is posted when elements
    * completed an ASYNC state change.
@@ -1055,7 +1012,7 @@ public:
    * @return The new async_done message. MT safe.
    */
   static Glib::RefPtr<Gst::MessageAsyncDone>
-    create(const Glib::RefPtr<Gst::Object>& src);
+    create(const Glib::RefPtr<Gst::Object>& src, ClockTime running_time);
 };
 
 /** A step start message.
@@ -1147,7 +1104,6 @@ public:
 class MessageStructureChange : public Message
 {
 public:
-  explicit MessageStructureChange(GstMessage* castitem);
 
   /** Create a new structure change message. This message is posted when the
    * structure of a pipeline is in the process of being changed, for example
@@ -1216,7 +1172,6 @@ public:
 class MessageRequestState : public Message
 {
 public:
-  explicit MessageRequestState(GstMessage* castitem);
 
   /** This message can be posted by elements when they want to have their
    * state changed. A typical use case would be an audio server that wants to
@@ -1246,8 +1201,6 @@ public:
 class MessageStreamStatus : public Message
 {
 public:
-  explicit MessageStreamStatus(GstMessage* castitem);
-
   /** Create a new stream status message. This message is posted when a
    * streaming thread is created/destroyed or when the state changed. 
    *
