@@ -25,6 +25,19 @@
 
 _DEFS(gstreamermm,gst)
 
+namespace Glib
+{
+    template<typename T>
+    Glib::RefPtr<T> wrap_query_derived(GstQuery* object, bool take_copy = false)
+    {
+      if(take_copy && object)
+        gst_query_ref(object);
+
+      // See the comment at the top of this file, if you want to know why the cast works.
+      return Glib::RefPtr<T>(reinterpret_cast<T*>(object));
+    }
+}
+
 namespace Gst
 {
 
@@ -141,7 +154,6 @@ protected:
 class QueryApplication : public Query
 {
 public:
-  explicit QueryApplication(GstQuery* query);
 
   /** Constructs a new custom application query object.  The Gst::Query may be
    * used by applications in their own way.  Please note that a custom
@@ -160,7 +172,6 @@ public:
 class QueryConvert : public Query
 {
 public:
-  explicit QueryConvert(GstQuery* query);
 
   /** Constructs a new convert query object.  A convert query is used to ask
    * for a conversion between one format and another.
@@ -225,7 +236,6 @@ public:
 class QueryPosition : public Query
 {
 public:
-  explicit QueryPosition(GstQuery* query);
 
   /** Constructs a new query stream position query object. A position query is
    * used to query the current position of playback in the streams, in some
@@ -266,7 +276,6 @@ public:
 class QueryDuration : public Query
 {
 public:
-  explicit QueryDuration(GstQuery* query);
 
   /** Constructs a new stream duration query object to query in the given
    * format. A duration query will give the total length of the stream.
@@ -306,7 +315,6 @@ public:
 class QueryLatency : public Query
 {
 public:
-  explicit QueryLatency(GstQuery* query);
 
   /** Constructs a new latency query object. A latency query is usually
    * performed by sinks to compensate for additional latency introduced by
@@ -352,7 +360,6 @@ public:
 class QuerySeeking : public Query
 {
 public:
-  explicit QuerySeeking(GstQuery* query);
 
   /** Constructs a new query object for querying seeking properties of the
    * stream.
@@ -406,7 +413,6 @@ public:
 class QueryFormats : public Query
 {
 public:
-  explicit QueryFormats(GstQuery* query);
 
   /** Constructs a new query object for querying formats of the stream.
    * @return The new Gst::QueryFormats.
@@ -447,7 +453,6 @@ public:
 class QuerySegment : public Query
 {
 public:
-  explicit QuerySegment(GstQuery* query);
 
   /** Constructs a new segment query object. A segment query is used to
    * discover information about the currently configured segment for playback.
@@ -516,7 +521,6 @@ public:
 class QueryBuffering : public Query
 {
 public:
-  explicit QueryBuffering(GstQuery* query);
 
   /** Constructs a new query object for querying the buffering status of a
    * stream.

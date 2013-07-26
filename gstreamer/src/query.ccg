@@ -46,30 +46,22 @@ Glib::RefPtr<Gst::Query> Query::create_writable()
   return Glib::wrap(gst_query_make_writable(gobj()));
 }
 
-QueryApplication::QueryApplication(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QueryApplication>
   QueryApplication::create(QueryType type, Gst::Structure& structure)
 {
   // Create copy because query takes ownership of structure:
   GstStructure* copy_struct = gst_structure_copy(structure.gobj());
-  GstQuery* query = gst_query_new_application(GstQueryType(type),
+  GstQuery* query = gst_query_new_custom(GstQueryType(type),
     copy_struct); 
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QueryApplication>(query);
 }
-
-QueryConvert::QueryConvert(GstQuery* castitem) :
-Query(castitem)
-{}
 
 Glib::RefPtr<Gst::QueryConvert>
   QueryConvert::create(Format src_format, gint64 value, Format dest_format)
 {
   GstQuery* query = gst_query_new_convert(GstFormat(src_format), value,
     GstFormat(dest_format));
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QueryConvert>(query);
 }
 
 void QueryConvert::set(Format src_format, gint64 src_value, Format dest_format, gint64 dest_value)
@@ -122,14 +114,10 @@ gint64 QueryConvert::parse_dest_value() const
   return dest_value;
 }
 
-QueryPosition::QueryPosition(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QueryPosition> QueryPosition::create(Format format)
 {
   GstQuery* query = gst_query_new_position(GstFormat(format));
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QueryPosition>(query);
 }
 
 void QueryPosition::set(Format format, gint64 position)
@@ -158,14 +146,10 @@ Format QueryPosition::parse_format() const
   return format;
 }
 
-QueryDuration::QueryDuration(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QueryDuration> QueryDuration::create(Format format)
 {
   GstQuery* query = gst_query_new_duration(GstFormat(format));
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QueryDuration>(query);
 }
 
 void QueryDuration::set(Format format, gint64 duration)
@@ -194,14 +178,10 @@ Format QueryDuration::parse_format() const
   return format;
 }
 
-QueryLatency::QueryLatency(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QueryLatency> QueryLatency::create()
 {
   GstQuery* query = gst_query_new_latency();
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QueryLatency>(query);
 }
 
 void QueryLatency::set(bool live, ClockTime min_latency, ClockTime max_latency)
@@ -241,14 +221,10 @@ ClockTime QueryLatency::parse_max() const
   return max;
 }
 
-QuerySeeking::QuerySeeking(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QuerySeeking> QuerySeeking::create(Format format)
 {
   GstQuery* query = gst_query_new_seeking(GstFormat(format));
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QuerySeeking>(query);
 }
 
 void QuerySeeking::set(Format format, bool seekable, gint64 segment_start, gint64 segment_end)
@@ -297,14 +273,10 @@ gint64 QuerySeeking::parse_end() const
   return end;
 }
 
-QueryFormats::QueryFormats(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QueryFormats> QueryFormats::create()
 {
   GstQuery* query = gst_query_new_formats();
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QueryFormats>(query);
 }
 
 void QueryFormats::set(const Glib::ArrayHandle<Format>& formats)
@@ -322,26 +294,22 @@ void QueryFormats::set(int n_formats, const Glib::ArrayHandle<Format>& formats)
 guint QueryFormats::parse_length() const
 {
   guint n_formats = 0;
-  gst_query_parse_formats_length(const_cast<GstQuery*>(gobj()), &n_formats);
+  gst_query_parse_n_formats(const_cast<GstQuery*>(gobj()), &n_formats);
   return n_formats;
 }
 
 Format QueryFormats::parse(guint nth) const
 {
   Format format = Gst::FORMAT_UNDEFINED;
-  gst_query_parse_formats_nth(const_cast<GstQuery*>(gobj()), nth,
+  gst_query_parse_nth_format(const_cast<GstQuery*>(gobj()), nth,
     reinterpret_cast<GstFormat*>(&format));
   return format;
 }
 
-QuerySegment::QuerySegment(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QuerySegment> QuerySegment::create(Format format)
 {
   GstQuery* query = gst_query_new_segment(GstFormat(format));
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QuerySegment>(query);
 }
 
 void QuerySegment::set(double rate, Format format, gint64 start_value, gint64 stop_value)
@@ -388,14 +356,10 @@ gint64 QuerySegment::parse_stop() const
   return stop;
 }
 
-QueryBuffering::QueryBuffering(GstQuery* castitem) :
-Query(castitem)
-{}
-
 Glib::RefPtr<Gst::QueryBuffering> QueryBuffering::create(Format format)
 {
   GstQuery* query = gst_query_new_buffering(GstFormat(format));
-  return Glib::wrap(query);
+  return Glib::wrap_query_derived<Gst::QueryBuffering>(query);
 }
 
 void QueryBuffering::set(bool busy, int percent)
