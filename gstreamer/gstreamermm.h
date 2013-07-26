@@ -131,7 +131,6 @@
 #include <gstreamermm/mixeroptions.h>
 #include <gstreamermm/mixertrack.h>
 #include <gstreamermm/navigation.h>
-#include <gstreamermm/propertyprobe.h>
 #include <gstreamermm/streamvolume.h>
 #include <gstreamermm/tuner.h>
 #include <gstreamermm/tunerchannel.h>
