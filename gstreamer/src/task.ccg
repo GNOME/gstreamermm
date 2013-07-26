@@ -24,14 +24,6 @@ _PINCLUDE(gstreamermm/private/object_p.h)
 namespace
 {
 
-// Used in set_thread_slots() method to set the slots.
-struct TaskThreadCallbacks
-{
-  GstTaskThreadCallbacks gst_task_thread_callbacks;
-  Gst::Task::SlotEnter* slot_enter;
-  Gst::Task::SlotLeave* slot_leave;
-};
-
 extern "C"
 {
 
@@ -51,8 +43,7 @@ static void Task_Task_gstreamermm_callback(void* data)
 
 static void Task_Enter_gstreamermm_callback(GstTask* task, GThread* thread, gpointer user_data)
 {
-  TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(user_data);
-  Gst::Task::SlotEnter* the_slot = callbacks->slot_enter;
+  Gst::Task::SlotEnter* the_slot = static_cast<Gst::Task::SlotEnter*>(user_data);
 
   try
   {
@@ -66,9 +57,7 @@ static void Task_Enter_gstreamermm_callback(GstTask* task, GThread* thread, gpoi
 
 static void Task_Leave_gstreamermm_callback(GstTask *task, GThread *thread, gpointer user_data)
 {
-  TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(user_data);
-  Gst::Task::SlotLeave* the_slot = callbacks->slot_leave;
-
+  Gst::Task::SlotLeave* the_slot = static_cast<Gst::Task::SlotLeave*>(user_data);
   try
   {
     (*the_slot)(Glib::wrap(task, true), Glib::Threads::wrap(thread));
@@ -81,10 +70,7 @@ static void Task_Leave_gstreamermm_callback(GstTask *task, GThread *thread, gpoi
 
 static void Task_Callbacks_gstreamermm_callback_destroy(void* data)
 {
-  TaskThreadCallbacks* callbacks = static_cast<TaskThreadCallbacks*>(data);
-  delete callbacks->slot_enter;
-  delete callbacks->slot_leave;
-  delete callbacks;
+  delete static_cast<Gst::Task::BiSlot*>(data);
 }
 
 } // extern "C"
@@ -106,26 +92,14 @@ Task::Task(const SlotTask& task_slot)
   // These lines are taken verbatim from gst_task_create() after calling
   // g_object_new().
   gobj()->func = &Task_Task_gstreamermm_callback;
-  gobj()->data = m_slot.get();
+  gobj()->user_data = m_slot.get();
 }
 
 void Task::set_thread_slots(const SlotEnter& enter_slot,
   const SlotLeave& leave_slot)
 {
-  TaskThreadCallbacks* callbacks = new TaskThreadCallbacks;
-
-  callbacks->gst_task_thread_callbacks.enter_thread =
-    &Task_Enter_gstreamermm_callback;
-
-  callbacks->gst_task_thread_callbacks.leave_thread =
-    &Task_Leave_gstreamermm_callback;
-
-  callbacks->slot_enter = new SlotEnter(enter_slot);
-  callbacks->slot_leave = new SlotLeave(leave_slot);
-
-  gst_task_set_thread_callbacks(gobj(),
-    reinterpret_cast<GstTaskThreadCallbacks*>(callbacks), callbacks,
-    &Task_Callbacks_gstreamermm_callback_destroy);
+  gst_task_set_enter_callback(gobj(), &Task_Enter_gstreamermm_callback, new SlotEnter(enter_slot), &Task_Callbacks_gstreamermm_callback_destroy);
+  gst_task_set_leave_callback(gobj(), &Task_Leave_gstreamermm_callback, new SlotEnter(leave_slot), &Task_Callbacks_gstreamermm_callback_destroy);
 }
 
 } //namespace Gst

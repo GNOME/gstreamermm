@@ -71,14 +71,18 @@ public:
    */
   typedef sigc::slot<void> SlotTask;
 
+  /**
+   * Bidirectional slot
+   */
+  typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&,
+          Glib::Threads::Thread*> BiSlot;
   /** For example,
    * void on_enter(const Glib::RefPtr<Gst::Task>& task, Glib::Threads::Thread&
    * thread);.
    * A thread is entered, this slot is called when the new thread enters its
    * function.
    */
-  typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&,
-    Glib::Threads::Thread*> SlotEnter;
+   typedef BiSlot SlotEnter;
 
   /** For example,
    * void on_leave(const Glib::RefPtr<Gst::Task>& task, Glib::Threads::Thread&
@@ -86,8 +90,7 @@ public:
    * A thread is exiting, this is called when the thread is about to leave its
    * function.
    */
-    typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&,
-      Glib::Threads::Thread*> SlotLeave;
+    typedef BiSlot SlotLeave;
 
 protected:
   explicit Task(const SlotTask& task_slot);
