@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/interfaces/xoverlay.h>
+#include <gst/video/videooverlay.h>
 #include <glibmm/interface.h>
 
 _DEFS(gstreamermm,gst)
@@ -26,7 +26,7 @@ namespace Gst
 {
 
 /** An interface for setting/getting a Window on elements supporting it.
- * The XOverlay interface is used for 2 main purposes :
+ * The VideoOverlay interface is used for 2 main purposes :
  *
  * - To get a grab on the Window where the video sink element is going to
  * render. This is achieved by either being informed about the Window
@@ -95,23 +95,18 @@ namespace Gst
  * @endcode
  * @ingroup GstInterfaces
  */
-class XOverlay : public Glib::Interface
+class VideoOverlay : public Glib::Interface
 {
-  _CLASS_INTERFACE(XOverlay, GstXOverlay, GST_X_OVERLAY, GstXOverlayClass)
+  _CLASS_INTERFACE(VideoOverlay, GstVideoOverlay, GST_VIDEO_OVERLAY, GstVideoOverlayClass)
 
 public:
-  _WRAP_METHOD(void set_xwindow_id(gulong xwindow_id), gst_x_overlay_set_xwindow_id)
-  _WRAP_METHOD(void got_xwindow_id(gulong xwindow_id), gst_x_overlay_got_xwindow_id)
-  _WRAP_METHOD(void got_window_handle(guintptr xwindow_id), gst_x_overlay_got_window_handle)
-  _WRAP_METHOD(void set_window_handle(guintptr xwindow_handle), gst_x_overlay_set_window_handle)
-  _WRAP_METHOD(void prepare_xwindow_id(), gst_x_overlay_prepare_xwindow_id)
-  _WRAP_METHOD(void expose(), gst_x_overlay_expose)
-  _WRAP_METHOD(void handle_events(bool handle_events), gst_x_overlay_handle_events)
-  _WRAP_METHOD(bool set_render_rectangle(int x, int y, int width, int height), gst_x_overlay_set_render_rectangle)
+  _WRAP_METHOD(void set_window_handle(guintptr window_handle), gst_video_overlay_set_window_handle)
+  _WRAP_METHOD(void got_window_handle(guintptr window_handle), gst_video_overlay_got_window_handle)
+  _WRAP_METHOD(void prepare_window_handle(), gst_video_overlay_prepare_window_handle)
+  _WRAP_METHOD(void expose(), gst_video_overlay_expose)
+  _WRAP_METHOD(void handle_events(bool handle_events), gst_video_overlay_handle_events)
+  _WRAP_METHOD(bool set_render_rectangle(int x, int y, int width, int height), gst_video_overlay_set_render_rectangle)
 
-  /** Virtual method to configure the XWindow id.
-   */
-  _WRAP_VFUNC(void set_xwindow_id(gulong xwindow_id), "set_xwindow_id")
 
   /** Virtual method to handle expose events.
    */
