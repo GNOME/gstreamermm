@@ -35,6 +35,7 @@ _CONV_ENUM(Gst,PadLinkCheck)
 _CONV_ENUM(Gst,PadLinkReturn)
 _CONV_ENUM(Gst,PadPresence)
 _CONV_ENUM(Gst,PluginDependencyFlags)
+_CONV_ENUM(Gst,QOSType)
 _CONV_ENUM(Gst,QueryType)
 _CONV_ENUM(Gst,Rank)
 _CONV_ENUM(Gst,SeekFlags)
@@ -116,6 +117,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::ElementFactory>&',`GstElementFactory*', `Gl
 
 dnl Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Glib::unwrap($3)')
+_CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3)')
 
 dnl Index
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Gst::Index>',`Glib::wrap($3)')
