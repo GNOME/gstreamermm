@@ -81,7 +81,7 @@ namespace Gst
 
 Structure::Structure(const Glib::ustring& name)
 {
-  gobject_ = gst_structure_empty_new(name.c_str());
+  gobject_ = gst_structure_new_empty(name.c_str());
 }
 
 Structure::operator bool() const
@@ -115,12 +115,6 @@ void Structure::set_field(const Glib::ustring& fieldname, guint value)
   gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_UINT, value, (void*)0);
 }
 
-void Structure::set_field(const Glib::ustring& fieldname, const Fourcc& value)
-{
-  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FOURCC,
-    value.get_fourcc(), (void*)0);
-}
-
 void Structure::set_field(const Glib::ustring& fieldname, double value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DOUBLE, value, (void*)0);
@@ -140,7 +134,7 @@ void Structure::set_field(const Glib::ustring& fieldname, const char* value)
  
 void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DATE, value.gobj(), (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE, value.gobj(), (void*)0);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const ClockTime& value)
@@ -200,17 +194,6 @@ bool Structure::get_field(const Glib::ustring& name, guint& value) const
 {
   return gst_structure_get_uint(gobj(), name.c_str(), &value);
 }
-
-bool Structure::get_field(const Glib::ustring& name, Fourcc& value) const
-{
-  guint32 cvalue = 0;
-  const bool result = gst_structure_get_fourcc(gobj(), name.c_str(), &cvalue);
-  if(result)
-    value = Fourcc(cvalue);
-
-  return result;
-}
-
 
 bool Structure::get_field(const Glib::ustring& name, double& value) const
 {
