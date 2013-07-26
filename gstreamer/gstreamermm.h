@@ -132,9 +132,6 @@
 #include <gstreamermm/mixertrack.h>
 #include <gstreamermm/navigation.h>
 #include <gstreamermm/streamvolume.h>
-#include <gstreamermm/tuner.h>
-#include <gstreamermm/tunerchannel.h>
-#include <gstreamermm/tunernorm.h>
 #include <gstreamermm/videoorientation.h>
 #include <gstreamermm/xoverlay.h>
 
