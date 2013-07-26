@@ -124,27 +124,12 @@ Glib::RefPtr<const Gst::Caps> Pad::get_pad_template_caps() const
   return Glib::wrap(copy_caps, false);
 }
 
-FlowReturn Pad::alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer)
-{
-  GstBuffer* c_buffer = 0;
-  GstFlowReturn result = gst_pad_alloc_buffer(gobj(), offset, size, caps->gobj(), &c_buffer);
-  buffer = wrap(c_buffer, false);
-  return FlowReturn(result);
-}
-
-FlowReturn Pad::alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buffer)
-{
-  GstBuffer* c_buffer = 0;
-  GstFlowReturn result = gst_pad_alloc_buffer_and_set_caps(gobj(), offset, size, caps->gobj(), &c_buffer);
-  buffer = wrap(c_buffer, false);
-  return FlowReturn(result);
-}
 
 FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   GstBuffer* c_buffer = 0;
   GstFlowReturn result = gst_pad_get_range(gobj(), offset, size, &c_buffer);
-  buffer = wrap(c_buffer, false);
+  buffer = Glib::wrap(c_buffer, false);
   return FlowReturn(result);
 }
 
@@ -164,7 +149,7 @@ FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>
 {
   GstBuffer* c_buffer = 0;
   GstFlowReturn result = gst_pad_pull_range(gobj(), offset, size, &c_buffer);
-  buffer = wrap(c_buffer, false);
+  buffer = Glib::wrap(c_buffer, false);
   return FlowReturn(result);
 }
 
@@ -176,22 +161,12 @@ bool Pad::send_event(const Glib::RefPtr<Gst::Event>& event)
 
 bool Pad::query_position(Format& format) const
 {
-  return gst_pad_query_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
+  return gst_pad_query_position(const_cast<GstPad*>(gobj()), (GstFormat)format, 0);
 }
 
 bool Pad::query_duration(Format& format) const
 {
-  return gst_pad_query_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
-}
-
-bool Pad::query_peer_position(Format& format) const
-{
-  return gst_pad_query_peer_position(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
-}
-
-bool Pad::query_peer_duration(Format& format) const
-{
-  return gst_pad_query_peer_duration(const_cast<GstPad*>(gobj()), reinterpret_cast<GstFormat*>(&format), 0);
+  return gst_pad_query_duration(const_cast<GstPad*>(gobj()), (GstFormat)format, 0);
 }
 
 FlowReturn Pad::chain(const Glib::RefPtr<Gst::Buffer>& buffer)
@@ -200,31 +175,5 @@ FlowReturn Pad::chain(const Glib::RefPtr<Gst::Buffer>& buffer)
   return FlowReturn(gst_pad_chain(gobj(), buffer->gobj()));
 }
 
-bool Pad::set_blocked_async(const SlotBlock& slot, bool blocked)
-{
-  SlotBlock* slot_copy = new SlotBlock(slot);
-  return bool(gst_pad_set_blocked_async_full(GST_PAD(gobj()), gboolean(blocked), &Pad_Block_gstreamermm_callback, slot_copy, &Pad_Block_gstreamermm_callback_destroy));
-}
-
-gulong Pad::add_data_probe(const SlotData& slot)
-{
-  SlotData* slot_copy = new SlotData(slot);
-
-  return gst_pad_add_data_probe_full(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy, &Pad_Data_gstreamermm_callback_disconnect);
-}
-
-gulong Pad::add_buffer_probe(const SlotData& slot)
-{
-  SlotData* slot_copy = new SlotData(slot);
-
-  return gst_pad_add_buffer_probe_full(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy, &Pad_Data_gstreamermm_callback_disconnect);
-}
-
-gulong Pad::add_event_probe(const SlotData& slot)
-{
-  SlotData* slot_copy = new SlotData(slot);
-
-  return gst_pad_add_event_probe_full(gobj(), G_CALLBACK (Pad_Data_gstreamermm_callback), slot_copy, &Pad_Data_gstreamermm_callback_disconnect);
-}
 
 } //namespace Gst

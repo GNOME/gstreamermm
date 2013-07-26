@@ -196,114 +196,14 @@ public:
   _WRAP_METHOD(bool is_active() const, gst_pad_is_active)
   _WRAP_METHOD(bool set_blocked(bool blocked = true), gst_pad_set_blocked)
 
-  /** Blocks or unblocks the dataflow on a pad asynchronously. The provided
-   * slot is called when the operation succeeds; this happens right before the
-   * next attempt at pushing a buffer on the pad.
-   *
-   * This can take a while as the pad can only become blocked when real
-   * dataflow is happening. When the pipeline is stalled, for example in
-   * PAUSED, this can take an indeterminate amount of time. Be careful with
-   * this blocking call as it might not return for reasons stated above.
-   *
-   * @param slot SlotBlock that will be called when the operation succeeds.
-   * @param blocked boolean indicating whether the pad should be blocked or
-   * unblocked.
-   * @return true if the pad could be blocked. This function can fail if the
-   * pad was already in the requested state. MT safe.
-   */
-  bool set_blocked_async(const SlotBlock& slot, bool blocked = true);
-  _IGNORE( gst_pad_set_blocked_async, gst_pad_set_blocked_async_full)
 
   _WRAP_METHOD(bool is_blocked() const, gst_pad_is_blocked)
   _WRAP_METHOD(bool is_blocking() const, gst_pad_is_blocking)
 
-  /** Adds a "data probe" to a pad. The slot will be called whenever data
-   * passes through a pad. In this case data means both events and buffers. The
-   * probe will be called with the data as an argument. Note that the data will
-   * have a reference count greater than 1, so it will be immutable -- you must
-   * not change it.
-   *
-   * For source pads, the probe will be called after the blocking function, if
-   * any (see set_blocked_async()), but before looking up the peer to chain to.
-   * For sink pads, the probe function will be called before configuring the
-   * sink with new caps, if any, and before calling the pad's chain function.
-   *
-   * Your data probe should return true to let the data continue to flow, or
-   * false to drop it. Dropping data is rarely useful, but occasionally comes
-   * in handy with events.
-   *
-   * To remove a probe, use the appropriate function, such as
-   * remove_data_probe().
-   *
-   * @param slot The slot to call when data is passed over pad (note: slot is
-   * not copied because it is connected to a signal).
-   * @return The handler id which may be used to remove the connection later.
-   */
-  gulong add_data_probe(const SlotData& slot);
-  _IGNORE(gst_pad_add_data_probe, gst_pad_add_data_probe_full)
-
-  /** Adds a probe that will be called for all buffers passing through a pad.
-   * See add_data_probe() for more information.
-   *
-   * @param slot The slot to call when buffers are passed over pad.
-   * @return The handler id.
-   */
-  gulong add_buffer_probe(const SlotData& slot);
-  _IGNORE(gst_pad_add_buffer_probe, gst_pad_add_buffer_probe_full)
-
-  /** Adds a probe that will be called for all events passing through a pad.
-   * See add_data_probe() for more information.
-   *
-   * @param slot The slot to call when events are passed over pad.
-   * @return The handler id.
-   */
-  gulong add_event_probe(const SlotData& slot);
-  _IGNORE(gst_pad_add_event_probe, gst_pad_add_event_probe_full)
 
   _WRAP_METHOD(void remove_data_probe(guint handler_id), gst_pad_remove_data_probe)
   _WRAP_METHOD(void remove_buffer_probe(guint handler_id), gst_pad_remove_buffer_probe)
   _WRAP_METHOD(void remove_event_probe(guint handler_id), gst_pad_remove_event_probe)
-
-  //This is handwritten because conversion from Glib::RefPtr<Gst::Buffer>& to
-  //GstBuffer** is difficult.
-  /** Allocates a new, empty buffer optimized to push to pad pad. This function
-   * only works if pad is a source pad and has a peer.
-   *
-   * A new, empty Gst::Buffer will be put in the buf argument. You need to
-   * check the caps of the buffer after performing this function and
-   * renegotiate to the format if needed.
-   *
-   * @param offset The offset of the new buffer in the stream.
-   * @param size The size of the new buffer.
-   * @param caps The caps of the new buffer.
-   * @param buf An uninitialized Glib::RefPtr<> in which to store the new
-   * Gst::Buffer.
-   * @return A result code indicating success of the operation. Any result code
-   * other than Gst::FLOW_OK is an error and buf should not be used. An error
-   * can occur if the pad is not connected or when the downstream peer elements
-   * cannot provide an acceptable buffer. MT safe.
-   */
-  FlowReturn alloc_buffer(guint64 offset, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buf);
-  _IGNORE(gst_pad_alloc_buffer)
-
-  //This is handwritten because conversion from Glib::RefPtr<Gst::Buffer>& to
-  //GstBuffer** is difficult.
-  /** In addition to the function alloc_buffer(), this function automatically
-   * calls set_caps() when the caps of the newly allocated buffer are different
-   * from the pad caps.  Again, the pad must be a source pad.
-   *
-   * @param offset The offset of the new buffer in the stream.
-   * @param size The size of the new buffer.
-   * @param caps The caps of the new buffer.
-   * @param buf An uninitialized Glib::RefPtr<> in which to store the new
-   * Gst::Buffer.
-   * @return A result code indicating success of the operation. Any result code
-   * other than Gst::FLOW_OK is an error and buf should not be used. An error
-   * can occur if the pad is not connected or when the downstream peer elements
-   * cannot provide an acceptable buffer. MT safe.
-   */
-  FlowReturn alloc_buffer_and_set_caps(guint64 offset, int size, const Glib::RefPtr<Gst::Caps>& caps, Glib::RefPtr<Gst::Buffer>& buf);
-  _IGNORE(gst_pad_alloc_buffer_and_set_caps)
 
   //This is handwritten because conversion from Glib::RefPtr<Gst::Buffer>& to
   //GstBuffer** is difficult.
@@ -441,24 +341,7 @@ public:
   bool query_duration(Format& format) const;
 
   _WRAP_METHOD(bool query_convert(Format src_format, gint64 src_value, Format dst_format, gint64& dst_value) const, gst_pad_query_convert)
-  _WRAP_METHOD(bool query_peer_position(Format& format, gint64& position) const, gst_pad_query_peer_position)
 
-  /** Queries the peer of a given sink pad for the stream position parsing only
-   * the format.
-   * @param format A reference to the Gst::Format asked for. On return contains
-   * the Gst::Format used.
-   * @return true if the query could be performed.
-   */
-  bool query_peer_position(Format& format) const;
-
-   _WRAP_METHOD(bool query_peer_duration(Format& format, gint64& duration) const, gst_pad_query_peer_duration)
-
-  /** Queries the peer pad of a given sink pad for the total stream duration.
-   * @param format A reference to the Gst::Format asked for. On return contains
-   * the Gst::Format used.
-   * @return true if the query could be performed.
-   */
-  bool query_peer_duration(Format& format) const;
 
    _WRAP_METHOD(bool query_peer_convert(Format src_format, gint64 src_value, Format& dst_format, gint64& dst_value) const, gst_pad_query_peer_convert)
 
