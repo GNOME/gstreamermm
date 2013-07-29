@@ -77,8 +77,6 @@
 #include <gstreamermm/filter.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/ghostpad.h>
-#include <gstreamermm/index.h>
-#include <gstreamermm/indexfactory.h>
 #include <gstreamermm/interface.h>
 #include <gstreamermm/iterator.h>
 #include <gstreamermm/message.h>
@@ -103,7 +101,6 @@
 #include <gstreamermm/typefindfactory.h>
 #include <gstreamermm/urihandler.h>
 #include <gstreamermm/value.h>
-#include <gstreamermm/xml.h>
 
 // Core library base includes
 #include <gstreamermm/basesink.h>
@@ -118,7 +115,6 @@
 #include <gstreamermm/audiosrc.h>
 #include <gstreamermm/audiobasesink.h>
 #include <gstreamermm/audiobasesrc.h>
-#include <gstreamermm/cddabasesrc.h>
 #include <gstreamermm/discoverer.h>
 #include <gstreamermm/discovererinfo.h>
 #include <gstreamermm/audioringbuffer.h>
@@ -145,18 +141,14 @@
 #include <gstreamermm/filesink.h>
 #include <gstreamermm/funnel.h>
 #include <gstreamermm/identity.h>
-#include <gstreamermm/inputselector.h>
 #include <gstreamermm/multiqueue.h>
-#include <gstreamermm/outputselector.h>
 #include <gstreamermm/queue.h>
 #include <gstreamermm/queue2.h>
 #include <gstreamermm/tee.h>
-#include <gstreamermm/typefindelement.h>
 #include <gstreamermm/valve.h>
 
 // Plug-in base includes
 #include <gstreamermm/adder.h>
-#include <gstreamermm/alsamixer.h>
 #include <gstreamermm/alsasink.h>
 #include <gstreamermm/alsasrc.h>
 #include <gstreamermm/audioconvert.h>
@@ -166,10 +158,6 @@
 #include <gstreamermm/cdparanoiasrc.h>
 #include <gstreamermm/clockoverlay.h>
 #include <gstreamermm/decodebin.h>
-#include <gstreamermm/decodebin2.h>
-#include <gstreamermm/ffmpegcolorspace.h>
-#include <gstreamermm/gdpdepay.h>
-#include <gstreamermm/gdppay.h>
 #include <gstreamermm/giosink.h>
 #include <gstreamermm/giosrc.h>
 #include <gstreamermm/giostreamsink.h>
@@ -180,7 +168,6 @@
 #include <gstreamermm/oggdemux.h>
 #include <gstreamermm/oggmux.h>
 #include <gstreamermm/playbin.h>
-#include <gstreamermm/playbin2.h>
 #include <gstreamermm/subtitleoverlay.h>
 #include <gstreamermm/tcpclientsrc.h>
 #include <gstreamermm/tcpclientsink.h>

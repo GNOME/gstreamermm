@@ -18,9 +18,7 @@
  */
 
 #include <gstreamermm/init.h>
-#include <gstreamermm/wrap.h>
 #include <gstreamermm/wrap_init.h>
-#include <gstreamermm/gst_wrap_init.h>
 #include <glibmm/init.h>
 #include <gst/gst.h>
 
