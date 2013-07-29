@@ -909,7 +909,7 @@ The different flags that can be used when packing and unpacking.
 
 <enum name="GstAudioRingBufferFormatType">
 <description>
-The format of the samples in the ringbuffer.
+The format of the samples in the audioringbuffer.
 
 </description>
 <parameters>
@@ -966,24 +966,24 @@ The format of the samples in the ringbuffer.
 
 <enum name="GstAudioRingBufferState">
 <description>
-The state of the ringbuffer.
+The state of the audioringbuffer.
 
 </description>
 <parameters>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_STOPPED">
-<parameter_description> The ringbuffer is stopped
+<parameter_description> The audioringbuffer is stopped
 </parameter_description>
 </parameter>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_PAUSED">
-<parameter_description> The ringbuffer is paused
+<parameter_description> The audioringbuffer is paused
 </parameter_description>
 </parameter>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_STARTED">
-<parameter_description> The ringbuffer is started
+<parameter_description> The audioringbuffer is started
 </parameter_description>
 </parameter>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_ERROR">
-<parameter_description> The ringbuffer has encountered an
+<parameter_description> The audioringbuffer has encountered an
 error after it has been started, e.g. because the device was
 disconnected (Since 1.2)
 </parameter_description>
@@ -1296,7 +1296,7 @@ The different types of buffering methods.
 </parameter_description>
 </parameter>
 <parameter name="GST_BUFFERING_TIMESHIFT">
-<parameter_description> the stream is being downloaded in a ringbuffer
+<parameter_description> the stream is being downloaded in a audioringbuffer
 </parameter_description>
 </parameter>
 <parameter name="GST_BUFFERING_LIVE">
@@ -8484,7 +8484,7 @@ buffer (see gst_object_set_parent()).
 </parameter_description>
 </parameter>
 </parameters>
-<return> The new ringbuffer of @sink.
+<return> The new audioringbuffer of @sink.
 </return>
 </function>
 
@@ -8675,7 +8675,7 @@ buffer (see gst_object_set_parent()).
 </parameter_description>
 </parameter>
 </parameters>
-<return> The new ringbuffer of @src.
+<return> The new audioringbuffer of @src.
 </return>
 </function>
 
@@ -10625,7 +10625,7 @@ the memory.
 
 <function name="gst_audio_ring_buffer_acquire">
 <description>
-Allocate the resources for the ringbuffer. This function fills
+Allocate the resources for the audioringbuffer. This function fills
 in the data pointer of the ring buffer with a valid #GstBuffer
 to which samples can be written.
 
@@ -10714,7 +10714,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_clear_all">
 <description>
-Fill the ringbuffer with silence.
+Fill the audioringbuffer with silence.
 
 MT safe.
 
@@ -10749,17 +10749,17 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_commit">
 <description>
-Commit @in_samples samples pointed to by @data to the ringbuffer @buf.
+Commit @in_samples samples pointed to by @data to the audioringbuffer @buf.
 
 @in_samples and @out_samples define the rate conversion to perform on the
 samples in @data. For negative rates, @out_samples must be negative and
 @in_samples positive.
 
 When @out_samples is positive, the first sample will be written at position @sample
-in the ringbuffer. When @out_samples is negative, the last sample will be written to
+in the audioringbuffer. When @out_samples is negative, the last sample will be written to
 @sample in reverse order.
 
-@out_samples does not need to be a multiple of the segment size of the ringbuffer
+@out_samples does not need to be a multiple of the segment size of the audioringbuffer
 although it is recommended for optimal performance.
 
 @accum will hold a temporary accumulator used in rate conversion and should be
@@ -10789,7 +10789,7 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="out_samples">
-<parameter_description> the number of samples to write to the ringbuffer
+<parameter_description> the number of samples to write to the audioringbuffer
 </parameter_description>
 </parameter>
 <parameter name="accum">
@@ -10797,7 +10797,7 @@ MT safe.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of samples written to the ringbuffer or -1 on error. The
+<return> The number of samples written to the audioringbuffer or -1 on error. The
 number of samples written can be less than @out_samples when @buf was interrupted
 with a flush or stop.
 </return>
@@ -10871,11 +10871,11 @@ usually less than the segment size but can be bigger when the
 implementation uses another internal buffer between the audio
 device.
 
-For playback ringbuffers this is the amount of samples transfered from the
+For playback audioringbuffers this is the amount of samples transfered from the
 ringbuffer to the device but still not played.
 
-For capture ringbuffers this is the amount of samples in the device that are
-not yet transfered to the ringbuffer.
+For capture audioringbuffers this is the amount of samples in the device that are
+not yet transfered to the audioringbuffer.
 
 
 </description>
@@ -10911,7 +10911,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_is_acquired">
 <description>
-Check if the ringbuffer is acquired and ready to use.
+Check if the audioringbuffer is acquired and ready to use.
 
 
 </description>
@@ -10921,7 +10921,7 @@ Check if the ringbuffer is acquired and ready to use.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the ringbuffer is acquired, FALSE on error.
+<return> TRUE if the audioringbuffer is acquired, FALSE on error.
 
 MT safe.
 </return>
@@ -10965,8 +10965,8 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_may_start">
 <description>
-Tell the ringbuffer that it is allowed to start playback when
-the ringbuffer is filled with samples. 
+Tell the audioringbuffer that it is allowed to start playback when
+the audioringbuffer is filled with samples. 
 
 MT safe.
 
@@ -11026,7 +11026,7 @@ Parse @caps into @spec.
 
 <function name="gst_audio_ring_buffer_pause">
 <description>
-Pause processing samples from the ringbuffer.
+Pause processing samples from the audioringbuffer.
 
 
 </description>
@@ -11075,12 +11075,12 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_read">
 <description>
-Read @len samples from the ringbuffer into the memory pointed 
+Read @len samples from the audioringbuffer into the memory pointed 
 to by @data.
 The first sample should be read from position @sample in
-the ringbuffer.
+the audioringbuffer.
 
-@len should not be a multiple of the segment size of the ringbuffer
+@len should not be a multiple of the segment size of the audioringbuffer
 although it is recommended.
 
 @timestamp will return the timestamp associated with the data returned.
@@ -11109,7 +11109,7 @@ although it is recommended.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of samples read from the ringbuffer or -1 on
+<return> The number of samples read from the audioringbuffer or -1 on
 error.
 
 MT safe.
@@ -11118,7 +11118,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_release">
 <description>
-Free the resources of the ringbuffer.
+Free the resources of the audioringbuffer.
 
 
 </description>
@@ -11136,7 +11136,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_samples_done">
 <description>
-Get the number of samples that were processed by the ringbuffer
+Get the number of samples that were processed by the audioringbuffer
 since it was last started. This does not include the number of samples not
 yet processed (see gst_audio_ring_buffer_delay()).
 
@@ -11148,7 +11148,7 @@ yet processed (see gst_audio_ring_buffer_delay()).
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of samples processed by the ringbuffer.
+<return> The number of samples processed by the audioringbuffer.
 
 MT safe.
 </return>
@@ -11181,8 +11181,8 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_set_channel_positions">
 <description>
-Tell the ringbuffer about the device's channel positions. This must
-be called in when the ringbuffer is acquired.
+Tell the audioringbuffer about the device's channel positions. This must
+be called in when the audioringbuffer is acquired.
 
 </description>
 <parameters>
@@ -11200,7 +11200,7 @@ be called in when the ringbuffer is acquired.
 
 <function name="gst_audio_ring_buffer_set_flushing">
 <description>
-Set the ringbuffer to flushing mode or normal mode.
+Set the audioringbuffer to flushing mode or normal mode.
 
 MT safe.
 
@@ -11223,7 +11223,7 @@ MT safe.
 Make sure that the next sample written to the device is
 accounted for as being the @sample sample written to the
 device. This value will be used in reporting the current
-sample position of the ringbuffer.
+sample position of the audioringbuffer.
 
 This function will also clear the buffer with silence.
 
@@ -11245,7 +11245,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_start">
 <description>
-Start processing samples from the ringbuffer.
+Start processing samples from the audioringbuffer.
 
 
 </description>
@@ -11263,7 +11263,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_stop">
 <description>
-Stop processing samples from the ringbuffer.
+Stop processing samples from the audioringbuffer.
 
 
 </description>
@@ -45890,7 +45890,7 @@ MT safe.
 </description>
 <parameters>
 <parameter name="buf">
-<parameter_description> the #GstRingBuffer
+<parameter_description> the #GstAudioRingBuffer
 </parameter_description>
 </parameter>
 <parameter name="readseg">
