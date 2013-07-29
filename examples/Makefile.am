@@ -24,6 +24,7 @@ examples_cppflags = $(GSTREAMERMM_CFLAGS)
 endif
 
 noinst_PROGRAMS =			\
+	ogg_rewriter/example
 	$(optional_examples)
 
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
@@ -35,6 +36,7 @@ LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
 
 element_link_example_SOURCES 		= element_link/element_link.cc
 hello_world_example_SOURCES 		= hello_world/main.cc
+ogg_rewriter_example_SOURCES 		= ogg_rewriter/main.cc
 media_player_gtkmm_example_SOURCES 	= media_player_gtkmm/main.cc \
 					  media_player_gtkmm/player_window.cc \
 					  media_player_gtkmm/player_window.h
