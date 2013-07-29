@@ -24,11 +24,6 @@ examples_cppflags = $(GSTREAMERMM_CFLAGS)
 endif
 
 noinst_PROGRAMS =			\
-	element_link/example		\
-	hello_world/example		\
-	ogg_player/example		\
-	optiongroup/example		\
-	typefind/example		\
 	$(optional_examples)
 
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)

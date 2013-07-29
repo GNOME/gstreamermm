@@ -74,10 +74,8 @@
 #include <gstreamermm/enums.h>
 #include <gstreamermm/error.h>
 #include <gstreamermm/event.h>
-#include <gstreamermm/filter.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/ghostpad.h>
-#include <gstreamermm/interface.h>
 #include <gstreamermm/iterator.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/object.h>
@@ -121,15 +119,8 @@
 #include <gstreamermm/videosink.h>
 
 // Base inteface includes
-#include <gstreamermm/colorbalance.h>
-#include <gstreamermm/colorbalancechannel.h>
-#include <gstreamermm/mixer.h>
-#include <gstreamermm/mixeroptions.h>
-#include <gstreamermm/mixertrack.h>
 #include <gstreamermm/navigation.h>
-#include <gstreamermm/streamvolume.h>
 #include <gstreamermm/videoorientation.h>
-#include <gstreamermm/xoverlay.h>
 
 // Plug-in core includes
 #include <gstreamermm/capsfilter.h>
@@ -144,8 +135,6 @@
 #include <gstreamermm/multiqueue.h>
 #include <gstreamermm/queue.h>
 #include <gstreamermm/queue2.h>
-#include <gstreamermm/tee.h>
-#include <gstreamermm/valve.h>
 
 // Plug-in base includes
 #include <gstreamermm/adder.h>
@@ -164,31 +153,9 @@
 #include <gstreamermm/giostreamsrc.h>
 //TODO? (Add plug-in first): #include <gstreamermm/gnomevfssink.h>
 //TODO? (Add plug-in first): #include <gstreamermm/gnomevfssrc.h>
-#include <gstreamermm/multifdsink.h>
 #include <gstreamermm/oggdemux.h>
 #include <gstreamermm/oggmux.h>
-#include <gstreamermm/playbin.h>
 #include <gstreamermm/subtitleoverlay.h>
-#include <gstreamermm/tcpclientsrc.h>
-#include <gstreamermm/tcpclientsink.h>
-#include <gstreamermm/tcpserversrc.h>
-#include <gstreamermm/tcpserversink.h>
-#include <gstreamermm/textoverlay.h>
-#include <gstreamermm/textrender.h>
-#include <gstreamermm/theoradec.h>
-#include <gstreamermm/theoraenc.h>
-#include <gstreamermm/theoraparse.h>
-#include <gstreamermm/timeoverlay.h>
-#include <gstreamermm/uridecodebin.h>
-#include <gstreamermm/videorate.h>
-#include <gstreamermm/videoscale.h>
-#include <gstreamermm/videotestsrc.h>
-#include <gstreamermm/volume.h>
-#include <gstreamermm/vorbisdec.h>
-#include <gstreamermm/vorbisenc.h>
-#include <gstreamermm/vorbisparse.h>
-#include <gstreamermm/vorbistag.h>
-#include <gstreamermm/ximagesink.h>
-#include <gstreamermm/xvimagesink.h>
+
 
 #endif // _GSTREAMERMM_H
