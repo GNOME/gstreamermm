@@ -68,11 +68,58 @@ bool Event::is_serialized() const
   return GST_EVENT_IS_SERIALIZED(gobj());
 }
 
-Gst::TagList EventTag::parse() const
+Glib::RefPtr<Gst::EventFlushStart> EventFlushStart::create()
 {
-  GstTagList* gst_taglist = gst_tag_list_new_empty();
+  GstEvent* event = gst_event_new_flush_start();
+  return Glib::wrap_event_derived<EventFlushStart>(event, false);
+}
+
+Glib::RefPtr<Gst::EventFlushStop> EventFlushStop::create(bool reset_time)
+{
+  GstEvent* event = gst_event_new_flush_stop(reset_time);
+  return Glib::wrap_event_derived<EventFlushStop>(event, false);
+}
+
+Glib::RefPtr<Gst::EventEos> EventEos::create()
+{
+  GstEvent* event = gst_event_new_eos();
+  return Glib::wrap_event_derived<EventEos>(event, false);
+}
+
+Glib::RefPtr<Gst::EventNewSegment>
+  EventNewSegment::create(const GstSegment* segment)
+{
+  GstEvent* event = gst_event_new_segment(segment);
+  return Glib::wrap_event_derived<EventNewSegment>(event, false);
+}
+
+void EventNewSegment::parse(const GstSegment** segment) const
+{
+  gst_event_parse_segment(const_cast<GstEvent*>(gobj()), segment);
+}
+
+Glib::RefPtr<Gst::EventTag> EventTag::create(const Gst::TagList& taglist)
+{
+  //We create a copy because gst_event_new_tag() takes ownership:
+  GstTagList* c_taglist = gst_tag_list_copy(taglist.gobj());
+  GstEvent* event = gst_event_new_tag(c_taglist);
+  return Glib::wrap_event_derived<EventTag>(event, false);
+}
+
+Gst::TagList EventTag::parse(const Glib::ustring& name) const
+{
+  GstTagList* gst_taglist = gst_tag_list_new(name.c_str());
   gst_event_parse_tag(const_cast<GstEvent*>(gobj()), &gst_taglist);
   return Gst::TagList(gst_taglist);
+}
+
+Glib::RefPtr<Gst::EventBufferSize>
+  EventBufferSize::create(Format format, gint64 minsize, gint64 maxsize,
+  bool async)
+{
+  GstEvent* event = gst_event_new_buffer_size(GstFormat(format), minsize,
+    maxsize, async);
+  return Glib::wrap_event_derived<EventBufferSize>(event, false);
 }
 
 void EventBufferSize::parse(Format& format, gint64& minsize, gint64& maxsize,
@@ -115,10 +162,18 @@ bool EventBufferSize::parse_async() const
   return gst_async;
 }
 
-void EventQos::parse(QOSType& type, double& proportion, ClockTimeDiff& diff,
+Glib::RefPtr<Gst::EventQos> EventQos::create(GstQOSType type, double proportion,
+  ClockTimeDiff diff, ClockTime timestamp)
+{
+  GstEvent* event = gst_event_new_qos(type, proportion, GstClockTimeDiff(diff),
+    GstClockTime(timestamp));
+  return Glib::wrap_event_derived<EventQos>(event, false);
+}
+
+void EventQos::parse(GstQOSType& type, double& proportion, ClockTimeDiff& diff,
   ClockTime& timestamp) const
 {
-  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), (GstQOSType*)&type, &proportion, &diff,
+  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), &type, &proportion, &diff,
     &timestamp);
 }
 
@@ -132,7 +187,6 @@ double EventQos::parse() const
 Gst::ClockTimeDiff EventQos::parse_diff() const
 {
   GstClockTimeDiff gst_diff = 0;
-
   gst_event_parse_qos(const_cast<GstEvent*>(gobj()), 0, 0, &gst_diff, 0);
   return gst_diff;
 }
@@ -142,6 +196,17 @@ Gst::ClockTime EventQos::parse_timestamp() const
   GstClockTime gst_timestamp = 0;
   gst_event_parse_qos(const_cast<GstEvent*>(gobj()), 0, 0, 0, &gst_timestamp);
   return gst_timestamp;
+}
+
+Glib::RefPtr<Gst::EventSeek> EventSeek::create(double rate, Format format,
+  SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type,
+  gint64 stop)
+{
+  GstEvent* event = gst_event_new_seek(rate, GstFormat(format),
+    GstSeekFlags(flags), GstSeekType(start_type), start,
+    GstSeekType(stop_type), stop);
+
+  return Glib::wrap_event_derived<EventSeek>(event, false);
 }
 
 void EventSeek::parse(double& rate, Format& format, SeekFlags& flags,
@@ -208,11 +273,35 @@ gint64 EventSeek::parse_stop() const
   return gst_stop;
 }
 
+Glib::RefPtr<Gst::EventNavigation>
+  EventNavigation::create(Gst::Structure& structure)
+{
+  // Make copy because event takes ownership of structure:
+  GstStructure* copy = gst_structure_copy(structure.gobj());
+  GstEvent* event = gst_event_new_navigation(copy);
+  return Glib::wrap_event_derived<EventNavigation>(event, false);
+}
+
+Glib::RefPtr<Gst::EventLatency> EventLatency::create(ClockTime time)
+{
+  GstEvent* event = gst_event_new_latency(GstClockTime(time));
+  return Glib::wrap_event_derived<EventLatency>(event, false);
+}
+
 ClockTime EventLatency::parse() const
 {
   GstClockTime gst_latency = 0;
   gst_event_parse_latency(const_cast<GstEvent*>(gobj()), &gst_latency);
   return gst_latency;
+}
+
+Glib::RefPtr<Gst::EventStep>
+  EventStep::create(Gst::Format format, guint64 amount, double rate,
+  bool flush, bool intermediate)
+{
+  GstEvent* event = gst_event_new_step(static_cast<GstFormat>(format),
+    amount, rate, flush, intermediate);
+  return Glib::wrap_event_derived<EventStep>(event, false);
 }
 
 void EventStep::parse(Gst::Format& format, guint64& amount, double& rate,
@@ -265,5 +354,25 @@ bool EventStep::parse_intermediate() const
   return gst_intermediate;
 }
 
+Glib::RefPtr<Gst::EventSinkMessage>
+  EventSinkMessage::create(const Glib::ustring& name, const Glib::RefPtr<Gst::Message>& msg)
+{
+  GstEvent* event = gst_event_new_sink_message(name.c_str(), msg->gobj());
+  return Glib::wrap_event_derived<EventSinkMessage>(event, false);
+}
+
+Glib::RefPtr<Gst::Message> EventSinkMessage::parse()
+{
+  GstMessage* gst_msg = 0;
+  gst_event_parse_sink_message(gobj(), &gst_msg);
+  return Glib::wrap(gst_msg);
+}
+
+Glib::RefPtr<const Gst::Message> EventSinkMessage::parse() const
+{
+  GstMessage* gst_msg = 0;
+  gst_event_parse_sink_message(const_cast<GstEvent*>(gobj()), &gst_msg);
+  return Glib::wrap(gst_msg);
+}
 
 } //namespace Gst
