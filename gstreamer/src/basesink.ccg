@@ -41,6 +41,16 @@ bool BaseSink::query_latency(bool& live, bool& upstream_live, ClockTime& min_lat
   return result;
 }
 
+ClockReturn BaseSink::wait_clock(ClockTime time)
+{
+  return static_cast<ClockReturn>(gst_base_sink_wait_clock(const_cast<GstBaseSink*>(gobj()), static_cast<GstClockTime>(time), 0));
+}
+
+FlowReturn BaseSink::wait(ClockTime time)
+{
+  return static_cast<FlowReturn>(gst_base_sink_wait(const_cast<GstBaseSink*>(gobj()), static_cast<GstClockTime>(time), 0));
+}
+
 gboolean BaseSink_Class::set_caps_vfunc_callback(GstBaseSink* self, GstCaps* caps)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
