@@ -1,0 +1,66 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gst.h>
+#include <gstreamermm/miniobject.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+_WRAP_ENUM(MemoryFlags, GstMemoryFlags)
+
+/**
+ * GstMemory is a lightweight refcounted object that wraps a region of memory.
+ * They are typically used to manage the data of a #GstBuffer.
+ *
+ * A GstMemory object has an allocated region of memory of maxsize. The maximum
+ * size does not change during the lifetime of the memory object. The memory
+ * also has an offset and size property that specifies the valid range of memory
+ * in the allocated region.
+ *
+ */
+class Memory : public MiniObject
+{
+  _CLASS_OPAQUE_REFCOUNTED(Memory, GstMemory, NONE, gst_memory_ref, gst_memory_unref)
+  _IGNORE(gst_memory_ref, gst_memory_unref)
+
+public:
+
+  /*
+   * Allocate a new memory block that wraps the given @data.
+   *
+   * @param flags: Gst::MemoryFlags.
+   * @param data Data to wrap.
+   * @param maxsize Allocated size of @data.
+   * @param offset Offset in @data.
+   * @param size Size of valid data.
+   *
+   * @returns a new #Gst::Memory.
+   */
+  static Glib::RefPtr<Memory> create(Gst::MemoryFlags flags, gpointer data, gsize maxsize, gsize offset, gsize size);
+
+  _MEMBER_GET(maxsize, maxsize, gsize, gsize)
+  _MEMBER_GET(align, align, gsize, gsize)
+  _MEMBER_GET(offset, offset, gsize, gsize)
+  _MEMBER_GET(size, size, gsize, gsize)
+};
+
+}//namespace Gst
