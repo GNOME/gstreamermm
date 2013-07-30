@@ -33,56 +33,58 @@
 #include <cstring>
 
 //this is a bit hacky, but for now necessary for Gst::Element_Class::class_init_function which is used by register_mm_type
-#include <gstreamermm/private/element_p.h>
+#include <gstreamermm/private/pushsrc_p.h>
 
-class Foo : public Gst::Element
+class FooSrc : public Gst::PushSrc
 {
-  Glib::RefPtr<Gst::Pad> sinkpad;
-  Glib::RefPtr<Gst::Pad> srcpad;
+  int count_left;
 
 public:
+  static const int COUNT = 5;
   static void base_init(BaseClassType *klass)
   {
     /* This is another hack.
      * For now it uses pure C functions, which should be wrapped then.
      */
-    gst_element_class_set_details_simple(klass, "foo_longname",
-        "foo_classification", "foo_detail_description", "foo_detail_author");
+    gst_element_class_set_details_simple(GST_ELEMENT_CLASS(klass),
+        "foosrc_longname", "foosrc_classification", "foosrc_detail_description",
+        "foosrc_detail_author");
 
-    gst_element_class_add_pad_template(klass,
-        Gst::PadTemplate::create("sink", Gst::PAD_SINK, Gst::PAD_ALWAYS,
-            Gst::Caps::create_any())->gobj());
-    gst_element_class_add_pad_template(klass,
+    gst_element_class_add_pad_template(GST_ELEMENT_CLASS(klass),
         Gst::PadTemplate::create("src", Gst::PAD_SRC, Gst::PAD_ALWAYS,
-            Gst::Caps::create_any())->gobj());
+            Gst::Caps::create_from_string("x-application/x-foo1"))->gobj());
   }
-
-  Gst::FlowReturn chain(const Glib::RefPtr<Gst::Pad> &pad, Glib::RefPtr<Gst::Buffer> &buf)
+  explicit FooSrc(GstPushSrc *gobj) :
+      Gst::PushSrc(gobj)
   {
-    assert(buf->gobj()->mini_object.refcount==1);
-    buf = buf->create_writable();
-    //run some C++ function
-    std::sort(buf->get_data(), buf->get_data() + buf->get_size());
-    assert(buf->gobj()->mini_object.refcount==1);
-    return srcpad->push(buf);
+    set_format(Gst::FORMAT_TIME);
   }
-  explicit Foo(GstElement *gobj) :
-      Gst::Element(gobj)
+  Gst::FlowReturn create_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
   {
-    add_pad(sinkpad = Gst::Pad::create(get_pad_template("sink"), "sink"));
-    add_pad(srcpad = Gst::Pad::create(get_pad_template("src"), "src"));
-    sinkpad->set_chain_function(sigc::mem_fun(*this, &Foo::chain));
+    if (count_left-- <= 0)
+      return Gst::FLOW_UNEXPECTED;
+    std::stringstream ss;
+    ss << COUNT - count_left << "";
+    std::string s = ss.str();
+    buffer = Gst::Buffer::create(s.size());
+    std::copy(s.begin(), s.end(), buffer->get_data());
+    return Gst::FLOW_OK;
   }
-  ~Foo()
+  virtual bool negotiate_vfunc()
   {
-    printf("destroying foo\n");
+    return true;
+  }
+  virtual bool start_vfunc()
+  {
+    count_left = COUNT;
+    return true;
   }
 };
 
 bool register_foo(Glib::RefPtr<Gst::Plugin> plugin)
 {
-  Gst::ElementFactory::register_element(plugin, "foomm", 10,
-      Gst::register_mm_type<Foo>("foomm"));
+  Gst::ElementFactory::register_element(plugin, "foosrcmm", 10,
+      Gst::register_mm_type<FooSrc>("foosrcmm"));
   return true;
 
 }
@@ -98,40 +100,27 @@ int main(int argc, char** argv)
 
   pipeline = Gst::Pipeline::create("my-pipeline");
 
-  Glib::RefPtr<Gst::AppSrc> source = Gst::AppSrc::create("source");
-  Glib::RefPtr<Gst::Element> filter1 = Gst::ElementFactory::create_element(
-      "foomm", "filter1");
+  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element(
+      "foosrcmm", "src");
   Glib::RefPtr<Gst::AppSink> sink = Gst::AppSink::create("sink");
 
   assert(source);
-  assert(filter1);
   assert(sink);
 
-  pipeline->add(source)->add(filter1)->add(sink);
-  source->link(filter1)->link(sink);
+  pipeline->add(source)->add(sink);
+  source->link(sink);
 
   pipeline->set_state(Gst::STATE_PLAYING);
 
-  std::cout << "pushing buffer" << std::endl;
-  std::vector<guint8> data;
-  data.push_back(1);
-  data.push_back(5);
-  data.push_back(2);
-  data.push_back(4);
-  Glib::RefPtr<Gst::Buffer> buf = Gst::Buffer::create(data.size());
-  std::copy(data.begin(), data.end(), buf->get_data());
-  source->push_buffer(buf);
-
-  std::cout << "pulling buffer" << std::endl;
-  Glib::RefPtr<Gst::Buffer> buf_out;
-  buf_out = sink->pull_buffer();
-  assert(buf_out);
-  assert(buf_out->get_data());
-  std::sort(data.begin(), data.end());
-  assert(std::equal(data.begin(), data.end(), buf_out->get_data()));
-
-  std::cout << "finishing stream" << std::endl;
-  source->end_of_stream();
+  for (int i = 0; i < FooSrc::COUNT; ++i)
+  {
+    std::cout << "pulling buffer " << i + 1 << std::endl;
+    Glib::RefPtr<Gst::Buffer> buf_out;
+    buf_out = sink->pull_buffer();
+    assert(buf_out);
+    assert(buf_out->get_data());
+    assert(buf_out->get_data()[0]=='1'+i);
+  }
 
   std::cout << "waiting for eos or error" << std::endl;
   Glib::RefPtr<Gst::Message> msg = pipeline->get_bus()->poll(
@@ -143,7 +132,8 @@ int main(int argc, char** argv)
 
   pipeline->set_state(Gst::STATE_NULL);
   pipeline.reset();
-  filter1.reset();
+  source.reset();
+  sink.reset();
 
   return 0;
 }
