@@ -87,9 +87,9 @@ Glib::RefPtr<Gst::EventEos> EventEos::create()
 }
 
 Glib::RefPtr<Gst::EventNewSegment>
-  EventNewSegment::create(const GstSegment* segment)
+  EventNewSegment::create(const Glib::RefPtr<Gst::Segment>& segment)
 {
-  GstEvent* event = gst_event_new_segment(segment);
+  GstEvent* event = gst_event_new_segment(segment->gobj());
   return Glib::wrap_event_derived<EventNewSegment>(event, false);
 }
 
@@ -162,18 +162,18 @@ bool EventBufferSize::parse_async() const
   return gst_async;
 }
 
-Glib::RefPtr<Gst::EventQos> EventQos::create(GstQOSType type, double proportion,
+Glib::RefPtr<Gst::EventQos> EventQos::create(Gst::QOSType type, double proportion,
   ClockTimeDiff diff, ClockTime timestamp)
 {
-  GstEvent* event = gst_event_new_qos(type, proportion, GstClockTimeDiff(diff),
+  GstEvent* event = gst_event_new_qos(GstQOSType(type), proportion, GstClockTimeDiff(diff),
     GstClockTime(timestamp));
   return Glib::wrap_event_derived<EventQos>(event, false);
 }
 
-void EventQos::parse(GstQOSType& type, double& proportion, ClockTimeDiff& diff,
+void EventQos::parse(Gst::QOSType& type, double& proportion, ClockTimeDiff& diff,
   ClockTime& timestamp) const
 {
-  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), &type, &proportion, &diff,
+  gst_event_parse_qos(const_cast<GstEvent*>(gobj()), (GstQOSType*)&type, &proportion, &diff,
     &timestamp);
 }
 

@@ -269,41 +269,45 @@ class EventNewSegment : public Event
 {
 public:
 
-  /** Allocate a new newsegment event with the given format/values tripplets
+  /**
+   * gst_event_new_segment:
+   * @segment: (transfer none): a #Gst::Segment
    *
-   * The newsegment event marks the range of buffers to be processed. All data
-   * not within the segment range is not to be processed. This can be used
-   * intelligently by plugins to apply more efficient methods of skipping
-   * unneeded data.
+   * Create a new SEGMENT event for @segment. The segment event can only travel
+   * downstream synchronized with the buffer flow and contains timing information
+   * and playback properties for the buffers that will follow.
    *
-   * The position value of the segment is used in conjunction with the start
+   * The newsegment event marks the range of buffers to be processed. All
+   * data not within the segment range is not to be processed. This can be
+   * used intelligently by plugins to apply more efficient methods of skipping
+   * unneeded data. The valid range is expressed with the @start and @stop
+   * values.
+   *
+   * The time value of the segment is used in conjunction with the start
    * value to convert the buffer timestamps into the stream time. This is
-   * usually done in sinks to report the current stream_time. position
-   * represents the stream_time of a buffer carrying a timestamp of start.
-   * position cannot be -1.
+   * usually done in sinks to report the current stream_time.
+   * @time represents the stream_time of a buffer carrying a timestamp of
+   * @start. @time cannot be -1.
    *
-   * start cannot be -1, stop can be -1. If there is a valid stop given, it
-   * must be greater or equal the start, including when the indicated playback
-   * rate is < 0.
+   * @start cannot be -1, @stop can be -1. If there
+   * is a valid @stop given, it must be greater or equal the @start, including
+   * when the indicated playback @rate is < 0.
    *
-   * The applied_rate value provides information about any rate adjustment that
+   * The @applied_rate value provides information about any rate adjustment that
    * has already been made to the timestamps and content on the buffers of the
-   * stream. (rate * applied_rate) should always equal the rate that has been
+   * stream. (@rate * @applied_rate) should always equal the rate that has been
    * requested for playback. For example, if an element has an input segment
-   * with intended playback rate of 2.0 and applied_rate of 1.0, it can adjust
-   * incoming timestamps and buffer content by half and output a newsegment
-   * event with rate of 1.0 and applied_rate of 2.0
+   * with intended playback @rate of 2.0 and applied_rate of 1.0, it can adjust
+   * incoming timestamps and buffer content by half and output a newsegment event
+   * with @rate of 1.0 and @applied_rate of 2.0
    *
    * After a newsegment event, the buffer stream time is calculated with:
    *
-   * position + (TIMESTAMP(buf) - start) * ABS (rate * applied_rate)
+   *   time + (TIMESTAMP(buf) - start) * ABS (rate * applied_rate)
    *
-   * @param update Is this segment an update to a previous one.
-   * @return A new newsegment event.
-   *
-   * Since 0.10.6
+   * Returns: (transfer full): the new SEGMENT event.
    */
-  static Glib::RefPtr<Gst::EventNewSegment> create(const GstSegment* segment);
+  static Glib::RefPtr<Gst::EventNewSegment> create(const Glib::RefPtr<Gst::Segment>& segment);
 
   /**
    * gst_event_parse_segment:
@@ -452,7 +456,7 @@ public:
   *
   * Returns: (transfer full): a new QOS event.
   */
-  static Glib::RefPtr<Gst::EventQos> create(GstQOSType type, double proportion,
+  static Glib::RefPtr<Gst::EventQos> create(QOSType type, double proportion,
     ClockTimeDiff diff, ClockTime timestamp);
 
  /**
@@ -466,7 +470,7 @@ public:
   * Get the type, proportion, diff and timestamp in the qos event. See
   * gst_event_new_qos() for more information about the different QoS values.
   */
-  void parse(GstQOSType& type, double& proportion, ClockTimeDiff& diff, ClockTime& timestamp) const;
+  void parse(QOSType& type, double& proportion, ClockTimeDiff& diff, ClockTime& timestamp) const;
   _IGNORE(gst_event_parse_qos)
 
   /** Get the proportion in the qos event. See create() for more information
@@ -712,17 +716,14 @@ class EventSinkMessage : public Event
 public:
 
   /**
-   * gst_event_new_sink_message:
-   * @name: a name for the event
-   * @msg: (transfer none): the #GstMessage to be posted
-   *
    * Create a new sink-message event. The purpose of the sink-message event is
    * to instruct a sink to post the message contained in the event synchronized
    * with the stream.
    *
    * @name is used to store multiple sticky events on one pad.
-   *
-   * Returns: (transfer full): a new #GstEvent
+   * @ param name A name for the event.
+   * @param messsage The #Gst::Message to be posted.
+   * @return a new #Gst::Event.
    */
   static Glib::RefPtr<Gst::EventSinkMessage>
     create(const Glib::ustring& name, const Glib::RefPtr<Gst::Message>& message);
