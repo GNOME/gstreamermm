@@ -123,7 +123,7 @@ public:
    */
   typedef sigc::slot< bool, const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::MiniObject>& > SlotData;
 
-  typedef sigc::slot< Gst::FlowReturn, const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::Buffer>& > SlotChain;
+  typedef sigc::slot< Gst::FlowReturn, const Glib::RefPtr<Gst::Pad>&, Glib::RefPtr<Gst::Buffer>& > SlotChain;
 
   /** Creates a new pad with the given name in the given direction.
    *
@@ -253,7 +253,7 @@ public:
    * @param buffer The Gst::Buffer to push.
    * @return A Gst::FlowReturn from the peer pad. MT safe.
    */
-  FlowReturn push(const Glib::RefPtr<Gst::Buffer>& buffer);
+  FlowReturn push(Glib::RefPtr<Gst::Buffer>& buffer);
   _IGNORE(gst_pad_push)
 
   // This method is written manually because an extra ref is necessary
@@ -366,7 +366,7 @@ public:
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::Pad> > get_internal_links_default() const, gst_pad_get_internal_links_default)
 
   // This method is written manually because an extra ref is necessary
-  FlowReturn chain(const Glib::RefPtr<Gst::Buffer>& buffer);
+  FlowReturn chain(Glib::RefPtr<Gst::Buffer>& buffer);
   _IGNORE(gst_pad_chain)
 
   _WRAP_METHOD(bool pause_task() , gst_pad_pause_task)
