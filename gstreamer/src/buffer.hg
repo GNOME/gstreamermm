@@ -20,6 +20,7 @@
 #include <gst/gst.h>
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/clock.h>
+#include <gstreamermm/memory.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -70,6 +71,12 @@ public:
 
   //This is const because it always returns a new buffer:
   _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> merge(const Glib::RefPtr<const Gst::Buffer>& other_buffer) const, gst_buffer_merge)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Memory> get_memory(guint idx) const, gst_buffer_get_memory)
+
+  _WRAP_METHOD(gsize get_size   () const, gst_buffer_get_size)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Memory> get_all_memory() const, gst_buffer_get_all_memory)
 
   _MEMBER_GET(pts, pts, ClockTime, GstClockTime)
   _MEMBER_GET(dts, dts, ClockTime, GstClockTime)
