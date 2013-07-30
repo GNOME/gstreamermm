@@ -123,6 +123,8 @@ public:
    */
   typedef sigc::slot< bool, const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::MiniObject>& > SlotData;
 
+  typedef sigc::slot< Gst::FlowReturn, const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::Buffer>& > SlotChain;
+
   /** Creates a new pad with the given name in the given direction.
    *
    * @param name The name of the new pad.
@@ -371,6 +373,9 @@ public:
   _WRAP_METHOD(bool stop_task() , gst_pad_stop_task)
   _WRAP_METHOD(bool set_active(bool active = true), gst_pad_set_active)
 
+  friend GstFlowReturn Pad_Chain_gstreamermm_callback(GstPad* pad, GstObject* parent, GstBuffer *buffer);
+  void set_chain_function(const SlotChain& slot);
+
     //C API specific pad callback setting functions are ignored.
     _IGNORE(
       gst_pad_set_acceptcaps_function,
@@ -411,6 +416,9 @@ public:
   _WRAP_PROPERTY("caps", Glib::RefPtr<Gst::Caps>)
   _WRAP_PROPERTY("direction", PadDirection)
   _WRAP_PROPERTY("template", PadTemplate)
+
+private:
+  SlotChain slot_chain;
 };
 
 } // namespace Gst
