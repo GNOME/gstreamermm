@@ -161,8 +161,7 @@ gboolean Element_Class::set_clock_vfunc_callback(GstElement* self, GstClock* clo
     return (*base->set_clock)(self, clock);
 
 
-  // Return same value as gst_element_set_clock() (base class vfunc) returns
-  // when base class has no set_clock() vfunc.
+  // Return the value that would be assumed as retval if element->set_clock was not set (see gst_element_set_clock() in gstelement.c)
   return true;
 }
 bool Gst::Element::set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock)
@@ -174,8 +173,8 @@ bool Gst::Element::set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock)
   if(base && base->set_clock)
     return (*base->set_clock)(gobj(),Glib::unwrap(clock));
 
-  typedef bool RType;
-  return RType();
+  // Return the value that would be assumed as retval if element->set_clock was not set (see gst_element_set_clock() in gstelement.c)
+  return true;
 }
 
 } //namespace Gst
