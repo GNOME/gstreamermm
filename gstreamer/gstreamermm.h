@@ -60,6 +60,7 @@
 
 #include <gstreamermm/init.h>
 #include <gstreamermm/version.h>
+#include <gstreamermm/register.h>
 
 // Core includes
 #include <gstreamermm/bin.h>
