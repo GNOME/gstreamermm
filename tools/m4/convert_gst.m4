@@ -186,6 +186,11 @@ _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Glib::unwrap($3)')
 dnl Registry
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')
 
+dnl Sample
+_CONVERSION(`GstSample*',`Glib::RefPtr<Gst::Sample>',`Glib::wrap($3)')
+_CONVERSION(`GstSample*',`Glib::RefPtr<const Gst::Sample>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Sample>&',`GstSample*', `Glib::unwrap($3)')
+
 dnl Segment
 _CONVERSION(`GstSegment*',`Glib::RefPtr<Gst::Segment>',`Glib::wrap($3)')
 _CONVERSION(`GstSegment*',`Glib::RefPtr<const Gst::Segment>',`Glib::wrap($3)')
