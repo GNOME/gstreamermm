@@ -1,5 +1,5 @@
 /*
- * buffer.cc
+ * test-buffer.cc
  *
  *  Created on: Jul 31, 2013
  *      Author: m.kolny
