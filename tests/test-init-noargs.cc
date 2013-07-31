@@ -30,16 +30,5 @@ int main(int, char**)
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 
-  Glib::RefPtr< Gst::ElementInterfaced<Gst::XOverlay> > xoverlay =
-    Gst::Interface::cast <Gst::XOverlay>(element);
-
-  if(xoverlay)
-  {
-    std::cout << "element '" << element->get_name() <<
-      "' implements XOverlay interface." << std::endl;
-
-    xoverlay->handle_events(false);
-  }
-
   return 0;
 }
