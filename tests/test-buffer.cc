@@ -27,14 +27,8 @@ TEST(BufferTest, CheckBufferFlags)
 {
     guint buff_flags = 1;
     Glib::RefPtr<Buffer> buf = Buffer::create();
+
     buf->set_flags(buff_flags);
-    Glib::RefPtr<MapInfo> map_info(new MapInfo());
 
-    buf->map(map_info, MAP_READ);
-
-    buf->get_flags();
-
-    EXPECT_EQ(buff_flags, map_info->get_flags());
-
-    buf->unmap(map_info);
+    EXPECT_EQ(buff_flags, buf->get_flags());
 }
