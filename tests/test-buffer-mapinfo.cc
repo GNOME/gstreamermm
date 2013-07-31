@@ -17,12 +17,12 @@ int main(int argc, char* argv[])
     int buffer_size = 15;
     cout << "Creating buffer..." << endl;
     Glib::RefPtr<Gst::Buffer> buffer = Gst::Buffer::create(buffer_size);
-    Gst::MapInfo mapinfo ;
+    Glib::RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
     Gst::MapFlags flags;
 
-    buffer->map(&mapinfo, flags);
+    buffer->map(mapinfo, flags);
 
-    assert(mapinfo.get_size() == buffer_size);
+    assert(mapinfo->get_size() == buffer_size);
 
     cout << "Correct!" << endl;
 }
