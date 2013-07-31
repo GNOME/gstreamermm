@@ -18,11 +18,12 @@ int main(int argc, char* argv[])
     cout << "Creating buffer..." << endl;
     Glib::RefPtr<Gst::Buffer> buffer = Gst::Buffer::create(buffer_size);
     Glib::RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
-    Gst::MapFlags flags;
 
-    buffer->map(mapinfo, flags);
+    buffer->map(mapinfo, Gst::MAP_READ);
 
     assert(mapinfo->get_size() == buffer_size);
+
+    buffer->unmap(mapinfo);
 
     cout << "Correct!" << endl;
 }

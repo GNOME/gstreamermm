@@ -31,6 +31,7 @@
 #include <gstreamermm/appsrc.h>
 #include <gstreamermm/appsink.h>
 #include <cstring>
+#include <cstdio>
 
 //this is a bit hacky, but for now necessary for Gst::Element_Class::class_init_function which is used by register_mm_type
 #include <gstreamermm/private/element_p.h>
@@ -59,10 +60,12 @@ public:
 
   Gst::FlowReturn chain(const Glib::RefPtr<Gst::Pad> &pad, Glib::RefPtr<Gst::Buffer> &buf)
   {
-    assert(buf->gobj()->mini_object.refcount==1);
     buf = buf->create_writable();
-    //run some C++ function
-    std::sort(buf->get_data(), buf->get_data() + buf->get_size());
+    assert(buf->gobj()->mini_object.refcount==1);
+    Glib::RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
+    buf->map(mapinfo, Gst::MAP_WRITE);
+    std::sort(mapinfo->get_data(), mapinfo->get_data() + mapinfo->get_size());
+    buf->unmap(mapinfo);
     assert(buf->gobj()->mini_object.refcount==1);
     return srcpad->push(buf);
   }
@@ -119,17 +122,22 @@ int main(int argc, char** argv)
   data.push_back(2);
   data.push_back(4);
   Glib::RefPtr<Gst::Buffer> buf = Gst::Buffer::create(data.size());
-  std::copy(data.begin(), data.end(), buf->get_data());
-  source->push_buffer(buf);
+  Glib::RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
+  buf->map(mapinfo, Gst::MAP_WRITE);
 
+  std::copy(data.begin(), data.end(), mapinfo->get_data());
+  source->push_buffer(buf);
+  buf->unmap(mapinfo);
   std::cout << "pulling buffer" << std::endl;
   Glib::RefPtr<Gst::Buffer> buf_out;
-  buf_out = sink->pull_buffer();
-  assert(buf_out);
-  assert(buf_out->get_data());
-  std::sort(data.begin(), data.end());
-  assert(std::equal(data.begin(), data.end(), buf_out->get_data()));
+  assert(sink != NULL);
+  Glib::RefPtr<Gst::Sample> samp = sink->pull_preroll();
 
+  buf_out = samp->get_buffer();
+  assert(mapinfo->get_data());
+  std::sort(data.begin(), data.end());
+  assert(std::equal(data.begin(), data.end(), mapinfo->get_data()));
+  buf_out->unmap(mapinfo);
   std::cout << "finishing stream" << std::endl;
   source->end_of_stream();
 

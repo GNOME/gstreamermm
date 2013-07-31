@@ -55,7 +55,9 @@ int main(int argc, char** argv)
 
   std::string data = "hello world";
   Glib::RefPtr<Gst::Buffer> buf = Gst::Buffer::create(data.length() + 1);
-  strcpy((char *)buf->get_data(), data.c_str());
+  Glib::RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
+  buf->map(mapinfo, Gst::MapFlags());
+  strcpy((char *)mapinfo->get_data(), data.c_str());
   appsrc->push_buffer(buf);
 
   {

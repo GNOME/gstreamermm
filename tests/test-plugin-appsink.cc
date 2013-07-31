@@ -60,9 +60,13 @@ int main(int argc, char** argv)
 
   std::string data = "hello world";
   Glib::RefPtr<Gst::Buffer> buf = Gst::Buffer::create(data.length() + 1);
-  strcpy((char *)buf->get_data(), data.c_str());
-  appsrc->push_buffer(buf);
+  Glib::RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
 
+  buf = buf->create_writable();
+  buf->map(mapinfo, Gst::MAP_WRITE);
+  strcpy((char *)mapinfo->get_data(), data.c_str());
+  appsrc->push_buffer(buf);
+  buf->unmap(mapinfo);
   {
     std::cout << "waiting for state change" << std::endl;
     Gst::State state;
@@ -71,21 +75,27 @@ int main(int argc, char** argv)
   }
 
   Glib::RefPtr<Gst::Buffer> buf_out;
-  buf_out = appsink->pull_buffer();
+  Glib::RefPtr<Gst::Sample> sample = appsink->pull_sample();
+  assert(sample);
+  buf_out = sample->get_buffer();
   assert(buf_out);
-  assert(buf_out->get_data());
-  assert(std::string((char *)buf_out->get_data()) == data);
+  buf_out->map(mapinfo, Gst::MAP_READ);
+  assert(mapinfo->get_data());
+  assert(std::string((char *)mapinfo->get_data()) == data);
 
+  buf_out->unmap(mapinfo);
   appsrc->end_of_stream();
 
   std::cout << "waiting for eos or error" << std::endl;
   Glib::RefPtr<Gst::Message> msg = pipeline->get_bus()->poll((Gst::MessageType)(Gst::MESSAGE_EOS | Gst::MESSAGE_ERROR) , 1*Gst::SECOND);
+
   assert(msg);
   assert(msg->get_message_type() == Gst::MESSAGE_EOS);
   std::cout << "shutting down" << std::endl;
 
   pipeline->set_state(Gst::STATE_NULL);
 
+  pipeline->set_state(Gst::STATE_NULL);
 
   return 0;
 }
