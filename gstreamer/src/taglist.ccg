@@ -141,6 +141,16 @@ void TagList::add(const Glib::ustring& tag, const char* data, TagMergeMode mode)
                    static_cast<void*>(0));
 }
 
+void TagList::add(Tag tag, const Glib::Date& date, TagMergeMode mode)
+{
+  add(_tag_strings[tag], date, mode);
+}
+
+void TagList::add(const Glib::ustring& tag, const Glib::Date& date, TagMergeMode mode)
+{
+  gst_tag_list_add(gobj(), static_cast<GstTagMergeMode>(mode), tag.c_str(), date.gobj(), 0);
+}
+
 void TagList::foreach(const SlotForeach& slot)
 {
   gst_tag_list_foreach(gobj(), &TagList_foreach_gstreamermm_callback,
