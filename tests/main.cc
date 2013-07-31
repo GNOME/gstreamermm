@@ -1,17 +1,10 @@
 #include <gtest/gtest.h>
-
-TEST(FajnyTest, FailTest)
-{
-  EXPECT_EQ(1, 2);
-}
-
-TEST(FajnyTest, OKTest)
-{
-  EXPECT_EQ(1, 1);
-}
+#include <gstreamermm.h>
 
 int main(int argc, char** argv)
 {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    Gst::init(argc, argv);
+
+    return RUN_ALL_TESTS();
 }
