@@ -21,6 +21,7 @@
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/memory.h>
+#include <gstreamermm/mapinfo.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -48,8 +49,6 @@ class Buffer : public MiniObject
   _IGNORE(gst_buffer_ref, gst_buffer_unref)
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<Gst::Buffer> create(guint size), gst_buffer_try_new_and_alloc)
-
   /** Create a copy of the given buffer. This will also make a newly allocated
    * copy of the data the source buffer contains.
    * @return The Gst::Buffer copy.
@@ -58,6 +57,8 @@ public:
 
   _WRAP_METHOD(void copy_into(const Glib::RefPtr<Gst::Buffer>& source_buffer, BufferCopyFlags flags, gsize offset, gsize size), gst_buffer_copy_into)
   _WRAP_METHOD(bool is_metadata_writable() const, gst_buffer_is_metadata_writable)
+
+  static Glib::RefPtr<Gst::Buffer> create(guint size);
 
   /** Makes a writable buffer from the given buffer. If the source buffer is
    * already writable, this will simply return the same buffer. A copy will
@@ -87,6 +88,10 @@ public:
    */
   _MEMBER_GET(duration, duration, ClockTime, GstClockTime)
 
+#m4 _CONVERSION(`Gst::MapInfo*', `GstMapInfo*', `$3->gobj()')
+  _WRAP_METHOD(bool map(Gst::MapInfo* info, MapFlags flags), gst_buffer_map);
+
+  _WRAP_METHOD(void unmap(Gst::MapInfo* info), gst_buffer_unmap);
   /** Get the offset of this buffer.
    * @return The offset in the source file of the beginning of this buffer.
    */

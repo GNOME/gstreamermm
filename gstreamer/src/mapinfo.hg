@@ -1,0 +1,69 @@
+/*
+ * mapinfo.hg
+ *
+ *  Created on: Jul 31, 2013
+ *      Author: m.kolny
+ */
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gst.h>
+#include <gstreamermm/memory.h>
+#include <gstreamermm/object.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+_WRAP_ENUM(MapFlags, GstMapFlags)
+
+/* A structure containing the result of a map operation such as
+ * Memory::Map(). It contains the data and size.
+ */
+class MapInfo
+{
+    _CLASS_GENERIC(MapInfo, GstMapInfo)
+public:
+    MapInfo();
+
+    explicit MapInfo(GstMapInfo& castitem,
+      bool take_ownership = false);
+
+    MapInfo(const MapInfo& other);
+
+    virtual ~MapInfo();
+
+
+  _MEMBER_GET(flags, flags, MapFlags, GstMapFlags)
+  _MEMBER_GET(data, data, guint8*, guint8*)
+  _MEMBER_GET(maxsize, maxsize, gsize, gsize)
+  _MEMBER_GET(size, size, gsize, gsize)
+
+  GstMapInfo* gobj() { return m_spec; };
+  const GstMapInfo* gobj() const { return m_spec; };
+
+protected:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GstMapInfo* m_spec;
+  bool take_ownership;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+};
+
+}//namespace Gst

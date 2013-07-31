@@ -1,0 +1,57 @@
+/*
+ * mapinfo.ccg
+ *
+ *  Created on: Jul 31, 2013
+ *      Author: m.kolny
+ */
+#include <gstreamermm/handle_error.h>
+_PINCLUDE(gstreamermm/private/object_p.h)
+
+namespace Gst
+{
+MapInfo::MapInfo()
+: m_spec(g_try_new(GstMapInfo, 1)),
+  take_ownership(true)
+{
+  if(!m_spec)
+  {
+    gstreamermm_handle_error(
+      "Failed to allocate a new Gst::MapInfo.");
+    return;
+  }
+}
+
+MapInfo::MapInfo(GstMapInfo& castitem, bool take_ownership)
+: m_spec(&castitem),
+  take_ownership(take_ownership)
+{
+}
+
+MapInfo::MapInfo(const MapInfo& other)
+: m_spec(g_try_new(GstMapInfo, 1)),
+  take_ownership(true)
+{
+  // Handle possible memory allocation failure.
+  if(!m_spec)
+  {
+    gstreamermm_handle_error("Failed to allocate a new Gst::MapInfo.");
+    return;
+  }
+
+  m_spec->memory = other.m_spec->memory;
+  m_spec->data = other.m_spec->data;
+  m_spec->flags = other.m_spec->flags;
+  m_spec->maxsize = other.m_spec->maxsize;
+  m_spec->size = other.m_spec->size;
+
+}
+
+
+MapInfo::~MapInfo()
+{
+  if(take_ownership)
+    g_free(m_spec);
+}
+}
+
+
