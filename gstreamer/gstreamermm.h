@@ -157,6 +157,7 @@
 #include <gstreamermm/oggdemux.h>
 #include <gstreamermm/oggmux.h>
 #include <gstreamermm/subtitleoverlay.h>
+#include <gstreamermm/videooverlay.h>
 
 
 #endif // _GSTREAMERMM_H

@@ -31,18 +31,7 @@ int main(int argc, char** argv)
     std::cout << "Successfully created gst element '" <<
       element->get_name() << "'." << std::endl;
 
-  Glib::RefPtr< Gst::ElementInterfaced<Gst::XOverlay> > xoverlay =
-    Gst::Interface::cast <Gst::XOverlay>(element);
-
-  if(xoverlay)
-  {
-    std::cout << "element '" << element->get_name() <<
-      "' implements XOverlay interface." << std::endl;
-
-    xoverlay->handle_events(false);
-  }
-
-  GstClock* gst_clock = gst_audio_clock_new("clock", 0, 0);
+  GstClock* gst_clock = gst_audio_clock_new("clock", 0, 0, 0);
   Glib::RefPtr<Gst::AudioClock> clock = Glib::wrap(GST_AUDIO_CLOCK(gst_clock));
 
   if(clock)
