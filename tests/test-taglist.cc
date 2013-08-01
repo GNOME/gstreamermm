@@ -74,3 +74,13 @@ TEST_F(TagListTest, GetTagDateFromList)
     EXPECT_EQ(song_date.get_year(), out_date.get_year());
     EXPECT_EQ(song_date.get_month(), out_date.get_month());
 }
+
+TEST_F(TagListTest, GetNonExistingTag)
+{
+	Glib::ustring album;
+
+    bool album_exists = tag_list.get(TAG_ALBUM, album);
+
+    ASSERT_FALSE(album_exists);
+
+}
