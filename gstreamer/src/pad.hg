@@ -22,6 +22,7 @@
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/query.h>
+#include <gstreamermm/bufferlist.h>
 #include <glibmm/arrayhandle.h>
 
 _DEFS(gstreamermm,gst)
@@ -35,6 +36,7 @@ class Element;
 class Event;
 class PadTemplate;
 class Query;
+class PadProbeInfo;
 
 //Gst::Iterator<> forward declaration.
 template <class CppType>
@@ -116,7 +118,7 @@ public:
    * bool on_have_data(const Glib::RefPtr<Gst::Pad>& pad, const
    * Glib::RefPtr<Gst::MiniObjec>& data);.
    */
-  typedef sigc::slot< PadProbeReturn, const Glib::RefPtr<Gst::Pad>&, GstPadProbeInfo* > SlotProbe;
+  typedef sigc::slot< PadProbeReturn, const Glib::RefPtr<Gst::Pad>&, const Gst::PadProbeInfo& > SlotProbe;
 
   typedef sigc::slot< Gst::FlowReturn, const Glib::RefPtr<Gst::Pad>&, Glib::RefPtr<Gst::Buffer>& > SlotChain;
 
@@ -420,4 +422,39 @@ private:
   SlotChain slot_chain;
 };
 
+class PadProbeInfo
+{
+  _CLASS_GENERIC(PadProbeInfo, GstPadProbeInfo)
+
+public:
+  PadProbeInfo();
+  explicit PadProbeInfo(GstPadProbeInfo& castitem,
+      bool take_ownership = false);
+  explicit PadProbeInfo(GstPadProbeInfo* castitem,
+        bool take_copy = false);
+  PadProbeInfo(const PadProbeInfo& other);
+  virtual ~PadProbeInfo();
+
+  GstPadProbeInfo* gobj() { return gobj_; };
+
+  const GstPadProbeInfo* gobj() const { return gobj_; };
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Event> get_event(), gst_pad_probe_info_get_event)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Query> get_query(), gst_pad_probe_info_get_query)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> get_buffer(), gst_pad_probe_info_get_buffer)
+  _WRAP_METHOD(Glib::RefPtr<Gst::BufferList> get_buffer_list(), gst_pad_probe_info_get_buffer_list)
+protected:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GstPadProbeInfo* gobj_;
+  bool take_ownership;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+};
+
 } // namespace Gst
+
+namespace Glib
+{
+Gst::PadProbeInfo wrap(GstPadProbeInfo* probe_info, bool take_copy);
+
+} // namespace Glib
+

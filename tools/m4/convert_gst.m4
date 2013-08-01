@@ -66,7 +66,7 @@ _CONVERSION(`Glib::RefPtr<Gst::Buffer>',`GstBuffer*', `Glib::unwrap($3)')
 
 dnl BufferList
 _CONVERSION(`Glib::RefPtr<Gst::BufferList>',`GstBufferList*', `Glib::unwrap($3)')
-_CONVERSION(`GstBufferList*', `Glib::RefPtr<BufferList>', `Glib::wrap($3)')
+_CONVERSION(`GstBufferList*', `Glib::RefPtr<Gst::BufferList>', `Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::BufferList>&', `GstBufferList*', `Glib::unwrap($3)')
 
 dnl Bus
@@ -120,6 +120,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::ElementFactory>&',`GstElementFactory*', `Gl
 dnl Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Glib::unwrap($3)')
 _CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3)')
+_CONVERSION(`GstEvent*',`Glib::RefPtr<Gst::Event>', `Glib::wrap($3)')
 
 dnl Index
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Gst::Index>',`Glib::wrap($3)')
@@ -184,6 +185,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::PluginFeature>&',`GstPluginFeature*',`Glib:
 
 dnl Query
 _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Glib::unwrap($3)')
+_CONVERSION(`GstQuery*', `Glib::RefPtr<Gst::Query>',`Glib::wrap($3)')
 
 dnl Registry
 _CONVERSION(`GstRegistry*',`Glib::RefPtr<Gst::Registry>', `Glib::wrap($3)')

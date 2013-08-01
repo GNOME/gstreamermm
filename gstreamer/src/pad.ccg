@@ -39,7 +39,7 @@ static GstPadProbeReturn Pad_Probe_gstreamermm_callback(GstPad* pad, GstPadProbe
 
   try
   {
-      return static_cast<GstPadProbeReturn>((*the_slot)(Glib::wrap(pad, true), probe_info));
+      return static_cast<GstPadProbeReturn>((*the_slot)(Glib::wrap(pad, true), Glib::wrap(probe_info, true)));
   }
   catch(...)
   {
@@ -199,4 +199,73 @@ void Pad::set_chain_function(const SlotChain& slot)
   gst_pad_set_chain_function(GST_PAD(gobj()), &Pad_Chain_gstreamermm_callback);
 }
 
+PadProbeInfo::PadProbeInfo()
+: gobj_(g_try_new(GstPadProbeInfo, 1)),
+  take_ownership(true)
+{
+  // Handle possible memory allocation failure.
+  if(!gobj_)
+  {
+    gstreamermm_handle_error(
+      "Failed to allocate a new Gst::PadProbeInfo.");
+  }
+}
+
+PadProbeInfo::PadProbeInfo(GstPadProbeInfo& castitem, bool take_ownership)
+: gobj_(&castitem),
+  take_ownership(take_ownership)
+{
+}
+
+PadProbeInfo::PadProbeInfo(GstPadProbeInfo* castitem, bool take_copy)
+: take_ownership(take_copy)
+{
+  if(take_copy)
+  {
+    gobj_ = (g_try_new(GstPadProbeInfo, 1));
+
+    if(!gobj_)
+    {
+        gstreamermm_handle_error(
+              "Failed to allocate a new Gst::PadProbeInfo.");
+        return;
+    }
+
+    if(castitem)
+      *gobj_ = *castitem;
+  }
+  else
+  {
+    gobj_ = castitem;
+  }
+}
+
+PadProbeInfo::PadProbeInfo(const PadProbeInfo& other)
+: gobj_(g_try_new(GstPadProbeInfo, 1)),
+  take_ownership(true)
+{
+  if(!gobj_)
+  {
+    gstreamermm_handle_error("Failed to allocate a new Gst::PadProbeInfo.");
+    return;
+  }
+
+  // I can do it, because there is no dynamic allocated memory in pad
+  *gobj_ = *other.gobj_;
+}
+
+PadProbeInfo::~PadProbeInfo()
+{
+  if(take_ownership)
+    g_free(gobj_);
+}
+
 } //namespace Gst
+
+namespace Glib
+{
+Gst::PadProbeInfo wrap(GstPadProbeInfo* probe_info, bool take_copy)
+{
+  return Gst::PadProbeInfo(probe_info, take_copy);
+}
+}

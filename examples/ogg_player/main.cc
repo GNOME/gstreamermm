@@ -111,7 +111,7 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   }
 }
 
-Gst::PadProbeReturn on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad, GstPadProbeInfo* info)
+Gst::PadProbeReturn on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad, const Gst::PadProbeInfo& info)
 {
   std::cout << "Sink pad '" << pad->get_name() << "' has received data;";
   std::cout << " will now remove sink data probe id: " << data_probe_id << std::endl;
