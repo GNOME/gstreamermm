@@ -38,7 +38,7 @@ TEST_F(PadTest, PadCorrectCreatedUsingPadDirection)
 
 TEST_F(PadTest, PadCorrectCreatedUsingTemplate)
 {
-    Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw,format=(yuv)");
+    Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw");
     caps->set_simple("width", 500);
     caps->set_simple("framerate", Gst::Fraction(25, 1));
 
