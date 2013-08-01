@@ -34,7 +34,12 @@ void CheckEq(const FractionRange& expected, const FractionRange& output)
 class StructureTest : public ::testing::Test
 {
 protected:
-    Structure structure = Structure("test-struct");
+    Structure structure;
+
+    virtual void SetUp()
+    {
+        structure = Structure("test-struct");
+    }
 
     template<typename T>
     void CheckGetSetField(const T& expected, const Glib::ustring& field_name)
