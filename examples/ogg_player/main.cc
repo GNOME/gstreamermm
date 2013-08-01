@@ -111,12 +111,12 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   }
 }
 
-GstPadProbeReturn on_sink_pad_have_data(GstPad *pad, GstPadProbeInfo* info, gpointer user_date)
+Gst::PadProbeReturn on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad, GstPadProbeInfo* info)
 {
-  std::cout << "Sink pad has received data;";
+  std::cout << "Sink pad '" << pad->get_name() << "' has received data;";
   std::cout << " will now remove sink data probe id: " << data_probe_id << std::endl;
-  gst_pad_remove_probe(pad, data_probe_id);
-  return GST_PAD_PROBE_OK;
+  pad->remove_probe(data_probe_id);
+  return Gst::PAD_PROBE_OK;
 }
 
 } // anonymous namespace
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 
   Glib::RefPtr<Gst::Pad> pad = sink->get_static_pad("sink");
   if(pad)
-    data_probe_id = pad->add_probe(Gst::PAD_PROBE_TYPE_DATA_DOWNSTREAM, on_sink_pad_have_data, 0, 0);
+    data_probe_id = pad->add_probe(Gst::PAD_PROBE_TYPE_DATA_DOWNSTREAM, sigc::ptr_fun(&on_sink_pad_have_data));
 
   std::cout << "sink data probe id = " << data_probe_id << std::endl;
 

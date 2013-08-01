@@ -47,6 +47,7 @@ _WRAP_ENUM(PadFlags, GstPadFlags)
 _WRAP_ENUM(PadLinkReturn, GstPadLinkReturn)
 _WRAP_ENUM(PadLinkCheck, GstPadLinkCheck)
 _WRAP_ENUM(PadProbeType, GstPadProbeType)
+_WRAP_ENUM(PadProbeReturn, GstPadProbeReturn)
 
 /** A class that represents objects contained by elements that allows links to
  * other elements.
@@ -112,17 +113,10 @@ protected:
 
 public:
   /** For example,
-   * void on_block(const Glib::RefPtr<Gst::Pad>& pad, bool blocked);.
-   */
-  typedef sigc::slot<void, const Glib::RefPtr<Gst::Pad>&, bool> SlotBlock;
-
-  /** For example,
    * bool on_have_data(const Glib::RefPtr<Gst::Pad>& pad, const
    * Glib::RefPtr<Gst::MiniObjec>& data);.
-   * The data method should return true to keep the data in the pipeline, false
-   * to drop it (throw it away).
    */
-  typedef sigc::slot< bool, const Glib::RefPtr<Gst::Pad>&, const Glib::RefPtr<Gst::MiniObject>& > SlotData;
+  typedef sigc::slot< PadProbeReturn, const Glib::RefPtr<Gst::Pad>&, GstPadProbeInfo* > SlotProbe;
 
   typedef sigc::slot< Gst::FlowReturn, const Glib::RefPtr<Gst::Pad>&, Glib::RefPtr<Gst::Buffer>& > SlotChain;
 
@@ -187,7 +181,7 @@ public:
   Glib::RefPtr<const Gst::Caps> get_pad_template_caps() const;
   _IGNORE(gst_pad_get_pad_template_caps)
 
-  _WRAP_METHOD(gulong add_probe(PadProbeType mask, GstPadProbeCallback callback, gpointer userdata, GDestroyNotify notify), gst_pad_add_probe)
+  gulong add_probe(PadProbeType mask, const SlotProbe& slot);
   _WRAP_METHOD(void remove_probe(gulong id), gst_pad_remove_probe)
 
 

@@ -33,46 +33,25 @@ namespace
 
 extern "C"
 {
-
-static void Pad_Block_gstreamermm_callback(GstPad* pad, gboolean blocked, void* data)
+static GstPadProbeReturn Pad_Probe_gstreamermm_callback(GstPad* pad, GstPadProbeInfo* probe_info, void* data)
 {
-  Gst::Pad::SlotBlock * the_slot = static_cast<Gst::Pad::SlotBlock*>(data);
+  Gst::Pad::SlotProbe* the_slot = static_cast<Gst::Pad::SlotProbe*>(data);
 
   try
   {
-    (*the_slot)(Glib::wrap(pad), blocked);
-    delete the_slot;
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-}
-
-static void Pad_Block_gstreamermm_callback_destroy(void* data)
-{
-  delete static_cast<Gst::Pad::SlotBlock*>(data);
-}
-
-static gboolean Pad_Data_gstreamermm_callback(GstPad* pad, GstMiniObject* mini_obj, void* data)
-{
-  Gst::Pad::SlotData* the_slot = static_cast<Gst::Pad::SlotData*>(data);
-
-  try
-  {
-    return (*the_slot)(Glib::wrap(pad, true), Glib::wrap(mini_obj, true));
+      return static_cast<GstPadProbeReturn>((*the_slot)(Glib::wrap(pad, true), probe_info));
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
 
-  return false;
+  return GST_PAD_PROBE_DROP;
 }
 
-static void Pad_Data_gstreamermm_callback_disconnect(void* data)
+static void Pad_Probe_gstreamermm_callback_disconnect(void* data)
 {
-  Gst::Pad::SlotData* the_slot = static_cast<Gst::Pad::SlotData*>(data);
+  Gst::Pad::SlotProbe* the_slot = static_cast<Gst::Pad::SlotProbe*>(data);
 
   if(the_slot)
     delete the_slot;
@@ -113,6 +92,12 @@ Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ)
     gstreamermm_handle_error(
       "Gst::Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>&): Failed to "
       "construct pad from null template.");
+}
+
+gulong Pad::add_probe(PadProbeType mask, const SlotProbe& slot)
+{
+    SlotProbe* slot_copy = new SlotProbe(slot);
+    return gst_pad_add_probe(gobj(), static_cast<GstPadProbeType>(mask), &Pad_Probe_gstreamermm_callback, slot_copy, &Pad_Probe_gstreamermm_callback_disconnect);
 }
 
 // This is handcoded because the documentation tells us that we need to copy
@@ -176,7 +161,6 @@ bool Pad::query_duration(Format& format) const
 
 FlowReturn Pad::chain(Glib::RefPtr<Gst::Buffer>& buffer)
 {
-  GstBuffer *buffer_gobj = buffer->gobj();
   buffer->reference();  //hold reference for gst_pad_chain()
   buffer.reset();       //free caller's reference
   return FlowReturn(gst_pad_chain(gobj(), buffer->gobj()));
