@@ -4,7 +4,7 @@ CXXFLAGS=-c -std=c++0x
 CXXFLAGS+=$(shell pkg-config --cflags $(MODULES))
 LDFLAGS = -lgtest -lpthread 
 LDFLAGS+=$(shell pkg-config --libs $(MODULES))
-SRC = $(wildcard *.cc)
+SRC = $(wildcard *.cc plugins/*.cc)
 OBJ = $(SRC:.cc=.o)
 EXEC = test-all
 
