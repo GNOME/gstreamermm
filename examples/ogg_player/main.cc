@@ -43,7 +43,7 @@ bool on_timeout()
     // Cast query's RefPtr to RefPtr<Gst::QueryPosition> to parse the
     // pipeline's position query with the Gst::QueryPosition::parse() method
     Glib::RefPtr<Gst::QueryPosition> query_pos =
-      Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+      Glib::RefPtr<Gst::QueryPosition>::cast_static(query);
     if(query_pos)
       pos = query_pos->parse();
 
@@ -74,7 +74,7 @@ bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<
       return false;
     case Gst::MESSAGE_ERROR:
     {
-      Glib::RefPtr<Gst::MessageError> msgError = Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
+      Glib::RefPtr<Gst::MessageError> msgError = Glib::RefPtr<Gst::MessageError>::cast_static(message);
       if(msgError)
       {
         Glib::Error err;
@@ -111,13 +111,12 @@ void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   }
 }
 
-bool on_sink_pad_have_data(const Glib::RefPtr<Gst::Pad>& pad,
-                           const Glib::RefPtr<Gst::MiniObject>&)
+GstPadProbeReturn on_sink_pad_have_data(GstPad *pad, GstPadProbeInfo* info, gpointer user_date)
 {
-  std::cout << "Sink pad '" << pad->get_name() << "' has received data;";
+  std::cout << "Sink pad has received data;";
   std::cout << " will now remove sink data probe id: " << data_probe_id << std::endl;
-  pad->remove_data_probe(data_probe_id);
-  return true;
+  gst_pad_remove_probe(pad, data_probe_id);
+  return GST_PAD_PROBE_OK;
 }
 
 } // anonymous namespace
@@ -177,8 +176,9 @@ int main(int argc, char** argv)
 
   Glib::RefPtr<Gst::Pad> pad = sink->get_static_pad("sink");
   if(pad)
-    data_probe_id = pad->add_data_probe( sigc::ptr_fun(&on_sink_pad_have_data) );
-  //std::cout << "sink data probe id = " << data_probe_id << std::endl;
+    data_probe_id = pad->add_probe(Gst::PAD_PROBE_TYPE_DATA_DOWNSTREAM, on_sink_pad_have_data, 0, 0);
+
+  std::cout << "sink data probe id = " << data_probe_id << std::endl;
 
   source->set_property("location", filename);
 
