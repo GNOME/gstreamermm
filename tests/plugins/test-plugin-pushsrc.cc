@@ -39,7 +39,7 @@ public:
     Gst::FlowReturn create_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
     {
         if (count_left-- <= 0)
-            return Gst::FLOW_ERROR;
+            return Gst::FLOW_EOS;
 
         std::string s = std::to_string(COUNT - count_left);
         buffer = Gst::Buffer::create(s.size());
