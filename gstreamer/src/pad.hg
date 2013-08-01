@@ -46,6 +46,7 @@ _WRAP_ENUM(PadDirection, GstPadDirection)
 _WRAP_ENUM(PadFlags, GstPadFlags)
 _WRAP_ENUM(PadLinkReturn, GstPadLinkReturn)
 _WRAP_ENUM(PadLinkCheck, GstPadLinkCheck)
+_WRAP_ENUM(PadProbeType, GstPadProbeType)
 
 /** A class that represents objects contained by elements that allows links to
  * other elements.
@@ -185,6 +186,10 @@ public:
    */
   Glib::RefPtr<const Gst::Caps> get_pad_template_caps() const;
   _IGNORE(gst_pad_get_pad_template_caps)
+
+  _WRAP_METHOD(gulong add_probe(PadProbeType mask, GstPadProbeCallback callback, gpointer userdata, GDestroyNotify notify), gst_pad_add_probe)
+  _WRAP_METHOD(void remove_probe(gulong id), gst_pad_remove_probe)
+
 
   _WRAP_METHOD(bool set_caps(const Glib::RefPtr<Gst::Caps>& caps), gst_pad_set_caps)
   _WRAP_METHOD(Glib::RefPtr<Gst::Pad> get_peer(), gst_pad_get_peer)
