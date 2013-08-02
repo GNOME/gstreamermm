@@ -20,6 +20,7 @@
 #include <glibmm.h>
 #include <iostream>
 #include <stdlib.h>
+#include <gstreamermm/playbin.h>
 
 namespace
 {
@@ -38,7 +39,7 @@ bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
     case Gst::MESSAGE_ERROR:
     {
       Glib::RefPtr<Gst::MessageError> msgError =
-        Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
+        Glib::RefPtr<Gst::MessageError>::cast_static(message);
 
       if(msgError)
       {
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
   }
 
   // Create a playbin2 element.
-  Glib::RefPtr<Gst::PlayBin2> playbin = Gst::PlayBin2::create();
+  Glib::RefPtr<Gst::PlayBin> playbin = Gst::PlayBin::create();
 
   if(!playbin)
   {

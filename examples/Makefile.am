@@ -25,6 +25,7 @@ endif
 
 noinst_PROGRAMS =			\
 	element_link/example	\
+	hello_world/example		\
 	ogg_player/example		\
 	ogg_rewriter/example	\
 	optiongroup/example	\
