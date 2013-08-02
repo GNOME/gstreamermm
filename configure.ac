@@ -100,6 +100,7 @@ AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
 adder|adder|Adder \
 alsasink|alsasink|AlsaSink \
 alsasrc|alsasrc|AlsaSrc \
+appsink|appsink|AppSink \
 appsrc|appsrc|AppSrc \
 audioconvert|audioconvert|AudioConvert \
 audiorate|audiorate|AudioRate \
