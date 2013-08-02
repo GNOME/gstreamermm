@@ -413,6 +413,27 @@ public:
   template <class DataType>
   void add(const Glib::ustring& tag, const DataType& data, TagMergeMode mode = TAG_MERGE_PREPEND);
 
+  // Methods below are written as workaround for Glib::Date - it's not working with
+  // with Glib::Value, because GValue with Glib::Date is invalid type for gstreamer functions.
+
+  /** Sets the value for the given tag using the specified mode.
+   *
+   * @param tag The tag name.
+   * @param data A value which the tag should be set to (this can be any
+   * supported C++ type).
+   * @param mode The merge mode to use.
+   */
+  void add(Tag tag, const Glib::Date& date, TagMergeMode mode = TAG_MERGE_PREPEND);
+
+  /** Sets the value for the given tag using the specified mode.
+   *
+   * @param tag The tag name.
+   * @param data A value which the tag should be set to (this can be any
+   * supported C++ type).
+   * @param mode The merge mode to use.
+   */
+  void add(const Glib::ustring& tag, const Glib::Date& date, TagMergeMode mode = TAG_MERGE_PREPEND);
+
   _IGNORE(gst_tag_list_add_valist, gst_tag_list_add_valist_values)
 
 #m4begin

@@ -1,73 +1,90 @@
-/* gstreamermm - a C++ wrapper for gstreamer
+/*
+ * test-structure.cc
  *
- * Copyright 2008 The gstreamermm Development Team
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *  Created on: 1 sie 2013
+ *      Author: loganek
  */
 
+
+#include <gtest/gtest.h>
 #include <gstreamermm.h>
-#include <glibmm/date.h>
-#include <iostream>
 
-int main(int argc, char** argv)
+using namespace Gst;
+
+template<typename T>
+void CheckEq(const T& expected, const T& output)
 {
-  Gst::init(argc, argv);
+    EXPECT_EQ(expected, output);
+}
 
-  Gst::Structure structure("my_structure");
+template<>
+void CheckEq(const Fraction& expected, const Fraction& output)
+{
+    EXPECT_EQ(expected.denom, output.denom);
+    EXPECT_EQ(expected.num, output.num);
+}
 
-  structure.set_field(Glib::Quark("string"), "Hello; This is a ustring");
-  structure.set_field("integer", 100);
-  structure.set_field("fraction", Gst::Fraction(1,2));
-  structure.set_field("range", Gst::FractionRange(Gst::Fraction(1,2),
-    Gst::Fraction(3,4)));
-  Glib::Date date;
-  date.set_time_current();
-  structure.set_field("date", date);
-  structure.set_field("state", Glib::Value<Gst::State>::value_type(),
-    Gst::STATE_PAUSED);
+template<>
+void CheckEq(const FractionRange& expected, const FractionRange& output)
+{
+    CheckEq(expected.min, output.min);
+    CheckEq(expected.max, output.max);
+}
 
-  Glib::ustring value1;
-  structure.get_field("string", value1);
-  std::cout << "string value after getting = '" << value1 << "'." << std::endl;
+class StructureTest : public ::testing::Test
+{
+protected:
+    Structure structure;
 
-  int value2;
-  structure.get_field("integer", value2);
-  std::cout << "integer value after getting = " << value2 << "." <<
-    std::endl;
+    virtual void SetUp()
+    {
+        structure = Structure("test-struct");
+    }
 
-  Gst::Fraction value3;
-  structure.get_field("fraction", value3);
-  std::cout << "fraction value after getting = " << value3.num << "/" <<
-    value3.denom << "." << std::endl;
+    template<typename T>
+    void CheckGetSetField(const T& expected, const Glib::ustring& field_name)
+    {
+        structure.set_field(field_name, expected);
 
-  Gst::FractionRange value4;
-  structure.get_field("range", value4);
-  std::cout << "fractional range value after getting = [(" <<
-    value4.min.num << "/" << value4.min.denom << "), (" <<
-    value4.max.num << "/" << value4.max.denom << ")]." << std::endl;
+        T output;
+        structure.get_field(field_name, output);
 
-  Glib::Date value5;
-  structure.get_field("date", value5);
-  std::cout << "date value after getting = " <<  value5.get_month() << "/" <<
-    (int) value5.get_day() << "/" << value5.get_year() << "." << std::endl;
+        CheckEq(expected, output);
+    }
+};
 
-  int state;
-  structure.get_field("state", Glib::Value<Gst::State>::value_type(), state);
-  if((state == Gst::STATE_PAUSED))
-    std::cout << "state value after getting = Gst::STATE_PAUSED." <<
-      std::endl;
+TEST_F(StructureTest, GetSetStringVariable)
+{
+    CheckGetSetField<std::string>("this is simple test", "string");
+}
 
-  return 0;
+TEST_F(StructureTest, GetSetIntegerVariable)
+{
+    CheckGetSetField(1234, "integer");
+}
+
+TEST_F(StructureTest, GetSetFractionVariable)
+{
+    CheckGetSetField(Fraction(5,6), "fraction");
+}
+
+TEST_F(StructureTest, GetSetFractionRangeVariable)
+{
+    CheckGetSetField(FractionRange(Fraction(5,6), Gst::Fraction(13,14)), "fraction_range");
+}
+
+TEST_F(StructureTest, GetSetDateVariable)
+{
+    CheckGetSetField(Glib::Date(10, Glib::Date::DECEMBER, 1991), "date");
+}
+
+TEST_F(StructureTest, GetSetEnumVariable)
+{
+    State input_state = STATE_PAUSED;
+    structure.set_field("state", Glib::Value<State>::value_type(), input_state);
+
+    int output_state;
+    structure.get_field("state", Glib::Value<State>::value_type(), output_state);
+
+    EXPECT_EQ(input_state, (State)output_state);
 }
