@@ -141,6 +141,7 @@ theoradec|theoradec|TheoraDec \
 theoraenc|theoraenc|TheoraEnc \
 theoraparse|theoraparse|TheoraParse \
 timeoverlay|timeoverlay|TimeOverlay \
+typefindelement|typefind|TypeFindElement \
 uridecodebin|uridecodebin|UriDecodeBin \
 valve|valve|Valve \
 videoconvert|videoconvert|VideoConvert \

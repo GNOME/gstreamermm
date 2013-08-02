@@ -111,7 +111,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const
       //There was an error, so stop playing, 
       //and output some information to stdout:
       Glib::RefPtr<Gst::MessageError> error_message =
-        Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
+        Glib::RefPtr<Gst::MessageError>::cast_static(message);
       if(error_message)
       {
         Glib::Error err;
@@ -241,7 +241,7 @@ void PlayerWindow::on_button_forward()
   if(m_main_pipeline->query(query))
   {
     Glib::RefPtr<Gst::QueryPosition> posQuery =
-      Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+      Glib::RefPtr<Gst::QueryPosition>::cast_static(query);
 
     gint64 pos = posQuery->parse();
 
@@ -253,7 +253,7 @@ void PlayerWindow::on_button_forward()
       Gst::SEEK_TYPE_NONE, -1);
 
     Glib::RefPtr<Gst::EventSeek> seekEvent =
-      Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
+      Glib::RefPtr<Gst::EventSeek>::cast_static(event);
 
     if(m_main_pipeline->send_event(seekEvent))
     {

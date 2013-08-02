@@ -21,7 +21,7 @@
 #include <gstreamermm/element.h>
 
 // Plug-ins:
-#include <gstreamermm/playbin2.h>
+#include <gstreamermm/playbin.h>
 
 #include <iostream>
 #include "player_window.h"
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 
   // playbin2 plays any media type, choosing an appropriate set of elements
   // and linking them together.
-  Glib::RefPtr<Gst::PlayBin2> playbin = Gst::PlayBin2::create("playbin");
+  Glib::RefPtr<Gst::PlayBin> playbin = Gst::PlayBin::create("playbin");
 
   if(!playbin)
   {

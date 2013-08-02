@@ -33,8 +33,7 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/message.h>
 #include <gstreamermm/query.h>
-#include <gstreamermm/interface.h>
-#include <gstreamermm/xoverlay.h>
+#include <gstreamermm/videooverlay.h>
 #include <glibmm/main.h>
 #include <glibmm/miscutils.h>
 #include <glibmm/convert.h>
@@ -43,7 +42,7 @@
 #include <iomanip>
 #include "player_window.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin2>& playbin)
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button(Gtk::Stock::MEDIA_PLAY),
@@ -152,12 +151,11 @@ void PlayerWindow::on_bus_message_sync(
   Glib::RefPtr<Gst::Element> element =
       Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source());
 
-  Glib::RefPtr< Gst::ElementInterfaced<Gst::XOverlay> > xoverlay =
-      Gst::Interface::cast <Gst::XOverlay>(element);
+  Glib::RefPtr< Gst::VideoOverlay > videooverlay = Glib::RefPtr<Gst::VideoOverlay>::cast_dynamic(element);
 
-  if(xoverlay)
+  if(videooverlay)
   {
-    xoverlay->set_xwindow_id(m_x_window_id);
+      videooverlay->set_window_handle(m_x_window_id);
   }
 }
 
@@ -174,7 +172,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
     }
     case Gst::MESSAGE_ERROR:
     {
-      Glib::RefPtr<Gst::MessageError> msgError = Glib::RefPtr<Gst::MessageError>::cast_dynamic(message);
+      Glib::RefPtr<Gst::MessageError> msgError = Glib::RefPtr<Gst::MessageError>::cast_static(message);
       if(msgError)
       {
         Glib::Error err;
@@ -204,42 +202,39 @@ void PlayerWindow::on_video_changed()
     // Add a buffer probe to the video sink pad which will be removed after
     // the first buffer is received in the on_video_pad_got_buffer method.
     // When the first buffer arrives, the video size can be extracted.
-    m_pad_probe_id = pad->add_buffer_probe(
+    m_pad_probe_id = pad->add_probe(Gst::PAD_PROBE_TYPE_BUFFER,
       sigc::mem_fun(*this, &PlayerWindow::on_video_pad_got_buffer));
   }
 }
 
-bool PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
-    const Glib::RefPtr<Gst::MiniObject>& data)
+Gst::PadProbeReturn PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
+        const Gst::PadProbeInfo& data)
 {
-  Glib::RefPtr<Gst::Buffer> buffer = Glib::RefPtr<Gst::Buffer>::cast_dynamic(data);
+  int width_value;
+  int height_value;
 
-  if(buffer)
+  Glib::RefPtr<Gst::Caps> caps = pad->query_caps(Glib::RefPtr<Gst::Caps>());
+
+  caps = caps->create_writable();
+
+  const Gst::Structure structure = caps->get_structure(0);
+  if(structure)
   {
-    int width_value;
-    int height_value;
-
-    Glib::RefPtr<Gst::Caps> caps = buffer->get_caps();
-
-    const Gst::Structure structure = caps->get_structure(0);
-    if(structure)
-    {
-      structure.get_field("width", width_value);
-      structure.get_field("height", height_value);
-    }
-
-    m_video_area.set_size_request(width_value, height_value);
-
-    // Resize to minimum when first playing by making size 
-    // smallest then resizing according to video new size:
-    resize(1, 1);
-    check_resize();
+    structure.get_field("width", width_value);
+    structure.get_field("height", height_value);
   }
 
-  pad->remove_buffer_probe(m_pad_probe_id);
+  m_video_area.set_size_request(width_value, height_value);
+
+  // Resize to minimum when first playing by making size
+  // smallest then resizing according to video new size:
+  resize(1, 1);
+  check_resize();
+
+  pad->remove_probe(m_pad_probe_id);
   m_pad_probe_id = 0; // Clear probe id to indicate that it has been removed
 
-  return true; // Keep buffer in pipeline (do not throw away)
+  return Gst::PAD_PROBE_OK;
 }
 
 void PlayerWindow::on_button_play()
@@ -352,7 +347,7 @@ void PlayerWindow::on_button_forward()
   if(m_playbin->query(query))
   {
     Glib::RefPtr<Gst::QueryPosition> posQuery =
-      Glib::RefPtr<Gst::QueryPosition>::cast_dynamic(query);
+      Glib::RefPtr<Gst::QueryPosition>::cast_static(query);
 
     gint64 pos = posQuery->parse();
 
@@ -364,7 +359,7 @@ void PlayerWindow::on_button_forward()
         Gst::SEEK_TYPE_NONE, -1);
 
     Glib::RefPtr<Gst::EventSeek> seekEvent =
-      Glib::RefPtr<Gst::EventSeek>::cast_dynamic(event);
+      Glib::RefPtr<Gst::EventSeek>::cast_static(event);
 
     if(Glib::RefPtr<Gst::Element>::cast_static(m_playbin)->send_event(event))
     {

@@ -47,6 +47,11 @@ Glib::RefPtr<Gst::Caps> Caps::create_simple(const Glib::ustring& media_type)
   return result;
 }
 
+Glib::RefPtr<Gst::Caps> Caps::create_writable()
+{
+    return Glib::RefPtr<Gst::Caps>(Glib::wrap(gst_caps_make_writable(gobj())));
+}
+
 Glib::RefPtr<Gst::Caps> Caps::create(const Structure& structure)
 {
   //We take a copy because gst_caps_append_structure() wants to take ownership:

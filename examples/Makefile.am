@@ -28,6 +28,7 @@ noinst_PROGRAMS =			\
 	hello_world/example		\
 	ogg_player/example		\
 	ogg_rewriter/example	\
+	typefind/example	\
 	optiongroup/example	\
 	$(optional_examples)
 
