@@ -1,0 +1,38 @@
+/*
+ * check.hg
+ *
+ *  Created on: Aug 2, 2013
+ *      Author: m.kolny
+ */
+
+#include <gst/gst.h>
+#include <gst/check/gstcheck.h>
+#include <gstreamermm/element.h>
+#include <gstreamermm/buffer.h>
+#include <gstreamermm/caps.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class Check
+{
+_CLASS_GENERIC(Check, GObject)
+public:
+    void init(int* argc, char** argv);
+    Check();
+    Check(const Check &);
+    Check & operator = (const Check&);
+
+    _WRAP_METHOD(static Glib::RefPtr<Gst::Element> setup_element(const Glib::ustring& factory), gst_check_setup_element)
+    _WRAP_METHOD(static void teardown_pad_by_name(Glib::RefPtr<Gst::Element> element, const Glib::ustring& name), gst_check_teardown_pad_by_name)
+    _WRAP_METHOD(static void teardown_element(Glib::RefPtr<Gst::Element> element), gst_check_teardown_element)
+    _WRAP_METHOD(static void teardown_sink_pad(Glib::RefPtr<Gst::Element> element), gst_check_teardown_sink_pad)
+    _WRAP_METHOD(static void teardown_src_pad(Glib::RefPtr<Gst::Element> element), gst_check_teardown_src_pad)
+    _WRAP_METHOD(static void drop_buffers(), gst_check_drop_buffers)
+    _WRAP_METHOD(static void buffer_data(Glib::RefPtr<Gst::Buffer> buffer, gconstpointer data, gsize size), gst_check_buffer_data)
+    _WRAP_METHOD(static void caps_equal(Glib::RefPtr<Gst::Caps> caps1, Glib::RefPtr<Gst::Caps> caps2), gst_check_caps_equal)
+};
+
+}
