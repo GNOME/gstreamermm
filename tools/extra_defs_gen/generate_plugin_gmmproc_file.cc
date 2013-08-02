@@ -381,8 +381,10 @@ static std::string get_signal_wrap_statements(std::string& includeMacroCalls,
         if(g_type_is_a(returnGType, G_TYPE_BOXED))
         {
           // Unwrapping conversion:
+          std::string access_operator = (returnGType != G_TYPE_VALUE_ARRAY && returnGType != GST_TYPE_TAG_LIST) ? "->" : ".";
+          // For GValueArray and TagList, RefPtr is not generated, and we need to use '.' operator.
           convertMacros += "#m4 _CONVERSION(_LQ()" + returnCTypeTranslation +
-            "_RQ(), ``" + returnCType + "'', ``($3).gobj_copy()'')\n";
+            "_RQ(), ``" + returnCType + "'', ``($3)" + access_operator + "gobj_copy()'')\n";
 
           // Also include a wrapping conversion:
 
