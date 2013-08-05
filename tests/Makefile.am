@@ -16,12 +16,12 @@
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
 local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
 
-AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(GSTREAMERMM_CFLAGS)
+AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(GSTREAMERMM_CFLAGS) -std=c++0x
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest
 
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
-                 test-structure test-taglist
+                 test-query test-structure test-taglist
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
@@ -29,8 +29,8 @@ TESTS = $(check_PROGRAMS)
 test_caps_SOURCES			= test-caps.cc main.cc
 test_buffer_SOURCES			= test-buffer.cc main.cc
 test_bus_SOURCES			= test-bus.cc main.cc
-test_caps_SOURCES			= test-caps.cc main.cc
 test_pad_SOURCES			= test-pad.cc main.cc
+test_query_SOURCES			= test-query.cc main.cc
 test_structure_SOURCES		= test-structure.cc main.cc
 test_taglist_SOURCES		= test-taglist.cc main.cc
 
