@@ -1,0 +1,161 @@
+/*
+ * test-regression-seekonstartup.cc
+ *
+ *  Created on: 5 sie 2013
+ *      Author: loganek
+ */
+
+#include <gtest/gtest.h>
+#include <gstreamermm.h>
+#include <gstreamermm/fakesink.h>
+#include <glibmm.h>
+#include "utils.h"
+
+using namespace Gst;
+using Glib::RefPtr;
+
+RefPtr<Glib::MainLoop> mainloop;
+RefPtr<Bus> bus;
+RefPtr<Pipeline> pipeline;
+RefPtr<Pad> sink_pad;
+static volatile gint counter;
+bool prerolled = false;
+bool was_check = false;
+
+bool on_timeout()
+{
+    gint64 pos;
+
+    if (pipeline->query_position(FORMAT_TIME, pos))
+    {
+        EXPECT_EQ(2000000000, pos);
+        g_atomic_int_set(&was_check, 1);
+        was_check = true;
+
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+void dec_counter()
+{
+    if (prerolled)
+        return;
+
+    if (g_atomic_int_dec_and_test (&counter))
+    {
+        prerolled = true;
+        bus->post(MessageApplication::create(pipeline));
+    }
+}
+
+PadProbeReturn cb_blocked (const RefPtr <Pad>& pad, const PadProbeInfo& info)
+{
+  if (prerolled)
+    return PAD_PROBE_REMOVE;
+
+  dec_counter();
+
+  return PAD_PROBE_OK;
+}
+
+bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
+{
+    switch(message->get_message_type())
+    {
+        case MESSAGE_EOS:
+            mainloop->quit();
+            return false;
+        case MESSAGE_ERROR:
+        {
+            mainloop->quit();
+            return false;
+        }
+        case GST_MESSAGE_APPLICATION:
+        {
+            pipeline->seek(1.0, FORMAT_TIME,
+                    (SeekFlags)(SEEK_FLAG_FLUSH | SEEK_FLAG_ACCURATE),
+                    SEEK_TYPE_SET, 2 * SECOND,
+                    SEEK_TYPE_SET, 3 * SECOND);
+              pipeline->set_state(STATE_PLAYING);
+
+            break;
+          }
+        default:
+            break;
+    }
+    return true;
+}
+
+void on_pad_added(const RefPtr<Pad>& newPad)
+{
+    if (prerolled)
+        return;
+
+    g_atomic_int_inc(&counter);
+
+    newPad->add_probe(PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, sigc::ptr_fun(&cb_blocked));
+
+    PadLinkReturn ret = newPad->link(sink_pad);
+
+    ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
+}
+
+void no_more_pads()
+{
+    if (prerolled)
+        return;
+
+    dec_counter();
+}
+
+TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
+{
+    Glib::ustring input_filename = "test.ogg";
+
+    GenerateSampleOggFile(100, input_filename);
+
+    mainloop = Glib::MainLoop::create();
+    pipeline = Pipeline::create("seekonstartup-pipeline");
+    ASSERT_TRUE(pipeline);
+    bus = pipeline->get_bus();
+    ASSERT_TRUE(bus);
+    bus->add_watch(sigc::ptr_fun(&on_bus_message));
+
+    RefPtr<Element> src = ElementFactory::create_element("uridecodebin"),
+            csp = ElementFactory::create_element("videoconvert"),
+            vs = ElementFactory::create_element("videoscale"),
+            sink = ElementFactory::create_element("autovideosink");
+
+    ASSERT_TRUE(src);
+    ASSERT_TRUE(csp);
+    ASSERT_TRUE(vs);
+    ASSERT_TRUE(sink);
+
+    src->set_property("uri", Glib::ustring("file:///home/loganek/test.ogg"));
+
+    ASSERT_NO_THROW(pipeline->add(src)->add(csp)->add(vs)->add(sink));
+    ASSERT_NO_THROW(csp->link(vs)->link(sink));
+
+    sink_pad = csp->get_static_pad("sink");
+
+    g_atomic_int_set(&counter, 1);
+
+    src->signal_pad_added().connect(sigc::ptr_fun(&on_pad_added));
+    src->signal_no_more_pads().connect(sigc::ptr_fun(&no_more_pads));
+
+    pipeline->set_state(STATE_PAUSED);
+
+    Glib::signal_timeout().connect(sigc::ptr_fun(&on_timeout), 0);
+    mainloop->run();
+
+    pipeline->set_state(Gst::STATE_NULL);
+
+    ASSERT_TRUE(was_check);
+
+    remove(input_filename.c_str());
+}
+
+
+
