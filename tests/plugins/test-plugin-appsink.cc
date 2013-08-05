@@ -22,8 +22,10 @@ protected:
 
     void CreatePipelineWithElements()
     {
-        sink = Gst::ElementFactory::create_element("appsink", "sink");
+        pipeline = Gst::Pipeline::create();
+
         source = ElementFactory::create_element("appsrc", "source");
+        sink = ElementFactory::create_element("appsink", "sink");
 
         ASSERT_TRUE(sink);
         ASSERT_TRUE(source);
@@ -40,12 +42,9 @@ TEST_F(AppSinkPluginTest, CreatePipelineWithAppsink)
 
 TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
 {
-    sink = Gst::ElementFactory::create_element("appsink", "sink");
+    CreatePipelineWithElements();
     RefPtr<AppSink> appsink = appsink.cast_static(sink);
-    source = ElementFactory::create_element("appsrc", "source");
     RefPtr<AppSrc> appsrc = appsrc.cast_static(source);
-    pipeline->add(source)->add(sink);
-    source->link(sink);
 
     pipeline->set_state(STATE_PLAYING);
 
@@ -58,12 +57,6 @@ TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
     buf->unmap(map_info);
 
     appsrc->push_buffer(buf);
-
-    {
-        State state;
-        StateChangeReturn ret = pipeline->get_state(state, state, 1*Gst::SECOND);
-        ASSERT_EQ(STATE_CHANGE_SUCCESS, ret);
-   }
 
     RefPtr<Buffer> buf_out;
     RefPtr<Sample> sample = appsink->pull_sample();

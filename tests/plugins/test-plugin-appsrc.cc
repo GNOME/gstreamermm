@@ -20,8 +20,13 @@ protected:
 
     void CreatePipelineWithElements()
     {
+        pipeline = Gst::Pipeline::create();
+
         RefPtr<Element> sink = Gst::ElementFactory::create_element("fakesink", "sink");
         source_element = ElementFactory::create_element("appsrc", "source");
+
+        ASSERT_TRUE(sink);
+        ASSERT_TRUE(source_element);
 
         ASSERT_NO_THROW(pipeline->add(source_element)->add(sink));
         ASSERT_NO_THROW(source_element->link(sink));
@@ -47,6 +52,8 @@ TEST_F(AppSrcPluginTest, CreatePipelineWithAppSrcElement)
 
 TEST_F(AppSrcPluginTest, SimpleDataFlowInPipelineWitAppSrcElement)
 {
+    CreatePipelineWithElements();
+
     pipeline->set_state(Gst::STATE_PLAYING);
 
     std::string data = "hello world";
