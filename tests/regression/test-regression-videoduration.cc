@@ -15,6 +15,8 @@ using namespace Gst;
 using Glib::RefPtr;
 
 RefPtr<Glib::MainLoop> mainloop;
+RefPtr<Element> decoder;
+RefPtr<Gst::Pipeline> pipeline;
 
 bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
 {
@@ -35,28 +37,20 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
     return true;
 }
 
-static void
-on_pad_added (GstElement *element,
-              GstPad     *pad,
-              gpointer    data)
+void on_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 {
-    GstPad *sinkpad;
-    GstElement *decoder = (GstElement *) data;
+    RefPtr<Gst::Pad> sinkPad = decoder->get_static_pad("sink");
+    PadLinkReturn ret = newPad->link(sinkPad);
 
-    sinkpad = gst_element_get_static_pad (decoder, "sink");
-
-    gst_pad_link (pad, sinkpad);
-
-    gst_object_unref (sinkpad);
+    ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
 }
 
 
-static gboolean
-cb_print_position (GstElement *pipeline)
+bool on_timeout()
 {
     gint64 len;
 
-    if (gst_element_query_duration (pipeline, GST_FORMAT_TIME, &len))
+    if (pipeline->query_duration(FORMAT_TIME, len))
     {
         EXPECT_EQ(333333333, len);
         return FALSE;
@@ -71,7 +65,6 @@ TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
 
     GenerateSampleOggFile(10, input_filename);
 
-    Glib::RefPtr<Gst::Pipeline> pipeline;
     RefPtr<FileSrc> filesrc = Gst::FileSrc::create();
     ASSERT_TRUE(filesrc);
 
@@ -80,8 +73,8 @@ TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
     mainloop = Glib::MainLoop::create();
     pipeline = Pipeline::create("rewriter");
     RefPtr<Element> sink = ElementFactory::create_element("fakesink"),
-            demuxer = ElementFactory::create_element("oggdemux"),
-            decoder = ElementFactory::create_element("theoradec");
+            demuxer = ElementFactory::create_element("oggdemux");
+    decoder = ElementFactory::create_element("theoradec");
     ASSERT_TRUE(sink);
     ASSERT_TRUE(demuxer);
     ASSERT_TRUE(decoder);
@@ -92,10 +85,11 @@ TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
     pipeline->add(filesrc)->add(demuxer)->add(decoder)->add(sink);
     filesrc->link(demuxer);
     decoder->link(sink);
-    g_signal_connect (demuxer->gobj(), "pad-added", G_CALLBACK(on_pad_added), decoder->gobj());
+
+    demuxer->signal_pad_added().connect(sigc::ptr_fun(&on_pad_added));
 
     pipeline->set_state(Gst::STATE_PLAYING);
-    g_timeout_add(0, (GSourceFunc) cb_print_position, pipeline->gobj());
+    Glib::signal_timeout().connect(sigc::ptr_fun(&on_timeout), 0);
     mainloop->run();
 
     pipeline->set_state(Gst::STATE_NULL);
