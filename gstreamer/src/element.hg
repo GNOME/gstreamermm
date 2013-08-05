@@ -388,6 +388,17 @@ public:
 
   Glib::RefPtr<Gst::PadTemplate> get_pad_template(const Glib::ustring &factory_name) const;
 
+  /**
+   * Sets specified property. Allows to create property-chain
+   * (e.g. element->property("location", "test.ogg")->property("num_buffers", 20);
+   */
+  template<typename T>
+  Glib::RefPtr<Gst::Element> property(const Glib::ustring& name, const T& value)
+  {
+      set_property(name, value);
+      return Glib::RefPtr<Gst::Element>(*this);
+  }
+
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
