@@ -21,21 +21,24 @@ AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest
 
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
+                 test-ghostpad \
                  test-query test-structure test-taglist test-plugin-appsink \
                  test-plugin-appsrc test-plugin-register test-plugin-pushsrc
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
+TEST_MAIN_SOURCE = main.cc
 
-test_caps_SOURCES			= test-caps.cc main.cc
-test_buffer_SOURCES			= test-buffer.cc main.cc
-test_bus_SOURCES			= test-bus.cc main.cc
-test_pad_SOURCES			= test-pad.cc main.cc
-test_query_SOURCES			= test-query.cc main.cc
-test_structure_SOURCES		= test-structure.cc main.cc
-test_taglist_SOURCES		= test-taglist.cc main.cc
+test_caps_SOURCES			= test-caps.cc $(TEST_MAIN_SOURCE)
+test_buffer_SOURCES			= test-buffer.cc $(TEST_MAIN_SOURCE)
+test_bus_SOURCES			= test-bus.cc $(TEST_MAIN_SOURCE)
+test_ghostpad_SOURCES		= test-ghostpad.cc $(TEST_MAIN_SOURCE)
+test_pad_SOURCES			= test-pad.cc $(TEST_MAIN_SOURCE)
+test_query_SOURCES			= test-query.cc $(TEST_MAIN_SOURCE)
+test_structure_SOURCES		= test-structure.cc $(TEST_MAIN_SOURCE)
+test_taglist_SOURCES		= test-taglist.cc $(TEST_MAIN_SOURCE)
 
-test_plugin_appsink_SOURCES			= plugins/test-plugin-appsink.cc main.cc
-test_plugin_appsrc_SOURCES			= plugins/test-plugin-appsrc.cc main.cc
-test_plugin_pushsrc_SOURCES			= plugins/test-plugin-pushsrc.cc main.cc
-test_plugin_register_SOURCES		= plugins/test-plugin-register.cc main.cc
+test_plugin_appsink_SOURCES			= plugins/test-plugin-appsink.cc $(TEST_MAIN_SOURCE)
+test_plugin_appsrc_SOURCES			= plugins/test-plugin-appsrc.cc $(TEST_MAIN_SOURCE)
+test_plugin_pushsrc_SOURCES			= plugins/test-plugin-pushsrc.cc $(TEST_MAIN_SOURCE)
+test_plugin_register_SOURCES		= plugins/test-plugin-register.cc $(TEST_MAIN_SOURCE)
