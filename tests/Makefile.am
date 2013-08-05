@@ -21,7 +21,8 @@ AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest
 
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
-                 test-query test-structure test-taglist
+                 test-query test-structure test-taglist test-plugin-appsink \
+                 test-plugin-appsrc test-plugin-register test-plugin-pushsrc
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
@@ -34,3 +35,7 @@ test_query_SOURCES			= test-query.cc main.cc
 test_structure_SOURCES		= test-structure.cc main.cc
 test_taglist_SOURCES		= test-taglist.cc main.cc
 
+test_plugin_appsink_SOURCES			= plugins/test-plugin-appsink.cc main.cc
+test_plugin_appsrc_SOURCES			= plugins/test-plugin-appsrc.cc main.cc
+test_plugin_pushsrc_SOURCES			= plugins/test-plugin-pushsrc.cc main.cc
+test_plugin_register_SOURCES		= plugins/test-plugin-register.cc main.cc
