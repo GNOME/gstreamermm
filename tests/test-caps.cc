@@ -99,3 +99,15 @@ TEST_F(CapsTest, GetNonExistingValue)
 
     ASSERT_FALSE(ok);
 }
+
+TEST_F(CapsTest, SetCapsToElement)
+{
+    Glib::RefPtr<Element> element = ElementFactory::create_element("multifilesrc", "source");
+
+    gchar* str_caps = "image/jpeg, framerate=(fraction)2/1";
+
+    element->set_property("caps", Caps::create_from_string(str_caps));
+    element->get_property("caps", caps);
+
+    ASSERT_STREQ(str_caps, caps->to_string().c_str());
+}
