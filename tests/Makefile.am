@@ -23,11 +23,13 @@ LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
                  test-ghostpad \
                  test-query test-structure test-taglist test-plugin-appsink \
-                 test-plugin-appsrc test-plugin-register test-plugin-pushsrc
+                 test-plugin-appsrc test-plugin-register test-plugin-pushsrc \
+                 test-regression-rewritefile
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
 TEST_MAIN_SOURCE = main.cc
+TEST_REGRESSION_UTILS = regression/utils.cc
 
 test_caps_SOURCES			= test-caps.cc $(TEST_MAIN_SOURCE)
 test_buffer_SOURCES			= test-buffer.cc $(TEST_MAIN_SOURCE)
@@ -42,3 +44,5 @@ test_plugin_appsink_SOURCES			= plugins/test-plugin-appsink.cc $(TEST_MAIN_SOURC
 test_plugin_appsrc_SOURCES			= plugins/test-plugin-appsrc.cc $(TEST_MAIN_SOURCE)
 test_plugin_pushsrc_SOURCES			= plugins/test-plugin-pushsrc.cc $(TEST_MAIN_SOURCE)
 test_plugin_register_SOURCES		= plugins/test-plugin-register.cc $(TEST_MAIN_SOURCE)
+
+test_regression_rewritefile_SOURCES = regression/test-regression-rewritefile.cc $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)

@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 
   if(!filesrc)
   {
-    std::cerr << "The playbin2 element could not be created." << std::endl;
+    std::cerr << "The FileSrc element could not be created." << std::endl;
     return EXIT_FAILURE;
   }
 
