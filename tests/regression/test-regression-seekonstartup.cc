@@ -20,7 +20,7 @@ RefPtr<Pipeline> pipeline;
 RefPtr<Pad> sink_pad;
 static volatile gint counter;
 bool prerolled = false;
-bool was_check = false;
+gboolean was_check = 0;
 
 bool on_timeout()
 {
@@ -133,7 +133,7 @@ TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
     ASSERT_TRUE(vs);
     ASSERT_TRUE(sink);
 
-    src->set_property("uri", Glib::ustring("file:///home/loganek/test.ogg"));
+    ASSERT_NO_THROW(src->set_property("uri", URIHandler::filename_to_uri(input_filename)));
 
     ASSERT_NO_THROW(pipeline->add(src)->add(csp)->add(vs)->add(sink));
     ASSERT_NO_THROW(csp->link(vs)->link(sink));
