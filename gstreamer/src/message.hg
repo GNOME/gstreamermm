@@ -25,22 +25,18 @@
 
 _DEFS(gstreamermm,gst)
 
-namespace Glib
-{
-    template<typename T>
-    Glib::RefPtr<T> wrap_msg_derived(GstMessage* object, bool take_copy)
-    {
-      if(take_copy && object)
-        gst_message_ref(object);
-
-      // See the comment at the top of this file, if you want to know why the cast works.
-      return Glib::RefPtr<T>(reinterpret_cast<T*>(object));
-    }
-
-}
-
 namespace Gst
 {
+
+  template<typename T>
+  Glib::RefPtr<T> wrap_msg_derived(GstMessage* object, bool take_copy)
+  {
+    if(take_copy && object)
+      gst_message_ref(object);
+
+    // See the comment at the top of this file, if you want to know why the cast works.
+    return Glib::RefPtr<T>(reinterpret_cast<T*>(object));
+  }
 
 _WRAP_ENUM(MessageType, GstMessageType)
 _WRAP_ENUM(StructureChangeType, GstStructureChangeType)
