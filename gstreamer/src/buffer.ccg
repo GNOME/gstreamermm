@@ -32,7 +32,15 @@ Glib::RefPtr<Gst::Buffer> Buffer::copy() const
 
 Glib::RefPtr<Gst::Buffer> Buffer::create_writable()
 {
-  return Glib::wrap(gst_buffer_make_writable(gobj()), true);
+  if(is_writable())  // caller has the only one reference to the buffer
+  {                 // since there is no other ref to the buffer, nobody else can do a ref in the meantime
+    return Glib::wrap(gst_buffer_make_writable(gobj()), true); // take copy so original object is left to the current owner (and hopefully will be released soon)
+  }
+  else
+  {
+    reference(); // gst_buffer_make_writable(buf) will unref the old buffer, but our caller is still holding RefPtr to it
+    return Glib::wrap(gst_buffer_make_writable(gobj()));
+  }
 }
 
 Glib::RefPtr<Gst::Buffer> Buffer::create(guint size)
