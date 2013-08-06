@@ -42,18 +42,18 @@ void CreatingQueryTestStatic(RefPtr<Query> (*create_method)(Args...) , Args... a
 
 TEST(QueryTest, CorrectCreatingQueryBuffering)
 {
-    CreatingQueryTestStatic<QueryBuffering, QUERY_BUFFERING, Format>(&Query::new_buffering, FORMAT_BUFFERS);
+    CreatingQueryTestStatic<QueryBuffering, QUERY_BUFFERING, Format>(&Query::create_buffering, FORMAT_BUFFERS);
     CreatingQueryTest<QueryBuffering, QUERY_BUFFERING, Format>(FORMAT_BUFFERS);
 }
 
 TEST(QueryTest, CorrectCreatingQueryPosition)
 {
-    CreatingQueryTestStatic<QueryPosition, QUERY_POSITION, Format>(&Query::new_position, FORMAT_PERCENT);
+    CreatingQueryTestStatic<QueryPosition, QUERY_POSITION, Format>(&Query::create_position, FORMAT_PERCENT);
     CreatingQueryTest<QueryPosition, QUERY_POSITION, Format>(FORMAT_PERCENT);
 }
 
 TEST(QueryTest, CorrectCreatingQueryConvert)
 {
-    CreatingQueryTestStatic<QueryConvert, QUERY_CONVERT, Format, gint64, Format>(&Query::new_convert, FORMAT_PERCENT, 10, FORMAT_BYTES);
+    CreatingQueryTestStatic<QueryConvert, QUERY_CONVERT, Format, gint64, Format>(&Query::create_convert, FORMAT_PERCENT, 10, FORMAT_BYTES);
     CreatingQueryTest<QueryConvert, QUERY_CONVERT, Format, gint64, Format>(FORMAT_PERCENT, 10, FORMAT_BYTES);
 }
