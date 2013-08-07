@@ -63,7 +63,6 @@ register_mm_type(const gchar * type_name=typeid(DerivedCppType).name())
             gobject_class->get_property = &Glib::custom_get_property_callback;
             gobject_class->set_property = &Glib::custom_set_property_callback;
             gobject_class->finalize =  &GlibCppType::finalize;
-            //FIXME: install properties?
         }
 
         static void base_init(typename DerivedCppType::BaseClassType *klass)
