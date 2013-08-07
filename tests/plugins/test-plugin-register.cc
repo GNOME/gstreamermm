@@ -54,6 +54,20 @@ TEST_F(RegisterPluginTest, CreateRegisteredElement)
     ASSERT_TRUE(filter);
 }
 
+TEST_F(RegisterPluginTest, CheckPropertyUsage)
+{
+    filter = Gst::ElementFactory::create_element("foomm", "filter");
+
+    Glib::ustring property_value;
+    filter->get_property("sample_property", property_value);
+    ASSERT_STREQ("def_val", property_value.c_str());
+
+    Glib::ustring expected_property_value = "second_property_test";
+    filter->set_property("sample_property", expected_property_value);
+    filter->get_property("sample_property", property_value);
+    ASSERT_STREQ(expected_property_value.c_str(), property_value.c_str());
+}
+
 TEST_F(RegisterPluginTest, CreatePipelineWithRegisteredElement)
 {
     CreatePipelineWithElements();

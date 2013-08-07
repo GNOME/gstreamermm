@@ -18,6 +18,7 @@ class Foo : public Element
 {
     Glib::RefPtr<Pad> sinkpad;
     Glib::RefPtr<Pad> srcpad;
+    Glib::Property<Glib::ustring> sample_property;
 
 public:
     static void base_init(BaseClassType *klass)
@@ -49,7 +50,10 @@ public:
     }
 
     explicit Foo(GstElement *gobj)
-        : Gst::Element(gobj)
+        : Glib::ObjectBase(typeid (Foo)), // type must be registered before use
+          Gst::Element(gobj),
+          sample_property(*this, "sample_property", "def_val")
+
     {
         add_pad(sinkpad = Gst::Pad::create(get_pad_template("sink"), "sink"));
         add_pad(srcpad = Gst::Pad::create(get_pad_template("src"), "src"));
