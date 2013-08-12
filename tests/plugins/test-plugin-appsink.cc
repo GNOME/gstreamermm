@@ -65,17 +65,14 @@ TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
     ASSERT_TRUE(buf_out);
 
     ASSERT_TRUE(buf_out->memcmp(0, data.c_str(), data.length()) == 0);
-    buf_out->map(map_info, MAP_READ);
-    assert(std::string((char *)map_info->get_data()) == data);
-    buf_out->unmap(map_info);
 
-     appsrc->end_of_stream();
+    appsrc->end_of_stream();
 
-     RefPtr<Message> msg = pipeline->get_bus()->poll((MessageType)(MESSAGE_EOS | MESSAGE_ERROR) , 1*SECOND);
-     ASSERT_TRUE(msg);
-     ASSERT_EQ(MESSAGE_EOS, msg->get_message_type());
+    RefPtr<Message> msg = pipeline->get_bus()->poll((MessageType)(MESSAGE_EOS | MESSAGE_ERROR) , 1*SECOND);
+    ASSERT_TRUE(msg);
+    ASSERT_EQ(MESSAGE_EOS, msg->get_message_type());
 
-     pipeline->set_state(STATE_NULL);
+    pipeline->set_state(STATE_NULL);
 }
 
 
