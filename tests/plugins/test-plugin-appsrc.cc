@@ -59,7 +59,7 @@ TEST_F(AppSrcPluginTest, SimpleDataFlowInPipelineWitAppSrcElement)
     std::string data = "hello world";
     RefPtr<Buffer> buf = Buffer::create(data.length() + 1);
     RefPtr<MapInfo> mapinfo(new Gst::MapInfo());
-    buf->map(mapinfo, Gst::MapFlags());
+    buf->map(mapinfo, MAP_WRITE);
     strcpy((char *)mapinfo->get_data(), data.c_str());
 
     RefPtr<AppSrc> appsrc;

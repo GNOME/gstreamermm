@@ -64,6 +64,7 @@ TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
     buf_out = sample->get_buffer();
     ASSERT_TRUE(buf_out);
 
+    ASSERT_TRUE(buf_out->memcmp(0, data.c_str(), data.length()) == 0);
     buf_out->map(map_info, MAP_READ);
     assert(std::string((char *)map_info->get_data()) == data);
     buf_out->unmap(map_info);
