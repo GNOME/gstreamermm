@@ -23,13 +23,14 @@ optional_examples =
 examples_cppflags = $(GSTREAMERMM_CFLAGS)
 endif
 
-noinst_PROGRAMS =			\
-	element_link/example	\
-	hello_world/example		\
-	ogg_player/example		\
-	ogg_rewriter/example	\
-	typefind/example	\
-	optiongroup/example	\
+noinst_PROGRAMS =				\
+	audio_video_muxer/example	\
+	element_link/example		\
+	hello_world/example			\
+	ogg_player/example			\
+	ogg_rewriter/example		\
+	typefind/example			\
+	optiongroup/example			\
 	$(optional_examples)
 
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
@@ -39,6 +40,7 @@ AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(examples_cppflags)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
 
+audio_video_muxer_example_SOURCES	= audio_video_muxer/main.cc
 element_link_example_SOURCES 		= element_link/element_link.cc
 hello_world_example_SOURCES 		= hello_world/main.cc
 ogg_rewriter_example_SOURCES 		= ogg_rewriter/main.cc
