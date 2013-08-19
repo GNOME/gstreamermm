@@ -26,6 +26,7 @@ endif
 noinst_PROGRAMS =						\
 	audio_video_muxer/example			\
 	dynamic_changing_element/example	\
+	dynamic_changing_source/example		\
 	element_link/example				\
 	hello_world/example					\
 	ogg_player/example					\
@@ -43,6 +44,7 @@ LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
 
 audio_video_muxer_example_SOURCES			= audio_video_muxer/main.cc
 dynamic_changing_element_example_SOURCES	= dynamic_changing_element/main.cc
+dynamic_changing_source_example_SOURCES		= dynamic_changing_source/main.cc
 element_link_example_SOURCES 				= element_link/element_link.cc
 hello_world_example_SOURCES 				= hello_world/main.cc
 ogg_rewriter_example_SOURCES	 			= ogg_rewriter/main.cc
