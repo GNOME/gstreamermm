@@ -711,4 +711,37 @@ public:
   Glib::RefPtr<const Gst::Message> parse() const;
 };
 
+/** A stream-start event.  See create() for more details.
+ */
+class EventStreamStart : public Event
+{
+public:
+
+  /**
+   * Create a new STREAM_START event. The stream start event can only
+   * travel downstream synchronized with the buffer flow. It is expected
+   * to be the first event that is sent for a new stream.
+   *
+   * Source elements, demuxers and other elements that create new streams
+   * are supposed to send this event as the first event of a new stream. It
+   * should not be send after a flushing seek or in similar situations
+   * and is used to mark the beginning of a new logical stream. Elements
+   * combining multiple streams must ensure that this event is only forwarded
+   * downstream once and not for every single input stream.
+   *
+   * The @stream_id should be a unique string that consists of the upstream
+   * stream-id, / as separator and a unique stream-id for this specific
+   * stream. A new stream-id should only be created for a stream if the upstream
+   * stream is split into (potentially) multiple new streams, e.g. in a demuxer,
+   * but not for every single element in the pipeline.
+   * gst_pad_create_stream_id() or gst_pad_create_stream_id_printf() can be
+   * used to create a stream-id.
+   *
+   * @param stream_id Identifier for this stream.
+   * @return a new #Gst::Event.
+   */
+  static Glib::RefPtr<Gst::EventStreamStart>
+    create(const Glib::ustring& stream_id);
+};
+
 } //namespace Gst

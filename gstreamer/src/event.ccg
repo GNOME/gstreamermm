@@ -375,4 +375,11 @@ Glib::RefPtr<const Gst::Message> EventSinkMessage::parse() const
   return Glib::wrap(gst_msg);
 }
 
+Glib::RefPtr<Gst::EventStreamStart>
+EventStreamStart::create(const Glib::ustring& stream_id)
+{
+  GstEvent* event = gst_event_new_stream_start(stream_id.c_str());
+  return Glib::wrap_event_derived<EventStreamStart>(event, false);
+}
+
 } //namespace Gst
