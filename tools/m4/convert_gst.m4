@@ -76,6 +76,7 @@ _CONVERSION(`GstBus*',`Glib::RefPtr<Gst::Bus>',`Glib::wrap($3)')
 dnl Caps
 _CONVERSION(`GstCaps*',`Glib::RefPtr<Gst::Caps>',`Glib::wrap($3)')
 _CONVERSION(`GstCaps*',`Glib::RefPtr<const Gst::Caps>',`Glib::wrap($3)')
+_CONVERSION(`const GstCaps*',`const Glib::RefPtr<const Gst::Caps>&',`Glib::wrap(const_cast<GstCaps*>($3))')
 _CONVERSION(`Glib::RefPtr<Gst::Caps>',`GstCaps*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`GstCaps*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`GstCaps*', `const_cast<$2>(Glib::unwrap($3))')
@@ -175,6 +176,7 @@ _CONVERSION(`const Glib::RefPtr<const Gst::Pad>&',`GstPad*',`const_cast<GstPad*>
 
 dnl PadTemplate
 _CONVERSION(`GstPadTemplate*',`Glib::RefPtr<Gst::PadTemplate>', `Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::PadTemplate>',`GstPadTemplate*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::PadTemplate>&',`GstPadTemplate*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>(Glib::unwrap($3))')
 
