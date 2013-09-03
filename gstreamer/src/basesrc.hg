@@ -182,14 +182,14 @@ public:
    */
   _WRAP_VFUNC(bool negotiate(), "negotiate")
 
-  /** Start processing. Subclasses should open resources and prepare to produce
-   * data.
-   */
-  virtual bool start_vfunc();
-
   /** Stop processing. Subclasses should use this to close resources.
    */
-  virtual bool stop_vfunc();
+  _WRAP_VFUNC(bool stop(), "stop", return_value true)
+
+  /** Start processing. Subclasses should open resources and prepare to produce
+    * data.
+    */
+  _WRAP_VFUNC(bool start(), "start", return_value true)
 
 #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
 #m4 _CONVERSION(`GstClockTime*', `ClockTime&', `*($3)')
@@ -250,14 +250,10 @@ public:
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->start = &start_vfunc_callback;
-  klass->stop = &stop_vfunc_callback;
   klass->do_seek = &do_seek_vfunc_callback;
   klass->prepare_seek_segment = &prepare_seek_segment_vfunc_callback;
   klass->create = &create_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
-  static gboolean start_vfunc_callback(GstBaseSrc* self);
-  static gboolean stop_vfunc_callback(GstBaseSrc* self);
   static gboolean do_seek_vfunc_callback(GstBaseSrc* self, GstSegment* segment);
   static gboolean prepare_seek_segment_vfunc_callback(GstBaseSrc* self, GstEvent* seek, GstSegment* segment);
   static GstFlowReturn create_vfunc_callback(GstBaseSrc* self, guint64 offset, guint size, GstBuffer** buf);
