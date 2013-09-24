@@ -61,7 +61,7 @@ AC_SUBST([GSTREAMERMM_MODULES],
          [[], [-app], [-audio], [-base], [-check],
            [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
            [-riff], [-rtp], [-sdp], [-tag], [-video]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.0.8])'])
+         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.0.10])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
