@@ -1,0 +1,69 @@
+/*
+ * toc.hg
+ *
+ *  Created on: Sep 25, 2013
+ *      Author: m.kolny
+ */
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008-20013 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gst.h>
+#include <gstreamermm/miniobject.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+  class TocEntry;
+
+  _WRAP_ENUM(TocScope, GstTocScope)
+  _WRAP_ENUM(TocEntryType, GstTocEntryType)
+
+class Toc : public MiniObject
+{
+  _CLASS_OPAQUE_REFCOUNTED(Toc, GstToc, NONE, gst_toc_ref, gst_toc_unref)
+public:
+  _WRAP_METHOD(void append_entry(Glib::RefPtr<Gst::TocEntry> entry), gst_toc_append_entry)
+  _WRAP_METHOD(void dump(), gst_toc_dump)
+  _WRAP_METHOD(void dump() const, gst_toc_dump, constversion)
+};
+
+class TocEntry : public MiniObject
+{
+  _CLASS_OPAQUE_REFCOUNTED(TocEntry, GstTocEntry, NONE, gst_toc_entry_ref, gst_toc_entry_unref)
+public:
+  _WRAP_METHOD(TocEntryType get_entry_type(), gst_toc_entry_get_entry_type)
+  _WRAP_METHOD(Glib::ustring get_uid(), gst_toc_entry_get_uid)
+  _WRAP_METHOD(void append_sub_entry(Glib::RefPtr<Gst::TocEntry> entry), gst_toc_entry_append_sub_entry)
+
+  _WRAP_METHOD(bool is_alternative(), gst_toc_entry_is_alternative)
+  _WRAP_METHOD(bool is_alternative() const, gst_toc_entry_is_alternative, constversion)
+
+  _WRAP_METHOD(bool is_sequence(), gst_toc_entry_is_sequence)
+  _WRAP_METHOD(bool is_sequence() const, gst_toc_entry_is_sequence, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::TocEntry> get_parent(), gst_toc_entry_get_parent)
+  _WRAP_METHOD(void set_start_stop_times(gint64 start, gint64 stop), gst_toc_entry_set_start_stop_times)
+
+  _WRAP_METHOD(bool get_start_stop_times(gint64& start, gint64& stop), gst_toc_entry_get_start_stop_times)
+  _WRAP_METHOD(bool get_start_stop_times(gint64& start, gint64& stop) const, gst_toc_entry_get_start_stop_times, constversion)
+};
+
+
+}

@@ -48,6 +48,8 @@ _CONV_ENUM(Gst,StateChangeReturn)
 _CONV_ENUM(Gst,StreamVolumeFormat)
 _CONV_ENUM(Gst,TagMergeMode)
 _CONV_ENUM(Gst,TaskState)
+_CONV_ENUM(Gst,TocEntryType)
+_CONV_ENUM(Gst,TocScope)
 _CONV_ENUM(Gst,TunerChannelFlags)
 _CONV_ENUM(Gst,URIType)
 
@@ -225,6 +227,10 @@ dnl TaskPool
 _CONVERSION(`const Glib::RefPtr<Gst::TaskPool>&',`GstTaskPool*', `Glib::unwrap($3)')
 _CONVERSION(`GstTaskPool*',`Glib::RefPtr<Gst::TaskPool>',`Glib::wrap($3)')
 _CONVERSION(`GstTaskPool*',`Glib::RefPtr<const Gst::TaskPool>',`Glib::wrap($3)')
+
+dnl TocEntry
+_CONVERSION(`GstTocEntry*',`Glib::RefPtr<Gst::TocEntry>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::TocEntry>', `GstTocEntry*',`Glib::unwrap($3)')
 
 dnl TypeFind
 _CONVERSION(`Gst::TypeFind&',`GstTypeFind*',`$3.gobj()')
