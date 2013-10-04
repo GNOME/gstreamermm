@@ -122,6 +122,10 @@ public:
 
   typedef sigc::slot< Gst::FlowReturn, const Glib::RefPtr<Gst::Pad>&, Glib::RefPtr<Gst::Buffer>& > SlotChain;
 
+  typedef sigc::slot< gboolean, const Glib::RefPtr<Gst::Pad>&, Glib::RefPtr<Gst::Event>& > SlotEvent;
+
+  typedef sigc::slot< gboolean, const Glib::RefPtr<Gst::Pad>&, Glib::RefPtr<Gst::Query>& > SlotQuery;
+
   /** Creates a new pad with the given name in the given direction.
    *
    * @param name The name of the new pad.
@@ -379,6 +383,10 @@ public:
 
   friend GstFlowReturn Pad_Chain_gstreamermm_callback(GstPad* pad, GstObject* parent, GstBuffer *buffer);
   void set_chain_function(const SlotChain& slot);
+  friend gboolean Pad_Event_gstreamermm_callback(GstPad* pad, GstObject* parent, GstEvent* event);
+  void set_event_function(const SlotEvent& slot);
+  friend gboolean Pad_Query_gstreamermm_callback(GstPad* pad, GstObject* parent, GstQuery* query);
+  void set_query_function(const SlotQuery& slot);
 
     //C API specific pad callback setting functions are ignored.
     _IGNORE(
@@ -429,6 +437,8 @@ public:
 
 private:
   SlotChain slot_chain;
+  SlotEvent slot_event;
+  SlotQuery slot_query;
 };
 
 class PadProbeInfo

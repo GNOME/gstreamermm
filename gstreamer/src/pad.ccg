@@ -193,10 +193,68 @@ GstFlowReturn Pad_Chain_gstreamermm_callback(GstPad* pad, GstObject* parent, Gst
   return GST_FLOW_ERROR;
 }
 
+gboolean Pad_Query_gstreamermm_callback(GstPad* pad, GstObject* parent, GstQuery* query)
+{
+  Gst::Pad *pad_wrapper = dynamic_cast<Gst::Pad*>
+    (static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)pad)
+      )
+    );
+  g_assert(pad);
+
+  try
+  {
+    Glib::RefPtr<Query> query_wrapped = Glib::wrap(query, false);
+
+    return pad_wrapper->slot_query(Glib::wrap(pad, true), query_wrapped);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return false;
+}
+
+gboolean Pad_Event_gstreamermm_callback(GstPad* pad, GstObject* parent, GstEvent* event)
+{
+  Gst::Pad *pad_wrapper = dynamic_cast<Gst::Pad*>
+    (static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)pad)
+      )
+    );
+  g_assert(pad);
+
+  try
+  {
+    Glib::RefPtr<Event> event_wrapped = Glib::wrap(event, false);
+
+    return pad_wrapper->slot_event(Glib::wrap(pad, true), event_wrapped);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return false;
+}
+
 void Pad::set_chain_function(const SlotChain& slot)
 {
   slot_chain = slot;
   gst_pad_set_chain_function(GST_PAD(gobj()), &Pad_Chain_gstreamermm_callback);
+}
+
+void Pad::set_query_function(const SlotQuery& slot)
+{
+	slot_query = slot;
+	gst_pad_set_query_function(GST_PAD(gobj()), &Pad_Query_gstreamermm_callback);
+}
+
+void Pad::set_event_function(const SlotEvent& slot)
+{
+	slot_event = slot;
+	gst_pad_set_event_function(GST_PAD(gobj()), &Pad_Event_gstreamermm_callback);
 }
 
 bool Pad::is_ghost_pad() const
