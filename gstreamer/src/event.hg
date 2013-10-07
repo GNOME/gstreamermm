@@ -22,6 +22,7 @@
 #include <gstreamermm/format.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/segment.h>
+#include <gstreamermm/caps.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -742,6 +743,24 @@ public:
    */
   static Glib::RefPtr<Gst::EventStreamStart>
     create(const Glib::ustring& stream_id);
+};
+
+class EventCaps : public Event
+{
+public:
+
+  /**
+   * Create a new CAPS event for @caps. The caps event can only travel downstream
+   * synchronized with the buffer flow and contains the format of the buffers
+   * that will follow after the event.
+   *
+   * @param caps event caps
+   * @return the new CAPS event.
+  */
+  static Glib::RefPtr<Gst::EventCaps>
+    create(const Glib::RefPtr<Gst::Caps>& caps);
+
+  Glib::RefPtr<Gst::Caps> parse();
 };
 
 } //namespace Gst

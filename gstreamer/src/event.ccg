@@ -382,4 +382,18 @@ EventStreamStart::create(const Glib::ustring& stream_id)
   return Glib::wrap_event_derived<EventStreamStart>(event, false);
 }
 
+Glib::RefPtr<Gst::EventCaps>
+EventCaps::create(const Glib::RefPtr<Gst::Caps>& caps)
+{
+  GstEvent* event = gst_event_new_caps(caps->gobj());
+  return Glib::wrap_event_derived<EventCaps>(event, false);
+}
+
+Glib::RefPtr<Gst::Caps> EventCaps::parse()
+{
+  GstCaps* gst_caps = 0;
+  gst_event_parse_caps(gobj(), &gst_caps);
+  return Glib::wrap(gst_caps);
+}
+
 } //namespace Gst
