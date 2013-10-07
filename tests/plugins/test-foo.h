@@ -12,12 +12,10 @@
 #include <gstreamermm/private/element_p.h>
 #include <assert.h>
 
-using namespace Gst;
-
-class Foo : public Element
+class Foo : public Gst::Element
 {
-    Glib::RefPtr<Pad> sinkpad;
-    Glib::RefPtr<Pad> srcpad;
+    Glib::RefPtr<Gst::Pad> sinkpad;
+    Glib::RefPtr<Gst::Pad> srcpad;
     Glib::Property<Glib::ustring> sample_property;
 
 public:
@@ -37,7 +35,7 @@ public:
                         Gst::Caps::create_any())->gobj());
     }
 
-    FlowReturn chain(const Glib::RefPtr<Gst::Pad> &pad, Glib::RefPtr<Gst::Buffer> &buf)
+    Gst::FlowReturn chain(const Glib::RefPtr<Gst::Pad> &pad, Glib::RefPtr<Gst::Buffer> &buf)
     {
         buf = buf->create_writable();
         assert(buf->gobj()->mini_object.refcount==1);
@@ -62,7 +60,7 @@ public:
 
     static bool register_foo(Glib::RefPtr<Gst::Plugin> plugin)
     {
-        ElementFactory::register_element(plugin, "foomm", 10, register_mm_type<Foo>("foomm"));
+        Gst::ElementFactory::register_element(plugin, "foomm", 10, Gst::register_mm_type<Foo>("foomm"));
 
         return true;
     }
