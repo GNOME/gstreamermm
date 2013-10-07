@@ -128,16 +128,13 @@ public:
   _WRAP_METHOD(bool can_src_any_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_src_any_caps)
 
   _WRAP_METHOD(GType get_element_type() const, gst_element_factory_get_element_type)
-  _WRAP_METHOD(Glib::ustring get_long_name() const, gst_element_factory_get_longname)
-  _WRAP_METHOD(Glib::ustring get_kclass() const, gst_element_factory_get_klass)
-  _WRAP_METHOD(Glib::ustring get_description() const, gst_element_factory_get_description)
-  _WRAP_METHOD(Glib::ustring get_author() const, gst_element_factory_get_author)
-  _WRAP_METHOD(Glib::ustring get_documentation_uri() const, gst_element_factory_get_documentation_uri)
-  _WRAP_METHOD(Glib::ustring get_icon_name() const, gst_element_factory_get_icon_name)
+
+  #m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_metadata_keys() const, gst_element_factory_get_metadata_keys)
+  _WRAP_METHOD(Glib::ustring get_metadata(const Glib::ustring& key) const, gst_element_factory_get_metadata)
+
   _WRAP_METHOD(guint get_num_pad_templates() const, gst_element_factory_get_num_pad_templates)
   _WRAP_METHOD(URIType get_uri_type() const, gst_element_factory_get_uri_type)
-  
-#m4 _CONVERSION(`const gchar* const*',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>($3, Glib::OWNERSHIP_NONE)')
 
   _WRAP_METHOD(bool has_interface(const Glib::ustring& name) const, gst_element_factory_has_interface)
   _WRAP_METHOD(bool can_sink_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_sink_caps)
