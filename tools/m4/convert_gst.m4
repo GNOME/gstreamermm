@@ -182,6 +182,10 @@ _CONVERSION(`Glib::RefPtr<Gst::PadTemplate>',`GstPadTemplate*', `Glib::unwrap($3
 _CONVERSION(`const Glib::RefPtr<Gst::PadTemplate>&',`GstPadTemplate*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::PadTemplate>&',`GstPadTemplate*',`const_cast<GstPadTemplate*>(Glib::unwrap($3))')
 
+dnl StaticPadTemplate
+_CONVERSION(`Gst::StaticPadTemplate&',`GstStaticPadTemplate*',($3).gobj())
+_CONVERSION(`const Gst::StaticPadTemplate&',`const GstStaticPadTemplate*',($3).gobj())
+
 dnl Plugin
 _CONVERSION(`const Glib::RefPtr<Gst::Plugin>&',`GstPlugin*',`Glib::unwrap($3)')
 _CONVERSION(`GstPlugin*',`Glib::RefPtr<Gst::Plugin>',`Glib::wrap($3)')

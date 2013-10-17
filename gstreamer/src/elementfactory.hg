@@ -57,6 +57,8 @@ enum ElementFactoryListType
 class Caps;
 class Element;
 class PadTemplate;
+class StaticPadTemplate;
+struct StaticPadTemplateTraits;
 class Plugin;
 
 /** A class that creates Gst::Element objects from a factory.
@@ -140,11 +142,8 @@ public:
   _WRAP_METHOD(bool can_sink_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_sink_caps)
   _WRAP_METHOD(bool can_src_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_src_caps)
 
-#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<Gst::PadTemplate> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Gst::PadTemplate> > get_static_pad_templates(), gst_element_factory_get_static_pad_templates)
-
-#m4 _CONVERSION(`const GList*', `Glib::ListHandle< Glib::RefPtr<const Gst::PadTemplate> >', `$2(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<const Gst::PadTemplate> > get_static_pad_templates() const, gst_element_factory_get_static_pad_templates)
+#m4 _CONVERSION(`const GList*', `std::vector< Gst::StaticPadTemplate >', `Glib::ListHandler< Gst::StaticPadTemplate, StaticPadTemplateTraits >::list_to_vector(const_cast<GList*>($3), Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector< Gst::StaticPadTemplate > get_static_pad_templates() const, gst_element_factory_get_static_pad_templates)
 
 #m4 _CONVERSION(`GList*', `std::vector< Glib::RefPtr<Gst::ElementFactory> >', `Glib::ListHandler< Glib::RefPtr<Gst::ElementFactory> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
 #m4 _CONVERSION(`const std::vector< Glib::RefPtr<Gst::ElementFactory> >&', `GList*', `Glib::ListHandler< Glib::RefPtr<Gst::ElementFactory> >::vector_to_list($3).data()')
