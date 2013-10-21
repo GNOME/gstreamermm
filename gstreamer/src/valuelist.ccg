@@ -1,0 +1,63 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+namespace Gst
+{
+
+ValueList::ValueList()
+{}
+
+// static
+GType ValueList::get_type()
+{
+  return GST_TYPE_LIST;
+}
+
+guint ValueList::size() const
+{
+  return gst_value_list_get_size(gobj());
+}
+
+bool ValueList::get(guint index, Glib::ValueBase& value) const
+{
+  const GValue* g_value = gst_value_list_get_value(gobj(), index);
+
+  if(g_value)
+  {
+    value.init(g_value);
+    return true;
+  }
+  else
+    return false;
+}
+
+Gst::ValueList& ValueList::append(const Glib::ValueBase& value)
+{
+  gst_value_list_append_value(gobj(), value.gobj());
+  return *this;
+}
+
+Gst::ValueList& ValueList::prepend(const Glib::ValueBase& value)
+{
+  gst_value_list_prepend_value(gobj(), value.gobj());
+  return *this;
+}
+
+
+} // Glib namespace

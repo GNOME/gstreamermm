@@ -101,6 +101,7 @@
 #include <gstreamermm/typefindfactory.h>
 #include <gstreamermm/urihandler.h>
 #include <gstreamermm/value.h>
+#include <gstreamermm/valuelist.h>
 
 // Core library base includes
 #include <gstreamermm/basesink.h>
