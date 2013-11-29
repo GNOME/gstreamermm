@@ -20,13 +20,13 @@ class FooSrc : public Gst::PushSrc
 
 public:
     static const int COUNT = 5;
-    static void base_init(BaseClassType *klass)
+    static void base_init(Gst::ElementClass<FooSrc> *klass)
     {
-        gst_element_class_set_details_simple(GST_ELEMENT_CLASS(klass), "foosrc_longname",
+        klass->set_metadata("foosrc_longname",
                 "foosrc_classification", "foosrc_detail_description", "foosrc_detail_author");
 
-        gst_element_class_add_pad_template(GST_ELEMENT_CLASS(klass),
-                Gst::PadTemplate::create("src", Gst::PAD_SRC, Gst::PAD_ALWAYS,Gst::Caps::create_from_string("x-application/x-foo1"))->gobj());
+        klass->add_pad_template(Gst::PadTemplate::create("src", Gst::PAD_SRC, Gst::PAD_ALWAYS,
+                                                     Gst::Caps::create_from_string("x-application/x-foo1")));
     }
 
     explicit FooSrc(GstPushSrc *gobj)

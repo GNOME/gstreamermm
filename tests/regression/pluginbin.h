@@ -23,7 +23,7 @@ private:
     Glib::Property<Glib::ustring> location;
 
 public:
-    static void base_init(BaseClassType *klass)
+    static void base_init(Gst::ElementClass<PluginBin> *klass)
     {
         GstElementClass* element_klass = (GstElementClass*)klass;
         gst_element_class_set_details_simple(element_klass, "Custom test bin",

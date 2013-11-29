@@ -22,9 +22,39 @@
 
 #include <glib-object.h>
 #include <glibmm/property.h>
+#include <gstreamermm/padtemplate.h>
 
 namespace Gst
 {
+
+template<class DerivedCppType>
+static GType
+register_mm_type(const gchar * type_name=typeid(DerivedCppType).name());
+
+template<typename DerivedCppType>
+class ElementClass
+{
+  friend GType register_mm_type<DerivedCppType>(const gchar * type_name);
+  GstElementClass* klass;
+  ElementClass(typename DerivedCppType::BaseClassType* klass): klass((GstElementClass*)klass){}
+  ElementClass(ElementClass const&);
+  void operator=(ElementClass const&);
+public:
+  void add_pad_template(const Glib::RefPtr<Gst::PadTemplate>& tpl)
+  {
+    gst_element_class_add_pad_template(klass, tpl->gobj());
+  }
+  void set_metadata(const Glib::ustring& longname, const Glib::ustring& classification,
+                    const Glib::ustring& description, const Glib::ustring& author)
+  {
+    gst_element_class_set_metadata(klass, longname.c_str(), classification.c_str(), description.c_str(), author.c_str());
+  }
+
+  void add_metadata(const Glib::ustring& key, const Glib::ustring& value)
+  {
+  	gst_element_class_add_metadata(klass ,key.c_str(), value.c_str());
+  }
+};
 
 template<class DerivedCppType>
 static GType
@@ -40,7 +70,11 @@ register_mm_type(const gchar * type_name=typeid(DerivedCppType).name())
             instance->self = new DerivedCppType(&instance->parent);
 
         }
-
+        static void base_init(typename DerivedCppType::BaseClassType *klass)
+        {
+            Gst::ElementClass<DerivedCppType> element_class(klass);
+            DerivedCppType::base_init(&element_class);
+        }
         static void finalize(GObject *object)
         {
             //the following will destroy q_data, among which MM wrapper to this "object" is stored. This will cause implicit delete on "self", since it is registered as wrapper of "object".
@@ -83,7 +117,7 @@ register_mm_type(const gchar * type_name=typeid(DerivedCppType).name())
         GTypeInfo info;
 
         info.class_size = sizeof(GlibCppTypeClass);
-        info.base_init = (GBaseInitFunc)&DerivedCppType::base_init;
+        info.base_init = (GBaseInitFunc)&GlibCppType::base_init;
         info.base_finalize = 0;
         info.class_init = (GClassInitFunc) &GlibCppTypeClass::init;
         info.class_finalize = 0;

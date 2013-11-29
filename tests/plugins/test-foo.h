@@ -19,20 +19,15 @@ class Foo : public Gst::Element
     Glib::Property<Glib::ustring> sample_property;
 
 public:
-    static void base_init(BaseClassType *klass)
+    static void base_init(Gst::ElementClass<Foo> *klass)
     {
-        /* This is another hack.
-         * For now it uses pure C functions, which should be wrapped then.
-         */
-        gst_element_class_set_details_simple(klass, "foo_longname",
+        klass->set_metadata("foo_longname",
                 "foo_classification", "foo_detail_description", "foo_detail_author");
 
-        gst_element_class_add_pad_template(klass,
-                Gst::PadTemplate::create("sink", Gst::PAD_SINK, Gst::PAD_ALWAYS,
-                        Gst::Caps::create_any())->gobj());
-        gst_element_class_add_pad_template(klass,
-                Gst::PadTemplate::create("src", Gst::PAD_SRC, Gst::PAD_ALWAYS,
-                        Gst::Caps::create_any())->gobj());
+        klass->add_pad_template(Gst::PadTemplate::create("sink", Gst::PAD_SINK, Gst::PAD_ALWAYS,
+                        Gst::Caps::create_any()));
+        klass->add_pad_template(Gst::PadTemplate::create("src", Gst::PAD_SRC, Gst::PAD_ALWAYS,
+                        Gst::Caps::create_any()));
     }
 
     Gst::FlowReturn chain(const Glib::RefPtr<Gst::Pad> &pad, Glib::RefPtr<Gst::Buffer> &buf)
