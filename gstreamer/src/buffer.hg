@@ -28,7 +28,7 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-_WRAP_ENUM(BufferFlag, GstBufferFlag)
+_WRAP_ENUM(BufferFlags, GstBufferFlags)
 _WRAP_ENUM(BufferCopyFlags, GstBufferCopyFlags)
 
 /** A data-passing buffer type, supporting sub-buffers.
@@ -56,7 +56,6 @@ public:
   Glib::RefPtr<Gst::Buffer> copy() const;
 
   _WRAP_METHOD(void copy_into(Glib::RefPtr<Gst::Buffer> source_buffer, BufferCopyFlags flags, gsize offset, gsize size), gst_buffer_copy_into)
-  _WRAP_METHOD(bool is_metadata_writable() const, gst_buffer_is_metadata_writable)
 
   static Glib::RefPtr<Gst::Buffer> create(guint size);
 
@@ -66,12 +65,6 @@ public:
    * @return A buffer (possibly the same pointer) that is writable.
    */
   Glib::RefPtr<Gst::Buffer> create_writable();
-
-  //This is const because it always returns a new buffer:
-  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> make_metadata_writable() const, gst_buffer_make_metadata_writable)
-
-  //This is const because it always returns a new buffer:
-  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> merge(const Glib::RefPtr<const Gst::Buffer>& other_buffer) const, gst_buffer_merge)
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Memory> get_memory(guint idx) const, gst_buffer_get_memory)
 

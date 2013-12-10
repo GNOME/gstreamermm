@@ -122,13 +122,6 @@ Glib::ustring get_name(StateChangeReturn state_ret);
  * element with get_state() and set_state(). To get a string representation of
  * a State, use Gst::Enums::get_name().
  *
- * You can get and set a Clock on an element using get_clock() and set_clock().
- * Some elements can provide a clock for the pipeline if provides_clock()
- * returns true. With the provide_clock() method one can retrieve the clock
- * provided by such an element. Not all elements require a clock to operate
- * correctly. If requires_clock() returns true, a clock should be set on the
- * element with set_clock().
- *
  * Note that clock slection and distribution is normally handled by the
  * toplevel Gst::Pipeline so the clock functions are only to be used in very
  * specific situations.
@@ -238,17 +231,13 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::ElementFactory> get_factory(), gst_element_get_factory, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gst::ElementFactory> get_factory() const, gst_element_get_factory, refreturn, constversion)
 
-  _WRAP_METHOD(bool is_indexable() const, gst_element_is_indexable)
-
   // We don't wrap the gst_element_get_name(), gst_element_set_name(), 
   // gst_element_get_parent(), and gst_element_set_parent() macros because they 
   // just calls the base (GstObject) class's functions anyway.
 
-  _WRAP_METHOD(bool requires_clock() const, gst_element_requires_clock)
   _WRAP_METHOD(bool set_clock(const Glib::RefPtr<Gst::Clock>& clock), gst_element_set_clock)
   _WRAP_METHOD(Glib::RefPtr<Gst::Clock> get_clock(), gst_element_get_clock)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Clock> get_clock() const, gst_element_get_clock, constversion)
-  _WRAP_METHOD(bool provides_clock() const, gst_element_provides_clock)
   _WRAP_METHOD(Glib::RefPtr<Gst::Clock> provide_clock(), gst_element_provide_clock)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Clock> provide_clock() const, gst_element_provide_clock, constversion)
   _WRAP_METHOD(StateChangeReturn set_state(State state), gst_element_set_state)
@@ -258,11 +247,8 @@ public:
   _WRAP_METHOD(void abort_state(), gst_element_abort_state)
   _WRAP_METHOD(StateChangeReturn continue_state(StateChangeReturn ret), gst_element_continue_state)
   _WRAP_METHOD(void lost_state(), gst_element_lost_state)
-  _WRAP_METHOD(void lost_state(bool new_base_time), gst_element_lost_state_full)
   _WRAP_METHOD(bool sync_state_with_parent(), gst_element_sync_state_with_parent)
   _WRAP_METHOD(StateChangeReturn change_state(StateChange transition), gst_element_change_state)
-  _WRAP_METHOD(void found_tags(Gst::TagList& list), gst_element_found_tags)
-  _WRAP_METHOD(void found_tags_for_pad(const Glib::RefPtr<Gst::Pad>& pad, Gst::TagList& list), gst_element_found_tags_for_pad)
 
   /** Post an error, warning or info message on the bus from inside an element.
    *
@@ -291,9 +277,6 @@ public:
   _IGNORE(gst_element_message_full)
 
   _WRAP_METHOD(bool post_message(const Glib::RefPtr<Gst::Message>& message), gst_element_post_message)
-
-#m4 _CONVERSION(`const GstQueryType*',`Glib::ArrayHandle<QueryType>',`Glib::ArrayHandle<QueryType>((QueryType*)($3), Glib::OWNERSHIP_NONE)')
-  _WRAP_METHOD(Glib::ArrayHandle<QueryType> get_query_types() const, gst_element_get_query_types)
 
   _WRAP_METHOD(bool query(const Glib::RefPtr<Gst::Query>& query) const, gst_element_query)
   _WRAP_METHOD(bool query_convert(Gst::Format src_format, gint64 src_val, Format dest_format, gint64& dest_val) const, gst_element_query_convert)
@@ -331,8 +314,6 @@ public:
    */
   bool send_event(const Glib::RefPtr<Gst::Event>& event);
   _IGNORE(gst_element_send_event)
-
-  _WRAP_METHOD(bool implements_interface(GType iface_type) const, gst_element_implements_interface)
 
   _WRAP_SIGNAL(void no_more_pads(), "no-more-pads")
 

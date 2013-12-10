@@ -45,11 +45,10 @@ _TRANSLATION(`GstVideoOverlay*',`Gst::VideoOverlay',`const Glib::RefPtr<Gst::Vid
 dnl Wrapped enums:
 dnl One should be included for each enum wrapped outside of plug-ins so that
 dnl the generator does not try to generate a _WRAP_ENUM() for it.
-_ENUM_IS_WRAPPED(GstActivateMode)
 _ENUM_IS_WRAPPED(GstAssocFlags)
 _ENUM_IS_WRAPPED(GstAutoplugSelectResult)
 _ENUM_IS_WRAPPED(GstBufferCopyFlags)
-_ENUM_IS_WRAPPED(GstBufferFlag)
+_ENUM_IS_WRAPPED(GstBufferFlags)
 _ENUM_IS_WRAPPED(GstBufferingMode)
 _ENUM_IS_WRAPPED(GstBusFlags)
 _ENUM_IS_WRAPPED(GstBusSyncReply)
@@ -73,6 +72,7 @@ _ENUM_IS_WRAPPED(GstMiniObjectFlags)
 _ENUM_IS_WRAPPED(GstPadDirection)
 _ENUM_IS_WRAPPED(GstPadFlags)
 _ENUM_IS_WRAPPED(GstPadLinkReturn)
+_ENUM_IS_WRAPPED(GstPadMode)
 _ENUM_IS_WRAPPED(GstPadPresence)
 _ENUM_IS_WRAPPED(GstPadTemplateFlags)
 _ENUM_IS_WRAPPED(GstQOSType)

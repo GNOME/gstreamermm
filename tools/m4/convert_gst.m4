@@ -6,7 +6,7 @@ _CONV_ENUM(Gst,AutoplugSelectResult)
 _CONV_ENUM(Gst,AudioBaseSinkSlaveMethod)
 _CONV_ENUM(Gst,AudioBaseSrcSlaveMethod)
 _CONV_ENUM(Gst,BufferCopyFlags)
-_CONV_ENUM(Gst,BufferFlag)
+_CONV_ENUM(Gst,BufferFlags)
 _CONV_ENUM(Gst,AudioFormat)
 _CONV_ENUM(Gst,AudioFormatFlags)
 _CONV_ENUM(Gst,AudioRingBufferFormatType)
@@ -34,6 +34,7 @@ _CONV_ENUM(Gst,NavigationCommand)
 _CONV_ENUM(Gst,PadDirection)
 _CONV_ENUM(Gst,PadLinkCheck)
 _CONV_ENUM(Gst,PadLinkReturn)
+_CONV_ENUM(Gst,PadMode)
 _CONV_ENUM(Gst,PadPresence)
 _CONV_ENUM(Gst,PadProbeType)
 _CONV_ENUM(Gst,PluginDependencyFlags)
@@ -196,6 +197,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::PluginFeature>&',`GstPluginFeature*',`Glib:
 
 dnl Query
 _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Query>',`GstQuery*', `Glib::unwrap($3)')
 _CONVERSION(`GstQuery*', `Glib::RefPtr<Gst::Query>',`Glib::wrap($3)')
 
 dnl Registry

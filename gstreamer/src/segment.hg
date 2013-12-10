@@ -50,12 +50,6 @@ _WRAP_ENUM(SeekType, GstSeekType)
  * configured with a start value of 0 and a stop/duration of -1, which is
  * undefined. The default rate and applied_rate is 1.0.
  *
- * If the segment is used for managing seeks, the segment duration should be
- * set with set_duration(). The public duration field contains the duration of
- * the segment. When using the segment for seeking, the start and time members
- * should normally be left to their default 0 value. The stop position is left
- * to -1 unless explicitly configured to a different value after a seek event.
- *
  * The current position in the segment should be set with the set_last_stop().
  * The public last_stop field contains the last set stop position in the
  * segment.
@@ -65,11 +59,6 @@ _WRAP_ENUM(SeekType, GstSeekType)
  * all the segment fields. The last_stop field will contain the new playback
  * position. If the cur_type was different from Gst::SEEK_TYPE_NONE, playback
  * continues from the last_stop position, possibly with updated flags or rate.
- *
- * For elements that want to use Gst::Segment to track the playback region, use
- * set_newsegment() to update the segment fields with the information from the
- * newsegment event. The clip() method can be used to check and clip the media
- * data to the segment boundaries.
  *
  * For elements that want to synchronize to the pipeline clock,
  * to_running_time() can be used to convert a timestamp to a value that can be
@@ -90,11 +79,7 @@ class Segment
 public:
   _WRAP_METHOD(bool clip(Format format, guint64 start, guint64 stop, guint64& clip_start, guint64& clip_stop) const, gst_segment_clip)
   _WRAP_METHOD(void init(Format format), gst_segment_init)
-  _WRAP_METHOD(void set_duration(Format format, guint64 duration), gst_segment_set_duration)
-  _WRAP_METHOD(void set_last_stop(Format format, guint64 position), gst_segment_set_last_stop)
-  _WRAP_METHOD(void set_newsegment(bool update, double rate, Format format, guint64 start, guint64 stop, guint64 time), gst_segment_set_newsegment)
-  _WRAP_METHOD(void set_newsegment(bool update, double rate, double applied_rate, Format format, guint64 start, guint64 stop, guint64 time), gst_segment_set_newsegment_full)
-  _WRAP_METHOD_DOCS_ONLY(gst_segment_set_seek)
+  _WRAP_METHOD_DOCS_ONLY(gst_segment_do_seek)
   void set_seek(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop, bool& update);
   _WRAP_METHOD(guint64 to_running_time(Format format, guint64 position) const, gst_segment_to_running_time)
   _WRAP_METHOD(guint64 to_stream_time(Format format, guint64 position) const, gst_segment_to_stream_time)
