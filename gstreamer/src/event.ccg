@@ -87,9 +87,9 @@ Glib::RefPtr<Gst::EventEos> EventEos::create()
 }
 
 Glib::RefPtr<Gst::EventNewSegment>
-  EventNewSegment::create(const Glib::RefPtr<Gst::Segment>& segment)
+  EventNewSegment::create(const Gst::Segment& segment)
 {
-  GstEvent* event = gst_event_new_segment(segment->gobj());
+  GstEvent* event = gst_event_new_segment(segment.gobj());
   return Glib::wrap_event_derived<EventNewSegment>(event, false);
 }
 
@@ -393,7 +393,7 @@ Glib::RefPtr<Gst::Caps> EventCaps::parse()
 {
   GstCaps* gst_caps = 0;
   gst_event_parse_caps(gobj(), &gst_caps);
-  return Glib::wrap(gst_caps);
+  return Glib::wrap(gst_caps, true);
 }
 
 } //namespace Gst
