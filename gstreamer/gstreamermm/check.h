@@ -50,7 +50,7 @@ class Check
          * @param caps2: Second caps to compare.
          * @throw Gst::Exception if caps are not equal.
          */
-        void caps_equal (Glib::RefPtr<Gst::Caps> caps1, Glib::RefPtr<Gst::Caps> caps2);;
+        void caps_equal (Glib::RefPtr<Gst::Caps> caps1, Glib::RefPtr<Gst::Caps> caps2);
     };
 
     Check();
