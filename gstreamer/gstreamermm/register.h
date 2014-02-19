@@ -73,6 +73,7 @@ register_mm_type(const gchar * type_name=typeid(DerivedCppType).name())
         static void base_init(typename DerivedCppType::BaseClassType *klass)
         {
             Gst::ElementClass<DerivedCppType> element_class(klass);
+	    DerivedCppType::base_init(&element_class);
         }
         static void finalize(GObject *object)
         {
@@ -101,7 +102,6 @@ register_mm_type(const gchar * type_name=typeid(DerivedCppType).name())
         static void base_init(typename DerivedCppType::BaseClassType *klass)
         {
             Gst::init();
-            DerivedCppType::base_class_init(klass);
         }
     };
 
