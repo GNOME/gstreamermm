@@ -162,7 +162,7 @@ xvimagesink|xvimagesink|XvImageSink
 # it only applies in maintainer-mode.
 AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
 [
-  gstmm_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-0.10 2>&AS_MESSAGE_LOG_FD`
+  gstmm_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-1.0 2>&AS_MESSAGE_LOG_FD`
   AC_PATH_PROGS([GST_INSPECT], [gst-inspect-1.0],,
                 [$gstmm_toolsdir$PATH_SEPARATOR$PATH])
 
