@@ -88,14 +88,12 @@ bool Bus::remove_watch(guint id)
 
 void Bus::set_sync_handler(const SlotMessageSync& slot)
 {
-  static SlotMessageSync slot_copy;
-
   // Clear a possibly existing sync handler by calling with 0 before setting
   // a new one (see gst_bus_set_sync_handler docs)
   gst_bus_set_sync_handler(gobj(), 0, 0, 0);
 
-  slot_copy = slot;
-  gst_bus_set_sync_handler(gobj(), &Bus_Message_Sync_gstreamermm_callback, &slot_copy, NULL);
+  SlotMessageSync* slot_copy = new SlotMessageSync(slot);
+  gst_bus_set_sync_handler(gobj(), &Bus_Message_Sync_gstreamermm_callback, slot_copy, &Bus_Message_gstreamermm_callback_destroy);
 }
 
 } //namespace Gst
