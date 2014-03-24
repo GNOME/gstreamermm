@@ -204,9 +204,15 @@ gboolean Pad_Query_gstreamermm_callback(GstPad* pad, GstObject* parent, GstQuery
 
   try
   {
+    //We cannot make copy of query, since some elements fail to answer the query if it's refcount>1 (is not writtable)
     Glib::RefPtr<Query> query_wrapped = Glib::wrap(query, false);
 
-    return pad_wrapper->slot_query(Glib::wrap(pad, true), query_wrapped);
+    gboolean res = pad_wrapper->slot_query(Glib::wrap(pad, true), query_wrapped);
+    
+    //we have to increase refcount, since freeing RefPtr will decrease it which would be inaccurate here, since the
+    //caller is responsible for managing the object (see "transfer none" on this parameter)
+    query_wrapped->reference();
+    return res;
   }
   catch(...)
   {
@@ -227,6 +233,7 @@ gboolean Pad_Event_gstreamermm_callback(GstPad* pad, GstObject* parent, GstEvent
 
   try
   {
+    //we don't make copy, since ownership is transfered to the callee ("transfer full")
     Glib::RefPtr<Event> event_wrapped = Glib::wrap(event, false);
 
     return pad_wrapper->slot_event(Glib::wrap(pad, true), event_wrapped);
