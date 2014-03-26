@@ -32,8 +32,26 @@ Glib::RefPtr<Gst::Buffer> Buffer::copy() const
 
 Glib::RefPtr<Gst::Buffer> Buffer::create_writable()
 {
-  if(is_writable())  // caller has the only one reference to the buffer
-  {                 // since there is no other ref to the buffer, nobody else can do a ref in the meantime
+  /*
+   * This function is generally used in the following pattern:
+   * RefPtr<Buffer> p = (...);
+   * p = p->create_writable();
+   *
+   * There are two cases:
+   * 1. object is not writable, therefore:
+   *   - somebody else may have another reference to the object (but it this might change in the meantime)
+   *   - gst_buffer_make_writable may return a new copy of object
+   *   - we have to make additional ref, that will be unreffed in gst_buffer_make_writable
+   * 2. object is_writable, then:
+   *   - our caller has the only one reference to object (therefore nobody can increase refcount in the meantime)
+   *   - gst_buffer_make_writable will return the same object and will not do any reffing/unreffing
+   *   - we cannot make any additional refs before calling gst_buffer_make_writable, since it would enforce unnecessary
+   *     copying of the object
+   *   - we are supposed to create a new RefPtr with is own reference to the object, therefore we need to "take copy"
+   *   - however when caller release the pointer (implicitly, during assignment) the refcount will be 1 again
+   */
+  if(is_writable())
+  {
     return Glib::wrap(gst_buffer_make_writable(gobj()), true); // take copy so original object is left to the current owner (and hopefully will be released soon)
   }
   else
