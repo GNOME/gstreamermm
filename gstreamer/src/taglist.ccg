@@ -164,8 +164,14 @@ bool TagList::get_value(Tag tag, Glib::ValueBase& dest) const
 
 bool TagList::get_value(const Glib::ustring& tag, Glib::ValueBase& dest) const
 {
-  return gst_tag_list_copy_value(dest.gobj(), const_cast<GstTagList*>(gobj()),
-    tag.c_str());
+  GValue gst_value = {0};
+  if(gst_tag_list_copy_value(&gst_value, const_cast<GstTagList*>(gobj()), tag.c_str()))
+  {
+    g_value_copy(&gst_value, dest.gobj());
+    g_value_unset(&gst_value);
+    return true;
+  }
+  return false;
 }
 
 bool TagList::get_value(Tag tag, guint index, Glib::ValueBase& value) const
@@ -178,9 +184,10 @@ bool TagList::get_value(const Glib::ustring& tag, guint index, Glib::ValueBase& 
   const GValue* gst_value =
     gst_tag_list_get_value_index(const_cast<GstTagList*>(gobj()),
     tag.c_str(), index);
+
   if(gst_value)
   {
-    value.init(gst_value);
+    g_value_copy(gst_value, value.gobj());
     return true;
   }
 
