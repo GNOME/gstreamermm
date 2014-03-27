@@ -106,9 +106,9 @@ Glib::RefPtr<Gst::EventTag> EventTag::create(const Gst::TagList& taglist)
   return Glib::wrap_event_derived<EventTag>(event, false);
 }
 
-Gst::TagList EventTag::parse(const Glib::ustring& name) const
+Gst::TagList EventTag::parse() const
 {
-  GstTagList* gst_taglist = gst_tag_list_new(name.c_str());
+  GstTagList* gst_taglist = gst_tag_list_new_empty();
   gst_event_parse_tag(const_cast<GstEvent*>(gobj()), &gst_taglist);
   return Gst::TagList(gst_taglist);
 }
