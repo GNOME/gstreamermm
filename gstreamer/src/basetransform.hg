@@ -187,21 +187,6 @@ public:
   /** Allows the subclass to be notified of the actual caps set.
    */
   _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps), "set_caps", return_value true)
-  _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps), "set_caps")
-
-  //TODO: Handwrapped because default return should be true otherwise the
-  //ogg_player_gtkmm example fails to run successfully.
-  /** Optional. Called when the element starts processing. Allows opening
-   * external resources.
-   */
-  virtual bool start_vfunc();
-
-  //TODO: Handwrapped because default return should be true otherwise the
-  //ogg_player_gtkmm example fails to run successfully.
-  /** Optional. Called when the element stops processing. Allows closing
-   * external resources.
-   */
-  virtual bool stop_vfunc();
 
 #m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3, true)')
 #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
@@ -241,6 +226,15 @@ public:
    */
   _WRAP_VFUNC(bool accept_caps(PadDirection direction, const Glib::RefPtr<const Gst::Caps>& caps), "accept_caps")
 
+  /** Optional. Called when the element starts processing. Allows opening
+   * external resources.
+   */
+  _WRAP_VFUNC(bool start(), "start", return_value true)
+
+  /** Optional. Called when the element starts processing. Allows opening
+   * external resources.
+   */
+  _WRAP_VFUNC(bool stop(), "stop", return_value true)
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
@@ -248,8 +242,6 @@ protected:
   klass->stop = &stop_vfunc_callback;
   klass->prepare_output_buffer = &prepare_output_buffer_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
-  static gboolean start_vfunc_callback(GstBaseTransform* self);
-  static gboolean stop_vfunc_callback(GstBaseTransform* self);
   static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer** buf);
   _POP()
 #m4end
