@@ -137,10 +137,16 @@ void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& valu
   gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE, value.gobj(), (void*)0);
 }
 
-void Structure::set_field(const Glib::ustring& fieldname, const ClockTime& value)
+void Structure::set_field(const Glib::ustring& fieldname, gint64 value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_CLOCK_TIME,
-    (GstClockTime) value, (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_INT64,
+    (gint64) value, (void*)0);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, guint64 value)
+{
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_INT64,
+    (guint64) value, (void*)0);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, GType enumtype, int value)
