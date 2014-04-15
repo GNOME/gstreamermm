@@ -22,6 +22,7 @@
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/format.h>
 #include <gstreamermm/query.h>
+#include <gstreamermm/event.h>
 #include <gstreamermm/bufferlist.h>
 #include <glibmm/arrayhandle.h>
 
@@ -37,6 +38,7 @@ class Event;
 class PadTemplate;
 class Query;
 class PadProbeInfo;
+enum EventType;
 
 //Gst::Iterator<> forward declaration.
 template <class CppType>
@@ -342,6 +344,8 @@ public:
   _WRAP_METHOD(bool pause_task() , gst_pad_pause_task)
   _WRAP_METHOD(bool stop_task() , gst_pad_stop_task)
   _WRAP_METHOD(bool set_active(bool active = true), gst_pad_set_active)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Event> get_sticky_event(Gst::EventType event_type, guint idx) const, gst_pad_get_sticky_event)
 
   friend GstFlowReturn Pad_Chain_gstreamermm_callback(GstPad* pad, GstObject* parent, GstBuffer *buffer);
   void set_chain_function(const SlotChain& slot);
