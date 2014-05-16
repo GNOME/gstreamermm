@@ -19,3 +19,115 @@
 
 #include <gst/gst.h>
 #include <gstreamermm/element.h>
+
+namespace Gst
+{
+
+URIType URIHandler::get_type_vfunc()
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+    g_type_interface_peek_parent(
+      g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type())
+      )  );
+
+  if(base && base->get_type)
+  {
+    return static_cast<URIType>((*base->get_type)(CppObjectType::get_type()));
+  }
+
+  return URIType();
+}
+
+GstURIType URIHandler_Class::get_type_vfunc_callback(GType type)
+{
+  gpointer self = g_object_new(type, NULL);
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj)
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        return static_cast<GstURIType>(obj->get_type_vfunc());
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+    g_type_interface_peek_parent(
+      g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type())
+      )  );
+
+  if(base && base->get_type)
+  {
+    return (*base->get_type)(type);
+  }
+
+  return GstURIType();
+}
+
+const gchar * const * URIHandler::get_protocols_vfunc() const
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+    g_type_interface_peek_parent(
+      g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type())
+      )  );
+
+  if(base && base->get_protocols)
+  {
+    return (*base->get_protocols)(CppObjectType::get_type());
+  }
+  static const gchar* protocols[] = {NULL};
+  return protocols;
+}
+
+const gchar * const * URIHandler_Class::get_protocols_vfunc_callback(GType type)
+{
+  gpointer self = g_object_new(type, NULL);
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj)
+    {
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        return obj->get_protocols_vfunc();
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+    g_type_interface_peek_parent(
+      g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type())
+      )  );
+
+  if(base && base->get_protocols)
+  {
+    return (*base->get_protocols)(type);
+  }
+  static const gchar *protocols[] = { NULL };
+  return protocols;
+}
+}

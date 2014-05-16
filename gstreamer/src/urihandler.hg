@@ -21,7 +21,7 @@
 #include <glibmm/interface.h>
 #include <gstreamermm/enums.h>
 #include <glibmm/arrayhandle.h>
-
+#include <cstdio>
 _DEFS(gstreamermm,gst)
 
 namespace Gst
@@ -80,11 +80,24 @@ public:
    */
   _WRAP_VFUNC(bool set_uri(const Glib::ustring& uri, GError** error), "set_uri)
 
-  //TODO: The GstURIHandler vfuncs get_type(), get_protocols(), get_type_full()
-  //and get_protocols_full() don't have a GstURIHandler as an argument declared
-  //in the Interface structure so those seem impossible to wrap because the C++
-  //callback would have no way of knowing which object's virtual function
-  //should be called.
+  /**
+   * Method to return the list of protocols handled by the element.
+   */
+  virtual const gchar * const * get_protocols_vfunc() const;
+
+  virtual URIType get_type_vfunc();
+
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->get_type = &get_type_vfunc_callback;
+  klass->get_protocols = &get_protocols_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static GstURIType get_type_vfunc_callback(GType type);
+  static const gchar * const * get_protocols_vfunc_callback(GType type);
+_POP()
+#m4end
 };
 
 } // namespace Gst
