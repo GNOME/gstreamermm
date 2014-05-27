@@ -123,6 +123,12 @@ public:
 
   typedef sigc::slot< gboolean, const Glib::RefPtr<Gst::Pad>&, /*transfer none*/ const Glib::RefPtr<Gst::Query>& > SlotQuery;
 
+  typedef sigc::slot< bool, const Glib::RefPtr<Gst::Pad>& > SlotActivate;
+
+  typedef sigc::slot< bool, const Glib::RefPtr<Gst::Pad>&, Gst::PadMode, bool > SlotActivatemode;
+
+  typedef sigc::slot< Gst::FlowReturn, const Glib::RefPtr<Gst::Pad>&, guint64, guint, Glib::RefPtr<Gst::Buffer>& > SlotGetrange;
+
   /** Creates a new pad with the given name in the given direction.
    *
    * @param name The name of the new pad.
@@ -353,6 +359,12 @@ public:
   void set_event_function(const SlotEvent& slot);
   friend gboolean Pad_Query_gstreamermm_callback(GstPad* pad, GstObject* parent, GstQuery* query);
   void set_query_function(const SlotQuery& slot);
+  friend gboolean Pad_Activate_gstreamermm_callback(GstPad* pad, GstObject* parent);
+  void set_activate_function(const SlotActivate& slot);
+  friend gboolean Pad_Activatemode_gstreamermm_callback(GstPad* pad, GstObject* parent, GstPadMode mode, gboolean active);
+  void set_activatemode_function(const SlotActivatemode& slot);
+  friend GstFlowReturn Pad_Getrange_gstreamermm_callback(GstPad* pad, GstObject* parent, guint64 offset, guint length, GstBuffer **buffer);
+  void set_getrange_function(const SlotGetrange& slot);
 
     //C API specific pad callback setting functions are ignored.
     _IGNORE(
@@ -404,6 +416,9 @@ private:
   SlotChain slot_chain;
   SlotEvent slot_event;
   SlotQuery slot_query;
+  SlotActivate slot_activate;
+  SlotActivatemode slot_activatemode;
+  SlotGetrange slot_getrange;
 };
 
 class PadProbeInfo

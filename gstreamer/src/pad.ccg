@@ -246,6 +246,71 @@ gboolean Pad_Event_gstreamermm_callback(GstPad* pad, GstObject* parent, GstEvent
   return false;
 }
 
+gboolean Pad_Activate_gstreamermm_callback(GstPad* pad, GstObject* parent)
+{
+  Gst::Pad *pad_wrapper = dynamic_cast<Gst::Pad*>
+    (static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)pad)
+      )
+    );
+  g_assert(pad);
+
+  try
+  {
+    return pad_wrapper->slot_activate(Glib::wrap(pad, true));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return false;
+}
+
+gboolean Pad_Activatemode_gstreamermm_callback(GstPad* pad, GstObject* parent, GstPadMode mode, gboolean active)
+{
+  Gst::Pad *pad_wrapper = dynamic_cast<Gst::Pad*>
+    (static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)pad)
+      )
+    );
+  g_assert(pad);
+
+  try
+  {
+    return pad_wrapper->slot_activatemode(Glib::wrap(pad, true), static_cast<PadMode>(mode), active);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return false;
+}
+
+GstFlowReturn Pad_Getrange_gstreamermm_callback(GstPad* pad, GstObject* parent, guint64 offset, guint length, GstBuffer **buffer)
+{
+  Gst::Pad *pad_wrapper = dynamic_cast<Gst::Pad*>
+    (static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)pad)
+      )
+    );
+  g_assert(pad);
+  Glib::RefPtr<Buffer> buf = Glib::wrap(*buffer, false);
+  try
+  {
+    return static_cast<GstFlowReturn>(
+    		pad_wrapper->slot_getrange(Glib::wrap(pad, true), offset, length, buf)
+    		);
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return GST_FLOW_ERROR;
+}
+
 void Pad::set_chain_function(const SlotChain& slot)
 {
   slot_chain = slot;
@@ -262,6 +327,24 @@ void Pad::set_event_function(const SlotEvent& slot)
 {
 	slot_event = slot;
 	gst_pad_set_event_function(GST_PAD(gobj()), &Pad_Event_gstreamermm_callback);
+}
+
+void Pad::set_activate_function(const SlotActivate& slot)
+{
+  slot_activate = slot;
+  gst_pad_set_activate_function(GST_PAD(gobj()), &Pad_Activate_gstreamermm_callback);
+}
+
+void Pad::set_activatemode_function(const SlotActivatemode& slot)
+{
+  slot_activatemode= slot;
+  gst_pad_set_activatemode_function(GST_PAD(gobj()), &Pad_Activatemode_gstreamermm_callback);
+}
+
+void Pad::set_getrange_function(const SlotGetrange& slot)
+{
+  slot_getrange = slot;
+  gst_pad_set_getrange_function(GST_PAD(gobj()), &Pad_Getrange_gstreamermm_callback);
 }
 
 bool Pad::is_ghost_pad() const
