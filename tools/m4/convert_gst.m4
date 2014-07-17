@@ -147,6 +147,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::MapInfo>&', `GstMapInfo*', `$3->gobj()')
 dnl Memory
 _CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Memory>',`GstMemory*', `Glib::unwrap($3)')
 
 dnl Message
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Glib::wrap($3)')
