@@ -30,7 +30,7 @@ public:
                         Gst::Caps::create_any()));
     }
 
-    Gst::FlowReturn chain(const Glib::RefPtr<Gst::Pad> &pad, Glib::RefPtr<Gst::Buffer> &buf)
+    Gst::FlowReturn chain(const Glib::RefPtr<Gst::Pad> & /* pad */, Glib::RefPtr<Gst::Buffer> &buf)
     {
         buf = buf->create_writable();
         assert(buf->gobj()->mini_object.refcount==1);

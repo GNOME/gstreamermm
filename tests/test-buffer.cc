@@ -6,6 +6,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <glibmm/threads.h>
 #include <gstreamermm/buffer.h>
 
 using namespace Gst;

@@ -15,7 +15,7 @@ using Glib::RefPtr;
 RefPtr<Element> video_parser, audio_parser;
 RefPtr<Glib::MainLoop> main_loop;
 
-bool on_bus_message(const RefPtr<Gst::Bus>& bus,
+bool on_bus_message(const RefPtr<Gst::Bus>&,
                     const RefPtr<Message>& message)
 {
 	switch(message->get_message_type())

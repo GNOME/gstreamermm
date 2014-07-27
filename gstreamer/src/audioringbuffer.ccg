@@ -20,33 +20,6 @@
 #include <gstreamermm/handle_error.h>
 _PINCLUDE(gstreamermm/private/object_p.h)
 
-namespace
-{
-
-extern "C"
-{
-
-static void AudioRingBuffer_Fill_gstreamermm_callback(GstAudioRingBuffer*,
-  guint8* data, guint len, gpointer user_data)
-{
-  Gst::AudioRingBuffer::SlotFill& slot_fill =
-    *static_cast<Gst::AudioRingBuffer::SlotFill*>(user_data);
-
-  try
-  {
-    Glib::ArrayHandle<guint8> cpp_data(data, len, Glib::OWNERSHIP_NONE);
-    slot_fill(cpp_data, len);
-  }
-  catch (...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-}
-
-} // extern "C"
-
-} // anonymous namespace
-
 namespace Gst
 {
 

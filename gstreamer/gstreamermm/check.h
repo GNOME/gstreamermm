@@ -8,6 +8,7 @@
 #ifndef _GSTREAMERMM_CHECK_H
 #define _GSTREAMERMM_CHECK_H
 
+#include <glibmm/threads.h>
 #include <glibmm/ustring.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/pad.h>

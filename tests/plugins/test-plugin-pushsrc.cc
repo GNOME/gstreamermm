@@ -36,7 +36,7 @@ public:
         set_format(Gst::FORMAT_TIME);
     }
 
-    Gst::FlowReturn create_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
+    Gst::FlowReturn create_vfunc(guint64 /* offset */, guint /* size */, Glib::RefPtr<Gst::Buffer>& buffer)
     {
         if (count_left-- <= 0)
             return Gst::FLOW_EOS;

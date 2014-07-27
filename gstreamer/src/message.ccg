@@ -623,8 +623,8 @@ Format MessageSegmentDone::parse_format() const
 }
 
 Glib::RefPtr<Gst::MessageDuration>
-  MessageDuration::create(const Glib::RefPtr<Gst::Object>& src, Format format,
-  gint64 duration)
+  MessageDuration::create(const Glib::RefPtr<Gst::Object>& src, Gst::Format,
+  gint64 /* duration */)
 {
   GstMessage* message = gst_message_new_duration(Glib::unwrap(src),
     static_cast<GstFormat>(format), duration);
@@ -660,8 +660,7 @@ Glib::RefPtr<Gst::MessageLatency>
 }
 
 Glib::RefPtr<Gst::MessageAsyncStart>
-  MessageAsyncStart::create(const Glib::RefPtr<Gst::Object>& src,
-  bool new_base_time)
+  MessageAsyncStart::create(const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_async_start(Glib::unwrap(src));
   return Gst::wrap_msg_derived<Gst::MessageAsyncStart>(message, true);

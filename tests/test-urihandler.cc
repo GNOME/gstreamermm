@@ -34,7 +34,7 @@ public:
 	{
 	}
 
-	bool set_uri_vfunc(const Glib::ustring& uri, GError** error)
+        bool set_uri_vfunc(const Glib::ustring& /* uri */, GError** /* error */)
 	{
 		return true;
 	}

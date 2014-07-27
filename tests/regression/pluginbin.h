@@ -25,9 +25,7 @@ private:
 public:
     static void base_init(Gst::ElementClass<PluginBin> *klass)
     {
-        GstElementClass* element_klass = (GstElementClass*)klass;
-        gst_element_class_set_details_simple(element_klass, "Custom test bin",
-                "test/bins", "test bin", "author");
+       klass->set_metadata("Custom test bin", "test/bins", "test bin", "author");
     }
 
     explicit PluginBin(GstBin *gobj)

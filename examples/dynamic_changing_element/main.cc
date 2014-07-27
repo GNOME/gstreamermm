@@ -56,7 +56,7 @@ PadProbeReturn pad_probe_cb(const RefPtr<Pad>& pad, const PadProbeInfo& info)
 	return PAD_PROBE_OK;
 }
 
-bool on_bus_message(const Glib::RefPtr<Gst::Bus>& bus,
+bool on_bus_message(const Glib::RefPtr<Gst::Bus>&,
                     const Glib::RefPtr<Gst::Message>& message)
 {
 	switch (message->get_message_type())

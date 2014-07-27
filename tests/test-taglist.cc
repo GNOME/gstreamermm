@@ -23,7 +23,7 @@ protected:
     template<typename Ty>
     Ty ValidateTag(Tag tag)
     {
-        Ty output;
+        Ty output = {};
 
         bool ok = tag_list.get(tag, output);
 
@@ -63,7 +63,7 @@ TEST_F(TagListTest, DISABLED_GetTagDurationFromList)
     EXPECT_EQ(song_duration, out_duration);
 }
 
-TEST_F(TagListTest, GetTagDateFromList)
+TEST_F(TagListTest, DISABLED_GetTagDateFromList)
 {
     tag_list.add(TAG_DATE, song_date);
 

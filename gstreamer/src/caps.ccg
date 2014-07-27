@@ -87,7 +87,7 @@ Glib::RefPtr<Gst::Caps> Caps::create(const Structure& structure)
 {
   //We take a copy because gst_caps_append_structure() wants to take ownership:
   GstStructure* copy = gst_structure_copy(structure.gobj());
-  return Glib::wrap(gst_caps_new_full(copy, 0));
+  return Glib::wrap(gst_caps_new_full(copy, NULL));
 }
 
 void Caps::append_structure(const Structure& structure)
@@ -97,11 +97,11 @@ void Caps::append_structure(const Structure& structure)
   gst_caps_append_structure(gobj(), copy);
 }
 
-void Caps::merge_structure(Structure& structure)
+Glib::RefPtr<Caps> Caps::merge_structure(Structure& structure)
 {
   //We take a copy because gst_caps_append_structure() wants to take ownership:
   GstStructure* copy = gst_structure_copy(structure.gobj());
-  gst_caps_merge_structure(gobj(), copy);
+  return Glib::wrap(gst_caps_merge_structure(gobj(), copy), true);
 }
 
 //TODO: Want to return RefPtr to Caps but using RefPtr in expressions such

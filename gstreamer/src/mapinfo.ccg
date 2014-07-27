@@ -28,7 +28,10 @@ MapInfo::MapInfo(GstMapInfo& castitem, bool take_ownership)
 }
 
 MapInfo::MapInfo(const MapInfo& other)
-: m_spec(g_try_new(GstMapInfo, 1)),
+: sigc::trackable(),
+  Glib::ObjectBase(),
+  Glib::Object(),
+  m_spec(g_try_new(GstMapInfo, 1)),
   take_ownership(true)
 {
   // Handle possible memory allocation failure.

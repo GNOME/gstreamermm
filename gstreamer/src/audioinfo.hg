@@ -35,20 +35,16 @@ class AudioInfo : public Gst::AudioFormatInfo
 {
   _CLASS_GENERIC(AudioInfo, GstAudioInfo)
 public:
-  AudioInfo(const GstAudioInfo& info){}
+  AudioInfo(const GstAudioInfo* info, bool take_ownership = false);
 
 
   virtual ~AudioInfo();
-
-  /// Gets the underlying gobject.
-  GstAudioInfo* gobj() { return m_info; };
-
   /// Gets the underlying gobject.
   const GstAudioInfo* gobj() const { return m_info; };
 
 protected:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GstAudioInfo* m_info;
+  const GstAudioInfo* m_info;
   bool take_ownership;
 #endif
 };

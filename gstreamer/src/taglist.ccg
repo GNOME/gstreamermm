@@ -148,7 +148,7 @@ void TagList::add(Tag tag, const Glib::Date& date, TagMergeMode mode)
 
 void TagList::add(const Glib::ustring& tag, const Glib::Date& date, TagMergeMode mode)
 {
-  gst_tag_list_add(gobj(), static_cast<GstTagMergeMode>(mode), tag.c_str(), date.gobj(), 0);
+  gst_tag_list_add(gobj(), static_cast<GstTagMergeMode>(mode), tag.c_str(), date.gobj(), NULL);
 }
 
 void TagList::foreach(const SlotForeach& slot)
@@ -164,7 +164,7 @@ bool TagList::get_value(Tag tag, Glib::ValueBase& dest) const
 
 bool TagList::get_value(const Glib::ustring& tag, Glib::ValueBase& dest) const
 {
-  GValue gst_value = {0};
+  GValue gst_value = G_VALUE_INIT;
   if(gst_tag_list_copy_value(&gst_value, const_cast<GstTagList*>(gobj()), tag.c_str()))
   {
     g_value_copy(&gst_value, dest.gobj());

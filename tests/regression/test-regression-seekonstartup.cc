@@ -50,7 +50,7 @@ void dec_counter()
     }
 }
 
-PadProbeReturn cb_blocked (const RefPtr <Pad>& pad, const PadProbeInfo& info)
+PadProbeReturn cb_blocked (const RefPtr <Pad>& /* pad */, const PadProbeInfo& /* info */)
 {
   if (prerolled)
     return PAD_PROBE_REMOVE;

@@ -18,12 +18,12 @@ local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GS
 
 AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(GSTREAMERMM_CFLAGS) -std=c++0x
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g
-LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest
+LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest -lpthread
 
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
                  test-urihandler test-ghostpad \
                  test-query test-structure test-taglist test-plugin-appsink \
-                 test-plugin-appsrc test-plugin-register test-plugin-pushsrc \ 
+                 test-plugin-appsrc test-plugin-register test-plugin-pushsrc \
                  test-regression-bininpipeline test-regression-binplugin \
                  test-regression-rewritefile test-regression-seekonstartup \
                  test-regression-videoduration
