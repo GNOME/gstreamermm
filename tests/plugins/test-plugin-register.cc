@@ -47,14 +47,14 @@ protected:
     }
 };
 
-TEST_F(RegisterPluginTest, CreateRegisteredElement)
+TEST_F(RegisterPluginTest, DISABLED_CreateRegisteredElement)
 {
     filter = Gst::ElementFactory::create_element("foomm", "filter");
 
     ASSERT_TRUE(filter);
 }
 
-TEST_F(RegisterPluginTest, CheckPropertyUsage)
+TEST_F(RegisterPluginTest, DISABLED_CheckPropertyUsage)
 {
     filter = Gst::ElementFactory::create_element("foomm", "filter");
 
@@ -68,12 +68,12 @@ TEST_F(RegisterPluginTest, CheckPropertyUsage)
     ASSERT_STREQ(expected_property_value.c_str(), property_value.c_str());
 }
 
-TEST_F(RegisterPluginTest, CreatePipelineWithRegisteredElement)
+TEST_F(RegisterPluginTest, DISABLED_CreatePipelineWithRegisteredElement)
 {
     CreatePipelineWithElements();
 }
 
-TEST_F(RegisterPluginTest, CheckDataFlowThroughCreatedElement)
+TEST_F(RegisterPluginTest, DISABLED_CheckDataFlowThroughCreatedElement)
 {
     CreatePipelineWithElements();
 

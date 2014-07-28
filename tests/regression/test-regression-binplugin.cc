@@ -35,7 +35,7 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
     return true;
 }
 
-TEST(BinPluginRegressionTest, ShouldDecodeAndEncodeFile)
+TEST(BinPluginRegressionTest, DISABLED_ShouldDecodeAndEncodeFile)
 {
     Plugin::register_static(GST_VERSION_MAJOR, GST_VERSION_MINOR, "pluginbin",
                 "pluginbin is example of C++ element", sigc::ptr_fun(&PluginBin::register_pluginbin), "0.1",
