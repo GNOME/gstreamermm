@@ -165,6 +165,91 @@ void deinit();
  */
 Glib::OptionGroup get_option_group();
 
+/**
+ * Gets the version number of the GStreamer library.
+ *
+ * @major: (out): pointer to a guint to store the major version number
+ * @minor: (out): pointer to a guint to store the minor version number
+ * @micro: (out): pointer to a guint to store the micro version number
+ * @nano:  (out): pointer to a guint to store the nano version number
+ */
+void version(guint& major, guint& minor, guint& micro, guint& nano);
+
+/**
+ * This function returns a string that is useful for describing this version
+ * of GStreamer to the outside world: user agent strings, logging, ...
+ *
+ * @return A newly allocated string describing this version
+ * of GStreamer.
+ */
+Glib::ustring version_string();
+
+/**
+ * Some functions in the GStreamer core might install a custom SIGSEGV handler
+ * to better catch and report errors to the application. Currently this feature
+ * is enabled by default when loading plugins.
+ *
+ * Applications might want to disable this behaviour with the
+ * gst_segtrap_set_enabled() function. This is typically done if the application
+ * wants to install its own handler without GStreamer interfering.
+ *
+ * @return <tt>true</tt> if GStreamer is allowed to install a custom SIGSEGV handler.
+ */
+bool segtrap_is_enabled();
+
+/**
+ * Applications might want to disable/enable the SIGSEGV handling of
+ * the GStreamer core. See gst_segtrap_is_enabled() for more information.
+ *
+ * @enabled: whether a custom SIGSEGV handler should be installed.
+ */
+void segtrap_set_enabled(bool enabled);
+
+/**
+ * By default GStreamer will perform scanning and rebuilding of the
+ * registry file using a helper child process.
+ *
+ * Applications might want to disable this behaviour with the
+ * gst_registry_fork_set_enabled() function, in which case new plugins
+ * are scanned (and loaded) into the application process.
+ *
+ * @return <tt>true</tt> if GStreamer will use the child helper process when
+ * rebuilding the registry.
+ */
+bool registry_fork_is_enabled();
+
+/**
+ * Applications might want to disable/enable spawning of a child helper process
+ * when rebuilding the registry. See gst_registry_fork_is_enabled() for more
+ * information.
+ *
+ * @enabled: whether rebuilding the registry can use a temporary child helper process.
+ */
+void registry_fork_set_enabled(bool enabled);
+
+/**
+ * Forces GStreamer to re-scan its plugin paths and update the default
+ * plugin registry.
+ *
+ * Applications will almost never need to call this function, it is only
+ * useful if the application knows new plugins have been installed (or old
+ * ones removed) since the start of the application (or, to be precise, the
+ * first call to gst_init()) and the application wants to make use of any
+ * newly-installed plugins without restarting the application.
+ *
+ * Applications should assume that the registry update is neither atomic nor
+ * thread-safe and should therefore not have any dynamic pipelines running
+ * (including the playbin and decodebin elements) and should also not create
+ * any elements or access the GStreamer registry while the update is in
+ * progress.
+ *
+ * Note that this function may block for a significant amount of time.
+ *
+ * @return <tt>true</tt> if the registry has been updated successfully (does not
+ *          imply that there were changes), otherwise <tt>false</tt>.
+ */
+bool update_registry();
+
 }//end namespace Gst
 
 #endif //_GSTREAMERMM_INIT_H

@@ -119,4 +119,39 @@ Glib::OptionGroup get_option_group()
   return Glib::OptionGroup(gst_init_get_option_group());
 }
 
+void version(guint& major, guint& minor, guint& micro, guint& nano)
+{
+  gst_version(&major, &minor, &micro, &nano);
+}
+
+Glib::ustring version_string()
+{
+  return Glib::ustring(gst_version_string());
+}
+
+bool segtrap_is_enabled()
+{
+  return gst_segtrap_is_enabled();
+}
+
+void segtrap_set_enabled(bool enabled)
+{
+  gst_segtrap_set_enabled(enabled);
+}
+
+bool registry_fork_is_enabled()
+{
+  return gst_registry_fork_is_enabled();
+}
+
+void registry_fork_set_enabled(bool enabled)
+{
+  gst_registry_fork_set_enabled(enabled);
+}
+
+bool update_registry()
+{
+  return gst_update_registry();
+}
+
 }
