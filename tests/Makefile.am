@@ -21,7 +21,7 @@ AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest -lpthread
 
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
-                 test-urihandler test-ghostpad \
+                 test-urihandler test-ghostpad test-init \
                  test-query test-structure test-taglist test-plugin-appsink \
                  test-plugin-appsrc test-plugin-register test-plugin-pushsrc \
                  test-regression-bininpipeline test-regression-binplugin \
@@ -37,6 +37,7 @@ test_caps_SOURCES			= test-caps.cc $(TEST_MAIN_SOURCE)
 test_buffer_SOURCES			= test-buffer.cc $(TEST_MAIN_SOURCE)
 test_bus_SOURCES			= test-bus.cc $(TEST_MAIN_SOURCE)
 test_ghostpad_SOURCES		= test-ghostpad.cc $(TEST_MAIN_SOURCE)
+test_init_SOURCES			= test-init.cc $(TEST_MAIN_SOURCE)
 test_pad_SOURCES			= test-pad.cc $(TEST_MAIN_SOURCE)
 test_query_SOURCES			= test-query.cc $(TEST_MAIN_SOURCE)
 test_structure_SOURCES		= test-structure.cc $(TEST_MAIN_SOURCE)
