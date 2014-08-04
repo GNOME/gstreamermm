@@ -64,6 +64,7 @@
 #include <gstreamermm/register.h>
 
 // Core includes
+#include <gstreamermm/allocator.h>
 #include <gstreamermm/bin.h>
 #include <gstreamermm/buffer.h>
 #include <gstreamermm/bufferlist.h>

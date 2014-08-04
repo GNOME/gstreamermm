@@ -27,6 +27,7 @@ _CONV_ENUM(Gst,IndexLookupMethod)
 _CONV_ENUM(Gst,IndexResolverMethod)
 _CONV_ENUM(Gst,LockFlags)
 _CONV_ENUM(Gst,MapFlags)
+_CONV_ENUM(Gst,MemoryFlags)
 _CONV_ENUM(Gst,MessageType)
 _CONV_ENUM(Gst,MixerFlags)
 _CONV_ENUM(Gst,MixerType)
@@ -59,6 +60,10 @@ _CONV_GLIB_ENUM(ThreadPriority)
 
 
 dnl ############### gstreamermm Class Conversions ######################
+
+dnl AllocationParams
+_CONVERSION(`AllocationParams', `GstAllocationParams*', `$3.gobj()')
+_CONVERSION(`GstAllocationParams*', `AllocationParams', `AllocationParams($3, true)')
 
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')
@@ -145,6 +150,7 @@ dnl MapInfo
 _CONVERSION(`const Glib::RefPtr<Gst::MapInfo>&', `GstMapInfo*', `$3->gobj()')
 
 dnl Memory
+_CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>&',`Glib::wrap($3)')
 _CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>',`GstMemory*', `Glib::unwrap($3)')

@@ -1,0 +1,113 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2014 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gst.h>
+#include <gstreamermm/memory.h>
+#include <gstreamermm/object.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class AllocationParams
+{
+  _CLASS_BOXEDTYPE(AllocationParams, GstAllocationParams, NONE, gst_allocation_params_copy, gst_allocation_params_free)
+
+public:
+  _CUSTOM_DEFAULT_CTOR
+
+  AllocationParams();
+
+  _WRAP_METHOD(void init(), gst_allocation_params_init)
+
+  _MEMBER_GET(flags, flags, MemoryFlags, GstMemoryFlags)
+  _MEMBER_SET(flags, flags, MemoryFlags, GstMemoryFlags)
+
+  _MEMBER_GET(align, align, gsize, gsize)
+  _MEMBER_SET(align, align, gsize, gsize)
+
+  _MEMBER_GET(prefix, prefix, gsize, gsize)
+  _MEMBER_SET(prefix, prefix, gsize, gsize)
+
+  _MEMBER_GET(padding, padding, gsize, gsize)
+  _MEMBER_SET(padding, padding, gsize, gsize)
+};
+
+class Allocator : public Gst::Object
+{
+  _CLASS_GOBJECT(Allocator, GstAllocator, GST_ALLOCATOR, Gst::Object, GstObject)
+
+public:
+  /**
+   * Find a previously registered allocator with @name.
+   *
+   * @name: the name of the allocator
+   *
+   * @return: a #Glib::RefPtr<Gst::Allocator>.
+   */
+  static Glib::RefPtr<Gst::Allocator> find(const Glib::ustring& name);
+  _IGNORE(gst_allocator_find)
+
+  /**
+   * Registers the memory @allocator with @name.
+   *
+   * @name: the name of the allocator
+   * @allocator: (transfer full): #GstAllocator
+   */
+  void register_allocator(const Glib::ustring& name);
+  _IGNORE(gst_allocator_register)
+
+  /**
+   * Set the default allocator.
+   */
+  void set_default();
+  _IGNORE(gst_allocator_set_default)
+
+  /**
+   * Find default allocator.
+   *
+   * @return: default allocator.
+   */
+  static Glib::RefPtr<Gst::Allocator> get_default_allocator();
+
+  /** Free @a memory that was previously allocated with alloc().
+   * @param memory The memory to free.
+   */
+  void free(Glib::RefPtr<Gst::Memory>& memory);
+  _IGNORE(gst_allocator_free)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Memory> alloc(gsize size, AllocationParams params), gst_allocator_alloc)
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Memory> alloc(gsize size, AllocationParams params), "alloc")
+
+  // This vfunc is hand-coded because it takes reference to a memory.
+  // In generally, arguments are passed to a function by copy, so
+  // custom wrapper is necessary.
+  virtual void free_vfunc(Glib::RefPtr<Gst::Memory>& memory);
+
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->free = &free_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static void free_vfunc_callback(GstAllocator* self, GstMemory* memory);
+  _POP()
+#m4end
+};
+}
