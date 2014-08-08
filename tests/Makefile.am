@@ -21,7 +21,7 @@ AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest -lpthread
 
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
-                 test-allocator test-atomicqueue \
+                 test-allocator test-atomicqueue test-bin \
                  test-urihandler test-ghostpad test-init \
                  test-query test-structure test-taglist test-plugin-appsink \
                  test-plugin-appsrc test-plugin-register test-plugin-pushsrc \
@@ -36,6 +36,7 @@ TEST_REGRESSION_UTILS = regression/utils.cc
 
 test_allocator_SOURCES		= test-allocator.cc $(TEST_MAIN_SOURCE)
 test_atomicqueue_SOURCES	= test-atomicqueue.cc $(TEST_MAIN_SOURCE)
+test_bin_SOURCES			= test-bin.cc $(TEST_MAIN_SOURCE)
 test_caps_SOURCES			= test-caps.cc $(TEST_MAIN_SOURCE)
 test_buffer_SOURCES			= test-buffer.cc $(TEST_MAIN_SOURCE)
 test_bus_SOURCES			= test-bus.cc $(TEST_MAIN_SOURCE)
