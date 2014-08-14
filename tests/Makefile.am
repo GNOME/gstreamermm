@@ -26,6 +26,7 @@ check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
                  test-query test-structure test-taglist test-plugin-appsink \
                  test-plugin-appsrc test-plugin-register test-plugin-pushsrc \
                  test-regression-bininpipeline test-regression-binplugin \
+                 test-pipeline \
                  test-regression-rewritefile test-regression-seekonstartup \
                  test-regression-videoduration
 
@@ -44,6 +45,7 @@ test_ghostpad_SOURCES		= test-ghostpad.cc $(TEST_MAIN_SOURCE)
 test_init_SOURCES			= test-init.cc $(TEST_MAIN_SOURCE)
 test_miniobject_SOURCES		= test-miniobject.cc $(TEST_MAIN_SOURCE)
 test_pad_SOURCES			= test-pad.cc $(TEST_MAIN_SOURCE)
+test_pipeline_SOURCES			= test-pipeline.cc $(TEST_MAIN_SOURCE)
 test_query_SOURCES			= test-query.cc $(TEST_MAIN_SOURCE)
 test_structure_SOURCES		= test-structure.cc $(TEST_MAIN_SOURCE)
 test_taglist_SOURCES		= test-taglist.cc $(TEST_MAIN_SOURCE)
