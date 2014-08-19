@@ -44,7 +44,17 @@ public:
   _WRAP_METHOD(bool lock(LockFlags flags), gst_mini_object_lock)
   _WRAP_METHOD(void unlock(LockFlags flags), gst_mini_object_unlock)
   _WRAP_METHOD(bool is_writable() const, gst_mini_object_is_writable)
-  _WRAP_METHOD(Glib::RefPtr<MiniObject> create_writable(), gst_mini_object_make_writable)
+
+  _IGNORE(gst_mini_object_make_writable)
+  /** Checks if a mini-object is writable.  If not, a writable copy is made and
+   * returned.  This gives away the reference to the original mini object,
+   * and returns a reference to the new object.
+   *
+   * MT safe
+   * @return A mini-object (possibly the same pointer) that
+   * is writable.
+   */
+  Glib::RefPtr<MiniObject> create_writable();
 
   // Copying a mini object can be achieved by assignment.
   _IGNORE(gst_mini_object_copy)
