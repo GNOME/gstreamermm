@@ -24,6 +24,8 @@
 #include <gstreamermm/event.h>
 #include <gstreamermm/padtemplate.h>
 #include <gstreamermm/iterator.h>
+#include <gstreamermm/message.h>
+#include <gstreamermm/bus.h>
 
 _PINCLUDE(glibmm/private/object_p.h)
 _PINCLUDE(gstreamermm/private/object_p.h)
@@ -36,14 +38,14 @@ extern "C"
 static GstPadProbeReturn Pad_Probe_gstreamermm_callback(GstPad* pad, GstPadProbeInfo* probe_info, void* data)
 {
   Gst::Pad::SlotProbe* the_slot = static_cast<Gst::Pad::SlotProbe*>(data);
-
+  Glib::RefPtr<Gst::Pad> pad_wrapper = Glib::wrap(pad, true);
   try
   {
-      return static_cast<GstPadProbeReturn>((*the_slot)(Glib::wrap(pad, true), Glib::wrap(probe_info, true)));
+      return static_cast<GstPadProbeReturn>((*the_slot)(pad_wrapper, Glib::wrap(probe_info, true)));
   }
   catch(...)
   {
-    Glib::exception_handlers_invoke();
+    pad_wrapper->exception_handler();
   }
 
   return GST_PAD_PROBE_DROP;
@@ -92,6 +94,44 @@ Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ)
     gstreamermm_handle_error(
       "Gst::Pad::Pad(const Glib::RefPtr<Gst::PadTemplate>&): Failed to "
       "construct pad from null template.");
+}
+
+void Pad::exception_handler()
+{
+  Glib::RefPtr<Element> parent = parent.cast_dynamic(get_parent());
+  
+  if (!parent)
+  {
+    puts ("nie postuje buga");
+    Glib::exception_handlers_invoke();
+    return;
+  }
+
+  Glib::RefPtr<Message> error_msg;
+
+  try
+  {
+    throw;
+  }
+  catch(const Glib::Error& error)
+  {
+    Glib::Error err = error;
+    error_msg = MessageError::create(parent, err, "glibmm exception");
+  }
+  catch(const std::exception& ex)
+  {
+    Glib::Error err(GST_CORE_ERROR, GST_CORE_ERROR_FAILED, ex.what());
+    error_msg = MessageError::create(parent, err, "standard exception");
+  }
+  catch(...)
+  {
+    Glib::Error err(GST_CORE_ERROR, GST_CORE_ERROR_FAILED, "");
+    error_msg = MessageError::create(parent, err, "unknown error type");
+  }
+
+  puts ("postuje buga");
+  int out = parent->post_message(error_msg);
+  printf ("na port: %d\n", out);
 }
 
 gulong Pad::add_probe(PadProbeType mask, const SlotProbe& slot)
@@ -187,7 +227,7 @@ GstFlowReturn Pad::Pad_Chain_gstreamermm_callback(GstPad* pad, GstObject*, GstBu
   }
   catch(...)
   {
-    Glib::exception_handlers_invoke();
+    pad_wrapper->exception_handler();
   }
 
   return GST_FLOW_ERROR;
@@ -216,7 +256,7 @@ gboolean Pad::Pad_Query_gstreamermm_callback(GstPad* pad, GstObject*, GstQuery* 
   }
   catch(...)
   {
-    Glib::exception_handlers_invoke();
+    pad_wrapper->exception_handler();
   }
 
   return false;
@@ -240,7 +280,7 @@ gboolean Pad::Pad_Event_gstreamermm_callback(GstPad* pad, GstObject*, GstEvent* 
   }
   catch(...)
   {
-    Glib::exception_handlers_invoke();
+    pad_wrapper->exception_handler();
   }
 
   return false;
@@ -261,7 +301,7 @@ gboolean Pad::Pad_Activate_gstreamermm_callback(GstPad* pad, GstObject*)
   }
   catch(...)
   {
-    Glib::exception_handlers_invoke();
+    pad_wrapper->exception_handler();
   }
 
   return false;
@@ -282,7 +322,7 @@ gboolean Pad::Pad_Activatemode_gstreamermm_callback(GstPad* pad, GstObject*, Gst
   }
   catch(...)
   {
-    Glib::exception_handlers_invoke();
+    pad_wrapper->exception_handler();
   }
 
   return false;
@@ -305,7 +345,7 @@ GstFlowReturn Pad::Pad_Getrange_gstreamermm_callback(GstPad* pad, GstObject*, gu
   }
   catch(...)
   {
-    Glib::exception_handlers_invoke();
+    pad_wrapper->exception_handler();
   }
 
   return GST_FLOW_ERROR;
