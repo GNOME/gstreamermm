@@ -102,7 +102,6 @@ void Pad::exception_handler()
   
   if (!parent)
   {
-    puts ("nie postuje buga");
     Glib::exception_handlers_invoke();
     return;
   }
@@ -129,9 +128,7 @@ void Pad::exception_handler()
     error_msg = MessageError::create(parent, err, "unknown error type");
   }
 
-  puts ("postuje buga");
-  int out = parent->post_message(error_msg);
-  printf ("na port: %d\n", out);
+  parent->post_message(error_msg);
 }
 
 gulong Pad::add_probe(PadProbeType mask, const SlotProbe& slot)
