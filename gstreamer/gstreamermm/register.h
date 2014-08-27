@@ -58,7 +58,7 @@ public:
 
 template<class DerivedCppType>
 static GType
-register_mm_type(const gchar * type_name=typeid(DerivedCppType).name())
+register_mm_type(const gchar * type_name)
 {
     struct GlibCppType
     {
