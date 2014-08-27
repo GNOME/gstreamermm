@@ -183,6 +183,17 @@ on outgoing buffers.
 <return></return>
 </signal>
 
+<signal name="GstAppSrc::current-level-bytes">
+<description>
+The number of currently queued bytes inside appsrc.
+
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GstAppSrc::emit-signals">
 <description>
 Make appsrc emit the &quot;need-data&quot;, &quot;enough-data&quot; and &quot;seek-data&quot; signals.
@@ -909,7 +920,7 @@ The different flags that can be used when packing and unpacking.
 
 <enum name="GstAudioRingBufferFormatType">
 <description>
-The format of the samples in the audioringbuffer.
+The format of the samples in the ringbuffer.
 
 </description>
 <parameters>
@@ -966,24 +977,24 @@ The format of the samples in the audioringbuffer.
 
 <enum name="GstAudioRingBufferState">
 <description>
-The state of the audioringbuffer.
+The state of the ringbuffer.
 
 </description>
 <parameters>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_STOPPED">
-<parameter_description> The audioringbuffer is stopped
+<parameter_description> The ringbuffer is stopped
 </parameter_description>
 </parameter>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_PAUSED">
-<parameter_description> The audioringbuffer is paused
+<parameter_description> The ringbuffer is paused
 </parameter_description>
 </parameter>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_STARTED">
-<parameter_description> The audioringbuffer is started
+<parameter_description> The ringbuffer is started
 </parameter_description>
 </parameter>
 <parameter name="GST_AUDIO_RING_BUFFER_STATE_ERROR">
-<parameter_description> The audioringbuffer has encountered an
+<parameter_description> The ringbuffer has encountered an
 error after it has been started, e.g. because the device was
 disconnected (Since 1.2)
 </parameter_description>
@@ -1296,7 +1307,7 @@ The different types of buffering methods.
 </parameter_description>
 </parameter>
 <parameter name="GST_BUFFERING_TIMESHIFT">
-<parameter_description> the stream is being downloaded in a audioringbuffer
+<parameter_description> the stream is being downloaded in a ringbuffer
 </parameter_description>
 </parameter>
 <parameter name="GST_BUFFERING_LIVE">
@@ -1894,6 +1905,27 @@ debugging categories to make them stand out in debugging output.
 </parameters>
 </enum>
 
+<enum name="GstDebugColorMode">
+<description>
+
+</description>
+<parameters>
+<parameter name="GST_DEBUG_COLOR_MODE_OFF">
+<parameter_description> Do not use colors in logs.
+</parameter_description>
+</parameter>
+<parameter name="GST_DEBUG_COLOR_MODE_ON">
+<parameter_description> Paint logs in a platform-specific way.
+</parameter_description>
+</parameter>
+<parameter name="GST_DEBUG_COLOR_MODE_UNIX">
+<parameter_description> Paint logs with UNIX terminal color codes
+no matter what platform GStreamer is running on.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GstDebugGraphDetails">
 <description>
 Available details for pipeline graphs produced by GST_DEBUG_BIN_TO_DOT_FILE()
@@ -2003,8 +2035,8 @@ ASCII characters.
 
 <signal name="GstDiscoverer::discovered">
 <description>
-Will be emitted when all information on a URI could be discovered, or
-an error ocurred.
+Will be emitted in async mode when all information on a URI could be
+discovered, or an error occurred.
 
 When an error occurs, @info might still contain some partial information,
 depending on the circumstances of the error.
@@ -2032,7 +2064,7 @@ the discoverer.
 
 <signal name="GstDiscoverer::finished">
 <description>
-Will be emitted when all pending URIs have been processed.
+Will be emitted in async mode when all pending URIs have been processed.
 
 </description>
 <parameters>
@@ -2282,11 +2314,6 @@ without a SEGMENT event.
 <parameter name="GST_EVENT_TOC">
 <parameter_description> An event which indicates that a new table of contents (TOC)
 was found or updated.
-</parameter_description>
-</parameter>
-<parameter name="GST_EVENT_CONTEXT">
-<parameter_description> An event to communicate a #GstContext to other
-elements (Since 1.2)
 </parameter_description>
 </parameter>
 <parameter name="GST_EVENT_QOS">
@@ -3211,6 +3238,14 @@ the next title actually starts playing (which will be some time after
 the URI for the next title has been set).
 </parameter_description>
 </parameter>
+<parameter name="GST_MESSAGE_NEED_CONTEXT">
+<parameter_description> Message indicating that an element wants a specific context (Since 1.2)
+</parameter_description>
+</parameter>
+<parameter name="GST_MESSAGE_HAVE_CONTEXT">
+<parameter_description> Message indicating that an element created a context (Since 1.2)
+</parameter_description>
+</parameter>
 <parameter name="GST_MESSAGE_ANY">
 <parameter_description> mask for all of the above messages.
 </parameter_description>
@@ -3968,6 +4003,11 @@ Parsing options.
 in some cases)
 </parameter_description>
 </parameter>
+<parameter name="GST_PARSE_FLAG_NO_SINGLE_ELEMENT_BINS">
+<parameter_description> If a bin only has a single element,
+just return the element.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -4192,7 +4232,8 @@ Standard predefined Query types
 </parameter_description>
 </parameter>
 <parameter name="GST_QUERY_CONTEXT">
-<parameter_description> query the pipeline-local context from downstream
+<parameter_description> query the pipeline-local context from
+downstream or upstream (since 1.2)
 </parameter_description>
 </parameter>
 </parameters>
@@ -5060,6 +5101,12 @@ both reading and writing, or either (but unspecified which).
 <parameter_description> used when the resource has no space left.
 </parameter_description>
 </parameter>
+<parameter name="GST_RESOURCE_ERROR_NOT_AUTHORIZED">
+<parameter_description> used when the resource can't be opened
+due to missing authorization.
+Since: 1.2.4
+</parameter_description>
+</parameter>
 <parameter name="GST_RESOURCE_ERROR_NUM_ERRORS">
 <parameter_description> the number of resource error types.
 </parameter_description>
@@ -5099,7 +5146,7 @@ The different scheduling flags.
 </parameter_description>
 </parameter>
 <parameter name="GST_SCHEDULING_FLAG_BANDWIDTH_LIMITED">
-<parameter_description> if bandwidth is limited and buffering possible
+<parameter_description> if bandwidth is limited and buffering possible (since 1.2)
 </parameter_description>
 </parameter>
 </parameters>
@@ -6514,6 +6561,31 @@ progressive.
 </parameters>
 </enum>
 
+<enum name="GstVideoGLTextureOrientation">
+<description>
+The orientation of the GL texture.
+
+</description>
+<parameters>
+<parameter name="GST_VIDEO_GL_TEXTURE_ORIENTATION_X_NORMAL_Y_NORMAL">
+<parameter_description> Top line first in memory, left row first
+</parameter_description>
+</parameter>
+<parameter name="GST_VIDEO_GL_TEXTURE_ORIENTATION_X_NORMAL_Y_FLIP">
+<parameter_description> Bottom line first in memory, left row first
+</parameter_description>
+</parameter>
+<parameter name="GST_VIDEO_GL_TEXTURE_ORIENTATION_X_FLIP_Y_NORMAL">
+<parameter_description> Top line first in memory, right row first
+</parameter_description>
+</parameter>
+<parameter name="GST_VIDEO_GL_TEXTURE_ORIENTATION_X_FLIP_Y_FLIP">
+<parameter_description> Bottom line first in memory, right row first
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GstVideoGLTextureType">
 <description>
 The GL texture type.
@@ -7482,9 +7554,10 @@ oven-fresh hot data, or #NULL if @nbytes bytes are not available
 <description>
 Returns a #GstBuffer containing the first @nbytes bytes of the
 @adapter. The returned bytes will be flushed from the adapter.
-This function is potentially more performant than gst_adapter_take()
-since it can reuse the memory in pushed buffers by subbuffering
-or merging.
+This function is potentially more performant than
+gst_adapter_take() since it can reuse the memory in pushed buffers
+by subbuffering or merging. This function will always return a
+buffer with a single memory region.
 
 Note that no assumptions should be made as to whether certain buffer
 flags such as the DISCONT flag are set on the returned buffer, or not.
@@ -7511,6 +7584,48 @@ Free-function: gst_buffer_unref
 <return> a #GstBuffer containing the first @nbytes of
 the adapter, or #NULL if @nbytes bytes are not available.
 gst_buffer_unref() when no longer needed.
+</return>
+</function>
+
+<function name="gst_adapter_take_buffer_fast">
+<description>
+Returns a #GstBuffer containing the first @nbytes of the @adapter.
+The returned bytes will be flushed from the adapter.  This function
+is potentially more performant than gst_adapter_take_buffer() since
+it can reuse the memory in pushed buffers by subbuffering or
+merging. Unlike gst_adapter_take_buffer(), the returned buffer may
+be composed of multiple non-contiguous #GstMemory objects, no
+copies are made.
+
+Note that no assumptions should be made as to whether certain buffer
+flags such as the DISCONT flag are set on the returned buffer, or not.
+The caller needs to explicitly set or unset flags that should be set or
+unset.
+
+This function can return buffer up to the return value of
+gst_adapter_available() without making copies if possible.
+
+Caller owns a reference to the returned buffer. gst_buffer_unref() after
+usage.
+
+Free-function: gst_buffer_unref
+
+
+</description>
+<parameters>
+<parameter name="adapter">
+<parameter_description>  a #GstAdapter
+</parameter_description>
+</parameter>
+<parameter name="nbytes">
+<parameter_description> the number of bytes to take
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer containing the first @nbytes of
+the adapter, or #NULL if @nbytes bytes are not available.
+gst_buffer_unref() when no longer needed.
+
 </return>
 </function>
 
@@ -8049,6 +8164,23 @@ Get the configured caps on @appsrc.
 </return>
 </function>
 
+<function name="gst_app_src_get_current_level_bytes">
+<description>
+Get the number of currently queued bytes inside @appsrc.
+
+
+</description>
+<parameters>
+<parameter name="appsrc">
+<parameter_description> a #GstAppSrc
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of currently queued bytes.
+
+</return>
+</function>
+
 <function name="gst_app_src_get_emit_signals">
 <description>
 Check if appsrc will emit the &quot;new-preroll&quot; and &quot;new-buffer&quot; signals.
@@ -8484,7 +8616,7 @@ buffer (see gst_object_set_parent()).
 </parameter_description>
 </parameter>
 </parameters>
-<return> The new audioringbuffer of @sink.
+<return> The new ringbuffer of @sink.
 </return>
 </function>
 
@@ -8675,7 +8807,7 @@ buffer (see gst_object_set_parent()).
 </parameter_description>
 </parameter>
 </parameters>
-<return> The new audioringbuffer of @src.
+<return> The new ringbuffer of @src.
 </return>
 </function>
 
@@ -9379,7 +9511,9 @@ MT safe.
 
 <function name="gst_audio_decoder_negotiate">
 <description>
-Negotiate with downstreame elements to currently configured #GstAudioInfo.
+Negotiate with downstream elements to currently configured #GstAudioInfo.
+Unmark GST_PAD_FLAG_NEED_RECONFIGURE in any case. But mark it again if
+negotiate fails.
 
 
 </description>
@@ -9914,7 +10048,9 @@ MT safe.
 
 <function name="gst_audio_encoder_negotiate">
 <description>
-Negotiate with downstreame elements to currently configured #GstCaps.
+Negotiate with downstream elements to currently configured #GstCaps.
+Unmark GST_PAD_FLAG_NEED_RECONFIGURE in any case. But mark it again if
+negotiate fails.
 
 
 </description>
@@ -10625,7 +10761,7 @@ the memory.
 
 <function name="gst_audio_ring_buffer_acquire">
 <description>
-Allocate the resources for the audioringbuffer. This function fills
+Allocate the resources for the ringbuffer. This function fills
 in the data pointer of the ring buffer with a valid #GstBuffer
 to which samples can be written.
 
@@ -10714,7 +10850,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_clear_all">
 <description>
-Fill the audioringbuffer with silence.
+Fill the ringbuffer with silence.
 
 MT safe.
 
@@ -10749,17 +10885,17 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_commit">
 <description>
-Commit @in_samples samples pointed to by @data to the audioringbuffer @buf.
+Commit @in_samples samples pointed to by @data to the ringbuffer @buf.
 
 @in_samples and @out_samples define the rate conversion to perform on the
 samples in @data. For negative rates, @out_samples must be negative and
 @in_samples positive.
 
 When @out_samples is positive, the first sample will be written at position @sample
-in the audioringbuffer. When @out_samples is negative, the last sample will be written to
+in the ringbuffer. When @out_samples is negative, the last sample will be written to
 @sample in reverse order.
 
-@out_samples does not need to be a multiple of the segment size of the audioringbuffer
+@out_samples does not need to be a multiple of the segment size of the ringbuffer
 although it is recommended for optimal performance.
 
 @accum will hold a temporary accumulator used in rate conversion and should be
@@ -10789,7 +10925,7 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="out_samples">
-<parameter_description> the number of samples to write to the audioringbuffer
+<parameter_description> the number of samples to write to the ringbuffer
 </parameter_description>
 </parameter>
 <parameter name="accum">
@@ -10797,7 +10933,7 @@ MT safe.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of samples written to the audioringbuffer or -1 on error. The
+<return> The number of samples written to the ringbuffer or -1 on error. The
 number of samples written can be less than @out_samples when @buf was interrupted
 with a flush or stop.
 </return>
@@ -10871,11 +11007,11 @@ usually less than the segment size but can be bigger when the
 implementation uses another internal buffer between the audio
 device.
 
-For playback audioringbuffers this is the amount of samples transfered from the
+For playback ringbuffers this is the amount of samples transfered from the
 ringbuffer to the device but still not played.
 
-For capture audioringbuffers this is the amount of samples in the device that are
-not yet transfered to the audioringbuffer.
+For capture ringbuffers this is the amount of samples in the device that are
+not yet transfered to the ringbuffer.
 
 
 </description>
@@ -10911,7 +11047,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_is_acquired">
 <description>
-Check if the audioringbuffer is acquired and ready to use.
+Check if the ringbuffer is acquired and ready to use.
 
 
 </description>
@@ -10921,7 +11057,7 @@ Check if the audioringbuffer is acquired and ready to use.
 </parameter_description>
 </parameter>
 </parameters>
-<return> TRUE if the audioringbuffer is acquired, FALSE on error.
+<return> TRUE if the ringbuffer is acquired, FALSE on error.
 
 MT safe.
 </return>
@@ -10965,8 +11101,8 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_may_start">
 <description>
-Tell the audioringbuffer that it is allowed to start playback when
-the audioringbuffer is filled with samples. 
+Tell the ringbuffer that it is allowed to start playback when
+the ringbuffer is filled with samples. 
 
 MT safe.
 
@@ -11026,7 +11162,7 @@ Parse @caps into @spec.
 
 <function name="gst_audio_ring_buffer_pause">
 <description>
-Pause processing samples from the audioringbuffer.
+Pause processing samples from the ringbuffer.
 
 
 </description>
@@ -11075,12 +11211,12 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_read">
 <description>
-Read @len samples from the audioringbuffer into the memory pointed 
+Read @len samples from the ringbuffer into the memory pointed 
 to by @data.
 The first sample should be read from position @sample in
-the audioringbuffer.
+the ringbuffer.
 
-@len should not be a multiple of the segment size of the audioringbuffer
+@len should not be a multiple of the segment size of the ringbuffer
 although it is recommended.
 
 @timestamp will return the timestamp associated with the data returned.
@@ -11109,7 +11245,7 @@ although it is recommended.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of samples read from the audioringbuffer or -1 on
+<return> The number of samples read from the ringbuffer or -1 on
 error.
 
 MT safe.
@@ -11118,7 +11254,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_release">
 <description>
-Free the resources of the audioringbuffer.
+Free the resources of the ringbuffer.
 
 
 </description>
@@ -11136,7 +11272,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_samples_done">
 <description>
-Get the number of samples that were processed by the audioringbuffer
+Get the number of samples that were processed by the ringbuffer
 since it was last started. This does not include the number of samples not
 yet processed (see gst_audio_ring_buffer_delay()).
 
@@ -11148,7 +11284,7 @@ yet processed (see gst_audio_ring_buffer_delay()).
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of samples processed by the audioringbuffer.
+<return> The number of samples processed by the ringbuffer.
 
 MT safe.
 </return>
@@ -11181,8 +11317,8 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_set_channel_positions">
 <description>
-Tell the audioringbuffer about the device's channel positions. This must
-be called in when the audioringbuffer is acquired.
+Tell the ringbuffer about the device's channel positions. This must
+be called in when the ringbuffer is acquired.
 
 </description>
 <parameters>
@@ -11200,7 +11336,7 @@ be called in when the audioringbuffer is acquired.
 
 <function name="gst_audio_ring_buffer_set_flushing">
 <description>
-Set the audioringbuffer to flushing mode or normal mode.
+Set the ringbuffer to flushing mode or normal mode.
 
 MT safe.
 
@@ -11223,7 +11359,7 @@ MT safe.
 Make sure that the next sample written to the device is
 accounted for as being the @sample sample written to the
 device. This value will be used in reporting the current
-sample position of the audioringbuffer.
+sample position of the ringbuffer.
 
 This function will also clear the buffer with silence.
 
@@ -11245,7 +11381,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_start">
 <description>
-Start processing samples from the audioringbuffer.
+Start processing samples from the ringbuffer.
 
 
 </description>
@@ -11263,7 +11399,7 @@ MT safe.
 
 <function name="gst_audio_ring_buffer_stop">
 <description>
-Stop processing samples from the audioringbuffer.
+Stop processing samples from the ringbuffer.
 
 
 </description>
@@ -14091,6 +14227,80 @@ of @comp.
 <return></return>
 </function>
 
+<function name="gst_buffer_add_video_region_of_interest_meta">
+<description>
+Attaches #GstVideoRegionOfInterestMeta metadata to @buffer with the given
+parameters.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="roi_type">
+<parameter_description> Type of the region of interest (e.g. &quot;face&quot;)
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> X position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Y position
+</parameter_description>
+</parameter>
+<parameter name="w">
+<parameter_description> width
+</parameter_description>
+</parameter>
+<parameter name="h">
+<parameter_description> height
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstVideoRegionOfInterestMeta on @buffer.
+</return>
+</function>
+
+<function name="gst_buffer_add_video_region_of_interest_meta_id">
+<description>
+Attaches #GstVideoRegionOfInterestMeta metadata to @buffer with the given
+parameters.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="roi_type">
+<parameter_description> Type of the region of interest (e.g. &quot;face&quot;)
+</parameter_description>
+</parameter>
+<parameter name="x">
+<parameter_description> X position
+</parameter_description>
+</parameter>
+<parameter name="y">
+<parameter_description> Y position
+</parameter_description>
+</parameter>
+<parameter name="w">
+<parameter_description> width
+</parameter_description>
+</parameter>
+<parameter name="h">
+<parameter_description> height
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstVideoRegionOfInterestMeta on @buffer.
+</return>
+</function>
+
 <function name="gst_buffer_append">
 <description>
 Append all the memory from @buf2 to @buf1. The result buffer will contain a
@@ -14661,6 +14871,30 @@ multiview buffers.
 </parameters>
 <return> the #GstVideoMeta with @id or %NULL when there is no such metadata
 on @buffer.
+</return>
+</function>
+
+<function name="gst_buffer_get_video_region_of_interest_meta_id">
+<description>
+Find the #GstVideoRegionOfInterestMeta on @buffer with the given @id.
+
+Buffers can contain multiple #GstVideoRegionOfInterestMeta metadata items if
+multiple regions of interests are marked on a frame.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="id">
+<parameter_description> a metadata id
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstVideoeRegionOfInterestMeta with @id or %NULL when there is
+no such metadata on @buffer.
 </return>
 </function>
 
@@ -15285,10 +15519,6 @@ Get the memory block at @idx in @buffer. The memory block stays valid until
 the memory block in @buffer is removed, replaced or merged, typically with
 any call that modifies the memory in @buffer.
 
-Since this call does not influence the refcount of the memory,
-gst_memory_is_writable() can be used to check if @buffer is the sole owner
-of the returned memory.
-
 
 </description>
 <parameters>
@@ -15324,7 +15554,7 @@ can hold a pointer to the new buffer.
 </parameter_description>
 </parameter>
 <parameter name="params">
-<parameter_description> (transfer none) (allow-none) parameters.
+<parameter_description> parameters.
 </parameter_description>
 </parameter>
 </parameters>
@@ -19889,8 +20119,8 @@ checking if there is enough free space available in the byte writer.
 
 <function name="gst_byte_writer_put_int8">
 <description>
-Writes a signed 8 bit integer to @writer without
-checking if there is enough free space available in the byte writer.
+Writes a signed 8 bit integer to @writer.
+
 
 </description>
 <parameters>
@@ -19903,7 +20133,8 @@ checking if there is enough free space available in the byte writer.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the value could be written
+</return>
 </function>
 
 <function name="gst_byte_writer_put_string">
@@ -20457,6 +20688,7 @@ becomes the owner of @structure.
 <description>
 Appends @structure with @features to @caps.  The structure is not copied; @caps
 becomes the owner of @structure.
+
 
 </description>
 <parameters>
@@ -21052,6 +21284,7 @@ belongs to the #GstCaps.
 </parameters>
 <return> a pointer to the #GstCapsFeatures corresponding
 to @index
+
 </return>
 </function>
 
@@ -21372,6 +21605,7 @@ for more information.
 </parameter>
 </parameters>
 <return> %TRUE if @structure is a subset of @caps
+
 </return>
 </function>
 
@@ -21481,6 +21715,7 @@ Appends @structure with @features to @caps if its not already expressed by @caps
 </parameter>
 </parameters>
 <return> the merged caps.
+
 </return>
 </function>
 
@@ -21693,6 +21928,7 @@ replace the caps pointed to by @ocaps.
 <function name="gst_caps_set_features">
 <description>
 Sets the #GstCapsFeatures @features for the structure at @index.
+
 
 </description>
 <parameters>
@@ -22056,8 +22292,10 @@ setup an element for a filter test with mysrcpad and mysinkpad
 
 <function name="gst_check_setup_events">
 <description>
-Push stream-start, caps and segment event, which concist of the minimum required
-events to allow streaming. Caps is optional to allow raw src testing.
+Push stream-start, caps and segment event, which concist of the minimum
+required events to allow streaming. Caps is optional to allow raw src
+testing. If @element has more than one src or sink pad, use
+gst_check_setup_events_with_stream_id() instead.
 
 </description>
 <parameters>
@@ -22075,6 +22313,38 @@ events to allow streaming. Caps is optional to allow raw src testing.
 </parameter>
 <parameter name="format">
 <parameter_description> The #GstFormat of the default segment to send
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_check_setup_events_with_stream_id">
+<description>
+Push stream-start, caps and segment event, which concist of the minimum
+required events to allow streaming. Caps is optional to allow raw src
+testing.
+
+</description>
+<parameters>
+<parameter name="srcpad">
+<parameter_description> The src #GstPad to push on
+</parameter_description>
+</parameter>
+<parameter name="element">
+<parameter_description> The #GstElement use to create the stream id
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> #GstCaps in case caps event must be sent
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> The #GstFormat of the default segment to send
+</parameter_description>
+</parameter>
+<parameter name="stream_id">
+<parameter_description> A unique identifier for the stream
 </parameter_description>
 </parameter>
 </parameters>
@@ -23103,6 +23373,23 @@ below for a more details).
 </parameter>
 </parameters>
 <return> %TRUE if the level and profile could be set, %FALSE otherwise.
+</return>
+</function>
+
+<function name="gst_codec_utils_aac_get_index_from_sample_rate">
+<description>
+Translates the sample rate to the index corresponding to it in AAC spec.
+
+
+</description>
+<parameters>
+<parameter name="rate">
+<parameter_description> Sample rate
+</parameter_description>
+</parameter>
+</parameters>
+<return> The AAC index for this sample rate, -1 if the rate is not a
+valid AAC sample rate.
 </return>
 </function>
 
@@ -24194,6 +24481,23 @@ MT safe
 </return>
 </function>
 
+<function name="gst_context_get_context_type">
+<description>
+Get the type of @context.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> The #GstContext.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The type of the context.
+
+</return>
+</function>
+
 <function name="gst_context_get_structure">
 <description>
 Access the structure of the context.
@@ -24209,6 +24513,44 @@ Access the structure of the context.
 <return> The structure of the context. The structure is
 still owned by the context, which means that you should not modify it,
 free it and that the pointer becomes invalid when you free the context.
+
+</return>
+</function>
+
+<function name="gst_context_has_context_type">
+<description>
+Checks if @context has @context_type.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> The #GstContext.
+</parameter_description>
+</parameter>
+<parameter name="context_type">
+<parameter_description> Context type to check.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @context has @context_type.
+
+</return>
+</function>
+
+<function name="gst_context_is_persistent">
+<description>
+Check if @context is persistent.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> The #GstContext.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the context is persistent.
 
 </return>
 </function>
@@ -24254,6 +24596,10 @@ Create a new context.
 
 </description>
 <parameters>
+<parameter name="persistent">
+<parameter_description> Persistent context
+</parameter_description>
+</parameter>
 </parameters>
 <return> The new context.
 
@@ -24758,6 +25104,35 @@ MT safe.
 Pushes a #GstDataQueueItem (or a structure that begins with the same fields)
 on the @queue. If the @queue is full, the call will block until space is
 available, OR the @queue is set to flushing state.
+MT safe.
+
+Note that this function has slightly different semantics than gst_pad_push()
+and gst_pad_push_event(): this function only takes ownership of @item and
+the #GstMiniObject contained in @item if the push was successful. If FALSE
+is returned, the caller is responsible for freeing @item and its contents.
+
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GstDataQueue.
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> a #GstDataQueueItem.
+</parameter_description>
+</parameter>
+</parameters>
+<return> #TRUE if the @item was successfully pushed on the @queue.
+
+</return>
+</function>
+
+<function name="gst_data_queue_push_force">
+<description>
+Pushes a #GstDataQueueItem (or a structure that begins with the same fields)
+on the @queue. It ignores if the @queue is full or not and forces the @item
+to be pushed anyway.
 MT safe.
 
 Note that this function has slightly different semantics than gst_pad_push()
@@ -25585,6 +25960,19 @@ debug categories
 </return>
 </function>
 
+<function name="gst_debug_get_color_mode">
+<description>
+Changes the coloring mode for debug output.
+
+
+</description>
+<parameters>
+</parameters>
+<return> see @GstDebugColorMode for possible values.
+
+</return>
+</function>
+
 <function name="gst_debug_get_default_threshold">
 <description>
 Returns the default threshold that is used for new categories.
@@ -25851,9 +26239,46 @@ during initialization.&lt;/para&gt;&lt;/note&gt;
 <return></return>
 </function>
 
+<function name="gst_debug_set_color_mode">
+<description>
+Changes the coloring mode for debug output.
+
+This function may be called before gst_init().
+
+
+</description>
+<parameters>
+<parameter name="mode">
+<parameter_description> The coloring mode for debug output. See @GstDebugColorMode.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_debug_set_color_mode_from_string">
+<description>
+Changes the coloring mode for debug output.
+
+This function may be called before gst_init().
+
+
+</description>
+<parameters>
+<parameter name="mode">
+<parameter_description> The coloring mode for debug output. One of the following:
+&quot;on&quot;, &quot;auto&quot;, &quot;off&quot;, &quot;disable&quot;, &quot;unix&quot;.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_debug_set_colored">
 <description>
 Sets or unsets the use of coloured debugging output.
+Same as gst_debug_set_color_mode () with the argument being
+being GST_DEBUG_COLOR_MODE_ON or GST_DEBUG_COLOR_MODE_OFF.
 
 This function may be called before gst_init().
 
@@ -26832,15 +27257,15 @@ The memory is only mmapped on gst_buffer_mmap() request.
 </return>
 </function>
 
-<function name="gst_dmabuf_allocator_obtain">
+<function name="gst_dmabuf_allocator_new">
 <description>
-Return a dmabuf allocator.
+Return a new dmabuf allocator.
 
 
 </description>
 <parameters>
 </parameters>
-<return> a dmabuf allocator, or NULL if the allocator
+<return> a new dmabuf allocator, or NULL if the allocator
 isn't available. Use gst_object_unref() to release the allocator after
 usage
 
@@ -27683,24 +28108,6 @@ was found. No unreferencing is necessary.
 </return>
 </function>
 
-<function name="gst_element_get_context">
-<description>
-Gets the current context of the element.
-
-MT safe.
-
-
-</description>
-<parameters>
-<parameter name="element">
-<parameter_description> a #GstElement to get the context from.
-</parameter_description>
-</parameter>
-</parameters>
-<return> The current context of the element
-</return>
-</function>
-
 <function name="gst_element_get_factory">
 <description>
 Retrieves the factory that was used to create this element.
@@ -28451,7 +28858,14 @@ Queries an element to convert @src_val in @src_format to @dest_format.
 
 <function name="gst_element_query_duration">
 <description>
-Queries an element for the total stream duration.
+Queries an element (usually top-level pipeline or playbin element) for the
+total stream duration in nanoseconds. This query will only work once the
+pipeline is prerolled (i.e. reached PAUSED or PLAYING state). The application
+will receive an ASYNC_DONE message on the pipeline bus when that is the case.
+
+If the duration changes for some reason, you will get a DURATION_CHANGED
+message on the pipeline bus, in which case you should re-query the duration
+using this function.
 
 
 </description>
@@ -28475,8 +28889,15 @@ Queries an element for the total stream duration.
 
 <function name="gst_element_query_position">
 <description>
-Queries an element for the stream position. If one repeatedly calls this
-function one can also create and reuse it in gst_element_query().
+Queries an element (usually top-level pipeline or playbin element) for the
+stream position in nanoseconds. This will be a value between 0 and the
+stream duration (if the stream duration is known). This query will usually
+only work once the pipeline is prerolled (i.e. reached PAUSED or PLAYING
+state). The application will receive an ASYNC_DONE message on the pipeline
+bus when that is the case.
+
+If one repeatedly calls this function one can also create a query and reuse
+it in gst_element_query().
 
 
 </description>
@@ -30216,24 +30637,6 @@ that will follow after the event.
 </return>
 </function>
 
-<function name="gst_event_new_context">
-<description>
-Create a new context event. The purpose of the context event is
-to pass a pipeline-local context to downstream elements.
-
-
-</description>
-<parameters>
-<parameter name="context">
-<parameter_description> the #GstContext
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GstEvent
-
-</return>
-</function>
-
 <function name="gst_event_new_custom">
 <description>
 Create a new custom-typed event. This can be used for anything not
@@ -30833,25 +31236,6 @@ valid.
 <return></return>
 </function>
 
-<function name="gst_event_parse_context">
-<description>
-Parse the context event. Unref @context after usage.
-
-
-</description>
-<parameters>
-<parameter name="event">
-<parameter_description> The event to query
-</parameter_description>
-</parameter>
-<parameter name="context">
-<parameter_description> a pointer to store the #GstContext in.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gst_event_parse_flush_stop">
 <description>
 Parse the FLUSH_STOP event and retrieve the @reset_time member.
@@ -30892,6 +31276,26 @@ the gap, or %NULL
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_event_parse_group_id">
+<description>
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a stream-start event
+</parameter_description>
+</parameter>
+<parameter name="group_id">
+<parameter_description> address of variable where to store the group id
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if a group id was set on the event and could be parsed,
+%FALSE otherwise.
+
+</return>
 </function>
 
 <function name="gst_event_parse_latency">
@@ -31221,6 +31625,31 @@ replace the event pointed to by @old_event.
 </parameters>
 <return> TRUE if @new_event was different from @old_event
 </return>
+</function>
+
+<function name="gst_event_set_group_id">
+<description>
+All streams that have the same group id are supposed to be played
+together, i.e. all streams inside a container file should have the
+same group id but different stream ids. The group id should change
+each time the stream is started, resulting in different group ids
+each time a file is played for example.
+
+Use gst_util_group_id_next() to get a new group id.
+
+
+</description>
+<parameters>
+<parameter name="event">
+<parameter_description> a stream-start event
+</parameter_description>
+</parameter>
+<parameter name="group_id">
+<parameter_description> the group id to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_event_set_seqnum">
@@ -33983,24 +34412,6 @@ Decrease the refcount of an memory, freeing it if the refcount reaches 0.
 <return></return>
 </function>
 
-<function name="gst_message_add_context_type">
-<description>
-Add a new context type to @message.
-
-</description>
-<parameters>
-<parameter name="message">
-<parameter_description> a GST_MESSAGE_NEED_CONTEXT type message
-</parameter_description>
-</parameter>
-<parameter name="context_type">
-<parameter_description> a context type
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gst_message_copy">
 <description>
 Creates a copy of the message. Returns a copy of the message.
@@ -34016,23 +34427,6 @@ Creates a copy of the message. Returns a copy of the message.
 <return> a new copy of @msg.
 
 MT safe
-</return>
-</function>
-
-<function name="gst_message_get_n_context_types">
-<description>
-Retrieve the number of values currently stored in the
-context-types array of the message's structure.
-
-
-</description>
-<parameters>
-<parameter name="message">
-<parameter_description> a GST_MESSAGE_NEED_CONTEXT type message
-</parameter_description>
-</parameter>
-</parameters>
-<return> the context-types array size as a #guint.
 </return>
 </function>
 
@@ -34462,6 +34856,7 @@ This message is posted when an element has a new local #GstContext.
 <return> The new have-context message.
 
 MT safe.
+
 </return>
 </function>
 
@@ -34522,10 +34917,15 @@ This message is posted when an element needs a specific #GstContext.
 <parameter_description> The object originating the message.
 </parameter_description>
 </parameter>
+<parameter name="context_type">
+<parameter_description> The context type that is needed
+</parameter_description>
+</parameter>
 </parameters>
 <return> The new need-context message.
 
 MT safe.
+
 </return>
 </function>
 
@@ -35168,6 +35568,27 @@ object, or NULL
 <return></return>
 </function>
 
+<function name="gst_message_parse_context_type">
+<description>
+Parse a context type from an existing GST_MESSAGE_NEED_CONTEXT message.
+
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> a GST_MESSAGE_NEED_CONTEXT type message
+</parameter_description>
+</parameter>
+<parameter name="context_type">
+<parameter_description> the context type, or NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gboolean indicating if the parsing succeeded.
+
+</return>
+</function>
+
 <function name="gst_message_parse_error">
 <description>
 Extracts the GError and debug string from the GstMessage. The values returned
@@ -35215,11 +35636,36 @@ or NULL
 <return></return>
 </function>
 
+<function name="gst_message_parse_group_id">
+<description>
+Extract the group from the STREAM_START message.
+
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> A valid #GstMessage of type GST_MESSAGE_STREAM_START.
+</parameter_description>
+</parameter>
+<parameter name="group_id">
+<parameter_description> Result location for the group id or
+NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the message had a group id set, %FALSE otherwise
+
+MT safe.
+
+</return>
+</function>
+
 <function name="gst_message_parse_have_context">
 <description>
 Extract the context from the HAVE_CONTEXT message.
 
 MT safe.
+
 
 </description>
 <parameters>
@@ -35228,7 +35674,8 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="context">
-<parameter_description> Result location for the context or NULL
+<parameter_description> Result location for the
+context or NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -35281,27 +35728,6 @@ new clock
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="gst_message_parse_nth_context_type">
-<description>
-Parse a context type from an existing GST_MESSAGE_NEED_CONTEXT message
-from @index.
-
-
-</description>
-<parameters>
-<parameter name="message">
-<parameter_description> a GST_MESSAGE_NEED_CONTEXT type message
-</parameter_description>
-</parameter>
-<parameter name="context_type">
-<parameter_description> the context type, or NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #gboolean indicating if the parsing succeeded.
-</return>
 </function>
 
 <function name="gst_message_parse_progress">
@@ -35476,7 +35902,8 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="running_time">
-<parameter_description> Result location for the running_time or NULL
+<parameter_description> Result location for the running_time or
+NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -35882,6 +36309,33 @@ Configures the buffering stats values in @message.
 <return></return>
 </function>
 
+<function name="gst_message_set_group_id">
+<description>
+Sets the group id on the stream-start message.
+
+All streams that have the same group id are supposed to be played
+together, i.e. all streams inside a container file should have the
+same group id but different stream ids. The group id should change
+each time the stream is started, resulting in different group ids
+each time a file is played for example.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="message">
+<parameter_description> the message
+</parameter_description>
+</parameter>
+<parameter name="group_id">
+<parameter_description> the group id
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_message_set_qos_stats">
 <description>
 Set the QoS stats representing the history of the current continuous pipeline
@@ -36038,6 +36492,21 @@ freeing it.
 <return></return>
 </function>
 
+<function name="gst_meta_api_type_get_tags">
+<description>
+
+</description>
+<parameters>
+<parameter name="api">
+<parameter_description> an API
+</parameter_description>
+</parameter>
+</parameters>
+<return> an array of tags as strings.
+
+</return>
+</function>
+
 <function name="gst_meta_api_type_has_tag">
 <description>
 Check if @api was registered with @tag.
@@ -36120,15 +36589,15 @@ The same @info can be retrieved later with gst_meta_get_info() by using
 </parameter_description>
 </parameter>
 <parameter name="init_func">
-<parameter_description> (scope async) a #GstMetaInitFunction
+<parameter_description> a #GstMetaInitFunction
 </parameter_description>
 </parameter>
 <parameter name="free_func">
-<parameter_description> (scope async) a #GstMetaFreeFunction
+<parameter_description> a #GstMetaFreeFunction
 </parameter_description>
 </parameter>
 <parameter name="transform_func">
-<parameter_description> (scope async) a #GstMetaTransformFunction
+<parameter_description> a #GstMetaTransformFunction
 </parameter_description>
 </parameter>
 </parameters>
@@ -37135,7 +37604,7 @@ Parse the number of commands in the #GstNavigation commands @query.
 </parameter_description>
 </parameter>
 <parameter name="n_cmds">
-<parameter_description> the number of commands in this query.
+<parameter_description> (out) the number of commands in this query.
 </parameter_description>
 </parameter>
 </parameters>
@@ -37161,7 +37630,7 @@ set to #GST_NAVIGATION_COMMAND_INVALID.
 </parameter_description>
 </parameter>
 <parameter name="cmd">
-<parameter_description> a pointer to store the nth command into.
+<parameter_description> (out) a pointer to store the nth command into.
 </parameter_description>
 </parameter>
 </parameters>
@@ -37487,8 +37956,8 @@ Allows network clients to get the current time of @clock.
 </parameter_description>
 </parameter>
 <parameter name="address">
-<parameter_description> an address to bind on as a dotted quad (xxx.xxx.xxx.xxx), IPv6 address, or NULL
-to bind to all addresses
+<parameter_description> an address to bind on as a dotted quad
+(xxx.xxx.xxx.xxx), IPv6 address, or NULL to bind to all addresses
 </parameter_description>
 </parameter>
 <parameter name="port">
@@ -38357,7 +38826,7 @@ stream-id manually instead.
 
 Since stream IDs are sorted alphabetically, any numbers in the
 stream ID should be printed with a fixed number of characters,
-preceded by 0's, such as by using the format %%03u instead of %%u.
+preceded by 0's, such as by using the format \%03u instead of \%u.
 
 
 </description>
@@ -40705,8 +41174,9 @@ gst_parse_context_new(), or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-created bin, or
-%NULL if an error occurred.
+<return> a newly-created element, which
+is guaranteed to be a bin unless GST_FLAG_NO_SINGLE_ELEMENT_BINS was
+passed, or %NULL if an error occurred.
 </return>
 </function>
 
@@ -40900,7 +41370,8 @@ Adds a codec tag describing the format specified by @caps to @taglist.
 </parameter>
 <parameter name="codec_tag">
 <parameter_description> a GStreamer codec tag such as #GST_TAG_AUDIO_CODEC,
-#GST_TAG_VIDEO_CODEC or #GST_TAG_CODEC
+#GST_TAG_VIDEO_CODEC or #GST_TAG_CODEC. If none is specified,
+the function will attempt to detect the appropriate category.
 </parameter_description>
 </parameter>
 <parameter name="caps">
@@ -41313,7 +41784,7 @@ which will be added to the content of the environment variable, e.g.
 </parameter>
 <parameter name="paths">
 <parameter_description> NULL-terminated array of directories/paths where dependent files
-may be.
+may be, or NULL.
 </parameter_description>
 </parameter>
 <parameter name="names">
@@ -43034,24 +43505,6 @@ start position of the array should be inferior to @start.
 </return>
 </function>
 
-<function name="gst_query_add_context_type">
-<description>
-Add a new context type to @query.
-
-</description>
-<parameters>
-<parameter name="query">
-<parameter_description> a GST_QUERY_NEED_CONTEXT type query
-</parameter_description>
-</parameter>
-<parameter name="context_type">
-<parameter_description> a context type
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="gst_query_add_scheduling_mode">
 <description>
 Add @mode as aone of the supported scheduling modes to @query.
@@ -43184,23 +43637,6 @@ buffered-ranges array of the query's structure.
 </parameter>
 </parameters>
 <return> the range array size as a #guint.
-</return>
-</function>
-
-<function name="gst_query_get_n_context_types">
-<description>
-Retrieve the number of values currently stored in the
-context-types array of the query's structure.
-
-
-</description>
-<parameters>
-<parameter name="query">
-<parameter_description> a GST_QUERY_NEED_CONTEXT type query
-</parameter_description>
-</parameter>
-</parameters>
-<return> the context-types array size as a #guint.
 </return>
 </function>
 
@@ -43428,8 +43864,13 @@ Free-function: gst_query_unref
 
 </description>
 <parameters>
+<parameter name="context_type">
+<parameter_description> Context type to query
+</parameter_description>
+</parameter>
 </parameters>
 <return> a new #GstQuery
+
 </return>
 </function>
 
@@ -43750,7 +44191,7 @@ and @segment_end values, or NULL
 </parameter>
 <parameter name="estimated_total">
 <parameter_description> estimated total amount of download
-time, or NULL
+time remaining in miliseconds, or NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -43831,6 +44272,7 @@ Get the caps result from @query. The caps remains valid as long as
 Get the context from the context @query. The context remains valid as long as
 @query remains valid.
 
+
 </description>
 <parameters>
 <parameter name="query">
@@ -43843,6 +44285,27 @@ Get the context from the context @query. The context remains valid as long as
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_query_parse_context_type">
+<description>
+Parse a context type from an existing GST_QUERY_CONTEXT query.
+
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a GST_QUERY_CONTEXT type query
+</parameter_description>
+</parameter>
+<parameter name="context_type">
+<parameter_description> the context type, or NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gboolean indicating if the parsing succeeded.
+
+</return>
 </function>
 
 <function name="gst_query_parse_convert">
@@ -44064,27 +44527,6 @@ at the @index of the buffered ranges array.
 </return>
 </function>
 
-<function name="gst_query_parse_nth_context_type">
-<description>
-Parse a context type from an existing GST_QUERY_NEED_CONTEXT query
-from @index.
-
-
-</description>
-<parameters>
-<parameter name="query">
-<parameter_description> a GST_QUERY_NEED_CONTEXT type query
-</parameter_description>
-</parameter>
-<parameter name="context_type">
-<parameter_description> the context type, or NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #gboolean indicating if the parsing succeeded.
-</return>
-</function>
-
 <function name="gst_query_parse_nth_format">
 <description>
 Parse the format query and retrieve the @nth format from it into
@@ -44272,6 +44714,28 @@ Free the string with g_free() after usage.
 <return></return>
 </function>
 
+<function name="gst_query_parse_uri_redirection">
+<description>
+Parse an URI query, writing the URI into @uri as a newly
+allocated string, if the respective parameters are non-NULL.
+Free the string with g_free() after usage.
+
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> the storage for the redirect URI
+(may be NULL)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_query_ref">
 <description>
 Increases the refcount of the given query by one.
@@ -44310,6 +44774,7 @@ Remove the metadata API at @index of the metadata API array.
 <description>
 Remove the allocation param at @index of the allocation param array.
 
+
 </description>
 <parameters>
 <parameter name="query">
@@ -44327,6 +44792,7 @@ Remove the allocation param at @index of the allocation param array.
 <function name="gst_query_remove_nth_allocation_pool">
 <description>
 Remove the allocation pool at @index of the allocation pool array.
+
 
 </description>
 <parameters>
@@ -44433,7 +44899,8 @@ Set the available query result fields in @query.
 </parameter_description>
 </parameter>
 <parameter name="estimated_total">
-<parameter_description> estimated total amount of download time
+<parameter_description> estimated total amount of download time remaining in
+miliseconds
 </parameter_description>
 </parameter>
 </parameters>
@@ -44491,6 +44958,7 @@ Set the @caps result in @query.
 <function name="gst_query_set_context">
 <description>
 Answer a context query by setting the requested context.
+
 
 </description>
 <parameters>
@@ -44817,6 +45285,25 @@ negative rates, playback will actually happen from @stop_value to
 <function name="gst_query_set_uri">
 <description>
 Answer a URI query by setting the requested URI.
+
+</description>
+<parameters>
+<parameter name="query">
+<parameter_description> a #GstQuery with query type GST_QUERY_URI
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> the URI to set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_query_set_uri_redirection">
+<description>
+Answer a URI query by setting the requested URI redirection.
+
 
 </description>
 <parameters>
@@ -45890,7 +46377,7 @@ MT safe.
 </description>
 <parameters>
 <parameter name="buf">
-<parameter_description> the #GstAudioRingBuffer
+<parameter_description> the #GstRingBuffer
 </parameter_description>
 </parameter>
 <parameter name="readseg">
@@ -47672,6 +48159,35 @@ Check if the extension bit is set on the RTP packet in @buffer.
 </return>
 </function>
 
+<function name="gst_rtp_buffer_get_extension_bytes">
+<description>
+Similar to gst_rtp_buffer_get_extension_data, but more suitable for language
+bindings usage. @bits will contain the extension 16 bits of custom data and
+the extension data (not including the extension header) is placed in a new
+#GBytes structure.
+
+If @rtp did not contain an extension, this function will return %NULL, with
+@bits unchanged. If there is an extension header but no extension data then
+an empty #GBytes will be returned.
+
+
+</description>
+<parameters>
+<parameter name="rtp">
+<parameter_description> the RTP packet
+</parameter_description>
+</parameter>
+<parameter name="bits">
+<parameter_description> location for header bits
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GBytes if an extension header was present
+and %NULL otherwise.
+
+</return>
+</function>
+
 <function name="gst_rtp_buffer_get_extension_data">
 <description>
 Get the extension data. @bits will contain the extension 16 bits of custom
@@ -47875,6 +48391,25 @@ avoided.
 </parameter>
 </parameters>
 <return> A new buffer with the data of the payload.
+</return>
+</function>
+
+<function name="gst_rtp_buffer_get_payload_bytes">
+<description>
+Similar to gst_rtp_buffer_get_payload, but more suitable for language
+bindings usage. The return value is a pointer to a #GBytes structure
+containing the payload data in @rtp.
+
+
+</description>
+<parameters>
+<parameter name="rtp">
+<parameter_description> the RTP packet
+</parameter_description>
+</parameter>
+</parameters>
+<return> A new #GBytes containing the payload data in @rtp.
+
 </return>
 </function>
 
@@ -48795,6 +49330,24 @@ calls. The server is then responsible for configuring the TLS connection.
 </return>
 </function>
 
+<function name="gst_rtsp_connection_get_tls_validation_flags">
+<description>
+Gets the TLS validation flags used to verify the peer certificate
+when a TLS connection is established.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the validationg flags.
+
+</return>
+</function>
+
 <function name="gst_rtsp_connection_get_tunnelid">
 <description>
 Get the tunnel session id the connection. 
@@ -49176,6 +49729,29 @@ The default value is %TRUE
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_rtsp_connection_set_tls_validation_flags">
+<description>
+Sets the TLS validation flags to be used to verify the peer
+certificate when a TLS connection is established.
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the validation flags.
+</parameter_description>
+</parameter>
+</parameters>
+<return> TRUE if the validation flags are set correctly, or FALSE if
+@conn is NULL or is not a TLS connection.
+
+</return>
 </function>
 
 <function name="gst_rtsp_connection_set_tunneled">
@@ -50539,6 +51115,24 @@ are reached.
 </return>
 </function>
 
+<function name="gst_sample_copy">
+<description>
+Create a copy of the given sample. This will also make a newly allocated
+copy of the data the source sample contains.
+
+
+</description>
+<parameters>
+<parameter name="buf">
+<parameter_description> a #GstSample.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new copy of @buf.
+
+</return>
+</function>
+
 <function name="gst_sample_get_buffer">
 <description>
 Get the buffer associated with @sample
@@ -50553,6 +51147,8 @@ Get the buffer associated with @sample
 </parameters>
 <return> the buffer of @sample or NULL when there
 is no buffer. The buffer remains valid as long as @sample is valid.
+If you need to hold on to it for longer than that, take a ref to
+the buffer with gst_buffer_ref().
 </return>
 </function>
 
@@ -50570,6 +51166,8 @@ Get the caps associated with @sample
 </parameters>
 <return> the caps of @sample or NULL when there
 is no caps. The caps remain valid as long as @sample is valid.
+If you need to hold on to the caps for longer than that, take a ref to
+the caps with gst_caps_ref().
 </return>
 </function>
 
@@ -52366,7 +52964,10 @@ When -1 is given as @idx, the attribute is inserted at the end.
 </parameter>
 <parameter name="idx">
 <parameter_description> an index
-@attribute a #GstSDPAttribute
+</parameter_description>
+</parameter>
+<parameter name="attr">
+<parameter_description> a #GstSDPAttribute
 </parameter_description>
 </parameter>
 </parameters>
@@ -52392,12 +52993,8 @@ When -1 is given as @idx, the bandwidth is inserted at the end.
 <parameter_description> an index
 </parameter_description>
 </parameter>
-<parameter name="bwtype">
-<parameter_description> the bandwidth modifier type
-</parameter_description>
-</parameter>
-<parameter name="bandwidth">
-<parameter_description> the bandwidth in kilobits per second
+<parameter name="bw">
+<parameter_description> the bandwidth
 </parameter_description>
 </parameter>
 </parameters>
@@ -52738,7 +53335,7 @@ Remove the zone information in @msg at index @idx.
 
 <function name="gst_sdp_message_replace_attribute">
 <description>
-Replace the attribute in @msg at index @idx with @attribute.
+Replace the attribute in @msg at index @idx with @attr.
 
 
 </description>
@@ -52751,7 +53348,7 @@ Replace the attribute in @msg at index @idx with @attribute.
 <parameter_description> the index
 </parameter_description>
 </parameter>
-<parameter name="attribute">
+<parameter name="attr">
 <parameter_description> a #GstSDPAttribute
 </parameter_description>
 </parameter>
@@ -52763,7 +53360,7 @@ Replace the attribute in @msg at index @idx with @attribute.
 
 <function name="gst_sdp_message_replace_bandwidth">
 <description>
-Replace the bandwidth information in @msg at index @idx with @bwtype and @bandwidth.
+Replace the bandwidth information in @msg at index @idx with @bw.
 
 
 </description>
@@ -52776,12 +53373,8 @@ Replace the bandwidth information in @msg at index @idx with @bwtype and @bandwi
 <parameter_description> the bandwidth index
 </parameter_description>
 </parameter>
-<parameter name="bwtype">
-<parameter_description> the bandwidth modifier type
-</parameter_description>
-</parameter>
-<parameter name="bandwidth">
-<parameter_description> the bandwidth in kilobits per second
+<parameter name="bw">
+<parameter_description> the bandwidth
 </parameter_description>
 </parameter>
 </parameters>
@@ -53417,6 +54010,33 @@ Free-function: gst_segment_free
 <parameters>
 </parameters>
 <return> a new #GstSegment, free with gst_segment_free().
+</return>
+</function>
+
+<function name="gst_segment_offset_running_time">
+<description>
+Adjust the values in @segment so that @offset is applied to all
+future running-time calculations.
+
+
+
+</description>
+<parameters>
+<parameter name="segment">
+<parameter_description> a #GstSegment structure.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the segment.
+</parameter_description>
+</parameter>
+<parameter name="offset">
+<parameter_description> the offset to apply in the segment
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the segment could be updated successfully. If %FALSE is
+returned, @offset is not in @segment.
 </return>
 </function>
 
@@ -54873,6 +55493,28 @@ Free-function: gst_structure_free
 </parameter>
 </parameters>
 <return> a new, empty #GstStructure
+</return>
+</function>
+
+<function name="gst_structure_new_from_string">
+<description>
+Creates a #GstStructure from a string representation.
+If end is not NULL, a pointer to the place inside the given string
+where parsing ended will be returned.
+
+Free-function: gst_structure_free
+
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> a string representation of a #GstStructure
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstStructure or NULL when the string could
+not be parsed. Free with gst_structure_free() after use.
+
 </return>
 </function>
 
@@ -60219,6 +60861,22 @@ and @b.
 </return>
 </function>
 
+<function name="gst_util_group_id_next">
+<description>
+Return a constantly incrementing group id.
+
+This function is used to generate a new group-id for the
+stream-start event.
+
+
+</description>
+<parameters>
+</parameters>
+<return> A constantly incrementing unsigned integer, which might
+overflow back to 0 at some point.
+</return>
+</function>
+
 <function name="gst_util_seqnum_compare">
 <description>
 Compare two sequence numbers, handling wraparound.
@@ -60809,7 +61467,7 @@ Gets the bitmask specified by @value.
 </description>
 <parameters>
 <parameter name="value">
-<parameter_description> a GValue initialized to #GST_TYPE_FRACTION
+<parameter_description> a GValue initialized to #GST_TYPE_BITMASK
 </parameter_description>
 </parameter>
 </parameters>
@@ -61365,7 +62023,7 @@ Sets @value to the bitmask specified by @bitmask.
 </description>
 <parameters>
 <parameter name="value">
-<parameter_description> a GValue initialized to #GST_TYPE_FRACTION
+<parameter_description> a GValue initialized to #GST_TYPE_BITMASK
 </parameter_description>
 </parameter>
 <parameter name="bitmask">
@@ -62649,7 +63307,9 @@ MT safe.
 
 <function name="gst_video_decoder_negotiate">
 <description>
-Negotiate with downstreame elements to currently configured #GstVideoCodecState.
+Negotiate with downstream elements to currently configured #GstVideoCodecState.
+Unmark GST_PAD_FLAG_NEED_RECONFIGURE in any case. But mark it again if
+negotiate fails.
 
 
 </description>
@@ -62661,6 +63321,27 @@ Negotiate with downstreame elements to currently configured #GstVideoCodecState.
 </parameters>
 <return> #TRUE if the negotiation succeeded, else #FALSE.
 </return>
+</function>
+
+<function name="gst_video_decoder_release_frame">
+<description>
+Similar to gst_video_decoder_drop_frame(), but simply releases @frame
+without any processing other than removing it from list of pending frames,
+after which it is considered finished and released.
+
+
+</description>
+<parameters>
+<parameter name="dec">
+<parameter_description> a #GstVideoDecoder
+</parameter_description>
+</parameter>
+<parameter name="frame">
+<parameter_description> the #GstVideoCodecFrame to release
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_video_decoder_set_estimate_rate">
@@ -63018,6 +63699,8 @@ MT safe.
 <function name="gst_video_encoder_negotiate">
 <description>
 Negotiate with downstream elements to currently configured #GstVideoCodecState.
+Unmark GST_PAD_FLAG_NEED_RECONFIGURE in any case. But mark it again if
+negotiate fails.
 
 
 </description>
