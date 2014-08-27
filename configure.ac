@@ -13,7 +13,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gstreamermm], [1.0.10],
+AC_INIT([gstreamermm], [1.2.4],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gstreamermm],
         [gstreamermm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -61,7 +61,7 @@ AC_SUBST([GSTREAMERMM_MODULES],
          [[], [-app], [-audio], [-base], [-check],
            [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
            [-riff], [-rtp], [-sdp], [-tag], [-video]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.0.10])'])
+         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.2.4])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
