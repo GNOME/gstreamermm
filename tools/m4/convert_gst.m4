@@ -131,6 +131,9 @@ _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Glib::unwrap($3)')
 _CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3)')
 _CONVERSION(`GstEvent*',`Glib::RefPtr<Gst::Event>', `Glib::wrap($3)')
 
+dnl Socket
+_CONVERSION(`const Glib::RefPtr<Gio::Socket>&',`GSocket*', `Glib::unwrap($3)')
+
 dnl Index
 _CONVERSION(`GstIndex*',`Glib::RefPtr<Gst::Index>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Index>&',`GstIndex*',`Glib::unwrap($3)')

@@ -13,9 +13,11 @@ dnl giomm
 _TRANSLATION(`GFile*',`Gio::File',`const Glib::RefPtr<Gio::File>&',`Glib::RefPtr<Gio::File>',`<giomm/file.h>')
 _TRANSLATION(`GInputStream*',`Gio::InputStream',`const Glib::RefPtr<Gio::InputStream>&',`Glib::RefPtr<Gio::InputStream>',`<giomm/inputstream.h>')
 _TRANSLATION(`GOutputStream*',`Gio::OutputStream',`const Glib::RefPtr<Gio::OutputStream>&',`Glib::RefPtr<Gio::OutputStream>',`<giomm/outputstream.h>')
+_TRANSLATION(`GSocket*',`Gio::Socket',`const Glib::RefPtr<Gio::Socket>&',`Glib::RefPtr<Gio::Socket>',`<giomm/socket.h>')
 
 dnl glibmm
 _TRANSLATION(`GValueArray*',`Glib::ValueArray',`const Glib::ValueArray&',`Glib::ValueArray',`<glibmm/valuearray.h>')
+_TRANSLATION(`GObject*',`Glib::Object',`const Glib::Object&',`Glib::Object',`<glibmm/object.h>')
 
 dnl gstreamermm
 _TRANSLATION(`GstBuffer*',`Gst::Buffer',`const Glib::RefPtr<Gst::Buffer>&',`Glib::RefPtr<Gst::Buffer>',`<gstreamermm/buffer.h>')

@@ -93,8 +93,8 @@ MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 # gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
 # in lowercase with a .hg extension).
 
-#TODO (Add below? Plug-in is missing in 1.1.1): gdpdepay|gdpdepay|GDPDepay \
-#TODO (Add below? Plug-in is missing in 1.1.1): gdppay|gdppay|GDPPay \
+
+# todo audioresample|audioresample|AudioResample
 
 AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
 adder|adder|Adder \
@@ -104,7 +104,6 @@ appsink|appsink|AppSink \
 appsrc|appsrc|AppSrc \
 audioconvert|audioconvert|AudioConvert \
 audiorate|audiorate|AudioRate \
-audioresample|audioresample|AudioResample \
 audiotestsrc|audiotestsrc|AudioTestSrc \
 capsfilter|capsfilter|CapsFilter \
 cdparanoiasrc|cdparanoiasrc|CdParanoiaSrc \
@@ -122,10 +121,13 @@ giosrc|giosrc|GioSrc \
 giostreamsink|giostreamsink|GioStreamSink \
 giostreamsrc|giostreamsrc|GioStreamSrc \
 identity|identity|Identity \
+inputselector|input-selector|InputSelector \
 multifdsink|multifdsink|MultiFdSink \
 multiqueue|multiqueue|MultiQueue \
+multisocketsink|multisocketsink|MultiSocketSink \
 oggdemux|oggdemux|OggDemux \
 oggmux|oggmux|OggMux \
+outputselector|output-selector|OutputSelector \
 playbin|playbin|PlayBin \
 queue|queue|Queue \
 queue2|queue2|Queue2 \
