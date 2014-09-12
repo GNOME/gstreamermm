@@ -24,6 +24,7 @@ examples_cppflags = $(GSTREAMERMM_CFLAGS)
 endif
 
 noinst_PROGRAMS =						\
+	all_media_player/example			\
 	audio_video_muxer/example			\
 	dynamic_changing_element/example	\
 	dynamic_changing_source/example		\
@@ -42,6 +43,7 @@ AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(examples_cppflags)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -std=c++0x
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
 
+all_media_player_example_SOURCES			= all_media_player/main.cc
 audio_video_muxer_example_SOURCES			= audio_video_muxer/main.cc
 dynamic_changing_element_example_SOURCES	= dynamic_changing_element/main.cc
 dynamic_changing_source_example_SOURCES		= dynamic_changing_source/main.cc
