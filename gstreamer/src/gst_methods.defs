@@ -2146,12 +2146,47 @@
   (return-type "GstBuffer*")
 )
 
+(define-method unref
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_copy")
+  (return-type "GstBuffer*")
+)
+
+(define-method copy_into
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_copy_into")
+  (return-type "gboolean")
+  (parameters
+    '("GstBuffer*" "src")
+    '("GstBufferCopyFlags" "flags")
+    '("gsize" "offset")
+    '("gsize" "size")
+  )
+)
+
 (define-function gst_buffer_replace
   (c-name "gst_buffer_replace")
   (return-type "gboolean")
   (parameters
     '("GstBuffer**" "obuf")
     '("GstBuffer*" "nbuf")
+  )
+)
+
+(define-method copy_region
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_copy_region")
+  (return-type "GstBuffer*")
+  (parameters
+    '("GstBufferCopyFlags" "flags")
+    '("gsize" "offset")
+    '("gsize" "size")
   )
 )
 
@@ -2230,6 +2265,23 @@
   (of-object "GstBufferList")
   (c-name "gst_buffer_list_ref")
   (return-type "GstBufferList*")
+)
+
+(define-method unref
+  (of-object "GstBufferList")
+  (c-name "gst_buffer_list_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstBufferList")
+  (c-name "gst_buffer_list_copy")
+  (return-type "GstBufferList*")
+)
+
+(define-function gst_buffer_list_get_type
+  (c-name "gst_buffer_list_get_type")
+  (return-type "GType")
 )
 
 (define-function gst_buffer_list_new
@@ -2830,6 +2882,36 @@
   (of-object "GstCaps")
   (c-name "gst_caps_ref")
   (return-type "GstCaps*")
+)
+
+(define-method unref
+  (of-object "GstCaps")
+  (c-name "gst_caps_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstCaps")
+  (c-name "gst_caps_copy")
+  (return-type "GstCaps*")
+)
+
+(define-function gst_caps_replace
+  (c-name "gst_caps_replace")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps**" "old_caps")
+    '("GstCaps*" "new_caps")
+  )
+)
+
+(define-function gst_caps_take
+  (c-name "gst_caps_take")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps**" "old_caps")
+    '("GstCaps*" "new_caps")
+  )
 )
 
 (define-function gst_caps_get_type
@@ -3544,6 +3626,15 @@
 
 ;; From gstcompat.h
 
+(define-method set_caps
+  (of-object "GstPad")
+  (c-name "gst_pad_set_caps")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps*" "caps")
+  )
+)
+
 
 
 ;; From gstcontext.h
@@ -3557,6 +3648,37 @@
   (of-object "GstContext")
   (c-name "gst_context_ref")
   (return-type "GstContext*")
+)
+
+(define-method unref
+  (of-object "GstContext")
+  (c-name "gst_context_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstContext")
+  (c-name "gst_context_copy")
+  (return-type "GstContext*")
+)
+
+(define-function gst_context_replace
+  (c-name "gst_context_replace")
+  (return-type "gboolean")
+  (parameters
+    '("GstContext**" "old_context")
+    '("GstContext*" "new_context")
+  )
+)
+
+(define-function gst_context_new
+  (c-name "gst_context_new")
+  (is-constructor-of "GstContext")
+  (return-type "GstContext*")
+  (parameters
+    '("const-gchar*" "context_type")
+    '("gboolean" "persistent")
+  )
 )
 
 (define-method get_context_type
@@ -4473,6 +4595,23 @@
   )
 )
 
+(define-function gst_event_steal
+  (c-name "gst_event_steal")
+  (return-type "GstEvent*")
+  (parameters
+    '("GstEvent**" "old_event")
+  )
+)
+
+(define-function gst_event_take
+  (c-name "gst_event_take")
+  (return-type "gboolean")
+  (parameters
+    '("GstEvent**" "old_event")
+    '("GstEvent*" "new_event")
+  )
+)
+
 (define-method get_name
   (of-object "GstEventType")
   (c-name "gst_event_type_get_name")
@@ -4495,6 +4634,23 @@
   (of-object "GstEvent")
   (c-name "gst_event_ref")
   (return-type "GstEvent*")
+)
+
+(define-method unref
+  (of-object "GstEvent")
+  (c-name "gst_event_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstEvent")
+  (c-name "gst_event_copy")
+  (return-type "GstEvent*")
+)
+
+(define-function gst_event_get_type
+  (c-name "gst_event_get_type")
+  (return-type "GType")
 )
 
 (define-function gst_event_new_custom
@@ -5431,6 +5587,315 @@
   )
 )
 
+(define-function GST_CAT_LEVEL_LOG_valist
+  (c-name "GST_CAT_LEVEL_LOG_valist")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("GstDebugLevel" "level")
+    '("gpointer" "object")
+    '("const-char*" "format")
+    '("va_list" "varargs")
+  )
+)
+
+(define-function GST_CAT_LEVEL_LOG
+  (c-name "GST_CAT_LEVEL_LOG")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("GstDebugLevel" "level")
+    '("gpointer" "object")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_ERROR_OBJECT
+  (c-name "GST_CAT_ERROR_OBJECT")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_WARNING_OBJECT
+  (c-name "GST_CAT_WARNING_OBJECT")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_INFO_OBJECT
+  (c-name "GST_CAT_INFO_OBJECT")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_DEBUG_OBJECT
+  (c-name "GST_CAT_DEBUG_OBJECT")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_LOG_OBJECT
+  (c-name "GST_CAT_LOG_OBJECT")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_FIXME_OBJECT
+  (c-name "GST_CAT_FIXME_OBJECT")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_TRACE_OBJECT
+  (c-name "GST_CAT_TRACE_OBJECT")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_ERROR
+  (c-name "GST_CAT_ERROR")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_WARNING
+  (c-name "GST_CAT_WARNING")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_INFO
+  (c-name "GST_CAT_INFO")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_DEBUG
+  (c-name "GST_CAT_DEBUG")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_LOG
+  (c-name "GST_CAT_LOG")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_FIXME
+  (c-name "GST_CAT_FIXME")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_CAT_TRACE
+  (c-name "GST_CAT_TRACE")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_ERROR_OBJECT
+  (c-name "GST_ERROR_OBJECT")
+  (return-type "none")
+  (parameters
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_WARNING_OBJECT
+  (c-name "GST_WARNING_OBJECT")
+  (return-type "none")
+  (parameters
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_INFO_OBJECT
+  (c-name "GST_INFO_OBJECT")
+  (return-type "none")
+  (parameters
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_DEBUG_OBJECT
+  (c-name "GST_DEBUG_OBJECT")
+  (return-type "none")
+  (parameters
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_LOG_OBJECT
+  (c-name "GST_LOG_OBJECT")
+  (return-type "none")
+  (parameters
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_FIXME_OBJECT
+  (c-name "GST_FIXME_OBJECT")
+  (return-type "none")
+  (parameters
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_TRACE_OBJECT
+  (c-name "GST_TRACE_OBJECT")
+  (return-type "none")
+  (parameters
+    '("gpointer" "obj")
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_ERROR
+  (c-name "GST_ERROR")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_WARNING
+  (c-name "GST_WARNING")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_INFO
+  (c-name "GST_INFO")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_DEBUG
+  (c-name "GST_DEBUG")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_LOG
+  (c-name "GST_LOG")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_FIXME
+  (c-name "GST_FIXME")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function GST_TRACE
+  (c-name "GST_TRACE")
+  (return-type "none")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function gst_debug_print_stack_trace
+  (c-name "gst_debug_print_stack_trace")
+  (return-type "none")
+)
+
 
 
 ;; From gstiterator.h
@@ -5600,6 +6065,22 @@
   (return-type "GstMemory*")
 )
 
+(define-method unref
+  (of-object "GstMemory")
+  (c-name "gst_memory_unref")
+  (return-type "none")
+)
+
+(define-method get_sizes
+  (of-object "GstMemory")
+  (c-name "gst_memory_get_sizes")
+  (return-type "gsize")
+  (parameters
+    '("gsize*" "offset")
+    '("gsize*" "maxsize")
+  )
+)
+
 (define-method resize
   (of-object "GstMemory")
   (c-name "gst_memory_resize")
@@ -5694,6 +6175,37 @@
   (of-object "GstMessage")
   (c-name "gst_message_ref")
   (return-type "GstMessage*")
+)
+
+(define-method unref
+  (of-object "GstMessage")
+  (c-name "gst_message_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstMessage")
+  (c-name "gst_message_copy")
+  (return-type "GstMessage*")
+)
+
+(define-function gst_message_replace
+  (c-name "gst_message_replace")
+  (return-type "gboolean")
+  (parameters
+    '("GstMessage**" "old_message")
+    '("GstMessage*" "new_message")
+  )
+)
+
+(define-function gst_message_new_custom
+  (c-name "gst_message_new_custom")
+  (return-type "GstMessage*")
+  (parameters
+    '("GstMessageType" "type")
+    '("GstObject*" "src")
+    '("GstStructure*" "structure")
+  )
 )
 
 (define-method get_structure
@@ -8167,6 +8679,36 @@
   (return-type "GstQuery*")
 )
 
+(define-method unref
+  (of-object "GstQuery")
+  (c-name "gst_query_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstQuery")
+  (c-name "gst_query_copy")
+  (return-type "GstQuery*")
+)
+
+(define-function gst_query_replace
+  (c-name "gst_query_replace")
+  (return-type "gboolean")
+  (parameters
+    '("GstQuery**" "old_query")
+    '("GstQuery*" "new_query")
+  )
+)
+
+(define-function gst_query_new_custom
+  (c-name "gst_query_new_custom")
+  (return-type "GstQuery*")
+  (parameters
+    '("GstQueryType" "type")
+    '("GstStructure*" "structure")
+  )
+)
+
 (define-method get_structure
   (of-object "GstQuery")
   (c-name "gst_query_get_structure")
@@ -9125,6 +9667,18 @@
 (define-method ref
   (of-object "GstSample")
   (c-name "gst_sample_ref")
+  (return-type "GstSample*")
+)
+
+(define-method unref
+  (of-object "GstSample")
+  (c-name "gst_sample_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstSample")
+  (c-name "gst_sample_copy")
   (return-type "GstSample*")
 )
 
@@ -10429,6 +10983,18 @@
   (return-type "GstTagList*")
 )
 
+(define-method unref
+  (of-object "GstTagList")
+  (c-name "gst_tag_list_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstTagList")
+  (c-name "gst_tag_list_copy")
+  (return-type "GstTagList*")
+)
+
 
 
 ;; From gsttagsetter.h
@@ -11269,6 +11835,100 @@
 (define-function gst_util_group_id_next
   (c-name "gst_util_group_id_next")
   (return-type "guint")
+)
+
+(define-function GFLOAT_SWAP_LE_BE
+  (c-name "GFLOAT_SWAP_LE_BE")
+  (return-type "gfloat")
+  (parameters
+    '("gfloat" "in")
+  )
+)
+
+(define-function GDOUBLE_SWAP_LE_BE
+  (c-name "GDOUBLE_SWAP_LE_BE")
+  (return-type "gdouble")
+  (parameters
+    '("gdouble" "in")
+  )
+)
+
+(define-function GST_READ_FLOAT_LE
+  (c-name "GST_READ_FLOAT_LE")
+  (return-type "gfloat")
+  (parameters
+    '("const-guint8*" "data")
+  )
+)
+
+(define-function GST_READ_FLOAT_BE
+  (c-name "GST_READ_FLOAT_BE")
+  (return-type "gfloat")
+  (parameters
+    '("const-guint8*" "data")
+  )
+)
+
+(define-function GST_READ_DOUBLE_LE
+  (c-name "GST_READ_DOUBLE_LE")
+  (return-type "gdouble")
+  (parameters
+    '("const-guint8*" "data")
+  )
+)
+
+(define-function GST_READ_DOUBLE_BE
+  (c-name "GST_READ_DOUBLE_BE")
+  (return-type "gdouble")
+  (parameters
+    '("const-guint8*" "data")
+  )
+)
+
+(define-function GST_WRITE_FLOAT_LE
+  (c-name "GST_WRITE_FLOAT_LE")
+  (return-type "none")
+  (parameters
+    '("guint8*" "data")
+    '("gfloat" "num")
+  )
+)
+
+(define-function GST_WRITE_FLOAT_BE
+  (c-name "GST_WRITE_FLOAT_BE")
+  (return-type "none")
+  (parameters
+    '("guint8*" "data")
+    '("gfloat" "num")
+  )
+)
+
+(define-function GST_WRITE_DOUBLE_LE
+  (c-name "GST_WRITE_DOUBLE_LE")
+  (return-type "none")
+  (parameters
+    '("guint8*" "data")
+    '("gdouble" "num")
+  )
+)
+
+(define-function GST_WRITE_DOUBLE_BE
+  (c-name "GST_WRITE_DOUBLE_BE")
+  (return-type "none")
+  (parameters
+    '("guint8*" "data")
+    '("gdouble" "num")
+  )
+)
+
+(define-method default_error
+  (of-object "GstObject")
+  (c-name "gst_object_default_error")
+  (return-type "none")
+  (parameters
+    '("const-GError*" "error")
+    '("const-gchar*" "debug")
+  )
 )
 
 (define-method create_all_pads
@@ -13459,6 +14119,21 @@
   )
 )
 
+(define-method skip_unchecked
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_skip_unchecked")
+  (return-type "none")
+  (parameters
+    '("guint" "nbits")
+  )
+)
+
+(define-method skip_to_byte_unchecked
+  (of-object "GstBitReader")
+  (c-name "gst_bit_reader_skip_to_byte_unchecked")
+  (return-type "none")
+)
+
 
 
 ;; From gstbytereader-docs.h
@@ -14327,6 +15002,33 @@
   )
 )
 
+(define-method skip_unchecked
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_skip_unchecked")
+  (return-type "none")
+  (parameters
+    '("guint" "nbytes")
+  )
+)
+
+(define-method get_data_unchecked
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_data_unchecked")
+  (return-type "const-guint8*")
+  (parameters
+    '("guint" "size")
+  )
+)
+
+(define-method dup_data_unchecked
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_dup_data_unchecked")
+  (return-type "guint8*")
+  (parameters
+    '("guint" "size")
+  )
+)
+
 
 
 ;; From gstbytewriter-docs.h
@@ -14662,6 +15364,12 @@
   (return-type "guint")
 )
 
+(define-method get_remaining
+  (of-object "GstByteWriter")
+  (c-name "gst_byte_writer_get_remaining")
+  (return-type "guint")
+)
+
 (define-method ensure_free_space
   (of-object "GstByteWriter")
   (c-name "gst_byte_writer_ensure_free_space")
@@ -14920,6 +15628,27 @@
   (of-object "GstByteWriter")
   (c-name "gst_byte_writer_put_buffer")
   (return-type "gboolean")
+  (parameters
+    '("GstBuffer*" "buffer")
+    '("gsize" "offset")
+    '("gssize" "size")
+  )
+)
+
+(define-method fill_unchecked
+  (of-object "GstByteWriter")
+  (c-name "gst_byte_writer_fill_unchecked")
+  (return-type "none")
+  (parameters
+    '("guint8" "value")
+    '("guint" "size")
+  )
+)
+
+(define-method put_buffer_unchecked
+  (of-object "GstByteWriter")
+  (c-name "gst_byte_writer_put_buffer_unchecked")
+  (return-type "none")
   (parameters
     '("GstBuffer*" "buffer")
     '("gsize" "offset")
@@ -15254,6 +15983,11 @@
 
 ;; From gstindex.h
 
+(define-function gst_index_get_type
+  (c-name "gst_index_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_index_new
   (c-name "gst_index_new")
   (is-constructor-of "GstIndex")
@@ -15305,6 +16039,27 @@
   (return-type "GstIndexCertainty")
 )
 
+(define-method set_filter
+  (of-object "GstIndex")
+  (c-name "gst_index_set_filter")
+  (return-type "none")
+  (parameters
+    '("GstIndexFilter" "filter")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method set_filter_full
+  (of-object "GstIndex")
+  (c-name "gst_index_set_filter_full")
+  (return-type "none")
+  (parameters
+    '("GstIndexFilter" "filter")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_destroy")
+  )
+)
+
 (define-method set_resolver
   (of-object "GstIndex")
   (c-name "gst_index_set_resolver")
@@ -15326,6 +16081,16 @@
   )
 )
 
+(define-method get_writer_id
+  (of-object "GstIndex")
+  (c-name "gst_index_get_writer_id")
+  (return-type "gboolean")
+  (parameters
+    '("GstObject*" "writer")
+    '("gint*" "id")
+  )
+)
+
 (define-method add_format
   (of-object "GstIndex")
   (c-name "gst_index_add_format")
@@ -15333,6 +16098,18 @@
   (parameters
     '("gint" "id")
     '("GstFormat" "format")
+  )
+)
+
+(define-method add_associationv
+  (of-object "GstIndex")
+  (c-name "gst_index_add_associationv")
+  (return-type "GstIndexEntry*")
+  (parameters
+    '("gint" "id")
+    '("GstIndexAssociationFlags" "flags")
+    '("gint" "n")
+    '("const-GstIndexAssociation*" "list")
   )
 )
 
@@ -15347,6 +16124,71 @@
     '("gint64" "value")
   )
   (varargs #t)
+)
+
+(define-method add_id
+  (of-object "GstIndex")
+  (c-name "gst_index_add_id")
+  (return-type "GstIndexEntry*")
+  (parameters
+    '("gint" "id")
+    '("gchar*" "description")
+  )
+)
+
+(define-method get_assoc_entry
+  (of-object "GstIndex")
+  (c-name "gst_index_get_assoc_entry")
+  (return-type "GstIndexEntry*")
+  (parameters
+    '("gint" "id")
+    '("GstIndexLookupMethod" "method")
+    '("GstIndexAssociationFlags" "flags")
+    '("GstFormat" "format")
+    '("gint64" "value")
+  )
+)
+
+(define-method get_assoc_entry_full
+  (of-object "GstIndex")
+  (c-name "gst_index_get_assoc_entry_full")
+  (return-type "GstIndexEntry*")
+  (parameters
+    '("gint" "id")
+    '("GstIndexLookupMethod" "method")
+    '("GstIndexAssociationFlags" "flags")
+    '("GstFormat" "format")
+    '("gint64" "value")
+    '("GCompareDataFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function gst_index_entry_get_type
+  (c-name "gst_index_entry_get_type")
+  (return-type "GType")
+)
+
+(define-method copy
+  (of-object "GstIndexEntry")
+  (c-name "gst_index_entry_copy")
+  (return-type "GstIndexEntry*")
+)
+
+(define-method free
+  (of-object "GstIndexEntry")
+  (c-name "gst_index_entry_free")
+  (return-type "none")
+)
+
+(define-method assoc_map
+  (of-object "GstIndexEntry")
+  (c-name "gst_index_entry_assoc_map")
+  (return-type "gboolean")
+  (parameters
+    '("GstFormat" "format")
+    '("gint64*" "value")
+  )
 )
 
 
@@ -26624,6 +27466,17 @@
   (return-type "GstVideoOverlayRectangle*")
 )
 
+(define-method unref
+  (of-object "GstVideoOverlayRectangle")
+  (c-name "gst_video_overlay_rectangle_unref")
+  (return-type "none")
+)
+
+(define-function gst_video_overlay_rectangle_get_type
+  (c-name "gst_video_overlay_rectangle_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_video_overlay_rectangle_new_raw
   (c-name "gst_video_overlay_rectangle_new_raw")
   (return-type "GstVideoOverlayRectangle*")
@@ -26752,6 +27605,17 @@
   (of-object "GstVideoOverlayComposition")
   (c-name "gst_video_overlay_composition_ref")
   (return-type "GstVideoOverlayComposition*")
+)
+
+(define-method unref
+  (of-object "GstVideoOverlayComposition")
+  (c-name "gst_video_overlay_composition_unref")
+  (return-type "none")
+)
+
+(define-function gst_video_overlay_composition_get_type
+  (c-name "gst_video_overlay_composition_get_type")
+  (return-type "GType")
 )
 
 (define-method copy
