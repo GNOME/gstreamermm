@@ -42,19 +42,19 @@
  *
  * If your source file is @c program.cc, you can compile it with:
  * @code
- * g++ program.cc -o program  `pkg-config --cflags --libs gstreamermm-0.10`
+ * g++ program.cc -o program  `pkg-config --cflags --libs gstreamermm-1.0`
  * @endcode
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
- * PKG_CHECK_MODULES([GSTREAMERMM], [gstreamermm-0.10])
+ * PKG_CHECK_MODULES([GSTREAMERMM_1_0], [gstreamermm-1.0])
  * @endcode
- * Then use the generated @c GSTREAMERMM_CFLAGS and @c GSTREAMERMM_LIBS
+ * Then use the generated @c GSTREAMERMM_1_0_CFLAGS and @c GSTREAMERMM_1_0_LIBS
  * variables in the
  * project @c Makefile.am files. For example:
  * @code
- * program_CPPFLAGS = $(GSTREAMERMM_CFLAGS)
- * program_LDADD = $(GSTREAMERMM_LIBS)
+ * program_CPPFLAGS = $(GSTREAMERMM_1_0_CFLAGS)
+ * program_LDADD = $(GSTREAMERMM_1_0_LIBS)
  * @endcode
  */
 
