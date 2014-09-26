@@ -18,7 +18,7 @@
  */
 
 #ifndef _GSTREAMERMM_HANDLE_ERROR_H
-#define _GSTREAMERMM_IHANDLE_ERRORH
+#define _GSTREAMERMM_HANDLE_ERROR_H
 
 #include <glibmm/ustring.h>
 #include <stdexcept>

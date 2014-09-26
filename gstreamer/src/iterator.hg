@@ -326,10 +326,10 @@ void IteratorBase<CppType>::swap(IteratorBase<CppType>& other)
   take_ownership = other.take_ownership;
   other.take_ownership = temp_take_ownership;
 
-  GValue * const temp_current;
-  g_value_copy(current, temp_current);
+  GValue temp_current;
+  g_value_copy(current, &temp_current);
   g_value_copy(other.current, current);
-  g_value_copy(temp_current, other.current);
+  g_value_copy(&temp_current, other.current);
 
   const IteratorResult temp_result = current_result;
   current_result = other.current_result;
