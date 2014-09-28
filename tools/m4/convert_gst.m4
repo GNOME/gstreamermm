@@ -41,7 +41,9 @@ _CONV_ENUM(Gst,PadProbeType)
 _CONV_ENUM(Gst,PluginDependencyFlags)
 _CONV_ENUM(Gst,QOSType)
 _CONV_ENUM(Gst,QueryType)
+_CONV_ENUM(Gst,QueryTypeFlags)
 _CONV_ENUM(Gst,Rank)
+_CONV_ENUM(Gst,SchedulingFlags)
 _CONV_ENUM(Gst,SeekFlags)
 _CONV_ENUM(Gst,SeekType)
 _CONV_ENUM(Gst,State)
@@ -233,6 +235,7 @@ _CONVERSION(`Gst::AudioRingBufferSpec&', `GstAudioRingBufferSpec*', `$3.gobj()')
 
 dnl Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
+_CONVERSION(`const Gst::Structure&',`GstStructure*',`const_cast<GstStructure*>($3.gobj())') 
 
 dnl TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')

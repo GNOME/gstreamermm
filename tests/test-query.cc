@@ -57,3 +57,15 @@ TEST(QueryTest, CorrectCreatingQueryConvert)
     CreatingQueryTest<QueryConvert>(
             std::bind(&QueryConvert::create, FORMAT_PERCENT, 10, FORMAT_BYTES), QUERY_CONVERT);
 }
+
+TEST(QueryTest, CheckRefCountsDuringQueryCapsCreation)
+{
+  RefPtr<Caps> filter = Caps::create_from_string("video/x-raw");
+  RefPtr<QueryCaps> query = QueryCaps::create(filter);
+
+  RefPtr<Caps> caps = query->parse();
+  ASSERT_EQ(caps, filter);
+  ASSERT_EQ(3, caps->gobj()->mini_object.refcount); // - 1 (caps object) + 1 (filter object) + 1 (owned by query) = 3
+}
+
+
