@@ -19,6 +19,7 @@
 
 #include <gst/gst.h>
 #include <glibmm/value.h>
+#include <sigc++/sigc++.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -27,6 +28,14 @@ namespace Gst
 
 _WRAP_ENUM(MiniObjectFlags, GstMiniObjectFlags)
 _WRAP_ENUM(LockFlags, GstLockFlags)
+
+/** This is a base class for data which represents qdata.
+ */
+class QuarkData
+{
+public:
+  virtual ~QuarkData(){}
+};
 
 /** This is a base class for some gstreamermm objects.
  * It is similar to Glib::Object but has no GObject property or signal support.
@@ -37,9 +46,15 @@ class MiniObject
   _IGNORE(gst_mini_object_ref, gst_mini_object_unref)
 
 public:
+  typedef sigc::slot< void > SlotFinalizer;
+
   ~MiniObject();
   _MEMBER_GET(flags, flags, guint, guint)
   _MEMBER_SET(flags, flags, guint, guint)
+
+  _MEMBER_GET(refcount, refcount, gint, gint)
+
+  _MEMBER_GET(lockstate, lockstate, gint, gint)
 
   _WRAP_METHOD(bool lock(LockFlags flags), gst_mini_object_lock)
   _WRAP_METHOD(void unlock(LockFlags flags), gst_mini_object_unlock)
@@ -56,8 +71,54 @@ public:
    */
   Glib::RefPtr<MiniObject> create_writable();
 
+  /** This sets an opaque, named pointer on a miniobject.
+   * The name is specified through a #GQuark (retrived e.g. via
+   * g_quark_from_static_string()), and the pointer
+   * can be gotten back with get_qdata().
+   * Setting a previously set user data pointer, overrides (frees)
+   * the old pointer set, using NULL as pointer essentially
+   * removes the data stored.
+   * @param quark a GQuark, naming the user data pointer.
+   * @param data an opaque user data pointer.
+   */
+  void set_qdata(GQuark quark, QuarkData *data);
+  _IGNORE(gst_mini_object_set_qdata)
+
+  /** This function gets back user data pointers stored via
+   * set_qdata().
+   * @param quark a GQuark, naming the user data pointer.
+   * @return the user data pointer set, or NULL.
+   */
+  QuarkData* get_qdata(GQuark quark) const;
+  _IGNORE(gst_mini_object_get_qdata)
+
+#m4 _CONVERSION(`gpointer',`QuarkData*',`static_cast<QuarkData*>($3)')
+  _WRAP_METHOD(QuarkData* steal_qdata(GQuark quark), gst_mini_object_steal_qdata)
+
   // Copying a mini object can be achieved by assignment.
   _IGNORE(gst_mini_object_copy)
+
+  /** Adds notifier when mini object is finalized
+   * @param slot notifier.
+   */
+  void add_finalize_notifier(const SlotFinalizer& slot);
+
+  /** Remove finalize notifier
+   */
+  void remove_finalize_notifier();
+
+  _IGNORE(gst_mini_object_weak_ref)
+  _IGNORE(gst_mini_object_weak_unref)
+
+private:
+  // In this class non-static member cannot exists, so there is a map
+  // with key = gobj() and value = handler.
+  static std::map<GstMiniObject*, SlotFinalizer*> finalizers;
+
+  static void destroy_qdata(gpointer qdata);
+
+  static void MiniObject_Finalizer_gstreamermm_callback(gpointer userdata, GstMiniObject *obj);
+
 };
 
 } // namespace Gst

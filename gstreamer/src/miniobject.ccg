@@ -23,6 +23,8 @@
 namespace Gst
 {
 
+std::map<GstMiniObject*, MiniObject::SlotFinalizer*> MiniObject::finalizers;
+
 MiniObject::~MiniObject()
 {
     GstMiniObject *const gobject_ = reinterpret_cast<GstMiniObject*>(const_cast<MiniObject*>(this));
@@ -30,8 +32,16 @@ MiniObject::~MiniObject()
   // being destroyed as a result of weak reference notification no
   // unreferencing is done and thus no error is issued on unreferencing a mini
   // object with a reference of 0.
-  if(gobject_ && GST_MINI_OBJECT_REFCOUNT_VALUE(gobject_) > 0)
+  if (gobject_ && GST_MINI_OBJECT_REFCOUNT_VALUE(gobject_) > 0)
+  {
     gst_mini_object_unref(gobject_);
+  }
+
+  if (finalizers.find(gobject_) != finalizers.end())
+  {
+    delete finalizers[gobject_];
+    finalizers[gobject_] = NULL;
+  }
 }
 
 Glib::RefPtr<Gst::MiniObject> MiniObject::create_writable()
@@ -62,6 +72,53 @@ Glib::RefPtr<Gst::MiniObject> MiniObject::create_writable()
   {
     reference(); // gst_mini_object_make_writable(buf) will unref the old buffer, but our caller is still holding RefPtr to it
     return Glib::wrap(gst_mini_object_make_writable(gobj()));
+  }
+}
+
+void MiniObject::set_qdata(GQuark quark, QuarkData *data)
+{
+  gst_mini_object_set_qdata(gobj(), quark, static_cast<gpointer>(data), &MiniObject::destroy_qdata);
+}
+
+void MiniObject::destroy_qdata(gpointer qdata)
+{
+  QuarkData *data = static_cast<QuarkData*>(qdata);
+  delete data;
+}
+
+QuarkData* MiniObject::get_qdata(GQuark quark) const
+{
+  gpointer qdata = gst_mini_object_get_qdata(const_cast<GstMiniObject*>(gobj()), quark);
+  return static_cast<QuarkData*>(qdata);
+}
+
+void MiniObject::add_finalize_notifier(const SlotFinalizer& slot)
+{
+  SlotFinalizer *finalizer = new SlotFinalizer(slot);
+  if (finalizers.find(gobj()) != finalizers.end())
+  {
+    delete finalizers[gobj()];
+    finalizers[gobj()] = finalizer;
+  }
+  else
+  {
+    finalizers.insert(std::make_pair(gobj(), finalizer));
+  }
+  gst_mini_object_weak_ref(gobj(), &MiniObject::MiniObject_Finalizer_gstreamermm_callback, static_cast<gpointer>(finalizer));
+}
+
+void MiniObject::MiniObject_Finalizer_gstreamermm_callback(gpointer userdata, GstMiniObject *obj)
+{
+  (*static_cast<SlotFinalizer*>(userdata))();
+}
+
+void MiniObject::remove_finalize_notifier()
+{
+  if (finalizers.find(gobj()) != finalizers.end())
+  {
+    gst_mini_object_weak_unref(gobj(), &MiniObject::MiniObject_Finalizer_gstreamermm_callback, finalizers[gobj()]);
+    delete finalizers[gobj()];
+    finalizers[gobj()] = NULL;
   }
 }
 
