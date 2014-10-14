@@ -26,6 +26,7 @@
 #include <gstreamermm/message.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/query.h>
+#include <gstreamermm/context.h>
 #include <glibmm/arrayhandle.h>
 
 _DEFS(gstreamermm,gst)
@@ -184,6 +185,7 @@ public:
   _WRAP_METHOD(Gst::Iterator<Gst::Pad> iterate_src_pads(), gst_element_iterate_src_pads)
   _WRAP_METHOD(Gst::Iterator<const Gst::Pad> iterate_src_pads() const, gst_element_iterate_src_pads)
   _WRAP_METHOD(void unlink(const Glib::RefPtr<Gst::Element>& dest), gst_element_unlink)
+  _WRAP_METHOD(void set_context(const Glib::RefPtr<Gst::Context>& context), gst_element_set_context)
   _IGNORE(gst_element_unlink_many)
 
   //This is not like link() because link() was written to return the
@@ -370,6 +372,10 @@ public:
   /** Perform a Gst::Query on the element.
    */
   _WRAP_VFUNC(bool query(const Glib::RefPtr<Gst::Query>& query) const, "query")
+
+  /** Set a Gst::Context on the element
+   */
+  _WRAP_VFUNC(void set_context(const Glib::RefPtr<Gst::Context>& context), "set_context")
 
   Glib::RefPtr<Gst::PadTemplate> get_pad_template(const Glib::ustring &factory_name) const;
 
