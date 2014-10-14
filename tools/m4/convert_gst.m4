@@ -108,6 +108,10 @@ dnl ColorBalanceChannel
 _CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>(Glib::unwrap($3))')
 
+dnl Context
+_CONVERSION(`GstContext*',`Glib::RefPtr<Gst::Context>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Context>&',`GstContext*',`$3->gobj()')
+
 dnl DiscovererInfo
 _CONVERSION(`GstDiscovererInfo*',`Glib::RefPtr<DiscovererInfo>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<DiscovererInfo>&',`GstDiscovererInfo*',`Glib::unwrap($3)')
@@ -236,6 +240,7 @@ _CONVERSION(`Gst::AudioRingBufferSpec&', `GstAudioRingBufferSpec*', `$3.gobj()')
 dnl Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
 _CONVERSION(`const Gst::Structure&',`GstStructure*',`const_cast<GstStructure*>($3.gobj())') 
+_CONVERSION(`GstStructure*', `Gst::Structure', `Glib::wrap($3)')
 
 dnl TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')

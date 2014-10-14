@@ -73,6 +73,7 @@
 #include <gstreamermm/caps.h>
 #include <gstreamermm/childproxy.h>
 #include <gstreamermm/clock.h>
+#include <gstreamermm/context.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/elementfactory.h>
 #include <gstreamermm/enums.h>
