@@ -110,6 +110,7 @@ _CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceCha
 
 dnl Context
 _CONVERSION(`GstContext*',`Glib::RefPtr<Gst::Context>',`Glib::wrap($3)')
+_CONVERSION(`GstContext*',`const Glib::RefPtr<Gst::Context>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Context>&',`GstContext*',`$3->gobj()')
 
 dnl DiscovererInfo
