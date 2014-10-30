@@ -83,10 +83,18 @@ TEST(BufferTest, ShouldResetMemoryPointerButAllowIncreaseRefcount)
   ASSERT_EQ(1, mem2->gobj()->mini_object.refcount);
 }
 
-TEST(BufferTest, CheckBufferRefcountAfterCopying)
+TEST(BufferTest, CheckBufferRefcountAfterCopyingRegion)
 {
   Glib::RefPtr<Buffer> buf = Buffer::create(10);
   auto b = buf->copy_region(BUFFER_COPY_MEMORY, 0, 10);
+  ASSERT_EQ(1, b->gobj()->mini_object.refcount);
+  ASSERT_EQ(1, buf->gobj()->mini_object.refcount);
+}
+
+TEST(BufferTest, CheckBufferRefcountAfterCopying)
+{
+  Glib::RefPtr<Buffer> buf = Buffer::create(10);
+  auto b = buf->copy();
   ASSERT_EQ(1, b->gobj()->mini_object.refcount);
   ASSERT_EQ(1, buf->gobj()->mini_object.refcount);
 }
