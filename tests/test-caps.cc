@@ -88,6 +88,7 @@ TEST_F(CapsTest, AppendCapsToCaps)
 
     CheckCaps("width", width, 1);
     CheckCaps("framerate", framerate);
+    ASSERT_FALSE(new_caps);
 }
 
 TEST_F(CapsTest, GetNonExistingValue)
@@ -110,4 +111,13 @@ TEST_F(CapsTest, SetCapsToElement)
     element->get_property("caps", caps);
 
     ASSERT_STREQ(str_caps, caps->to_string().c_str());
+}
+
+TEST_F(CapsTest, MergeCaps)
+{
+    Glib::RefPtr<Caps> tmp = Caps::create_from_string("video/x-raw, format=RGBA");
+    Glib::RefPtr<Caps> tmp2 = Caps::create_from_string("video/x-raw, format=RGB");
+    tmp = tmp->merge(tmp2);
+    ASSERT_EQ(1, tmp->get_refcount());
+    ASSERT_FALSE(tmp2);
 }

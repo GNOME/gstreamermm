@@ -111,4 +111,21 @@ Caps::set_simple(const Glib::ustring& name, const char* data)
   set_simple(name, std::string(data));
 }
 
+Glib::RefPtr<Gst::Caps> Caps::merge(Glib::RefPtr<Gst::Caps>& caps)
+{
+  GstCaps *c1 = gobj(), *c2 = Glib::unwrap(caps);
+  caps->reference(); caps.reset();
+  reference();
+  return Glib::wrap(gst_caps_merge(c1, c2));
+}
+
+void Caps::append(Glib::RefPtr<Gst::Caps>& caps)
+{
+  caps->reference();
+  GstCaps *c_caps = Glib::unwrap(caps);
+  caps.reset();
+  gst_caps_append(gobj(), c_caps);
+}
+
+
 } //namespace Gst
