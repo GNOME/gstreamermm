@@ -68,8 +68,6 @@ public:
     }
 };
 
-#define Checker Check::Instance()
-
 }
 
 #endif
