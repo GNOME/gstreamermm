@@ -22,6 +22,7 @@ LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest -lpthread
 
 check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
                  test-allocator test-atomicqueue test-bin \
+                 test-capsfeatures \
                  test-urihandler test-ghostpad test-init test-miniobject \
                  test-query test-structure test-taglist test-plugin-appsink \
                  test-plugin-appsrc test-plugin-register test-plugin-pushsrc \
@@ -39,6 +40,7 @@ test_allocator_SOURCES		= test-allocator.cc $(TEST_MAIN_SOURCE)
 test_atomicqueue_SOURCES	= test-atomicqueue.cc $(TEST_MAIN_SOURCE)
 test_bin_SOURCES			= test-bin.cc $(TEST_MAIN_SOURCE)
 test_caps_SOURCES			= test-caps.cc $(TEST_MAIN_SOURCE)
+test_capsfeatures_SOURCES	= test-capsfeatures.cc $(TEST_MAIN_SOURCE)
 test_buffer_SOURCES			= test-buffer.cc $(TEST_MAIN_SOURCE)
 test_bus_SOURCES			= test-bus.cc $(TEST_MAIN_SOURCE)
 test_ghostpad_SOURCES		= test-ghostpad.cc $(TEST_MAIN_SOURCE)

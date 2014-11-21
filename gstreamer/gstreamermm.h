@@ -71,6 +71,7 @@
 #include <gstreamermm/bufferlist.h>
 #include <gstreamermm/bus.h>
 #include <gstreamermm/caps.h>
+#include <gstreamermm/capsfeatures.h>
 #include <gstreamermm/childproxy.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/context.h>

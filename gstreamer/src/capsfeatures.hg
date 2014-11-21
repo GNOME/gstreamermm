@@ -1,0 +1,90 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2014 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/gst.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class CapsFeatures
+{
+  _CLASS_BOXEDTYPE(CapsFeatures, GstCapsFeatures, NONE, gst_caps_features_copy, gst_caps_features_free)
+
+
+  _IGNORE(gst_caps_features_new_id_valist)
+  _IGNORE(gst_caps_features_new_valist)
+  _IGNORE(gst_caps_features_copy)
+  _IGNORE(gst_caps_features_free)
+
+public:
+  _CUSTOM_DEFAULT_CTOR
+
+  /**
+   * Creates a new, empty Gst::CapsFeatures.
+   */
+  CapsFeatures();
+  _IGNORE(gst_caps_features_new_empty)
+
+  /**
+   * Creates a new Gst::CapsFeatures with the given first feature.
+   *
+   * @param feature1 name of first feature to set.
+   */
+  explicit CapsFeatures(const Glib::ustring& feature1);
+
+  /**
+   * Creates a new, ANY Gst::CapsFeatures. This will be equal to any other
+   * Gst::CapsFeatures but caps with these are unfixed.
+   */
+  static CapsFeatures create_any();
+  _IGNORE(gst_caps_features_new_any)
+
+  static CapsFeatures create_from_string(const Glib::ustring& features);
+  _IGNORE(gst_caps_features_from_string)
+
+  _WRAP_METHOD(Glib::ustring to_string() const, gst_caps_features_to_string)
+
+  _WRAP_METHOD(bool set_parent_refcount(gint *refcount), gst_caps_features_set_parent_refcount)
+
+  _WRAP_METHOD(bool is_equal(const Gst::CapsFeatures& features2) const, gst_caps_features_is_equal)
+
+  _WRAP_METHOD(bool is_any() const, gst_caps_features_is_any)
+
+  _WRAP_METHOD(bool contains(const Glib::ustring& feature) const, gst_caps_features_contains)
+
+  _WRAP_METHOD(bool contains(GQuark feature) const, gst_caps_features_contains_id)
+
+  _WRAP_METHOD(guint get_size() const, gst_caps_features_get_size)
+
+  _WRAP_METHOD(Glib::ustring get_nth(guint i) const, gst_caps_features_get_nth)
+
+  _WRAP_METHOD(GQuark get_nth_id(guint i) const, gst_caps_features_get_nth_id)
+
+  _WRAP_METHOD(void add(const Glib::ustring& feature), gst_caps_features_add)
+
+  _WRAP_METHOD(void add(GQuark feature), gst_caps_features_add_id)
+
+  _WRAP_METHOD(void remove(const Glib::ustring& feature), gst_caps_features_remove)
+
+  _WRAP_METHOD(void remove(GQuark feature), gst_caps_features_remove_id)
+};
+
+}
