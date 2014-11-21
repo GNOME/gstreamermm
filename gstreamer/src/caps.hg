@@ -20,6 +20,7 @@
 #include <gst/gst.h>
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/structure.h>
+#include <gstreamermm/capsfeatures.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -123,12 +124,29 @@ public:
   void append_structure(const Structure& structure);
   _IGNORE(gst_caps_append_structure)
 
+
+  /** Appends a structure to caps.
+   *
+   * @param structure The Gst::Structure to append.
+   * @param features The Gst::CapsFeatures to append.
+   */
+  void append_structure(const Structure& structure, const CapsFeatures& features);
+  _IGNORE(gst_caps_append_structure_full)
+
   /** Appends a structure to caps if its not already expressed by caps.
    *
    * @param structure The Gst::Structure to merge.
    */
-  Glib::RefPtr<Gst::Caps> merge_structure(Structure& structure);
+  Glib::RefPtr<Gst::Caps> merge_structure(const Structure& structure);
   _IGNORE(gst_caps_merge_structure)
+
+  /** Appends a structure to caps if its not already expressed by caps.
+   *
+   * @param structure The Gst::Structure to merge.
+   * @param features The Gst::CapsFeatures to merge.
+   */
+  Glib::RefPtr<Gst::Caps> merge_structure(const Structure& structure, const CapsFeatures& features);
+  _IGNORE(gst_caps_merge_structure_full)
 
 #m4 _CONVERSION(`GstStructure*', `const Structure', `Glib::wrap($3, true)')
   /** Finds the structure in caps that has the index @a idx, and returns it.
@@ -227,6 +245,24 @@ public:
    */
   Glib::RefPtr<Gst::Caps> create_writable();
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> truncate(), gst_caps_truncate)
+
+  /**
+   * Finds the features in caps that has the index index , and returns it.
+   *
+   * @param index the index of the structure.
+   * @return The new Gst::CapsFeatures corresponding to index.
+   */
+  CapsFeatures get_features(guint index) const;
+  _IGNORE(gst_caps_get_features)
+
+  /**
+   * Sets the Gst::CapsFeatures for the structure at index.
+   *
+   * @param index The index of the structure.
+   * @param features The Gst::CapsFeatures to set.
+   */
+  void set_features(guint index, const CapsFeatures& features);
+  _IGNORE(gst_caps_set_features)
 };
 
 /******************************* Gst::Caps *******************************/

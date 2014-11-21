@@ -71,11 +71,28 @@ void Caps::append_structure(const Structure& structure)
   gst_caps_append_structure(gobj(), copy);
 }
 
-Glib::RefPtr<Caps> Caps::merge_structure(Structure& structure)
+void Caps::append_structure(const Structure& structure, const CapsFeatures& features)
 {
-  //We take a copy because gst_caps_append_structure() wants to take ownership:
+  //We take a copy because gst_caps_append_structure_full() wants to take ownership:
+  GstStructure* copy_structure = gst_structure_copy(structure.gobj());
+  GstCapsFeatures* copy_features = gst_caps_features_copy(features.gobj());
+  gst_caps_append_structure_full(gobj(), copy_structure, copy_features);
+}
+
+
+Glib::RefPtr<Caps> Caps::merge_structure(const Structure& structure)
+{
+  //We take a copy because gst_caps_merge_structure() wants to take ownership:
   GstStructure* copy = gst_structure_copy(structure.gobj());
   return Glib::wrap(gst_caps_merge_structure(gobj(), copy), true);
+}
+
+Glib::RefPtr<Caps> Caps::merge_structure(const Structure& structure, const CapsFeatures& features)
+{
+  //We take a copy because gst_caps_merge_structure_full() wants to take ownership:
+  GstStructure* copy_structure = gst_structure_copy(structure.gobj());
+  GstCapsFeatures* copy_features = gst_caps_features_copy(features.gobj());
+  return Glib::wrap(gst_caps_merge_structure_full(gobj(), copy_structure, copy_features), true);
 }
 
 //TODO: Want to return RefPtr to Caps but using RefPtr in expressions such
@@ -125,6 +142,18 @@ void Caps::append(Glib::RefPtr<Gst::Caps>& caps)
   GstCaps *c_caps = Glib::unwrap(caps);
   caps.reset();
   gst_caps_append(gobj(), c_caps);
+}
+
+CapsFeatures Caps::get_features(guint index) const
+{
+  GstCapsFeatures* features = gst_caps_get_features(gobj(), index);
+  return CapsFeatures(features, true);
+}
+
+void Caps::set_features(guint index, const CapsFeatures& features)
+{
+  GstCapsFeatures* copy = gst_caps_features_copy(features.gobj());
+  gst_caps_set_features(gobj(), index, copy);
 }
 
 
