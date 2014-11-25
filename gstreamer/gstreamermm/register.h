@@ -54,6 +54,9 @@ public:
   {
   	gst_element_class_add_metadata(klass ,key.c_str(), value.c_str());
   }
+
+  const GstElementClass* gobj() const { return klass; }
+  GstElementClass* gobj() { return klass; }
 };
 
 template<class DerivedCppType>
