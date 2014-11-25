@@ -581,7 +581,7 @@ void QueryAllocation::remove_nth_allocation_pool(guint index)
 
 void QueryAllocation::add_allocation_param(const Glib::RefPtr<Allocator>& allocator, const AllocationParams& params)
 {
-  gst_query_add_allocation_param(gobj(), allocator->gobj(), (const GstAllocationParams*)&params);
+  gst_query_add_allocation_param(gobj(), allocator->gobj(), params.gobj());
 }
 
 guint QueryAllocation::get_n_allocation_params() const
@@ -592,13 +592,13 @@ guint QueryAllocation::get_n_allocation_params() const
 void QueryAllocation::parse_nth_allocation_param(guint index, Glib::RefPtr<Allocator>& allocator, AllocationParams& params) const
 {
   GstAllocator* n_allocator;
-  gst_query_parse_nth_allocation_param(const_cast<GstQuery*>(gobj()), index, &n_allocator, (GstAllocationParams*)&params);
+  gst_query_parse_nth_allocation_param(const_cast<GstQuery*>(gobj()), index, &n_allocator, params.gobj());
   allocator = Glib::wrap(n_allocator, false);
 }
 
 void QueryAllocation::set_nth_allocation_param(guint index, const Glib::RefPtr<Allocator>& allocator, const AllocationParams& params)
 {
-  gst_query_set_nth_allocation_param(gobj(), index, allocator->gobj(), (const GstAllocationParams*)&params);
+  gst_query_set_nth_allocation_param(gobj(), index, allocator->gobj(), params.gobj());
 }
 
 void QueryAllocation::remove_nth_allocation_param(guint index)

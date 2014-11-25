@@ -68,4 +68,16 @@ TEST(QueryTest, CheckRefCountsDuringQueryCapsCreation)
   ASSERT_EQ(3, caps->gobj()->mini_object.refcount); // - 1 (caps object) + 1 (filter object) + 1 (owned by query) = 3
 }
 
+TEST(QueryTest, CheckStoringAllocationParams)
+{
+  auto alloc_query = QueryAllocation::create(Caps::create_from_string("video/x-raw, format=RGB"), false);
+  RefPtr<Allocator> allocator = Allocator::get_default_allocator(), allocator2;
+  AllocationParams params, params2;
+  params.init(); params.set_align(10);
+  alloc_query->add_allocation_param(allocator, params);
+  alloc_query->parse_nth_allocation_param(0, allocator2, params2);
+  ASSERT_EQ(allocator, allocator2);
+  ASSERT_EQ(params.get_align(), params2.get_align());
+}
+
 
