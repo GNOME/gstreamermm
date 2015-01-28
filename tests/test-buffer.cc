@@ -98,3 +98,24 @@ TEST(BufferTest, CheckBufferRefcountAfterCopying)
   ASSERT_EQ(1, b->gobj()->mini_object.refcount);
   ASSERT_EQ(1, buf->gobj()->mini_object.refcount);
 }
+
+TEST(BufferTest, CheckBufferCopyIntoMethod)
+{
+  std::vector<char> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+  Glib::RefPtr<Buffer> src = Buffer::create(data.size());
+  Glib::RefPtr<Buffer> dest = Buffer::create();
+  src->set_pts(10);
+  Glib::RefPtr<MapInfo> info(new MapInfo());
+  src->map(info, MAP_READ);
+  std::copy(data.begin(), data.end(), info->get_data());
+  src->unmap(info);
+
+  Gst::Buffer::copy_into(dest, src, BUFFER_COPY_TIMESTAMPS | BUFFER_COPY_MEMORY, 0, data.size());
+  ASSERT_EQ(dest->get_pts(), 10);
+  ASSERT_EQ(data.size(), dest->get_size());
+
+  ASSERT_EQ(0, dest->memcmp(0, data.data(), data.size()));
+  
+  ASSERT_EQ(1, src->get_refcount());
+  ASSERT_EQ(1, dest->get_refcount());
+}
