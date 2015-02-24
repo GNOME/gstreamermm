@@ -510,18 +510,11 @@ Glib::RefPtr<const Gst::Clock> MessageNewClock::parse() const
 
 Glib::RefPtr<Gst::MessageApplication>
   MessageApplication::create(const Glib::RefPtr<Gst::Object>& src,
-  Gst::Structure& structure)
+  const Gst::Structure& structure)
 {
   GstStructure* copy_struct = gst_structure_copy(structure.gobj());
   GstMessage* message = gst_message_new_application(Glib::unwrap(src),
     copy_struct);
-  return Gst::wrap_msg_derived<Gst::MessageApplication>(message, true);
-}
-
-Glib::RefPtr<Gst::MessageApplication>
-  MessageApplication::create(const Glib::RefPtr<Gst::Object>& src)
-{
-  GstMessage* message = gst_message_new_application(Glib::unwrap(src), 0);
   return Gst::wrap_msg_derived<Gst::MessageApplication>(message, true);
 }
 

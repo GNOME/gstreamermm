@@ -245,6 +245,8 @@ dnl Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
 _CONVERSION(`const Gst::Structure&',`GstStructure*',`const_cast<GstStructure*>($3.gobj())') 
 _CONVERSION(`GstStructure*', `Gst::Structure', `Glib::wrap($3)')
+_CONVERSION(`const Gst::Structure&',`const GstStructure*',`$3.gobj()')
+_CONVERSION(`const GstStructure*',`Gst::Structure', `Glib::wrap($3, false)')
 
 dnl TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')

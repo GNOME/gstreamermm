@@ -46,7 +46,7 @@ void dec_counter()
     if (g_atomic_int_dec_and_test (&counter))
     {
         prerolled = true;
-        bus->post(MessageApplication::create(pipeline));
+        bus->post(MessageApplication::create(pipeline, Structure("empty")));
     }
 }
 
