@@ -171,7 +171,7 @@ TEST_F(BinTest, ShouldContainsAddedElements)
 TEST_F(BinTest, ShouldCallOnElementAddedHandler)
 {
   bool call = false;
-  bin->signal_element_added().connect([&call](const RefPtr<Element>& e){
+  bin->signal_element_added().connect([&call](const RefPtr<Element>&){
     call = true;
   });
   AddElementToBin();
@@ -182,7 +182,7 @@ TEST_F(BinTest, ShouldCallOnElementRemovedHandler)
 {
   bool call = false;
   RefPtr<Element> e = AddElementToBin();
-  bin->signal_element_removed().connect([&call](const RefPtr<Element>& e){
+  bin->signal_element_removed().connect([&call](const RefPtr<Element>&){
     call = true;
   });
   bin->remove(e);

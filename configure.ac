@@ -94,7 +94,11 @@ MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 # in lowercase with a .hg extension).
 
 
-# todo audioresample|audioresample|AudioResample
+# todo
+# audioresample|audioresample|AudioResample
+# multisocketsink|multisocketsink|MultiSocketSink
+# videoconvert|videoconvert|VideoConvert 
+
 
 AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
 adder|adder|Adder \
@@ -124,7 +128,6 @@ identity|identity|Identity \
 inputselector|input-selector|InputSelector \
 multifdsink|multifdsink|MultiFdSink \
 multiqueue|multiqueue|MultiQueue \
-multisocketsink|multisocketsink|MultiSocketSink \
 oggdemux|oggdemux|OggDemux \
 oggmux|oggmux|OggMux \
 outputselector|output-selector|OutputSelector \
@@ -146,7 +149,6 @@ timeoverlay|timeoverlay|TimeOverlay \
 typefindelement|typefind|TypeFindElement \
 uridecodebin|uridecodebin|UriDecodeBin \
 valve|valve|Valve \
-videoconvert|videoconvert|VideoConvert \
 videorate|videorate|VideoRate \
 videoscale|videoscale|VideoScale \
 videotestsrc|videotestsrc|VideoTestSrc \
