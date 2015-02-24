@@ -84,9 +84,9 @@ Structure::Structure(const Glib::ustring& name)
   gobject_ = gst_structure_new_empty(name.c_str());
 }
 
-Structure::operator bool() const
+Structure::operator const void*() const
 {
-  return gobject_ != 0;
+  return gobject_ ? GINT_TO_POINTER(1) : 0;
 }
 
 void Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
@@ -131,10 +131,15 @@ void Structure::set_field(const Glib::ustring& fieldname, const char* value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_STRING, value, (void*)0);
 }
- 
+
 void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE, value.gobj(), (void*)0);
+}
+
+void Structure::set_field(const Glib::ustring& fieldname, const Glib::DateTime& value)
+{
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE_TIME, value.gobj(), (void*)0);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, gint64 value)
@@ -236,6 +241,16 @@ bool Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
   const bool has = gst_structure_get_date(gobj(), name.c_str(), &gdate);
   if(has)
     date.set_julian(Glib::Date(*gdate).get_julian());
+
+  return has;
+}
+
+bool Structure::get_field(const Glib::ustring& name, Glib::DateTime& datetime) const
+{
+  GstDateTime* gstdatetime = 0;
+  const bool has = gst_structure_get_date_time(gobj(), name.c_str(), &gstdatetime);
+  if(has)
+    datetime = Glib::wrap(gst_date_time_to_g_date_time(gstdatetime), false);
 
   return has;
 }

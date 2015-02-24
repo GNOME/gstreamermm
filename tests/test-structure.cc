@@ -31,6 +31,13 @@ void CheckEq(const FractionRange& expected, const FractionRange& output)
     CheckEq(expected.max, output.max);
 }
 
+template<>
+void CheckEq(const Glib::DateTime& expected, const Glib::DateTime& output)
+{
+    CheckEq(expected.get_year(), output.get_year());
+    CheckEq(expected.get_second(), output.get_second());
+}
+
 class StructureTest : public ::testing::Test
 {
 protected:

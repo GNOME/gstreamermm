@@ -21,6 +21,7 @@
 #include <gstreamermm/enums.h>
 #include <gstreamermm/value.h>
 #include <glibmm/date.h>
+#include <glibmm/datetime.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -62,11 +63,9 @@ public:
   static Structure create_from_string(const Glib::ustring& the_string);
   _IGNORE(gst_structure_from_string)
 
-  //TODO: Use operator void*() instead. See similar stuff in gtkmm. murrayc.
-
   /** Use this to discover if the Structure is a valid object.
    */
-  operator bool() const;
+  operator const void*() const;
 
   _WRAP_METHOD(Glib::ustring get_name() const, gst_structure_get_name)
   _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
@@ -169,6 +168,18 @@ public:
    * @param value The value to set the field to.
    */
   void set_field(const Glib::ustring& fieldname, const Glib::Date& value);
+
+  /** Sets the field with name @a fieldname to the Glib::DateTime @a value. If
+   * the field does not exist, it is created. If the field exists, the previous
+   * value is replaced and freed. Please note that when setting fields to
+   * special types such as Gst::Fourcc and Gst::Fraction and Glib::Date they
+   * are converted to the GStreamer GTypes and thus when attempting to get
+   * these fields back as GValues, they will have the GStreamer GType.
+   *
+   * @param fieldname The name of the field to set.
+   * @param value The value to set the field to.
+   */
+    void set_field(const Glib::ustring& fieldname, const Glib::DateTime& value);
 
   /** Sets the field with name @a fieldname to the @a value. If
    * the field does not exist, it is created. If the field exists, the previous
@@ -386,6 +397,19 @@ public:
   bool get_field(const Glib::ustring& fieldname, Glib::Date& value) const;
   _IGNORE(gst_structure_get_date)
 
+  /** Gets the value of field @a fieldname into Glib::DateTime @a value.
+   * The caller is responsible for making sure the field exists and has the
+   * correct type.
+   *
+   * @param fieldname The name of a field.
+   * @param value The Glib::DateTime to set.
+   * @return true if @a value could be set correctly. If there was no field
+   * with @a fieldname or the existing field did not contain a Glib::DateTime,
+   * this function returns false.
+   */
+  bool get_field(const Glib::ustring& fieldname, Glib::DateTime& value) const;
+  _IGNORE(gst_structure_get_date_time)
+
   /** Gets the value of field @a fieldname into Gst::ClockTime @a value.
    * The caller is responsible for making sure the field exists and has the
    * correct type.
@@ -492,6 +516,8 @@ public:
   _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
   _WRAP_METHOD(bool fixate_field_nearest_int(const Glib::ustring& name, int target), gst_structure_fixate_field_nearest_int)
   _WRAP_METHOD(bool fixate_field_nearest_double(const Glib::ustring& name, double target), gst_structure_fixate_field_nearest_double)
+  _WRAP_METHOD(bool fixate_field_string(const Glib::ustring& name, const Glib::ustring& target), gst_structure_fixate_field_string)
+  _WRAP_METHOD(bool fixate_field(const Glib::ustring& name), gst_structure_fixate_field)
 
   /** Fixates a Gst::Structure by changing the given field to the nearest
    * fraction to given Gst::Fraction that is a subset of the existing field.
@@ -507,6 +533,18 @@ public:
 
   //Variable argument functions are ignored.
   _IGNORE(gst_structure_set, gst_structure_id_set)
+
+  _WRAP_METHOD(Gst::Structure intersect(const Gst::Structure& struct2) const, gst_structure_intersect)
+
+  _WRAP_METHOD(bool is_equal(const Gst::Structure& struct2) const, gst_structure_is_equal)
+
+  _WRAP_METHOD(bool is_subset(const Gst::Structure& superset) const, gst_structure_is_subset)
+
+  _WRAP_METHOD(bool can_intersect(const Gst::Structure& struct2) const, gst_structure_can_intersect)
+
+  _WRAP_METHOD(void fixate(), gst_structure_fixate)
+
+
 };
 
 } //namespace Gst
