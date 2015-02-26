@@ -69,13 +69,6 @@ public:
 #endif
 
 public:
-  /** Creates a new Gst::Caps that indicates that it is compatible with any
-   * media format.
-   *
-   * @return The new Gst::Caps.
-   */
-  static Glib::RefPtr<Gst::Caps> create_any();
-
   /** Creates a new Gst::Caps that contains one Gst::Structure.
    *
    * @param media_type The media type of the structure.
@@ -92,8 +85,6 @@ public:
   static Glib::RefPtr<Gst::Caps> create(const Structure& first_struct);
 
   _WRAP_METHOD(static Glib::RefPtr<Gst::Caps> create_from_string(const Glib::ustring& string), gst_caps_from_string)
-
-  Glib::RefPtr<Gst::Caps> copy() const;
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> copy_nth(guint nth) const, gst_caps_copy_nth)
 
@@ -216,6 +207,14 @@ public:
   _WRAP_METHOD(bool is_always_compatible(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_is_always_compatible)
   _WRAP_METHOD(bool is_subset(const Glib::RefPtr<const Gst::Caps>& superset_caps) const, gst_caps_is_subset)
   _WRAP_METHOD(bool can_intersect(const Glib::RefPtr<const Gst::Caps>& caps2) const, gst_caps_can_intersect)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> fixate() const, gst_caps_fixate)
+  _WRAP_METHOD(bool is_strictly_equal(const Glib::RefPtr<const Gst::Caps>& caps2) const, gst_caps_is_strictly_equal)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> copy() const, gst_caps_copy)
+  _WRAP_METHOD(bool is_subset_structure(const Gst::Structure& structure) const, gst_caps_is_subset_structure)
+  _WRAP_METHOD(bool is_subset_structure(const Gst::Structure& structure, const Gst::CapsFeatures& features) const, gst_caps_is_subset_structure_full)
+
+
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Caps> create_any(), gst_caps_create_any)
 
   //This is const (returns a non const) because it always creates a new instance:
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_intersect(const Glib::RefPtr<const Gst::Caps>& other_caps) const, gst_caps_intersect)
