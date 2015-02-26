@@ -22,6 +22,7 @@
 #include <gstreamermm/buffer.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/caps.h>
+#include <gstreamermm/sample.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -185,21 +186,35 @@ public:
 
   _WRAP_METHOD(void set_sync(bool sync), gst_base_sink_set_sync)
   _WRAP_METHOD(bool get_sync() const, gst_base_sink_get_sync)
+
   _WRAP_METHOD(void set_max_lateness(gint64 max_lateness), gst_base_sink_set_max_lateness)
   _WRAP_METHOD(gint64 get_max_lateness() const, gst_base_sink_get_max_lateness)
+
   _WRAP_METHOD(void set_qos_enabled(bool enabled), gst_base_sink_set_qos_enabled)
   _WRAP_METHOD(bool is_qos_enabled() const, gst_base_sink_is_qos_enabled)
+
   _WRAP_METHOD(void set_async_enabled(bool enabled), gst_base_sink_set_async_enabled) 
   _WRAP_METHOD(bool is_async_enabled() const, gst_base_sink_is_async_enabled)
+
   _WRAP_METHOD(void set_ts_offset(ClockTimeDiff offset), gst_base_sink_set_ts_offset)
   _WRAP_METHOD(ClockTimeDiff get_ts_offset() const, gst_base_sink_get_ts_offset)
+
   _WRAP_METHOD(void set_render_delay(ClockTime delay), gst_base_sink_set_render_delay)
   _WRAP_METHOD(ClockTime get_render_delay() const, gst_base_sink_get_render_delay)
+
   _WRAP_METHOD(void set_blocksize(guint blocksize), gst_base_sink_set_blocksize)
   _WRAP_METHOD(guint get_blocksize() const, gst_base_sink_get_blocksize)
 
   _WRAP_METHOD(guint64 get_throttle_time() const, gst_base_sink_get_throttle_time)
   _WRAP_METHOD(void set_throttle_time(guint64 throttle), gst_base_sink_set_throttle_time)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Sample> get_last_sample() const, gst_base_sink_get_last_sample)
+
+  _WRAP_METHOD(void set_max_bitrate(guint64 max_bitrate), gst_base_sink_set_max_bitrate)
+  _WRAP_METHOD(guint64 get_max_bitrate() const, gst_base_sink_get_max_bitrate)
+
+  _WRAP_METHOD(void set_last_sample_enabled(bool enabled), gst_base_sink_set_last_sample_enabled)
+  _WRAP_METHOD(bool is_last_sample_enabled() const, gst_base_sink_is_last_sample_enabled)
 
   /** Gets the sink Gst::Pad object of the element.
    */
@@ -213,6 +228,10 @@ public:
   _WRAP_PROPERTY("render-delay", guint64)
   _WRAP_PROPERTY("throttle-time", guint64)
   _WRAP_PROPERTY("blocksize", guint)
+  _WRAP_PROPERTY("last-sample", Glib::RefPtr<Gst::Sample>)
+  _WRAP_PROPERTY("enable-last-sample", bool)
+  _WRAP_PROPERTY("max-bitrate", guint64)
+
 
 #m4 _CONVERSION(`Glib::RefPtr<Gst::Caps>', `GstCaps*', `Glib::unwrap($3)')
   /** Called to get sink pad caps from the subclass.
