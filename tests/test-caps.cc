@@ -103,7 +103,7 @@ TEST_F(CapsTest, GetNonExistingValue)
 
 TEST_F(CapsTest, SetCapsToElement)
 {
-    Glib::RefPtr<Element> element = ElementFactory::create_element("multifilesrc", "source");
+    Glib::RefPtr<Element> element = ElementFactory::create_element("capsfilter", "filter");
 
     const char* str_caps = "image/jpeg, framerate=(fraction)2/1";
 

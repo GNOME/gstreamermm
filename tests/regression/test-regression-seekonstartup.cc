@@ -126,7 +126,7 @@ TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
     RefPtr<Element> src = ElementFactory::create_element("uridecodebin"),
             csp = ElementFactory::create_element("videoconvert"),
             vs = ElementFactory::create_element("videoscale"),
-            sink = ElementFactory::create_element("autovideosink");
+            sink = ElementFactory::create_element("ximagesink");
 
     ASSERT_TRUE(src);
     ASSERT_TRUE(csp);

@@ -48,7 +48,7 @@ TEST(BinPluginRegressionTest, DISABLED_ShouldDecodeAndEncodeFile)
     ASSERT_TRUE(mainloop);
     RefPtr<Element> pluginbin = Gst::ElementFactory::create_element("pluginbin", "sample-pluginbin");
     ASSERT_TRUE(pluginbin);
-    RefPtr<Element> jpg_encoder = ElementFactory::create_element("jpegenc");
+    RefPtr<Element> jpg_encoder = ElementFactory::create_element("queue");
     ASSERT_TRUE(jpg_encoder);
     RefPtr<FileSink> file_sink = FileSink::create("file-sink");
     ASSERT_TRUE(file_sink);

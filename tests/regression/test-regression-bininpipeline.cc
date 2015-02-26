@@ -18,20 +18,20 @@ class CustomBin : public Bin
 {
 private:
     RefPtr<FileSrc> source_file;
-    RefPtr<Element> png_decoder;
+    RefPtr<Element> queue;
     RefPtr<GhostPad> src_pad;
 protected:
     explicit CustomBin(const Glib::ustring& name)
     : Bin(name)
     {
         source_file = FileSrc::create("source-file");
-        png_decoder = ElementFactory::create_element("pngdec");
+        queue = ElementFactory::create_element("queue");
 
         add(source_file);
-        add(png_decoder);
-        source_file->link(png_decoder);
+        add(queue);
+        source_file->link(queue);
 
-        src_pad = add_ghost_pad(png_decoder, "src", "src");
+        src_pad = add_ghost_pad(queue, "src", "src");
         src_pad->set_active(true);
     }
 public:
@@ -69,7 +69,7 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
     return true;
 }
 
-TEST(BinInPipelineRegressionTest, CustomBinShouldCorrectEncodeImageAndOtherElementsShouldEncodeItToJPGAndWriteToFile)
+TEST(BinInPipelineRegressionTest, CustomBinShouldCorrectPassThroughImage)
 {
     Glib::ustring input_png = "resources/input-image.png",
             output_jpg = "resources/test-regression-bininpipeline-output-image.jpg";
@@ -78,15 +78,15 @@ TEST(BinInPipelineRegressionTest, CustomBinShouldCorrectEncodeImageAndOtherEleme
     ASSERT_TRUE(mainloop);
     RefPtr<CustomBin> custom_bin = CustomBin::create("file-png-decoder");
     ASSERT_TRUE(custom_bin);
-    RefPtr<Element> jpg_encoder = ElementFactory::create_element("jpegenc");
-    ASSERT_TRUE(jpg_encoder);
+    RefPtr<Element> queue = ElementFactory::create_element("queue");
+    ASSERT_TRUE(queue);
     RefPtr<FileSink> file_sink = FileSink::create("file-sink");
     ASSERT_TRUE(file_sink);
     RefPtr<Pipeline> pipeline = Pipeline::create("image-converter-pipeline");
     ASSERT_TRUE(custom_bin);
 
-    ASSERT_NO_THROW(pipeline->add(custom_bin)->add(jpg_encoder)->add(file_sink));
-    ASSERT_NO_THROW(custom_bin->link(jpg_encoder)->link(file_sink));
+    ASSERT_NO_THROW(pipeline->add(custom_bin)->add(queue)->add(file_sink));
+    ASSERT_NO_THROW(custom_bin->link(queue)->link(file_sink));
 
     Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
     ASSERT_TRUE(bus);
