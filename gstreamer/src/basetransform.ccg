@@ -93,4 +93,11 @@ FlowReturn Gst::BaseTransform::prepare_output_buffer_vfunc(const Glib::RefPtr<Gs
   return RType();
 }
 
+Glib::RefPtr<Allocator> BaseTransform::get_allocator(AllocationParams& params)
+{
+  GstAllocator* alloc;
+  gst_base_transform_get_allocator(gobj(), &alloc, params.gobj());
+  return Glib::wrap(alloc, false);
+}
+
 } //namespace Gst
