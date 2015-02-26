@@ -70,6 +70,27 @@
   (gtype-id "GST_TYPE_BIN")
 )
 
+(define-object DeviceProvider
+  (in-module "Gst")
+  (parent "GstObject")
+  (c-name "GstDeviceProvider")
+  (gtype-id "GST_TYPE_DEVICE_PROVIDER")
+)
+
+(define-object DeviceMonitor
+  (in-module "Gst")
+  (parent "GstObject")
+  (c-name "GstDeviceMonitor")
+  (gtype-id "GST_TYPE_DEVICE_MONITOR")
+)
+
+(define-object Device
+  (in-module "Gst")
+  (parent "GstObject")
+  (c-name "GstDevice")
+  (gtype-id "GST_TYPE_DEVICE")
+)
+
 (define-object ControlSource
   (in-module "Gst")
   (parent "GstObject")
@@ -180,6 +201,13 @@
   (parent "GstPluginFeature")
   (c-name "GstElementFactory")
   (gtype-id "GST_TYPE_ELEMENT_FACTORY")
+)
+
+(define-object DeviceProviderFactory
+  (in-module "Gst")
+  (parent "GstPluginFeature")
+  (c-name "GstDeviceProviderFactory")
+  (gtype-id "GST_TYPE_DEVICE_PROVIDER_FACTORY")
 )
 
 (define-object ProxyPad
@@ -310,6 +338,7 @@
     '("gap" "GST_BUFFER_FLAG_GAP")
     '("droppable" "GST_BUFFER_FLAG_DROPPABLE")
     '("delta-unit" "GST_BUFFER_FLAG_DELTA_UNIT")
+    '("tag-memory" "GST_BUFFER_FLAG_TAG_MEMORY")
     '("last" "GST_BUFFER_FLAG_LAST")
   )
 )
@@ -432,7 +461,9 @@
     '("caps-details" "GST_DEBUG_GRAPH_SHOW_CAPS_DETAILS")
     '("non-default-params" "GST_DEBUG_GRAPH_SHOW_NON_DEFAULT_PARAMS")
     '("states" "GST_DEBUG_GRAPH_SHOW_STATES")
+    '("full-params" "GST_DEBUG_GRAPH_SHOW_FULL_PARAMS")
     '("all" "GST_DEBUG_GRAPH_SHOW_ALL")
+    '("verbose" "GST_DEBUG_GRAPH_SHOW_VERBOSE")
   )
 )
 
@@ -825,6 +856,9 @@
     '("stream-start" "GST_MESSAGE_STREAM_START")
     '("need-context" "GST_MESSAGE_NEED_CONTEXT")
     '("have-context" "GST_MESSAGE_HAVE_CONTEXT")
+    '("extended" "GST_MESSAGE_EXTENDED")
+    '("device-added" "GST_MESSAGE_DEVICE_ADDED")
+    '("device-removed" "GST_MESSAGE_DEVICE_REMOVED")
     '("any" "GST_MESSAGE_ANY")
   )
 )
@@ -1041,6 +1075,7 @@
     '("proxy-caps" "GST_PAD_FLAG_PROXY_CAPS")
     '("proxy-allocation" "GST_PAD_FLAG_PROXY_ALLOCATION")
     '("proxy-scheduling" "GST_PAD_FLAG_PROXY_SCHEDULING")
+    '("accept-intersect" "GST_PAD_FLAG_ACCEPT_INTERSECT")
     '("last" "GST_PAD_FLAG_LAST")
   )
 )
@@ -1247,10 +1282,13 @@
     '("accurate" "GST_SEEK_FLAG_ACCURATE")
     '("key-unit" "GST_SEEK_FLAG_KEY_UNIT")
     '("segment" "GST_SEEK_FLAG_SEGMENT")
+    '("trickmode" "GST_SEEK_FLAG_TRICKMODE")
     '("skip" "GST_SEEK_FLAG_SKIP")
     '("snap-before" "GST_SEEK_FLAG_SNAP_BEFORE")
     '("snap-after" "GST_SEEK_FLAG_SNAP_AFTER")
     '("snap-nearest" "GST_SEEK_FLAG_SNAP_NEAREST")
+    '("trickmode-key-units" "GST_SEEK_FLAG_TRICKMODE_KEY_UNITS")
+    '("trickmode-no-audio" "GST_SEEK_FLAG_TRICKMODE_NO_AUDIO")
   )
 )
 
@@ -1261,8 +1299,11 @@
   (values
     '("none" "GST_SEGMENT_FLAG_NONE")
     '("reset" "GST_SEGMENT_FLAG_RESET")
+    '("trickmode" "GST_SEGMENT_FLAG_TRICKMODE")
     '("skip" "GST_SEGMENT_FLAG_SKIP")
     '("segment" "GST_SEGMENT_FLAG_SEGMENT")
+    '("trickmode-key-units" "GST_SEGMENT_FLAG_TRICKMODE_KEY_UNITS")
+    '("trickmode-no-audio" "GST_SEGMENT_FLAG_TRICKMODE_NO_AUDIO")
   )
 )
 
@@ -1349,6 +1390,18 @@
     '("title" "GST_TOC_ENTRY_TYPE_TITLE")
     '("track" "GST_TOC_ENTRY_TYPE_TRACK")
     '("chapter" "GST_TOC_ENTRY_TYPE_CHAPTER")
+  )
+)
+
+(define-enum TocLoopType
+  (in-module "Gst")
+  (c-name "GstTocLoopType")
+  (gtype-id "GST_TYPE_TOC_LOOP_TYPE")
+  (values
+    '("none" "GST_TOC_LOOP_NONE")
+    '("forward" "GST_TOC_LOOP_FORWARD")
+    '("reverse" "GST_TOC_LOOP_REVERSE")
+    '("ping-pong" "GST_TOC_LOOP_PING_PONG")
   )
 )
 
@@ -1994,6 +2047,22 @@
   )
 )
 
+(define-method is_memory_range_writable
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_is_memory_range_writable")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "idx")
+    '("gint" "length")
+  )
+)
+
+(define-method is_all_memory_writable
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_is_all_memory_writable")
+  (return-type "gboolean")
+)
+
 (define-method fill
   (of-object "GstBuffer")
   (c-name "gst_buffer_fill")
@@ -2403,6 +2472,15 @@
   )
 )
 
+(define-method set_flushing
+  (of-object "GstBufferPool")
+  (c-name "gst_buffer_pool_set_flushing")
+  (return-type "none")
+  (parameters
+    '("gboolean" "flushing")
+  )
+)
+
 (define-function gst_buffer_pool_config_set_params
   (c-name "gst_buffer_pool_config_set_params")
   (return-type "none")
@@ -2479,6 +2557,18 @@
   (parameters
     '("GstStructure*" "config")
     '("const-gchar*" "option")
+  )
+)
+
+(define-function gst_buffer_pool_config_validate_params
+  (c-name "gst_buffer_pool_config_validate_params")
+  (return-type "gboolean")
+  (parameters
+    '("GstStructure*" "config")
+    '("GstCaps*" "caps")
+    '("guint" "size")
+    '("guint" "min_buffers")
+    '("guint" "max_buffers")
   )
 )
 
@@ -2617,6 +2707,12 @@
     '("GstBusFunc" "func")
     '("gpointer" "user_data")
   )
+)
+
+(define-method remove_watch
+  (of-object "GstBus")
+  (c-name "gst_bus_remove_watch")
+  (return-type "gboolean")
 )
 
 (define-method poll
@@ -3135,6 +3231,36 @@
   )
 )
 
+(define-method foreach
+  (of-object "GstCaps")
+  (c-name "gst_caps_foreach")
+  (return-type "gboolean")
+  (parameters
+    '("GstCapsForeachFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method map_in_place
+  (of-object "GstCaps")
+  (c-name "gst_caps_map_in_place")
+  (return-type "gboolean")
+  (parameters
+    '("GstCapsMapFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method filter_and_map_in_place
+  (of-object "GstCaps")
+  (c-name "gst_caps_filter_and_map_in_place")
+  (return-type "none")
+  (parameters
+    '("GstCapsFilterMapFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method is_any
   (of-object "GstCaps")
   (c-name "gst_caps_is_any")
@@ -3505,6 +3631,21 @@
   )
 )
 
+(define-method add_observation_unapplied
+  (of-object "GstClock")
+  (c-name "gst_clock_add_observation_unapplied")
+  (return-type "gboolean")
+  (parameters
+    '("GstClockTime" "slave")
+    '("GstClockTime" "master")
+    '("gdouble*" "r_squared")
+    '("GstClockTime*" "internal")
+    '("GstClockTime*" "external")
+    '("GstClockTime*" "rate_num")
+    '("GstClockTime*" "rate_denom")
+  )
+)
+
 (define-method get_internal_time
   (of-object "GstClock")
   (c-name "gst_clock_get_internal_time")
@@ -3517,6 +3658,19 @@
   (return-type "GstClockTime")
   (parameters
     '("GstClockTime" "internal")
+  )
+)
+
+(define-method adjust_with_calibration
+  (of-object "GstClock")
+  (c-name "gst_clock_adjust_with_calibration")
+  (return-type "GstClockTime")
+  (parameters
+    '("GstClockTime" "internal_target")
+    '("GstClockTime" "cinternal")
+    '("GstClockTime" "cexternal")
+    '("GstClockTime" "cnum")
+    '("GstClockTime" "cdenom")
   )
 )
 
@@ -3634,6 +3788,10 @@
     '("GstCaps*" "caps")
   )
 )
+
+
+
+;; From gstconfig.h
 
 
 
@@ -3816,6 +3974,11 @@
 
 
 ;; From gstdatetime.h
+
+(define-function gst_date_time_get_type
+  (c-name "gst_date_time_get_type")
+  (return-type "GType")
+)
 
 (define-method has_year
   (of-object "GstDateTime")
@@ -4020,6 +4183,15 @@
 
 ;; From gstdebugutils.h
 
+(define-function gst_debug_bin_to_dot_data
+  (c-name "gst_debug_bin_to_dot_data")
+  (return-type "gchar*")
+  (parameters
+    '("GstBin*" "bin")
+    '("GstDebugGraphDetails" "details")
+  )
+)
+
 (define-function gst_debug_bin_to_dot_file
   (c-name "gst_debug_bin_to_dot_file")
   (return-type "none")
@@ -4038,6 +4210,332 @@
     '("GstDebugGraphDetails" "details")
     '("const-gchar*" "file_name")
   )
+)
+
+
+
+;; From gstdevice.h
+
+(define-function gst_device_get_type
+  (c-name "gst_device_get_type")
+  (return-type "GType")
+)
+
+(define-method create_element
+  (of-object "GstDevice")
+  (c-name "gst_device_create_element")
+  (return-type "GstElement*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method get_caps
+  (of-object "GstDevice")
+  (c-name "gst_device_get_caps")
+  (return-type "GstCaps*")
+)
+
+(define-method get_display_name
+  (of-object "GstDevice")
+  (c-name "gst_device_get_display_name")
+  (return-type "gchar*")
+)
+
+(define-method get_device_class
+  (of-object "GstDevice")
+  (c-name "gst_device_get_device_class")
+  (return-type "gchar*")
+)
+
+(define-method reconfigure_element
+  (of-object "GstDevice")
+  (c-name "gst_device_reconfigure_element")
+  (return-type "gboolean")
+  (parameters
+    '("GstElement*" "element")
+  )
+)
+
+(define-method has_classesv
+  (of-object "GstDevice")
+  (c-name "gst_device_has_classesv")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "classes")
+  )
+)
+
+(define-method has_classes
+  (of-object "GstDevice")
+  (c-name "gst_device_has_classes")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "classes")
+  )
+)
+
+
+
+;; From gstdevicemonitor.h
+
+(define-function gst_device_monitor_get_type
+  (c-name "gst_device_monitor_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_device_monitor_new
+  (c-name "gst_device_monitor_new")
+  (is-constructor-of "GstDeviceMonitor")
+  (return-type "GstDeviceMonitor*")
+)
+
+(define-method get_bus
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_get_bus")
+  (return-type "GstBus*")
+)
+
+(define-method get_devices
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_get_devices")
+  (return-type "GList*")
+)
+
+(define-method start
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_start")
+  (return-type "gboolean")
+)
+
+(define-method stop
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_stop")
+  (return-type "none")
+)
+
+(define-method add_filter
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_add_filter")
+  (return-type "guint")
+  (parameters
+    '("const-gchar*" "classes")
+    '("GstCaps*" "caps")
+  )
+)
+
+(define-method remove_filter
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_remove_filter")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "filter_id")
+  )
+)
+
+
+
+;; From gstdeviceproviderfactory.h
+
+(define-function gst_device_provider_factory_get_type
+  (c-name "gst_device_provider_factory_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_device_provider_factory_find
+  (c-name "gst_device_provider_factory_find")
+  (return-type "GstDeviceProviderFactory*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method get_device_provider_type
+  (of-object "GstDeviceProviderFactory")
+  (c-name "gst_device_provider_factory_get_device_provider_type")
+  (return-type "GType")
+)
+
+(define-method get_metadata
+  (of-object "GstDeviceProviderFactory")
+  (c-name "gst_device_provider_factory_get_metadata")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "key")
+  )
+)
+
+(define-method get_metadata_keys
+  (of-object "GstDeviceProviderFactory")
+  (c-name "gst_device_provider_factory_get_metadata_keys")
+  (return-type "gchar**")
+)
+
+(define-method get
+  (of-object "GstDeviceProviderFactory")
+  (c-name "gst_device_provider_factory_get")
+  (return-type "GstDeviceProvider*")
+)
+
+(define-function gst_device_provider_factory_get_by_name
+  (c-name "gst_device_provider_factory_get_by_name")
+  (return-type "GstDeviceProvider*")
+  (parameters
+    '("const-gchar*" "factoryname")
+  )
+)
+
+(define-function gst_device_provider_register
+  (c-name "gst_device_provider_register")
+  (return-type "gboolean")
+  (parameters
+    '("GstPlugin*" "plugin")
+    '("const-gchar*" "name")
+    '("guint" "rank")
+    '("GType" "type")
+  )
+)
+
+(define-method has_classesv
+  (of-object "GstDeviceProviderFactory")
+  (c-name "gst_device_provider_factory_has_classesv")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "classes")
+  )
+)
+
+(define-method has_classes
+  (of-object "GstDeviceProviderFactory")
+  (c-name "gst_device_provider_factory_has_classes")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "classes")
+  )
+)
+
+(define-function gst_device_provider_factory_list_get_device_providers
+  (c-name "gst_device_provider_factory_list_get_device_providers")
+  (return-type "GList*")
+  (parameters
+    '("GstRank" "minrank")
+  )
+)
+
+
+
+;; From gstdeviceprovider.h
+
+(define-function gst_device_provider_get_type
+  (c-name "gst_device_provider_get_type")
+  (return-type "GType")
+)
+
+(define-method get_devices
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_get_devices")
+  (return-type "GList*")
+)
+
+(define-method start
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_start")
+  (return-type "gboolean")
+)
+
+(define-method stop
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_stop")
+  (return-type "none")
+)
+
+(define-method can_monitor
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_can_monitor")
+  (return-type "gboolean")
+)
+
+(define-method get_bus
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_get_bus")
+  (return-type "GstBus*")
+)
+
+(define-method device_add
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_device_add")
+  (return-type "none")
+  (parameters
+    '("GstDevice*" "device")
+  )
+)
+
+(define-method device_remove
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_device_remove")
+  (return-type "none")
+  (parameters
+    '("GstDevice*" "device")
+  )
+)
+
+(define-method set_metadata
+  (of-object "GstDeviceProviderClass")
+  (c-name "gst_device_provider_class_set_metadata")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "longname")
+    '("const-gchar*" "classification")
+    '("const-gchar*" "description")
+    '("const-gchar*" "author")
+  )
+)
+
+(define-method set_static_metadata
+  (of-object "GstDeviceProviderClass")
+  (c-name "gst_device_provider_class_set_static_metadata")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "longname")
+    '("const-gchar*" "classification")
+    '("const-gchar*" "description")
+    '("const-gchar*" "author")
+  )
+)
+
+(define-method add_metadata
+  (of-object "GstDeviceProviderClass")
+  (c-name "gst_device_provider_class_add_metadata")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "key")
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method add_static_metadata
+  (of-object "GstDeviceProviderClass")
+  (c-name "gst_device_provider_class_add_static_metadata")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "key")
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_metadata
+  (of-object "GstDeviceProviderClass")
+  (c-name "gst_device_provider_class_get_metadata")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "key")
+  )
+)
+
+(define-method get_factory
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_get_factory")
+  (return-type "GstDeviceProviderFactory*")
 )
 
 
@@ -4551,6 +5049,395 @@
 
 
 
+;; From gstenumtypes.h
+
+(define-function gst_object_flags_get_type
+  (c-name "gst_object_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_allocator_flags_get_type
+  (c-name "gst_allocator_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_bin_flags_get_type
+  (c-name "gst_bin_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_buffer_flags_get_type
+  (c-name "gst_buffer_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_buffer_copy_flags_get_type
+  (c-name "gst_buffer_copy_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_buffer_pool_acquire_flags_get_type
+  (c-name "gst_buffer_pool_acquire_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_bus_flags_get_type
+  (c-name "gst_bus_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_bus_sync_reply_get_type
+  (c-name "gst_bus_sync_reply_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_caps_flags_get_type
+  (c-name "gst_caps_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_caps_intersect_mode_get_type
+  (c-name "gst_caps_intersect_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_clock_return_get_type
+  (c-name "gst_clock_return_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_clock_entry_type_get_type
+  (c-name "gst_clock_entry_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_clock_flags_get_type
+  (c-name "gst_clock_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_debug_graph_details_get_type
+  (c-name "gst_debug_graph_details_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_state_get_type
+  (c-name "gst_state_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_state_change_return_get_type
+  (c-name "gst_state_change_return_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_state_change_get_type
+  (c-name "gst_state_change_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_element_flags_get_type
+  (c-name "gst_element_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_core_error_get_type
+  (c-name "gst_core_error_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_library_error_get_type
+  (c-name "gst_library_error_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_resource_error_get_type
+  (c-name "gst_resource_error_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_stream_error_get_type
+  (c-name "gst_stream_error_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_event_type_flags_get_type
+  (c-name "gst_event_type_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_event_type_get_type
+  (c-name "gst_event_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_qos_type_get_type
+  (c-name "gst_qos_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_stream_flags_get_type
+  (c-name "gst_stream_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_format_get_type
+  (c-name "gst_format_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_debug_level_get_type
+  (c-name "gst_debug_level_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_debug_color_flags_get_type
+  (c-name "gst_debug_color_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_debug_color_mode_get_type
+  (c-name "gst_debug_color_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_iterator_result_get_type
+  (c-name "gst_iterator_result_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_iterator_item_get_type
+  (c-name "gst_iterator_item_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_message_type_get_type
+  (c-name "gst_message_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_structure_change_type_get_type
+  (c-name "gst_structure_change_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_stream_status_type_get_type
+  (c-name "gst_stream_status_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_progress_type_get_type
+  (c-name "gst_progress_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_meta_flags_get_type
+  (c-name "gst_meta_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_memory_flags_get_type
+  (c-name "gst_memory_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_map_flags_get_type
+  (c-name "gst_map_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_mini_object_flags_get_type
+  (c-name "gst_mini_object_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_lock_flags_get_type
+  (c-name "gst_lock_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_direction_get_type
+  (c-name "gst_pad_direction_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_mode_get_type
+  (c-name "gst_pad_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_link_return_get_type
+  (c-name "gst_pad_link_return_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_flow_return_get_type
+  (c-name "gst_flow_return_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_link_check_get_type
+  (c-name "gst_pad_link_check_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_probe_type_get_type
+  (c-name "gst_pad_probe_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_probe_return_get_type
+  (c-name "gst_pad_probe_return_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_flags_get_type
+  (c-name "gst_pad_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_presence_get_type
+  (c-name "gst_pad_presence_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pad_template_flags_get_type
+  (c-name "gst_pad_template_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_pipeline_flags_get_type
+  (c-name "gst_pipeline_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_plugin_error_get_type
+  (c-name "gst_plugin_error_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_plugin_flags_get_type
+  (c-name "gst_plugin_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_plugin_dependency_flags_get_type
+  (c-name "gst_plugin_dependency_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rank_get_type
+  (c-name "gst_rank_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_query_type_flags_get_type
+  (c-name "gst_query_type_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_query_type_get_type
+  (c-name "gst_query_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_buffering_mode_get_type
+  (c-name "gst_buffering_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_scheduling_flags_get_type
+  (c-name "gst_scheduling_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_seek_type_get_type
+  (c-name "gst_seek_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_seek_flags_get_type
+  (c-name "gst_seek_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_segment_flags_get_type
+  (c-name "gst_segment_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_clock_type_get_type
+  (c-name "gst_clock_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tag_merge_mode_get_type
+  (c-name "gst_tag_merge_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tag_flag_get_type
+  (c-name "gst_tag_flag_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tag_scope_get_type
+  (c-name "gst_tag_scope_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_task_state_get_type
+  (c-name "gst_task_state_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_toc_scope_get_type
+  (c-name "gst_toc_scope_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_toc_entry_type_get_type
+  (c-name "gst_toc_entry_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_toc_loop_type_get_type
+  (c-name "gst_toc_loop_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_type_find_probability_get_type
+  (c-name "gst_type_find_probability_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_uri_error_get_type
+  (c-name "gst_uri_error_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_uri_type_get_type
+  (c-name "gst_uri_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_search_mode_get_type
+  (c-name "gst_search_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_parse_error_get_type
+  (c-name "gst_parse_error_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_parse_flags_get_type
+  (c-name "gst_parse_flags_get_type")
+  (return-type "GType")
+)
+
+
+
 ;; From gsterror.h
 
 (define-function gst_error_get_message
@@ -4695,6 +5582,21 @@
   (return-type "none")
   (parameters
     '("guint32" "seqnum")
+  )
+)
+
+(define-method get_running_time_offset
+  (of-object "GstEvent")
+  (c-name "gst_event_get_running_time_offset")
+  (return-type "gint64")
+)
+
+(define-method set_running_time_offset
+  (of-object "GstEvent")
+  (c-name "gst_event_set_running_time_offset")
+  (return-type "none")
+  (parameters
+    '("gint64" "offset")
   )
 )
 
@@ -5399,7 +6301,7 @@
     '("gint" "line")
     '("GObject*" "object")
     '("GstDebugMessage*" "message")
-    '("gpointer" "unused")
+    '("gpointer" "user_data")
   )
 )
 
@@ -6877,6 +7779,42 @@
   )
 )
 
+(define-function gst_message_new_device_added
+  (c-name "gst_message_new_device_added")
+  (return-type "GstMessage*")
+  (parameters
+    '("GstObject*" "src")
+    '("GstDevice*" "device")
+  )
+)
+
+(define-method parse_device_added
+  (of-object "GstMessage")
+  (c-name "gst_message_parse_device_added")
+  (return-type "none")
+  (parameters
+    '("GstDevice**" "device")
+  )
+)
+
+(define-function gst_message_new_device_removed
+  (c-name "gst_message_new_device_removed")
+  (return-type "GstMessage*")
+  (parameters
+    '("GstObject*" "src")
+    '("GstDevice*" "device")
+  )
+)
+
+(define-method parse_device_removed
+  (of-object "GstMessage")
+  (c-name "gst_message_parse_device_removed")
+  (return-type "none")
+  (parameters
+    '("GstDevice**" "device")
+  )
+)
+
 
 
 ;; From gstmeta.h
@@ -7113,6 +8051,15 @@
   (return-type "none")
 )
 
+(define-method has_parent
+  (of-object "GstObject")
+  (c-name "gst_object_has_parent")
+  (return-type "gboolean")
+  (parameters
+    '("GstObject*" "parent")
+  )
+)
+
 (define-method has_ancestor
   (of-object "GstObject")
   (c-name "gst_object_has_ancestor")
@@ -7303,6 +8250,12 @@
 
 ;; From gstpad.h
 
+(define-method get_name
+  (of-object "GstPadMode")
+  (c-name "gst_pad_mode_get_name")
+  (return-type "const-gchar*")
+)
+
 (define-function gst_flow_get_name
   (c-name "gst_flow_get_name")
   (return-type "const-gchar*")
@@ -7316,6 +8269,14 @@
   (return-type "GQuark")
   (parameters
     '("GstFlowReturn" "ret")
+  )
+)
+
+(define-function gst_pad_link_get_name
+  (c-name "gst_pad_link_get_name")
+  (return-type "const-gchar*")
+  (parameters
+    '("GstPadLinkReturn" "ret")
   )
 )
 
@@ -7732,6 +8693,12 @@
   )
 )
 
+(define-method get_last_flow_return
+  (of-object "GstPad")
+  (c-name "gst_pad_get_last_flow_return")
+  (return-type "GstFlowReturn")
+)
+
 (define-method chain
   (of-object "GstPad")
   (c-name "gst_pad_chain")
@@ -7866,12 +8833,6 @@
     '("GstPadForwardFunction" "forward")
     '("gpointer" "user_data")
   )
-)
-
-(define-method get_name
-  (of-object "GstPadMode")
-  (c-name "gst_pad_mode_get_name")
-  (return-type "const-gchar*")
 )
 
 
@@ -8638,6 +9599,12 @@
   (return-type "const-gchar*")
 )
 
+(define-method is_editable
+  (of-object "GstPreset")
+  (c-name "gst_preset_is_editable")
+  (return-type "gboolean")
+)
+
 
 
 ;; From gst_private.h
@@ -9087,6 +10054,24 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "uri")
+  )
+)
+
+(define-method parse_uri_redirection_permanent
+  (of-object "GstQuery")
+  (c-name "gst_query_parse_uri_redirection_permanent")
+  (return-type "none")
+  (parameters
+    '("gboolean*" "permanent")
+  )
+)
+
+(define-method set_uri_redirection_permanent
+  (of-object "GstQuery")
+  (c-name "gst_query_set_uri_redirection_permanent")
+  (return-type "none")
+  (parameters
+    '("gboolean" "permanent")
   )
 )
 
@@ -10123,6 +11108,16 @@
   )
 )
 
+(define-method filter_and_map_in_place
+  (of-object "GstStructure")
+  (c-name "gst_structure_filter_and_map_in_place")
+  (return-type "none")
+  (parameters
+    '("GstStructureFilterMapFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method n_fields
   (of-object "GstStructure")
   (c-name "gst_structure_n_fields")
@@ -10203,6 +11198,26 @@
   (parameters
     '("const-gchar*" "fieldname")
     '("guint*" "value")
+  )
+)
+
+(define-method get_int64
+  (of-object "GstStructure")
+  (c-name "gst_structure_get_int64")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "fieldname")
+    '("gint64*" "value")
+  )
+)
+
+(define-method get_uint64
+  (of-object "GstStructure")
+  (c-name "gst_structure_get_uint64")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "fieldname")
+    '("guint64*" "value")
   )
 )
 
@@ -10406,6 +11421,14 @@
 (define-function gst_system_clock_obtain
   (c-name "gst_system_clock_obtain")
   (return-type "GstClock*")
+)
+
+(define-function gst_system_clock_set_default
+  (c-name "gst_system_clock_set_default")
+  (return-type "none")
+  (parameters
+    '("GstClock*" "new_clock")
+  )
 )
 
 
@@ -11434,6 +12457,26 @@
   )
 )
 
+(define-method set_loop
+  (of-object "GstTocEntry")
+  (c-name "gst_toc_entry_set_loop")
+  (return-type "none")
+  (parameters
+    '("GstTocLoopType" "loop_type")
+    '("gint" "repeat_count")
+  )
+)
+
+(define-method get_loop
+  (of-object "GstTocEntry")
+  (c-name "gst_toc_entry_get_loop")
+  (return-type "gboolean")
+  (parameters
+    '("GstTocLoopType*" "loop_type")
+    '("gint*" "repeat_count")
+  )
+)
+
 (define-method get_toc
   (of-object "GstTocEntry")
   (c-name "gst_toc_entry_get_toc")
@@ -11708,6 +12751,344 @@
     '("const-gchar*" "uri")
     '("GError**" "error")
   )
+)
+
+(define-function gst_uri_get_type
+  (c-name "gst_uri_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_uri_new
+  (c-name "gst_uri_new")
+  (is-constructor-of "GstUri")
+  (return-type "GstUri*")
+  (parameters
+    '("const-gchar*" "scheme")
+    '("const-gchar*" "userinfo")
+    '("const-gchar*" "host")
+    '("guint" "port")
+    '("const-gchar*" "path")
+    '("const-gchar*" "query")
+    '("const-gchar*" "fragment")
+  )
+)
+
+(define-method new_with_base
+  (of-object "GstUri")
+  (c-name "gst_uri_new_with_base")
+  (return-type "GstUri*")
+  (parameters
+    '("const-gchar*" "scheme")
+    '("const-gchar*" "userinfo")
+    '("const-gchar*" "host")
+    '("guint" "port")
+    '("const-gchar*" "path")
+    '("const-gchar*" "query")
+    '("const-gchar*" "fragment")
+  )
+)
+
+(define-function gst_uri_from_string
+  (c-name "gst_uri_from_string")
+  (return-type "GstUri*")
+  (parameters
+    '("const-gchar*" "uri")
+  )
+)
+
+(define-method from_string_with_base
+  (of-object "GstUri")
+  (c-name "gst_uri_from_string_with_base")
+  (return-type "GstUri*")
+  (parameters
+    '("const-gchar*" "uri")
+  )
+)
+
+(define-method equal
+  (of-object "GstUri")
+  (c-name "gst_uri_equal")
+  (return-type "gboolean")
+  (parameters
+    '("const-GstUri*" "second")
+  )
+)
+
+(define-method join
+  (of-object "GstUri")
+  (c-name "gst_uri_join")
+  (return-type "GstUri*")
+  (parameters
+    '("GstUri*" "ref_uri")
+  )
+)
+
+(define-function gst_uri_join_strings
+  (c-name "gst_uri_join_strings")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "base_uri")
+    '("const-gchar*" "ref_uri")
+  )
+)
+
+(define-method is_writable
+  (of-object "GstUri")
+  (c-name "gst_uri_is_writable")
+  (return-type "gboolean")
+)
+
+(define-method make_writable
+  (of-object "GstUri")
+  (c-name "gst_uri_make_writable")
+  (return-type "GstUri*")
+)
+
+(define-method to_string
+  (of-object "GstUri")
+  (c-name "gst_uri_to_string")
+  (return-type "gchar*")
+)
+
+(define-method is_normalized
+  (of-object "GstUri")
+  (c-name "gst_uri_is_normalized")
+  (return-type "gboolean")
+)
+
+(define-method normalize
+  (of-object "GstUri")
+  (c-name "gst_uri_normalize")
+  (return-type "gboolean")
+)
+
+(define-method get_scheme
+  (of-object "GstUri")
+  (c-name "gst_uri_get_scheme")
+  (return-type "const-gchar*")
+)
+
+(define-method set_scheme
+  (of-object "GstUri")
+  (c-name "gst_uri_set_scheme")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "scheme")
+  )
+)
+
+(define-method get_userinfo
+  (of-object "GstUri")
+  (c-name "gst_uri_get_userinfo")
+  (return-type "const-gchar*")
+)
+
+(define-method set_userinfo
+  (of-object "GstUri")
+  (c-name "gst_uri_set_userinfo")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "userinfo")
+  )
+)
+
+(define-method get_host
+  (of-object "GstUri")
+  (c-name "gst_uri_get_host")
+  (return-type "const-gchar*")
+)
+
+(define-method set_host
+  (of-object "GstUri")
+  (c-name "gst_uri_set_host")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "host")
+  )
+)
+
+(define-method get_port
+  (of-object "GstUri")
+  (c-name "gst_uri_get_port")
+  (return-type "guint")
+)
+
+(define-method set_port
+  (of-object "GstUri")
+  (c-name "gst_uri_set_port")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "port")
+  )
+)
+
+(define-method get_path
+  (of-object "GstUri")
+  (c-name "gst_uri_get_path")
+  (return-type "gchar*")
+)
+
+(define-method set_path
+  (of-object "GstUri")
+  (c-name "gst_uri_set_path")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "path")
+  )
+)
+
+(define-method get_path_string
+  (of-object "GstUri")
+  (c-name "gst_uri_get_path_string")
+  (return-type "gchar*")
+)
+
+(define-method set_path_string
+  (of-object "GstUri")
+  (c-name "gst_uri_set_path_string")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "path")
+  )
+)
+
+(define-method get_path_segments
+  (of-object "GstUri")
+  (c-name "gst_uri_get_path_segments")
+  (return-type "GList*")
+)
+
+(define-method set_path_segments
+  (of-object "GstUri")
+  (c-name "gst_uri_set_path_segments")
+  (return-type "gboolean")
+  (parameters
+    '("GList*" "path_segments")
+  )
+)
+
+(define-method append_path
+  (of-object "GstUri")
+  (c-name "gst_uri_append_path")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "relative_path")
+  )
+)
+
+(define-method append_path_segment
+  (of-object "GstUri")
+  (c-name "gst_uri_append_path_segment")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "path_segment")
+  )
+)
+
+(define-method get_query_string
+  (of-object "GstUri")
+  (c-name "gst_uri_get_query_string")
+  (return-type "gchar*")
+)
+
+(define-method set_query_string
+  (of-object "GstUri")
+  (c-name "gst_uri_set_query_string")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "query")
+  )
+)
+
+(define-method get_query_table
+  (of-object "GstUri")
+  (c-name "gst_uri_get_query_table")
+  (return-type "GHashTable*")
+)
+
+(define-method set_query_table
+  (of-object "GstUri")
+  (c-name "gst_uri_set_query_table")
+  (return-type "gboolean")
+  (parameters
+    '("GHashTable*" "query_table")
+  )
+)
+
+(define-method set_query_value
+  (of-object "GstUri")
+  (c-name "gst_uri_set_query_value")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "query_key")
+    '("const-gchar*" "query_value")
+  )
+)
+
+(define-method remove_query_key
+  (of-object "GstUri")
+  (c-name "gst_uri_remove_query_key")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "query_key")
+  )
+)
+
+(define-method query_has_key
+  (of-object "GstUri")
+  (c-name "gst_uri_query_has_key")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "query_key")
+  )
+)
+
+(define-method get_query_value
+  (of-object "GstUri")
+  (c-name "gst_uri_get_query_value")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "query_key")
+  )
+)
+
+(define-method get_query_keys
+  (of-object "GstUri")
+  (c-name "gst_uri_get_query_keys")
+  (return-type "GList*")
+)
+
+(define-method get_fragment
+  (of-object "GstUri")
+  (c-name "gst_uri_get_fragment")
+  (return-type "const-gchar*")
+)
+
+(define-method set_fragment
+  (of-object "GstUri")
+  (c-name "gst_uri_set_fragment")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "fragment")
+  )
+)
+
+(define-method copy
+  (of-object "GstUri")
+  (c-name "gst_uri_copy")
+  (return-type "GstUri*")
+)
+
+(define-method ref
+  (of-object "GstUri")
+  (c-name "gst_uri_ref")
+  (return-type "GstUri*")
+)
+
+(define-method unref
+  (of-object "GstUri")
+  (c-name "gst_uri_unref")
+  (return-type "none")
 )
 
 
@@ -12507,11 +13888,6 @@
   (return-type "GType")
 )
 
-(define-function gst_date_time_get_type
-  (c-name "gst_date_time_get_type")
-  (return-type "GType")
-)
-
 (define-function gst_value_register
   (c-name "gst_value_register")
   (return-type "none")
@@ -13025,6 +14401,10 @@
 
 
 
+;; From gstversion.h
+
+
+
 ;; From math-compat.h
 
 
@@ -13082,6 +14462,16 @@
   (return-type "none")
   (parameters
     '("gpointer" "dest")
+    '("gsize" "offset")
+    '("gsize" "size")
+  )
+)
+
+(define-method copy_bytes
+  (of-object "GstAdapter")
+  (c-name "gst_adapter_copy_bytes")
+  (return-type "GBytes*")
+  (parameters
     '("gsize" "offset")
     '("gsize" "size")
   )
@@ -13655,6 +15045,15 @@
   (return-type "none")
   (parameters
     '("gboolean" "dynamic")
+  )
+)
+
+(define-method set_automatic_eos
+  (of-object "GstBaseSrc")
+  (c-name "gst_base_src_set_automatic_eos")
+  (return-type "none")
+  (parameters
+    '("gboolean" "automatic_eos")
   )
 )
 
@@ -14465,6 +15864,26 @@
   )
 )
 
+(define-method peek_sub_reader
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_peek_sub_reader")
+  (return-type "gboolean")
+  (parameters
+    '("GstByteReader*" "sub_reader")
+    '("guint" "size")
+  )
+)
+
+(define-method get_sub_reader
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_get_sub_reader")
+  (return-type "gboolean")
+  (parameters
+    '("GstByteReader*" "sub_reader")
+    '("guint" "size")
+  )
+)
+
 (define-method set_pos
   (of-object "GstByteReader")
   (c-name "gst_byte_reader_set_pos")
@@ -14999,6 +16418,19 @@
     '("guint32" "pattern")
     '("guint" "offset")
     '("guint" "size")
+  )
+)
+
+(define-method masked_scan_uint32_peek
+  (of-object "GstByteReader")
+  (c-name "gst_byte_reader_masked_scan_uint32_peek")
+  (return-type "guint")
+  (parameters
+    '("guint32" "mask")
+    '("guint32" "pattern")
+    '("guint" "offset")
+    '("guint" "size")
+    '("guint32*" "value")
   )
 )
 
@@ -15731,6 +17163,16 @@
   )
 )
 
+(define-method set_flush_function
+  (of-object "GstCollectPads")
+  (c-name "gst_collect_pads_set_flush_function")
+  (return-type "none")
+  (parameters
+    '("GstCollectPadsFlushFunction" "func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method add_pad
   (of-object "GstCollectPads")
   (c-name "gst_collect_pads_add_pad")
@@ -15860,6 +17302,16 @@
   )
 )
 
+(define-method src_event_default
+  (of-object "GstCollectPads")
+  (c-name "gst_collect_pads_src_event_default")
+  (return-type "gboolean")
+  (parameters
+    '("GstPad*" "pad")
+    '("GstEvent*" "event")
+  )
+)
+
 (define-method query_default
   (of-object "GstCollectPads")
   (c-name "gst_collect_pads_query_default")
@@ -15977,6 +17429,60 @@
   (of-object "GstDataQueue")
   (c-name "gst_data_queue_limits_changed")
   (return-type "none")
+)
+
+
+
+;; From gstflowcombiner.h
+
+(define-function gst_flow_combiner_new
+  (c-name "gst_flow_combiner_new")
+  (is-constructor-of "GstFlowCombiner")
+  (return-type "GstFlowCombiner*")
+)
+
+(define-method free
+  (of-object "GstFlowCombiner")
+  (c-name "gst_flow_combiner_free")
+  (return-type "none")
+)
+
+(define-method update_flow
+  (of-object "GstFlowCombiner")
+  (c-name "gst_flow_combiner_update_flow")
+  (return-type "GstFlowReturn")
+  (parameters
+    '("GstFlowReturn" "fret")
+  )
+)
+
+(define-method add_pad
+  (of-object "GstFlowCombiner")
+  (c-name "gst_flow_combiner_add_pad")
+  (return-type "none")
+  (parameters
+    '("GstPad*" "pad")
+  )
+)
+
+(define-method remove_pad
+  (of-object "GstFlowCombiner")
+  (c-name "gst_flow_combiner_remove_pad")
+  (return-type "none")
+  (parameters
+    '("GstPad*" "pad")
+  )
+)
+
+(define-method clear
+  (of-object "GstFlowCombiner")
+  (c-name "gst_flow_combiner_clear")
+  (return-type "none")
+)
+
+(define-function gst_flow_combiner_get_type
+  (c-name "gst_flow_combiner_get_type")
+  (return-type "GType")
 )
 
 
@@ -16421,6 +17927,15 @@
   )
 )
 
+(define-function gst_check_setup_src_pad_from_template
+  (c-name "gst_check_setup_src_pad_from_template")
+  (return-type "GstPad*")
+  (parameters
+    '("GstElement*" "element")
+    '("GstPadTemplate*" "tmpl")
+  )
+)
+
 (define-function gst_check_setup_src_pad_by_name
   (c-name "gst_check_setup_src_pad_by_name")
   (return-type "GstPad*")
@@ -16431,12 +17946,50 @@
   )
 )
 
+(define-function gst_check_setup_src_pad_by_name_from_template
+  (c-name "gst_check_setup_src_pad_by_name_from_template")
+  (return-type "GstPad*")
+  (parameters
+    '("GstElement*" "element")
+    '("GstPadTemplate*" "tmpl")
+    '("const-gchar*" "name")
+  )
+)
+
+(define-function gst_check_setup_sink_pad
+  (c-name "gst_check_setup_sink_pad")
+  (return-type "GstPad*")
+  (parameters
+    '("GstElement*" "element")
+    '("GstStaticPadTemplate*" "tmpl")
+  )
+)
+
+(define-function gst_check_setup_sink_pad_from_template
+  (c-name "gst_check_setup_sink_pad_from_template")
+  (return-type "GstPad*")
+  (parameters
+    '("GstElement*" "element")
+    '("GstPadTemplate*" "tmpl")
+  )
+)
+
 (define-function gst_check_setup_sink_pad_by_name
   (c-name "gst_check_setup_sink_pad_by_name")
   (return-type "GstPad*")
   (parameters
     '("GstElement*" "element")
     '("GstStaticPadTemplate*" "tmpl")
+    '("const-gchar*" "name")
+  )
+)
+
+(define-function gst_check_setup_sink_pad_by_name_from_template
+  (c-name "gst_check_setup_sink_pad_by_name_from_template")
+  (return-type "GstPad*")
+  (parameters
+    '("GstElement*" "element")
+    '("GstPadTemplate*" "tmpl")
     '("const-gchar*" "name")
   )
 )
@@ -16507,15 +18060,6 @@
   )
 )
 
-(define-function gst_check_setup_sink_pad
-  (c-name "gst_check_setup_sink_pad")
-  (return-type "GstPad*")
-  (parameters
-    '("GstElement*" "element")
-    '("GstStaticPadTemplate*" "tmpl")
-  )
-)
-
 (define-function gst_check_teardown_sink_pad
   (c-name "gst_check_teardown_sink_pad")
   (return-type "none")
@@ -16563,6 +18107,24 @@
     '("GstCaps*" "caps")
     '("GstFormat" "format")
     '("const-gchar*" "stream_id")
+  )
+)
+
+(define-function gst_check_objects_destroyed_on_unref
+  (c-name "gst_check_objects_destroyed_on_unref")
+  (return-type "none")
+  (parameters
+    '("gpointer" "object_to_unref")
+    '("gpointer" "first_object")
+  )
+  (varargs #t)
+)
+
+(define-function gst_check_object_destroyed_on_unref
+  (c-name "gst_check_object_destroyed_on_unref")
+  (return-type "none")
+  (parameters
+    '("gpointer" "object_to_unref")
   )
 )
 
@@ -16699,6 +18261,37 @@
   (return-type "GstClockTime")
 )
 
+(define-method wait_for_multiple_pending_ids
+  (of-object "GstTestClock")
+  (c-name "gst_test_clock_wait_for_multiple_pending_ids")
+  (return-type "none")
+  (parameters
+    '("guint" "count")
+    '("GList**" "pending_list")
+  )
+)
+
+(define-method process_id_list
+  (of-object "GstTestClock")
+  (c-name "gst_test_clock_process_id_list")
+  (return-type "guint")
+  (parameters
+    '("const-GList*" "pending_list")
+  )
+)
+
+(define-function gst_test_clock_id_list_get_latest_time
+  (c-name "gst_test_clock_id_list_get_latest_time")
+  (return-type "GstClockTime")
+  (parameters
+    '("const-GList*" "pending_list")
+  )
+)
+
+
+
+;; From internal-check.h
+
 
 
 ;; From controller.h
@@ -16789,6 +18382,11 @@
 
 
 ;; From gsttimedvaluecontrolsource.h
+
+(define-function gst_control_point_get_type
+  (c-name "gst_control_point_get_type")
+  (return-type "GType")
+)
 
 (define-function gst_timed_value_control_source_get_type
   (c-name "gst_timed_value_control_source_get_type")
@@ -16910,7 +18508,7 @@
   (is-constructor-of "GstNetClientClock")
   (return-type "GstClock*")
   (parameters
-    '("gchar*" "name")
+    '("const-gchar*" "name")
     '("const-gchar*" "remote_address")
     '("gint" "remote_port")
     '("GstClockTime" "base_time")
@@ -17724,6 +19322,7 @@
     '("x-server-ip-address" "GST_RTSP_HDR_X_SERVER_IP_ADDRESS")
     '("x-sessioncookie" "GST_RTSP_HDR_X_SESSIONCOOKIE")
     '("rtcp-interval" "GST_RTSP_HDR_RTCP_INTERVAL")
+    '("keymgmt" "GST_RTSP_HDR_KEYMGMT")
     '("last" "GST_RTSP_HDR_LAST")
   )
 )
@@ -17771,6 +19370,7 @@
     '("only-aggregate-operation-allowed" "GST_RTSP_STS_ONLY_AGGREGATE_OPERATION_ALLOWED")
     '("unsupported-transport" "GST_RTSP_STS_UNSUPPORTED_TRANSPORT")
     '("destination-unreachable" "GST_RTSP_STS_DESTINATION_UNREACHABLE")
+    '("key-management-failure" "GST_RTSP_STS_KEY_MANAGEMENT_FAILURE")
     '("internal-server-error" "GST_RTSP_STS_INTERNAL_SERVER_ERROR")
     '("not-implemented" "GST_RTSP_STS_NOT_IMPLEMENTED")
     '("bad-gateway" "GST_RTSP_STS_BAD_GATEWAY")
@@ -17840,6 +19440,8 @@
     '("unknown" "GST_RTSP_PROFILE_UNKNOWN")
     '("avp" "GST_RTSP_PROFILE_AVP")
     '("savp" "GST_RTSP_PROFILE_SAVP")
+    '("avpf" "GST_RTSP_PROFILE_AVPF")
+    '("savpf" "GST_RTSP_PROFILE_SAVPF")
   )
 )
 
@@ -17854,6 +19456,157 @@
     '("tcp" "GST_RTSP_LOWER_TRANS_TCP")
     '("http" "GST_RTSP_LOWER_TRANS_HTTP")
     '("tls" "GST_RTSP_LOWER_TRANS_TLS")
+  )
+)
+
+(define-enum MIKEYType
+  (in-module "Gst")
+  (c-name "GstMIKEYType")
+  (gtype-id "GST_TYPE_MIKEY_TYPE")
+  (values
+    '("invalid" "GST_MIKEY_TYPE_INVALID")
+    '("psk-init" "GST_MIKEY_TYPE_PSK_INIT")
+    '("psk-verify" "GST_MIKEY_TYPE_PSK_VERIFY")
+    '("pk-init" "GST_MIKEY_TYPE_PK_INIT")
+    '("pk-verify" "GST_MIKEY_TYPE_PK_VERIFY")
+    '("dh-init" "GST_MIKEY_TYPE_DH_INIT")
+    '("dh-resp" "GST_MIKEY_TYPE_DH_RESP")
+    '("error" "GST_MIKEY_TYPE_ERROR")
+  )
+)
+
+(define-enum MIKEYPayloadType
+  (in-module "Gst")
+  (c-name "GstMIKEYPayloadType")
+  (gtype-id "GST_TYPE_MIKEY_PAYLOAD_TYPE")
+  (values
+    '("last" "GST_MIKEY_PT_LAST")
+    '("kemac" "GST_MIKEY_PT_KEMAC")
+    '("pke" "GST_MIKEY_PT_PKE")
+    '("dh" "GST_MIKEY_PT_DH")
+    '("sign" "GST_MIKEY_PT_SIGN")
+    '("t" "GST_MIKEY_PT_T")
+    '("id" "GST_MIKEY_PT_ID")
+    '("cert" "GST_MIKEY_PT_CERT")
+    '("chash" "GST_MIKEY_PT_CHASH")
+    '("v" "GST_MIKEY_PT_V")
+    '("sp" "GST_MIKEY_PT_SP")
+    '("rand" "GST_MIKEY_PT_RAND")
+    '("err" "GST_MIKEY_PT_ERR")
+    '("key-data" "GST_MIKEY_PT_KEY_DATA")
+    '("gen-ext" "GST_MIKEY_PT_GEN_EXT")
+  )
+)
+
+(define-enum MIKEYPRFFunc
+  (in-module "Gst")
+  (c-name "GstMIKEYPRFFunc")
+  (gtype-id "GST_TYPE_MIKEYPRF_FUNC")
+  (values
+    '("1" "GST_MIKEY_PRF_MIKEY_1")
+  )
+)
+
+(define-enum MIKEYMapType
+  (in-module "Gst")
+  (c-name "GstMIKEYMapType")
+  (gtype-id "GST_TYPE_MIKEY_MAP_TYPE")
+  (values
+    '("srtp" "GST_MIKEY_MAP_TYPE_SRTP")
+  )
+)
+
+(define-enum MIKEYEncAlg
+  (in-module "Gst")
+  (c-name "GstMIKEYEncAlg")
+  (gtype-id "GST_TYPE_MIKEY_ENC_ALG")
+  (values
+    '("null" "GST_MIKEY_ENC_NULL")
+    '("aes-cm-128" "GST_MIKEY_ENC_AES_CM_128")
+    '("aes-kw-128" "GST_MIKEY_ENC_AES_KW_128")
+  )
+)
+
+(define-enum MIKEYMacAlg
+  (in-module "Gst")
+  (c-name "GstMIKEYMacAlg")
+  (gtype-id "GST_TYPE_MIKEY_MAC_ALG")
+  (values
+    '("null" "GST_MIKEY_MAC_NULL")
+    '("hmac-sha-1-160" "GST_MIKEY_MAC_HMAC_SHA_1_160")
+  )
+)
+
+(define-enum MIKEYCacheType
+  (in-module "Gst")
+  (c-name "GstMIKEYCacheType")
+  (gtype-id "GST_TYPE_MIKEY_CACHE_TYPE")
+  (values
+    '("none" "GST_MIKEY_CACHE_NONE")
+    '("always" "GST_MIKEY_CACHE_ALWAYS")
+    '("for-csb" "GST_MIKEY_CACHE_FOR_CSB")
+  )
+)
+
+(define-enum MIKEYTSType
+  (in-module "Gst")
+  (c-name "GstMIKEYTSType")
+  (gtype-id "GST_TYPE_MIKEYTS_TYPE")
+  (values
+    '("ntp-utc" "GST_MIKEY_TS_TYPE_NTP_UTC")
+    '("ntp" "GST_MIKEY_TS_TYPE_NTP")
+    '("counter" "GST_MIKEY_TS_TYPE_COUNTER")
+  )
+)
+
+(define-enum MIKEYSecProto
+  (in-module "Gst")
+  (c-name "GstMIKEYSecProto")
+  (gtype-id "GST_TYPE_MIKEY_SEC_PROTO")
+  (values
+    '("srtp" "GST_MIKEY_SEC_PROTO_SRTP")
+  )
+)
+
+(define-enum MIKEYSecSRTP
+  (in-module "Gst")
+  (c-name "GstMIKEYSecSRTP")
+  (gtype-id "GST_TYPE_MIKEY_SEC_SRTP")
+  (values
+    '("enc-alg" "GST_MIKEY_SP_SRTP_ENC_ALG")
+    '("enc-key-len" "GST_MIKEY_SP_SRTP_ENC_KEY_LEN")
+    '("auth-alg" "GST_MIKEY_SP_SRTP_AUTH_ALG")
+    '("auth-key-len" "GST_MIKEY_SP_SRTP_AUTH_KEY_LEN")
+    '("salt-key-len" "GST_MIKEY_SP_SRTP_SALT_KEY_LEN")
+    '("prf" "GST_MIKEY_SP_SRTP_PRF")
+    '("key-deriv-rate" "GST_MIKEY_SP_SRTP_KEY_DERIV_RATE")
+    '("srtp-enc" "GST_MIKEY_SP_SRTP_SRTP_ENC")
+    '("srtcp-enc" "GST_MIKEY_SP_SRTP_SRTCP_ENC")
+    '("fec-order" "GST_MIKEY_SP_SRTP_FEC_ORDER")
+    '("srtp-auth" "GST_MIKEY_SP_SRTP_SRTP_AUTH")
+    '("auth-tag-len" "GST_MIKEY_SP_SRTP_AUTH_TAG_LEN")
+    '("srtp-prefix-len" "GST_MIKEY_SP_SRTP_SRTP_PREFIX_LEN")
+  )
+)
+
+(define-enum MIKEYKeyDataType
+  (in-module "Gst")
+  (c-name "GstMIKEYKeyDataType")
+  (gtype-id "GST_TYPE_MIKEY_KEY_DATA_TYPE")
+  (values
+    '("tgk" "GST_MIKEY_KD_TGK")
+    '("tek" "GST_MIKEY_KD_TEK")
+  )
+)
+
+(define-enum MIKEYKVType
+  (in-module "Gst")
+  (c-name "GstMIKEYKVType")
+  (gtype-id "GST_TYPE_MIKEYKV_TYPE")
+  (values
+    '("null" "GST_MIKEY_KV_NULL")
+    '("spi" "GST_MIKEY_KV_SPI")
+    '("interval" "GST_MIKEY_KV_INTERVAL")
   )
 )
 
@@ -18097,6 +19850,7 @@
     '("bt709" "GST_VIDEO_COLOR_MATRIX_BT709")
     '("bt601" "GST_VIDEO_COLOR_MATRIX_BT601")
     '("smpte240m" "GST_VIDEO_COLOR_MATRIX_SMPTE240M")
+    '("bt2020" "GST_VIDEO_COLOR_MATRIX_BT2020")
   )
 )
 
@@ -18116,6 +19870,7 @@
     '("gamma28" "GST_VIDEO_TRANSFER_GAMMA28")
     '("log100" "GST_VIDEO_TRANSFER_LOG100")
     '("log316" "GST_VIDEO_TRANSFER_LOG316")
+    '("bt2020-12" "GST_VIDEO_TRANSFER_BT2020_12")
   )
 )
 
@@ -18131,6 +19886,31 @@
     '("smpte170m" "GST_VIDEO_COLOR_PRIMARIES_SMPTE170M")
     '("smpte240m" "GST_VIDEO_COLOR_PRIMARIES_SMPTE240M")
     '("film" "GST_VIDEO_COLOR_PRIMARIES_FILM")
+    '("bt2020" "GST_VIDEO_COLOR_PRIMARIES_BT2020")
+  )
+)
+
+(define-enum VideoDitherMethod
+  (in-module "Gst")
+  (c-name "GstVideoDitherMethod")
+  (gtype-id "GST_TYPE_VIDEO_DITHER_METHOD")
+  (values
+    '("none" "GST_VIDEO_DITHER_NONE")
+    '("verterr" "GST_VIDEO_DITHER_VERTERR")
+    '("floyd-steinberg" "GST_VIDEO_DITHER_FLOYD_STEINBERG")
+    '("sierra-lite" "GST_VIDEO_DITHER_SIERRA_LITE")
+    '("bayer" "GST_VIDEO_DITHER_BAYER")
+  )
+)
+
+(define-flags VideoDitherFlags
+  (in-module "Gst")
+  (c-name "GstVideoDitherFlags")
+  (gtype-id "GST_TYPE_VIDEO_DITHER_FLAGS")
+  (values
+    '("none" "GST_VIDEO_DITHER_FLAG_NONE")
+    '("interlaced" "GST_VIDEO_DITHER_FLAG_INTERLACED")
+    '("quantize" "GST_VIDEO_DITHER_FLAG_QUANTIZE")
   )
 )
 
@@ -18192,6 +19972,7 @@
     '("gbr-10le" "GST_VIDEO_FORMAT_GBR_10LE")
     '("nv16" "GST_VIDEO_FORMAT_NV16")
     '("nv24" "GST_VIDEO_FORMAT_NV24")
+    '("nv12-64z32" "GST_VIDEO_FORMAT_NV12_64Z32")
   )
 )
 
@@ -18208,6 +19989,7 @@
     '("palette" "GST_VIDEO_FORMAT_FLAG_PALETTE")
     '("complex" "GST_VIDEO_FORMAT_FLAG_COMPLEX")
     '("unpack" "GST_VIDEO_FORMAT_FLAG_UNPACK")
+    '("tiled" "GST_VIDEO_FORMAT_FLAG_TILED")
   )
 )
 
@@ -18248,6 +20030,16 @@
   )
 )
 
+(define-flags VideoFrameMapFlags
+  (in-module "Gst")
+  (c-name "GstVideoFrameMapFlags")
+  (gtype-id "GST_TYPE_VIDEO_FRAME_MAP_FLAGS")
+  (values
+    '("no-ref" "GST_VIDEO_FRAME_MAP_FLAG_NO_REF")
+    '("last" "GST_VIDEO_FRAME_MAP_FLAG_LAST")
+  )
+)
+
 (define-enum VideoInterlaceMode
   (in-module "Gst")
   (c-name "GstVideoInterlaceMode")
@@ -18279,6 +20071,58 @@
     '("none" "GST_VIDEO_OVERLAY_FORMAT_FLAG_NONE")
     '("premultiplied-alpha" "GST_VIDEO_OVERLAY_FORMAT_FLAG_PREMULTIPLIED_ALPHA")
     '("global-alpha" "GST_VIDEO_OVERLAY_FORMAT_FLAG_GLOBAL_ALPHA")
+  )
+)
+
+(define-enum VideoResamplerMethod
+  (in-module "Gst")
+  (c-name "GstVideoResamplerMethod")
+  (gtype-id "GST_TYPE_VIDEO_RESAMPLER_METHOD")
+  (values
+    '("nearest" "GST_VIDEO_RESAMPLER_METHOD_NEAREST")
+    '("linear" "GST_VIDEO_RESAMPLER_METHOD_LINEAR")
+    '("cubic" "GST_VIDEO_RESAMPLER_METHOD_CUBIC")
+    '("sinc" "GST_VIDEO_RESAMPLER_METHOD_SINC")
+    '("lanczos" "GST_VIDEO_RESAMPLER_METHOD_LANCZOS")
+  )
+)
+
+(define-enum VideoResamplerFlags
+  (in-module "Gst")
+  (c-name "GstVideoResamplerFlags")
+  (gtype-id "GST_TYPE_VIDEO_RESAMPLER_FLAGS")
+  (values
+    '("none" "GST_VIDEO_RESAMPLER_FLAG_NONE")
+  )
+)
+
+(define-flags VideoScalerFlags
+  (in-module "Gst")
+  (c-name "GstVideoScalerFlags")
+  (gtype-id "GST_TYPE_VIDEO_SCALER_FLAGS")
+  (values
+    '("none" "GST_VIDEO_SCALER_FLAG_NONE")
+    '("interlaced" "GST_VIDEO_SCALER_FLAG_INTERLACED")
+  )
+)
+
+(define-enum VideoTileType
+  (in-module "Gst")
+  (c-name "GstVideoTileType")
+  (gtype-id "GST_TYPE_VIDEO_TILE_TYPE")
+  (values
+    '("indexed" "GST_VIDEO_TILE_TYPE_INDEXED")
+  )
+)
+
+(define-enum VideoTileMode
+  (in-module "Gst")
+  (c-name "GstVideoTileMode")
+  (gtype-id "GST_TYPE_VIDEO_TILE_MODE")
+  (values
+    '("gst-video-tile-mode-unknown" "GST_VIDEO_TILE_MODE_UNKNOWN")
+    '("gst-video-tile-mode-zflipz-2x2" "GST_VIDEO_TILE_MODE_ZFLIPZ_2X2")
+    '("indexed)" "INDEXED)")
   )
 )
 
@@ -18324,6 +20168,10 @@
 
 
 ;; From app.h
+
+
+
+;; From gstapp-marshal.h
 
 
 
@@ -18553,6 +20401,15 @@
   (return-type "GstFlowReturn")
 )
 
+(define-method push_sample
+  (of-object "GstAppSrc")
+  (c-name "gst_app_src_push_sample")
+  (return-type "GstFlowReturn")
+  (parameters
+    '("GstSample*" "sample")
+  )
+)
+
 (define-method set_callbacks
   (of-object "GstAppSrc")
   (c-name "gst_app_src_set_callbacks")
@@ -18642,6 +20499,50 @@
     '("const-GstAudioChannelPosition*" "to")
     '("gint*" "reorder_map")
   )
+)
+
+
+
+;; From audio-enumtypes.h
+
+(define-function gst_audio_format_get_type
+  (c-name "gst_audio_format_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_format_flags_get_type
+  (c-name "gst_audio_format_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_pack_flags_get_type
+  (c-name "gst_audio_pack_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_channel_position_get_type
+  (c-name "gst_audio_channel_position_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_flags_get_type
+  (c-name "gst_audio_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_layout_get_type
+  (c-name "gst_audio_layout_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_ring_buffer_state_get_type
+  (c-name "gst_audio_ring_buffer_state_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_ring_buffer_format_type_get_type
+  (c-name "gst_audio_ring_buffer_format_type_get_type")
+  (return-type "GType")
 )
 
 
@@ -19028,6 +20929,16 @@
   (return-type "gboolean")
   (parameters
     '("const-GstAudioInfo*" "info")
+  )
+)
+
+(define-method proxy_getcaps
+  (of-object "GstAudioDecoder")
+  (c-name "gst_audio_decoder_proxy_getcaps")
+  (return-type "GstCaps*")
+  (parameters
+    '("GstCaps*" "caps")
+    '("GstCaps*" "filter")
   )
 )
 
@@ -19940,6 +21851,430 @@
   )
 )
 
+(define-function audio_orc_splat_u16
+  (c-name "audio_orc_splat_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_splat_u32
+  (c-name "audio_orc_splat_u32")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_splat_u64
+  (c-name "audio_orc_splat_u64")
+  (return-type "none")
+  (parameters
+    '("guint64*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+
+
+;; From gstaudiopack.h
+
+(define-function audio_orc_unpack_u8
+  (c-name "audio_orc_unpack_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s8
+  (c-name "audio_orc_unpack_s8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u16
+  (c-name "audio_orc_unpack_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s16
+  (c-name "audio_orc_unpack_s16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u16_swap
+  (c-name "audio_orc_unpack_u16_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s16_swap
+  (c-name "audio_orc_unpack_s16_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u24_32
+  (c-name "audio_orc_unpack_u24_32")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s24_32
+  (c-name "audio_orc_unpack_s24_32")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u24_32_swap
+  (c-name "audio_orc_unpack_u24_32_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s24_32_swap
+  (c-name "audio_orc_unpack_s24_32_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u32
+  (c-name "audio_orc_unpack_u32")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u32_swap
+  (c-name "audio_orc_unpack_u32_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s32
+  (c-name "audio_orc_unpack_s32")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s32_swap
+  (c-name "audio_orc_unpack_s32_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_f32
+  (c-name "audio_orc_unpack_f32")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gfloat*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_f32_swap
+  (c-name "audio_orc_unpack_f32_swap")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gfloat*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_f64
+  (c-name "audio_orc_unpack_f64")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_f64_swap
+  (c-name "audio_orc_unpack_f64_swap")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_u8
+  (c-name "audio_orc_pack_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_s8
+  (c-name "audio_orc_pack_s8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_u16
+  (c-name "audio_orc_pack_u16")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_s16
+  (c-name "audio_orc_pack_s16")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_u16_swap
+  (c-name "audio_orc_pack_u16_swap")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_s16_swap
+  (c-name "audio_orc_pack_s16_swap")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_u24_32
+  (c-name "audio_orc_pack_u24_32")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_s24_32
+  (c-name "audio_orc_pack_s24_32")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_u24_32_swap
+  (c-name "audio_orc_pack_u24_32_swap")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_s24_32_swap
+  (c-name "audio_orc_pack_s24_32_swap")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_u32
+  (c-name "audio_orc_pack_u32")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_s32
+  (c-name "audio_orc_pack_s32")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_u32_swap
+  (c-name "audio_orc_pack_u32_swap")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_s32_swap
+  (c-name "audio_orc_pack_s32_swap")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_f32
+  (c-name "audio_orc_pack_f32")
+  (return-type "none")
+  (parameters
+    '("gfloat*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_f32_swap
+  (c-name "audio_orc_pack_f32_swap")
+  (return-type "none")
+  (parameters
+    '("gfloat*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_f64
+  (c-name "audio_orc_pack_f64")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_pack_f64_swap
+  (c-name "audio_orc_pack_f64_swap")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_splat_u16
+  (c-name "audio_orc_splat_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_splat_u32
+  (c-name "audio_orc_splat_u32")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_splat_u64
+  (c-name "audio_orc_splat_u64")
+  (return-type "none")
+  (parameters
+    '("guint64*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
 
 
 ;; From gstaudioringbuffer.h
@@ -20209,6 +22544,10 @@
   (c-name "gst_audio_src_get_type")
   (return-type "GType")
 )
+
+
+
+;; From gstaudioutilsprivate.h
 
 
 
@@ -20915,6 +23254,51 @@
   )
 )
 
+(define-function gst_codec_utils_h265_get_profile
+  (c-name "gst_codec_utils_h265_get_profile")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-guint8*" "profile_tier_level")
+    '("guint" "len")
+  )
+)
+
+(define-function gst_codec_utils_h265_get_tier
+  (c-name "gst_codec_utils_h265_get_tier")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-guint8*" "profile_tier_level")
+    '("guint" "len")
+  )
+)
+
+(define-function gst_codec_utils_h265_get_level
+  (c-name "gst_codec_utils_h265_get_level")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-guint8*" "profile_tier_level")
+    '("guint" "len")
+  )
+)
+
+(define-function gst_codec_utils_h265_get_level_idc
+  (c-name "gst_codec_utils_h265_get_level_idc")
+  (return-type "guint8")
+  (parameters
+    '("const-gchar*" "level")
+  )
+)
+
+(define-function gst_codec_utils_h265_caps_set_level_tier_and_profile
+  (c-name "gst_codec_utils_h265_caps_set_level_tier_and_profile")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps*" "caps")
+    '("const-guint8*" "profile_tier_level")
+    '("guint" "len")
+  )
+)
+
 (define-function gst_codec_utils_mpeg4video_get_profile
   (c-name "gst_codec_utils_mpeg4video_get_profile")
   (return-type "const-gchar*")
@@ -21071,6 +23455,21 @@
   (return-type "none")
   (parameters
     '("GstCaps*" "format")
+  )
+)
+
+(define-method get_allow_dynamic_output
+  (of-object "GstEncodingProfile")
+  (c-name "gst_encoding_profile_get_allow_dynamic_output")
+  (return-type "gboolean")
+)
+
+(define-method set_allow_dynamic_output
+  (of-object "GstEncodingProfile")
+  (c-name "gst_encoding_profile_set_allow_dynamic_output")
+  (return-type "none")
+  (parameters
+    '("gboolean" "allow_dynamic_output")
   )
 )
 
@@ -21639,6 +24038,12 @@
   (return-type "const-GstToc*")
 )
 
+(define-method get_missing_elements_installer_details
+  (of-object "GstDiscovererInfo")
+  (c-name "gst_discoverer_info_get_missing_elements_installer_details")
+  (return-type "const-gchar**")
+)
+
 (define-method get_streams
   (of-object "GstDiscovererInfo")
   (c-name "gst_discoverer_info_get_streams")
@@ -21728,6 +24133,26 @@
 
 
 
+;; From gstpluginsbaseversion.h
+
+(define-function gst_plugins_base_version
+  (c-name "gst_plugins_base_version")
+  (return-type "none")
+  (parameters
+    '("guint*" "major")
+    '("guint*" "minor")
+    '("guint*" "micro")
+    '("guint*" "nano")
+  )
+)
+
+(define-function gst_plugins_base_version_string
+  (c-name "gst_plugins_base_version_string")
+  (return-type "gchar*")
+)
+
+
+
 ;; From install-plugins.h
 
 (define-function gst_install_plugins_context_new
@@ -21740,6 +24165,33 @@
   (of-object "GstInstallPluginsContext")
   (c-name "gst_install_plugins_context_free")
   (return-type "none")
+)
+
+(define-method set_confirm_search
+  (of-object "GstInstallPluginsContext")
+  (c-name "gst_install_plugins_context_set_confirm_search")
+  (return-type "none")
+  (parameters
+    '("gboolean" "confirm_search")
+  )
+)
+
+(define-method set_desktop_id
+  (of-object "GstInstallPluginsContext")
+  (c-name "gst_install_plugins_context_set_desktop_id")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "desktop_id")
+  )
+)
+
+(define-method set_startup_notification_id
+  (of-object "GstInstallPluginsContext")
+  (c-name "gst_install_plugins_context_set_startup_notification_id")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "startup_id")
+  )
 )
 
 (define-method set_xid
@@ -21913,6 +24365,20 @@
   (parameters
     '("const-GstCaps*" "encode_caps")
   )
+)
+
+
+
+;; From pbutils-enumtypes.h
+
+(define-function gst_install_plugins_return_get_type
+  (c-name "gst_install_plugins_return_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_discoverer_result_get_type
+  (c-name "gst_discoverer_result_get_type")
+  (return-type "GType")
 )
 
 
@@ -23268,6 +25734,21 @@
   (return-type "GTlsCertificateFlags")
 )
 
+(define-method set_tls_database
+  (of-object "GstRTSPConnection")
+  (c-name "gst_rtsp_connection_set_tls_database")
+  (return-type "none")
+  (parameters
+    '("GTlsDatabase*" "database")
+  )
+)
+
+(define-method get_tls_database
+  (of-object "GstRTSPConnection")
+  (c-name "gst_rtsp_connection_get_tls_database")
+  (return-type "GTlsDatabase*")
+)
+
 (define-method read
   (of-object "GstRTSPConnection")
   (c-name "gst_rtsp_connection_read")
@@ -23552,6 +26033,24 @@
   )
 )
 
+(define-method wait_backlog
+  (of-object "GstRTSPWatch")
+  (c-name "gst_rtsp_watch_wait_backlog")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("GTimeVal*" "timeout")
+  )
+)
+
+(define-method set_flushing
+  (of-object "GstRTSPWatch")
+  (c-name "gst_rtsp_watch_set_flushing")
+  (return-type "none")
+  (parameters
+    '("gboolean" "flushing")
+  )
+)
+
 
 
 ;; From gstrtspdefs.h
@@ -23630,6 +26129,55 @@
   (parameters
     '("GstRTSPHeaderField" "field")
   )
+)
+
+
+
+;; From gstrtsp-enumtypes.h
+
+(define-function gst_rtsp_result_get_type
+  (c-name "gst_rtsp_result_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_event_get_type
+  (c-name "gst_rtsp_event_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_family_get_type
+  (c-name "gst_rtsp_family_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_state_get_type
+  (c-name "gst_rtsp_state_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_version_get_type
+  (c-name "gst_rtsp_version_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_method_get_type
+  (c-name "gst_rtsp_method_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_auth_method_get_type
+  (c-name "gst_rtsp_auth_method_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_header_field_get_type
+  (c-name "gst_rtsp_header_field_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_rtsp_status_code_get_type
+  (c-name "gst_rtsp_status_code_get_type")
+  (return-type "GType")
 )
 
 
@@ -23907,6 +26455,47 @@
   )
 )
 
+(define-method add_header_by_name
+  (of-object "GstRTSPMessage")
+  (c-name "gst_rtsp_message_add_header_by_name")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("const-gchar*" "header")
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method take_header_by_name
+  (of-object "GstRTSPMessage")
+  (c-name "gst_rtsp_message_take_header_by_name")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("const-gchar*" "header")
+    '("gchar*" "value")
+  )
+)
+
+(define-method remove_header_by_name
+  (of-object "GstRTSPMessage")
+  (c-name "gst_rtsp_message_remove_header_by_name")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("const-gchar*" "header")
+    '("gint" "index")
+  )
+)
+
+(define-method get_header_by_name
+  (of-object "GstRTSPMessage")
+  (c-name "gst_rtsp_message_get_header_by_name")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("const-gchar*" "header")
+    '("gchar**" "value")
+    '("gint" "index")
+  )
+)
+
 (define-method append_headers
   (of-object "GstRTSPMessage")
   (c-name "gst_rtsp_message_append_headers")
@@ -24072,6 +26661,15 @@
   )
 )
 
+(define-method get_media_type
+  (of-object "GstRTSPTransport")
+  (c-name "gst_rtsp_transport_get_media_type")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("const-gchar**" "media_type")
+  )
+)
+
 (define-method free
   (of-object "GstRTSPTransport")
   (c-name "gst_rtsp_transport_free")
@@ -24141,6 +26739,442 @@
 
 
 ;; From rtsp.h
+
+
+
+;; From gstmikey.h
+
+(define-function gst_mikey_message_get_type
+  (c-name "gst_mikey_message_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_mikey_payload_get_type
+  (c-name "gst_mikey_payload_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_mikey_payload_new
+  (c-name "gst_mikey_payload_new")
+  (is-constructor-of "GstMikeyPayload")
+  (return-type "GstMIKEYPayload*")
+  (parameters
+    '("GstMIKEYPayloadType" "type")
+  )
+)
+
+(define-method ref
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_ref")
+  (return-type "GstMIKEYPayload*")
+)
+
+(define-method unref
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_copy")
+  (return-type "GstMIKEYPayload*")
+)
+
+(define-method kemac_set
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_kemac_set")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYEncAlg" "enc_alg")
+    '("GstMIKEYMacAlg" "mac_alg")
+  )
+)
+
+(define-method kemac_get_n_sub
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_kemac_get_n_sub")
+  (return-type "guint")
+)
+
+(define-method kemac_get_sub
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_kemac_get_sub")
+  (return-type "const-GstMIKEYPayload*")
+  (parameters
+    '("guint" "idx")
+  )
+)
+
+(define-method kemac_remove_sub
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_kemac_remove_sub")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "idx")
+  )
+)
+
+(define-method kemac_add_sub
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_kemac_add_sub")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYPayload*" "newpay")
+  )
+)
+
+(define-method pke_set
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_pke_set")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYCacheType" "C")
+    '("guint16" "data_len")
+    '("const-guint8*" "data")
+  )
+)
+
+(define-method t_set
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_t_set")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYTSType" "type")
+    '("const-guint8*" "ts_value")
+  )
+)
+
+(define-method sp_set
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_sp_set")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "policy")
+    '("GstMIKEYSecProto" "proto")
+  )
+)
+
+(define-method sp_get_n_params
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_sp_get_n_params")
+  (return-type "guint")
+)
+
+(define-method sp_get_param
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_sp_get_param")
+  (return-type "const-GstMIKEYPayloadSPParam*")
+  (parameters
+    '("guint" "idx")
+  )
+)
+
+(define-method sp_remove_param
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_sp_remove_param")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "idx")
+  )
+)
+
+(define-method sp_add_param
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_sp_add_param")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "type")
+    '("guint8" "len")
+    '("const-guint8*" "val")
+  )
+)
+
+(define-method rand_set
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_rand_set")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "len")
+    '("const-guint8*" "rand")
+  )
+)
+
+(define-method key_data_set_key
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_key_data_set_key")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYKeyDataType" "key_type")
+    '("guint16" "key_len")
+    '("const-guint8*" "key_data")
+  )
+)
+
+(define-method key_data_set_salt
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_key_data_set_salt")
+  (return-type "gboolean")
+  (parameters
+    '("guint16" "salt_len")
+    '("const-guint8*" "salt_data")
+  )
+)
+
+(define-method key_data_set_spi
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_key_data_set_spi")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "spi_len")
+    '("const-guint8*" "spi_data")
+  )
+)
+
+(define-method key_data_set_interval
+  (of-object "GstMIKEYPayload")
+  (c-name "gst_mikey_payload_key_data_set_interval")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "vf_len")
+    '("const-guint8*" "vf_data")
+    '("guint8" "vt_len")
+    '("const-guint8*" "vt_data")
+  )
+)
+
+(define-function gst_mikey_message_new
+  (c-name "gst_mikey_message_new")
+  (is-constructor-of "GstMikeyMessage")
+  (return-type "GstMIKEYMessage*")
+)
+
+(define-function gst_mikey_message_new_from_data
+  (c-name "gst_mikey_message_new_from_data")
+  (return-type "GstMIKEYMessage*")
+  (parameters
+    '("gconstpointer" "data")
+    '("gsize" "size")
+    '("GstMIKEYDecryptInfo*" "info")
+    '("GError**" "error")
+  )
+)
+
+(define-function gst_mikey_message_new_from_bytes
+  (c-name "gst_mikey_message_new_from_bytes")
+  (return-type "GstMIKEYMessage*")
+  (parameters
+    '("GBytes*" "bytes")
+    '("GstMIKEYDecryptInfo*" "info")
+    '("GError**" "error")
+  )
+)
+
+(define-method to_bytes
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_to_bytes")
+  (return-type "GBytes*")
+  (parameters
+    '("GstMIKEYEncryptInfo*" "info")
+    '("GError**" "error")
+  )
+)
+
+(define-method ref
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_ref")
+  (return-type "GstMIKEYMessage*")
+)
+
+(define-method unref
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_unref")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_copy")
+  (return-type "GstMIKEYMessage*")
+)
+
+(define-method set_info
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_set_info")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "version")
+    '("GstMIKEYType" "type")
+    '("gboolean" "V")
+    '("GstMIKEYPRFFunc" "prf_func")
+    '("guint32" "CSB_id")
+    '("GstMIKEYMapType" "map_type")
+  )
+)
+
+(define-method get_n_cs
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_get_n_cs")
+  (return-type "guint")
+)
+
+(define-method get_cs_srtp
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_get_cs_srtp")
+  (return-type "const-GstMIKEYMapSRTP*")
+  (parameters
+    '("guint" "idx")
+  )
+)
+
+(define-method insert_cs_srtp
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_insert_cs_srtp")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "idx")
+    '("const-GstMIKEYMapSRTP*" "map")
+  )
+)
+
+(define-method replace_cs_srtp
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_replace_cs_srtp")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "idx")
+    '("const-GstMIKEYMapSRTP*" "map")
+  )
+)
+
+(define-method remove_cs_srtp
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_remove_cs_srtp")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "idx")
+  )
+)
+
+(define-method add_cs_srtp
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_add_cs_srtp")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "policy")
+    '("guint32" "ssrc")
+    '("guint32" "roc")
+  )
+)
+
+(define-method get_n_payloads
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_get_n_payloads")
+  (return-type "guint")
+)
+
+(define-method get_payload
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_get_payload")
+  (return-type "const-GstMIKEYPayload*")
+  (parameters
+    '("guint" "idx")
+  )
+)
+
+(define-method find_payload
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_find_payload")
+  (return-type "const-GstMIKEYPayload*")
+  (parameters
+    '("GstMIKEYPayloadType" "type")
+    '("guint" "nth")
+  )
+)
+
+(define-method remove_payload
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_remove_payload")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "idx")
+  )
+)
+
+(define-method insert_payload
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_insert_payload")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "idx")
+    '("GstMIKEYPayload*" "payload")
+  )
+)
+
+(define-method add_payload
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_add_payload")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYPayload*" "payload")
+  )
+)
+
+(define-method replace_payload
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_replace_payload")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "idx")
+    '("GstMIKEYPayload*" "payload")
+  )
+)
+
+(define-method add_pke
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_add_pke")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYCacheType" "C")
+    '("guint16" "data_len")
+    '("const-guint8*" "data")
+  )
+)
+
+(define-method add_t
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_add_t")
+  (return-type "gboolean")
+  (parameters
+    '("GstMIKEYTSType" "type")
+    '("const-guint8*" "ts_value")
+  )
+)
+
+(define-method add_t_now_ntp_utc
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_add_t_now_ntp_utc")
+  (return-type "gboolean")
+)
+
+(define-method add_rand
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_add_rand")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "len")
+    '("const-guint8*" "rand")
+  )
+)
+
+(define-method add_rand_len
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_add_rand_len")
+  (return-type "gboolean")
+  (parameters
+    '("guint8" "len")
+  )
+)
 
 
 
@@ -25756,6 +28790,21 @@
   (return-type "gint")
 )
 
+(define-method set_needs_format
+  (of-object "GstVideoDecoder")
+  (c-name "gst_video_decoder_set_needs_format")
+  (return-type "none")
+  (parameters
+    '("gboolean" "enabled")
+  )
+)
+
+(define-method get_needs_format
+  (of-object "GstVideoDecoder")
+  (c-name "gst_video_decoder_get_needs_format")
+  (return-type "gboolean")
+)
+
 (define-method set_latency
   (of-object "GstVideoDecoder")
   (c-name "gst_video_decoder_set_latency")
@@ -25826,6 +28875,12 @@
   (of-object "GstVideoDecoder")
   (c-name "gst_video_decoder_have_frame")
   (return-type "GstFlowReturn")
+)
+
+(define-method get_pending_frame_size
+  (of-object "GstVideoDecoder")
+  (c-name "gst_video_decoder_get_pending_frame_size")
+  (return-type "gsize")
 )
 
 (define-method allocate_output_buffer
@@ -25919,6 +28974,16 @@
   )
 )
 
+(define-method proxy_getcaps
+  (of-object "GstVideoDecoder")
+  (c-name "gst_video_decoder_proxy_getcaps")
+  (return-type "GstCaps*")
+  (parameters
+    '("GstCaps*" "caps")
+    '("GstCaps*" "filter")
+  )
+)
+
 
 
 ;; From gstvideoencoder.h
@@ -26007,18 +29072,6 @@
     '("GstCaps*" "caps")
     '("GstCaps*" "filter")
   )
-)
-
-(define-method set_discont
-  (of-object "GstVideoEncoder")
-  (c-name "gst_video_encoder_set_discont")
-  (return-type "none")
-)
-
-(define-method get_discont
-  (of-object "GstVideoEncoder")
-  (c-name "gst_video_encoder_get_discont")
-  (return-type "gboolean")
 )
 
 (define-method set_latency
@@ -26355,6 +29408,10 @@
 
 
 
+;; From gstvideoutilsprivate.h
+
+
+
 ;; From navigation.h
 
 (define-function gst_navigation_get_type
@@ -26673,6 +29730,40 @@
 
 ;; From video-color.h
 
+(define-method get_Kr_Kb
+  (of-object "GstVideoColorMatrix")
+  (c-name "gst_video_color_matrix_get_Kr_Kb")
+  (return-type "gboolean")
+  (parameters
+    '("gdouble*" "Kr")
+    '("gdouble*" "Kb")
+  )
+)
+
+(define-function gst_video_color_transfer_encode
+  (c-name "gst_video_color_transfer_encode")
+  (return-type "gdouble")
+  (parameters
+    '("GstVideoTransferFunction" "func")
+    '("gdouble" "val")
+  )
+)
+
+(define-function gst_video_color_transfer_decode
+  (c-name "gst_video_color_transfer_decode")
+  (return-type "gdouble")
+  (parameters
+    '("GstVideoTransferFunction" "func")
+    '("gdouble" "val")
+  )
+)
+
+(define-method get_info
+  (of-object "GstVideoColorPrimaries")
+  (c-name "gst_video_color_primaries_get_info")
+  (return-type "const-GstVideoColorPrimariesInfo*")
+)
+
 (define-method matches
   (of-object "GstVideoColorimetry")
   (c-name "gst_video_colorimetry_matches")
@@ -26706,6 +29797,206 @@
     '("gint" "offset[GST_VIDEO_MAX_COMPONENTS]")
     '("gint" "scale[GST_VIDEO_MAX_COMPONENTS]")
   )
+)
+
+
+
+;; From video-converter.h
+
+(define-function gst_video_converter_new
+  (c-name "gst_video_converter_new")
+  (is-constructor-of "GstVideoConverter")
+  (return-type "GstVideoConverter*")
+  (parameters
+    '("GstVideoInfo*" "in_info")
+    '("GstVideoInfo*" "out_info")
+    '("GstStructure*" "config")
+  )
+)
+
+(define-method free
+  (of-object "GstVideoConverter")
+  (c-name "gst_video_converter_free")
+  (return-type "none")
+)
+
+(define-method set_config
+  (of-object "GstVideoConverter")
+  (c-name "gst_video_converter_set_config")
+  (return-type "gboolean")
+  (parameters
+    '("GstStructure*" "config")
+  )
+)
+
+(define-method get_config
+  (of-object "GstVideoConverter")
+  (c-name "gst_video_converter_get_config")
+  (return-type "const-GstStructure*")
+)
+
+(define-method frame
+  (of-object "GstVideoConverter")
+  (c-name "gst_video_converter_frame")
+  (return-type "none")
+  (parameters
+    '("const-GstVideoFrame*" "src")
+    '("GstVideoFrame*" "dest")
+  )
+)
+
+
+
+;; From video-dither.h
+
+(define-function gst_video_dither_new
+  (c-name "gst_video_dither_new")
+  (is-constructor-of "GstVideoDither")
+  (return-type "GstVideoDither*")
+  (parameters
+    '("GstVideoDitherMethod" "method")
+    '("GstVideoDitherFlags" "flags")
+    '("GstVideoFormat" "format")
+    '("guint" "quantizer[GST_VIDEO_MAX_COMPONENTS]")
+    '("guint" "width")
+  )
+)
+
+(define-method free
+  (of-object "GstVideoDither")
+  (c-name "gst_video_dither_free")
+  (return-type "none")
+)
+
+(define-method line
+  (of-object "GstVideoDither")
+  (c-name "gst_video_dither_line")
+  (return-type "none")
+  (parameters
+    '("gpointer" "line")
+    '("guint" "x")
+    '("guint" "y")
+    '("guint" "width")
+  )
+)
+
+
+
+;; From video-enumtypes.h
+
+(define-function gst_video_format_get_type
+  (c-name "gst_video_format_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_format_flags_get_type
+  (c-name "gst_video_format_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_pack_flags_get_type
+  (c-name "gst_video_pack_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_color_range_get_type
+  (c-name "gst_video_color_range_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_color_matrix_get_type
+  (c-name "gst_video_color_matrix_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_transfer_function_get_type
+  (c-name "gst_video_transfer_function_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_color_primaries_get_type
+  (c-name "gst_video_color_primaries_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_interlace_mode_get_type
+  (c-name "gst_video_interlace_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_flags_get_type
+  (c-name "gst_video_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_dither_method_get_type
+  (c-name "gst_video_dither_method_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_dither_flags_get_type
+  (c-name "gst_video_dither_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_color_balance_type_get_type
+  (c-name "gst_color_balance_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_navigation_command_get_type
+  (c-name "gst_navigation_command_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_navigation_query_type_get_type
+  (c-name "gst_navigation_query_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_navigation_message_type_get_type
+  (c-name "gst_navigation_message_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_navigation_event_type_get_type
+  (c-name "gst_navigation_event_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_chroma_site_get_type
+  (c-name "gst_video_chroma_site_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_chroma_method_get_type
+  (c-name "gst_video_chroma_method_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_chroma_flags_get_type
+  (c-name "gst_video_chroma_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_tile_type_get_type
+  (c-name "gst_video_tile_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_tile_mode_get_type
+  (c-name "gst_video_tile_mode_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_resampler_method_get_type
+  (c-name "gst_video_resampler_method_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_resampler_flags_get_type
+  (c-name "gst_video_resampler_flags_get_type")
+  (return-type "GType")
 )
 
 
@@ -26921,6 +30212,16 @@
   )
 )
 
+(define-function gst_video_guess_framerate
+  (c-name "gst_video_guess_framerate")
+  (return-type "gboolean")
+  (parameters
+    '("GstClockTime" "duration")
+    '("gint*" "dest_n")
+    '("gint*" "dest_d")
+  )
+)
+
 (define-function gst_video_convert_sample_async
   (c-name "gst_video_convert_sample_async")
   (return-type "none")
@@ -27054,6 +30355,16 @@
     '("guint8*-ORC_RESTRICT" "d1")
     '("guint8*-ORC_RESTRICT" "d2")
     '("guint8*-ORC_RESTRICT" "d3")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_Y
+  (c-name "video_orc_pack_Y")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
     '("const-guint8*-ORC_RESTRICT" "s1")
     '("int" "n")
   )
@@ -27351,6 +30662,137 @@
   )
 )
 
+(define-function video_orc_pack_AY
+  (c-name "video_orc_pack_AY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB15
+  (c-name "video_orc_unpack_RGB15")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB15_trunc
+  (c-name "video_orc_unpack_RGB15_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_RGB15
+  (c-name "video_orc_pack_RGB15")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR15
+  (c-name "video_orc_unpack_BGR15")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR15_trunc
+  (c-name "video_orc_unpack_BGR15_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_BGR15
+  (c-name "video_orc_pack_BGR15")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB16
+  (c-name "video_orc_unpack_RGB16")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB16_trunc
+  (c-name "video_orc_unpack_RGB16_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_RGB16
+  (c-name "video_orc_pack_RGB16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR16
+  (c-name "video_orc_unpack_BGR16")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR16_trunc
+  (c-name "video_orc_unpack_BGR16_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_BGR16
+  (c-name "video_orc_pack_BGR16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
 (define-function video_orc_resample_bilinear_u32
   (c-name "video_orc_resample_bilinear_u32")
   (return-type "none")
@@ -27371,6 +30813,2879 @@
     '("const-orc_uint8*-ORC_RESTRICT" "s1")
     '("const-orc_uint8*-ORC_RESTRICT" "s2")
     '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_memset_2d
+  (c-name "video_orc_memset_2d")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_memcpy_2d
+  (c-name "video_orc_memcpy_2d")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_u16_to_u8
+  (c-name "video_orc_convert_u16_to_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_u8_to_u16
+  (c-name "video_orc_convert_u8_to_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat_u16
+  (c-name "video_orc_splat_u16")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat_u32
+  (c-name "video_orc_splat_u32")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat_u64
+  (c-name "video_orc_splat_u64")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat2_u64
+  (c-name "video_orc_splat2_u64")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_I420_UYVY
+  (c-name "video_orc_convert_I420_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_I420_YUY2
+  (c-name "video_orc_convert_I420_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_I420_AYUV
+  (c-name "video_orc_convert_I420_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_YUY2_I420
+  (c-name "video_orc_convert_YUY2_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("guint8*-ORC_RESTRICT" "d4")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_UYVY_YUY2
+  (c-name "video_orc_convert_UYVY_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_420_422
+  (c-name "video_orc_planar_chroma_420_422")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_420_444
+  (c-name "video_orc_planar_chroma_420_444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_422_444
+  (c-name "video_orc_planar_chroma_422_444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_444_422
+  (c-name "video_orc_planar_chroma_444_422")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_444_420
+  (c-name "video_orc_planar_chroma_444_420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_422_420
+  (c-name "video_orc_planar_chroma_422_420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_YUY2_AYUV
+  (c-name "video_orc_convert_YUY2_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_AYUV
+  (c-name "video_orc_convert_UYVY_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_YUY2_Y42B
+  (c-name "video_orc_convert_YUY2_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_Y42B
+  (c-name "video_orc_convert_UYVY_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_YUY2_Y444
+  (c-name "video_orc_convert_YUY2_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_Y444
+  (c-name "video_orc_convert_UYVY_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_I420
+  (c-name "video_orc_convert_UYVY_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("guint8*-ORC_RESTRICT" "d4")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_AYUV_I420
+  (c-name "video_orc_convert_AYUV_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("guint8*-ORC_RESTRICT" "d4")
+    '("int" "d4_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_YUY2
+  (c-name "video_orc_convert_AYUV_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_UYVY
+  (c-name "video_orc_convert_AYUV_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_Y42B
+  (c-name "video_orc_convert_AYUV_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_Y444
+  (c-name "video_orc_convert_AYUV_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y42B_YUY2
+  (c-name "video_orc_convert_Y42B_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y42B_UYVY
+  (c-name "video_orc_convert_Y42B_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y42B_AYUV
+  (c-name "video_orc_convert_Y42B_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y444_YUY2
+  (c-name "video_orc_convert_Y444_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y444_UYVY
+  (c-name "video_orc_convert_Y444_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y444_AYUV
+  (c-name "video_orc_convert_Y444_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_ARGB
+  (c-name "video_orc_convert_AYUV_ARGB")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_BGRA
+  (c-name "video_orc_convert_AYUV_BGRA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_ABGR
+  (c-name "video_orc_convert_AYUV_ABGR")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_RGBA
+  (c-name "video_orc_convert_AYUV_RGBA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_I420_BGRA
+  (c-name "video_orc_convert_I420_BGRA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_matrix8
+  (c-name "video_orc_matrix8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("orc_int64" "p1")
+    '("orc_int64" "p2")
+    '("orc_int64" "p3")
+    '("orc_int64" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_near_u32_lq
+  (c-name "video_orc_resample_h_near_u32_lq")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_2tap_1u8_lq
+  (c-name "video_orc_resample_h_2tap_1u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_2tap_4u8_lq
+  (c-name "video_orc_resample_h_2tap_4u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_2tap_u8_lq
+  (c-name "video_orc_resample_h_2tap_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-gint16*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_2tap_u8_lq
+  (c-name "video_orc_resample_v_2tap_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_2tap_u16
+  (c-name "video_orc_resample_v_2tap_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_2tap_u8
+  (c-name "video_orc_resample_v_2tap_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_4tap_u8_lq
+  (c-name "video_orc_resample_v_4tap_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_4tap_u8
+  (c-name "video_orc_resample_v_4tap_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_multaps_u8
+  (c-name "video_orc_resample_h_multaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps_u8
+  (c-name "video_orc_resample_h_muladdtaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_resample_scaletaps_u8
+  (c-name "video_orc_resample_scaletaps_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_multaps_u8_lq
+  (c-name "video_orc_resample_h_multaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps_u8_lq
+  (c-name "video_orc_resample_h_muladdtaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_resample_h_multaps3_u8_lq
+  (c-name "video_orc_resample_h_multaps3_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("const-gint16*-ORC_RESTRICT" "s6")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps3_u8_lq
+  (c-name "video_orc_resample_h_muladdtaps3_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("const-gint16*-ORC_RESTRICT" "s6")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdscaletaps3_u8_lq
+  (c-name "video_orc_resample_h_muladdscaletaps3_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("const-gint16*-ORC_RESTRICT" "s6")
+    '("const-gint16*-ORC_RESTRICT" "s7")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_scaletaps_u8_lq
+  (c-name "video_orc_resample_scaletaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_multaps_u16
+  (c-name "video_orc_resample_h_multaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps_u16
+  (c-name "video_orc_resample_h_muladdtaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_resample_scaletaps_u16
+  (c-name "video_orc_resample_scaletaps_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps_u8
+  (c-name "video_orc_resample_v_multaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps_u8
+  (c-name "video_orc_resample_v_muladdtaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps_u16
+  (c-name "video_orc_resample_v_multaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps_u16
+  (c-name "video_orc_resample_v_muladdtaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps_u8_lq
+  (c-name "video_orc_resample_v_multaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps4_u8_lq
+  (c-name "video_orc_resample_v_multaps4_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps_u8_lq
+  (c-name "video_orc_resample_v_muladdtaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps4_u8_lq
+  (c-name "video_orc_resample_v_muladdtaps4_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdscaletaps4_u8_lq
+  (c-name "video_orc_resample_v_muladdscaletaps4_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_h2_u8
+  (c-name "video_orc_chroma_down_h2_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v2_u8
+  (c-name "video_orc_chroma_down_v2_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_up_v2_u8
+  (c-name "video_orc_chroma_up_v2_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_up_v2_u16
+  (c-name "video_orc_chroma_up_v2_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("guint16*-ORC_RESTRICT" "d2")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v2_u16
+  (c-name "video_orc_chroma_down_v2_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v4_u8
+  (c-name "video_orc_chroma_down_v4_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v4_u16
+  (c-name "video_orc_chroma_down_v4_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("const-guint16*-ORC_RESTRICT" "s3")
+    '("const-guint16*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_none_4u8_mask
+  (c-name "video_orc_dither_none_4u8_mask")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_none_4u16_mask
+  (c-name "video_orc_dither_none_4u16_mask")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_verterr_4u8_mask
+  (c-name "video_orc_dither_verterr_4u8_mask")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint16*-ORC_RESTRICT" "d2")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_fs_muladd_u8
+  (c-name "video_orc_dither_fs_muladd_u8")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_ordered_u8
+  (c-name "video_orc_dither_ordered_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_ordered_4u8_mask
+  (c-name "video_orc_dither_ordered_4u8_mask")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_ordered_4u16_mask
+  (c-name "video_orc_dither_ordered_4u16_mask")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+
+
+;; From video-orc.h
+
+(define-function video_orc_blend_little
+  (c-name "video_orc_blend_little")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_blend_big
+  (c-name "video_orc_blend_big")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_I420
+  (c-name "video_orc_unpack_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_I420
+  (c-name "video_orc_pack_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_Y
+  (c-name "video_orc_pack_Y")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_YUY2
+  (c-name "video_orc_unpack_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_YUY2
+  (c-name "video_orc_pack_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_UYVY
+  (c-name "video_orc_pack_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_UYVY
+  (c-name "video_orc_unpack_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_YVYU
+  (c-name "video_orc_unpack_YVYU")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_YVYU
+  (c-name "video_orc_pack_YVYU")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_YUV9
+  (c-name "video_orc_unpack_YUV9")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_Y42B
+  (c-name "video_orc_unpack_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_Y42B
+  (c-name "video_orc_pack_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_Y444
+  (c-name "video_orc_unpack_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_Y444
+  (c-name "video_orc_pack_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_GRAY8
+  (c-name "video_orc_unpack_GRAY8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_GRAY8
+  (c-name "video_orc_pack_GRAY8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGRA
+  (c-name "video_orc_unpack_BGRA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_BGRA
+  (c-name "video_orc_pack_BGRA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_RGBA
+  (c-name "video_orc_pack_RGBA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGBA
+  (c-name "video_orc_unpack_RGBA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_ABGR
+  (c-name "video_orc_unpack_ABGR")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_ABGR
+  (c-name "video_orc_pack_ABGR")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_NV12
+  (c-name "video_orc_unpack_NV12")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_NV12
+  (c-name "video_orc_pack_NV12")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_NV21
+  (c-name "video_orc_unpack_NV21")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_NV21
+  (c-name "video_orc_pack_NV21")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_NV24
+  (c-name "video_orc_unpack_NV24")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_NV24
+  (c-name "video_orc_pack_NV24")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_A420
+  (c-name "video_orc_unpack_A420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_A420
+  (c-name "video_orc_pack_A420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("guint8*-ORC_RESTRICT" "d4")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_AY
+  (c-name "video_orc_pack_AY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB15
+  (c-name "video_orc_unpack_RGB15")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB15_trunc
+  (c-name "video_orc_unpack_RGB15_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_RGB15
+  (c-name "video_orc_pack_RGB15")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR15
+  (c-name "video_orc_unpack_BGR15")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR15_trunc
+  (c-name "video_orc_unpack_BGR15_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_BGR15
+  (c-name "video_orc_pack_BGR15")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB16
+  (c-name "video_orc_unpack_RGB16")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_RGB16_trunc
+  (c-name "video_orc_unpack_RGB16_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_RGB16
+  (c-name "video_orc_pack_RGB16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR16
+  (c-name "video_orc_unpack_BGR16")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_unpack_BGR16_trunc
+  (c-name "video_orc_unpack_BGR16_trunc")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_pack_BGR16
+  (c-name "video_orc_pack_BGR16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_bilinear_u32
+  (c-name "video_orc_resample_bilinear_u32")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_merge_linear_u8
+  (c-name "video_orc_merge_linear_u8")
+  (return-type "none")
+  (parameters
+    '("orc_uint8*-ORC_RESTRICT" "d1")
+    '("const-orc_uint8*-ORC_RESTRICT" "s1")
+    '("const-orc_uint8*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_memset_2d
+  (c-name "video_orc_memset_2d")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_memcpy_2d
+  (c-name "video_orc_memcpy_2d")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_u16_to_u8
+  (c-name "video_orc_convert_u16_to_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_u8_to_u16
+  (c-name "video_orc_convert_u8_to_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat_u16
+  (c-name "video_orc_splat_u16")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat_u32
+  (c-name "video_orc_splat_u32")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat_u64
+  (c-name "video_orc_splat_u64")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_splat2_u64
+  (c-name "video_orc_splat2_u64")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_I420_UYVY
+  (c-name "video_orc_convert_I420_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_I420_YUY2
+  (c-name "video_orc_convert_I420_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_I420_AYUV
+  (c-name "video_orc_convert_I420_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_YUY2_I420
+  (c-name "video_orc_convert_YUY2_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("guint8*-ORC_RESTRICT" "d4")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_UYVY_YUY2
+  (c-name "video_orc_convert_UYVY_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_420_422
+  (c-name "video_orc_planar_chroma_420_422")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_420_444
+  (c-name "video_orc_planar_chroma_420_444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_422_444
+  (c-name "video_orc_planar_chroma_422_444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_444_422
+  (c-name "video_orc_planar_chroma_444_422")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_444_420
+  (c-name "video_orc_planar_chroma_444_420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_planar_chroma_422_420
+  (c-name "video_orc_planar_chroma_422_420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_YUY2_AYUV
+  (c-name "video_orc_convert_YUY2_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_AYUV
+  (c-name "video_orc_convert_UYVY_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_YUY2_Y42B
+  (c-name "video_orc_convert_YUY2_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_Y42B
+  (c-name "video_orc_convert_UYVY_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_YUY2_Y444
+  (c-name "video_orc_convert_YUY2_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_Y444
+  (c-name "video_orc_convert_UYVY_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_UYVY_I420
+  (c-name "video_orc_convert_UYVY_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("guint8*-ORC_RESTRICT" "d4")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_AYUV_I420
+  (c-name "video_orc_convert_AYUV_I420")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("guint8*-ORC_RESTRICT" "d4")
+    '("int" "d4_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_YUY2
+  (c-name "video_orc_convert_AYUV_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_UYVY
+  (c-name "video_orc_convert_AYUV_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_Y42B
+  (c-name "video_orc_convert_AYUV_Y42B")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_Y444
+  (c-name "video_orc_convert_AYUV_Y444")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("int" "d2_stride")
+    '("guint8*-ORC_RESTRICT" "d3")
+    '("int" "d3_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y42B_YUY2
+  (c-name "video_orc_convert_Y42B_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y42B_UYVY
+  (c-name "video_orc_convert_Y42B_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y42B_AYUV
+  (c-name "video_orc_convert_Y42B_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y444_YUY2
+  (c-name "video_orc_convert_Y444_YUY2")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y444_UYVY
+  (c-name "video_orc_convert_Y444_UYVY")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_Y444_AYUV
+  (c-name "video_orc_convert_Y444_AYUV")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "s3_stride")
+    '("int" "p1")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_ARGB
+  (c-name "video_orc_convert_AYUV_ARGB")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_BGRA
+  (c-name "video_orc_convert_AYUV_BGRA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_ABGR
+  (c-name "video_orc_convert_AYUV_ABGR")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_AYUV_RGBA
+  (c-name "video_orc_convert_AYUV_RGBA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_convert_I420_BGRA
+  (c-name "video_orc_convert_I420_BGRA")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "p5")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_matrix8
+  (c-name "video_orc_matrix8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("orc_int64" "p1")
+    '("orc_int64" "p2")
+    '("orc_int64" "p3")
+    '("orc_int64" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_near_u32_lq
+  (c-name "video_orc_resample_h_near_u32_lq")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_2tap_1u8_lq
+  (c-name "video_orc_resample_h_2tap_1u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_2tap_4u8_lq
+  (c-name "video_orc_resample_h_2tap_4u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("const-guint32*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_2tap_u8_lq
+  (c-name "video_orc_resample_h_2tap_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-gint16*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_2tap_u8_lq
+  (c-name "video_orc_resample_v_2tap_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_2tap_u16
+  (c-name "video_orc_resample_v_2tap_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_2tap_u8
+  (c-name "video_orc_resample_v_2tap_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_4tap_u8_lq
+  (c-name "video_orc_resample_v_4tap_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_4tap_u8
+  (c-name "video_orc_resample_v_4tap_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_multaps_u8
+  (c-name "video_orc_resample_h_multaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps_u8
+  (c-name "video_orc_resample_h_muladdtaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_resample_scaletaps_u8
+  (c-name "video_orc_resample_scaletaps_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_multaps_u8_lq
+  (c-name "video_orc_resample_h_multaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps_u8_lq
+  (c-name "video_orc_resample_h_muladdtaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_resample_h_multaps3_u8_lq
+  (c-name "video_orc_resample_h_multaps3_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("const-gint16*-ORC_RESTRICT" "s6")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps3_u8_lq
+  (c-name "video_orc_resample_h_muladdtaps3_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("const-gint16*-ORC_RESTRICT" "s6")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdscaletaps3_u8_lq
+  (c-name "video_orc_resample_h_muladdscaletaps3_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-gint16*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("const-gint16*-ORC_RESTRICT" "s6")
+    '("const-gint16*-ORC_RESTRICT" "s7")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_scaletaps_u8_lq
+  (c-name "video_orc_resample_scaletaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-gint16*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_multaps_u16
+  (c-name "video_orc_resample_h_multaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_h_muladdtaps_u16
+  (c-name "video_orc_resample_h_muladdtaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("const-gint16*-ORC_RESTRICT" "s2")
+    '("int" "s2_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
+(define-function video_orc_resample_scaletaps_u16
+  (c-name "video_orc_resample_scaletaps_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps_u8
+  (c-name "video_orc_resample_v_multaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps_u8
+  (c-name "video_orc_resample_v_muladdtaps_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps_u16
+  (c-name "video_orc_resample_v_multaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps_u16
+  (c-name "video_orc_resample_v_muladdtaps_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps_u8_lq
+  (c-name "video_orc_resample_v_multaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_multaps4_u8_lq
+  (c-name "video_orc_resample_v_multaps4_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps_u8_lq
+  (c-name "video_orc_resample_v_muladdtaps_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdtaps4_u8_lq
+  (c-name "video_orc_resample_v_muladdtaps4_u8_lq")
+  (return-type "none")
+  (parameters
+    '("gint16*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_resample_v_muladdscaletaps4_u8_lq
+  (c-name "video_orc_resample_v_muladdscaletaps4_u8_lq")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("const-gint16*-ORC_RESTRICT" "s5")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "p3")
+    '("int" "p4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_h2_u8
+  (c-name "video_orc_chroma_down_h2_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v2_u8
+  (c-name "video_orc_chroma_down_v2_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_up_v2_u8
+  (c-name "video_orc_chroma_up_v2_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint8*-ORC_RESTRICT" "d2")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_up_v2_u16
+  (c-name "video_orc_chroma_up_v2_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("guint16*-ORC_RESTRICT" "d2")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v2_u16
+  (c-name "video_orc_chroma_down_v2_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v4_u8
+  (c-name "video_orc_chroma_down_v4_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("const-guint8*-ORC_RESTRICT" "s2")
+    '("const-guint8*-ORC_RESTRICT" "s3")
+    '("const-guint8*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_chroma_down_v4_u16
+  (c-name "video_orc_chroma_down_v4_u16")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("const-guint16*-ORC_RESTRICT" "s2")
+    '("const-guint16*-ORC_RESTRICT" "s3")
+    '("const-guint16*-ORC_RESTRICT" "s4")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_none_4u8_mask
+  (c-name "video_orc_dither_none_4u8_mask")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_none_4u16_mask
+  (c-name "video_orc_dither_none_4u16_mask")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_verterr_4u8_mask
+  (c-name "video_orc_dither_verterr_4u8_mask")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("guint16*-ORC_RESTRICT" "d2")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_fs_muladd_u8
+  (c-name "video_orc_dither_fs_muladd_u8")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_ordered_u8
+  (c-name "video_orc_dither_ordered_u8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_ordered_4u8_mask
+  (c-name "video_orc_dither_ordered_4u8_mask")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("orc_int64" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function video_orc_dither_ordered_4u16_mask
+  (c-name "video_orc_dither_ordered_4u16_mask")
+  (return-type "none")
+  (parameters
+    '("guint16*-ORC_RESTRICT" "d1")
+    '("const-guint16*-ORC_RESTRICT" "s1")
+    '("orc_int64" "p1")
     '("int" "n")
   )
 )
@@ -27762,6 +34077,138 @@
   (return-type "gboolean")
   (parameters
     '("GstMessage*" "msg")
+  )
+)
+
+
+
+;; From video-resampler.h
+
+(define-method init
+  (of-object "GstVideoResampler")
+  (c-name "gst_video_resampler_init")
+  (return-type "gboolean")
+  (parameters
+    '("GstVideoResamplerMethod" "method")
+    '("GstVideoResamplerFlags" "flags")
+    '("guint" "n_phases")
+    '("guint" "n_taps")
+    '("gdouble" "shift")
+    '("guint" "in_size")
+    '("guint" "out_size")
+    '("GstStructure*" "options")
+  )
+)
+
+(define-method clear
+  (of-object "GstVideoResampler")
+  (c-name "gst_video_resampler_clear")
+  (return-type "none")
+)
+
+
+
+;; From video-scaler.h
+
+(define-function gst_video_scaler_new
+  (c-name "gst_video_scaler_new")
+  (is-constructor-of "GstVideoScaler")
+  (return-type "GstVideoScaler*")
+  (parameters
+    '("GstVideoResamplerMethod" "method")
+    '("GstVideoScalerFlags" "flags")
+    '("guint" "n_taps")
+    '("guint" "in_size")
+    '("guint" "out_size")
+    '("GstStructure*" "options")
+  )
+)
+
+(define-method free
+  (of-object "GstVideoScaler")
+  (c-name "gst_video_scaler_free")
+  (return-type "none")
+)
+
+(define-method get_coeff
+  (of-object "GstVideoScaler")
+  (c-name "gst_video_scaler_get_coeff")
+  (return-type "const-gdouble*")
+  (parameters
+    '("guint" "out_offset")
+    '("guint*" "in_offset")
+    '("guint*" "n_taps")
+  )
+)
+
+(define-method horizontal
+  (of-object "GstVideoScaler")
+  (c-name "gst_video_scaler_horizontal")
+  (return-type "none")
+  (parameters
+    '("GstVideoFormat" "format")
+    '("gpointer" "src")
+    '("gpointer" "dest")
+    '("guint" "dest_offset")
+    '("guint" "width")
+  )
+)
+
+(define-method vertical
+  (of-object "GstVideoScaler")
+  (c-name "gst_video_scaler_vertical")
+  (return-type "none")
+  (parameters
+    '("GstVideoFormat" "format")
+    '("gpointer[]" "src_lines")
+    '("gpointer" "dest")
+    '("guint" "dest_offset")
+    '("guint" "width")
+  )
+)
+
+(define-method combine_packed_YUV
+  (of-object "GstVideoScaler")
+  (c-name "gst_video_scaler_combine_packed_YUV")
+  (return-type "GstVideoScaler*")
+  (parameters
+    '("GstVideoScaler*" "uv_scale")
+    '("GstVideoFormat" "in_format")
+    '("GstVideoFormat" "out_format")
+  )
+)
+
+(define-method 2d
+  (of-object "GstVideoScaler")
+  (c-name "gst_video_scaler_2d")
+  (return-type "none")
+  (parameters
+    '("GstVideoScaler*" "vscale")
+    '("GstVideoFormat" "format")
+    '("gpointer" "src")
+    '("gint" "src_stride")
+    '("gpointer" "dest")
+    '("gint" "dest_stride")
+    '("guint" "x")
+    '("guint" "y")
+    '("guint" "width")
+    '("guint" "height")
+  )
+)
+
+
+
+;; From video-tile.h
+
+(define-function gst_video_tile_get_index
+  (c-name "gst_video_tile_get_index")
+  (return-type "guint")
+  (parameters
+    '("GstVideoTileMode" "mode")
+    '("gint" "x")
+    '("gint" "y")
+    '("gint" "x_tiles")
+    '("gint" "y_tiles")
   )
 )
 

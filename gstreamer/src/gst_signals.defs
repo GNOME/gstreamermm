@@ -71,9 +71,9 @@
   (construct-only #f)
 )
 
-;; From GstBuffer
+;; GstBuffer is neither a GObject nor a GInterface. Not checked for signals and properties.
 
-;; From GstCaps
+;; GstCaps is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstChildProxy
 
@@ -154,13 +154,13 @@
 
 ;; From GstElementFactory
 
-;; From GstEvent
+;; GstEvent is neither a GObject nor a GInterface. Not checked for signals and properties.
 
-;; From GstFormat
+;; GstFormat is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstGhostPad
 
-;; From GstMessage
+;; GstMessage is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstObject
 
@@ -239,6 +239,15 @@
   (construct-only #f)
 )
 
+(define-property offset
+  (of-object "GstPad")
+  (prop-type "GParamInt64")
+  (docs "The running time offset of the pad")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstPadTemplate
 
 (define-signal pad-created
@@ -286,7 +295,7 @@
   (construct-only #t)
 )
 
-;; From GstStaticPadTemplate
+;; GstStaticPadTemplate is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstPipeline
 
@@ -312,7 +321,7 @@
 
 ;; From GstPluginFeature
 
-;; From GstQuery
+;; GstQuery is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstRegistry
 
@@ -334,9 +343,9 @@
   )
 )
 
-;; From GstSegment
+;; GstSegment is neither a GObject nor a GInterface. Not checked for signals and properties.
 
-;; From GstStructure
+;; GstStructure is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstSystemClock
 
@@ -349,13 +358,13 @@
   (construct-only #f)
 )
 
-;; From GstTagList
+;; GstTagList is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstTagSetter
 
 ;; From GstTask
 
-;; From GstTypeFind
+;; GstTypeFind is neither a GObject nor a GInterface. Not checked for signals and properties.
 
 ;; From GstTypeFindFactory
 
@@ -628,6 +637,33 @@
   (construct-only #f)
 )
 
+(define-property round-trip-limit
+  (of-object "GstNetClientClock")
+  (prop-type "GParamUInt64")
+  (docs "Maximum tolerable round-trip interval for packets, in nanoseconds (0 = no limit)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property minimum-update-interval
+  (of-object "GstNetClientClock")
+  (prop-type "GParamUInt64")
+  (docs "Minimum polling interval for packets, in nanoseconds(0 = no limit)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property bus
+  (of-object "GstNetClientClock")
+  (prop-type "GParamObject")
+  (docs "A GstBus on which to send clock status information")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstNetTimeProvider
 
 (define-property port
@@ -672,6 +708,15 @@
   (of-object "GstCapsFilter")
   (prop-type "GParamBoxed")
   (docs "Restrict the possible allowed capabilities (NULL means ANY). Setting this property takes a reference to the supplied GstCaps object.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property caps-change-mode
+  (of-object "GstCapsFilter")
+  (prop-type "GParamEnum")
+  (docs "Filter caps change behaviour")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -755,7 +800,7 @@
 (define-property pattern
   (of-object "GstFakeSrc")
   (prop-type "GParamString")
-  (docs "pattern")
+  (docs "Set the pattern (unused)")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1723,7 +1768,7 @@
 (define-property slave-method
   (of-object "GstAudioBaseSink")
   (prop-type "GParamEnum")
-  (docs "Algorithm to use to match the rate of the masterclock")
+  (docs "Algorithm used to match the rate of the masterclock")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1770,7 +1815,7 @@
 (define-property buffer-time
   (of-object "GstAudioBaseSrc")
   (prop-type "GParamInt64")
-  (docs "Size of audio buffer in microseconds, this is the maximum amount of data that is buffered in the device and the maximum latency that the source reports")
+  (docs "Size of audio buffer in microseconds. This is the maximum amount of data that is buffered in the device and the maximum latency that the source reports. This value might be ignored by the element if necessary; see 'actual-buffer-time'")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1779,7 +1824,7 @@
 (define-property latency-time
   (of-object "GstAudioBaseSrc")
   (prop-type "GParamInt64")
-  (docs "The minimum amount of data to read in each iteration in microseconds, this is the minimum latency that the source reports")
+  (docs "The minimum amount of data to read in each iteration in microseconds. This is the minimum latency that the source reports. This value might be ignored by the element if necessary; see 'actual-latency-time'")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1815,7 +1860,7 @@
 (define-property slave-method
   (of-object "GstAudioBaseSrc")
   (prop-type "GParamEnum")
-  (docs "Algorithm to use to match the rate of the masterclock")
+  (docs "Algorithm used to match the rate of the masterclock")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1915,6 +1960,15 @@
 
 ;; From GstRTPBaseDepayload
 
+(define-property stats
+  (of-object "GstRTPBaseDepayload")
+  (prop-type "GParamBoxed")
+  (docs "Various statistics")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
 ;; From GstRTPBasePayload
 
 (define-property mtu
@@ -2013,6 +2067,15 @@
   (docs "Force buffers to be multiples of this duration in ns (0 disables)")
   (readable #t)
   (writable #t)
+  (construct-only #f)
+)
+
+(define-property stats
+  (of-object "GstRTPBasePayload")
+  (prop-type "GParamBoxed")
+  (docs "Various statistics")
+  (readable #t)
+  (writable #f)
   (construct-only #f)
 )
 
@@ -2181,6 +2244,15 @@
   (when "last")
   (parameters
     '("GstBuffer*" "p0")
+  )
+)
+
+(define-signal push-sample
+  (of-object "GstAppSrc")
+  (return-type "GstFlowReturn")
+  (when "last")
+  (parameters
+    '("GstSample*" "p0")
   )
 )
 
@@ -3404,6 +3476,24 @@
   (construct-only #f)
 )
 
+(define-property audio-filter
+  (of-object "GstPlayBin")
+  (prop-type "GParamObject")
+  (docs "the audio filter(s) to apply, if possible")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property video-filter
+  (of-object "GstPlayBin")
+  (prop-type "GParamObject")
+  (docs "the video filter(s) to apply, if possible")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstSubtitleOverlay
 
 (define-property silent
@@ -3713,6 +3803,15 @@
 ;; From GstTheoraParse
 
 ;; From GstTimeOverlay
+
+(define-property time-mode
+  (of-object "GstTimeOverlay")
+  (prop-type "GParamEnum")
+  (docs "What time to show")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
 
 ;; From GstURIDecodeBin
 
@@ -4036,6 +4135,15 @@
   (of-object "GstVideoScale")
   (prop-type "GParamDouble")
   (docs "Size of filter envelope")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property gamma-decode
+  (of-object "GstVideoScale")
+  (prop-type "GParamBoolean")
+  (docs "Decode gamma before scaling")
   (readable #t)
   (writable #t)
   (construct-only #f)

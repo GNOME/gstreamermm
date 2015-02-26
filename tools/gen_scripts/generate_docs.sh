@@ -16,9 +16,9 @@ OUT_DIR="$ROOT_DIR/gstreamer/src"
 
 PARAMS="-s $PREFIX/gstreamer/gst/"
 
-for dir in "$PREFIX"/gstreamer/libs/gst/{base,check,controller,dataprotocol,\
-net} "$PREFIX"/gst-plugins-base/gst-libs/gst/{allocators,app,audio,cdda,fft,\
-floatcast,interfaces,netbuffer,pbutils,riff,rtp,rtsp,sdp,tag,video}; do
+for dir in "$PREFIX"/gstreamer/libs/gst/{base,check,controller,helpers,\
+net} "$PREFIX"/gst-plugins-base/gst-libs/gst/{allocators,app,audio,fft,\
+pbutils,riff,rtp,rtsp,sdp,tag,video}; do
   PARAMS="$PARAMS -s $dir"
 done
 
