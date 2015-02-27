@@ -206,6 +206,16 @@ bool Structure::get_field(const Glib::ustring& name, guint& value) const
   return gst_structure_get_uint(gobj(), name.c_str(), &value);
 }
 
+bool Structure::get_field(const Glib::ustring& name, guint64& value) const
+{
+  return gst_structure_get_uint64(gobj(), name.c_str(), &value);
+}
+
+bool Structure::get_field(const Glib::ustring& name, gint64& value) const
+{
+  return gst_structure_get_int64(gobj(), name.c_str(), &value);
+}
+
 bool Structure::get_field(const Glib::ustring& name, double& value) const
 {
   return gst_structure_get_double(gobj(), name.c_str(), &value);
@@ -254,15 +264,6 @@ bool Structure::get_field(const Glib::ustring& name, Glib::DateTime& datetime) c
 
   return has;
 }
-
-bool Structure::get_field(const Glib::ustring& name, ClockTime& value) const
-{
-  GstClockTime cvalue = 0;
-  const bool result = gst_structure_get_clock_time(gobj(), name.c_str(), &cvalue);
-  value = cvalue;
-  return result;
-}
-
 
 bool Structure::get_field(const Glib::ustring& name, GType enum_type, int& value) const
 {
