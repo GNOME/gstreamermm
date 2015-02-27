@@ -86,6 +86,13 @@ bool Bus::remove_watch(guint id)
   return g_source_remove(id);
 }
 
+bool Bus::post(Glib::RefPtr<Gst::Message>& message)
+{
+  GstMessage* msg = message->gobj();
+  message->reference(); message.reset();
+  return gst_bus_post(gobj(), msg);
+}
+
 void Bus::set_sync_handler(const SlotMessageSync& slot)
 {
   // Clear a possibly existing sync handler by calling with 0 before setting
