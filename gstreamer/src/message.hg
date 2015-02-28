@@ -22,6 +22,8 @@
 #include <gstreamermm/format.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/query.h>
+#include <gstreamermm/context.h>
+#include <gstreamermm/toc.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -39,6 +41,7 @@ namespace Gst
   }
 
 _WRAP_ENUM(MessageType, GstMessageType)
+_WRAP_ENUM(ProgressType, GstProgressType)
 _WRAP_ENUM(StructureChangeType, GstStructureChangeType)
 
 _WRAP_ENUM(StreamStatusType, GstStreamStatusType)
@@ -98,6 +101,7 @@ public:
 
   _WRAP_METHOD(guint32 get_seqnum() const, gst_message_get_seqnum)
   _WRAP_METHOD(void set_seqnum(guint32 seqnum), gst_message_set_seqnum)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Message> copy() const, gst_message_copy)
 
   /** Get the GstMessageType of message.
    */
@@ -111,6 +115,8 @@ public:
   /** Get the object that posted the message.
    */
   _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
+
+  _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_message_has_name)
 
 protected:
   // This method is used in the create() methods to convert a wrapped
@@ -886,60 +892,23 @@ public:
 /** A duration message.
  * See create() for more details.
  */
-class MessageDuration : public Message
+class MessageDurationChanged : public Message
 {
 public:
 
-  /** Create a new duration message. This message is posted by elements that
-   * know the duration of a stream in a specific format. This message is
-   * received by bins and is used to calculate the total duration of a
+  /** Create a new duration changed message. This message is posted by elements
+   * that know the duration of a stream when the duration changes. This message
+   * is received by bins and is used to calculate the total duration of a
    * pipeline. Elements may post a duration message with a duration of
    * Gst::CLOCK_TIME_NONE to indicate that the duration has changed and the
    * cached duration should be discarded. The new duration can then be
    * retrieved via a query.
    *
    * @param src The object originating the message.
-   * @param format The format of the duration.  
-   * @param duration The new duration.  
-   * @return The new duration message. MT safe.
+   * @return The new duration-changed message. MT safe.
    */
-  static Glib::RefPtr<Gst::MessageDuration>
-    create(const Glib::RefPtr<Gst::Object>& src, Format format,
-    gint64 duration);
-
-  /** Extracts the duration and format from the duration message. The duration
-   * might be Gst::CLOCK_TIME_NONE, which indicates that the duration has
-   * changed. Applications should always use a query to retrieve the duration
-   * of a pipeline.
-   *
-   * MT safe.
-   *
-   * @param format Result location for the format.
-   * @param duration Result location for the duration.
-   */
-  void parse(Format& format, gint64& duration) const;
-  _IGNORE(gst_message_parse_duration)
-
-  /** Extracts and returns the duration from the duration message. The duration
-   * might be Gst::CLOCK_TIME_NONE, which indicates that the duration has
-   * changed. Applications should always use a query to retrieve the duration
-   * of a pipeline.
-   *
-   * MT safe.
-   *
-   * @return The duration.
-   */
-  gint64 parse() const;
-
-  /** Extracts and returns the format from the duration message. Applications
-   * should always use a query to retrieve the duration
-   * of a pipeline.
-   *
-   * MT safe.
-   *
-   * @return The format.
-   */
-  Format parse_format() const;
+  static Glib::RefPtr<Gst::MessageDurationChanged>
+    create(const Glib::RefPtr<Gst::Object>& src);
 };
 
 /** A latency message.
@@ -978,8 +947,6 @@ public:
    */
   static Glib::RefPtr<Gst::MessageAsyncStart>
     create(const Glib::RefPtr<Gst::Object>& src);
-
-  _IGNORE(gst_message_parse_async_start)
 };
 
 /** An asynchronous done message.
@@ -997,6 +964,15 @@ public:
    */
   static Glib::RefPtr<Gst::MessageAsyncDone>
     create(const Glib::RefPtr<Gst::Object>& src, ClockTime running_time);
+
+  /** Extract the running_time from the async_done message.
+   *
+   * MT safe.
+   *
+   * @return The running time from the async_done message.
+   */
+  Gst::ClockTime parse() const;
+  _IGNORE(gst_message_parse_async_done)
 };
 
 /** A step start message.
@@ -1248,6 +1224,320 @@ public:
    * Since 0.10.24.
    */
   Glib::RefPtr<Gst::Element> parse_owner() const;
+};
+
+/** A qos message.
+ * See create() for more details.
+ */
+class MessageQos : public Message
+{
+public:
+  /** A QOS message is posted on the bus whenever an element decides to drop a
+   * buffer because of QoS reasons or whenever it changes its processing strategy
+   * because of QoS reasons (quality adjustments such as processing at lower
+   * accuracy).
+   *
+   * This message can be posted by an element that performs synchronisation against the
+   * clock (live) or it could be dropped by an element that performs QoS because of QOS
+   * events received from a downstream element (!live).
+   *
+   * MT safe.
+   *
+   * @param src The object originating the message.
+   * @param live If the message was generated by a live element
+   * @param running_time The running time of the buffer that generated the message
+   * @param stream_time The stream time of the buffer that generated the message
+   * @param timestamp The timestamps of the buffer that generated the message
+   * @param duration The duration of the buffer that generated the message
+   *
+   * @return The new qos message.
+   */
+  static Glib::RefPtr<Gst::MessageQos>
+    create(const Glib::RefPtr<Gst::Object>& src, bool live, guint64 running_time,
+    guint64 stream_time, guint64 timestamp, guint64 duration);
+
+  /** Set the QoS values that have been calculated/analysed from the QoS data.
+   *
+   * MT safe.
+   *
+   * @param jitter The difference of the running-time against the deadline.
+   * @param proportion Long term prediction of the ideal rate relative to normal rate
+   *    to get optimal quality.
+   * @param quality An element dependent integer value that specifies the current
+   *     quality level of the element. The default maximum quality is 1000000.
+   */
+  void set_values(gint64 jitter, double proportion, gint quality);
+  _IGNORE(gst_message_set_qos_values)
+
+  /** Set the QoS stats representing the history of the current continuous pipeline
+   * playback period.
+   *
+   * When @format is Gst::FORMAT_UNDEFINED both @dropped and @processed are
+   * invalid. Values of -1 for either @processed or @dropped mean unknown values.
+   *
+   * MT safe.
+   *
+   * @param format Units of the 'processed' and 'dropped' fields. Video sinks and video
+   *    filters will use Gst::FORMAT_BUFFERS (frames). Audio sinks and audio filters
+   *    will likely use Gst::FORMAT_DEFAULT (samples).
+   * @param processed Total number of units correctly processed since the last state
+   *    change to READY or a flushing operation.
+   * @param dropped Total number of units dropped since the last state change to READY
+   *    or a flushing operation.
+   */
+  void set_stats(Gst::Format format, guint64 processed, guint64 dropped);
+  _IGNORE(gst_message_set_qos_stats)
+
+  /** Extract the timestamps and live status from the QoS message.
+   *
+   * The returned values give the running_time, stream_time, timestamp and
+   * duration of the dropped buffer. Values of Gst::CLOCK_TIME_NONE mean unknown
+   * values.
+   *
+   * MT safe.
+   *
+   * @param live If the message was generated by a live element.
+   * @param running_time The running time of the buffer that
+   *     generated the message.
+   * @param stream_time The stream time of the buffer that
+   *     generated the message.
+   * @param timestamp The timestamps of the buffer that
+   *     generated the message.
+   * @param duration The duration of the buffer that
+   *     generated the message.
+   */
+  void parse(bool& live, guint64& running_time, guint64& stream_time,
+    guint64& timestamp, guint64& duration) const;
+  _IGNORE(gst_message_parse_qos)
+
+  /** Extract the QoS values that have been calculated/analysed from the QoS data.
+   * @param jitter The difference of the running-time against
+   *     the deadline.
+   * @param proportion Long term prediction of the ideal rate
+   *     relative to normal rate to get optimal quality.
+   * @param An element dependent integer value that
+   *     specifies the current quality level of the element. The default
+   *     maximum quality is 1000000.
+   *
+   * MT safe.
+   */
+  void parse_values(gint64& jitter, double& proportion, gint& quality) const;
+  _IGNORE(gst_message_parse_qos_values)
+
+  /** Extract the QoS stats representing the history of the current continuous
+   * pipeline playback period.
+   *
+   * @param format Units of the 'processed' and 'dropped' fields.
+   *     Video sinks and video filters will use GST_FORMAT_BUFFERS (frames).
+   *     Audio sinks and audio filters will likely use GST_FORMAT_DEFAULT
+   *     (samples).
+   * @param processed Total number of units correctly processed
+   *     since the last state change to READY or a flushing operation.
+   * @param dropped Total number of units dropped since the last
+   *     state change to READY or a flushing operation.
+   *
+   * MT_safe.
+   *
+   * When @format is Gst::FORMAT_UNDEFINED both @dropped and @processed are
+   * invalid. Values of -1 for either @processed or @dropped mean unknown values.
+   */
+  void parse_stats(Gst::Format& format, guint64& processed, guint64& dropped) const;
+  _IGNORE(gst_message_parse_qos_stats)
+};
+
+/** A stream-start message.
+ * See create() for more details.
+ */
+class MessageStreamStart : public Message
+{
+public:
+	/** Create a new stream_start message. This message is generated and posted in
+	 * the sink elements of a GstBin. The bin will only forward the STREAM_START
+	 * message to the application if all sinks have posted an STREAM_START message.
+	 *
+	 * MT safe.
+	 *
+	 * @param src The object originating the message.
+	 *
+	 * @return The new stream_start message.
+	 */
+  static Glib::RefPtr<Gst::MessageStreamStart> create(const Glib::RefPtr<Gst::Object>& src);
+
+  /** Sets the group id on the stream-start message.
+   *
+   * All streams that have the same group id are supposed to be played
+   * together, i.e. all streams inside a container file should have the
+   * same group id but different stream ids. The group id should change
+   * each time the stream is started, resulting in different group ids
+   * each time a file is played for example.
+   *
+   * MT safe.
+   *
+   * @param group_id The group id.
+   */
+  void set_group_id(guint group_id);
+  _IGNORE(gst_message_set_group_id)
+
+  /** Extract the group from the STREAM_START message.
+   *
+   * MT safe
+   *
+   * @param group_id Result location for the group id.
+   *
+   * @return true if the message had a group id set, false otherwse.
+   */
+  bool parse_group_id(guint& group_id) const;
+  _IGNORE(gst_message_parse_group_id)
+};
+
+/** A have-context message.
+ * See create() for more details.
+ */
+class MessageHaveContext : public Message
+{
+public:
+  /** This message is posted when an element has a new local Gst::Context.
+   *
+   * MT safe
+   *
+   * @param src The object originating the message.
+   * @param context The context.
+   *
+   * @return The new have-context message.
+   */
+  static Glib::RefPtr<Gst::MessageHaveContext>
+    create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Context>& context);
+
+  /** Extract the context from the HAVE_CONTEXT message.
+   *
+   * MT safe.
+   *
+   * @return context Result location for the context.
+   */
+  Glib::RefPtr<Gst::Context> parse() const;
+  _IGNORE(gst_message_parse_have_context)
+};
+
+/** A need-context message.
+ * See create() for more details.
+ */
+class MessageNeedContext : public Message
+{
+public:
+  /** This message is posted when an element needs a specific Gst::Context.
+   *
+   * MT safe.
+   *
+   * @param src The object originating the message.
+   * @param context_type The context type that is needed.
+   *
+   * @return The new need-context message.
+   */
+  static Glib::RefPtr<Gst::MessageNeedContext>
+    create(const Glib::RefPtr<Gst::Object>& src, const Glib::ustring& context_type);
+
+  /** Parse a context type from an existing Gst::MESSAGE_NEED_CONTEXT message.
+   *
+   * @param context_type The context type.
+   *
+   * @return a bool indicating if the parsing succeeded.
+   */
+  bool parse(Glib::ustring& context_type) const;
+  _IGNORE(gst_message_parse_context_type)
+};
+
+/** A reset-time message.
+ * See create() for more details.
+ */
+class MessageResetTime : public Message
+{
+public:
+  /** This message is posted when the pipeline running-time should be reset to
+    *     @running_time, like after a flushing seek.
+    *
+    * MT safe.
+    *
+    * @param src The object originating the message.
+    * @param running_time The requested running-time.
+    *
+    * @return The new reset_time message.
+    */
+  static Glib::RefPtr<Gst::MessageResetTime>
+    create(const Glib::RefPtr<Gst::Object>& src, Gst::ClockTime running_time);
+
+  /** Extract the running-time from the RESET_TIME message.
+   *
+   * MT safe.
+   *
+   * @return Result location for the running_time.
+   */
+  Gst::ClockTime parse() const;
+  _IGNORE(gst_message_parse_reset_time)
+};
+
+/** A toc message.
+ * See create() for more details.
+ */
+class MessageToc : public Message
+{
+public:
+  /** Create a new TOC message. The message is posted by elements
+   * that discovered or updated a TOC.
+   *
+   * MT safe.
+   *
+   * @param src The object originating the message.
+   * @param toc Gst::Toc structure for hte message.
+   * @param updated whether TOC was updated
+   *
+   * @return A new TOC message.
+   */
+  static Glib::RefPtr<Gst::MessageToc>
+    create(const Glib::RefPtr<Gst::Object>& src,
+      const Glib::RefPtr<Gst::Toc>& toc, bool updated);
+
+  /** Extract the TOC from the Gst::Message.
+   *
+   * MT safe.
+   *
+   * @param toc Return location for the TOC.
+   * @param updated Return location for the updated flag.
+   */
+  void parse(Glib::RefPtr<Gst::Toc>& toc, bool& updated) const;
+  _IGNORE(gst_message_parse_toc)
+};
+
+/** A progress message.
+ * See create() for more details.
+ */
+class MessageProgress : public Message
+{
+public:
+  /** Progress messages are posted by elements when they use an asynchronous task
+   * to perform actions triggered by a state change.
+   *
+   * @code contains a well defined string describing the action.
+   * @text should contain a user visible string detailing the current action.
+   *
+   * @param src The object originating the message.
+   * @param type A Gst::ProgressType.
+   * @param code A progress code.
+   * @param text Free, user visible text describing the progress.
+   *
+   * @return The new progress message.
+   */
+  static Glib::RefPtr<Gst::MessageProgress>
+    create(const Glib::RefPtr<Gst::Object>& src,
+      Gst::ProgressType type, const Glib::ustring& code, const Glib::ustring& text);
+
+  /** Parses the progress @type, @code and @text.
+   *
+   * @param type A Gst::ProgressType.
+   * @param code A code.
+   * @param text A text.
+   */
+  void parse(Gst::ProgressType& type, Glib::ustring code, Glib::ustring& text) const;
+  _IGNORE(gst_message_parse_progress)
 };
 
 } //namespace Gst

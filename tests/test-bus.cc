@@ -18,7 +18,8 @@ protected:
 
     void PostMessage()
     {
-        bool message_posted = bus->post(MessageEos::create(Glib::RefPtr<Object>()));
+        Glib::RefPtr<Message> m = MessageEos::create(Glib::RefPtr<Object>());
+        bool message_posted = bus->post(m);
         ASSERT_TRUE(message_posted);
     }
 
