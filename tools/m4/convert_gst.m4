@@ -68,6 +68,9 @@ dnl AllocationParams
 _CONVERSION(`AllocationParams', `GstAllocationParams*', `$3.gobj()')
 _CONVERSION(`GstAllocationParams*', `AllocationParams', `AllocationParams($3, true)')
 
+dnl Allocator
+_CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `Glib::unwrap($3)')
+
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `Glib::unwrap($3)')
@@ -167,6 +170,7 @@ dnl Memory
 _CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>&',`Glib::wrap($3)')
 _CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>',`GstMemory*', `Glib::unwrap($3)')
 
 dnl Message

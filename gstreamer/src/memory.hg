@@ -19,6 +19,7 @@
 
 #include <gst/gst.h>
 #include <gstreamermm/miniobject.h>
+#include <gstreamermm/mapinfo.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -26,6 +27,8 @@ namespace Gst
 {
 
 _WRAP_ENUM(MemoryFlags, GstMemoryFlags)
+
+class Allocator;
 
 /**
  * GstMemory is a lightweight refcounted object that wraps a region of memory.
@@ -61,6 +64,29 @@ public:
   _MEMBER_GET(align, align, gsize, gsize)
   _MEMBER_GET(offset, offset, gsize, gsize)
   _MEMBER_GET(size, size, gsize, gsize)
+
+  _WRAP_METHOD(bool is_type(const Glib::ustring& mem_type) const, gst_memory_is_type)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Memory> share(gssize offset, gssize size), gst_memory_share)
+  _WRAP_METHOD(void resize(gssize offset, gsize size), gst_memory_resize)
+  _WRAP_METHOD(bool is_span(const Glib::RefPtr<Gst::Memory>& mem2, gsize& offset), gst_memory_is_span)
+  _WRAP_METHOD(bool map(const Glib::RefPtr<Gst::MapInfo>& info, Gst::MapFlags flags), gst_memory_map)
+  _WRAP_METHOD(void unmap(const Glib::RefPtr<Gst::MapInfo>& info), gst_memory_unmap)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Memory> copy(gssize offset, gssize size), gst_memory_copy)
+  _WRAP_METHOD(void init(Gst::MemoryFlags flags, const Glib::RefPtr<Gst::Allocator>& allocator, const Glib::RefPtr<Gst::Memory>& parent, gsize maxsize, gsize align, gsize offset, gsize size), gst_memory_init)
+  _WRAP_METHOD(gsize get_sizes(gsize& offset, gsize& maxsize), gst_memory_get_sizes)
+
+  /** Create a Gst::Memory object that is mapped with @flags. If @mem is mappable
+   * with @flags, this function returns the mapped @mem directly. Otherwise a
+   * mapped copy of @mem is returned.
+   *
+   * @param info Pointer for info.
+   * @param flags Mapping flags.
+   *
+   * @return a Gst::Memory object mapped.
+   */
+  Glib::RefPtr<Gst::Memory> make_mapped(const Glib::RefPtr<Gst::MapInfo>& info, Gst::MapFlags flags);
+  _IGNORE(gst_memory_make_mapped)
+
 };
 
 }//namespace Gst
