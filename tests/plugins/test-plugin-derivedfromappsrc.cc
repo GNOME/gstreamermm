@@ -1,18 +1,13 @@
-/*
- * test-plugin-appsrc.cc
- *
- *  Created on: Aug 1, 2013
- *      Author: m.kolny
- */
-
 #include <gtest/gtest.h>
 #include <gstreamermm.h>
 #include <gstreamermm/appsrc.h>
 
+#include "derivedfromappsrc.h"
+
 using namespace Gst;
 using Glib::RefPtr;
 
-class AppSrcPluginTest : public ::testing::Test
+class DerivedFromAppSrcPluginTest : public ::testing::Test
 {
 protected:
     RefPtr<Element> source;
@@ -21,10 +16,10 @@ protected:
 
     void CreatePipelineWithElements()
     {
-        pipeline = Gst::Pipeline::create();
+        pipeline = Pipeline::create();
 
         sink = ElementFactory::create_element("fakesink", "sink");
-        source = ElementFactory::create_element("appsrc", "source");
+        source = ElementFactory::create_element("derivedfromappsrc", "source");
 
         ASSERT_TRUE(sink);
         ASSERT_TRUE(source);
@@ -32,26 +27,29 @@ protected:
         ASSERT_NO_THROW(pipeline->add(source)->add(sink));
         ASSERT_NO_THROW(source->link(sink));
     }
+
+    virtual void SetUp()
+    {
+        Plugin::register_static(GST_VERSION_MAJOR, GST_VERSION_MINOR, "derivedfromappsrc",
+            "derivedfromappsrc is an example of C++ element derived from Gst::AppSrc",
+            sigc::ptr_fun(&DerivedFromAppSrc::register_element), "0.123",
+            "LGPL", "source?", "package?", "http://example.com");
+    }
 };
 
-TEST_F(AppSrcPluginTest, CorrectCreatedAppSrcElement)
+TEST_F(DerivedFromAppSrcPluginTest, CreateRegisteredElement)
 {
-    RefPtr<AppSrc> source = AppSrc::create("source");
-    ASSERT_TRUE(source);
+    RefPtr<Element> source_element = ElementFactory::create_element("derivedfromappsrc", "source");
 
-    RefPtr<Element> source_element = ElementFactory::create_element("appsrc", "source");
     ASSERT_TRUE(source_element);
-
-    source = source.cast_dynamic(source_element);
-    ASSERT_TRUE(source);
 }
 
-TEST_F(AppSrcPluginTest, CreatePipelineWithAppSrcElement)
+TEST_F(DerivedFromAppSrcPluginTest, CreatePipelineWithRegisteredElement)
 {
     CreatePipelineWithElements();
 }
 
-TEST_F(AppSrcPluginTest, SrcPadQueryCapsShouldReturnProperCapsObjects)
+TEST_F(DerivedFromAppSrcPluginTest, SrcPadQueryCapsShouldReturnProperCapsObjects)
 {
     CreatePipelineWithElements();
 
@@ -85,7 +83,7 @@ TEST_F(AppSrcPluginTest, SrcPadQueryCapsShouldReturnProperCapsObjects)
     }
 }
 
-TEST_F(AppSrcPluginTest, SimpleDataFlowInPipelineWithAppSrcElement)
+TEST_F(DerivedFromAppSrcPluginTest, SimpleDataFlowInPipelineWithAppSrcElement)
 {
     CreatePipelineWithElements();
 
@@ -118,3 +116,4 @@ TEST_F(AppSrcPluginTest, SimpleDataFlowInPipelineWithAppSrcElement)
     EXPECT_EQ(MESSAGE_EOS, msg->get_message_type());
     EXPECT_EQ(STATE_CHANGE_SUCCESS, pipeline->set_state(STATE_NULL));
 }
+

@@ -43,6 +43,7 @@ check_PROGRAMS =                                \
                                                 \
         test-plugin-appsink                     \
         test-plugin-appsrc                      \
+        test-plugin-derivedfromappsrc           \
         test-plugin-derivedfrombasetransform    \
         test-plugin-pushsrc                     \
         test-plugin-register                    \
@@ -80,6 +81,7 @@ test_urihandler_SOURCES                         = test-urihandler.cc            
 
 test_plugin_appsink_SOURCES                     = plugins/test-plugin-appsink.cc                     $(TEST_MAIN_SOURCE)
 test_plugin_appsrc_SOURCES                      = plugins/test-plugin-appsrc.cc                      $(TEST_MAIN_SOURCE)
+test_plugin_derivedfromappsrc_SOURCES           = plugins/test-plugin-derivedfromappsrc.cc           $(TEST_MAIN_SOURCE)
 test_plugin_derivedfrombasetransform_SOURCES    = plugins/test-plugin-derivedfrombasetransform.cc    $(TEST_MAIN_SOURCE)
 test_plugin_pushsrc_SOURCES                     = plugins/test-plugin-pushsrc.cc                     $(TEST_MAIN_SOURCE)
 test_plugin_register_SOURCES                    = plugins/test-plugin-register.cc                    $(TEST_MAIN_SOURCE)
