@@ -5,8 +5,8 @@
  *      Author: loganek
  */
 
-#ifndef CUSTOMBIN_H_
-#define CUSTOMBIN_H_
+#ifndef TESTS_REGRESSION_PLUGINBIN_H_
+#define TESTS_REGRESSION_PLUGINBIN_H_
 
 #include <gstreamermm.h>
 #include <gstreamermm/private/bin_p.h>
@@ -70,4 +70,4 @@ public:
 
 
 
-#endif /* CUSTOMBIN_H_ */
+#endif /* TESTS_REGRESSION_PLUGINBIN_H_ */

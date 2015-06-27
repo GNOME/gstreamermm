@@ -1,12 +1,12 @@
 /*
- * test-foo.h
+ * foo.h
  *
  *  Created on: Aug 1, 2013
  *      Author: m.kolny
  */
 
-#ifndef TEST_FOO_H_
-#define TEST_FOO_H_
+#ifndef TESTS_PLUGINS_FOO_H_
+#define TESTS_PLUGINS_FOO_H_
 
 #include <gstreamermm.h>
 #include <gstreamermm/private/element_p.h>
@@ -55,10 +55,10 @@ public:
 
     static bool register_foo(Glib::RefPtr<Gst::Plugin> plugin)
     {
-        Gst::ElementFactory::register_element(plugin, "foomm", 10, Gst::register_mm_type<Foo>("foomm"));
+        Gst::ElementFactory::register_element(plugin, "foomm", 10, Gst::register_mm_type<Foo>("foo"));
 
         return true;
     }
 };
 
-#endif /* TEST_FOO_H_ */
+#endif /* TESTS_PLUGINS_FOO_H_ */

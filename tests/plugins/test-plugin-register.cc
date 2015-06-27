@@ -10,7 +10,7 @@
 #include <gstreamermm/appsink.h>
 #include <gstreamermm/appsrc.h>
 #include <vector>
-#include "test-foo.h"
+#include "foo.h"
 
 using namespace Gst;
 using Glib::RefPtr;
