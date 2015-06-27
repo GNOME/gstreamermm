@@ -20,48 +20,70 @@ AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(GSTREAMERMM_CFLAGS) -s
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest -lpthread
 
-check_PROGRAMS = test-caps test-buffer test-bus test-caps test-pad \
-                 test-allocator test-atomicqueue test-bin \
-                 test-capsfeatures test-message test-memory \
-                 test-urihandler test-ghostpad test-init test-miniobject \
-                 test-query test-structure test-taglist test-plugin-appsink \
-                 test-plugin-appsrc test-plugin-register test-plugin-pushsrc \
-                 test-regression-bininpipeline test-regression-binplugin \
-                 test-pipeline \
-                 test-regression-rewritefile test-regression-seekonstartup \
-                 test-regression-videoduration
+check_PROGRAMS =                                \
+        test-allocator                          \
+        test-atomicqueue                        \
+        test-bin                                \
+        test-buffer                             \
+        test-bus                                \
+        test-caps                               \
+        test-caps                               \
+        test-capsfeatures                       \
+        test-ghostpad                           \
+        test-init                               \
+        test-memory                             \
+        test-message                            \
+        test-miniobject                         \
+        test-pad                                \
+        test-pipeline                           \
+        test-query                              \
+        test-structure                          \
+        test-taglist                            \
+        test-urihandler                         \
+                                                \
+        test-plugin-appsink                     \
+        test-plugin-appsrc                      \
+        test-plugin-pushsrc                     \
+        test-plugin-register                    \
+                                                \
+        test-regression-bininpipeline           \
+        test-regression-binplugin               \
+        test-regression-rewritefile             \
+        test-regression-seekonstartup           \
+        test-regression-videoduration
+
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
 TEST_MAIN_SOURCE = main.cc
 TEST_REGRESSION_UTILS = regression/utils.cc
 
-test_allocator_SOURCES		= test-allocator.cc $(TEST_MAIN_SOURCE)
-test_atomicqueue_SOURCES	= test-atomicqueue.cc $(TEST_MAIN_SOURCE)
-test_bin_SOURCES			= test-bin.cc $(TEST_MAIN_SOURCE)
-test_caps_SOURCES			= test-caps.cc $(TEST_MAIN_SOURCE)
-test_capsfeatures_SOURCES	= test-capsfeatures.cc $(TEST_MAIN_SOURCE)
-test_buffer_SOURCES			= test-buffer.cc $(TEST_MAIN_SOURCE)
-test_bus_SOURCES			= test-bus.cc $(TEST_MAIN_SOURCE)
-test_ghostpad_SOURCES		= test-ghostpad.cc $(TEST_MAIN_SOURCE)
-test_init_SOURCES			= test-init.cc $(TEST_MAIN_SOURCE)
-test_memory_SOURCES			= test-memory.cc $(TEST_MAIN_SOURCE)
-test_message_SOURCES		= test-message.cc $(TEST_MAIN_SOURCE)
-test_miniobject_SOURCES		= test-miniobject.cc $(TEST_MAIN_SOURCE)
-test_pad_SOURCES			= test-pad.cc $(TEST_MAIN_SOURCE)
-test_pipeline_SOURCES			= test-pipeline.cc $(TEST_MAIN_SOURCE)
-test_query_SOURCES			= test-query.cc $(TEST_MAIN_SOURCE)
-test_structure_SOURCES		= test-structure.cc $(TEST_MAIN_SOURCE)
-test_taglist_SOURCES		= test-taglist.cc $(TEST_MAIN_SOURCE)
-test_urihandler_SOURCES		= test-urihandler.cc $(TEST_MAIN_SOURCE)
+test_allocator_SOURCES                          = test-allocator.cc                                  $(TEST_MAIN_SOURCE)
+test_atomicqueue_SOURCES                        = test-atomicqueue.cc                                $(TEST_MAIN_SOURCE)
+test_bin_SOURCES                                = test-bin.cc                                        $(TEST_MAIN_SOURCE)
+test_buffer_SOURCES                             = test-buffer.cc                                     $(TEST_MAIN_SOURCE)
+test_bus_SOURCES                                = test-bus.cc                                        $(TEST_MAIN_SOURCE)
+test_capsfeatures_SOURCES                       = test-capsfeatures.cc                               $(TEST_MAIN_SOURCE)
+test_caps_SOURCES                               = test-caps.cc                                       $(TEST_MAIN_SOURCE)
+test_ghostpad_SOURCES                           = test-ghostpad.cc                                   $(TEST_MAIN_SOURCE)
+test_init_SOURCES                               = test-init.cc                                       $(TEST_MAIN_SOURCE)
+test_memory_SOURCES                             = test-memory.cc                                     $(TEST_MAIN_SOURCE)
+test_message_SOURCES                            = test-message.cc                                    $(TEST_MAIN_SOURCE)
+test_miniobject_SOURCES                         = test-miniobject.cc                                 $(TEST_MAIN_SOURCE)
+test_pad_SOURCES                                = test-pad.cc                                        $(TEST_MAIN_SOURCE)
+test_pipeline_SOURCES                           = test-pipeline.cc                                   $(TEST_MAIN_SOURCE)
+test_query_SOURCES                              = test-query.cc                                      $(TEST_MAIN_SOURCE)
+test_structure_SOURCES                          = test-structure.cc                                  $(TEST_MAIN_SOURCE)
+test_taglist_SOURCES                            = test-taglist.cc                                    $(TEST_MAIN_SOURCE)
+test_urihandler_SOURCES                         = test-urihandler.cc                                 $(TEST_MAIN_SOURCE)
 
-test_plugin_appsink_SOURCES			= plugins/test-plugin-appsink.cc $(TEST_MAIN_SOURCE)
-test_plugin_appsrc_SOURCES			= plugins/test-plugin-appsrc.cc $(TEST_MAIN_SOURCE)
-test_plugin_pushsrc_SOURCES			= plugins/test-plugin-pushsrc.cc $(TEST_MAIN_SOURCE)
-test_plugin_register_SOURCES		= plugins/test-plugin-register.cc $(TEST_MAIN_SOURCE)
+test_plugin_appsink_SOURCES                     = plugins/test-plugin-appsink.cc                     $(TEST_MAIN_SOURCE)
+test_plugin_appsrc_SOURCES                      = plugins/test-plugin-appsrc.cc                      $(TEST_MAIN_SOURCE)
+test_plugin_pushsrc_SOURCES                     = plugins/test-plugin-pushsrc.cc                     $(TEST_MAIN_SOURCE)
+test_plugin_register_SOURCES                    = plugins/test-plugin-register.cc                    $(TEST_MAIN_SOURCE)
 
-test_regression_bininpipeline_SOURCES = regression/test-regression-bininpipeline.cc $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
-test_regression_binplugin_SOURCES = regression/test-regression-binplugin.cc $(TEST_MAIN_SOURCE) 
-test_regression_rewritefile_SOURCES = regression/test-regression-rewritefile.cc $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
-test_regression_seekonstartup_SOURCES = regression/test-regression-seekonstartup.cc $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
-test_regression_videoduration_SOURCES = regression/test-regression-videoduration.cc $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
+test_regression_bininpipeline_SOURCES           = regression/test-regression-bininpipeline.cc        $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
+test_regression_binplugin_SOURCES               = regression/test-regression-binplugin.cc            $(TEST_MAIN_SOURCE)
+test_regression_rewritefile_SOURCES             = regression/test-regression-rewritefile.cc          $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
+test_regression_seekonstartup_SOURCES           = regression/test-regression-seekonstartup.cc        $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
+test_regression_videoduration_SOURCES           = regression/test-regression-videoduration.cc        $(TEST_MAIN_SOURCE) $(TEST_REGRESSION_UTILS)
