@@ -1,19 +1,14 @@
-/*
- * test-plugin-appsink.cc
- *
- *  Created on: 5 sie 2013
- *      Author: loganek
- */
-
 #include <gtest/gtest.h>
 #include <gstreamermm.h>
-#include <gstreamermm/appsink.h>
 #include <gstreamermm/appsrc.h>
+#include <gstreamermm/appsink.h>
+
+#include "derivedfromappsink.h"
 
 using namespace Gst;
 using Glib::RefPtr;
 
-class AppSinkPluginTest : public ::testing::Test
+class DerivedFromAppSinkPluginTest : public ::testing::Test
 {
 protected:
     RefPtr<Element> source;
@@ -24,7 +19,7 @@ protected:
     {
         pipeline = Gst::Pipeline::create();
 
-        sink = ElementFactory::create_element("appsink", "sink");
+        sink = ElementFactory::create_element("derivedfromappsink", "sink");
         source = ElementFactory::create_element("appsrc", "source");
 
         ASSERT_TRUE(sink);
@@ -33,26 +28,29 @@ protected:
         ASSERT_NO_THROW(pipeline->add(source)->add(sink));
         ASSERT_NO_THROW(source->link(sink));
     }
+
+    virtual void SetUp()
+    {
+        Plugin::register_static(GST_VERSION_MAJOR, GST_VERSION_MINOR, "derivedfromappsink",
+            "derivedfromappsink is an example of C++ element derived from Gst::AppSink",
+            sigc::ptr_fun(&DerivedFromAppSink::register_element), "0.123",
+            "LGPL", "source?", "package?", "http://example.com");
+    }
 };
 
-TEST_F(AppSinkPluginTest, CorrectCreatedAppSinkElement)
+TEST_F(DerivedFromAppSinkPluginTest, CreateRegisteredElement)
 {
-    RefPtr<AppSink> source = AppSink::create("sink");
-    ASSERT_TRUE(source);
+    RefPtr<Element> sink_element = ElementFactory::create_element("derivedfromappsink", "source");
 
-    RefPtr<Element> source_element = ElementFactory::create_element("appsink", "source");
-    ASSERT_TRUE(source_element);
-
-    source = source.cast_dynamic(source_element);
-    ASSERT_TRUE(source);
+    ASSERT_TRUE(sink_element);
 }
 
-TEST_F(AppSinkPluginTest, CreatePipelineWithAppsink)
+TEST_F(DerivedFromAppSinkPluginTest, CreatePipelineWithRegisteredElement)
 {
     CreatePipelineWithElements();
 }
 
-TEST_F(AppSinkPluginTest, SinkPadQueryCapsShouldReturnProperCapsObjects)
+TEST_F(DerivedFromAppSinkPluginTest, SinkPadQueryCapsShouldReturnProperCapsObjects)
 {
     CreatePipelineWithElements();
 
@@ -86,7 +84,7 @@ TEST_F(AppSinkPluginTest, SinkPadQueryCapsShouldReturnProperCapsObjects)
     }
 }
 
-TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
+TEST_F(DerivedFromAppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
 {
     CreatePipelineWithElements();
 
