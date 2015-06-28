@@ -47,59 +47,61 @@ protected:
     }
 };
 
-TEST_F(RegisterPluginTest, DISABLED_CreateRegisteredElement)
+TEST_F(RegisterPluginTest, CreateRegisteredElement)
 {
     filter = Gst::ElementFactory::create_element("foomm", "filter");
 
     ASSERT_TRUE(filter);
 }
 
-TEST_F(RegisterPluginTest, DISABLED_CheckPropertyUsage)
+TEST_F(RegisterPluginTest, CheckPropertyUsage)
 {
     filter = Gst::ElementFactory::create_element("foomm", "filter");
 
+    ASSERT_TRUE(filter);
+
     Glib::ustring property_value;
     filter->get_property("sample_property", property_value);
-    ASSERT_STREQ("def_val", property_value.c_str());
+    EXPECT_STREQ("def_val", property_value.c_str());
 
     Glib::ustring expected_property_value = "second_property_test";
     filter->set_property("sample_property", expected_property_value);
     filter->get_property("sample_property", property_value);
-    ASSERT_STREQ(expected_property_value.c_str(), property_value.c_str());
+    EXPECT_STREQ(expected_property_value.c_str(), property_value.c_str());
 }
 
-TEST_F(RegisterPluginTest, DISABLED_CreatePipelineWithRegisteredElement)
+TEST_F(RegisterPluginTest, CreatePipelineWithRegisteredElement)
 {
     CreatePipelineWithElements();
 }
 
-TEST_F(RegisterPluginTest, DISABLED_CheckDataFlowThroughCreatedElement)
+TEST_F(RegisterPluginTest, CheckDataFlowThroughCreatedElement)
 {
     CreatePipelineWithElements();
 
-    pipeline->set_state(STATE_PLAYING);
+    EXPECT_EQ(STATE_CHANGE_ASYNC, pipeline->set_state(STATE_PLAYING));
 
     std::vector<guint8> data = {4, 5, 2, 7, 1};
     RefPtr<Buffer> buf = Buffer::create(data.size());
+    ASSERT_TRUE(buf);
     RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
 
-    buf->map(mapinfo, MAP_WRITE);
+    ASSERT_TRUE(buf->map(mapinfo, MAP_WRITE));
     std::copy(data.begin(), data.end(), mapinfo->get_data());
-    source->push_buffer(buf);
+    EXPECT_EQ(FLOW_OK, source->push_buffer(buf));
     buf->unmap(mapinfo);
 
     RefPtr<Gst::Buffer> buf_out;
     RefPtr<Gst::Sample> samp = sink->pull_preroll();
 
+    ASSERT_TRUE(samp);
     buf_out = samp->get_buffer();
-    buf_out->map(mapinfo, MAP_READ);
+    ASSERT_TRUE(buf_out->map(mapinfo, MAP_READ));
     ASSERT_TRUE(mapinfo->get_data());
     std::sort(data.begin(), data.end());
     ASSERT_TRUE(std::equal(data.begin(), data.end(), mapinfo->get_data()));
     buf_out->unmap(mapinfo);
-    source->end_of_stream();
+    EXPECT_EQ(FLOW_OK, source->end_of_stream());
 
-    pipeline->set_state(Gst::STATE_NULL);
-    pipeline.reset();
-    filter.reset();
+    EXPECT_EQ(STATE_CHANGE_SUCCESS, pipeline->set_state(Gst::STATE_NULL));
 }
