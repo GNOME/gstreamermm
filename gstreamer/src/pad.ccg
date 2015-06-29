@@ -137,16 +137,6 @@ gulong Pad::add_probe(PadProbeType mask, const SlotProbe& slot)
     return gst_pad_add_probe(gobj(), static_cast<GstPadProbeType>(mask), &Pad_Probe_gstreamermm_callback, slot_copy, &Pad_Probe_gstreamermm_callback_disconnect);
 }
 
-// This is handcoded because the documentation tells us that we need to copy
-// the Caps
-Glib::RefPtr<const Gst::Caps> Pad::get_pad_template_caps() const
-{
-  const GstCaps* caps = gst_pad_get_pad_template_caps(const_cast<GstPad*>(gobj()));
-  GstCaps* copy_caps = gst_caps_copy(caps);
-  return Glib::wrap(copy_caps, false);
-}
-
-
 FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   GstBuffer* c_buffer = 0;

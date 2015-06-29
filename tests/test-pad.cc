@@ -49,3 +49,13 @@ TEST_F(PadTest, PadCorrectCreatedUsingTemplate)
     CheckPad();
 }
 
+TEST_F(PadTest, PadVerifyGetPadTemplateCaps)
+{
+    Glib::RefPtr<Gst::Caps> caps;
+    {
+        Glib::RefPtr<PadTemplate> pad_tpl =
+            PadTemplate::create("source-template", pad_direction, PAD_ALWAYS, Caps::create_any());
+        caps = Pad::create(pad_tpl, pad_name)->get_pad_template_caps();
+    }
+    ASSERT_EQ(1, caps->get_refcount());
+}
