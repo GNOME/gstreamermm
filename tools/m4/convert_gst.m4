@@ -90,6 +90,8 @@ _CONVERSION(`GstBus*',`Glib::RefPtr<Gst::Bus>',`Glib::wrap($3)')
 dnl Caps
 _CONVERSION(`GstCaps*',`Glib::RefPtr<Gst::Caps>',`Glib::wrap($3)')
 _CONVERSION(`GstCaps*',`Glib::RefPtr<const Gst::Caps>',`Glib::wrap($3)')
+_CONVERSION(`GstCaps*',`const Glib::RefPtr<Gst::Caps>&',`Glib::wrap($3, true)')
+_CONVERSION(`GstCaps*',`const Glib::RefPtr<const Gst::Caps>&',`Glib::wrap($3, true)')
 _CONVERSION(`const GstCaps*',`const Glib::RefPtr<const Gst::Caps>&',`Glib::wrap(const_cast<GstCaps*>($3))')
 _CONVERSION(`Glib::RefPtr<Gst::Caps>',`GstCaps*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`GstCaps*', `Glib::unwrap($3)')
