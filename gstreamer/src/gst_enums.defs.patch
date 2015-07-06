@@ -1,6 +1,35 @@
+diff --git a/gstreamer/src/gst_enums.defs b/gstreamer/src/gst_enums.defs
+index 5906490..5725103 100644
 --- a/gstreamer/src/gst_enums.defs
 +++ b/gstreamer/src/gst_enums.defs
-@@ -2617,6 +2617,19 @@
+@@ -2750,10 +2750,11 @@
+ ;;   GST_QUEUE_LEAK_DOWNSTREAM     = 2
+ ;; };
+ 
+-(define-enum-extended 
++(define-enum-extended QueueLeaky
+   (in-module "Gst")
+-  (c-name "")
++  (c-name "GstQueueLeaky")
+   (values
++    '("no" "GST_QUEUE_LEAK_NO_LEAK" "0")
+     '("upstream" "GST_QUEUE_LEAK_UPSTREAM" "1")
+     '("downstream" "GST_QUEUE_LEAK_DOWNSTREAM" "2")
+   )
+@@ -6574,9 +6575,9 @@
+   (in-module "Gst")
+   (c-name "GstTextRenderLineAlign")
+   (values
+-    '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "PANGO_ALIGN_LEFT")
+-    '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "PANGO_ALIGN_CENTER")
+-    '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "PANGO_ALIGN_RIGHT")
++    '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "0")
++    '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "1")
++    '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "2")
+   )
+ )
+ 
+@@ -6619,3 +6620,56 @@
    )
  )
  
@@ -16,49 +45,6 @@
 +  )
 +)
 +
-+
- ;; From gstinputselector.h
- 
- ;; Original typedef:
-@@ -2654,9 +2667,10 @@
- ;;   GST_QUEUE_LEAK_DOWNSTREAM     = 2
- ;; };
- 
--(define-enum-extended 
-+(define-enum-extended QueueLeaky
-   (in-module "Gst")
--  (c-name "")
-+  (c-name "GstQueueLeaky")
-   (values
-+    '("no" "GST_QUEUE_LEAK_NO_LEAK" "0")
-     '("upstream" "GST_QUEUE_LEAK_UPSTREAM" "1")
-     '("downstream" "GST_QUEUE_LEAK_DOWNSTREAM" "2")
-@@ -4788,7 +4801,7 @@
- 
- (define-enum-extended SpeexResamplerSincFilterMode
-   (in-module "Gst")
--  (c-name "SpeexResamplerSincFilterMode")
-+  (c-name "GstSpeexResamplerSincFilterMode")
-   (values
-     '("interpolated" "RESAMPLER_SINC_FILTER_INTERPOLATED" "0")
-     '("full" "RESAMPLER_SINC_FILTER_FULL" "1")
-@@ -5636,9 +5649,9 @@
-   (in-module "Gst")
-   (c-name "GstTextRenderLineAlign")
-   (values
--    '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "PANGO_ALIGN_LEFT")
--    '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "PANGO_ALIGN_CENTER")
--    '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "PANGO_ALIGN_RIGHT")
-+    '("left" "GST_TEXT_RENDER_LINE_ALIGN_LEFT" "0")
-+    '("center" "GST_TEXT_RENDER_LINE_ALIGN_CENTER" "1")
-+    '("right" "GST_TEXT_RENDER_LINE_ALIGN_RIGHT" "2")
-   )
- )
- 
-@@ -5662,3 +5675,17 @@
-   )
- )
- 
 +;; Handwritten for CdParanoiaSrc plugin (values taken from output of
 +;; `gst-inspect cdparanoiasrc' -- "paranoia-mode" property information)
 +(define-enum-extended CdParanoiaMode
@@ -73,13 +59,6 @@
 +    '("full" "GST_PARANOIA_MODE_FULL" "0xff")
 +  )
 +)
-
---- a/gstreamer/src/gst_enums.defs
-+++ b/gstreamer/src/gst_enums.defs
-@@ -5689,3 +5689,30 @@
-     '("full" "GST_PARANOIA_MODE_FULL" "0xff")
-   )
- )
 +
 +;; Handwritten for MultiSocketSink plugin (values taken from output of
 +;; `gst-inspect multisocketsink' -- "sync-method" property information)
@@ -107,8 +86,3 @@
 +    '("active" "GST_OUTPUT_SELECTOR_PAD_NEGOTIATION_MODE_ACTIVE" "2")
 +  )
 +)
-
- 
--- 
-1.9.1
-

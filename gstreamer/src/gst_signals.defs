@@ -99,6 +99,15 @@
 
 ;; From GstClock
 
+(define-signal synced
+  (of-object "GstClock")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("gboolean" "p0")
+  )
+)
+
 (define-property window-size
   (of-object "GstClock")
   (prop-type "GParamInt")
@@ -312,6 +321,15 @@
   (of-object "GstPipeline")
   (prop-type "GParamBoolean")
   (docs "Whether to automatically flush the pipeline's bus when going from READY into NULL state")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property latency
+  (of-object "GstPipeline")
+  (prop-type "GParamUInt64")
+  (docs "Latency to configure on the pipeline")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -661,6 +679,24 @@
   (docs "A GstBus on which to send clock status information")
   (readable #t)
   (writable #t)
+  (construct-only #f)
+)
+
+(define-property base-time
+  (of-object "GstNetClientClock")
+  (prop-type "GParamUInt64")
+  (docs "Initial time that is reported before synchronization")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property internal-clock
+  (of-object "GstNetClientClock")
+  (prop-type "GParamObject")
+  (docs "Internal clock that directly slaved to the remote clock")
+  (readable #t)
+  (writable #f)
   (construct-only #f)
 )
 
@@ -1063,6 +1099,15 @@
 
 ;; From GstFunnel
 
+(define-property forward-sticky-events
+  (of-object "GstFunnel")
+  (prop-type "GParamBoolean")
+  (docs "Forward sticky events on stream changes")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstIdentity
 
 (define-signal handoff
@@ -1183,12 +1228,6 @@
 )
 
 ;; From GstInputSelector
-
-(define-signal block
-  (of-object "GstInputSelector")
-  (return-type "gint64")
-  (when "last")
-)
 
 (define-property n-pads
   (of-object "GstInputSelector")
@@ -1686,12 +1725,21 @@
   (construct-only #f)
 )
 
+(define-property allow-not-linked
+  (of-object "GstTee")
+  (prop-type "GParamBoolean")
+  (docs "Return GTS_FLOW_OK even if there are not source pads or all are unlinked")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstTypeFindElement
 
 (define-signal have-type
   (of-object "GstTypeFindElement")
   (return-type "void")
-  (when "first")
+  (when "last")
   (parameters
     '("guint" "p0")
     '("GstCaps*" "p1")
@@ -3489,6 +3537,24 @@
   (of-object "GstPlayBin")
   (prop-type "GParamObject")
   (docs "the video filter(s) to apply, if possible")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property video-multiview-mode
+  (of-object "GstPlayBin")
+  (prop-type "GParamEnum")
+  (docs "Re-interpret a video stream as one of several frame-packed stereoscopic modes.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property video-multiview-flags
+  (of-object "GstPlayBin")
+  (prop-type "GParamFlags")
+  (docs "Override details of the multiview frame layout")
   (readable #t)
   (writable #t)
   (construct-only #f)

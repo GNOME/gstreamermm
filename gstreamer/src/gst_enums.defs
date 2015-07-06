@@ -49,6 +49,7 @@
 ;;   GST_BUFFER_FLAG_DROPPABLE   = (GST_MINI_OBJECT_FLAG_LAST << 8),
 ;;   GST_BUFFER_FLAG_DELTA_UNIT  = (GST_MINI_OBJECT_FLAG_LAST << 9),
 ;;   GST_BUFFER_FLAG_TAG_MEMORY  = (GST_MINI_OBJECT_FLAG_LAST << 10),
+;;   GST_BUFFER_FLAG_SYNC_AFTER  = (GST_MINI_OBJECT_FLAG_LAST << 11),
 ;; 
 ;;   GST_BUFFER_FLAG_LAST        = (GST_MINI_OBJECT_FLAG_LAST << 16)
 ;; } GstBufferFlags;
@@ -68,6 +69,7 @@
     '("droppable" "GST_BUFFER_FLAG_DROPPABLE" "(GST_MINI_OBJECT_FLAG_LAST << 8)")
     '("delta-unit" "GST_BUFFER_FLAG_DELTA_UNIT" "(GST_MINI_OBJECT_FLAG_LAST << 9)")
     '("tag-memory" "GST_BUFFER_FLAG_TAG_MEMORY" "(GST_MINI_OBJECT_FLAG_LAST << 10)")
+    '("sync-after" "GST_BUFFER_FLAG_SYNC_AFTER" "(GST_MINI_OBJECT_FLAG_LAST << 11)")
     '("last" "GST_BUFFER_FLAG_LAST" "(GST_MINI_OBJECT_FLAG_LAST << 16)")
   )
 )
@@ -239,6 +241,7 @@
 ;;   GST_CLOCK_FLAG_CAN_DO_PERIODIC_ASYNC  = (GST_OBJECT_FLAG_LAST << 3),
 ;;   GST_CLOCK_FLAG_CAN_SET_RESOLUTION     = (GST_OBJECT_FLAG_LAST << 4),
 ;;   GST_CLOCK_FLAG_CAN_SET_MASTER         = (GST_OBJECT_FLAG_LAST << 5),
+;;   GST_CLOCK_FLAG_NEEDS_STARTUP_SYNC     = (GST_OBJECT_FLAG_LAST << 6),
 ;;   /* padding */
 ;;   GST_CLOCK_FLAG_LAST                   = (GST_OBJECT_FLAG_LAST << 8)
 ;; } GstClockFlags;
@@ -253,6 +256,7 @@
     '("can-do-periodic-async" "GST_CLOCK_FLAG_CAN_DO_PERIODIC_ASYNC" "(GST_OBJECT_FLAG_LAST << 3)")
     '("can-set-resolution" "GST_CLOCK_FLAG_CAN_SET_RESOLUTION" "(GST_OBJECT_FLAG_LAST << 4)")
     '("can-set-master" "GST_CLOCK_FLAG_CAN_SET_MASTER" "(GST_OBJECT_FLAG_LAST << 5)")
+    '("needs-startup-sync" "GST_CLOCK_FLAG_NEEDS_STARTUP_SYNC" "(GST_OBJECT_FLAG_LAST << 6)")
     '("last" "GST_CLOCK_FLAG_LAST" "(GST_OBJECT_FLAG_LAST << 8)")
   )
 )
@@ -569,6 +573,7 @@
 ;;   GST_EVENT_SINK_MESSAGE          = GST_EVENT_MAKE_TYPE (100, FLAG(DOWNSTREAM) | FLAG(SERIALIZED) | FLAG(STICKY) | FLAG(STICKY_MULTI)),
 ;;   GST_EVENT_EOS                   = GST_EVENT_MAKE_TYPE (110, FLAG(DOWNSTREAM) | FLAG(SERIALIZED) | FLAG(STICKY)),
 ;;   GST_EVENT_TOC                   = GST_EVENT_MAKE_TYPE (120, FLAG(DOWNSTREAM) | FLAG(SERIALIZED) | FLAG(STICKY) | FLAG(STICKY_MULTI)),
+;;   GST_EVENT_PROTECTION            = GST_EVENT_MAKE_TYPE (130, FLAG (DOWNSTREAM) | FLAG (SERIALIZED) | FLAG (STICKY) | FLAG (STICKY_MULTI)),
 ;; 
 ;;   /* non-sticky downstream serialized */
 ;;   GST_EVENT_SEGMENT_DONE          = GST_EVENT_MAKE_TYPE (150, FLAG(DOWNSTREAM) | FLAG(SERIALIZED)),
@@ -607,6 +612,7 @@
     '("sink-message" "GST_EVENT_SINK_MESSAGE" "GST_EVENT_MAKE_TYPE (100, FLAG(DOWNSTREAM) | FLAG(SERIALIZED) | FLAG(STICKY) | FLAG(STICKY_MULTI))")
     '("eos" "GST_EVENT_EOS" "GST_EVENT_MAKE_TYPE (110, FLAG(DOWNSTREAM) | FLAG(SERIALIZED) | FLAG(STICKY))")
     '("toc" "GST_EVENT_TOC" "GST_EVENT_MAKE_TYPE (120, FLAG(DOWNSTREAM) | FLAG(SERIALIZED) | FLAG(STICKY) | FLAG(STICKY_MULTI))")
+    '("protection" "GST_EVENT_PROTECTION" "GST_EVENT_MAKE_TYPE (130, FLAG (DOWNSTREAM) | FLAG (SERIALIZED) | FLAG (STICKY) | FLAG (STICKY_MULTI))")
     '("segment-done" "GST_EVENT_SEGMENT_DONE" "GST_EVENT_MAKE_TYPE (150, FLAG(DOWNSTREAM) | FLAG(SERIALIZED))")
     '("gap" "GST_EVENT_GAP" "GST_EVENT_MAKE_TYPE (160, FLAG(DOWNSTREAM) | FLAG(SERIALIZED))")
     '("qos" "GST_EVENT_QOS" "GST_EVENT_MAKE_TYPE (190, FLAG(UPSTREAM))")
@@ -2687,19 +2693,6 @@
   )
 )
 
-;; Handwritten for the filesink plug-in (Gst::FileSink).
-(define-enum-extended FileSinkBufferMode
-  (in-module "Gst")
-  (c-name "GstFileSinkBufferMode")
-  (values
-    '("default" "GST_FILE_SINK_BUFFER_MODE_DEFAULT" "-1")
-    '("full" "GST_FILE_SINK_BUFFER_MODE_FULL" "0")
-    '("line" "GST_FILE_SINK_BUFFER_MODE_LINE" "1")
-    '("unbuffered" "GST_FILE_SINK_BUFFER_MODE_UNBUFFERED" "2")
-  )
-)
-
-
 ;; From gstinputselector.h
 
 ;; Original typedef:
@@ -2884,6 +2877,25 @@
   (values
     '("never" "GST_TEE_PULL_MODE_NEVER" "0")
     '("single" "GST_TEE_PULL_MODE_SINGLE" "1")
+  )
+)
+
+;; From gstfdmemory.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_FD_MEMORY_FLAG_NONE = 0,
+;;   GST_FD_MEMORY_FLAG_KEEP_MAPPED = (1 << 0),
+;;   GST_FD_MEMORY_FLAG_MAP_PRIVATE = (1 << 1),
+;; } GstFdMemoryFlags;
+
+(define-flags-extended FdMemoryFlags
+  (in-module "Gst")
+  (c-name "GstFdMemoryFlags")
+  (values
+    '("none" "GST_FD_MEMORY_FLAG_NONE" "0x0")
+    '("keep-mapped" "GST_FD_MEMORY_FLAG_KEEP_MAPPED" "(1 << 0)")
+    '("map-private" "GST_FD_MEMORY_FLAG_MAP_PRIVATE" "(1 << 1)")
   )
 )
 
@@ -3176,7 +3188,8 @@
 ;; {
 ;;   GST_AUDIO_BASE_SINK_SLAVE_RESAMPLE,
 ;;   GST_AUDIO_BASE_SINK_SLAVE_SKEW,
-;;   GST_AUDIO_BASE_SINK_SLAVE_NONE
+;;   GST_AUDIO_BASE_SINK_SLAVE_NONE,
+;;   GST_AUDIO_BASE_SINK_SLAVE_CUSTOM
 ;; } GstAudioBaseSinkSlaveMethod;
 
 (define-enum-extended AudioBaseSinkSlaveMethod
@@ -3186,6 +3199,31 @@
     '("resample" "GST_AUDIO_BASE_SINK_SLAVE_RESAMPLE" "0")
     '("skew" "GST_AUDIO_BASE_SINK_SLAVE_SKEW" "1")
     '("none" "GST_AUDIO_BASE_SINK_SLAVE_NONE" "2")
+    '("custom" "GST_AUDIO_BASE_SINK_SLAVE_CUSTOM" "3")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   GST_AUDIO_BASE_SINK_DISCONT_REASON_NO_DISCONT,
+;;   GST_AUDIO_BASE_SINK_DISCONT_REASON_NEW_CAPS,
+;;   GST_AUDIO_BASE_SINK_DISCONT_REASON_FLUSH,
+;;   GST_AUDIO_BASE_SINK_DISCONT_REASON_SYNC_LATENCY,
+;;   GST_AUDIO_BASE_SINK_DISCONT_REASON_ALIGNMENT,
+;;   GST_AUDIO_BASE_SINK_DISCONT_REASON_DEVICE_FAILURE
+;; } GstAudioBaseSinkDiscontReason;
+
+(define-enum-extended AudioBaseSinkDiscontReason
+  (in-module "Gst")
+  (c-name "GstAudioBaseSinkDiscontReason")
+  (values
+    '("no-discont" "GST_AUDIO_BASE_SINK_DISCONT_REASON_NO_DISCONT" "0")
+    '("new-caps" "GST_AUDIO_BASE_SINK_DISCONT_REASON_NEW_CAPS" "1")
+    '("flush" "GST_AUDIO_BASE_SINK_DISCONT_REASON_FLUSH" "2")
+    '("sync-latency" "GST_AUDIO_BASE_SINK_DISCONT_REASON_SYNC_LATENCY" "3")
+    '("alignment" "GST_AUDIO_BASE_SINK_DISCONT_REASON_ALIGNMENT" "4")
+    '("device-failure" "GST_AUDIO_BASE_SINK_DISCONT_REASON_DEVICE_FAILURE" "5")
   )
 )
 
@@ -3353,6 +3391,27 @@
   )
 )
 
+;; Original typedef:
+;; typedef enum {
+;;   GST_DISCOVERER_SERIALIZE_BASIC = 0,
+;;   GST_DISCOVERER_SERIALIZE_CAPS  = 1 << 0,
+;;   GST_DISCOVERER_SERIALIZE_TAGS  = 1 << 1,
+;;   GST_DISCOVERER_SERIALIZE_MISC  = 1 << 2,
+;;   GST_DISCOVERER_SERIALIZE_ALL   = GST_DISCOVERER_SERIALIZE_CAPS | GST_DISCOVERER_SERIALIZE_TAGS | GST_DISCOVERER_SERIALIZE_MISC
+;; } GstDiscovererSerializeFlags;
+
+(define-flags-extended DiscovererSerializeFlags
+  (in-module "Gst")
+  (c-name "GstDiscovererSerializeFlags")
+  (values
+    '("basic" "GST_DISCOVERER_SERIALIZE_BASIC" "0x0")
+    '("caps" "GST_DISCOVERER_SERIALIZE_CAPS" "1 << 0")
+    '("tags" "GST_DISCOVERER_SERIALIZE_TAGS" "1 << 1")
+    '("misc" "GST_DISCOVERER_SERIALIZE_MISC" "1 << 2")
+    '("all" "GST_DISCOVERER_SERIALIZE_ALL" "0x7")
+  )
+)
+
 ;; From install-plugins.h
 
 ;; Original typedef:
@@ -3438,7 +3497,7 @@
 ;;   GST_RTCP_RTPFB_TYPE_TMMBR       = 3,
 ;;   GST_RTCP_RTPFB_TYPE_TMMBN       = 4,
 ;;   /* RTPFB types assigned in RFC 6051 */
-;;   GST_RTCP_RTPFB_TYPE_RCTP_SR_REQ = 5,
+;;   GST_RTCP_RTPFB_TYPE_RTCP_SR_REQ = 5,
 ;;   /* PSFB types */
 ;;   GST_RTCP_PSFB_TYPE_PLI          = 1,
 ;;   GST_RTCP_PSFB_TYPE_SLI          = 2,
@@ -3459,7 +3518,7 @@
     '("rtpfb-type-nack" "GST_RTCP_RTPFB_TYPE_NACK" "1")
     '("rtpfb-type-tmmbr" "GST_RTCP_RTPFB_TYPE_TMMBR" "3")
     '("rtpfb-type-tmmbn" "GST_RTCP_RTPFB_TYPE_TMMBN" "4")
-    '("rtpfb-type-rctp-sr-req" "GST_RTCP_RTPFB_TYPE_RCTP_SR_REQ" "5")
+    '("rtpfb-type-rtcp-sr-req" "GST_RTCP_RTPFB_TYPE_RTCP_SR_REQ" "5")
     '("psfb-type-pli" "GST_RTCP_PSFB_TYPE_PLI" "1")
     '("psfb-type-sli" "GST_RTCP_PSFB_TYPE_SLI" "2")
     '("psfb-type-rpsi" "GST_RTCP_PSFB_TYPE_RPSI" "3")
@@ -3500,6 +3559,29 @@
     '("tool" "GST_RTCP_SDES_TOOL" "6")
     '("note" "GST_RTCP_SDES_NOTE" "7")
     '("priv" "GST_RTCP_SDES_PRIV" "8")
+  )
+)
+
+;; From gstrtpdefs.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_RTP_PROFILE_UNKNOWN = 0,
+;;   GST_RTP_PROFILE_AVP,
+;;   GST_RTP_PROFILE_SAVP,
+;;   GST_RTP_PROFILE_AVPF,
+;;   GST_RTP_PROFILE_SAVPF
+;; } GstRTPProfile;
+
+(define-enum-extended RTPProfile
+  (in-module "Gst")
+  (c-name "GstRTPProfile")
+  (values
+    '("unknown" "GST_RTP_PROFILE_UNKNOWN" "0")
+    '("avp" "GST_RTP_PROFILE_AVP" "1")
+    '("savp" "GST_RTP_PROFILE_SAVP" "2")
+    '("avpf" "GST_RTP_PROFILE_AVPF" "3")
+    '("savpf" "GST_RTP_PROFILE_SAVPF" "4")
   )
 )
 
@@ -4733,7 +4815,8 @@
 ;;   GST_NAVIGATION_MESSAGE_INVALID,
 ;;   GST_NAVIGATION_MESSAGE_MOUSE_OVER,
 ;;   GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED,
-;;   GST_NAVIGATION_MESSAGE_ANGLES_CHANGED
+;;   GST_NAVIGATION_MESSAGE_ANGLES_CHANGED,
+;;   GST_NAVIGATION_MESSAGE_EVENT
 ;; } GstNavigationMessageType;
 
 (define-enum-extended NavigationMessageType
@@ -4744,6 +4827,7 @@
     '("mouse-over" "GST_NAVIGATION_MESSAGE_MOUSE_OVER" "1")
     '("commands-changed" "GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED" "2")
     '("angles-changed" "GST_NAVIGATION_MESSAGE_ANGLES_CHANGED" "3")
+    '("event" "GST_NAVIGATION_MESSAGE_EVENT" "4")
   )
 )
 
@@ -4940,6 +5024,95 @@
   )
 )
 
+;; From video-converter.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_ALPHA_MODE_COPY,
+;;   GST_VIDEO_ALPHA_MODE_SET,
+;;   GST_VIDEO_ALPHA_MODE_MULT
+;; } GstVideoAlphaMode;
+
+(define-enum-extended VideoAlphaMode
+  (in-module "Gst")
+  (c-name "GstVideoAlphaMode")
+  (values
+    '("copy" "GST_VIDEO_ALPHA_MODE_COPY" "0")
+    '("set" "GST_VIDEO_ALPHA_MODE_SET" "1")
+    '("mult" "GST_VIDEO_ALPHA_MODE_MULT" "2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_CHROMA_MODE_FULL,
+;;   GST_VIDEO_CHROMA_MODE_UPSAMPLE_ONLY,
+;;   GST_VIDEO_CHROMA_MODE_DOWNSAMPLE_ONLY,
+;;   GST_VIDEO_CHROMA_MODE_NONE
+;; } GstVideoChromaMode;
+
+(define-enum-extended VideoChromaMode
+  (in-module "Gst")
+  (c-name "GstVideoChromaMode")
+  (values
+    '("full" "GST_VIDEO_CHROMA_MODE_FULL" "0")
+    '("upsample-only" "GST_VIDEO_CHROMA_MODE_UPSAMPLE_ONLY" "1")
+    '("downsample-only" "GST_VIDEO_CHROMA_MODE_DOWNSAMPLE_ONLY" "2")
+    '("none" "GST_VIDEO_CHROMA_MODE_NONE" "3")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_MATRIX_MODE_FULL,
+;;   GST_VIDEO_MATRIX_MODE_INPUT_ONLY,
+;;   GST_VIDEO_MATRIX_MODE_OUTPUT_ONLY,
+;;   GST_VIDEO_MATRIX_MODE_NONE
+;; } GstVideoMatrixMode;
+
+(define-enum-extended VideoMatrixMode
+  (in-module "Gst")
+  (c-name "GstVideoMatrixMode")
+  (values
+    '("full" "GST_VIDEO_MATRIX_MODE_FULL" "0")
+    '("input-only" "GST_VIDEO_MATRIX_MODE_INPUT_ONLY" "1")
+    '("output-only" "GST_VIDEO_MATRIX_MODE_OUTPUT_ONLY" "2")
+    '("none" "GST_VIDEO_MATRIX_MODE_NONE" "3")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_GAMMA_MODE_NONE,
+;;   GST_VIDEO_GAMMA_MODE_REMAP
+;; } GstVideoGammaMode;
+
+(define-enum-extended VideoGammaMode
+  (in-module "Gst")
+  (c-name "GstVideoGammaMode")
+  (values
+    '("none" "GST_VIDEO_GAMMA_MODE_NONE" "0")
+    '("remap" "GST_VIDEO_GAMMA_MODE_REMAP" "1")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_PRIMARIES_MODE_NONE,
+;;   GST_VIDEO_PRIMARIES_MODE_MERGE_ONLY,
+;;   GST_VIDEO_PRIMARIES_MODE_FAST
+;; } GstVideoPrimariesMode;
+
+(define-enum-extended VideoPrimariesMode
+  (in-module "Gst")
+  (c-name "GstVideoPrimariesMode")
+  (values
+    '("none" "GST_VIDEO_PRIMARIES_MODE_NONE" "0")
+    '("merge-only" "GST_VIDEO_PRIMARIES_MODE_MERGE_ONLY" "1")
+    '("fast" "GST_VIDEO_PRIMARIES_MODE_FAST" "2")
+  )
+)
+
 ;; From video-dither.h
 
 ;; Original typedef:
@@ -5038,6 +5211,13 @@
 ;;   GST_VIDEO_FORMAT_NV16,
 ;;   GST_VIDEO_FORMAT_NV24,
 ;;   GST_VIDEO_FORMAT_NV12_64Z32,
+;;   GST_VIDEO_FORMAT_A420_10BE,
+;;   GST_VIDEO_FORMAT_A420_10LE,
+;;   GST_VIDEO_FORMAT_A422_10BE,
+;;   GST_VIDEO_FORMAT_A422_10LE,
+;;   GST_VIDEO_FORMAT_A444_10BE,
+;;   GST_VIDEO_FORMAT_A444_10LE,
+;;   GST_VIDEO_FORMAT_NV61,
 ;; } GstVideoFormat;
 
 (define-enum-extended VideoFormat
@@ -5098,6 +5278,13 @@
     '("nv16" "GST_VIDEO_FORMAT_NV16" "51")
     '("nv24" "GST_VIDEO_FORMAT_NV24" "52")
     '("nv12-64z32" "GST_VIDEO_FORMAT_NV12_64Z32" "53")
+    '("a420-10be" "GST_VIDEO_FORMAT_A420_10BE" "54")
+    '("a420-10le" "GST_VIDEO_FORMAT_A420_10LE" "55")
+    '("a422-10be" "GST_VIDEO_FORMAT_A422_10BE" "56")
+    '("a422-10le" "GST_VIDEO_FORMAT_A422_10LE" "57")
+    '("a444-10be" "GST_VIDEO_FORMAT_A444_10BE" "58")
+    '("a444-10le" "GST_VIDEO_FORMAT_A444_10LE" "59")
+    '("nv61" "GST_VIDEO_FORMAT_NV61" "60")
   )
 )
 
@@ -5157,7 +5344,9 @@
 ;;   GST_VIDEO_FRAME_FLAG_INTERLACED   = (1 << 0),
 ;;   GST_VIDEO_FRAME_FLAG_TFF          = (1 << 1),
 ;;   GST_VIDEO_FRAME_FLAG_RFF          = (1 << 2),
-;;   GST_VIDEO_FRAME_FLAG_ONEFIELD     = (1 << 3)
+;;   GST_VIDEO_FRAME_FLAG_ONEFIELD     = (1 << 3),
+;;   GST_VIDEO_FRAME_FLAG_MULTIPLE_VIEW = (1 << 4),
+;;   GST_VIDEO_FRAME_FLAG_FIRST_IN_BUNDLE = (1 << 5)
 ;; } GstVideoFrameFlags;
 
 (define-flags-extended VideoFrameFlags
@@ -5169,6 +5358,8 @@
     '("tff" "GST_VIDEO_FRAME_FLAG_TFF" "(1 << 1)")
     '("rff" "GST_VIDEO_FRAME_FLAG_RFF" "(1 << 2)")
     '("onefield" "GST_VIDEO_FRAME_FLAG_ONEFIELD" "(1 << 3)")
+    '("multiple-view" "GST_VIDEO_FRAME_FLAG_MULTIPLE_VIEW" "(1 << 4)")
+    '("first-in-bundle" "GST_VIDEO_FRAME_FLAG_FIRST_IN_BUNDLE" "(1 << 5)")
   )
 )
 
@@ -5178,6 +5369,9 @@
 ;;   GST_VIDEO_BUFFER_FLAG_TFF         = (GST_BUFFER_FLAG_LAST << 1),
 ;;   GST_VIDEO_BUFFER_FLAG_RFF         = (GST_BUFFER_FLAG_LAST << 2),
 ;;   GST_VIDEO_BUFFER_FLAG_ONEFIELD    = (GST_BUFFER_FLAG_LAST << 3),
+;; 
+;;   GST_VIDEO_BUFFER_FLAG_MULTIPLE_VIEW = (GST_BUFFER_FLAG_LAST << 4),
+;;   GST_VIDEO_BUFFER_FLAG_FIRST_IN_BUNDLE = (GST_BUFFER_FLAG_LAST << 5),
 ;; 
 ;;   GST_VIDEO_BUFFER_FLAG_LAST        = (GST_BUFFER_FLAG_LAST << 8)
 ;; } GstVideoBufferFlags;
@@ -5190,6 +5384,8 @@
     '("tff" "GST_VIDEO_BUFFER_FLAG_TFF" "(GST_BUFFER_FLAG_LAST << 1)")
     '("rff" "GST_VIDEO_BUFFER_FLAG_RFF" "(GST_BUFFER_FLAG_LAST << 2)")
     '("onefield" "GST_VIDEO_BUFFER_FLAG_ONEFIELD" "(GST_BUFFER_FLAG_LAST << 3)")
+    '("multiple-view" "GST_VIDEO_BUFFER_FLAG_MULTIPLE_VIEW" "(GST_BUFFER_FLAG_LAST << 4)")
+    '("first-in-bundle" "GST_VIDEO_BUFFER_FLAG_FIRST_IN_BUNDLE" "(GST_BUFFER_FLAG_LAST << 5)")
     '("last" "GST_VIDEO_BUFFER_FLAG_LAST" "(GST_BUFFER_FLAG_LAST << 8)")
   )
 )
@@ -5233,6 +5429,107 @@
 
 ;; Original typedef:
 ;; typedef enum {
+;;   GST_VIDEO_MULTIVIEW_MODE_NONE = -1,
+;;   GST_VIDEO_MULTIVIEW_MODE_MONO = 0,
+;;   /* Single view modes */
+;;   GST_VIDEO_MULTIVIEW_MODE_LEFT,
+;;   GST_VIDEO_MULTIVIEW_MODE_RIGHT,
+;;   /* Stereo view modes */
+;;   GST_VIDEO_MULTIVIEW_MODE_SIDE_BY_SIDE,
+;;   GST_VIDEO_MULTIVIEW_MODE_SIDE_BY_SIDE_QUINCUNX,
+;;   GST_VIDEO_MULTIVIEW_MODE_COLUMN_INTERLEAVED,
+;;   GST_VIDEO_MULTIVIEW_MODE_ROW_INTERLEAVED,
+;;   GST_VIDEO_MULTIVIEW_MODE_TOP_BOTTOM,
+;;   GST_VIDEO_MULTIVIEW_MODE_CHECKERBOARD,
+;;   /* Padding for new frame packing modes */
+;; 
+;;   GST_VIDEO_MULTIVIEW_MODE_FRAME_BY_FRAME = 32,
+;;   /* Multivew mode(s) */
+;;   GST_VIDEO_MULTIVIEW_MODE_MULTIVIEW_FRAME_BY_FRAME,
+;;   GST_VIDEO_MULTIVIEW_MODE_SEPARATED
+;;   /* future expansion for annotated modes */
+;; } GstVideoMultiviewMode;
+
+(define-enum-extended VideoMultiviewMode
+  (in-module "Gst")
+  (c-name "GstVideoMultiviewMode")
+  (values
+    '("none" "GST_VIDEO_MULTIVIEW_MODE_NONE" "-1")
+    '("mono" "GST_VIDEO_MULTIVIEW_MODE_MONO" "0")
+    '("left" "GST_VIDEO_MULTIVIEW_MODE_LEFT" "1")
+    '("right" "GST_VIDEO_MULTIVIEW_MODE_RIGHT" "2")
+    '("side-by-side" "GST_VIDEO_MULTIVIEW_MODE_SIDE_BY_SIDE" "3")
+    '("side-by-side-quincunx" "GST_VIDEO_MULTIVIEW_MODE_SIDE_BY_SIDE_QUINCUNX" "4")
+    '("column-interleaved" "GST_VIDEO_MULTIVIEW_MODE_COLUMN_INTERLEAVED" "5")
+    '("row-interleaved" "GST_VIDEO_MULTIVIEW_MODE_ROW_INTERLEAVED" "6")
+    '("top-bottom" "GST_VIDEO_MULTIVIEW_MODE_TOP_BOTTOM" "7")
+    '("checkerboard" "GST_VIDEO_MULTIVIEW_MODE_CHECKERBOARD" "8")
+    '("frame-by-frame" "GST_VIDEO_MULTIVIEW_MODE_FRAME_BY_FRAME" "32")
+    '("multiview-frame-by-frame" "GST_VIDEO_MULTIVIEW_MODE_MULTIVIEW_FRAME_BY_FRAME" "33")
+    '("separated" "GST_VIDEO_MULTIVIEW_MODE_SEPARATED" "34")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_NONE = GST_VIDEO_MULTIVIEW_MODE_NONE,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_MONO = GST_VIDEO_MULTIVIEW_MODE_MONO,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_LEFT = GST_VIDEO_MULTIVIEW_MODE_LEFT,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_RIGHT = GST_VIDEO_MULTIVIEW_MODE_RIGHT,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_SIDE_BY_SIDE = GST_VIDEO_MULTIVIEW_MODE_SIDE_BY_SIDE,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_SIDE_BY_SIDE_QUINCUNX = GST_VIDEO_MULTIVIEW_MODE_SIDE_BY_SIDE_QUINCUNX,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_COLUMN_INTERLEAVED = GST_VIDEO_MULTIVIEW_MODE_COLUMN_INTERLEAVED,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_ROW_INTERLEAVED = GST_VIDEO_MULTIVIEW_MODE_ROW_INTERLEAVED,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_TOP_BOTTOM = GST_VIDEO_MULTIVIEW_MODE_TOP_BOTTOM,
+;;   GST_VIDEO_MULTIVIEW_FRAME_PACKING_CHECKERBOARD = GST_VIDEO_MULTIVIEW_MODE_CHECKERBOARD
+;; } GstVideoMultiviewFramePacking;
+
+(define-enum-extended VideoMultiviewFramePacking
+  (in-module "Gst")
+  (c-name "GstVideoMultiviewFramePacking")
+  (values
+    '("none" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_NONE" "-1")
+    '("mono" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_MONO" "0")
+    '("left" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_LEFT" "1")
+    '("right" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_RIGHT" "2")
+    '("side-by-side" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_SIDE_BY_SIDE" "3")
+    '("side-by-side-quincunx" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_SIDE_BY_SIDE_QUINCUNX" "4")
+    '("column-interleaved" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_COLUMN_INTERLEAVED" "5")
+    '("row-interleaved" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_ROW_INTERLEAVED" "6")
+    '("top-bottom" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_TOP_BOTTOM" "7")
+    '("checkerboard" "GST_VIDEO_MULTIVIEW_FRAME_PACKING_CHECKERBOARD" "8")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_MULTIVIEW_FLAGS_NONE             = 0,
+;;   GST_VIDEO_MULTIVIEW_FLAGS_RIGHT_VIEW_FIRST = (1 << 0),
+;;   GST_VIDEO_MULTIVIEW_FLAGS_LEFT_FLIPPED     = (1 << 1),
+;;   GST_VIDEO_MULTIVIEW_FLAGS_LEFT_FLOPPED     = (1 << 2),
+;;   GST_VIDEO_MULTIVIEW_FLAGS_RIGHT_FLIPPED    = (1 << 3),
+;;   GST_VIDEO_MULTIVIEW_FLAGS_RIGHT_FLOPPED    = (1 << 4),
+;;   GST_VIDEO_MULTIVIEW_FLAGS_HALF_ASPECT      = (1 << 14),
+;;   GST_VIDEO_MULTIVIEW_FLAGS_MIXED_MONO       = (1 << 15)
+;; } GstVideoMultiviewFlags;
+
+(define-flags-extended VideoMultiviewFlags
+  (in-module "Gst")
+  (c-name "GstVideoMultiviewFlags")
+  (values
+    '("none" "GST_VIDEO_MULTIVIEW_FLAGS_NONE" "0x0")
+    '("right-view-first" "GST_VIDEO_MULTIVIEW_FLAGS_RIGHT_VIEW_FIRST" "(1 << 0)")
+    '("left-flipped" "GST_VIDEO_MULTIVIEW_FLAGS_LEFT_FLIPPED" "(1 << 1)")
+    '("left-flopped" "GST_VIDEO_MULTIVIEW_FLAGS_LEFT_FLOPPED" "(1 << 2)")
+    '("right-flipped" "GST_VIDEO_MULTIVIEW_FLAGS_RIGHT_FLIPPED" "(1 << 3)")
+    '("right-flopped" "GST_VIDEO_MULTIVIEW_FLAGS_RIGHT_FLOPPED" "(1 << 4)")
+    '("half-aspect" "GST_VIDEO_MULTIVIEW_FLAGS_HALF_ASPECT" "(1 << 14)")
+    '("mixed-mono" "GST_VIDEO_MULTIVIEW_FLAGS_MIXED_MONO" "(1 << 15)")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
 ;;   GST_VIDEO_FLAG_NONE                = 0,
 ;;   GST_VIDEO_FLAG_VARIABLE_FPS        = (1 << 0),
 ;;   GST_VIDEO_FLAG_PREMULTIPLIED_ALPHA = (1 << 1)
@@ -5245,6 +5542,27 @@
     '("none" "GST_VIDEO_FLAG_NONE" "0x0")
     '("variable-fps" "GST_VIDEO_FLAG_VARIABLE_FPS" "(1 << 0)")
     '("premultiplied-alpha" "GST_VIDEO_FLAG_PREMULTIPLIED_ALPHA" "(1 << 1)")
+  )
+)
+
+;; From video-multiview.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_VIDEO_MULTIVIEW_VIEW_UNKNOWN = 0,
+;;   GST_VIDEO_MULTIVIEW_VIEW_MONO = 1,
+;;   GST_VIDEO_MULTIVIEW_VIEW_LEFT = 2,
+;;   GST_VIDEO_MULTIVIEW_VIEW_RIGHT = 3
+;; } GstVideoMultiviewViewLabel;
+
+(define-enum-extended VideoMultiviewViewLabel
+  (in-module "Gst")
+  (c-name "GstVideoMultiviewViewLabel")
+  (values
+    '("unknown" "GST_VIDEO_MULTIVIEW_VIEW_UNKNOWN" "0")
+    '("mono" "GST_VIDEO_MULTIVIEW_VIEW_MONO" "1")
+    '("left" "GST_VIDEO_MULTIVIEW_VIEW_LEFT" "2")
+    '("right" "GST_VIDEO_MULTIVIEW_VIEW_RIGHT" "3")
   )
 )
 
@@ -5275,7 +5593,7 @@
 ;;   GST_VIDEO_RESAMPLER_METHOD_LINEAR,
 ;;   GST_VIDEO_RESAMPLER_METHOD_CUBIC,
 ;;   GST_VIDEO_RESAMPLER_METHOD_SINC,
-;;   GST_VIDEO_RESAMPLER_METHOD_LANCZOS,
+;;   GST_VIDEO_RESAMPLER_METHOD_LANCZOS
 ;; } GstVideoResamplerMethod;
 
 (define-enum-extended VideoResamplerMethod
@@ -5407,7 +5725,7 @@
 
 (define-enum-extended SpeexResamplerSincFilterMode
   (in-module "Gst")
-  (c-name "GstSpeexResamplerSincFilterMode")
+  (c-name "SpeexResamplerSincFilterMode")
   (values
     '("interpolated" "RESAMPLER_SINC_FILTER_INTERPOLATED" "0")
     '("full" "RESAMPLER_SINC_FILTER_FULL" "1")
@@ -5813,7 +6131,8 @@
 ;;   GST_VIDEO_TEST_SRC_BAR,
 ;;   GST_VIDEO_TEST_SRC_PINWHEEL,
 ;;   GST_VIDEO_TEST_SRC_SPOKES,
-;;   GST_VIDEO_TEST_SRC_GRADIENT
+;;   GST_VIDEO_TEST_SRC_GRADIENT,
+;;   GST_VIDEO_TEST_SRC_COLORS
 ;; } GstVideoTestSrcPattern;
 
 (define-enum-extended VideoTestSrcPattern
@@ -5844,6 +6163,7 @@
     '("pinwheel" "GST_VIDEO_TEST_SRC_PINWHEEL" "21")
     '("spokes" "GST_VIDEO_TEST_SRC_SPOKES" "22")
     '("gradient" "GST_VIDEO_TEST_SRC_GRADIENT" "23")
+    '("colors" "GST_VIDEO_TEST_SRC_COLORS" "24")
   )
 )
 
@@ -6297,6 +6617,18 @@
     '("single-pass" "MULTIPASS_MODE_SINGLE_PASS" "0")
     '("first-pass" "MULTIPASS_MODE_FIRST_PASS" "1")
     '("second-pass" "MULTIPASS_MODE_SECOND_PASS" "2")
+  )
+)
+
+;; Handwritten for the filesink plug-in (Gst::FileSink).
+(define-enum-extended FileSinkBufferMode
+  (in-module "Gst")
+  (c-name "GstFileSinkBufferMode")
+  (values
+    '("default" "GST_FILE_SINK_BUFFER_MODE_DEFAULT" "-1")
+    '("full" "GST_FILE_SINK_BUFFER_MODE_FULL" "0")
+    '("line" "GST_FILE_SINK_BUFFER_MODE_LINE" "1")
+    '("unbuffered" "GST_FILE_SINK_BUFFER_MODE_UNBUFFERED" "2")
   )
 )
 
