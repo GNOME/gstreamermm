@@ -57,6 +57,14 @@ _CONV_ENUM(Gst,TocEntryType)
 _CONV_ENUM(Gst,TocScope)
 _CONV_ENUM(Gst,TunerChannelFlags)
 _CONV_ENUM(Gst,URIType)
+_CONV_ENUM(Gst,VideoFlags)
+_CONV_ENUM(Gst,VideoFormat)
+_CONV_ENUM(Gst,VideoFormatFlags)
+_CONV_ENUM(Gst,VideoInterlaceMode)
+_CONV_ENUM(Gst,VideoMultiviewFlags)
+_CONV_ENUM(Gst,VideoMultiviewFramePacking)
+_CONV_ENUM(Gst,VideoMultiviewMode)
+_CONV_ENUM(Gst,VideoPackFlags)
 
 dnl Glibmm Enums
 _CONV_GLIB_ENUM(ThreadPriority)
@@ -271,6 +279,14 @@ _CONVERSION(`Glib::RefPtr<Gst::TocEntry>', `GstTocEntry*',`Glib::unwrap($3)')
 
 dnl TypeFind
 _CONVERSION(`Gst::TypeFind&',`GstTypeFind*',`$3.gobj()')
+
+dnl VideoInfo
+_CONVERSION(`VideoInfo', `GstVideoInfo*', `$3.gobj()')
+_CONVERSION(`const VideoInfo&', `const GstVideoInfo*', `$3.gobj()')
+
+dnl VideoFormatInfo
+_CONVERSION(`const GstVideoFormatInfo*', `const VideoFormatInfo&', `VideoFormatInfo($3)')
+
 
 dnl ############## gstreamermm Interface Conversions ######################
 

@@ -1,0 +1,87 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008-2015 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+ 
+#include <gstreamermm/caps.h>
+#include <gstreamermm/videoformat.h>
+#include <gstreamermm/format.h>
+#include <gst/video/video-info.h>
+ 
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+  _WRAP_ENUM(VideoInterlaceMode, GstVideoInterlaceMode)
+  _WRAP_ENUM(VideoMultiviewMode, GstVideoMultiviewMode)
+  _WRAP_ENUM(VideoMultiviewFramePacking, GstVideoMultiviewFramePacking)
+  _WRAP_ENUM(VideoMultiviewFlags, GstVideoMultiviewFlags)
+  _WRAP_ENUM(VideoFlags, GstVideoFlags)
+
+class VideoInfo
+{
+  _CLASS_BOXEDTYPE(VideoInfo, GstVideoInfo, gst_video_info_new, gst_video_info_copy, gst_video_info_free)
+
+public:
+  _WRAP_METHOD(void init(), gst_video_info_init)
+  _WRAP_METHOD(void set_format(Gst::VideoFormat format, guint width, guint height), gst_video_info_set_format)
+  _WRAP_METHOD(bool from_caps(const Glib::RefPtr<const Gst::Caps>& caps), gst_video_info_from_caps)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> to_caps() const, gst_video_info_to_caps);
+  _WRAP_METHOD(bool convert(Gst::Format src_format, gint64 src_value, Gst::Format dest_format, gint64& dest_value), gst_video_info_convert)
+  _WRAP_METHOD(bool is_equal(const VideoInfo& other) const, gst_video_info_is_equal)
+
+  _MEMBER_GET(finfo, finfo, const VideoFormatInfo&, const GstVideoFormatInfo*)
+  
+  _MEMBER_GET(interlace_mode, interlace_mode, Gst::VideoInterlaceMode, GstVideoInterlaceMode)
+  _MEMBER_SET(interlace_mode, interlace_mode, Gst::VideoInterlaceMode, GstVideoInterlaceMode)
+  
+  _MEMBER_GET(flags, flags, Gst::VideoFlags, GstVideoFlags)
+  _MEMBER_SET(flags, flags, Gst::VideoFlags, GstVideoFlags)
+  
+  _MEMBER_GET(width, width, gint, gint)
+  _MEMBER_SET(width, width, gint, gint)
+  
+  _MEMBER_GET(height, height, gint, gint)
+  _MEMBER_SET(height, height, gint, gint)
+  
+  _MEMBER_GET(size, size, gsize, gsize)
+  _MEMBER_SET(size, size, gsize, gsize)
+  
+  _MEMBER_GET(views, views, gint, gint)
+  _MEMBER_SET(views, views, gint, gint)
+  
+  _MEMBER_GET(par_n, par_n, gint, gint)
+  _MEMBER_SET(par_n, par_n, gint, gint)
+  
+  _MEMBER_GET(par_d, par_d, gint, gint)
+  _MEMBER_SET(par_d, par_d, gint, gint)
+  
+  _MEMBER_GET(fps_n, fps_n, gint, gint)
+  _MEMBER_SET(fps_n, fps_n, gint, gint)
+  
+  _MEMBER_GET(fps_d, fps_d, gint, gint)
+  _MEMBER_SET(fps_d, fps_d, gint, gint)
+  
+  _MEMBER_GET(multiview_mode, ABI.abi.multiview_mode, Gst::VideoMultiviewMode, GstVideoMultiviewMode)
+  _MEMBER_SET(multiview_mode, ABI.abi.multiview_mode, Gst::VideoMultiviewMode, GstVideoMultiviewMode)
+  
+  _MEMBER_GET(multiview_flags, ABI.abi.multiview_flags, Gst::VideoMultiviewFlags, GstVideoMultiviewFlags)
+  _MEMBER_SET(multiview_flags, ABI.abi.multiview_flags, Gst::VideoMultiviewFlags, GstVideoMultiviewFlags)
+};
+
+}

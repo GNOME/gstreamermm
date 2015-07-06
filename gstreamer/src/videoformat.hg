@@ -1,0 +1,66 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008-2015 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gst/video/video-format.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+  _WRAP_ENUM(VideoFormat, GstVideoFormat)
+  _WRAP_ENUM(VideoFormatFlags, GstVideoFormatFlags)
+  _WRAP_ENUM(VideoPackFlags, GstVideoPackFlags)
+  
+/**
+ * Information for a video format.
+ */
+class VideoFormatInfo
+{
+  _CLASS_GENERIC(VideoFormatInfo, GstVideoFormatInfo)
+  
+public:
+  explicit VideoFormatInfo(const GstVideoFormatInfo* castitem);
+  virtual ~VideoFormatInfo();
+  
+  const GstVideoFormatInfo* gobj() const { return gobj_; };
+
+  _MEMBER_GET(format, format, VideoFormat, GstVideoFormat)
+  
+  _MEMBER_GET(name, name, Glib::ustring, const gchar*)
+  
+  _MEMBER_GET(description, description, Glib::ustring, const gchar*)
+  
+  _MEMBER_GET(flags, flags, VideoFormatFlags, GstVideoFormatFlags)
+  
+  _MEMBER_GET(bits, bits, guint, guint)
+  
+  _MEMBER_GET(n_components, n_components, guint, guint)
+  
+  _MEMBER_GET(n_planes, n_planes, guint, guint)
+  
+  _MEMBER_GET(unpack_format, unpack_format, VideoFormat, GstVideoFormat)
+  
+  _MEMBER_GET(pack_lines, pack_lines, gint, gint)
+  
+protected:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  const GstVideoFormatInfo* gobj_;
+#endif
+};
+}
