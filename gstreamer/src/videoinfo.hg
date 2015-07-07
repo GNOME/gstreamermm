@@ -36,9 +36,26 @@ namespace Gst
 
 class VideoInfo
 {
-  _CLASS_BOXEDTYPE(VideoInfo, GstVideoInfo, gst_video_info_new, gst_video_info_copy, gst_video_info_free)
-
+  _CLASS_GENERIC(VideoInfo, GstVideoInfo)
+  _IGNORE(gst_video_info_free)
+  _IGNORE(gst_video_info_copy)
 public:
+  VideoInfo();
+  VideoInfo(const VideoInfo& other);
+  VideoInfo& operator=(const VideoInfo& other);
+
+  /** This constructor allows to wrap both dynamic and static allocated
+    * GstVideoInfo object. If castitem is either static allocated or
+    * dynamic allocated, but will be freed somewhere else, @take_ownership
+    * should be set to false. If @take_ownership is set to true, castitem
+    * is freed in VideoInfo destructor.
+    */
+  VideoInfo(GstVideoInfo* castitem, bool take_ownership);
+  ~VideoInfo();
+
+  GstVideoInfo* gobj() { return gobject_; }
+  const GstVideoInfo* gobj() const { return gobject_; }
+
   _WRAP_METHOD(void init(), gst_video_info_init)
   _WRAP_METHOD(void set_format(Gst::VideoFormat format, guint width, guint height), gst_video_info_set_format)
   _WRAP_METHOD(bool from_caps(const Glib::RefPtr<const Gst::Caps>& caps), gst_video_info_from_caps)
@@ -86,6 +103,10 @@ public:
   
   _MEMBER_GET(multiview_flags, ABI.abi.multiview_flags, Gst::VideoMultiviewFlags, GstVideoMultiviewFlags)
   _MEMBER_SET(multiview_flags, ABI.abi.multiview_flags, Gst::VideoMultiviewFlags, GstVideoMultiviewFlags)
+
+private:
+  GstVideoInfo* gobject_;
+  bool take_ownership;
 };
 
 }
