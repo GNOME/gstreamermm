@@ -57,10 +57,13 @@ _CONV_ENUM(Gst,TocEntryType)
 _CONV_ENUM(Gst,TocScope)
 _CONV_ENUM(Gst,TunerChannelFlags)
 _CONV_ENUM(Gst,URIType)
+_CONV_ENUM(Gst,VideoBufferFlags)
 _CONV_ENUM(Gst,VideoChromaSite)
 _CONV_ENUM(Gst,VideoFlags)
 _CONV_ENUM(Gst,VideoFormat)
 _CONV_ENUM(Gst,VideoFormatFlags)
+_CONV_ENUM(Gst,VideoFrameFlags)
+_CONV_ENUM(Gst,VideoFrameMapFlags)
 _CONV_ENUM(Gst,VideoInterlaceMode)
 _CONV_ENUM(Gst,VideoMultiviewFlags)
 _CONV_ENUM(Gst,VideoMultiviewFramePacking)
@@ -284,9 +287,18 @@ _CONVERSION(`Gst::TypeFind&',`GstTypeFind*',`$3.gobj()')
 dnl VideoInfo
 _CONVERSION(`VideoInfo', `GstVideoInfo*', `$3.gobj()')
 _CONVERSION(`const VideoInfo&', `const GstVideoInfo*', `$3.gobj()')
+_CONVERSION(`const VideoInfo&', `GstVideoInfo*', `const_cast<GstVideoInfo*>($3.gobj())')
+_CONVERSION(`const VideoInfo&', `GstVideoInfo', `*($3.gobj())')
+_CONVERSION(`VideoInfo', `GstVideoInfo', `*($3.gobj())')
+_CONVERSION(`GstVideoInfo', `VideoInfo', `VideoInfo(VideoInfo(const_cast<GstVideoInfo*>(&$3), false))')
 
 dnl VideoFormatInfo
 _CONVERSION(`const GstVideoFormatInfo*', `const VideoFormatInfo&', `VideoFormatInfo($3)')
+
+dnl VideoFrame
+_CONVERSION(`const VideoFrame&', `GstVideoFrame*', `$3.gobj()')
+_CONVERSION(`const VideoFrame&', `const GstVideoFrame*', `$3.gobj()')
+_CONVERSION(`const VideoFrame&', `GstVideoFrame*', `const_cast<GstVideoFrame*>($3.gobj())')
 
 
 dnl ############## gstreamermm Interface Conversions ######################
