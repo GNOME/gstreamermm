@@ -24,5 +24,10 @@ $ENUM_PL "$PREFIX"/gst-libs/gst/{allocators,app,audio,cdda,fft,floatcast,\
 interfaces,netbuffer,pbutils,riff,rtp,rtsp,sdp,tag,video}/*.h \
 "$PREFIX"/gst/*/*.h "$PREFIX"/ext/*/*.h >> "$OUT_DIR/gst_enums.defs"
 
+PREFIX="$JHBUILD_SOURCES/gst-plugins-bad"
+$ENUM_PL  "$PREFIX"/gst-libs/gst/{adaptivedemux,base,basecamerabinsrc,\
+codecparsers,gl,insertbin,interfaces,mpegts,uridownloader,video,wayland}/*.h >> \
+"$OUT_DIR/gst_enums.defs"
+
 #Patch generated file.
 patch $OUT_DIR/gst_enums.defs $OUT_DIR/gst_enums.defs.patch
