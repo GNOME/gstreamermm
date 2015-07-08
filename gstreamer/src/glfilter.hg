@@ -1,0 +1,69 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2008-2015 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(gstreamermm,gst)
+
+#include <gst/gl/gl.h>
+#include <gstreamermm/glbasefilter.h>
+#include <gstreamermm/videoinfo.h>
+#include <gstreamermm/buffer.h>
+
+namespace Gst
+{
+class GLFilter
+: public GLBaseFilter
+{
+  _CLASS_GOBJECT(GLFilter, GstGLFilter, GST_GL_FILTER, GLBaseFilter, GstGLBaseFilter)
+
+public:
+  _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps), "set_caps")
+  _WRAP_VFUNC(bool filter(const Glib::RefPtr<Gst::Buffer>& inbuf, const Glib::RefPtr<Gst::Buffer>& outbuf), "filter")
+  _WRAP_VFUNC(bool filter_texture(guint in_tex, guint out_tex), "filter_texture")
+  _WRAP_VFUNC(bool init_fbo(), "init_fbo")
+
+  _MEMBER_GET(in_info, in_info, VideoInfo, GstVideoInfo)
+  _MEMBER_SET(in_info, in_info, VideoInfo, GstVideoInfo)
+
+  _MEMBER_GET(out_caps, out_caps, Glib::RefPtr<Gst::Caps>, GstCaps*)
+  _MEMBER_SET(out_caps, out_caps, Glib::RefPtr<Gst::Caps>, GstCaps*)
+
+  _MEMBER_GET(fbo, fbo, GLuint, GLuint)
+  _MEMBER_SET(fbo, fbo, GLuint, GLuint)
+
+  _MEMBER_GET(depthbuffer, depthbuffer, GLuint, GLuint)
+  _MEMBER_SET(depthbuffer, depthbuffer, GLuint, GLuint)
+
+  _MEMBER_GET(vao, vao, GLuint, GLuint)
+  _MEMBER_SET(vao, vao, GLuint, GLuint)
+
+  _MEMBER_GET(vbo_indices, vbo_indices, GLuint, GLuint)
+  _MEMBER_SET(vbo_indices, vbo_indices, GLuint, GLuint)
+
+  _MEMBER_GET(vertex_buffer, vertex_buffer, GLuint, GLuint)
+  _MEMBER_SET(vertex_buffer, vertex_buffer, GLuint, GLuint)
+
+
+  _MEMBER_GET(draw_attr_position_loc, draw_attr_position_loc, GLint, GLint)
+  _MEMBER_SET(draw_attr_position_loc, draw_attr_position_loc, GLint, GLint)
+
+  _MEMBER_GET(draw_attr_texture_loc, draw_attr_texture_loc, GLint, GLint)
+  _MEMBER_SET(draw_attr_texture_loc, draw_attr_texture_loc, GLint, GLint)
+};
+
+}
