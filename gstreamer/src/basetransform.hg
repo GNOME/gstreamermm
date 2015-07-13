@@ -195,13 +195,12 @@ public:
   _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps), "set_caps", return_value true)
 
 #m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3, true)')
-#m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
 
   /** Required if the element does not operate in-place. Transforms one
    * incoming buffer to one outgoing buffer. The function is allowed to change
    * size/timestamp/duration of the outgoing buffer.
    */
-  _WRAP_VFUNC(FlowReturn transform(const Glib::RefPtr<Gst::Buffer>& inbuf, const Glib::RefPtr<Gst::Buffer>& outbuf), "transform")
+    virtual FlowReturn transform_vfunc(const Glib::RefPtr<Gst::Buffer>& inbuf, const Glib::RefPtr<Gst::Buffer>& outbuf);
 
   /** Required if the element operates in-place. Transform the incoming buffer
    * in-place.
@@ -246,8 +245,10 @@ protected:
   klass->start = &start_vfunc_callback;
   klass->stop = &stop_vfunc_callback;
   klass->prepare_output_buffer = &prepare_output_buffer_vfunc_callback;
+  klass->transform = &transform_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer** buf);
+  static GstFlowReturn transform_vfunc_callback(GstBaseTransform* self, GstBuffer* inbuf, GstBuffer* outbuf);
   _POP()
 #m4end
 };
