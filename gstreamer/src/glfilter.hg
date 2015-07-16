@@ -32,10 +32,17 @@ class GLFilter
   _CLASS_GOBJECT(GLFilter, GstGLFilter, GST_GL_FILTER, GLBaseFilter, GstGLBaseFilter)
 
 public:
-  _WRAP_VFUNC(bool set_caps(const Glib::RefPtr<Gst::Caps>& incaps, const Glib::RefPtr<Gst::Caps>& outcaps), "set_caps")
   _WRAP_VFUNC(bool filter(const Glib::RefPtr<Gst::Buffer>& inbuf, const Glib::RefPtr<Gst::Buffer>& outbuf), "filter")
   _WRAP_VFUNC(bool filter_texture(guint in_tex, guint out_tex), "filter_texture")
-  _WRAP_VFUNC(bool init_fbo(), "init_fbo")
+  _WRAP_VFUNC(bool init_fbo(), "init_fbo", return_value true)
+
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Caps> transform_internal_caps(Gst::PadDirection direction, const Glib::RefPtr<Gst::Caps>& caps, const Glib::RefPtr<Gst::Caps>& filter_caps), "transform_internal_caps")
+  _WRAP_VFUNC(void display_init_cb(), "display_init_cb")
+  _WRAP_VFUNC(void display_reset_cb(), "display_reset_cb")
+
+  typedef sigc::slot<void, gint, gint, guint> SlotTextureOperation;
+  void render_to_target(bool resize, GLuint input, GLuint target, const SlotTextureOperation& slot);
+  _IGNORE(gst_gl_filter_render_to_target);
 
   _MEMBER_GET(in_info, in_info, VideoInfo, GstVideoInfo)
   _MEMBER_SET(in_info, in_info, VideoInfo, GstVideoInfo)

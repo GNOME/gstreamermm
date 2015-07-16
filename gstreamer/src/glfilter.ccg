@@ -18,3 +18,21 @@
  */
 
 _PINCLUDE(gstreamermm/private/glbasefilter_p.h)
+
+static void Slot_Texture_Operation_gstreamermm_callback(gint param1, gint param2, guint param3, gpointer stuff)
+{
+  Gst::GLFilter::SlotTextureOperation* the_slot = static_cast<Gst::GLFilter::SlotTextureOperation*>(stuff);
+  (*the_slot)(param1, param2, param3);
+  delete the_slot;
+}
+
+namespace Gst
+{
+
+void GLFilter::render_to_target(bool resize, GLuint input, GLuint target, const SlotTextureOperation& slot)
+{
+  SlotTextureOperation* slot_copy = new SlotTextureOperation(slot);
+  gst_gl_filter_render_to_target(gobj(), resize, input, target, &Slot_Texture_Operation_gstreamermm_callback, slot_copy);
+}
+
+} //namespace Gst

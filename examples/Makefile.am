@@ -32,6 +32,7 @@ noinst_PROGRAMS =						\
 	hello_world/example					\
 	ogg_player/example					\
 	ogg_rewriter/example				\
+	opengl_filter/example		\
 	typefind/example					\
 	optiongroup/example					\
 	$(optional_examples)
@@ -59,5 +60,6 @@ ogg_player_gtkmm_example_SOURCES			= ogg_player_gtkmm/main.cc \
 												ogg_player_gtkmm/player_window.cc \
 												ogg_player_gtkmm/player_window.h
 ogg_player_gtkmm_example_LDADD				= $(GUI_EXAMPLES_LIBS) $(local_libgstreamermm)
+opengl_filter_example_SOURCES						= opengl_filter/main.cc
 optiongroup_example_SOURCES					= optiongroup/main.cc
 typefind_example_SOURCES					= typefind/main.cc
