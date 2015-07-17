@@ -15,12 +15,15 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-if ENABLE_GUI_EXAMPLES
-optional_examples = media_player_gtkmm/example ogg_player_gtkmm/example
-examples_cppflags = $(GUI_EXAMPLES_CFLAGS)
-else
-optional_examples =
 examples_cppflags = $(GSTREAMERMM_CFLAGS)
+
+if ENABLE_GUI_EXAMPLES
+gui_examples = media_player_gtkmm/example ogg_player_gtkmm/example
+examples_cppflags = $(GUI_EXAMPLES_CFLAGS) $(examples_cppflags)
+endif
+
+if ENABLE_GL
+gl_examples = opengl_filter/example
 endif
 
 noinst_PROGRAMS =						\
@@ -32,9 +35,9 @@ noinst_PROGRAMS =						\
 	hello_world/example					\
 	ogg_player/example					\
 	ogg_rewriter/example				\
-	opengl_filter/example		\
 	typefind/example					\
 	optiongroup/example					\
+	$(gl_examples)						\
 	$(optional_examples)
 
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)

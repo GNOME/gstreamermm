@@ -13,7 +13,9 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gstreamermm], [1.4.3],
+m4_define([GSTREAMERMM_VERSION], [1.4.3])
+
+AC_INIT([gstreamermm], GSTREAMERMM_VERSION,
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gstreamermm],
         [gstreamermm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -63,8 +65,22 @@ AC_SUBST([GSTREAMERMM_MODULES],
          [[], [-app], [-audio], [-base], [-check],
            [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
            [-riff], [-rtp], [-sdp], [-tag], [-video], [-gl]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= 1.4.3])'])
+         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= GSTREAMERMM_VERSION])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
+
+
+PKG_CHECK_MODULES([GSTREAMERMM_PLUGINS_BAD], gstreamer-plugins-bad-1.0 >= GSTREAMERMM_VERSION,
+                  [
+                    gstmm_bad_version=$(pkg-config --modversion gstreamer-plugins-bad-1.0)
+                    gstmm_enable_bad=yes
+                  ], [gstmm_enable_bad=no])
+
+PKG_CHECK_MODULES([GSTREAMERMM_GL], gstreamer-gl-1.0 >= GSTREAMERMM_VERSION,
+                  [gstmm_enable_gl=yes], [gstmm_enable_gl=no])
+AC_ARG_ENABLE([gl],
+              AS_HELP_STRING([--disable-gl], [Disable gl libraries]))
+AS_IF([test "x$enable_gl" = "xno"], [gstmm_enable_gl=no])
+AM_CONDITIONAL([ENABLE_GL], [test "x$gstmm_enable_gl" = xyes])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
                   [gstmm_enable_gui_examples=yes], [gstmm_enable_gui_examples=no])
@@ -205,3 +221,20 @@ AC_CONFIG_FILES([Makefile
                  docs/Makefile
                  docs/reference/Doxyfile])
 AC_OUTPUT
+
+cat <<EOF
+
+${PACKAGE}-${VERSION}
+
+  Build Environment
+    Install Prefix:              ${prefix}
+    
+  Libraries
+    GStreamer Version:           $(pkg-config --modversion gstreamer-1.0)
+    gstreamer-plugins-bad:       ${gstmm_enable_bad} ${gstmm_bad_version}
+        gstreamer-gl:            ${gstmm_enable_gl}
+
+  Extra features
+    GUI Examples:                ${gstmm_enable_gui_examples}
+
+EOF
