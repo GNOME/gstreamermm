@@ -22,7 +22,7 @@ gui_examples = media_player_gtkmm/example ogg_player_gtkmm/example
 examples_cppflags = $(GUI_EXAMPLES_CFLAGS) $(examples_cppflags)
 endif
 
-if ENABLE_GL
+if ENABLE_GSTREAMERMM_GL
 gl_examples = opengl_filter/example
 endif
 

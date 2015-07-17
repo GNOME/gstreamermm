@@ -75,12 +75,7 @@ PKG_CHECK_MODULES([GSTREAMERMM_PLUGINS_BAD], gstreamer-plugins-bad-1.0 >= GSTREA
                     gstmm_enable_bad=yes
                   ], [gstmm_enable_bad=no])
 
-PKG_CHECK_MODULES([GSTREAMERMM_GL], gstreamer-gl-1.0 >= GSTREAMERMM_VERSION,
-                  [gstmm_enable_gl=yes], [gstmm_enable_gl=no])
-AC_ARG_ENABLE([gl],
-              AS_HELP_STRING([--disable-gl], [Disable gl libraries]))
-AS_IF([test "x$enable_gl" = "xno"], [gstmm_enable_gl=no])
-AM_CONDITIONAL([ENABLE_GL], [test "x$gstmm_enable_gl" = xyes])
+FIND_GST_MODULE(GSTREAMERMM_GL, gl)
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
                   [gstmm_enable_gui_examples=yes], [gstmm_enable_gui_examples=no])
