@@ -72,13 +72,9 @@ PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 AC_SUBST([GSTREAMERMM_PLUGINS_BAD_MODULES],
          ["gstreamer-plugins-bad-1.0 >= GSTMM_VERSION $GSTREAMERMM_MODULES"])
-PKG_CHECK_MODULES([GSTREAMERMM_PLUGINS_BAD], ,
-                  [
-                    gstmm_bad_version=$(pkg-config --modversion gstreamer-plugins-bad-1.0)
-                    gstmm_enable_bad=yes
-                  ], [gstmm_enable_bad=no])
 
-FIND_GST_MODULE(GSTREAMERMM_GL, gl)
+FIND_GST_MODULE(GSTREAMERMM_PLUGINS_BAD, plugins-bad, plugins_bad)
+FIND_GST_MODULE(GSTREAMERMM_GL, gl, gl, $gstmm_enable_plugins_bad)
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
                   [gstmm_enable_gui_examples=yes], [gstmm_enable_gui_examples=no])
@@ -230,10 +226,10 @@ ${PACKAGE}-${VERSION}
 
   Build Environment
     Install Prefix:              ${prefix}
-    
+
   Libraries
     GStreamer Version:           $(pkg-config --modversion gstreamer-1.0)
-    gstreamer-plugins-bad:       ${gstmm_enable_bad} ${gstmm_bad_version}
+    gstreamer-plugins-bad:       ${gstmm_enable_plugins_bad} ${gstmm_plugins_bad_version}
         gstreamer-gl:            ${gstmm_enable_gl}
 
   Extra features

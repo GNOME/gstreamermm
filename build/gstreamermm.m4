@@ -17,6 +17,8 @@
 ## Arguments: 
 ##  * $1 - var_name (e.g. GSTREAMERMM_GL, GSTREAMERMM_NET)
 ##  * $2 - pkg-config module name sufix (e.g. gl, net)
+##  * $3 - var_name (e.g. gl, plugins_bad) - can't contain underscores
+##  * $4 - dependency conditions
 ## Macro creates two variables:
 ##  * ENABLE_$1 - true, if module will be enabled, false otherwise
 ##  * gstmm_enable_$2 - "yes", if module will be enabled, "no" otherwise
@@ -24,13 +26,18 @@
 ## in ./configure script.
 AC_DEFUN([FIND_GST_MODULE], 
 [
-
   PKG_CHECK_MODULES($1, gstreamer-[$2]-1.0 >= GSTREAMERMM_VERSION,
-                  [gstmm_enable_$2=yes], [gstmm_enable_$2=no])
-  
+                  [gstmm_enable_$3=yes], [gstmm_enable_$3=no])
+
   AC_ARG_ENABLE($2,
               AS_HELP_STRING([--disable-$2], [Disable gstreamer-$2 library]))
-  
-  AS_IF([test "x$enable_$2" = "xno"], [gstmm_enable_$2=no])
-  AM_CONDITIONAL([ENABLE_$1], [test "x$gstmm_enable_$2" = xyes])
+  tst=x$4
+  if test $tst = "x"; then :
+    tst=xyes
+  fi
+
+  gstmm_$3_version=v$(pkg-config --modversion gstreamer-[$2]-1.0)
+
+  AS_IF([test "x$enable_$3" = "xno" || test "$tst" != xyes], [gstmm_enable_$3=no])
+  AM_CONDITIONAL([ENABLE_$1], [test "x$gstmm_enable_$3" = xyes])
 ])
