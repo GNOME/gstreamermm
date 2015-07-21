@@ -13,9 +13,9 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-m4_define([GSTREAMERMM_VERSION], [1.4.3])
+m4_define([GSTMM_VERSION], [1.4.3])
 
-AC_INIT([gstreamermm], GSTREAMERMM_VERSION,
+AC_INIT([gstreamermm], [1.4.3],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gstreamermm],
         [gstreamermm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -27,6 +27,7 @@ AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h])
 
 MM_PREREQ([0.9.6])
 MM_INIT_MODULE([gstreamermm-1.0])
+MM_INIT_MODULE([gstreamermm-plugins-bad-1.0])
 
 # Copy the mm-common .pl scripts into docs/,
 # and use them from there,
@@ -56,6 +57,7 @@ AC_PROG_SED
 AS_IF([test "x$enable_static" = xyes],
 [
   AC_DEFINE([GSTREAMERMM_STATIC_LIB], [1], [Define if gstreamermm is built as a static library])
+  AC_DEFINE([GSTREAMERMM_PLUGINS_BAD_STATIC_LIB], [1], [Define if gstreamermm-plugins-bad is built as a static library])
 ])
 
 # The format below is used so that the requirements appear nicely in the .pc
@@ -65,11 +67,12 @@ AC_SUBST([GSTREAMERMM_MODULES],
          [[], [-app], [-audio], [-base], [-check],
            [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
            [-riff], [-rtp], [-sdp], [-tag], [-video], [-gl]],
-         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= GSTREAMERMM_VERSION])'])
+         [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= GSTMM_VERSION])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
-
-PKG_CHECK_MODULES([GSTREAMERMM_PLUGINS_BAD], gstreamer-plugins-bad-1.0 >= GSTREAMERMM_VERSION,
+AC_SUBST([GSTREAMERMM_PLUGINS_BAD_MODULES],
+         ["gstreamer-plugins-bad-1.0 >= GSTMM_VERSION $GSTREAMERMM_MODULES"])
+PKG_CHECK_MODULES([GSTREAMERMM_PLUGINS_BAD], ,
                   [
                     gstmm_bad_version=$(pkg-config --modversion gstreamer-plugins-bad-1.0)
                     gstmm_enable_bad=yes
@@ -211,6 +214,10 @@ AC_CONFIG_FILES([Makefile
                  gstreamer/${GSTREAMERMM_MODULE_NAME}-uninstalled.pc:gstreamer/gstreamermm-uninstalled.pc.in
                  gstreamer/src/Makefile
                  gstreamer/gstreamermm/Makefile
+                 gst-plugins-bad/${GSTREAMERMM_PLUGINS_BAD_MODULE_NAME}.pc:gst-plugins-bad/gstreamermm-plugins-bad.pc.in
+                 gst-plugins-bad/${GSTREAMERMM_PLUGINS_BAD_MODULE_NAME}-uninstalled.pc:gst-plugins-bad/gstreamermm-plugins-bad-uninstalled.pc.in
+                 gst-plugins-bad/src/Makefile
+                 gst-plugins-bad/gstreamermm-plugins-bad/Makefile
                  examples/Makefile
                  tests/Makefile
                  docs/Makefile

@@ -23,7 +23,7 @@ examples_cppflags = $(GUI_EXAMPLES_CFLAGS) $(examples_cppflags)
 endif
 
 if ENABLE_GSTREAMERMM_GL
-gl_examples = opengl_filter/example
+#gl_examples = opengl_filter/example
 endif
 
 noinst_PROGRAMS =						\
