@@ -16,14 +16,22 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 examples_cppflags = $(GSTREAMERMM_CFLAGS)
+gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer) 
+local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
 
 if ENABLE_GUI_EXAMPLES
 gui_examples = media_player_gtkmm/example ogg_player_gtkmm/example
-examples_cppflags = $(GUI_EXAMPLES_CFLAGS) $(examples_cppflags)
+examples_cppflags += $(GUI_EXAMPLES_CFLAGS)
+endif
+
+if ENABLE_GSTREAMERMM_PLUGINS_BAD
+gstreamermm_includes += -I$(top_builddir)/gst-plugins-bad $(if $(srcdir:.=),-I$(top_srcdir)/gst-plugins-bad)
+local_libgstreamermm += $(top_builddir)/gst-plugins-bad/gstreamermm-plugins-bad/libgstreamermm-plugins-bad-$(GSTREAMERMM_API_VERSION).la
 endif
 
 if ENABLE_GSTREAMERMM_GL
-#gl_examples = opengl_filter/example
+gl_examples = opengl_filter/example
+local_libgstreamermm += $(GSTREAMERMM_GL_LIBS)
 endif
 
 noinst_PROGRAMS =						\
@@ -40,8 +48,6 @@ noinst_PROGRAMS =						\
 	$(gl_examples)						\
 	$(optional_examples)
 
-gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
-local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
 
 AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(examples_cppflags)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -std=c++0x
@@ -63,6 +69,6 @@ ogg_player_gtkmm_example_SOURCES			= ogg_player_gtkmm/main.cc \
 												ogg_player_gtkmm/player_window.cc \
 												ogg_player_gtkmm/player_window.h
 ogg_player_gtkmm_example_LDADD				= $(GUI_EXAMPLES_LIBS) $(local_libgstreamermm)
-opengl_filter_example_SOURCES						= opengl_filter/main.cc
+opengl_filter_example_SOURCES				= opengl_filter/main.cc 
 optiongroup_example_SOURCES					= optiongroup/main.cc
 typefind_example_SOURCES					= typefind/main.cc

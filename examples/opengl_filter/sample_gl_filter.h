@@ -3,10 +3,10 @@
 
 #define GST_USE_UNSTABLE_API
 #include <gstreamermm.h>
-#include <gstreamermm/glfilter.h>
-#include <gstreamermm/private/glfilter_p.h>
+#include <gstreamermm-plugins-bad/glfilter.h>
+#include <gstreamermm-plugins-bad/private/glfilter_p.h>
 
-class SampleGLFilter: public Gst::GLFilter
+class SampleGLFilter: public Gst::Bad::GLFilter
 {
   void callback (gint /* width */, gint /* height */, guint texture)
   {
@@ -38,7 +38,7 @@ public:
 
   explicit SampleGLFilter(GstGLFilter *gobj)
       : Glib::ObjectBase(typeid (SampleGLFilter)),
-        Gst::GLFilter(gobj)
+        Gst::Bad::GLFilter(gobj)
   {
     // To use filter_texture vfunc, we have to set filter vfunc to null
       GST_GL_FILTER_GET_CLASS(gobj)->filter = NULL;
