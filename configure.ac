@@ -66,18 +66,20 @@ AC_SUBST([GSTREAMERMM_MODULES],
          ['giomm-2.4 >= 2.36.0[]m4_foreach([gstmm_mod],
          [[], [-app], [-audio], [-base], [-check],
            [-controller], [-fft], [-net], [-pbutils], [-plugins-base],
-           [-riff], [-rtp], [-sdp], [-tag], [-video], [-gl]],
+           [-riff], [-rtp], [-sdp], [-tag], [-video]],
          [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= GSTMM_VERSION])'])
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
 
 AC_SUBST([GSTREAMERMM_PLUGINS_BAD_MODULES],
-         ["gstreamer-plugins-bad-1.0 >= GSTMM_VERSION $GSTREAMERMM_MODULES"])
+         ["gstreamer-plugins-bad-1.0 >= GSTMM_VERSION gstreamermm-1.0 >= GSTMM_VERSION"])
 
 FIND_GST_MODULE(GSTREAMERMM_PLUGINS_BAD, plugins-bad, plugins_bad)
 FIND_GST_MODULE(GSTREAMERMM_GL, gl, gl, $gstmm_enable_plugins_bad)
+ADD_MODULE_CONDITIONALLY([GSTREAMERMM_PLUGINS_BAD_MODULES], [gstreamer-gl-1.0], [$gstmm_enable_gl])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
                   [gstmm_enable_gui_examples=yes], [gstmm_enable_gui_examples=no])
+
 AS_IF([test "x$gstmm_enable_gui_examples" != xyes],
       [AC_MSG_WARN([gtkmm not available: GUI examples will not be built.])])
 AM_CONDITIONAL([ENABLE_GUI_EXAMPLES], [test "x$gstmm_enable_gui_examples" = xyes])

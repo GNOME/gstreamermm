@@ -17,9 +17,11 @@ ACLOCAL_AMFLAGS = -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 EXTRA_DIST =  tests/plugins/test-foo.h tests/regression/utils.h tests/regression/pluginbin.h tests/resources/input-image.png
+srcmm_subdirs = gstreamer/gstreamermm
+pkgconfig_files = gstreamer/$(GSTREAMERMM_MODULE_NAME).pc
 
 if MAINTAINER_MODE
-src_subdirs = gstreamer/src gst-plugins-bad/src
+src_subdirs = gstreamer/src
 else
 src_subdirs =
 endif
@@ -28,8 +30,16 @@ doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = tools $(src_subdirs) gstreamer/gstreamermm \
-          gst-plugins-bad/gstreamermm-plugins-bad \
+
+if ENABLE_GSTREAMERMM_PLUGINS_BAD
+if MAINTAINER_MODE
+src_subdirs += gst-plugins-bad/src
+endif # MAINTAINER_MODE
+srcmm_subdirs += gst-plugins-bad/gstreamermm-plugins-bad
+pkgconfig_files +=  gst-plugins-bad/$(GSTREAMERMM_PLUGINS_BAD_MODULE_NAME).pc
+endif #ENABLE_PLUGINS_BAD
+
+SUBDIRS = tools $(src_subdirs) $(srcmm_subdirs) \
           tests examples $(doc_subdirs)
 
 gstreamermm_includedir = $(includedir)/$(GSTREAMERMM_MODULE_NAME)
@@ -38,7 +48,7 @@ gstreamermm_libincludedir = $(libdir)/$(GSTREAMERMM_MODULE_NAME)/include
 nodist_gstreamermm_libinclude_HEADERS = gstreamer/gstreamermmconfig.h
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = gstreamer/$(GSTREAMERMM_MODULE_NAME).pc gst-plugins-bad/$(GSTREAMERMM_PLUGINS_BAD_MODULE_NAME).pc
+pkgconfig_DATA = $(pkgconfig_files)
 
 dist_noinst_SCRIPTS = autogen.sh
 

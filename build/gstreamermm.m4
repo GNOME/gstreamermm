@@ -41,3 +41,15 @@ AC_DEFUN([FIND_GST_MODULE],
   AS_IF([test "x$enable_$3" = "xno" || test "$tst" != xyes], [gstmm_enable_$3=no])
   AM_CONDITIONAL([ENABLE_$1], [test "x$gstmm_enable_$3" = xyes])
 ])
+
+## Arguments:
+##  * $1 - modules name variable (e.g. GSTREAMERMM_PLUGINS_BAD_MODULES)
+##  * $2 - module name (e.g. gstreamer-gl-1.0)
+##  * $3 - conditional variable (must equals to yes)
+AC_DEFUN([ADD_MODULE_CONDITIONALLY],
+[
+  AS_IF([test x$3 = xyes], [
+    AC_SUBST([$1], ["$$1 $2"])
+  ])
+])
+
