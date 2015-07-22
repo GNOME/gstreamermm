@@ -85,6 +85,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `Glib::unwrap
 
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')
+_CONVERSION(`GstBuffer*',`const Glib::RefPtr<Gst::Buffer>&',`Glib::wrap($3, true)')
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>(Glib::unwrap($3))')
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `Glib::unwrap($3)')
