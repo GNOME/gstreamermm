@@ -28,10 +28,12 @@ $H2DEF_PY  "$PREFIX"/gst-libs/gst/{allocators,app,audio,cdda,fft,floatcast,\
 interfaces,netbuffer,pbutils,riff,rtp,rtsp,sdp,tag,video}/*.h >> \
 "$OUT_DIR/gst_methods.defs"
 
-PREFIX="$JHBUILD_SOURCES/gst-plugins-bad"
-$H2DEF_PY  "$PREFIX"/gst-libs/gst/{adaptivedemux,base,basecamerabinsrc,\
-codecparsers,gl,insertbin,interfaces,mpegts,uridownloader,video,wayland}/*.h >> \
-"$OUT_DIR/gst_methods.defs"
-
 #Patch generated file.
 patch  $OUT_DIR/gst_methods.defs $OUT_DIR/gst_methods.defs.patch
+
+OUT_DIR="$ROOT_DIR/gst-plugins-bad/src"
+PREFIX="$JHBUILD_SOURCES/gst-plugins-bad"
+$H2DEF_PY  "$PREFIX"/gst-libs/gst/{adaptivedemux,base,basecamerabinsrc,\
+codecparsers,gl,insertbin,interfaces,mpegts,uridownloader,video,wayland}/*.h > \
+"$OUT_DIR/gst_methods.defs"
+

@@ -7378,7 +7378,7 @@ Extra video frame flags
 </parameter>
 <parameter name="GST_VIDEO_FRAME_FLAG_INTERLACED">
 <parameter_description> The video frame is interlaced. In mixed
-interlace-mode, this flags specifies if the frame is interlace or
+interlace-mode, this flag specifies if the frame is interlaced or
 progressive.
 </parameter_description>
 </parameter>
@@ -18368,6 +18368,8 @@ This function is used to receive asynchronous messages in the main loop.
 There can only be a single bus watch per bus, you must remove it before you
 can set a new one.
 
+The bus watch will only work if a GLib main loop is being run.
+
 The watch can be removed using gst_bus_remove_watch() or by returning %FALSE
 from @func. If the watch was added to the default main context it is also
 possible to remove the watch using g_source_remove().
@@ -18405,6 +18407,8 @@ context 'manually').
 This function is used to receive asynchronous messages in the main loop.
 There can only be a single bus watch per bus, you must remove it before you
 can set a new one.
+
+The bus watch will only work if a GLib main loop is being run.
 
 When @func is called, the message belongs to the caller; if you want to
 keep a copy of it, call gst_message_ref() before leaving @func.
@@ -36794,6 +36798,1773 @@ Convert @value to a gdouble.
 </parameter>
 </parameters>
 <return> @value converted to a #gdouble.
+</return>
+</function>
+
+<function name="gst_harness_add_element_sink_pad">
+<description>
+Links the specifed #GstPad the @GstHarness srcpad.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="sinkpad">
+<parameter_description> a #GstPad to link to the harness srcpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_element_src_pad">
+<description>
+Links the specifed #GstPad the @GstHarness sinkpad. This can be useful if
+perhaps the srcpad did not exist at the time of creating the harness,
+like a demuxer that provides a sometimes-pad after receiving data.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="srcpad">
+<parameter_description> a #GstPad to link to the harness sinkpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_probe">
+<description>
+A convenience function to allows you to call gst_pad_add_probe on a
+#GstPad of a #GstElement that are residing inside the #GstHarness,
+by using normal gst_pad_add_probe syntax
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="element_name">
+<parameter_description> a #gchar with a #GstElementFactory name
+</parameter_description>
+</parameter>
+<parameter name="pad_name">
+<parameter_description> a #gchar with the name of the pad to attach the probe to
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> a #GstPadProbeType (see gst_pad_add_probe)
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GstPadProbeCallback (see gst_pad_add_probe)
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> a #gpointer (see gst_pad_add_probe)
+</parameter_description>
+</parameter>
+<parameter name="destroy_data">
+<parameter_description> a #GDestroyNotify (see gst_pad_add_probe)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_sink">
+<description>
+Similar to gst_harness_add_src, this allows you to send the data coming out
+of your harnessed #GstElement to a sink-element, allowing to test different
+responses the element output might create in sink elements. An example might
+be an existing sink providing some analytical data on the input it receives that
+can be useful to your testing. If the goal is to test a sink-element itself,
+this is better acheived using gst_harness_new directly on the sink.
+
+If a sink-harness already exists it will be replaced.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="sink_element_name">
+<parameter_description> a #gchar with the name of a #GstElement
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_sink_parse">
+<description>
+Similar to gst_harness_add_sink, this allows you to specify a launch-line
+instead of just an element name. See gst_harness_add_src_parse for details.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="launchline">
+<parameter_description> a #gchar with the name of a #GstElement
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_src">
+<description>
+A src-harness is a great way of providing the #GstHarness with data.
+By adding a src-type #GstElement, it is then easy to use functions like
+gst_harness_push_from_src or gst_harness_src_crank_and_push_many
+to provide your harnessed element with input. The @has_clock_wait variable
+is a greate way to control you src-element with, in that you can have it
+produce a buffer for you by simply cranking the clock, and not have it
+spin out of control producing buffers as fast as possible.
+
+If a src-harness already exists it will be replaced.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="src_element_name">
+<parameter_description> a #gchar with the name of a #GstElement
+</parameter_description>
+</parameter>
+<parameter name="has_clock_wait">
+<parameter_description> a #gboolean specifying if the #GstElement uses
+gst_clock_wait_id internally.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_src_parse">
+<description>
+Similar to gst_harness_add_src, this allows you to specify a launch-line,
+which can be useful for both having more then one #GstElement acting as your
+src (Like a src producing raw buffers, and then an encoder, providing encoded
+data), but also by allowing you to set properties like &quot;is-live&quot; directly on
+the elements.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="launchline">
+<parameter_description> a #gchar describing a gst-launch type line
+</parameter_description>
+</parameter>
+<parameter name="has_clock_wait">
+<parameter_description> a #gboolean specifying if the #GstElement uses
+gst_clock_wait_id internally.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_buffers_in_queue">
+<description>
+The number of #GstBuffers currently in the #GstHarness sinkpad #GAsyncQueue
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #guint number of buffers in the queue
+
+</return>
+</function>
+
+<function name="gst_harness_buffers_received">
+<description>
+The total number of #GstBuffers that has arrived on the #GstHarness sinkpad.
+This number includes buffers that have been dropped as well as buffers
+that have already been pulled out.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #guint number of buffers received
+
+</return>
+</function>
+
+<function name="gst_harness_crank_multiple_clock_waits">
+<description>
+Similar to gst_harness_crank_single_clock_wait, this is the function to use
+if your harnessed element(s) are using more then one gst_clock_id_wait.
+Failing to do so can (and will) make it racy which #GstClockID you actually
+are releasing, where as this function will process all the waits at the
+same time, ensuring that one thread can't register another wait before
+both are released.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="waits">
+<parameter_description> a #guint describing the number of #GstClockIDs to crank
+</parameter_description>
+</parameter>
+</parameters>
+<return> a @gboolean %TRUE if the &quot;crank&quot; was successful, %FALSE if not.
+
+</return>
+</function>
+
+<function name="gst_harness_crank_single_clock_wait">
+<description>
+A &quot;crank&quot; consists of three steps:
+1: Wait for a #GstClockID to be registered with the #GstTestClock.
+2: Advance the #GstTestClock to the time the #GstClockID is waiting for.
+3: Release the #GstClockID wait.
+Together, this provides an easy way to not have to think about the details
+around clocks and time, but still being able to write deterministic tests
+that are dependant on this. A &quot;crank&quot; can be though of as the notion of
+manually driving the clock forward to its next logical step.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a @gboolean %TRUE if the &quot;crank&quot; was successful, %FALSE if not.
+
+</return>
+</function>
+
+<function name="gst_harness_create_buffer">
+<description>
+Allocates a buffer using a #GstBufferPool if present, or else using the
+configured #GstAllocator and #GstAllocatorParams
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="size">
+<parameter_description> a #gsize specifying the size of the buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer of size @size
+
+</return>
+</function>
+
+<function name="gst_harness_dump_to_file">
+<description>
+Allows you to dump the #GstBuffers the #GstHarness sinkpad #GAsyncQueue
+to a file.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="filename">
+<parameter_description> a #gchar with a the name of a file
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_events_in_queue">
+<description>
+The number of #GstEvents currently in the #GstHarness sinkpad #GAsyncQueue
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #guint number of events in the queue
+
+</return>
+</function>
+
+<function name="gst_harness_events_received">
+<description>
+The total number of #GstEvents that has arrived on the #GstHarness sinkpad
+This number includes events handled by the harness as well as events
+that have already been pulled out.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #guint number of events received
+
+</return>
+</function>
+
+<function name="gst_harness_find_element">
+<description>
+Most useful in conjunction with gst_harness_new_parse, this will scan the
+#GstElements inside the #GstHarness, and check if any of them matches
+@element_name. Typical usecase being that you need to access one of the
+harnessed elements for properties and/or signals.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="element_name">
+<parameter_description> a #gchar with a #GstElementFactory name
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstElement or %NULL if not found
+
+</return>
+</function>
+
+<function name="gst_harness_get">
+<description>
+A convenience function to allows you to call g_object_get on a #GstElement
+that are residing inside the #GstHarness, by using normal g_object_get
+syntax.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="element_name">
+<parameter_description> a #gchar with a #GstElementFactory name
+</parameter_description>
+</parameter>
+<parameter name="first_property_name">
+<parameter_description> a #gchar with the first property name
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> return location for the first property, followed optionally by more
+name/return location pairs, followed by %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_get_allocator">
+<description>
+Gets the @allocator and its @params that has been decided to use after an
+allocation query.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="allocator">
+<parameter_description> the #GstAllocator
+used
+</parameter_description>
+</parameter>
+<parameter name="params">
+<parameter_description> the
+#GstAllocatorParams of @allocator
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_get_last_pushed_timestamp">
+<description>
+Get the timestamp of the last #GstBuffer pushed on the #GstHarness srcpad,
+typically with gst_harness_push or gst_harness_push_from_src.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstClockTime with the timestamp or %GST_CLOCK_TIME_NONE if no
+#GstBuffer has been pushed on the #GstHarness srcpad
+
+</return>
+</function>
+
+<function name="gst_harness_get_testclock">
+<description>
+Get the #GstTestClock. Useful if specific operations on the testclock is
+needed.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstTestClock, or %NULL if the testclock is not
+present.
+
+</return>
+</function>
+
+<function name="gst_harness_new">
+<description>
+Creates a new harness. Works like gst_harness_new_with_padnames, except it
+assumes the #GstElement sinkpad is named &quot;sink&quot; and srcpad is named &quot;src&quot;
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="element_name">
+<parameter_description> a #gchar describing the #GstElement name
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarness, or %NULL if the harness could
+not be created
+
+</return>
+</function>
+
+<function name="gst_harness_new_full">
+<description>
+Creates a new harness.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="element">
+<parameter_description> a #GstElement to attach the harness to (transfer none)
+</parameter_description>
+</parameter>
+<parameter name="hsrc">
+<parameter_description> a #GstStaticPadTemplate describing the harness srcpad.
+%NULL will not create a harness srcpad.
+</parameter_description>
+</parameter>
+<parameter name="sinkpad">
+<parameter_description> a #gchar with the name of the element sinkpad that is
+then linked to the harness srcpad. Can be a static or request or a sometimes
+pad that has been added. %NULL will not get/request a sinkpad from the
+element. (Like if the element is a src)
+</parameter_description>
+</parameter>
+<parameter name="hsink">
+<parameter_description> a #GstStaticPadTemplate describing the harness sinkpad.
+%NULL will not create a harness sinkpad.
+</parameter_description>
+</parameter>
+<parameter name="srcpad">
+<parameter_description> a #gchar with the name of the element srcpad that is
+then linked to the harness sinkpad, similar to the @sinkpad.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarness, or %NULL if the harness could
+not be created
+
+</return>
+</function>
+
+<function name="gst_harness_new_parse">
+<description>
+Creates a new harness, parsing the @launchline and putting that in a #GstBin,
+and then attches the harness to the bin.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="launchline">
+<parameter_description> a #gchar describing a gst-launch type line
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarness, or %NULL if the harness could
+not be created
+
+</return>
+</function>
+
+<function name="gst_harness_new_with_element">
+<description>
+Creates a new harness. Works in the same way as gst_harness_new_full, only
+that generic padtemplates are used for the harness src and sinkpads, which
+will be sufficient in most usecases.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="element">
+<parameter_description> a #GstElement to attach the harness to (transfer none)
+</parameter_description>
+</parameter>
+<parameter name="sinkpad">
+<parameter_description> a #gchar with the name of the element sinkpad that
+is then linked to the harness srcpad. %NULL does not attach a sinkpad
+</parameter_description>
+</parameter>
+<parameter name="srcpad">
+<parameter_description> a #gchar with the name of the element srcpad that is
+then linked to the harness sinkpad. %NULL does not attach a srcpad
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarness, or %NULL if the harness could
+not be created
+
+</return>
+</function>
+
+<function name="gst_harness_new_with_padnames">
+<description>
+Creates a new harness. Works in the same way as gst_harness_new_with_element,
+except you specify the factoryname of the #GstElement
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="element_name">
+<parameter_description> a #gchar describing the #GstElement name
+</parameter_description>
+</parameter>
+<parameter name="sinkpad">
+<parameter_description> a #gchar with the name of the element sinkpad that
+is then linked to the harness srcpad. %NULL does not attach a sinkpad
+</parameter_description>
+</parameter>
+<parameter name="srcpad">
+<parameter_description> a #gchar with the name of the element srcpad that is
+then linked to the harness sinkpad. %NULL does not attach a srcpad
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarness, or %NULL if the harness could
+not be created
+
+</return>
+</function>
+
+<function name="gst_harness_new_with_templates">
+<description>
+Creates a new harness, like gst_harness_new_full, except it
+assumes the #GstElement sinkpad is named &quot;sink&quot; and srcpad is named &quot;src&quot;
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="element_name">
+<parameter_description> a #gchar describing the #GstElement name
+</parameter_description>
+</parameter>
+<parameter name="hsrc">
+<parameter_description> a #GstStaticPadTemplate describing the harness srcpad.
+%NULL will not create a harness srcpad.
+</parameter_description>
+</parameter>
+<parameter name="hsink">
+<parameter_description> a #GstStaticPadTemplate describing the harness sinkpad.
+%NULL will not create a harness sinkpad.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarness, or %NULL if the harness could
+not be created
+
+</return>
+</function>
+
+<function name="gst_harness_play">
+<description>
+This will set the harnessed #GstElement to %GST_STATE_PLAYING.
+#GstElements without a sink-#GstPad and with the %GST_ELEMENT_FLAG_SOURCE
+flag set is concidered a src #GstElement
+Non-src #GstElements (like sinks and filters) are automatically set to
+playing by the #GstHarness, but src #GstElements are not to avoid them
+starting to produce buffers.
+Hence, for src #GstElement you will need to call gst_harness_play explicitly.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_pull">
+<description>
+Pulls a #GstBuffer from the #GAsyncQueue on the #GstHarness sinkpad. The pull
+will timeout in 60 seconds. This is the standard way of getting a buffer
+from a harnessed #GstElement.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer or %NULL if timed out.
+
+</return>
+</function>
+
+<function name="gst_harness_pull_event">
+<description>
+Pulls an #GstEvent from the #GAsyncQueue on the #GstHarness sinkpad.
+Timeouts after 60 seconds similar to gst_harness_pull.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstEvent or %NULL if timed out.
+
+</return>
+</function>
+
+<function name="gst_harness_pull_upstream_event">
+<description>
+Pulls an #GstEvent from the #GAsyncQueue on the #GstHarness srcpad.
+Timeouts after 60 seconds similar to gst_harness_pull.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstEvent or %NULL if timed out.
+
+</return>
+</function>
+
+<function name="gst_harness_push">
+<description>
+Pushes a #GstBuffer on the #GstHarness srcpad. The standard way of
+interacting with an harnessed element.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer to push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn with the result from the push
+
+</return>
+</function>
+
+<function name="gst_harness_push_and_pull">
+<description>
+Basically a gst_harness_push and a gst_harness_pull in one line. Reflects
+the fact that you often want to do exactly this in your test: Push one buffer
+in, and inspect the outcome.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer to push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer or %NULL if timed out.
+
+</return>
+</function>
+
+<function name="gst_harness_push_event">
+<description>
+Pushes an #GstEvent on the #GstHarness srcpad.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> a #GstEvent to push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gboolean with the result from the push
+
+</return>
+</function>
+
+<function name="gst_harness_push_from_src">
+<description>
+Transfer data from the src-#GstHarness to the main-#GstHarness. It consists
+of 4 steps:
+1: Make sure the src is started. (see: gst_harness_play)
+2: Crank the clock (see: gst_harness_crank_single_clock_wait)
+3: Pull a #GstBuffer from the src-#GstHarness (see: gst_harness_pull)
+4: Push the same #GstBuffer into the main-#GstHarness (see: gst_harness_push)
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn with the result of the push
+
+</return>
+</function>
+
+<function name="gst_harness_push_to_sink">
+<description>
+Transfer one #GstBuffer from the main-#GstHarness to the sink-#GstHarness.
+See gst_harness_push_from_src for details.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn with the result of the push
+
+</return>
+</function>
+
+<function name="gst_harness_push_upstream_event">
+<description>
+Pushes an #GstEvent on the #GstHarness sinkpad.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> a #GstEvent to push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gboolean with the result from the push
+
+</return>
+</function>
+
+<function name="gst_harness_query_latency">
+<description>
+Get the min latency reported by any harnessed #GstElement.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstClockTime with min latency
+
+</return>
+</function>
+
+<function name="gst_harness_set">
+<description>
+A convenience function to allows you to call g_object_set on a #GstElement
+that are residing inside the #GstHarness, by using normal g_object_set
+syntax.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="element_name">
+<parameter_description> a #gchar with a #GstElementFactory name
+</parameter_description>
+</parameter>
+<parameter name="first_property_name">
+<parameter_description> a #gchar with the first property name
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> value for the first property, followed optionally by more
+name/value pairs, followed by %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_blocking_push_mode">
+<description>
+Setting this will make the harness block in the chain-function, and
+then release when gst_harness_pull or gst_harness_try_pull is called.
+Can be useful when wanting to control a src-element that is not implementing
+gst_clock_id_wait so it can't be controlled by the #GstTestClock, since
+it otherwise would produce buffers as fast as possible.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_caps">
+<description>
+Sets the @GstHarness srcpad and sinkpad caps.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="in">
+<parameter_description> a #GstCaps to set on the harness srcpad
+</parameter_description>
+</parameter>
+<parameter name="out">
+<parameter_description> a #GstCaps to set on the harness sinkpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_caps_str">
+<description>
+Sets the @GstHarness srcpad and sinkpad caps using strings.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="in">
+<parameter_description> a @gchar describing a #GstCaps to set on the harness srcpad
+</parameter_description>
+</parameter>
+<parameter name="out">
+<parameter_description> a @gchar describing a #GstCaps to set on the harness sinkpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_drop_buffers">
+<description>
+When set to %TRUE, instead of placing the buffers arriving from the harnessed
+#GstElement inside the sinkpads #GAsyncQueue, they are instead unreffed.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="drop_buffers">
+<parameter_description> a #gboolean specifying to drop outgoing buffers or not
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_propose_allocator">
+<description>
+Sets the @allocator and @params to propose when receiving an allocation
+query.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="allocator">
+<parameter_description> a #GstAllocator
+</parameter_description>
+</parameter>
+<parameter name="params">
+<parameter_description> a #GstAllocationParams
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_sink_caps">
+<description>
+Sets the @GstHarness sinkpad caps.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps to set on the harness sinkpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_sink_caps_str">
+<description>
+Sets the @GstHarness sinkpad caps using a string.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="str">
+<parameter_description> a @gchar describing a #GstCaps to set on the harness sinkpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_src_caps">
+<description>
+Sets the @GstHarness srcpad caps. This must be done before any buffers
+can legally be pushed from the harness to the element.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps to set on the harness srcpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_src_caps_str">
+<description>
+Sets the @GstHarness srcpad caps using a string. This must be done before
+any buffers can legally be pushed from the harness to the element.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="str">
+<parameter_description> a @gchar describing a #GstCaps to set on the harness srcpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_time">
+<description>
+Advance the #GstTestClock to a specific time.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="time">
+<parameter_description> a #GstClockTime to advance the clock to
+</parameter_description>
+</parameter>
+</parameters>
+<return> a @gboolean %TRUE if the time could be set. %FALSE if not.
+
+</return>
+</function>
+
+<function name="gst_harness_set_upstream_latency">
+<description>
+Sets the min latency reported by #GstHarness when receiving a latency-query
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="latency">
+<parameter_description> a #GstClockTime specifying the latency
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstClockTime with min latency
+
+</return>
+</function>
+
+<function name="gst_harness_sink_push_many">
+<description>
+Convenience that calls gst_harness_push_to_sink @pushes number of times.
+Will abort the pushing if any one push fails.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="pushes">
+<parameter_description> a #gint with the number of calls to gst_harness_push_to_sink
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn with the result of the push
+
+</return>
+</function>
+
+<function name="gst_harness_src_crank_and_push_many">
+<description>
+Transfer data from the src-#GstHarness to the main-#GstHarness. Similar to
+gst_harness_push_from_src, this variant allows you to specify how many cranks
+and how many pushes to perform. This can be useful for both moving a lot
+of data at the same time, as well as cases when one crank does not equal one
+buffer to push and v.v.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="cranks">
+<parameter_description> a #gint with the number of calls to gst_harness_crank_single_clock_wait
+</parameter_description>
+</parameter>
+<parameter name="pushes">
+<parameter_description> a #gint with the number of calls to gst_harness_push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstFlowReturn with the result of the push
+
+</return>
+</function>
+
+<function name="gst_harness_src_push_event">
+<description>
+Similar to what gst_harness_src_push does with #GstBuffers, this transfers
+a #GstEvent from the src-#GstHarness to the main-#GstHarness. Note that
+some #GstEvents are being transferred automagically. Look at sink_forward_pad
+for details.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gboolean with the result of the push
+
+</return>
+</function>
+
+<function name="gst_harness_stress_custom_start">
+<description>
+Start a custom stress-thread that will call your @callback for every
+iteration allowing you to do something nasty.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="init">
+<parameter_description> a #GFunc that is called initially and only once
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GFunc that is called as often as possible
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> a #gpointer with custom data to pass to the @callback function
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each call to the @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_property_start_full">
+<description>
+Call g_object_set with @name and @value in intervals of @sleep microseconds
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a #gchar specifying a property name
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a #GValue to set the property to
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each g_object_set with @name and @value
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_push_buffer_start_full">
+<description>
+Push a #GstBuffer in intervals of @sleep microseconds.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps for the #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="segment">
+<parameter_description> a #GstSegment
+</parameter_description>
+</parameter>
+<parameter name="buf">
+<parameter_description> a #GstBuffer to push
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each call to gst_pad_push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_push_buffer_with_cb_start_full">
+<description>
+Push a #GstBuffer in intervals of @sleep microseconds.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps for the #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="segment">
+<parameter_description> a #GstSegment
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a #GstHarnessPrepareBufferFunc function called before every iteration
+to prepare / create a #GstBuffer for pushing
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> a #gpointer with data to the #GstHarnessPrepareBufferFunc function
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> a #GDestroyNotify that is called for every push to allow cleaning
+up the #GstBuffer. (like gst_buffer_unref)
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each call to gst_pad_push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_push_event_start_full">
+<description>
+Push the @event onto the harnessed #GstElement sinkpad in intervals of
+@sleep microseconds
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> a #GstEvent to push
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each gst_event_push with @event
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_push_upstream_event_start_full">
+<description>
+Push the @event onto the harnessed #GstElement srcpad in intervals of
+@sleep microseconds.
+Pushing events should generally be OOB events.
+If you need serialized events, you may use a custom stress thread which
+both pushes buffers and events.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> a #GstEvent to push
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each gst_event_push with @event
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_requestpad_start_full">
+<description>
+Call gst_element_request_pad in intervals of @sleep microseconds
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="templ">
+<parameter_description> a #GstPadTemplate
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a #gchar
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps
+</parameter_description>
+</parameter>
+<parameter name="release">
+<parameter_description> a #gboolean
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each gst_element_request_pad
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_statechange_start_full">
+<description>
+Change the state of your harnessed #GstElement from NULL to PLAYING and
+back again, only pausing for @sleep microseconds every time.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each state-change
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_thread_stop">
+<description>
+Stop the running #GstHarnessThread
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="t">
+<parameter_description> a #GstHarnessThread
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_teardown">
+<description>
+Tears down a @GstHarness, freeing all resources allocated using it.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_try_pull">
+<description>
+Pulls a #GstBuffer from the #GAsyncQueue on the #GstHarness sinkpad. Unlike
+gst_harness_pull this will not wait for any buffers if not any are present,
+and return %NULL straight away.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstBuffer or %NULL if no buffers are present in the #GAsyncQueue
+
+</return>
+</function>
+
+<function name="gst_harness_try_pull_event">
+<description>
+Pulls an #GstEvent from the #GAsyncQueue on the #GstHarness sinkpad.
+See gst_harness_try_pull for details.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstEvent or %NULL if no buffers are present in the #GAsyncQueue
+
+</return>
+</function>
+
+<function name="gst_harness_try_pull_upstream_event">
+<description>
+Pulls an #GstEvent from the #GAsyncQueue on the #GstHarness srcpad.
+See gst_harness_try_pull for details.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstEvent or %NULL if no buffers are present in the #GAsyncQueue
+
+</return>
+</function>
+
+<function name="gst_harness_upstream_events_in_queue">
+<description>
+The number of #GstEvents currently in the #GstHarness srcpad #GAsyncQueue
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #guint number of events in the queue
+
+</return>
+</function>
+
+<function name="gst_harness_upstream_events_received">
+<description>
+The total number of #GstEvents that has arrived on the #GstHarness srcpad
+This number includes events handled by the harness as well as events
+that have already been pulled out.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #guint number of events received
+
+</return>
+</function>
+
+<function name="gst_harness_use_systemclock">
+<description>
+Sets the system #GstClock on the @GstHarness #GstElement
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_use_testclock">
+<description>
+Sets the #GstTestClock on the #GstHarness #GstElement
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_wait_for_clock_id_waits">
+<description>
+Waits for @timeout seconds until @waits number of #GstClockID waits is
+registered with the #GstTestClock. Useful for writing deterministic tests,
+where you want to make sure that an expected number of waits have been
+reached.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="waits">
+<parameter_description> a #guint describing the numbers of #GstClockID registered with
+the #GstTestClock
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> a #guint describing how many seconds to wait for @waits to be true
+</parameter_description>
+</parameter>
+</parameters>
+<return> a @gboolean %TRUE if the waits have been registered, %FALSE if not.
+(Could be that it timed out waiting or that more waits then waits was found)
+
 </return>
 </function>
 

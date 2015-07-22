@@ -24,3 +24,16 @@ done
 
 DOCEXTRACT_TO_XML_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/docextract_to_xml.py"
 $DOCEXTRACT_TO_XML_PY --no-since $PARAMS > "$OUT_DIR/gst_docs.xml"
+
+
+OUT_DIR="$ROOT_DIR/gst-plugins-bad/src"
+PARAMS=""
+
+for dir in "$PREFIX"/gst-plugins-bad/gst-libs/gst/{adaptivedemux,base,\
+basecamerabinsrc,codecparsers,gl,insertbin,interfaces,mpegts,\
+uridownloader,video,wayland}; do
+  PARAMS="$PARAMS -s $dir"
+done
+
+DOCEXTRACT_TO_XML_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/docextract_to_xml.py"
+$DOCEXTRACT_TO_XML_PY --no-since $PARAMS > "$OUT_DIR/gst_docs.xml"
