@@ -150,8 +150,8 @@ public:
   _WRAP_METHOD(void set_format(Format format), gst_base_src_set_format)
 
   _WRAP_METHOD_DOCS_ONLY(gst_base_src_query_latency)
-  bool query_latency(bool& live, ClockTime& min_latency,
-    ClockTime& max_latency) const;
+  bool query_latency(bool& live, Gst::ClockTime& min_latency,
+    Gst::ClockTime& max_latency) const;
 
   _WRAP_METHOD(guint get_blocksize() const, gst_base_src_get_blocksize)
   _WRAP_METHOD(void set_blocksize(guint blocksize), gst_base_src_set_blocksize)
@@ -200,11 +200,11 @@ public:
   _WRAP_VFUNC(bool start(), "start", return_value true)
 
 #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
-#m4 _CONVERSION(`GstClockTime*', `ClockTime&', `*($3)')
+#m4 _CONVERSION(`GstClockTime*', `Gst::ClockTime&', `*($3)')
   /** Given a buffer, return the start and stop time when it should be pushed
    * out. The base class will sync on the clock using these times.
    */
-  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, ClockTime& start, ClockTime& end) const, "get_times")
+  _WRAP_VFUNC(void get_times(const Glib::RefPtr<Gst::Buffer>& buffer, Gst::ClockTime& start, Gst::ClockTime& end) const, "get_times")
 
 #m4 _CONVERSION(`guint64&', `guint64*', `&($3)')
 #m4 _CONVERSION(`guint64*', `guint64&', `*($3)')
