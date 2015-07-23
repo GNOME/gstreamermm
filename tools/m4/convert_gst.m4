@@ -77,14 +77,15 @@ _CONV_GLIB_ENUM(ThreadPriority)
 dnl ############### gstreamermm Class Conversions ######################
 
 dnl AllocationParams
-_CONVERSION(`AllocationParams', `GstAllocationParams*', `$3.gobj()')
-_CONVERSION(`GstAllocationParams*', `AllocationParams', `AllocationParams($3, true)')
+_CONVERSION(`Gst::AllocationParams', `GstAllocationParams*', `$3.gobj()')
+_CONVERSION(`GstAllocationParams*', `Gst::AllocationParams', `Gst::AllocationParams($3, true)')
 
 dnl Allocator
 _CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `Glib::unwrap($3)')
 
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')
+_CONVERSION(`GstBuffer*',`const Glib::RefPtr<Gst::Buffer>&',`Glib::wrap($3, true)')
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`GstBuffer*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<GstBuffer*>(Glib::unwrap($3))')
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `Glib::unwrap($3)')
@@ -127,8 +128,8 @@ _CONVERSION(`GstClockID',`Glib::RefPtr<Gst::ClockID>',`Glib::wrap((GstClockEntry
 _CONVERSION(`const Glib::RefPtr<Gst::ClockID>&',`GstClockEntry*',`Glib::unwrap($3)')
 
 dnl ColorBalanceChannel
-_CONVERSION(`const Glib::RefPtr<ColorBalanceChannel>&',`GstColorBalanceChannel*',`Glib::unwrap($3)')
-_CONVERSION(`const Glib::RefPtr<const ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>(Glib::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<Gst::ColorBalanceChannel>&',`GstColorBalanceChannel*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<const Gst::ColorBalanceChannel>&',`GstColorBalanceChannel*',`const_cast<GstColorBalanceChannel*>(Glib::unwrap($3))')
 
 dnl Context
 _CONVERSION(`GstContext*',`Glib::RefPtr<Gst::Context>',`Glib::wrap($3)')
@@ -136,11 +137,11 @@ _CONVERSION(`GstContext*',`const Glib::RefPtr<Gst::Context>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Context>&',`GstContext*',`$3->gobj()')
 
 dnl DiscovererInfo
-_CONVERSION(`GstDiscovererInfo*',`Glib::RefPtr<DiscovererInfo>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<DiscovererInfo>&',`GstDiscovererInfo*',`Glib::unwrap($3)')
+_CONVERSION(`GstDiscovererInfo*',`Glib::RefPtr<Gst::DiscovererInfo>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::DiscovererInfo>&',`GstDiscovererInfo*',`Glib::unwrap($3)')
 
 dnl DiscovererStreamInfo
-_CONVERSION(`GstDiscovererStreamInfo*', `Glib::RefPtr<DiscovererStreamInfo>', `Glib::wrap($3)')
+_CONVERSION(`GstDiscovererStreamInfo*', `Glib::RefPtr<Gst::DiscovererStreamInfo>', `Glib::wrap($3)')
 
 dnl Element
 _CONVERSION(`Glib::RefPtr<Gst::Element>',`GstElement*', `Glib::unwrap($3)')
@@ -194,7 +195,7 @@ _CONVERSION(`GstMessage*',`Glib::RefPtr<const Gst::Message>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `Glib::unwrap($3)')
 
 dnl MiniObject
-_CONVERSION(`GstMiniObject*',`Glib::RefPtr<MiniObject>',`Glib::wrap($3)')
+_CONVERSION(`GstMiniObject*',`Glib::RefPtr<Gst::MiniObject>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::MiniObject>&',`GstMiniObject*',`Glib::unwrap($3)')
 
 dnl Mixer
@@ -208,7 +209,7 @@ _CONVERSION(`GstObject*',`Glib::RefPtr<const Gst::Object>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Object>&',`GstObject*',`Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Object>',`GstObject*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Object>&',`GstObject*',`const_cast<GstObject*>(Glib::unwrap($3))')
-_CONVERSION(`const Glib::RefPtr<Object>&', `GstObject*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Object>&', `GstObject*', `Glib::unwrap($3)')
 
 dnl Pad
 _CONVERSION(`GstPad*',`Glib::RefPtr<Gst::Pad>',`Glib::wrap($3)')
@@ -286,20 +287,20 @@ dnl TypeFind
 _CONVERSION(`Gst::TypeFind&',`GstTypeFind*',`$3.gobj()')
 
 dnl VideoInfo
-_CONVERSION(`VideoInfo', `GstVideoInfo*', `$3.gobj()')
-_CONVERSION(`const VideoInfo&', `const GstVideoInfo*', `$3.gobj()')
-_CONVERSION(`const VideoInfo&', `GstVideoInfo*', `const_cast<GstVideoInfo*>($3.gobj())')
-_CONVERSION(`const VideoInfo&', `GstVideoInfo', `*($3.gobj())')
-_CONVERSION(`VideoInfo', `GstVideoInfo', `*($3.gobj())')
-_CONVERSION(`GstVideoInfo', `VideoInfo', `VideoInfo(VideoInfo(const_cast<GstVideoInfo*>(&$3), false))')
+_CONVERSION(`Gst::VideoInfo', `GstVideoInfo*', `$3.gobj()')
+_CONVERSION(`const Gst::VideoInfo&', `const GstVideoInfo*', `$3.gobj()')
+_CONVERSION(`const Gst::VideoInfo&', `GstVideoInfo*', `const_cast<GstVideoInfo*>($3.gobj())')
+_CONVERSION(`const Gst::VideoInfo&', `GstVideoInfo', `*($3.gobj())')
+_CONVERSION(`Gst::VideoInfo', `GstVideoInfo', `*($3.gobj())')
+_CONVERSION(`GstVideoInfo', `Gst::VideoInfo', `Gst::VideoInfo(Gst::VideoInfo(const_cast<GstVideoInfo*>(&$3), false))')
 
 dnl VideoFormatInfo
 _CONVERSION(`const GstVideoFormatInfo*', `const VideoFormatInfo&', `VideoFormatInfo($3)')
 
 dnl VideoFrame
-_CONVERSION(`const VideoFrame&', `GstVideoFrame*', `$3.gobj()')
-_CONVERSION(`const VideoFrame&', `const GstVideoFrame*', `$3.gobj()')
-_CONVERSION(`const VideoFrame&', `GstVideoFrame*', `const_cast<GstVideoFrame*>($3.gobj())')
+_CONVERSION(`const Gst::VideoFrame&', `GstVideoFrame*', `$3.gobj()')
+_CONVERSION(`const Gst::VideoFrame&', `const GstVideoFrame*', `$3.gobj()')
+_CONVERSION(`const Gst::VideoFrame&', `GstVideoFrame*', `const_cast<GstVideoFrame*>($3.gobj())')
 
 
 dnl ############## gstreamermm Interface Conversions ######################
@@ -332,17 +333,17 @@ _CONVERSION(`const guint32&',`guint32',`$3')
 _CONVERSION(`guint8*&',`guint8**',`&$3')
 
 dnl Basic Gstreamermm Conversions
-_CONVERSION(`ClockTime&',`GstClockTime*',`(GstClockTime*)(&$3)')
-_CONVERSION(`ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff($3)')
-_CONVERSION(`GstClockTimeDiff',`ClockTimeDiff',`ClockTimeDiff($3)')
-_CONVERSION(`ClockTimeDiff&',`GstClockTimeDiff*',`(GstClockTimeDiff*)(&$3)')
-_CONVERSION(`GstClockTimeDiff*',`ClockTimeDiff&',`(ClockTimeDiff&)(*$3)')
+_CONVERSION(`Gst::ClockTime&',`GstClockTime*',`(GstClockTime*)(&$3)')
+_CONVERSION(`Gst::ClockTimeDiff',`GstClockTimeDiff',`GstClockTimeDiff($3)')
+_CONVERSION(`GstClockTimeDiff',`Gst::ClockTimeDiff',`Gst::ClockTimeDiff($3)')
+_CONVERSION(`Gst::ClockTimeDiff&',`GstClockTimeDiff*',`(GstClockTimeDiff*)(&$3)')
+_CONVERSION(`GstClockTimeDiff*',`Gst::ClockTimeDiff&',`(Gst::ClockTimeDiff&)(*$3)')
 _CONVERSION(`GstMixerMessageType',`Gst::MixerMessageType',`(Gst::MixerMessageType)($3)')
-_CONVERSION(`const GstQueryType*',`const QueryType*',`(QueryType*)($3)')
+_CONVERSION(`const GstQueryType*',`const Gst::QueryType*',`(Gst::QueryType*)($3)')
 _CONVERSION(`GstState*',`State&',`*reinterpret_cast<Gst::State*>($3)')
-_CONVERSION(`GstTagFlag',`TagFlag',`(TagFlag)($3)')
-_CONVERSION(`guint64',`ClockTime',`(ClockTime)($3)')
-_CONVERSION(`const URIType',`const GstURIType',`(GstURIType)($3)')
+_CONVERSION(`GstTagFlag',`Gst::TagFlag',`(Gst::TagFlag)($3)')
+_CONVERSION(`guint64',`Gst::ClockTime',`(Gst::ClockTime)($3)')
+_CONVERSION(`const Gst::URIType',`const GstURIType',`(GstURIType)($3)')
 _CONVERSION(`const Gst::AudioChannelPosition&',`const GstAudioChannelPosition*',`(const GstAudioChannelPosition*)(&$3)')
 dnl C++ Conversions
 _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
