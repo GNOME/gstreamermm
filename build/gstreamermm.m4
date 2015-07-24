@@ -36,7 +36,7 @@ AC_DEFUN([FIND_GST_MODULE],
     tst=xyes
   fi
 
-  gstmm_$3_version=v$(pkg-config --modversion gstreamer-[$2]-1.0)
+  gstmm_$3_version=$(pkg-config --modversion gstreamer-[$2]-1.0)
 
   AS_IF([test "x$enable_$3" = "xno" || test "$tst" != xyes], [gstmm_enable_$3=no])
   AM_CONDITIONAL([ENABLE_$1], [test "x$gstmm_enable_$3" = xyes])
