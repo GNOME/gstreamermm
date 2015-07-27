@@ -109,15 +109,27 @@ MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 # Also add the target .hg file name to the plugins_hg variable in the
 # gstreamer/src/fileslist.am.  (That must be the same as "CppClassName" - all
 # in lowercase with a .hg extension).
+AC_SUBST([GSTREAMERMM_CORE_PLUGIN_DEFS], ["\
+capsfilter|capsfilter|CapsFilter \
+fakesink|fakesink|FakeSink \
+fakesrc|fakesrc|FakeSrc \
+fdsink|fdsink|FdSink \
+fdsrc|fdsrc|FdSrc \
+filesink|filesink|FileSink \
+filesrc|filesrc|FileSrc \
+funnel|funnel|Funnel \
+identity|identity|Identity \
+inputselector|input-selector|InputSelector \
+multiqueue|multiqueue|MultiQueue \
+outputselector|output-selector|OutputSelector \
+queue|queue|Queue \
+queue2|queue2|Queue2 \
+tee|tee|Tee \
+typefindelement|typefind|TypeFindElement \
+valve|valve|Valve
+"])
 
-
-# todo
-# audioresample|audioresample|AudioResample
-# multisocketsink|multisocketsink|MultiSocketSink
-# videoconvert|videoconvert|VideoConvert 
-
-
-AC_SUBST([GSTREAMERMM_PLUGIN_DEFS], ["\
+AC_SUBST([GSTREAMERMM_BASE_PLUGIN_DEFS], ["\
 adder|adder|Adder \
 alsasink|alsasink|AlsaSink \
 alsasrc|alsasrc|AlsaSrc \
@@ -126,46 +138,24 @@ appsrc|appsrc|AppSrc \
 audioconvert|audioconvert|AudioConvert \
 audiorate|audiorate|AudioRate \
 audiotestsrc|audiotestsrc|AudioTestSrc \
-capsfilter|capsfilter|CapsFilter \
 cdparanoiasrc|cdparanoiasrc|CdParanoiaSrc \
 clockoverlay|clockoverlay|ClockOverlay \
 decodebin|decodebin|DecodeBin \
-fakesink|fakesink|FakeSink \
-fakesrc|fakesrc|FakeSrc \
-fdsink|fdsink|FdSink \
-fdsrc|fdsrc|FdSrc \
-filesink|filesink|FileSink \
-filesrc|filesrc|FileSrc \
-funnel|funnel|Funnel \
 giosink|giosink|GioSink \
 giosrc|giosrc|GioSrc \
 giostreamsink|giostreamsink|GioStreamSink \
 giostreamsrc|giostreamsrc|GioStreamSrc \
-identity|identity|Identity \
-inputselector|input-selector|InputSelector \
-multifdsink|multifdsink|MultiFdSink \
-multiqueue|multiqueue|MultiQueue \
 oggdemux|oggdemux|OggDemux \
 oggmux|oggmux|OggMux \
-outputselector|output-selector|OutputSelector \
 playbin|playbin|PlayBin \
-queue|queue|Queue \
-queue2|queue2|Queue2 \
 subtitleoverlay|subtitleoverlay|SubtitleOverlay \
-tcpclientsink|tcpclientsink|TCPClientSink \
-tcpclientsrc|tcpclientsrc|TCPClientSrc \
-tcpserversink|tcpserversink|TcpServerSink \
-tcpserversrc|tcpserversrc|TCPServerSrc \
-tee|tee|Tee \
 textoverlay|textoverlay|TextOverlay \
 textrender|textrender|TextRender \
 theoradec|theoradec|TheoraDec \
 theoraenc|theoraenc|TheoraEnc \
 theoraparse|theoraparse|TheoraParse \
 timeoverlay|timeoverlay|TimeOverlay \
-typefindelement|typefind|TypeFindElement \
 uridecodebin|uridecodebin|UriDecodeBin \
-valve|valve|Valve \
 videorate|videorate|VideoRate \
 videoscale|videoscale|VideoScale \
 videotestsrc|videotestsrc|VideoTestSrc \
@@ -178,29 +168,8 @@ ximagesink|ximagesink|XImageSink \
 xvimagesink|xvimagesink|XvImageSink
 "])
 
-# Check for the existence of the plug-ins.  Note that this check doesn't
-# work when cross-compiling.  That isn't much of a problem though since
-# it only applies in maintainer-mode.
-AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
-[
-  gstmm_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-1.0 2>&AS_MESSAGE_LOG_FD`
-  AC_PATH_PROGS([GST_INSPECT], [gst-inspect-1.0],,
-                [$gstmm_toolsdir$PATH_SEPARATOR$PATH])
-
-  AC_MSG_CHECKING([the existance of required plug-ins.])
-  for gstmm_plugin_def in $GSTREAMERMM_PLUGIN_DEFS
-  do
-    # Extract plugin name and run gst-inspect to check whether the plugin
-    # is installed on the build system.
-    gstmm_plugin_name=`[expr "X$gstmm_plugin_def" : 'X.*|\(.*\)|.*$' 2>&]AS_MESSAGE_LOG_FD`
-    AS_IF([$GST_INSPECT "$gstmm_plugin_name" >/dev/null 2>&AS_MESSAGE_LOG_FD],,
-          [AC_MSG_FAILURE([[The gstreamer plug-in '$gstmm_plugin_name' does not exist.
-If you built gst-plugins-base from source code then you might need to
-install the appropriate -dev or -devel packages or enable experimental
-plugins before rebuilding gst-plugins-base.]])])
-  done
-  AC_MSG_RESULT([All required plug-ins found.])
-])
+GENERATE_PLUGINS_LIST_FILE([gstreamer/src/plugin_filelist.am], $GSTREAMERMM_CORE_PLUGIN_DEFS)
+GENERATE_PLUGINS_LIST_FILE([gstreamer/src/plugin_filelist.am], $GSTREAMERMM_BASE_PLUGIN_DEFS)
 
 #########################################################################
 

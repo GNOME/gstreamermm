@@ -14,7 +14,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 lib_LTLIBRARIES = libgstreamermm-@GSTREAMERMM_API_VERSION@.la
-
+include $(srcdir)/../src/plugin_filelist.am
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
 include $(top_srcdir)/build/compile-binding.am

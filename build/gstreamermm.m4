@@ -53,3 +53,51 @@ AC_DEFUN([ADD_MODULE_CONDITIONALLY],
   ])
 ])
 
+## Arguments:
+##  * $1 - output file
+##  * $2 - plugins list
+## Generates list of plug-ins. If USE_MAINTAINER_MODE defined, macro also
+## checks for the existence of the plug-ins. Note that this check doesn't
+## work when cross-compiling.  That isn't much of a problem though since
+## it only applies in maintainer-mode.
+AC_DEFUN([GENERATE_PLUGINS_LIST_FILE],
+[
+  # clear plugins file once per file
+  m4_ifndef([$1], [
+    printf "plugins_hg = \n" > $1
+    m4_define([$1], [yes])
+  ])
+
+  printf "plugins_hg += " >> $1
+
+  AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
+  [
+    gstmm_toolsdir=`$PKG_CONFIG --variable=toolsdir gstreamer-1.0 2>&AS_MESSAGE_LOG_FD`
+    AC_PATH_PROGS([GST_INSPECT], [gst-inspect-1.0],,
+                  [$gstmm_toolsdir$PATH_SEPARATOR$PATH])
+
+    AC_MSG_CHECKING([the existance of required plug-ins.])
+  ])
+  for gstmm_plugin_def in $2
+  do
+    gstmm_hg_name=`[expr "X$gstmm_plugin_def" : 'X\(.*\)|.*|.*$' 2>&]AS_MESSAGE_LOG_FD`
+    printf "$gstmm_hg_name.hg " >> $1
+    AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
+    [
+      # Extract plugin name and run gst-inspect to check whether the plugin
+      # is installed on the build system.
+      gstmm_plugin_name=`[expr "X$gstmm_plugin_def" : 'X.*|\(.*\)|.*$' 2>&]AS_MESSAGE_LOG_FD`
+      AS_IF([$GST_INSPECT "$gstmm_plugin_name" >/dev/null 2>&AS_MESSAGE_LOG_FD],,
+            [AC_MSG_FAILURE([[The gstreamer plug-in '$gstmm_plugin_name' does not exist.
+If you built gst-plugins-base from source code then you might need to
+install the appropriate -dev or -devel packages or enable experimental
+plugins before rebuilding gst-plugins-base.]])])
+    ])
+  done
+  AS_IF([test "x$USE_MAINTAINER_MODE" != xno],
+  [
+    AC_MSG_RESULT([All required plug-ins found.])
+  ])
+  printf "\n" >> $1
+])
+

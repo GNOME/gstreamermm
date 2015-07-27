@@ -23,7 +23,7 @@ include $(top_srcdir)/build/compile-binding.am
 local_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
 local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags) -DGSTREAMERMM_PLUGINS_BAD_BUILD=1
 
-AM_CPPFLAGS = $(local_cppflags) $(GSTREAMERMM_PLUGINS_BAD_CFLAGS)
+AM_CPPFLAGS = $(local_cppflags) $(GSTREAMERMM_PLUGINS_BAD_CFLAGS) $(GSTREAMERMM_CFLAGS)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
 
 local_libadd = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la

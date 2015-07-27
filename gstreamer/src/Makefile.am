@@ -17,6 +17,9 @@ binding_name    = gstreamermm
 wrap_init_flags = --namespace=Gst --parent_dir=gstreamermm
 codegen_srcdir  = $(top_srcdir)/tools
 
+include $(srcdir)/plugin_filelist.am
+plugins_ccg = $(plugins_hg:.hg=.ccg)
+
 include $(srcdir)/filelist.am
 include $(top_srcdir)/tools/m4/filelist.am
 include $(top_srcdir)/build/generate-binding.am
@@ -34,8 +37,9 @@ generate_plugin_dependencies = \
 	$(addprefix $(codegen_m4_srcdir)/,$(files_plugin_m4))
 
 target_hg_basename = $(basename $(notdir $@))
-target_plugin_and_classname  = $(wordlist 2,3,$(subst |, ,$(filter $(target_hg_basename)|%,$(GSTREAMERMM_PLUGIN_DEFS))))
-
+plugin_list = $(GSTREAMERMM_CORE_PLUGIN_DEFS) $(GSTREAMERMM_BASE_PLUGIN_DEFS)
+target_plugin_and_classname = $(wordlist 2,3,$(subst |, ,$(filter $(target_hg_basename)|%,$(plugin_list))))
+ 
 # This is to generate plugin .ccg files.  The generated .ccg file is piped
 # through m4 using the macros in tools/m4/ctocpp_base.m4 which then produces
 # the final .ccg file.
