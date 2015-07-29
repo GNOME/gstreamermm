@@ -23,7 +23,7 @@ AC_PREREQ([2.59])
 AC_CONFIG_SRCDIR([gstreamer/gstreamermm.h])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
-AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h])
+AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h gst-plugins-bad/gstreamermm-plugins-bad.h])
 
 MM_PREREQ([0.9.6])
 MM_INIT_MODULE([gstreamermm-1.0])

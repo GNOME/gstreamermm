@@ -19,6 +19,7 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 EXTRA_DIST =  tests/plugins/test-foo.h tests/regression/utils.h tests/regression/pluginbin.h tests/resources/input-image.png
 srcmm_subdirs = gstreamer/gstreamermm
 pkgconfig_files = gstreamer/$(GSTREAMERMM_MODULE_NAME).pc
+gstreamermm_include_HEADERS = gstreamer/gstreamermm.h
 
 if MAINTAINER_MODE
 src_subdirs = gstreamer/src
@@ -36,14 +37,14 @@ if MAINTAINER_MODE
 src_subdirs += gst-plugins-bad/src
 endif # MAINTAINER_MODE
 srcmm_subdirs += gst-plugins-bad/gstreamermm-plugins-bad
-pkgconfig_files +=  gst-plugins-bad/$(GSTREAMERMM_PLUGINS_BAD_MODULE_NAME).pc
+pkgconfig_files += gst-plugins-bad/$(GSTREAMERMM_PLUGINS_BAD_MODULE_NAME).pc
+gstreamermm_include_HEADERS += gst-plugins-bad/gstreamermm-plugins-bad.h
 endif #ENABLE_PLUGINS_BAD
 
 SUBDIRS = tools $(src_subdirs) $(srcmm_subdirs) \
           tests examples $(doc_subdirs)
 
 gstreamermm_includedir = $(includedir)/$(GSTREAMERMM_MODULE_NAME)
-gstreamermm_include_HEADERS = gstreamer/gstreamermm.h
 gstreamermm_libincludedir = $(libdir)/$(GSTREAMERMM_MODULE_NAME)/include
 nodist_gstreamermm_libinclude_HEADERS = gstreamer/gstreamermmconfig.h
 
