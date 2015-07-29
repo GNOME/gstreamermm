@@ -15,7 +15,7 @@
 
 binding_name    = gstreamermm-plugins-bad
 # generate_wrap_init.pl should support nested namespaces
-wrap_init_flags = --namespace=Gst --parent_dir=gstreamermm-plugins-bad 
+wrap_init_flags = --namespace=Gst::Bad --parent_dir=gstreamermm-plugins-bad 
 codegen_srcdir  = $(top_srcdir)/tools
 
 

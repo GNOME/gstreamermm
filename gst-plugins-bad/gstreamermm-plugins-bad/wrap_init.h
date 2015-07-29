@@ -26,11 +26,14 @@
 
 #include <gstreamermmconfig.h>
 
-namespace GstBad
+namespace Gst
+{
+namespace Bad
 {
   /** Initializes the gstreamermm-plugins-bad wrapping system.
    */
   void wrap_init();
-}
+} // Bad
+} // Gst
 
 #endif //_GSTREAMERMM_WRAP_INIT_H
