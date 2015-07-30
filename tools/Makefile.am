@@ -17,18 +17,6 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 include $(srcdir)/m4/filelist.am
 
-lib_LTLIBRARIES	= extra_defs_gen/libgstreamermm_get_plugin_defs-@GSTREAMERMM_API_VERSION@.la
-
-extra_defs_gen_libgstreamermm_get_plugin_defs_@GSTREAMERMM_API_VERSION@_la_SOURCES = \
-	extra_defs_gen/get_plugin_defs.cc
-extra_defs_gen_libgstreamermm_get_plugin_defs_@GSTREAMERMM_API_VERSION@_la_LIBADD = \
-	$(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4
-extra_defs_gen_libgstreamermm_get_plugin_defs_@GSTREAMERMM_API_VERSION@_la_LDFLAGS = \
-	-no-undefined -version-info $(GSTREAMERMM_SO_VERSION)
-
-defs_includedir = $(includedir)/$(GSTREAMERMM_MODULE_NAME)/gstreamermm_get_plugin_defs
-defs_include_HEADERS = extra_defs_gen/get_plugin_defs.h
-
 #TODO: Should these go into $(datadir)/$(PACKAGE_TARNAME)/ instead as in gtkmm?
 plugingen_bindir = $(libdir)/$(GSTREAMERMM_MODULE_NAME)/gen
 plugingen_m4dir  = $(plugingen_bindir)/m4
@@ -38,17 +26,21 @@ dist_plugingen_m4_DATA = $(addprefix m4/,$(files_codegen_m4) $(files_plugin_m4))
 # other gstreamermm modules can also generate plug-ins.
 plugingen_bin_PROGRAMS = extra_defs_gen/generate_plugin_gmmproc_file
 
-noinst_PROGRAMS = extra_defs_gen/generate_defs_gst
-
-local_lib = extra_defs_gen/libgstreamermm_get_plugin_defs-$(GSTREAMERMM_API_VERSION).la
+noinst_PROGRAMS = extra_defs_gen/generate_defs_gst \
+                  extra_defs_gen/generate_plugin_module_defs_gst
 
 extra_defs_gen_generate_plugin_gmmproc_file_SOURCES = \
 	extra_defs_gen/generate_plugin_gmmproc_file.cc
-extra_defs_gen_generate_plugin_gmmproc_file_LDADD = $(GSTREAMERMM_LIBS) $(local_lib)
+extra_defs_gen_generate_plugin_gmmproc_file_LDADD = $(GSTREAMERMM_LIBS)
 
 extra_defs_gen_generate_defs_gst_SOURCES = extra_defs_gen/generate_defs_gst.cc
 extra_defs_gen_generate_defs_gst_LDADD = \
-	$(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4 $(local_lib)
+	$(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4
+
+extra_defs_gen_generate_plugin_module_defs_gst_SOURCES = extra_defs_gen/generate_plugin_module_defs_gst.cc
+extra_defs_gen_generate_plugin_module_defs_gst_LDADD = \
+	$(GSTREAMERMM_LIBS) -lglibmm_generate_extra_defs-2.4
+
 
 AM_CPPFLAGS = -I$(top_builddir) $(GSTREAMERMM_CFLAGS)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
