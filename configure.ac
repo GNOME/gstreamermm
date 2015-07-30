@@ -13,9 +13,9 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-m4_define([GSTMM_VERSION], [1.4.3])
+m4_define([GSTMM_VERSION], [1.5.2])
 
-AC_INIT([gstreamermm], [1.4.3],
+AC_INIT([gstreamermm], [1.5.2],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gstreamermm],
         [gstreamermm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -111,6 +111,8 @@ MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 # in lowercase with a .hg extension).
 AC_SUBST([GSTREAMERMM_CORE_PLUGIN_DEFS], ["\
 capsfilter|capsfilter|CapsFilter \
+concat|concat|Concat \
+downloadbuffer|downloadbuffer|DownloadBuffer \
 fakesink|fakesink|FakeSink \
 fakesrc|fakesrc|FakeSrc \
 fdsink|fdsink|FdSink \
@@ -122,13 +124,14 @@ identity|identity|Identity \
 inputselector|input-selector|InputSelector \
 multiqueue|multiqueue|MultiQueue \
 outputselector|output-selector|OutputSelector \
+streamiddemux|streamiddemux|StreamidDemux \
 queue|queue|Queue \
 queue2|queue2|Queue2 \
 tee|tee|Tee \
 typefindelement|typefind|TypeFindElement \
 valve|valve|Valve
 "])
-
+#audioresample|audioresample|AudioResample 
 AC_SUBST([GSTREAMERMM_BASE_PLUGIN_DEFS], ["\
 adder|adder|Adder \
 alsasink|alsasink|AlsaSink \
@@ -141,14 +144,24 @@ audiotestsrc|audiotestsrc|AudioTestSrc \
 cdparanoiasrc|cdparanoiasrc|CdParanoiaSrc \
 clockoverlay|clockoverlay|ClockOverlay \
 decodebin|decodebin|DecodeBin \
+encodebin|encodebin|EncodeBin \
 giosink|giosink|GioSink \
 giosrc|giosrc|GioSrc \
 giostreamsink|giostreamsink|GioStreamSink \
 giostreamsrc|giostreamsrc|GioStreamSrc \
+multifdsink|multifdsink|MultiFdSink \
+multisocketsink|multisocketsink|MultiSocketSink \
 oggdemux|oggdemux|OggDemux \
 oggmux|oggmux|OggMux \
 playbin|playbin|PlayBin \
+playsink|playsink|PlaySink \
+socketsrc|socketsrc|SocketSrc \
+streamsynchronizer|streamsynchronizer|StreamSynchronizer \
 subtitleoverlay|subtitleoverlay|SubtitleOverlay \
+tcpclientsink|tcpclientsink|TCPClientSink \
+tcpclientsrc|tcpclientsrc|TCPClientSrc \
+tcpserversink|tcpserversink|TCPServerSink \
+tcpserversrc|tcpserversrc|TCPServerSrc \
 textoverlay|textoverlay|TextOverlay \
 textrender|textrender|TextRender \
 theoradec|theoradec|TheoraDec \
@@ -156,6 +169,7 @@ theoraenc|theoraenc|TheoraEnc \
 theoraparse|theoraparse|TheoraParse \
 timeoverlay|timeoverlay|TimeOverlay \
 uridecodebin|uridecodebin|UriDecodeBin \
+videoconvert|videoconvert|VideoConvert \
 videorate|videorate|VideoRate \
 videoscale|videoscale|VideoScale \
 videotestsrc|videotestsrc|VideoTestSrc \

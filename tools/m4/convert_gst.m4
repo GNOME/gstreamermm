@@ -31,6 +31,8 @@ _CONV_ENUM(Gst,MemoryFlags)
 _CONV_ENUM(Gst,MessageType)
 _CONV_ENUM(Gst,MixerFlags)
 _CONV_ENUM(Gst,MixerType)
+_CONV_ENUM(Gst,MultiHandleSinkClientStatus)
+_CONV_ENUM(Gst,MultiHandleSinkSyncMethod)
 _CONV_ENUM(Gst,NavigationCommand)
 _CONV_ENUM(Gst,PadDirection)
 _CONV_ENUM(Gst,PadLinkCheck)
@@ -38,6 +40,7 @@ _CONV_ENUM(Gst,PadLinkReturn)
 _CONV_ENUM(Gst,PadMode)
 _CONV_ENUM(Gst,PadPresence)
 _CONV_ENUM(Gst,PadProbeType)
+_CONV_ENUM(Gst,PlayFlags)
 _CONV_ENUM(Gst,PluginDependencyFlags)
 _CONV_ENUM(Gst,ProgressType)
 _CONV_ENUM(Gst,QOSType)
@@ -155,6 +158,9 @@ dnl ElementFactory
 _CONVERSION(`GstElementFactory*',`Glib::RefPtr<Gst::ElementFactory>',`Glib::wrap($3)')
 _CONVERSION(`GstElementFactory*',`Glib::RefPtr<const Gst::ElementFactory>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::ElementFactory>&',`GstElementFactory*', `Glib::unwrap($3)')
+
+dnl EncodingProfile
+_CONVERSION(`const Glib::RefPtr<Gst::EncodingProfile>&', `GstEncodingProfile*', `Glib::unwrap($3)')
 
 dnl Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Glib::unwrap($3)')
@@ -357,10 +363,13 @@ _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const c
 _CONVERSION(`const Glib::ValueArray&',`GValueArray*',`const_cast<GValueArray*>($3.gobj())')
 
 dnl String Conversions
+
 _CONVERSION(`const std::string&',`const guchar*',`($2)($3.c_str())')
 _CONVERSION(`gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+_CONVERSION(`gchararray',`const Glib::ustring&',__GCHARP_TO_USTRING)
 _CONVERSION(`const gchar*',`const Glib::ustring&',__GCHARP_TO_USTRING)
 _CONVERSION(`Glib::ustring&',`const guchar*', ($2)($3.c_str()))
+_CONVERSION(`const Glib::ustring&',`gchararray', $3.c_str())
 
 dnl libxml++ Conversions
 _CONVERSION(`xmlpp::Node*',`xmlNodePtr',`$3->cobj()')
