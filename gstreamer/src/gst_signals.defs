@@ -758,6 +758,185 @@
   (construct-only #f)
 )
 
+;; From GstConcat
+
+(define-property active-pad
+  (of-object "GstConcat")
+  (prop-type "GParamObject")
+  (docs "Currently active src pad")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property adjust-base
+  (of-object "GstConcat")
+  (prop-type "GParamBoolean")
+  (docs "Adjust the base value of segments to ensure they are adjacent")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstDownloadBuffer
+
+(define-property max-size-bytes
+  (of-object "GstDownloadBuffer")
+  (prop-type "GParamUInt")
+  (docs "Max. amount of data to buffer (bytes, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-size-time
+  (of-object "GstDownloadBuffer")
+  (prop-type "GParamUInt64")
+  (docs "Max. amount of data to buffer (in ns, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property low-percent
+  (of-object "GstDownloadBuffer")
+  (prop-type "GParamInt")
+  (docs "Low threshold for buffering to start. Only used if use-buffering is True")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property high-percent
+  (of-object "GstDownloadBuffer")
+  (prop-type "GParamInt")
+  (docs "High threshold for buffering to finish. Only used if use-buffering is True")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property temp-template
+  (of-object "GstDownloadBuffer")
+  (prop-type "GParamString")
+  (docs "File template to store temporary files in, should contain directory and XXXXXX. (NULL == disabled)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property temp-location
+  (of-object "GstDownloadBuffer")
+  (prop-type "GParamString")
+  (docs "Location to store temporary files in (Only read this property, use temp-template to configure the name template)")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property temp-remove
+  (of-object "GstDownloadBuffer")
+  (prop-type "GParamBoolean")
+  (docs "Remove the temp-location after use")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstFakeSink
+
+(define-signal handoff
+  (of-object "GstFakeSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstBuffer*" "p0")
+    '("GstPad*" "p1")
+  )
+)
+
+(define-signal preroll-handoff
+  (of-object "GstFakeSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GstBuffer*" "p0")
+    '("GstPad*" "p1")
+  )
+)
+
+(define-property state-error
+  (of-object "GstFakeSink")
+  (prop-type "GParamEnum")
+  (docs "Generate a state change error")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property silent
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Don't produce last_message events")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property dump
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Dump buffer contents to stdout")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property signal-handoffs
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Send a signal before unreffing the buffer")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property last-message
+  (of-object "GstFakeSink")
+  (prop-type "GParamString")
+  (docs "The message describing current status")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property can-activate-push
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Can activate in push mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property can-activate-pull
+  (of-object "GstFakeSink")
+  (prop-type "GParamBoolean")
+  (docs "Can activate in pull mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property num-buffers
+  (of-object "GstFakeSink")
+  (prop-type "GParamInt")
+  (docs "Number of buffers to accept going EOS")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstFakeSrc
 
 (define-signal handoff
@@ -923,100 +1102,6 @@
   (construct-only #f)
 )
 
-;; From GstFakeSink
-
-(define-signal handoff
-  (of-object "GstFakeSink")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstBuffer*" "p0")
-    '("GstPad*" "p1")
-  )
-)
-
-(define-signal preroll-handoff
-  (of-object "GstFakeSink")
-  (return-type "void")
-  (when "last")
-  (parameters
-    '("GstBuffer*" "p0")
-    '("GstPad*" "p1")
-  )
-)
-
-(define-property state-error
-  (of-object "GstFakeSink")
-  (prop-type "GParamEnum")
-  (docs "Generate a state change error")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property silent
-  (of-object "GstFakeSink")
-  (prop-type "GParamBoolean")
-  (docs "Don't produce last_message events")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property dump
-  (of-object "GstFakeSink")
-  (prop-type "GParamBoolean")
-  (docs "Dump buffer contents to stdout")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property signal-handoffs
-  (of-object "GstFakeSink")
-  (prop-type "GParamBoolean")
-  (docs "Send a signal before unreffing the buffer")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property last-message
-  (of-object "GstFakeSink")
-  (prop-type "GParamString")
-  (docs "The message describing current status")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property can-activate-push
-  (of-object "GstFakeSink")
-  (prop-type "GParamBoolean")
-  (docs "Can activate in push mode")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property can-activate-pull
-  (of-object "GstFakeSink")
-  (prop-type "GParamBoolean")
-  (docs "Can activate in pull mode")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property num-buffers
-  (of-object "GstFakeSink")
-  (prop-type "GParamInt")
-  (docs "Number of buffers to accept going EOS")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 ;; From GstFdSink
 
 (define-property fd
@@ -1043,17 +1128,6 @@
   (of-object "GstFdSrc")
   (prop-type "GParamUInt64")
   (docs "Post a message after timeout microseconds (0 = disabled)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-;; From GstFileSrc
-
-(define-property location
-  (of-object "GstFileSrc")
-  (prop-type "GParamString")
-  (docs "Location of the file to read")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1092,6 +1166,17 @@
   (of-object "GstFileSink")
   (prop-type "GParamBoolean")
   (docs "Append to an already existing file")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstFileSrc
+
+(define-property location
+  (of-object "GstFileSrc")
+  (prop-type "GParamString")
+  (docs "Location of the file to read")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -1728,7 +1813,7 @@
 (define-property allow-not-linked
   (of-object "GstTee")
   (prop-type "GParamBoolean")
-  (docs "Return GTS_FLOW_OK even if there are not source pads or all are unlinked")
+  (docs "Return GST_FLOW_OK even if there are no source pads or they are all unlinked")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -2260,6 +2345,83 @@
   (construct-only #f)
 )
 
+;; From GstAppSink
+
+(define-signal eos
+  (of-object "GstAppSink")
+  (return-type "void")
+  (when "last")
+)
+
+(define-signal new-preroll
+  (of-object "GstAppSink")
+  (return-type "GstFlowReturn")
+  (when "last")
+)
+
+(define-signal new-sample
+  (of-object "GstAppSink")
+  (return-type "GstFlowReturn")
+  (when "last")
+)
+
+(define-signal pull-preroll
+  (of-object "GstAppSink")
+  (return-type "GstSample*")
+  (when "last")
+)
+
+(define-signal pull-sample
+  (of-object "GstAppSink")
+  (return-type "GstSample*")
+  (when "last")
+)
+
+(define-property caps
+  (of-object "GstAppSink")
+  (prop-type "GParamBoxed")
+  (docs "The allowed caps for the sink pad")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property eos
+  (of-object "GstAppSink")
+  (prop-type "GParamBoolean")
+  (docs "Check if the sink is EOS or not started")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property emit-signals
+  (of-object "GstAppSink")
+  (prop-type "GParamBoolean")
+  (docs "Emit new-preroll and new-sample signals")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property max-buffers
+  (of-object "GstAppSink")
+  (prop-type "GParamUInt")
+  (docs "The maximum number of buffers to queue internally (0 = unlimited)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property drop
+  (of-object "GstAppSink")
+  (prop-type "GParamBoolean")
+  (docs "Drop old buffers when the buffer queue is filled")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstAppSrc
 
 (define-signal need-data
@@ -2415,83 +2577,6 @@
   (docs "The number of currently queued bytes")
   (readable #t)
   (writable #f)
-  (construct-only #f)
-)
-
-;; From GstAppSink
-
-(define-signal eos
-  (of-object "GstAppSink")
-  (return-type "void")
-  (when "last")
-)
-
-(define-signal new-preroll
-  (of-object "GstAppSink")
-  (return-type "GstFlowReturn")
-  (when "last")
-)
-
-(define-signal new-sample
-  (of-object "GstAppSink")
-  (return-type "GstFlowReturn")
-  (when "last")
-)
-
-(define-signal pull-preroll
-  (of-object "GstAppSink")
-  (return-type "GstSample*")
-  (when "last")
-)
-
-(define-signal pull-sample
-  (of-object "GstAppSink")
-  (return-type "GstSample*")
-  (when "last")
-)
-
-(define-property caps
-  (of-object "GstAppSink")
-  (prop-type "GParamBoxed")
-  (docs "The allowed caps for the sink pad")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property eos
-  (of-object "GstAppSink")
-  (prop-type "GParamBoolean")
-  (docs "Check if the sink is EOS or not started")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property emit-signals
-  (of-object "GstAppSink")
-  (prop-type "GParamBoolean")
-  (docs "Emit new-preroll and new-sample signals")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property max-buffers
-  (of-object "GstAppSink")
-  (prop-type "GParamUInt")
-  (docs "The maximum number of buffers to queue internally (0 = unlimited)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property drop
-  (of-object "GstAppSink")
-  (prop-type "GParamBoolean")
-  (docs "Drop old buffers when the buffer queue is filled")
-  (readable #t)
-  (writable #t)
   (construct-only #f)
 )
 
@@ -2938,6 +3023,89 @@
   (construct-only #f)
 )
 
+;; From GstEncodeBin
+
+(define-signal request-pad
+  (of-object "GstEncodeBin")
+  (return-type "GstPad*")
+  (when "last")
+  (parameters
+    '("GstCaps*" "p0")
+  )
+)
+
+(define-signal request-profile-pad
+  (of-object "GstEncodeBin")
+  (return-type "GstPad*")
+  (when "last")
+  (parameters
+    '("const-gchar*" "p0")
+  )
+)
+
+(define-property profile
+  (of-object "GstEncodeBin")
+  (prop-type "GParamObject")
+  (docs "The GstEncodingProfile to use")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property queue-buffers-max
+  (of-object "GstEncodeBin")
+  (prop-type "GParamUInt")
+  (docs "Max. number of buffers in the queue (0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property queue-bytes-max
+  (of-object "GstEncodeBin")
+  (prop-type "GParamUInt")
+  (docs "Max. amount of data in the queue (bytes, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property queue-time-max
+  (of-object "GstEncodeBin")
+  (prop-type "GParamUInt64")
+  (docs "Max. amount of data in the queue (in ns, 0=disable)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property audio-jitter-tolerance
+  (of-object "GstEncodeBin")
+  (prop-type "GParamUInt64")
+  (docs "Amount of timestamp jitter/imperfection to allow on audio streams before inserting/dropping samples (ns)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property avoid-reencoding
+  (of-object "GstEncodeBin")
+  (prop-type "GParamBoolean")
+  (docs "Whether to re-encode portions of compatible video streams that lay on segment boundaries")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property flags
+  (of-object "GstEncodeBin")
+  (prop-type "GParamFlags")
+  (docs "Flags to control behaviour")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GstGioSink
 
 (define-property location
@@ -3089,6 +3257,86 @@
   (construct-only #f)
 )
 
+;; From GstMultiSocketSink
+
+(define-signal add
+  (of-object "GstMultiSocketSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GSocket*" "p0")
+  )
+)
+
+(define-signal add-full
+  (of-object "GstMultiSocketSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GSocket*" "p0")
+    '("GstMultiHandleSinkSyncMethod" "p1")
+    '("GstFormat" "p2")
+    '("guint64" "p3")
+    '("GstFormat" "p4")
+    '("guint64" "p5")
+  )
+)
+
+(define-signal remove
+  (of-object "GstMultiSocketSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GSocket*" "p0")
+  )
+)
+
+(define-signal remove-flush
+  (of-object "GstMultiSocketSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GSocket*" "p0")
+  )
+)
+
+(define-signal get-stats
+  (of-object "GstMultiSocketSink")
+  (return-type "GstStructure*")
+  (when "last")
+  (parameters
+    '("GSocket*" "p0")
+  )
+)
+
+(define-signal client-added
+  (of-object "GstMultiSocketSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GObject*" "p0")
+  )
+)
+
+(define-signal client-removed
+  (of-object "GstMultiSocketSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("gint" "p0")
+    '("GstMultiHandleSinkClientStatus" "p1")
+  )
+)
+
+(define-signal client-socket-removed
+  (of-object "GstMultiSocketSink")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GSocket*" "p0")
+  )
+)
+
 ;; From GstOggDemux
 
 ;; From GstOggMux
@@ -3137,6 +3385,15 @@
   (when "last")
   (parameters
     '("GstElement*" "p0")
+  )
+)
+
+(define-signal convert-sample
+  (of-object "GstPlayBin")
+  (return-type "GstSample*")
+  (when "last")
+  (parameters
+    '("GstCaps*" "p0")
   )
 )
 
@@ -3215,15 +3472,6 @@
   (when "last")
   (parameters
     '("gint" "p0")
-  )
-)
-
-(define-signal convert-sample
-  (of-object "GstPlayBin")
-  (return-type "GstSample*")
-  (when "last")
-  (parameters
-    '("GstCaps*" "p0")
   )
 )
 
@@ -3560,6 +3808,186 @@
   (construct-only #f)
 )
 
+;; From GstPlaySink
+
+(define-signal reconfigure
+  (of-object "GstPlaySink")
+  (return-type "gboolean")
+  (when "last")
+)
+
+(define-signal convert-sample
+  (of-object "GstPlaySink")
+  (return-type "GstSample*")
+  (when "last")
+  (parameters
+    '("GstCaps*" "p0")
+  )
+)
+
+(define-property flags
+  (of-object "GstPlaySink")
+  (prop-type "GParamFlags")
+  (docs "Flags to control behaviour")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property mute
+  (of-object "GstPlaySink")
+  (prop-type "GParamBoolean")
+  (docs "Mute the audio channel without changing the volume")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property volume
+  (of-object "GstPlaySink")
+  (prop-type "GParamDouble")
+  (docs "The audio volume, 1.0=100%")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property subtitle-font-desc
+  (of-object "GstPlaySink")
+  (prop-type "GParamString")
+  (docs "Pango font description of font to be used for subtitle rendering")
+  (readable #f)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property subtitle-encoding
+  (of-object "GstPlaySink")
+  (prop-type "GParamString")
+  (docs "Encoding to assume if input subtitles are not in UTF-8 encoding. If not set, the GST_SUBTITLE_ENCODING environment variable will be checked for an encoding to use. If that is not set either, ISO-8859-15 will be assumed.")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property vis-plugin
+  (of-object "GstPlaySink")
+  (prop-type "GParamObject")
+  (docs "the visualization element to use (NULL = default)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property sample
+  (of-object "GstPlaySink")
+  (prop-type "GParamBoxed")
+  (docs "The last sample (NULL = no video available)")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property av-offset
+  (of-object "GstPlaySink")
+  (prop-type "GParamInt64")
+  (docs "The synchronisation offset between audio and video in nanoseconds")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property video-sink
+  (of-object "GstPlaySink")
+  (prop-type "GParamObject")
+  (docs "the video output element to use (NULL = default sink)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property audio-sink
+  (of-object "GstPlaySink")
+  (prop-type "GParamObject")
+  (docs "the audio output element to use (NULL = default sink)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property text-sink
+  (of-object "GstPlaySink")
+  (prop-type "GParamObject")
+  (docs "the text output element to use (NULL = default subtitleoverlay)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property send-event-mode
+  (of-object "GstPlaySink")
+  (prop-type "GParamEnum")
+  (docs "How to send events received in send_event function")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property force-aspect-ratio
+  (of-object "GstPlaySink")
+  (prop-type "GParamBoolean")
+  (docs "When enabled, scaling will respect original aspect ratio")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property video-filter
+  (of-object "GstPlaySink")
+  (prop-type "GParamObject")
+  (docs "the video filter(s) to apply, if possible")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property audio-filter
+  (of-object "GstPlaySink")
+  (prop-type "GParamObject")
+  (docs "the audio filter(s) to apply, if possible")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstSocketSrc
+
+(define-signal connection-closed-by-peer
+  (of-object "GstSocketSrc")
+  (return-type "void")
+  (when "first")
+)
+
+(define-property socket
+  (of-object "GstSocketSrc")
+  (prop-type "GParamObject")
+  (docs "The socket to receive packets from")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property caps
+  (of-object "GstSocketSrc")
+  (prop-type "GParamBoxed")
+  (docs "The caps of the source pad")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GstStreamSynchronizer
+
 ;; From GstSubtitleOverlay
 
 (define-property silent
@@ -3589,26 +4017,6 @@
   (construct-only #f)
 )
 
-;; From GstTCPClientSrc
-
-(define-property host
-  (of-object "GstTCPClientSrc")
-  (prop-type "GParamString")
-  (docs "The host IP address to receive packets from")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property port
-  (of-object "GstTCPClientSrc")
-  (prop-type "GParamInt")
-  (docs "The port to receive packets from")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 ;; From GstTCPClientSink
 
 (define-property host
@@ -3629,32 +4037,23 @@
   (construct-only #f)
 )
 
-;; From GstTCPServerSrc
+;; From GstTCPClientSrc
 
 (define-property host
-  (of-object "GstTCPServerSrc")
+  (of-object "GstTCPClientSrc")
   (prop-type "GParamString")
-  (docs "The hostname to listen as")
+  (docs "The host IP address to receive packets from")
   (readable #t)
   (writable #t)
   (construct-only #f)
 )
 
 (define-property port
-  (of-object "GstTCPServerSrc")
+  (of-object "GstTCPClientSrc")
   (prop-type "GParamInt")
-  (docs "The port to listen to (0=random available port)")
+  (docs "The port to receive packets from")
   (readable #t)
   (writable #t)
-  (construct-only #f)
-)
-
-(define-property current-port
-  (of-object "GstTCPServerSrc")
-  (prop-type "GParamInt")
-  (docs "The port number the socket is currently bound to")
-  (readable #t)
-  (writable #f)
   (construct-only #f)
 )
 
@@ -3680,6 +4079,35 @@
 
 (define-property current-port
   (of-object "GstTCPServerSink")
+  (prop-type "GParamInt")
+  (docs "The port number the socket is currently bound to")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+;; From GstTCPServerSrc
+
+(define-property host
+  (of-object "GstTCPServerSrc")
+  (prop-type "GParamString")
+  (docs "The hostname to listen as")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property port
+  (of-object "GstTCPServerSrc")
+  (prop-type "GParamInt")
+  (docs "The port to listen to (0=random available port)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property current-port
+  (of-object "GstTCPServerSrc")
   (prop-type "GParamInt")
   (docs "The port number the socket is currently bound to")
   (readable #t)
