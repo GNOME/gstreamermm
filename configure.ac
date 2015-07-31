@@ -96,6 +96,28 @@ MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 
+enable_unittests=yes
+AC_ARG_ENABLE(unittests,
+       AS_HELP_STRING([--disable-unittests], 
+       [Disable unit tests]),
+       [enable_unittests = no])
+
+AC_SUBST([ENABLE_UNITTESTS], ["$enable_unittests"])
+
+if test "x$enable_unittests" = xyes; then
+  AC_CHECK_PROG([CURL], [curl], [curl])
+  AC_CHECK_PROG([WGET], [wget], [wget])
+  AC_CHECK_PROG([UNZIP], [unzip], [unzip])
+  AS_VAR_IF([UNZIP], [], [AC_MSG_FAILURE([[Unit tests are enabled so unzip is required for building unit tests.]])])
+  AS_VAR_IF([CURL], [], [
+    AS_VAR_IF([WGET], [],[
+      AC_MSG_FAILURE([[
+        Unit tests are enabled so either curl or wget is required for building unit tests.
+        ]])
+    ])
+  ])
+fi
+
 #########################################################################
 #  Plug-in processing
 #########################################################################
@@ -222,5 +244,6 @@ ${PACKAGE}-${VERSION}
 
   Extra features
     GUI Examples:                ${gstmm_enable_gui_examples}
+    Unit Tests:                  ${enable_unittests}
 
 EOF
