@@ -25,7 +25,7 @@ AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h gst-plugins-bad/gstreamermm-plugins-bad.h])
 
-MM_PREREQ([0.9.6])
+MM_PREREQ([0.9.8])
 MM_INIT_MODULE([gstreamermm-1.0])
 MM_INIT_MODULE([gstreamermm-plugins-bad-1.0])
 
@@ -43,7 +43,7 @@ AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
+MM_AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
 
 AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
