@@ -134,7 +134,7 @@ public:
   T peek()
   {
     gpointer val = gst_atomic_queue_peek(gobj());
-    if (val == 0)
+    if (val == nullptr)
       gstreamermm_handle_error("Queue is empty");
     T v = *(T*)val;
     return v;
@@ -148,7 +148,7 @@ public:
   T pop()
   {
     gpointer val = gst_atomic_queue_pop(gobj());
-    if (val == 0)
+    if (val == nullptr)
       gstreamermm_handle_error("Queue is empty");
     T v = *(T*)val;
     delete (T*)val;

@@ -120,14 +120,14 @@ register_mm_type(const gchar * type_name)
 
         info.class_size = sizeof(GlibCppTypeClass);
         info.base_init = (GBaseInitFunc)&GlibCppType::base_init;
-        info.base_finalize = 0;
+        info.base_finalize = nullptr;
         info.class_init = (GClassInitFunc) &GlibCppTypeClass::init;
-        info.class_finalize = 0;
-        info.class_data = 0;
+        info.class_finalize = nullptr;
+        info.class_data = nullptr;
         info.instance_size = sizeof(GlibCppType);
-        info.n_preallocs = 0;
+        info.n_preallocs = nullptr;
         info.instance_init = (GInstanceInitFunc) &GlibCppType::init;
-        info.value_table = 0;
+        info.value_table = nullptr;
 
         GType _type = g_type_register_static(parent_type, type_name, &info, (GTypeFlags)0);
         g_once_init_leave(&gonce_data, (gsize) _type);

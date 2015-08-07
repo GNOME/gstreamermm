@@ -86,7 +86,7 @@ Structure::Structure(const Glib::ustring& name)
 
 Structure::operator const void*() const
 {
-  return gobject_ ? GINT_TO_POINTER(1) : 0;
+  return gobject_ ? GINT_TO_POINTER(1) : nullptr;
 }
 
 void Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
@@ -102,85 +102,85 @@ void Structure::set_field(const Glib::ustring& fieldname,
 
 void Structure::set_field(const Glib::ustring& fieldname, bool value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_BOOLEAN, value, (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_BOOLEAN, value, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, int value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_INT, value, (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_INT, value, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, guint value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_UINT, value, (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_UINT, value, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, double value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DOUBLE, value, (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DOUBLE, value, nullptr);
 };
 
 //We use std::string, because the encoding is unknown. murrayc
 void Structure::set_field(const Glib::ustring& fieldname, const std::string& value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_STRING, value.c_str(), (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_STRING, value.c_str(), nullptr);
 }
 
 //We use std::string, because the encoding is unknown. murrayc
 void Structure::set_field(const Glib::ustring& fieldname, const char* value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_STRING, value, (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_STRING, value, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Glib::Date& value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE, value.gobj(), (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE, value.gobj(), nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Glib::DateTime& value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE_TIME, value.gobj(), (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_DATE_TIME, value.gobj(), nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, gint64 value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_INT64,
-    (gint64) value, (void*)0);
+    (gint64) value, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, guint64 value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), G_TYPE_INT64,
-    (guint64) value, (void*)0);
+    (guint64) value, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, GType enumtype, int value)
 {
-  gst_structure_set(gobj(), fieldname.c_str(), enumtype, value, (void*)0);
+  gst_structure_set(gobj(), fieldname.c_str(), enumtype, value, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::Fraction& value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION, value.num,
-    value.denom, (void*)0);
+    value.denom, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::IntRange& value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_INT_RANGE, value.min,
-    value.max, (void*)0);
+    value.max, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::DoubleRange& value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_DOUBLE_RANGE,
-    value.min, value.max, (void*)0);
+    value.min, value.max, nullptr);
 }
 
 void Structure::set_field(const Glib::ustring& fieldname, const Gst::FractionRange& value)
 {
   gst_structure_set(gobj(), fieldname.c_str(), GST_TYPE_FRACTION_RANGE,
-    value.min.num, value.min.denom, value.max.num, value.max.denom, (void*)0);
+    value.min.num, value.min.denom, value.max.num, value.max.denom, nullptr);
 }
 
 void Structure::remove_field(const Glib::ustring& fieldname)
@@ -247,7 +247,7 @@ bool Structure::get_field(const Glib::ustring& name, std::string& value) const
 
 bool Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
 {
-  GDate* gdate = 0;
+  GDate* gdate = nullptr;
   const bool has = gst_structure_get_date(gobj(), name.c_str(), &gdate);
   if(has)
     date.set_julian(Glib::Date(*gdate).get_julian());
@@ -257,7 +257,7 @@ bool Structure::get_field(const Glib::ustring& name, Glib::Date& date) const
 
 bool Structure::get_field(const Glib::ustring& name, Glib::DateTime& datetime) const
 {
-  GstDateTime* gstdatetime = 0;
+  GstDateTime* gstdatetime = nullptr;
   const bool has = gst_structure_get_date_time(gobj(), name.c_str(), &gstdatetime);
   if(has)
     datetime = Glib::wrap(gst_date_time_to_g_date_time(gstdatetime), false);
@@ -347,7 +347,7 @@ bool Structure::map_in_place(const SlotMap& slot)
 
 Structure Structure::create_from_string(const Glib::ustring& the_string)
 {
-  return Structure(gst_structure_from_string(the_string.c_str(), 0)); 
+  return Structure(gst_structure_from_string(the_string.c_str(), nullptr)); 
 }
 
 bool Structure::fixate_nearest_fraction(const Glib::ustring& name, const Gst::Fraction& target)

@@ -134,7 +134,7 @@ gint64 EventBufferSize::parse() const
 {
   gint64 gst_minsize = 0;
   gst_event_parse_buffer_size(const_cast<GstEvent*>(gobj()), 0, &gst_minsize,
-    0, 0);
+    nullptr, nullptr);
   return gst_minsize;
 }
 
@@ -362,14 +362,14 @@ Glib::RefPtr<Gst::EventSinkMessage>
 
 Glib::RefPtr<Gst::Message> EventSinkMessage::parse()
 {
-  GstMessage* gst_msg = 0;
+  GstMessage* gst_msg = nullptr;
   gst_event_parse_sink_message(gobj(), &gst_msg);
   return Glib::wrap(gst_msg);
 }
 
 Glib::RefPtr<const Gst::Message> EventSinkMessage::parse() const
 {
-  GstMessage* gst_msg = 0;
+  GstMessage* gst_msg = nullptr;
   gst_event_parse_sink_message(const_cast<GstEvent*>(gobj()), &gst_msg);
   return Glib::wrap(gst_msg);
 }
@@ -390,7 +390,7 @@ EventCaps::create(const Glib::RefPtr<Gst::Caps>& caps)
 
 Glib::RefPtr<Gst::Caps> EventCaps::parse()
 {
-  GstCaps* gst_caps = 0;
+  GstCaps* gst_caps = nullptr;
   gst_event_parse_caps(gobj(), &gst_caps);
   return Glib::wrap(gst_caps, true);
 }

@@ -67,12 +67,12 @@ namespace Gst
 {
 
 Pad::Pad(PadDirection dir)
-  : _CONSTRUCT("name", static_cast<char*>(0), "direction", dir)
+  : _CONSTRUCT("name", nullptr, "direction", dir)
 {}
 
 Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ,
   const Glib::ustring& name)
-  : _CONSTRUCT("name", (name.empty() ? static_cast<char*>(0) : name.c_str()),
+  : _CONSTRUCT("name", (name.empty() ? nullptr : name.c_str()),
     "direction", (templ ? static_cast<GstPadDirection>(templ->get_direction())
       : GST_PAD_UNKNOWN),
     "template", Glib::unwrap(templ))
@@ -85,7 +85,7 @@ Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ,
 }
 
 Pad::Pad(const Glib::RefPtr<const Gst::PadTemplate>& templ)
-  : _CONSTRUCT("name", static_cast<char*>(0),
+  : _CONSTRUCT("name", nullptr,
     "direction", (templ ? static_cast<GstPadDirection>(templ->get_direction())
       : GST_PAD_UNKNOWN),
     "template", Glib::unwrap(templ))
@@ -139,7 +139,7 @@ gulong Pad::add_probe(PadProbeType mask, const SlotProbe& slot)
 
 FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
-  GstBuffer* c_buffer = 0;
+  GstBuffer* c_buffer = nullptr;
   GstFlowReturn result = gst_pad_get_range(gobj(), offset, size, &c_buffer);
   buffer = Glib::wrap(c_buffer, false);
   return FlowReturn(result);
@@ -164,7 +164,7 @@ bool Pad::push_event(const Glib::RefPtr<Gst::Event>& event)
 
 FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
-  GstBuffer* c_buffer = 0;
+  GstBuffer* c_buffer = nullptr;
   GstFlowReturn result = gst_pad_pull_range(gobj(), offset, size, &c_buffer);
   buffer = Glib::wrap(c_buffer, false);
   return FlowReturn(result);
@@ -178,12 +178,12 @@ bool Pad::send_event(const Glib::RefPtr<Gst::Event>& event)
 
 bool Pad::query_position(Format& format) const
 {
-  return gst_pad_query_position(const_cast<GstPad*>(gobj()), (GstFormat)format, 0);
+  return gst_pad_query_position(const_cast<GstPad*>(gobj()), (GstFormat)format, nullptr);
 }
 
 bool Pad::query_duration(Format& format) const
 {
-  return gst_pad_query_duration(const_cast<GstPad*>(gobj()), (GstFormat)format, 0);
+  return gst_pad_query_duration(const_cast<GstPad*>(gobj()), (GstFormat)format, nullptr);
 }
 
 FlowReturn Pad::chain(Glib::RefPtr<Gst::Buffer>& buffer)

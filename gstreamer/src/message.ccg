@@ -66,8 +66,8 @@ Glib::RefPtr<Gst::MessageError>
 
 void MessageError::parse(Glib::Error& error, std::string& debug) const
 {
-  GError* c_error = 0;
-  gchar* c_debug = 0;
+  GError* c_error = nullptr;
+  gchar* c_debug = nullptr;
   gst_message_parse_error(const_cast<GstMessage*>(gobj()), &c_error, &c_debug);
 
   debug = c_debug;
@@ -79,16 +79,16 @@ void MessageError::parse(Glib::Error& error, std::string& debug) const
 
 Glib::Error MessageError::parse() const
 {
-  GError* c_error = 0;
-  gst_message_parse_error(const_cast<GstMessage*>(gobj()), &c_error, 0);
+  GError* c_error = nullptr;
+  gst_message_parse_error(const_cast<GstMessage*>(gobj()), &c_error, nullptr);
 
   return Glib::Error(c_error);
 }
 
 std::string MessageError::parse_debug() const
 {
-  gchar* c_debug = 0;
-  GError* c_error = 0;
+  gchar* c_debug = nullptr;
+  GError* c_error = nullptr;
 
   gst_message_parse_error(const_cast<GstMessage*>(gobj()), &c_error, &c_debug);
 
@@ -114,8 +114,8 @@ Glib::RefPtr<Gst::MessageWarning>
 
 void MessageWarning::parse(Glib::Error& error, std::string& debug) const
 {
-  GError* c_error = 0;
-  gchar* c_debug = 0;
+  GError* c_error = nullptr;
+  gchar* c_debug = nullptr;
   gst_message_parse_warning(const_cast<GstMessage*>(gobj()), &c_error, &c_debug);
 
   debug = c_debug;
@@ -127,16 +127,16 @@ void MessageWarning::parse(Glib::Error& error, std::string& debug) const
 
 Glib::Error MessageWarning::parse() const
 {
-  GError* c_error = 0;
-  gst_message_parse_warning(const_cast<GstMessage*>(gobj()), &c_error, 0);
+  GError* c_error = nullptr;
+  gst_message_parse_warning(const_cast<GstMessage*>(gobj()), &c_error, nullptr);
 
   return Glib::Error(c_error);
 }
 
 std::string MessageWarning::parse_debug() const
 {
-  gchar* c_debug = 0;
-  GError* c_error = 0;
+  gchar* c_debug = nullptr;
+  GError* c_error = nullptr;
 
   gst_message_parse_warning(const_cast<GstMessage*>(gobj()), &c_error,
     &c_debug);
@@ -164,8 +164,8 @@ Glib::RefPtr<Gst::MessageInfo>
 
 void MessageInfo::parse(Glib::Error& error, std::string& debug) const
 {
-  GError* c_error = 0;
-  gchar* c_debug = 0;
+  GError* c_error = nullptr;
+  gchar* c_debug = nullptr;
   gst_message_parse_info(const_cast<GstMessage*>(gobj()), &c_error, &c_debug);
 
   debug = c_debug;
@@ -177,16 +177,16 @@ void MessageInfo::parse(Glib::Error& error, std::string& debug) const
 
 Glib::Error MessageInfo::parse() const
 {
-  GError* c_error = 0;
-  gst_message_parse_info(const_cast<GstMessage*>(gobj()), &c_error, 0);
+  GError* c_error = nullptr;
+  gst_message_parse_info(const_cast<GstMessage*>(gobj()), &c_error, nullptr);
 
   return Glib::Error(c_error);
 }
 
 std::string MessageInfo::parse_debug() const
 {
-  gchar* c_debug = 0;
-  GError* c_error = 0;
+  gchar* c_debug = nullptr;
+  GError* c_error = nullptr;
 
   gst_message_parse_info(const_cast<GstMessage*>(gobj()), &c_error, &c_debug);
 
@@ -212,7 +212,7 @@ Glib::RefPtr<Gst::MessageTag>
 void MessageTag::parse(Gst::TagList& tag_list)
   const
 {
-  GstTagList* gst_tag_list = 0;
+  GstTagList* gst_tag_list = nullptr;
 
   gst_message_parse_tag(const_cast<GstMessage*>(gobj()), &gst_tag_list);
 
@@ -222,7 +222,7 @@ void MessageTag::parse(Gst::TagList& tag_list)
 
 Gst::TagList MessageTag::parse() const
 {
-  GstTagList* gst_tag_list = 0;
+  GstTagList* gst_tag_list = nullptr;
   gst_message_parse_tag(const_cast<GstMessage*>(gobj()), &gst_tag_list);
   return Gst::TagList(gst_tag_list);
 }
@@ -261,7 +261,7 @@ BufferingMode MessageBuffering::parse_stats_buffering_mode() const
   GstBufferingMode mode = GST_BUFFERING_STREAM;
 
   gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), &mode,
-    0, 0, 0);
+    nullptr, nullptr, nullptr);
   return static_cast<BufferingMode>(mode);
 }
 
@@ -269,8 +269,8 @@ int MessageBuffering::parse_stats_avg_in() const
 {
   int avg_in = 0;
 
-  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), 0,
-    &avg_in, 0, 0);
+  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), nullptr,
+    &avg_in, nullptr, nullptr);
   return avg_in;
 }
 
@@ -278,8 +278,8 @@ int MessageBuffering::parse_stats_avg_out() const
 {
   int avg_out = 0;
 
-  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), 0,
-    0, &avg_out, 0);
+  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), nullptr,
+    nullptr, &avg_out, nullptr);
   return avg_out;
 }
 
@@ -287,8 +287,8 @@ gint64 MessageBuffering::parse_stats_buffering_left() const
 {
   gint64 buffering_left = 0;
 
-  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), 0,
-    0, 0, &buffering_left);
+  gst_message_parse_buffering_stats(const_cast<GstMessage*>(gobj()), nullptr,
+    nullptr, nullptr, &buffering_left);
   return buffering_left;
 }
 
@@ -315,8 +315,8 @@ State MessageStateChanged::parse() const
 {
   GstState new_state = GST_STATE_NULL;
 
-  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), 0,
-    &new_state, 0);
+  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), nullptr,
+    &new_state, nullptr);
   return State(new_state);
 }
 
@@ -325,15 +325,15 @@ State MessageStateChanged::parse_old() const
   GstState old_state = GST_STATE_NULL;
 
   gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), &old_state,
-    0, 0);
+    nullptr, nullptr);
   return State(old_state);
 }
 
 State MessageStateChanged::parse_pending() const
 {
   GstState pending_state = GST_STATE_NULL;
-  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), 0,
-    0, &pending_state);
+  gst_message_parse_state_changed(const_cast<GstMessage*>(gobj()), nullptr,
+    nullptr, &pending_state);
   return State(pending_state);
 }
 
@@ -374,8 +374,8 @@ void MessageStepDone::parse(Gst::Format& format, guint64& amount, double& rate,
 guint64 MessageStepDone::parse() const
 {
   guint64 duration = 0;
-  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0, 0,
-    &duration, 0);
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), nullptr, nullptr, nullptr, nullptr, nullptr,
+    &duration, nullptr);
   return duration;
 }
 
@@ -383,47 +383,47 @@ Gst::Format MessageStepDone::parse_format() const
 {
   GstFormat format = GST_FORMAT_UNDEFINED;
   gst_message_parse_step_done(const_cast<GstMessage*>(gobj()),
-    reinterpret_cast<GstFormat*>(&format), 0, 0, 0, 0, 0, 0);
+    reinterpret_cast<GstFormat*>(&format), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   return static_cast<Gst::Format>(format);
 }
 
 guint64 MessageStepDone::parse_amount() const
 {
   guint64 amount = 0;
-  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, &amount, 0,
-    0, 0, 0, 0);
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), nullptr, &amount, nullptr,
+    nullptr, nullptr, nullptr, nullptr);
   return amount;
 }
 
 double MessageStepDone::parse_rate() const
 {
   double rate = 0;
-  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, &rate, 0,
-    0, 0, 0);
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), nullptr, nullptr, &rate, nullptr,
+    nullptr, nullptr, nullptr);
   return rate;
 }
 
 bool MessageStepDone::parse_flush() const
 {
   gboolean gst_flush = FALSE;
-  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0,
-    &gst_flush, 0, 0, 0);
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), nullptr, nullptr, nullptr,
+    &gst_flush, nullptr, nullptr, nullptr);
   return gst_flush;
 }
 
 bool MessageStepDone::parse_intermediate() const
 {
   gboolean gst_intermediate = FALSE;
-  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0,
-    &gst_intermediate, 0, 0);
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), nullptr, nullptr, nullptr, nullptr,
+    &gst_intermediate, nullptr, nullptr);
   return gst_intermediate;
 }
 
 bool MessageStepDone::parse_eos() const
 {
   gboolean gst_eos = FALSE;
-  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0, 0,
-    0, &gst_eos);
+  gst_message_parse_step_done(const_cast<GstMessage*>(gobj()), nullptr, nullptr, nullptr, nullptr, nullptr,
+    nullptr, &gst_eos);
   return gst_eos;
 }
 
@@ -438,7 +438,7 @@ Glib::RefPtr<Gst::MessageClockProvide>
 
 void MessageClockProvide::parse(Glib::RefPtr<Gst::Clock>& clock, bool& ready) const
 {
-  GstClock* cclock = 0;
+  GstClock* cclock = nullptr;
   gboolean ready_ = false;
   gst_message_parse_clock_provide(const_cast<GstMessage*>(gobj()), &cclock,
     &ready_);
@@ -448,8 +448,8 @@ void MessageClockProvide::parse(Glib::RefPtr<Gst::Clock>& clock, bool& ready) co
 
 Glib::RefPtr<Gst::Clock> MessageClockProvide::parse()
 {
-  GstClock* cclock = 0;
-  gst_message_parse_clock_provide(gobj(), &cclock, 0);
+  GstClock* cclock = nullptr;
+  gst_message_parse_clock_provide(gobj(), &cclock, nullptr);
   return Glib::wrap(cclock);
 }
 
@@ -461,7 +461,7 @@ Glib::RefPtr<const Gst::Clock> MessageClockProvide::parse() const
 bool MessageClockProvide::parse_ready() const
 {
   gboolean ready = FALSE;
-  gst_message_parse_clock_provide(const_cast<GstMessage*>(gobj()), 0,
+  gst_message_parse_clock_provide(const_cast<GstMessage*>(gobj()), nullptr,
     &ready);
   return ready;
 }
@@ -477,7 +477,7 @@ Glib::RefPtr<Gst::MessageClockLost>
 
 Glib::RefPtr<Gst::Clock> MessageClockLost::parse()
 {
-  GstClock* cclock = 0;
+  GstClock* cclock = nullptr;
   gst_message_parse_clock_lost(gobj(), &cclock);
   return Glib::wrap(cclock, false);
 }
@@ -498,7 +498,7 @@ Glib::RefPtr<Gst::MessageNewClock>
 
 Glib::RefPtr<Gst::Clock> MessageNewClock::parse()
 {
-  GstClock* cclock = 0;
+  GstClock* cclock = nullptr;
   gst_message_parse_new_clock(gobj(), &cclock);
   return Glib::wrap(cclock, false);
 }
@@ -531,7 +531,7 @@ Glib::RefPtr<Gst::MessageElement>
 Glib::RefPtr<Gst::MessageElement>
   MessageElement::create(const Glib::RefPtr<Gst::Object>& src)
 {
-  GstMessage* message = gst_message_new_element(Glib::unwrap(src), 0);
+  GstMessage* message = gst_message_new_element(Glib::unwrap(src), nullptr);
   return Gst::wrap_msg_derived<Gst::MessageElement>(message, false);
 }
 
@@ -549,7 +549,7 @@ Glib::RefPtr<Gst::MessageCustom>
   MessageCustom::create(MessageType type, const Glib::RefPtr<Gst::Object>& src)
 {
   GstMessage* message = gst_message_new_custom(GstMessageType(type),
-    Glib::unwrap(src), 0);
+    Glib::unwrap(src), nullptr);
   return Gst::wrap_msg_derived<Gst::MessageCustom>(message, false);
 }
 
@@ -571,7 +571,7 @@ void MessageSegmentStart::parse(Format& format, gint64& position) const
 gint64 MessageSegmentStart::parse() const
 {
   gint64 position = 0;
-  gst_message_parse_segment_start(const_cast<GstMessage*>(gobj()), 0,
+  gst_message_parse_segment_start(const_cast<GstMessage*>(gobj()), nullptr,
     &position);
   return position;
 }
@@ -580,7 +580,7 @@ Format MessageSegmentStart::parse_format() const
 {
   Format format = Gst::FORMAT_DEFAULT;
   gst_message_parse_segment_start(const_cast<GstMessage*>(gobj()),
-    reinterpret_cast<GstFormat*>(&format), 0);
+    reinterpret_cast<GstFormat*>(&format), nullptr);
   return format;
 }
 
@@ -602,7 +602,7 @@ void MessageSegmentDone::parse(Format& format, gint64& position) const
 gint64 MessageSegmentDone::parse() const
 {
   gint64 position = 0;
-  gst_message_parse_segment_done(const_cast<GstMessage*>(gobj()), 0,
+  gst_message_parse_segment_done(const_cast<GstMessage*>(gobj()), nullptr,
     &position);
   return position;
 }
@@ -611,7 +611,7 @@ Format MessageSegmentDone::parse_format() const
 {
   Format format = Gst::FORMAT_UNDEFINED;
   gst_message_parse_segment_done(const_cast<GstMessage*>(gobj()),
-    reinterpret_cast<GstFormat*>(&format), 0);
+    reinterpret_cast<GstFormat*>(&format), nullptr);
   return format;
 }
 
@@ -679,47 +679,47 @@ void MessageStepStart::parse(bool& active, Gst::Format& format,
 guint64 MessageStepStart::parse() const
 {
   guint64 amount = 0;
-  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, &amount,
-    0, 0, 0);
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), nullptr, nullptr, &amount,
+    nullptr, nullptr, nullptr);
   return amount;
 }
 
 bool MessageStepStart::parse_active() const
 {
   gboolean gst_active = FALSE;
-  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), &gst_active, 0,
-    0, 0, 0, 0);
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), &gst_active, nullptr,
+    nullptr, nullptr, nullptr, nullptr);
   return gst_active;
 }
 
 Gst::Format MessageStepStart::parse_format() const
 {
   GstFormat format = GST_FORMAT_UNDEFINED;
-  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0,
-    reinterpret_cast<GstFormat*>(&format), 0, 0, 0, 0);
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), nullptr,
+    reinterpret_cast<GstFormat*>(&format), nullptr, nullptr, nullptr, nullptr);
   return static_cast<Gst::Format>(format);
 }
 
 double MessageStepStart::parse_rate() const
 {
   double rate = 0;
-  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, 0, &rate,
-    0, 0);
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), nullptr, nullptr, nullptr, &rate,
+    nullptr, nullptr);
   return rate;
 }
 
 bool MessageStepStart::parse_flush() const
 {
   gboolean gst_flush = FALSE;
-  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0,
-    &gst_flush, 0);
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), nullptr, nullptr, nullptr, nullptr,
+    &gst_flush, nullptr);
   return gst_flush;
 }
 
 bool MessageStepStart::parse_intermediate() const
 {
   gboolean gst_intermediate = FALSE;
-  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), 0, 0, 0, 0, 0,
+  gst_message_parse_step_start(const_cast<GstMessage*>(gobj()), nullptr, nullptr, nullptr, nullptr, nullptr,
     &gst_intermediate);
   return gst_intermediate;
 }
@@ -737,7 +737,7 @@ Glib::RefPtr<Gst::MessageStructureChange>
 void MessageStructureChange::parse(Gst::StructureChangeType& type,
   Glib::RefPtr<Gst::Element>& owner, bool& busy) const
 {
-  GstElement* gst_element = 0;
+  GstElement* gst_element = nullptr;
   gboolean gst_busy = false;
   gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()),
     reinterpret_cast<GstStructureChangeType*>(&type), &gst_element, &gst_busy);
@@ -749,22 +749,22 @@ Gst::StructureChangeType MessageStructureChange::parse() const
 {
   GstStructureChangeType gst_type = GST_STRUCTURE_CHANGE_TYPE_PAD_LINK;
   gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()),
-    &gst_type, 0, 0);
+    &gst_type, nullptr, nullptr);
   return static_cast<Gst::StructureChangeType>(gst_type);
 }
 
 Glib::RefPtr<Gst::Element> MessageStructureChange::parse_owner() const
 {
-  GstElement* gst_element = 0;
-  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()), 0,
-    &gst_element, 0);
+  GstElement* gst_element = nullptr;
+  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()), nullptr,
+    &gst_element, nullptr);
   return Glib::wrap(gst_element, true);
 }
 
 bool MessageStructureChange::parse_busy() const
 {
   gboolean gst_busy = false;
-  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()), 0, 0,
+  gst_message_parse_structure_change(const_cast<GstMessage*>(gobj()), nullptr, nullptr,
     &gst_busy);
   return gst_busy;
 }
@@ -825,14 +825,14 @@ Gst::StreamStatusType MessageStreamStatus::parse() const
 {
   GstStreamStatusType type;
   gst_message_parse_stream_status(const_cast<GstMessage*>(gobj()),
-    &type, 0);
+    &type, nullptr);
   return static_cast<Gst::StreamStatusType>(type);
 }
 
 Glib::RefPtr<Gst::Element> MessageStreamStatus::parse_owner() const
 {
   GstElement* gst_element;
-  gst_message_parse_stream_status(const_cast<GstMessage*>(gobj()), 0,
+  gst_message_parse_stream_status(const_cast<GstMessage*>(gobj()), nullptr,
     &gst_element);
   return Glib::wrap(gst_element, true);
 }
@@ -918,7 +918,7 @@ Glib::RefPtr<Gst::MessageNeedContext> MessageNeedContext::create(
 
 bool MessageNeedContext::parse(Glib::ustring& context_type) const
 {
-  gchar* c_context_type = 0;
+  gchar* c_context_type = nullptr;
   bool ret = gst_message_parse_context_type(const_cast<GstMessage*>(gobj()),
     const_cast<const gchar**>(&c_context_type));
   context_type = c_context_type;

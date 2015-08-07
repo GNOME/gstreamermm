@@ -54,7 +54,7 @@ void init()
   if(!s_init)
   {
     Glib::init();
-    gst_init(0, 0);
+    gst_init(nullptr, nullptr);
     initialize_wrap_system();
     s_init = true;
   }
@@ -69,7 +69,7 @@ bool init_check(int& argc, char**& argv)
   {
     Glib::init();
 
-    GError* gerror = 0;
+    GError* gerror = nullptr;
     result = gst_init_check(&argc, &argv, &gerror);
 
     if(gerror)
@@ -91,8 +91,8 @@ bool init_check()
   {
     Glib::init();
 
-    GError* gerror = 0;
-    result = gst_init_check(0, 0, &gerror);
+    GError* gerror = nullptr;
+    result = gst_init_check(nullptr, nullptr, &gerror);
 
     if(gerror)
       ::Glib::Error::throw_exception(gerror);

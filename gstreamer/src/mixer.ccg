@@ -30,7 +30,7 @@ MessageMixerMuteToggled::MessageMixerMuteToggled(GstMessage* castitem)
 void MessageMixerMuteToggled::parse(Glib::RefPtr<Gst::MixerTrack>& track,
   bool& mute) const
 {
-  GstMixerTrack* gst_track = 0;
+  GstMixerTrack* gst_track = nullptr;
   gboolean gst_mute = 0;
 
   gst_mixer_message_parse_mute_toggled(const_cast<GstMessage*>(gobj()),
@@ -41,8 +41,8 @@ void MessageMixerMuteToggled::parse(Glib::RefPtr<Gst::MixerTrack>& track,
 
 Glib::RefPtr<Gst::MixerTrack> MessageMixerMuteToggled::parse()
 {
-  GstMixerTrack* gst_track = 0;
-  gst_mixer_message_parse_mute_toggled(gobj(), &gst_track, 0);
+  GstMixerTrack* gst_track = nullptr;
+  gst_mixer_message_parse_mute_toggled(gobj(), &gst_track, nullptr);
   return Glib::wrap(gst_track);
 }
 
@@ -55,7 +55,7 @@ bool MessageMixerMuteToggled::parse_mute() const
 {
   gboolean gst_mute = 0;
   gst_mixer_message_parse_mute_toggled(const_cast<GstMessage*>(gobj()),
-    0, &gst_mute);
+    nullptr, &gst_mute);
   return gst_mute;
 }
 
@@ -66,7 +66,7 @@ MessageMixerRecordToggled::MessageMixerRecordToggled(GstMessage* castitem)
 void MessageMixerRecordToggled::parse(Glib::RefPtr<Gst::MixerTrack>& track,
   bool& record) const
 {
-  GstMixerTrack* gst_track = 0;
+  GstMixerTrack* gst_track = nullptr;
   gboolean gst_record = 0;
 
   gst_mixer_message_parse_record_toggled(const_cast<GstMessage*>(gobj()),
@@ -77,8 +77,8 @@ void MessageMixerRecordToggled::parse(Glib::RefPtr<Gst::MixerTrack>& track,
 
 Glib::RefPtr<Gst::MixerTrack> MessageMixerRecordToggled::parse()
 {
-  GstMixerTrack* gst_track = 0;
-  gst_mixer_message_parse_record_toggled(gobj(), &gst_track, 0);
+  GstMixerTrack* gst_track = nullptr;
+  gst_mixer_message_parse_record_toggled(gobj(), &gst_track, nullptr);
   return Glib::wrap(gst_track);
 }
 
@@ -91,7 +91,7 @@ bool MessageMixerRecordToggled::parse_record() const
 {
   gboolean gst_record = 0;
   gst_mixer_message_parse_record_toggled(const_cast<GstMessage*>(gobj()),
-    0, &gst_record);
+    nullptr, &gst_record);
   return gst_record;
 }
 
@@ -102,8 +102,8 @@ MessageMixerVolumeChanged::MessageMixerVolumeChanged(GstMessage* castitem)
 void MessageMixerVolumeChanged::parse(Glib::RefPtr<Gst::MixerTrack>& track,
   std::vector<int>& volumes) const
 {
-  GstMixerTrack* gst_track = 0;
-  gint* gst_volumes = 0;
+  GstMixerTrack* gst_track = nullptr;
+  gint* gst_volumes = nullptr;
   gint gst_num_channels = 0;
 
   gst_mixer_message_parse_volume_changed(const_cast<GstMessage*>(gobj()),
@@ -117,8 +117,8 @@ void MessageMixerVolumeChanged::parse(Glib::RefPtr<Gst::MixerTrack>& track,
 
 Glib::RefPtr<Gst::MixerTrack> MessageMixerVolumeChanged::parse()
 {
-  GstMixerTrack* gst_track = 0;
-  gst_mixer_message_parse_volume_changed(gobj(), &gst_track, 0, 0);
+  GstMixerTrack* gst_track = nullptr;
+  gst_mixer_message_parse_volume_changed(gobj(), &gst_track, nullptr, nullptr);
   return Glib::wrap(gst_track);
 }
 
@@ -129,11 +129,11 @@ Glib::RefPtr<const Gst::MixerTrack> MessageMixerVolumeChanged::parse() const
 
 std::vector<int> MessageMixerVolumeChanged::parse_volumes() const
 {
-  gint* gst_volumes = 0;
+  gint* gst_volumes = nullptr;
   gint gst_num_channels = 0;
 
   gst_mixer_message_parse_volume_changed(const_cast<GstMessage*>(gobj()),
-    0, &gst_volumes, &gst_num_channels);
+    nullptr, &gst_volumes, &gst_num_channels);
 
   return Glib::ArrayHandle<int>(gst_volumes, gst_num_channels,
     Glib::OWNERSHIP_DEEP);
@@ -146,8 +146,8 @@ MessageMixerOptionChanged::MessageMixerOptionChanged(GstMessage* castitem)
 void MessageMixerOptionChanged::parse(Glib::RefPtr<Gst::MixerOptions>& options,
   Glib::ustring& value) const
 {
-  GstMixerOptions* gst_options = 0;
-  const gchar* gst_value = 0;
+  GstMixerOptions* gst_options = nullptr;
+  const gchar* gst_value = nullptr;
 
   gst_mixer_message_parse_option_changed(const_cast<GstMessage*>(gobj()),
     &gst_options, &gst_value);
@@ -157,8 +157,8 @@ void MessageMixerOptionChanged::parse(Glib::RefPtr<Gst::MixerOptions>& options,
 
 Glib::RefPtr<Gst::MixerOptions> MessageMixerOptionChanged::parse()
 {
-  GstMixerOptions* gst_options = 0;
-  gst_mixer_message_parse_option_changed(gobj(), &gst_options, 0);
+  GstMixerOptions* gst_options = nullptr;
+  gst_mixer_message_parse_option_changed(gobj(), &gst_options, nullptr);
   return Glib::wrap(gst_options);
 }
 
@@ -169,9 +169,9 @@ Glib::RefPtr<const Gst::MixerOptions> MessageMixerOptionChanged::parse() const
 
 Glib::ustring MessageMixerOptionChanged::parse_value() const
 {
-  const gchar* gst_value = 0;
+  const gchar* gst_value = nullptr;
   gst_mixer_message_parse_option_changed(const_cast<GstMessage*>(gobj()),
-    0, &gst_value);
+    nullptr, &gst_value);
   return gst_value;
 }
 
@@ -181,7 +181,7 @@ MessageMixerOptionsListChanged::MessageMixerOptionsListChanged(GstMessage* casti
 
 Glib::RefPtr<Gst::MixerOptions> MessageMixerOptionsListChanged::parse()
 {
-  GstMixerOptions* gst_options = 0;
+  GstMixerOptions* gst_options = nullptr;
   gst_mixer_message_parse_options_list_changed(gobj(), &gst_options);
   return Glib::wrap(gst_options);
 }
