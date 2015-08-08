@@ -13,7 +13,7 @@ using namespace Gst;
 
 TEST(BufferTest, CheckBufferSize)
 {
-    int buff_size = 23;
+    gsize buff_size = 23;
     Glib::RefPtr<Buffer> buf = Buffer::create(buff_size);
     Glib::RefPtr<MapInfo> map_info(new MapInfo());
 
@@ -111,7 +111,7 @@ TEST(BufferTest, CheckBufferCopyIntoMethod)
   src->unmap(info);
 
   Gst::Buffer::copy_into(dest, src, BUFFER_COPY_TIMESTAMPS | BUFFER_COPY_MEMORY, 0, data.size());
-  ASSERT_EQ(dest->get_pts(), 10);
+  ASSERT_EQ(dest->get_pts(), 10ul);
   ASSERT_EQ(data.size(), dest->get_size());
 
   ASSERT_EQ(0, dest->memcmp(0, data.data(), data.size()));

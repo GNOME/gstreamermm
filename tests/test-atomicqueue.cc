@@ -20,7 +20,7 @@ TEST(AtomicQueueTest, ShouldReturnFirstElementInQueueAndNotRemoveIt)
 	queue->push(9);
 
 	ASSERT_EQ(12, queue->peek());
-	ASSERT_EQ(3, queue->length());
+	ASSERT_EQ(3u, queue->length());
 }
 
 TEST(AtomicQueueTest, ShouldThrowExceptionOnPeekIfQueueIsEmpty)
@@ -38,7 +38,7 @@ TEST(AtomicQueueTest, ShouldReturnFirstElementAndRemoveIt)
 	queue->push(10);
 
 	ASSERT_EQ(7, queue->pop());
-	ASSERT_EQ(2, queue->length());
+	ASSERT_EQ(2u, queue->length());
 }
 
 TEST(AtomicQueueTest, ShouldImitateGstAtomicQueueStructByGpointerAsTemplate)
@@ -56,6 +56,6 @@ TEST(AtomicQueueTest, ShouldImitateGstAtomicQueueStructByGpointerAsTemplate)
 	ASSERT_EQ(new_element, element);
 	EXPECT_STREQ("dummy-name", gst_element_get_name(new_element));
 	delete new_data;
-	ASSERT_EQ(1, GST_OBJECT_REFCOUNT(element));
+	ASSERT_EQ(1u, GST_OBJECT_REFCOUNT(element));
 	gst_object_unref(element);
 }

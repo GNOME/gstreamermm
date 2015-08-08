@@ -125,7 +125,7 @@ register_mm_type(const gchar * type_name)
         info.class_finalize = nullptr;
         info.class_data = nullptr;
         info.instance_size = sizeof(GlibCppType);
-        info.n_preallocs = nullptr;
+        info.n_preallocs = 0;
         info.instance_init = (GInstanceInitFunc) &GlibCppType::init;
         info.value_table = nullptr;
 

@@ -36,8 +36,8 @@ TEST(AllocatorTest, ShouldCorrectAllocateMemory)
   Glib::RefPtr<Memory> mem = allocator->alloc(10, params);
 
   ASSERT_TRUE(mem);
-  EXPECT_EQ(10, mem->get_size());
-  EXPECT_EQ(7, mem->get_align());
+  EXPECT_EQ(10ul, mem->get_size());
+  EXPECT_EQ(7ul, mem->get_align());
   EXPECT_TRUE(flags & mem->get_flags());
 
   allocator->free(mem);
@@ -91,8 +91,8 @@ TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedWrappedGst
   ASSERT_TRUE(mem->gobj());
   ASSERT_TRUE(GST_IS_MINI_OBJECT_TYPE(mem->gobj(), GST_TYPE_MEMORY));
   ASSERT_EQ(1, mem->get_refcount());
-  EXPECT_EQ(10, mem->get_size());
-  EXPECT_EQ(7, mem->get_align());
+  EXPECT_EQ(10ul, mem->get_size());
+  EXPECT_EQ(7ul, mem->get_align());
   EXPECT_TRUE(flags & mem->get_flags());
 
   allocator->free(mem);
@@ -114,8 +114,8 @@ TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedGstMemory)
   ASSERT_TRUE(mem);
   ASSERT_TRUE(GST_IS_MINI_OBJECT_TYPE(mem, GST_TYPE_MEMORY));
   ASSERT_EQ(1, mem->mini_object.refcount);
-  EXPECT_EQ(10, mem->size);
-  EXPECT_EQ(7, mem->align);
+  EXPECT_EQ(10ul, mem->size);
+  EXPECT_EQ(7ul, mem->align);
   EXPECT_TRUE(flags & mem->mini_object.flags);
   gst_allocator_free(allocator->gobj(), mem);
 }

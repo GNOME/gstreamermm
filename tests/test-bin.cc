@@ -148,7 +148,7 @@ TEST_F(BinTest, ShouldCorrectIterateElements)
     elements.erase(pos);
   }
 
-  ASSERT_EQ(0, elements.size());
+  ASSERT_EQ(0u, elements.size());
 }
 
 TEST_F(BinTest, ShouldContainsAddedElements)
@@ -165,7 +165,7 @@ TEST_F(BinTest, ShouldContainsAddedElements)
     ASSERT_NE(elements.end(), pos);
     elements.erase(pos);
   }
-  ASSERT_EQ(0, elements.size());
+  ASSERT_EQ(0u, elements.size());
 }
 
 TEST_F(BinTest, ShouldCallOnElementAddedHandler)

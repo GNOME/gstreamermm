@@ -36,11 +36,11 @@ TEST(InitTest, ShouldReturnCorrectGstreamerVersion)
 {
   guint major, minor, micro, nano;
   version(major, minor, micro, nano);
-
-  EXPECT_EQ(major, GST_VERSION_MAJOR);
-  EXPECT_EQ(minor, GST_VERSION_MINOR);
-  EXPECT_EQ(micro, GST_VERSION_MICRO);
-  EXPECT_EQ(nano, GST_VERSION_NANO);
+  /* todo fix it in gstreamer */
+  EXPECT_EQ(major, (guint)GST_VERSION_MAJOR);
+  EXPECT_EQ(minor, (guint)GST_VERSION_MINOR);
+  EXPECT_EQ(micro, (guint)GST_VERSION_MICRO);
+  EXPECT_EQ(nano, (guint)GST_VERSION_NANO);
 }
 
 TEST(InitTest, ShouldCorrectSetsSIGSEVHandling)
