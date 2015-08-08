@@ -29,6 +29,7 @@ check_PROGRAMS =                                \
         test-caps                               \
         test-caps                               \
         test-capsfeatures                       \
+	test-element                            \
         test-ghostpad                           \
         test-init                               \
         test-memory                             \
@@ -70,6 +71,7 @@ test_buffer_SOURCES                             = $(TEST_GTEST_SOURCES) test-buf
 test_bus_SOURCES                                = $(TEST_GTEST_SOURCES) test-bus.cc
 test_capsfeatures_SOURCES                       = $(TEST_GTEST_SOURCES) test-capsfeatures.cc
 test_caps_SOURCES                               = $(TEST_GTEST_SOURCES) test-caps.cc
+test_element_SOURCES                            = $(TEST_GTEST_SOURCES) test-element.cc
 test_ghostpad_SOURCES                           = $(TEST_GTEST_SOURCES) test-ghostpad.cc
 test_init_SOURCES                               = $(TEST_GTEST_SOURCES) test-init.cc
 test_memory_SOURCES                             = $(TEST_GTEST_SOURCES) test-memory.cc
