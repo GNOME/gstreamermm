@@ -199,6 +199,7 @@ dnl Message
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Glib::wrap($3)')
 _CONVERSION(`GstMessage*',`Glib::RefPtr<const Gst::Message>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Message>&',`GstMessage*', `Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Message>&&',`GstMessage*',`($3) ? $3.release()->gobj() : nullptr')
 
 dnl MiniObject
 _CONVERSION(`GstMiniObject*',`Glib::RefPtr<Gst::MiniObject>',`Glib::wrap($3)')
