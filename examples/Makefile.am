@@ -22,6 +22,16 @@ local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GS
 if ENABLE_GUI_EXAMPLES
 gui_examples = media_player_gtkmm/example ogg_player_gtkmm/example
 examples_cppflags += $(GUI_EXAMPLES_CFLAGS)
+
+media_player_gtkmm_example_SOURCES	 		= media_player_gtkmm/main.cc \
+												media_player_gtkmm/player_window.cc \
+												media_player_gtkmm/player_window.h
+media_player_gtkmm_example_LDADD 			= $(GUI_EXAMPLES_LIBS) $(local_libgstreamermm)
+
+ogg_player_gtkmm_example_SOURCES			= ogg_player_gtkmm/main.cc \
+												ogg_player_gtkmm/player_window.cc \
+												ogg_player_gtkmm/player_window.h
+ogg_player_gtkmm_example_LDADD				= $(GUI_EXAMPLES_LIBS) $(local_libgstreamermm)
 endif
 
 if ENABLE_GSTREAMERMM_PLUGINS_BAD
@@ -46,7 +56,7 @@ noinst_PROGRAMS =						\
 	typefind/example					\
 	optiongroup/example					\
 	$(gl_examples)						\
-	$(optional_examples)
+	$(gui_examples)
 
 
 AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(examples_cppflags)
@@ -60,15 +70,7 @@ dynamic_changing_source_example_SOURCES		= dynamic_changing_source/main.cc
 element_link_example_SOURCES 				= element_link/element_link.cc
 hello_world_example_SOURCES 				= hello_world/main.cc
 ogg_rewriter_example_SOURCES	 			= ogg_rewriter/main.cc
-media_player_gtkmm_example_SOURCES	 		= media_player_gtkmm/main.cc \
-												media_player_gtkmm/player_window.cc \
-												media_player_gtkmm/player_window.h
-media_player_gtkmm_example_LDADD 			= $(GUI_EXAMPLES_LIBS) $(local_libgstreamermm)
 ogg_player_example_SOURCES					= ogg_player/main.cc
-ogg_player_gtkmm_example_SOURCES			= ogg_player_gtkmm/main.cc \
-												ogg_player_gtkmm/player_window.cc \
-												ogg_player_gtkmm/player_window.h
-ogg_player_gtkmm_example_LDADD				= $(GUI_EXAMPLES_LIBS) $(local_libgstreamermm)
 opengl_filter_example_SOURCES				= opengl_filter/main.cc 
 optiongroup_example_SOURCES					= optiongroup/main.cc
 typefind_example_SOURCES					= typefind/main.cc

@@ -37,7 +37,7 @@ MM_CONFIG_DOCTOOL_DIR([docs])
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 AC_SUBST([GSTREAMERMM_SO_VERSION], [0:0:0])
 
-AM_INIT_AUTOMAKE([1.9 -Wno-portability check-news dist-bzip2 no-define nostdinc tar-ustar])
+AM_INIT_AUTOMAKE([1.9 subdir-objects -Wno-portability check-news dist-bzip2 no-define nostdinc tar-ustar])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
@@ -96,11 +96,11 @@ MM_ARG_WITH_TAGFILE_DOC([glibmm-2.4.tag], [glibmm-2.4])
 MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 
-enable_unittests=yes
 AC_ARG_ENABLE(unittests,
        AS_HELP_STRING([--disable-unittests], 
        [Disable unit tests]),
-       [enable_unittests = no])
+       [enable_unittests=no],
+       [enable_unittests=yes])
 
 AC_SUBST([ENABLE_UNITTESTS], ["$enable_unittests"])
 
