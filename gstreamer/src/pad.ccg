@@ -145,35 +145,12 @@ FlowReturn Pad::get_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>&
   return FlowReturn(result);
 }
 
-FlowReturn Pad::push(Glib::RefPtr<Gst::Buffer>& buffer)
-{
-    GstBuffer *buffer_gobj = buffer->gobj();
-    /* gst_pad_push takes ownership of given "buffer". It is recommended (for performance reasons) that the buffer given to gst_pad_push() has
-     * only one reference, since in other cases it will be copied whenever "make_writable" will be called.
-     */
-    buffer->reference();  //allocate additional ref for gst_pad_push()
-    buffer.reset();  //take away buffer from the caller
-    return FlowReturn(gst_pad_push(gobj(), buffer_gobj));
-}
-
-bool Pad::push_event(const Glib::RefPtr<Gst::Event>& event)
-{
-  event->reference();
-  return gst_pad_push_event(gobj(), event->gobj());
-}
-
 FlowReturn Pad::pull_range(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
 {
   GstBuffer* c_buffer = nullptr;
   GstFlowReturn result = gst_pad_pull_range(gobj(), offset, size, &c_buffer);
   buffer = Glib::wrap(c_buffer, false);
   return FlowReturn(result);
-}
-
-bool Pad::send_event(const Glib::RefPtr<Gst::Event>& event)
-{
-  event->reference();
-  return gst_pad_send_event(gobj(), event->gobj());
 }
 
 bool Pad::query_position(Format& format) const
@@ -184,13 +161,6 @@ bool Pad::query_position(Format& format) const
 bool Pad::query_duration(Format& format) const
 {
   return gst_pad_query_duration(const_cast<GstPad*>(gobj()), (GstFormat)format, nullptr);
-}
-
-FlowReturn Pad::chain(Glib::RefPtr<Gst::Buffer>& buffer)
-{
-  buffer->reference();  //hold reference for gst_pad_chain()
-  buffer.reset();       //free caller's reference
-  return FlowReturn(gst_pad_chain(gobj(), buffer->gobj()));
 }
 
 GstFlowReturn Pad::Pad_Chain_gstreamermm_callback(GstPad* pad, GstObject*, GstBuffer *buffer)

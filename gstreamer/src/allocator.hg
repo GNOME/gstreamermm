@@ -87,19 +87,14 @@ public:
    */
   static Glib::RefPtr<Gst::Allocator> get_default_allocator();
 
-  /** Free @a memory that was previously allocated with alloc().
-   * @param memory The memory to free.
-   */
-  void free(Glib::RefPtr<Gst::Memory>& memory);
-  _IGNORE(gst_allocator_free)
-
+  _WRAP_METHOD(void free(Glib::RefPtr<Gst::Memory>&& memory), gst_allocator_free)
   _WRAP_METHOD(Glib::RefPtr<Gst::Memory> alloc(gsize size, Gst::AllocationParams params), gst_allocator_alloc)
   _WRAP_VFUNC(Glib::RefPtr<Gst::Memory> alloc(gsize size, Gst::AllocationParams params), "alloc", refreturn_ctype)
 
   // This vfunc is hand-coded because it takes reference to a memory.
   // In generally, arguments are passed to a function by copy, so
   // custom wrapper is necessary.
-  virtual void free_vfunc(Glib::RefPtr<Gst::Memory>& memory);
+  virtual void free_vfunc(Glib::RefPtr<Gst::Memory>&& memory);
 
 protected:
 #m4begin

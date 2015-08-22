@@ -45,40 +45,22 @@ guint64 Buffer::offset_none()
   return GST_BUFFER_OFFSET_NONE;
 }
 
-void Buffer::insert_memory(guint idx, Glib::RefPtr<Gst::Memory>& mem)
+Glib::RefPtr<Gst::Buffer> Buffer::append_region(Glib::RefPtr<Gst::Buffer>&& buf, gssize offset, gssize size)
 {
-  GstMemory *mem_gobj = mem->gobj();
-  mem->reference();
-  mem.reset();
-  gst_buffer_insert_memory(gobj(), idx, mem_gobj);
+  if (is_writable())
+  {
+    return Glib::wrap(gst_buffer_append_region(gobj(), buf.release()->gobj(), offset, size), true);
+  }
+  else
+  {
+    reference();
+    return Glib::wrap(gst_buffer_append_region(gobj(), buf.release()->gobj(), offset, size), false);
+  }
 }
 
-void Buffer::prepend_memory(Glib::RefPtr<Gst::Memory>& mem)
+Glib::RefPtr<Gst::Buffer> Buffer::append(Glib::RefPtr<Gst::Buffer>&& buf)
 {
-  insert_memory(0, mem);
-}
-
-void Buffer::append_memory(Glib::RefPtr<Gst::Memory>& mem)
-{
-  insert_memory(-1, mem);
-}
-
-void Buffer::replace_memory_range(guint idx, gint length, Glib::RefPtr<Gst::Memory>& mem)
-{
-  GstMemory *mem_gobj = mem->gobj();
-  mem->reference();
-  mem.reset();
-  gst_buffer_replace_memory_range(gobj(), idx, length, mem_gobj);
-}
-
-void Buffer::replace_memory(guint idx, Glib::RefPtr<Gst::Memory>& mem)
-{
-  replace_memory_range(idx, 1, mem);
-}
-
-void Buffer::replace_all_memory(Glib::RefPtr<Gst::Memory>& mem)
-{
-  replace_memory_range(0, -1, mem);
+  return append_region(std::move(buf), 0, -1);
 }
 
 } // namespace Gst

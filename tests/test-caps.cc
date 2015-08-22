@@ -84,7 +84,7 @@ TEST_F(CapsTest, AppendCapsToCaps)
     Glib::RefPtr<Caps> new_caps = Caps::create_simple("video/x-raw");
     new_caps->set_simple("width", width);
 
-    caps->append(new_caps);
+    caps->append(std::move(new_caps));
 
     CheckCaps("width", width, 1);
     CheckCaps("framerate", framerate);
@@ -117,7 +117,7 @@ TEST_F(CapsTest, MergeCaps)
 {
     Glib::RefPtr<Caps> tmp = Caps::create_from_string("video/x-raw, format=RGBA");
     Glib::RefPtr<Caps> tmp2 = Caps::create_from_string("video/x-raw, format=RGB");
-    tmp = tmp->merge(tmp2);
+    tmp = tmp->merge(std::move(tmp2));
     ASSERT_EQ(1, tmp->get_refcount());
     ASSERT_FALSE(tmp2);
 }

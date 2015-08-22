@@ -218,39 +218,8 @@ public:
   _WRAP_METHOD(bool proxy_query_caps(const Glib::RefPtr<Gst::Query>& query), gst_pad_proxy_query_caps)
   _WRAP_METHOD(bool proxy_query_caps(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_proxy_query_caps, constversion)
   _WRAP_METHOD(bool peer_query_accept_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_pad_peer_query_accept_caps)
-
-  // This method is written manually because an extra ref is necessary
-  /** Pushes a buffer to the peer of the pad. The pad must be a source pad,
-   * otherwise this method returns Gst::FLOW_ERROR.
-   *
-   * This function will call an installed pad block before triggering any
-   * installed pad probes.
-   *
-   * If the caps on buffer are different from the currently configured caps on
-   * pad, this function will call any installed setcaps function on pad (see
-   * the C API gst_pad_set_setcaps_function()). In case of failure to
-   * renegotiate the new format, this function returns
-   * Gst::FLOW_NOT_NEGOTIATED.
-   *
-   * The function proceeds calling chain() on the peer pad and returns the
-   * value from that function. If pad has no peer, Gst::FLOW_NOT_LINKED will
-   * be returned.
-   *
-   * @param buffer The Gst::Buffer to push.
-   * @return A Gst::FlowReturn from the peer pad. MT safe.
-   */
-  FlowReturn push(Glib::RefPtr<Gst::Buffer>& buffer);
-  _IGNORE(gst_pad_push)
-
-  // This method is written manually because an extra ref is necessary
-  /** Sends the event to the peer of the pad. This function is mainly used by
-   * elements to send events to their peer elements.
-   *
-   * @param event The GstEvent to send to the pad.
-   * @return true if the event was handled. MT safe.
-   */
-  bool push_event(const Glib::RefPtr<Gst::Event>& event);
-  _IGNORE(gst_pad_push_event)
+  _WRAP_METHOD(FlowReturn push(Glib::RefPtr<Gst::Buffer>&& buffer), gst_pad_push)
+  _WRAP_METHOD(bool push_event(Glib::RefPtr<Gst::Event>&& event), gst_pad_push_event)
 
   /** Pulls a buffer from the peer pad.  This function will first trigger the
    * pad block signal if it was installed.  This method works only on sink
@@ -276,34 +245,9 @@ public:
   _IGNORE(gst_pad_pull_range)
 
   _WRAP_METHOD(bool activate_mode(Gst::PadMode mode, bool active = true), gst_pad_activate_mode)
+  _WRAP_METHOD(bool send_event(Glib::RefPtr<Gst::Event>&& event), gst_pad_send_event)
 
-  // This method is written manually because an extra ref is necessary
-  /** Sends the event to the pad. This function can be used by applications to
-   * send events in the pipeline.
-   *
-   * If the pad is a source pad, event should be an upstream event. If the pad
-   * is a sink pad, the event should be a downstream event. For example, you
-   * would not send a Gst::EVENT_EOS on a src pad; EOS events only propagate
-   * downstream.  Furthermore, some downstream events have to be serialized
-   * with data flow, like EOS, while some can travel out-of-band, like
-   * Gst::EVENT_FLUSH_START.  If the event needs to be serialized with data
-   * flow, this function will take the pad's stream lock while calling its
-   * event function.
-   *
-   * To find out whether an event type is upstream, downstream, or downstream
-   * and serialized, see Gst::EventTypeFlags, Gst::Enums::get_flags(),
-   * is_upstream(), Gst::Event::is_downstream(), and
-   * Gst::Event::is_serialized(). Note that in practice that an application or
-   * plugin doesn't need to bother itself with this information; the core
-   * handles all necessary locks and checks.
-   *
-   * @param event The Gst::Event to send to the pad.
-   * @return true if the event was handled. 
-   */
-  bool send_event(const Glib::RefPtr<Gst::Event>& event);
-  _IGNORE(gst_pad_send_event)
-
-  _WRAP_METHOD(bool event_default(const Glib::RefPtr<Gst::Object>& parent{?}, const Glib::RefPtr<Gst::Event>& event), gst_pad_event_default)
+  _WRAP_METHOD(bool event_default(const Glib::RefPtr<Gst::Object>& parent{?}, Glib::RefPtr<Gst::Event>&& event), gst_pad_event_default)
   _WRAP_METHOD(bool query(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_query)
   _WRAP_METHOD(bool peer_query(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_peer_query)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> peer_query_caps(const Glib::RefPtr<Gst::Caps>& filter) const, gst_pad_peer_query_caps)
@@ -335,10 +279,7 @@ public:
   _WRAP_METHOD(Gst::Iterator<const Gst::Pad> iterate_internal_links() const, gst_pad_iterate_internal_links)
   _WRAP_METHOD(Gst::Iterator<Gst::Pad> iterate_internal_links_default(const Glib::RefPtr<Gst::Object>& parent{?}), gst_pad_iterate_internal_links_default)
   _WRAP_METHOD(Gst::Iterator<const Gst::Pad> iterate_internal_links_default(const Glib::RefPtr<Gst::Object>& parent{?}) const, gst_pad_iterate_internal_links_default)
-
-  // This method is written manually because an extra ref is necessary
-  FlowReturn chain(Glib::RefPtr<Gst::Buffer>& buffer);
-  _IGNORE(gst_pad_chain)
+  _WRAP_METHOD(Gst::FlowReturn chain(Glib::RefPtr<Gst::Buffer>&& buffer), gst_pad_chain)
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_current_caps(), gst_pad_get_current_caps)
   _WRAP_METHOD(bool pause_task() , gst_pad_pause_task)

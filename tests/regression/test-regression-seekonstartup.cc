@@ -46,8 +46,7 @@ void dec_counter()
     if (g_atomic_int_dec_and_test (&counter))
     {
         prerolled = true;
-        Glib::RefPtr<Message> app = MessageApplication::create(pipeline, Structure("empty"));
-        bus->post(app);
+        bus->post(MessageApplication::create(pipeline, Structure("empty")));
     }
 }
 

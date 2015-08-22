@@ -39,7 +39,7 @@ public:
         std::sort(mapinfo->get_data(), mapinfo->get_data() + mapinfo->get_size());
         buf->unmap(mapinfo);
         assert(buf->gobj()->mini_object.refcount==1);
-        return srcpad->push(buf);
+        return srcpad->push(std::move(buf));
     }
 
     explicit Foo(GstElement *gobj)

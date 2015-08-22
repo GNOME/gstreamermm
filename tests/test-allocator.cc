@@ -40,7 +40,7 @@ TEST(AllocatorTest, ShouldCorrectAllocateMemory)
   EXPECT_EQ(7ul, mem->get_align());
   EXPECT_TRUE(flags & mem->get_flags());
 
-  allocator->free(mem);
+  allocator->free(std::move(mem));
 }
 
 class DerivedFromAllocator : public Gst::Allocator
@@ -62,10 +62,10 @@ public:
       return r;
     }
 
-    virtual void free_vfunc(Glib::RefPtr<Gst::Memory>& memory)
+    void free_vfunc(Glib::RefPtr<Gst::Memory>&& memory) override
     {
       memory->gobj()->allocator = the_allocator->gobj(); // pretend that it was the_allocator who allocated this memory
-      the_allocator->free(memory);
+      the_allocator->free(std::move(memory));
     }
 
     static Glib::RefPtr<Allocator> create()
@@ -95,7 +95,7 @@ TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedWrappedGst
   EXPECT_EQ(7ul, mem->get_align());
   EXPECT_TRUE(flags & mem->get_flags());
 
-  allocator->free(mem);
+  allocator->free(std::move(mem));
 }
 
 TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedGstMemory)

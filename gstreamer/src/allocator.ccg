@@ -52,15 +52,6 @@ void Allocator::set_default()
   gst_allocator_set_default(gobj());
 }
 
-void Allocator::free(Glib::RefPtr<Gst::Memory>& memory)
-{
-  GstMemory* memory_gobj = memory->gobj();
-  memory->reference();
-  memory.reset();
-
-  gst_allocator_free(gobj(), memory_gobj);
-}
-
 void Allocator_Class::free_vfunc_callback(GstAllocator* self, GstMemory* memory)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -82,7 +73,7 @@ void Allocator_Class::free_vfunc_callback(GstAllocator* self, GstMemory* memory)
       #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
     	Glib::RefPtr<Gst::Memory> mem = Glib::wrap(memory);
-        obj->free_vfunc(mem);
+        obj->free_vfunc(std::move(mem));
         return;
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
@@ -106,7 +97,7 @@ void Allocator_Class::free_vfunc_callback(GstAllocator* self, GstMemory* memory)
 
 }
 
-void Gst::Allocator::free_vfunc(Glib::RefPtr<Gst::Memory>& memory)
+void Gst::Allocator::free_vfunc(Glib::RefPtr<Gst::Memory>&& memory)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_))
@@ -114,9 +105,7 @@ void Gst::Allocator::free_vfunc(Glib::RefPtr<Gst::Memory>& memory)
 
   if(base && base->free)
   {
-    GstMemory* mem_gobj = memory->gobj();
-    memory->reference();
-    memory.reset();
+    GstMemory* mem_gobj = memory.release()->gobj();
     (*base->free)(gobj(), mem_gobj);
   }
 }

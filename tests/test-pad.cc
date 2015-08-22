@@ -59,3 +59,23 @@ TEST_F(PadTest, PadVerifyGetPadTemplateCaps)
     }
     ASSERT_EQ(1, caps->get_refcount());
 }
+
+TEST_F(PadTest, PadPushVerifyBufferRefcount)
+{
+  Glib::RefPtr<Gst::Buffer> buffer = Gst::Buffer::create();
+  pad = Pad::create(pad_name, Gst::PAD_SRC);
+
+  ASSERT_EQ(1, buffer->get_refcount());
+  pad->push(std::move(buffer));
+  ASSERT_FALSE(buffer);
+}
+
+TEST_F(PadTest, PadEventDefault)
+{
+  Glib::RefPtr<Gst::Event> event = Gst::EventEos::create();
+  pad = Pad::create(pad_name, pad_direction);
+
+  ASSERT_EQ(1, event->get_refcount());
+  pad->event_default(std::move(event));
+  ASSERT_FALSE(event);
+}

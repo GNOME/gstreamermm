@@ -135,40 +135,19 @@ public:
 
   _WRAP_METHOD(guint n_memory() const, gst_buffer_n_memory)
 
-  /** Insert the memory block @mem to @buffer at @idx. This function takes ownership
-   * of @mem and thus doesn't increase its refcount.
-   *
-   * Only get_max_memory() can be added to a buffer. If more memory is
-   * added, existing memory blocks will automatically be merged to make room for
-   * the new memory.
-   *
-   * @param idx: the index to add the memory at, or -1 to append it to the end.
-   * @param mem: a Gst::Memory.
-   */
-  void insert_memory(guint idx, Glib::RefPtr<Gst::Memory>& mem);
-  _IGNORE(gst_buffer_insert_memory)
+  _WRAP_METHOD(void insert_memory(gint idx, Glib::RefPtr<Gst::Memory>&& mem), gst_buffer_insert_memory)
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Memory> get_all_memory() const, gst_buffer_get_all_memory)
 
   _WRAP_METHOD(gsize fill(gsize offset, gconstpointer src, gsize size), gst_buffer_fill)
 
-  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> append(const Glib::RefPtr<Gst::Buffer>& buf) const, gst_buffer_append)
+  Glib::RefPtr<Gst::Buffer> append_region(Glib::RefPtr<Gst::Buffer>&& buf, gssize offset, gssize size);
+  _IGNORE(gst_buffer_append_region)
 
-  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> append_region(const Glib::RefPtr<Gst::Buffer>& buf, gssize offset, gssize size) const, gst_buffer_append_region)
+  Glib::RefPtr<Gst::Buffer> append(Glib::RefPtr<Gst::Buffer>&& buf);
+  _IGNORE(gst_buffer_append)
 
-  /** Replaces @a length memory blocks in @a buffer starting at @a idx with @a mem.
-   *
-   * If @a length is -1, all memory starting from @a idx will be removed and
-   * replaced with @a mem.
-   *
-   *  @a buffer should be writable.
-   *
-   * @param idx An index.
-   * @param length A length should not be 0.
-   * @param mem A Gst::Memory.
-   */
-  void replace_memory_range(guint idx, gint length, Glib::RefPtr<Gst::Memory>& mem);
-  _IGNORE(gst_buffer_replace_memory_range)
+  _WRAP_METHOD(void replace_memory_range(guint idx, gint length, Glib::RefPtr<Gst::Memory>&& mem), gst_buffer_replace_memory_range)
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Memory> get_memory_range(guint idx, gint length), gst_buffer_get_memory_range)
 
@@ -176,27 +155,9 @@ public:
 
   _WRAP_METHOD(bool find_memory(gsize offset, gsize size, guint& idx, guint& length, gsize& skip), gst_buffer_find_memory)
 
-  /** Prepend the memory block @mem to @buffer. This function takes
-   * ownership of @mem and thus doesn't increase its refcount.
-   *
-   * This function is identical to insert_memory() with an index of 0.
-   * See insert_memory() for more details.
-   *
-   * @param mem: a Gst::Memory.
-   */
-   void prepend_memory(Glib::RefPtr<Gst::Memory>& mem);
-  _IGNORE(gst_buffer_prepend_memory)
+  _WRAP_METHOD(void prepend_memory(Glib::RefPtr<Gst::Memory>&& mem), gst_buffer_prepend_memory)
 
-  /** Append the memory block @mem to @buffer. This function takes
-   * ownership of @mem and thus doesn't increase its refcount.
-
-   * This function is identical to insert_memory() with an index of -1.
-   * See insert_memory() for more details.
-   *
-   * @param mem: a Gst::Memory.
-   */
-  void append_memory(Glib::RefPtr<Gst::Memory>& mem);
-  _IGNORE(gst_buffer_append_memory);
+  _WRAP_METHOD(void append_memory(Glib::RefPtr<Gst::Memory>&& mem), gst_buffer_append_memory)
 
   _WRAP_METHOD(void remove_memory(guint idx), gst_buffer_remove_memory)
 
@@ -204,20 +165,9 @@ public:
 
   _WRAP_METHOD(gsize memset(gsize offset, guint8 val, gsize size), gst_buffer_memset)
 
-  /** Replaces the memory block at index @a idx in @a buffer with @a mem.
-   *
-   * @param idx An index.
-   * @param mem A Gst::Memory.
-   */
-  void replace_memory(guint idx, Glib::RefPtr<Gst::Memory>& mem);
-  _IGNORE(gst_buffer_replace_memory)
+  _WRAP_METHOD(void replace_memory(guint idx, Glib::RefPtr<Gst::Memory>&& mem), gst_buffer_replace_memory)
 
-  /** Replaces all memory in @a buffer with @a mem.
-   *
-   * @param mem A Gst::Memory.
-   */
-  void replace_all_memory(Glib::RefPtr<Gst::Memory>& mem);
-  _IGNORE(gst_buffer_replace_all_memory)
+  _WRAP_METHOD(void replace_all_memory(Glib::RefPtr<Gst::Memory>&& mem), gst_buffer_replace_all_memory)
 
   _WRAP_METHOD(gsize extract(gsize offset, gpointer dest, gsize size), gst_buffer_extract)
 

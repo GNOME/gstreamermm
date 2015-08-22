@@ -94,6 +94,8 @@ _CONVERSION(`const Glib::RefPtr<const Gst::Buffer>&',`GstBuffer*', `const_cast<G
 _CONVERSION(`const Glib::RefPtr<Gst::Buffer>&',`const GstBuffer*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Buffer>',`GstBuffer*', `Glib::unwrap($3)')
 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
+_CONVERSION(`Glib::RefPtr<Gst::Buffer>&&',`GstBuffer*',`($3) ? $3.release()->gobj() : nullptr')
+
 
 dnl BufferList
 _CONVERSION(`Glib::RefPtr<Gst::BufferList>',`GstBufferList*', `Glib::unwrap($3)')
@@ -115,6 +117,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`GstCaps*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`GstCaps*', `const_cast<$2>(Glib::unwrap($3))')
 _CONVERSION(`const Glib::RefPtr<Gst::Caps>&',`const GstCaps*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Gst::Caps>&',`const GstCaps*', `Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Caps>&&',`GstCaps*',`($3) ? $3.release()->gobj() : nullptr')
 
 dnl CapsFeatures
 _CONVERSION(`const Gst::CapsFeatures&',`const GstCapsFeatures*',`$3.gobj()')
@@ -166,6 +169,7 @@ dnl Event
 _CONVERSION(`const Glib::RefPtr<Gst::Event>&',`GstEvent*', `Glib::unwrap($3)')
 _CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3)')
 _CONVERSION(`GstEvent*',`Glib::RefPtr<Gst::Event>', `Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Event>&&',`GstEvent*',`($3) ? $3.release()->gobj() : nullptr')
 
 dnl Socket
 _CONVERSION(`const Glib::RefPtr<Gio::Socket>&',`GSocket*', `Glib::unwrap($3)')
@@ -194,6 +198,7 @@ _CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>',`GstMemory*', `Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Memory>&&',`GstMemory*',`($3) ? $3.release()->gobj() : nullptr')
 
 dnl Message
 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::Message>',`Glib::wrap($3)')
