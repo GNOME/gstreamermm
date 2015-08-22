@@ -2,7 +2,7 @@
  * test-buffer.cc
  *
  *  Created on: Jul 31, 2013
- *      Author: m.kolny
+ *    Author: m.kolny
  */
 
 #include <gtest/gtest.h>
@@ -13,25 +13,25 @@ using namespace Gst;
 
 TEST(BufferTest, CheckBufferSize)
 {
-    gsize buff_size = 23;
-    Glib::RefPtr<Buffer> buf = Buffer::create(buff_size);
-    Glib::RefPtr<MapInfo> map_info(new MapInfo());
+  gsize buff_size = 23;
+  Glib::RefPtr<Buffer> buf = Buffer::create(buff_size);
+  Glib::RefPtr<MapInfo> map_info(new MapInfo());
 
-    buf->map(map_info, MAP_READ);
+  buf->map(map_info, MAP_READ);
 
-    EXPECT_EQ(buff_size, map_info->get_size());
+  EXPECT_EQ(buff_size, map_info->get_size());
 
-    buf->unmap(map_info);
+  buf->unmap(map_info);
 }
 
 TEST(BufferTest, CheckBufferFlags)
 {
-    guint buff_flags = 1;
-    Glib::RefPtr<Buffer> buf = Buffer::create();
+  guint buff_flags = 1;
+  Glib::RefPtr<Buffer> buf = Buffer::create();
 
-    buf->set_flags(buff_flags);
+  buf->set_flags(buff_flags);
 
-    EXPECT_EQ(buff_flags, buf->get_flags());
+  EXPECT_EQ(buff_flags, buf->get_flags());
 }
 
 TEST(BufferTest, PeekedMemoryShouldExistsEvenWhenBufferWillBeDestroyed)
@@ -56,7 +56,7 @@ TEST(BufferTest, ShouldInsertMemoryObjectAndResetItButAllowToMakeExplicityRef)
   buf->insert_memory(0, std::move(mem));
   ASSERT_FALSE(mem);
   ASSERT_EQ(2, mem2->gobj()->mini_object.refcount); // two - one handled by mem2,
-                                                    //and the second by memory stored in buffer
+                          //and the second by memory stored in buffer
 }
 
 TEST(BufferTest, ShouldGetMemoryRangeAndIncreaseRefcount)
@@ -126,7 +126,7 @@ TEST(BufferTest, CheckRefcountAppendBufferToBuffer)
 
   { // buf1 not writable
     Glib::RefPtr<Gst::Buffer> buf2 = Gst::Buffer::create(6);
-    Glib::RefPtr<Gst::Buffer> dummy = buf1;
+  Glib::RefPtr<Gst::Buffer> dummy = buf1;
     Glib::RefPtr<Gst::Buffer> b = buf1->append(std::move(buf2));
     ASSERT_FALSE(buf2);
     ASSERT_EQ(2, buf1->get_refcount()); // dummy + buf1

@@ -45,33 +45,33 @@ TEST(AllocatorTest, ShouldCorrectAllocateMemory)
 
 class DerivedFromAllocator : public Gst::Allocator
 {
-    Glib::RefPtr<Gst::Allocator> the_allocator;
+  Glib::RefPtr<Gst::Allocator> the_allocator;
 
 public:
-    explicit DerivedFromAllocator(GstAllocator *gobj)
-        : Glib::ObjectBase(typeid (DerivedFromAllocator)),
-          Gst::Allocator(gobj),
-          the_allocator(Allocator::get_default_allocator())
-    {
-    }
+  explicit DerivedFromAllocator(GstAllocator *gobj)
+  : Glib::ObjectBase(typeid (DerivedFromAllocator)),
+    Gst::Allocator(gobj),
+    the_allocator(Allocator::get_default_allocator())
+  {
+  }
 
-    virtual Glib::RefPtr<Gst::Memory> alloc_vfunc(gsize size, AllocationParams params)
-    {
-      Glib::RefPtr<Gst::Memory> r = the_allocator->alloc(size, params);
-      r->gobj()->allocator = gobj(); // pretend that it was us who allocated this memory
-      return r;
-    }
+  virtual Glib::RefPtr<Gst::Memory> alloc_vfunc(gsize size, AllocationParams params)
+  {
+    Glib::RefPtr<Gst::Memory> r = the_allocator->alloc(size, params);
+    r->gobj()->allocator = gobj(); // pretend that it was us who allocated this memory
+    return r;
+  }
 
-    void free_vfunc(Glib::RefPtr<Gst::Memory>&& memory) override
-    {
-      memory->gobj()->allocator = the_allocator->gobj(); // pretend that it was the_allocator who allocated this memory
-      the_allocator->free(std::move(memory));
-    }
+  void free_vfunc(Glib::RefPtr<Gst::Memory>&& memory) override
+  {
+    memory->gobj()->allocator = the_allocator->gobj(); // pretend that it was the_allocator who allocated this memory
+    the_allocator->free(std::move(memory));
+  }
 
-    static Glib::RefPtr<Allocator> create()
-    {
-      return Glib::RefPtr<Allocator>(new DerivedFromAllocator((GstAllocator*)g_object_new(Allocator::get_type(), NULL)));
-    }
+  static Glib::RefPtr<Allocator> create()
+  {
+    return Glib::RefPtr<Allocator>(new DerivedFromAllocator((GstAllocator*)g_object_new(Allocator::get_type(), NULL)));
+  }
 };
 
 TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedWrappedGstMemory)

@@ -20,81 +20,77 @@ RefPtr<Gst::Pipeline> pipeline;
 
 bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
 {
-    switch(message->get_message_type())
-    {
-        case Gst::MESSAGE_EOS:
-            mainloop->quit();
-            return false;
-        case Gst::MESSAGE_ERROR:
-        {
-            mainloop->quit();
-            return false;
-        }
-        default:
-            break;
-    }
+  switch(message->get_message_type())
+  {
+  case Gst::MESSAGE_EOS:
+    mainloop->quit();
+    return false;
+  case Gst::MESSAGE_ERROR:
+    mainloop->quit();
+    return false;
+  default:
+    break;
+  }
 
-    return true;
+  return true;
 }
 
 void on_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 {
-    RefPtr<Gst::Pad> sinkPad = decoder->get_static_pad("sink");
-    PadLinkReturn ret = newPad->link(sinkPad);
+  RefPtr<Gst::Pad> sinkPad = decoder->get_static_pad("sink");
+  PadLinkReturn ret = newPad->link(sinkPad);
 
-    ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
+  ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
 }
 
 
 bool on_timeout()
 {
-    gint64 len;
+  gint64 len;
 
-    if (pipeline->query_duration(FORMAT_TIME, len))
-    {
-        EXPECT_EQ(333333333, len);
-        return FALSE;
-    }
+  if (pipeline->query_duration(FORMAT_TIME, len))
+  {
+    EXPECT_EQ(333333333, len);
+    return FALSE;
+  }
 
-    return TRUE;
+  return TRUE;
 }
 
 TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
 {
-    Glib::ustring input_filename = "test.ogg";
+  Glib::ustring input_filename = "test.ogg";
 
-    GenerateSampleOggFile(10, input_filename);
+  GenerateSampleOggFile(10, input_filename);
 
-    RefPtr<FileSrc> filesrc = Gst::FileSrc::create();
-    ASSERT_TRUE(filesrc);
+  RefPtr<FileSrc> filesrc = Gst::FileSrc::create();
+  ASSERT_TRUE(filesrc);
 
-    filesrc->property_location() = input_filename;
+  filesrc->property_location() = input_filename;
 
-    mainloop = Glib::MainLoop::create();
-    pipeline = Pipeline::create("rewriter");
-    RefPtr<Element> sink = ElementFactory::create_element("fakesink"),
-            demuxer = ElementFactory::create_element("oggdemux");
-    decoder = ElementFactory::create_element("theoradec");
-    ASSERT_TRUE(sink);
-    ASSERT_TRUE(demuxer);
-    ASSERT_TRUE(decoder);
+  mainloop = Glib::MainLoop::create();
+  pipeline = Pipeline::create("rewriter");
+  RefPtr<Element> sink = ElementFactory::create_element("fakesink"),
+        demuxer = ElementFactory::create_element("oggdemux");
+  decoder = ElementFactory::create_element("theoradec");
+  ASSERT_TRUE(sink);
+  ASSERT_TRUE(demuxer);
+  ASSERT_TRUE(decoder);
 
-    RefPtr<Bus> bus = pipeline->get_bus();
-    bus->add_watch(sigc::ptr_fun(&on_bus_message));
+  RefPtr<Bus> bus = pipeline->get_bus();
+  bus->add_watch(sigc::ptr_fun(&on_bus_message));
 
-    pipeline->add(filesrc)->add(demuxer)->add(decoder)->add(sink);
-    filesrc->link(demuxer);
-    decoder->link(sink);
+  pipeline->add(filesrc)->add(demuxer)->add(decoder)->add(sink);
+  filesrc->link(demuxer);
+  decoder->link(sink);
 
-    demuxer->signal_pad_added().connect(sigc::ptr_fun(&on_pad_added));
+  demuxer->signal_pad_added().connect(sigc::ptr_fun(&on_pad_added));
 
-    pipeline->set_state(Gst::STATE_PLAYING);
-    Glib::signal_timeout().connect(sigc::ptr_fun(&on_timeout), 0);
-    mainloop->run();
+  pipeline->set_state(Gst::STATE_PLAYING);
+  Glib::signal_timeout().connect(sigc::ptr_fun(&on_timeout), 0);
+  mainloop->run();
 
-    pipeline->set_state(Gst::STATE_NULL);
+  pipeline->set_state(Gst::STATE_NULL);
 
-    remove(input_filename.c_str());
+  remove(input_filename.c_str());
 }
-
-
