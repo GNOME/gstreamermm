@@ -243,10 +243,12 @@ _CONVERSION(`const Gst::StaticPadTemplate&',`const GstStaticPadTemplate*',($3).g
 dnl Plugin
 _CONVERSION(`const Glib::RefPtr<Gst::Plugin>&',`GstPlugin*',`Glib::unwrap($3)')
 _CONVERSION(`GstPlugin*',`Glib::RefPtr<Gst::Plugin>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::Plugin>&&',`GstPlugin*',`($3) ? $3.release()->gobj() : nullptr')
 
 dnl PluginFeature
 _CONVERSION(`GstPluginFeature*',`Glib::RefPtr<Gst::PluginFeature>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::PluginFeature>&',`GstPluginFeature*',`Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::PluginFeature>&&',`GstPluginFeature*',`($3) ? $3.release()->gobj() : nullptr')
 
 dnl Query
 _CONVERSION(`const Glib::RefPtr<Gst::Query>&',`GstQuery*', `Glib::unwrap($3)')
@@ -343,6 +345,7 @@ _CONVERSION(`const guint&',`guint',`$3')
 _CONVERSION(`gsize*',`gsize&',`*$3')
 _CONVERSION(`const guint32&',`guint32',`$3')
 _CONVERSION(`guint8*&',`guint8**',`&$3')
+_CONVERSION(`gdouble&',`gdouble*',`&$3')
 
 dnl Basic Gstreamermm Conversions
 _CONVERSION(`Gst::ClockTime&',`GstClockTime*',`(GstClockTime*)(&$3)')

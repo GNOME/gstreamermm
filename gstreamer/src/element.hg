@@ -305,17 +305,7 @@ public:
   _WRAP_METHOD(bool seek(Format format, SeekFlags seek_flags, gint64 seek_pos), gst_element_seek_simple)
   _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType cur_type, gint64 cur, SeekType stop_type, gint64 stop), gst_element_seek)
 
-  /** Sends an event to an element. If the element doesn't implement an event
-   * handler, the event will be pushed on a random linked sink pad for upstream
-   * events or a random linked source pad for downstream events.
-   *
-   * This function takes owership of the provided event.
-   *
-   * @param event The Gst::Event to send to the element.
-   * @return true if the event was handled. MT safe. 
-   */
-  bool send_event(const Glib::RefPtr<Gst::Event>& event);
-  _IGNORE(gst_element_send_event)
+  _WRAP_METHOD(bool send_event(Glib::RefPtr<Gst::Event>&& event), gst_element_send_event)
 
   _WRAP_SIGNAL(void no_more_pads(), "no-more-pads")
 

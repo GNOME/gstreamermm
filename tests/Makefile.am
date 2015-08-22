@@ -25,11 +25,12 @@ check_PROGRAMS =                                \
         test-atomicqueue                        \
         test-bin                                \
         test-buffer                             \
+        test-bufferlist                         \
         test-bus                                \
         test-caps                               \
         test-caps                               \
         test-capsfeatures                       \
-	test-element                            \
+        test-element                            \
         test-ghostpad                           \
         test-init                               \
         test-memory                             \
@@ -68,6 +69,7 @@ test_allocator_SOURCES                          = $(TEST_GTEST_SOURCES) test-all
 test_atomicqueue_SOURCES                        = $(TEST_GTEST_SOURCES) test-atomicqueue.cc
 test_bin_SOURCES                                = $(TEST_GTEST_SOURCES) test-bin.cc
 test_buffer_SOURCES                             = $(TEST_GTEST_SOURCES) test-buffer.cc
+test_bufferlist_SOURCES                         = $(TEST_GTEST_SOURCES) test-bufferlist.cc
 test_bus_SOURCES                                = $(TEST_GTEST_SOURCES) test-bus.cc
 test_capsfeatures_SOURCES                       = $(TEST_GTEST_SOURCES) test-capsfeatures.cc
 test_caps_SOURCES                               = $(TEST_GTEST_SOURCES) test-caps.cc
