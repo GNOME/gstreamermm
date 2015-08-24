@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2015 The gstreamermm Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -16,41 +16,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <gtkmm/stock.h>
-#include <gtkmm/filechooserdialog.h>
+#include "player_window.h"
 
-#ifdef GDK_WINDOWING_X11
+#include <gstreamermm.h>
+#include <gstreamermm/xvimagesink.h>
+
+#if defined (GDK_WINDOWING_X11)
 #include <gdk/gdkx.h>
-#endif
-#ifdef GDK_WINDOWING_WIN32
+#elif defined (GDK_WINDOWING_WIN32)
 #include <gdk/gdkwin32.h>
 #endif
 
-#include <gstreamermm/bus.h>
-#include <gstreamermm/caps.h>
-#include <gstreamermm/clock.h>
-#include <gstreamermm/buffer.h>
-#include <gstreamermm/event.h>
-#include <gstreamermm/message.h>
-#include <gstreamermm/query.h>
-#include <gstreamermm/videooverlay.h>
-#include <glibmm/main.h>
-#include <glibmm/miscutils.h>
-#include <glibmm/convert.h>
 #include <iostream>
-#include <sstream>
 #include <iomanip>
-#include "player_window.h"
 
 PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
-  m_play_button(Gtk::Stock::MEDIA_PLAY),
-  m_pause_button(Gtk::Stock::MEDIA_PAUSE),
-  m_stop_button(Gtk::Stock::MEDIA_STOP),
-  m_rewind_button(Gtk::Stock::MEDIA_REWIND),
-  m_forward_button(Gtk::Stock::MEDIA_FORWARD),
-  m_open_button(Gtk::Stock::OPEN)
+  m_play_button("Play"),
+  m_pause_button("Pause"),
+  m_stop_button("Stop"),
+  m_rewind_button("Rewind"),
+  m_forward_button("Forward"),
+  m_open_button("Open")
 {
   set_title("gstreamermm Media Player Example");
 
@@ -114,7 +102,7 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
   m_forward_button.set_sensitive(false);
 
   m_playbin = playbin;
-
+  m_playbin->property_video_sink() = Gst::XvImageSink::create();
   m_playbin->signal_video_changed().connect(
     sigc::mem_fun(*this, &PlayerWindow::on_video_changed) );
 
@@ -122,40 +110,63 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
   m_pause_button.hide();
 }
 
+
 void PlayerWindow::on_video_area_realize()
 {
   // When the video area (the drawing area) is realized, Get its X Window
-  // ID and save it for when the Gst::XOverlay is ready to accept an ID in
+  // ID and save it for when the Gst::VideoOverlay is ready to accept an ID in
   // which to draw the video.
 #ifdef GDK_WINDOWING_X11
-  m_x_window_id = GDK_WINDOW_XID(m_video_area.get_window()->gobj());
+  window_handler = GDK_WINDOW_XID (m_video_area.get_window()->gobj());
 #endif
 #ifdef GDK_WINDOWING_WIN32
-  m_x_window_id = GDK_WINDOW_HWND(m_video_area.get_window()->gobj());
+  window_handler = GDK_WINDOW_HWND ((m_video_area.get_window()->gobj());
 #endif
 }
 
-// This function is used to receive asynchronous messages from mainPipeline's
-// bus, specifically to prepare the Gst::XOverlay to draw inside the window
-// in which we want it to draw to.
-void PlayerWindow::on_bus_message_sync(
-    const Glib::RefPtr<Gst::Message>& message)
+static Glib::RefPtr<Gst::VideoOverlay> find_overlay(Glib::RefPtr<Gst::Element> element)
 {
-  // ignore anything but 'prepare-xwindow-id' element messages
-  if(message->get_message_type() != Gst::MESSAGE_ELEMENT)
-    return;
+  auto overlay = Glib::RefPtr<Gst::VideoOverlay>::cast_dynamic(element);
 
-  if(!message->get_structure().has_name("prepare-xwindow-id"))
-     return;
+  if (overlay)
+    return overlay;
 
-  Glib::RefPtr<Gst::Element> element =
-      Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source());
+  auto bin = Glib::RefPtr<Gst::Bin>::cast_dynamic(element);
 
-  Glib::RefPtr< Gst::VideoOverlay > videooverlay = Glib::RefPtr<Gst::VideoOverlay>::cast_dynamic(element);
+  if (!bin)
+    return overlay;
 
-  if(videooverlay)
+  for (auto e : bin->get_children())
   {
-      videooverlay->set_window_handle(m_x_window_id);
+    overlay = find_overlay(e);
+    if (overlay)
+      break;
+  }
+
+  return overlay;
+}
+
+// This function is used to receive asynchronous messages from mainPipeline's
+// bus, specifically to prepare the Gst::VideoOverlay to draw inside the window
+// in which we want it to draw to.
+void PlayerWindow::on_bus_message_sync(const Glib::RefPtr<Gst::Message>& message)
+{
+  if (!gst_is_video_overlay_prepare_window_handle_message (message->gobj()))
+   return;
+
+  if (window_handler != 0)
+  {
+    Glib::RefPtr< Gst::VideoOverlay > videooverlay =
+        find_overlay(Glib::RefPtr<Gst::Element>::cast_dynamic(message->get_source()));
+
+    if(videooverlay)
+    {
+      videooverlay->set_window_handle(window_handler);
+    }
+  }
+  else
+  {
+    std::cerr << "Should have obtained video_window_handle by now!";
   }
 }
 
@@ -172,11 +183,10 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
     }
     case Gst::MESSAGE_ERROR:
     {
-      Glib::RefPtr<Gst::MessageError> msgError = Glib::RefPtr<Gst::MessageError>::cast_static(message);
-      if(msgError)
+      Glib::RefPtr<Gst::MessageError> msg_error = Glib::RefPtr<Gst::MessageError>::cast_static(message);
+      if(msg_error)
       {
-        Glib::Error err;
-        err = msgError->parse();
+        Glib::Error err = msg_error->parse();
         std::cerr << "Error: " << err.what() << std::endl;
       }
       else
@@ -213,8 +223,7 @@ Gst::PadProbeReturn PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst
   int width_value;
   int height_value;
 
-  Glib::RefPtr<Gst::Caps> caps = pad->query_caps(Glib::RefPtr<Gst::Caps>());
-
+  Glib::RefPtr<Gst::Caps> caps = pad->get_current_caps();
   caps = caps->create_writable();
 
   const Gst::Structure structure = caps->get_structure(0);
@@ -259,7 +268,7 @@ void PlayerWindow::on_button_play()
   // set the pipeline to play mode:
   m_playbin->set_state(Gst::STATE_PLAYING);
 }
- 
+
 void PlayerWindow::on_button_pause()
 {
   m_play_button.set_sensitive();
@@ -270,11 +279,11 @@ void PlayerWindow::on_button_pause()
 
   // Disconnect the progress callback:
   m_timeout_connection.disconnect();
-  
+
   // Set the pipeline to pause mode:
   m_playbin->set_state(Gst::STATE_PAUSED);
 }
- 
+
 void PlayerWindow::on_button_stop()
 {
   //Change the UI appropriately:
@@ -301,11 +310,11 @@ void PlayerWindow::on_button_stop()
 
 bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, double value)
 {
-  const gint64 newPos = gint64(value * m_duration);
+  const gint64 new_pos = gint64(value * m_duration);
 
-  if(m_playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+  if(m_playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, new_pos))
   {
-    display_label_progress(newPos, m_duration);
+    display_label_progress(new_pos, m_duration);
     return true;
   }
   else
@@ -317,19 +326,17 @@ bool PlayerWindow::on_scale_value_changed(Gtk::ScrollType /* type_not_used */, d
 
 void PlayerWindow::on_button_rewind()
 {
-  static const gint64 skipAmount = Gst::SECOND * 2;
-
   gint64 pos = 0;
   Gst::Format fmt = Gst::FORMAT_TIME;
 
   if(m_playbin->query_position(fmt, pos))
   {
-    gint64 newPos = (pos > skipAmount) ? (pos - skipAmount) : 0;
+    gint64 new_pos = (pos > rewind_skip_amount) ? (pos - rewind_skip_amount) : 0;
 
-    if(m_playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, newPos))
+    if(m_playbin->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH, new_pos))
     {
-      m_progress_scale.set_value(double(newPos) / m_duration);
-      display_label_progress(newPos, m_duration);
+      m_progress_scale.set_value(double(new_pos) / m_duration);
+      display_label_progress(new_pos, m_duration);
     }
     else
       std::cerr << "Could not seek." << std::endl;
@@ -338,33 +345,23 @@ void PlayerWindow::on_button_rewind()
 
 void PlayerWindow::on_button_forward()
 {
-  static const gint64 skipAmount = Gst::SECOND * 3;
-
   Gst::Format fmt = Gst::FORMAT_TIME;
-
-  Glib::RefPtr<Gst::Query> query = Gst::QueryPosition::create(fmt);
+  Glib::RefPtr<Gst::QueryPosition> query = Gst::QueryPosition::create(fmt);
 
   if(m_playbin->query(query))
   {
-    Glib::RefPtr<Gst::QueryPosition> posQuery =
-      Glib::RefPtr<Gst::QueryPosition>::cast_static(query);
-
-    gint64 pos = posQuery->parse();
-
-    gint64 newPos = ((pos + skipAmount) < m_duration) ? (pos + skipAmount) :
+    gint64 pos = query->parse();
+    gint64 new_pos = ((pos + forward_skip_amount) < m_duration) ? (pos + forward_skip_amount) :
       m_duration;
 
     Glib::RefPtr<Gst::Event> event = Gst::EventSeek::create(1.0, fmt,
-        Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, newPos,
+        Gst::SEEK_FLAG_FLUSH, Gst::SEEK_TYPE_SET, new_pos,
         Gst::SEEK_TYPE_NONE, -1);
 
-    Glib::RefPtr<Gst::EventSeek> seekEvent =
-      Glib::RefPtr<Gst::EventSeek>::cast_static(event);
-
-    if(Glib::RefPtr<Gst::Element>::cast_static(m_playbin)->send_event(event))
+    if(Glib::RefPtr<Gst::Element>::cast_static(m_playbin)->send_event(std::move(event)))
     {
-      m_progress_scale.set_value(double(newPos) / m_duration);
-      display_label_progress(newPos, m_duration);
+      m_progress_scale.set_value(double(new_pos) / m_duration);
+      display_label_progress(new_pos, m_duration);
     }
     else
       std::cerr << "Could not seek." << std::endl;
@@ -374,14 +371,14 @@ void PlayerWindow::on_button_forward()
 void PlayerWindow::on_button_open()
 {
   static Glib::ustring working_dir = Glib::get_home_dir();
-  
+
   Gtk::FileChooserDialog chooser(*this,
     "Select a media file", Gtk::FILE_CHOOSER_ACTION_OPEN);
-  chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-  chooser.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
-  
+  chooser.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+  chooser.add_button("OK", Gtk::RESPONSE_OK);
+
   chooser.set_current_folder(working_dir);
-  
+
   const int response = chooser.run();
   if(response == Gtk::RESPONSE_OK)
   {
@@ -421,7 +418,7 @@ void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
   std::ostringstream locationStream (std::ostringstream::out);
   std::ostringstream durationStream (std::ostringstream::out);
 
-  locationStream << std::right << std::setfill('0') << 
+  locationStream << std::right << std::setfill('0') <<
     std::setw(3) << Gst::get_hours(pos) << ":" <<
     std::setw(2) << Gst::get_minutes(pos) << ":" <<
     std::setw(2) << Gst::get_seconds(pos) << "." <<
@@ -439,4 +436,5 @@ void PlayerWindow::display_label_progress(gint64 pos, gint64 len)
 PlayerWindow::~PlayerWindow()
 {
   m_playbin->get_bus()->remove_watch(m_watch_id);
+  m_playbin->set_state(Gst::STATE_NULL);
 }

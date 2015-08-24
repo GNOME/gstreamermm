@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2015 The gstreamermm Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -16,24 +16,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <gtkmm/main.h>
-#include <gstreamermm/init.h>
-#include <gstreamermm/element.h>
-
-// Plug-ins:
-#include <gstreamermm/playbin.h>
-
-#include <iostream>
 #include "player_window.h"
 
-int main(int argc, char** argv)
+#include <gtkmm.h>
+#include <gstreamermm/init.h>
+
+#include <iostream>
+
+int main (int argc, char **argv)
 {
-  Gtk::Main kit(argc, argv);
+  Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "org.gtkmm.gstreamermm.gtkmm-media-player");
   Gst::init(argc, argv);
 
-  // Create the elements:
-
-  // playbin2 plays any media type, choosing an appropriate set of elements
+  // playbin plays any media type, choosing an appropriate set of elements
   // and linking them together.
   Glib::RefPtr<Gst::PlayBin> playbin = Gst::PlayBin::create("playbin");
 
@@ -44,11 +39,7 @@ int main(int argc, char** argv)
   }
 
   //Create our player window and give it the pipeline and video sink:
-  PlayerWindow mainWindow(playbin);
-  kit.run(mainWindow);
+  PlayerWindow player(playbin);
 
-  // Clean up nicely:
-  playbin->set_state(Gst::STATE_NULL);
-
-  return 0;
+  return app->run(player);
 }

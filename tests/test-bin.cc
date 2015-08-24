@@ -111,16 +111,16 @@ TEST_F(BinTest, ShouldFindUnlinkedPads)
 
 TEST_F(BinTest, ShouldNotFindUnlinkedPads)
 {
-    RefPtr<Element> src = AddElementToBin();
-    RefPtr<Element> sink = AddElementToBin("fakesink", "sink");
+  RefPtr<Element> src = AddElementToBin();
+  RefPtr<Element> sink = AddElementToBin("fakesink", "sink");
 
-    src->link(sink);
+  src->link(sink);
 
-    RefPtr<Pad> pad_sink = bin->find_unlinked_pad(PAD_SINK);
-    RefPtr<Pad> pad_src = bin->find_unlinked_pad(PAD_SRC);
+  RefPtr<Pad> pad_sink = bin->find_unlinked_pad(PAD_SINK);
+  RefPtr<Pad> pad_src = bin->find_unlinked_pad(PAD_SRC);
 
-    ASSERT_FALSE(pad_sink);
-    ASSERT_FALSE(pad_src);
+  ASSERT_FALSE(pad_sink);
+  ASSERT_FALSE(pad_src);
 }
 
 TEST_F(BinTest, ShouldReturnCorrectQuantityOfChildren)

@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2015 The gstreamermm Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -16,26 +16,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef _PLAYERWINDOW_H
-#define _PLAYERWINDOW_H
+#ifndef PLAYER_WINDOW_H_
+#define PLAYER_WINDOW_H_
 
-#include <gtkmm/window.h>
-#include <gtkmm/drawingarea.h>
-#include <gtkmm/buttonbox.h>
-#include <gtkmm/label.h>
-#include <gtkmm/button.h>
-#include <gtkmm/scale.h>
-#include <gstreamermm/element.h>
-#include <gstreamermm/pipeline.h>
-#include <gstreamermm/bus.h>
+#include <gtkmm.h>
 #include <gstreamermm/playbin.h>
 
 class PlayerWindow : public Gtk::Window
 {
 public:
-  /**
-   * @param playbin The pipeline that can play media files.
-   */
   PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin);
   virtual ~PlayerWindow();
 
@@ -76,8 +65,11 @@ protected:
   sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;
-  gulong m_x_window_id;
+  gulong window_handler;
   gulong m_pad_probe_id;
+
+  const gint64 rewind_skip_amount = Gst::SECOND * 2;
+  const gint64 forward_skip_amount = Gst::SECOND * 3;
 };
 
-#endif /* _PLAYERWINDOW_H */
+#endif /* PLAYER_WINDOW_H_ */
