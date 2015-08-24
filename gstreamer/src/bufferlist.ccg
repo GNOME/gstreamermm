@@ -69,15 +69,10 @@ static gboolean BufferList_Foreach_gstreamermm_callback(GstBuffer** buffer, guin
 
 namespace Gst
 {
-
-bool BufferList::is_writable() const
+void BufferList::insert(gint idx, const Glib::RefPtr<Gst::Buffer>& buffer)
 {
-  return static_cast<bool>(gst_buffer_list_is_writable(gobj()));
-}
-
-Glib::RefPtr<BufferList> BufferList::create_writable()
-{
-  return Glib::RefPtr<BufferList>::cast_static(MiniObject::create_writable());
+  buffer->reference();
+  gst_buffer_list_insert(gobj(), idx, buffer->gobj());
 }
 
 void BufferList::foreach(const SlotForeach& slot)

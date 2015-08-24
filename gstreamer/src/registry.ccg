@@ -120,4 +120,17 @@ Registry::get()
   return Glib::wrap(gst_registry_get(), true);
 }
 
+void Registry::add_feature(const Glib::RefPtr<Gst::PluginFeature>& feature)
+{
+  feature->reference();
+  gst_registry_add_feature(gobj(), feature->gobj());
+}
+
+void Registry::add_plugin(const Glib::RefPtr<Gst::Plugin>& plugin)
+{
+  plugin->reference();
+  gst_registry_add_plugin(gobj(), plugin->gobj());
+}
+
+
 } //namespace Gst

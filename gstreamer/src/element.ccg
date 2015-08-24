@@ -159,6 +159,12 @@ bool Gst::Element::set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock)
   return true;
 }
 
+bool Element::send_event(const Glib::RefPtr<Gst::Event>& event)
+{
+  event->reference();
+  return gst_element_send_event(gobj(), Glib::unwrap(event));
+}
+
 Glib::RefPtr<Gst::PadTemplate> Gst::Element::get_pad_template(const Glib::ustring &factory_name) const
 {
   return Glib::wrap(gst_element_class_get_pad_template(GST_ELEMENT_GET_CLASS(gobject_), factory_name.c_str()), true);

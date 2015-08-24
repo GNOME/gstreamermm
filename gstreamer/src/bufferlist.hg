@@ -75,21 +75,8 @@ public:
 
   _WRAP_METHOD(void insert(gint idx, Glib::RefPtr<Gst::Buffer>&& buffer), gst_buffer_list_insert)
 
-  /** Tests if you can safely add buffers and groups into a buffer list.
-   * @return <tt>true</tt> if the buffer list is writable, <tt>false</tt>
-   * otherwise.
-   *
-   * Since 0.10.24
-   */
-  bool is_writable() const;
-
-  /** Makes a writable buffer list from the given buffer list. If the source buffer
-   * list is already writable, this will simply return the same buffer list. A copy
-   * will otherwise be made.
-   *
-   * @return A buffer list (possibly the same pointer) that is writable.
-   */
-  Glib::RefPtr<BufferList> create_writable();
+  /// A insert() convenience overload. Allows to re-use @buffer parameter after function call.
+  void insert(gint idx, const Glib::RefPtr<Gst::Buffer>& buffer);
 
   /** Call @a slot for each buffer in @a list.
    *

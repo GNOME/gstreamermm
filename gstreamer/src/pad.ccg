@@ -326,6 +326,12 @@ void Pad::set_event_function(const SlotEvent& slot)
 	gst_pad_set_event_function(GST_PAD(gobj()), &Pad_Event_gstreamermm_callback);
 }
 
+bool Pad::push_event(const Glib::RefPtr<Gst::Event>& event)
+{
+  event->reference();
+  return gst_pad_push_event(gobj(), event->gobj());
+}
+
 void Pad::set_activate_function(const SlotActivate& slot)
 {
   slot_activate = slot;
@@ -353,6 +359,14 @@ bool Pad::is_proxy_pad() const
 {
 	return GST_IS_PROXY_PAD(gobj());
 }
+
+bool Pad::send_event(const Glib::RefPtr<Gst::Event>& event)
+{
+  event->reference();
+  return gst_pad_send_event(gobj(), event->gobj());
+}
+
+
 
 PadProbeInfo::PadProbeInfo()
 : gobj_(g_try_new(GstPadProbeInfo, 1)),
