@@ -2094,10 +2094,10 @@ of events.
 </parameter>
 <parameter name="GST_LEVEL_LOG">
 <parameter_description> Log messages are messages that are very common but might be
-useful to know. As a rule of thumb a pipeline that is iterating as expected
-should never output anything else but LOG messages. Use this log level to
-log recurring information in chain functions and loop functions, for
-example.
+useful to know. As a rule of thumb a pipeline that is running as expected
+should never output anything else but LOG messages whilst processing data.
+Use this log level to log recurring information in chain functions and
+loop functions, for example.
 </parameter_description>
 </parameter>
 <parameter name="GST_LEVEL_TRACE">
@@ -4188,6 +4188,13 @@ of checking for a subset. This is interesting for
 parsers that can accept incompletely specified caps.
 </parameter_description>
 </parameter>
+<parameter name="GST_PAD_FLAG_ACCEPT_TEMPLATE">
+<parameter_description> the default accept-caps handler will use
+the template pad caps instead of query caps to
+compare with the accept caps. Use this in combination
+with %GST_PAD_FLAG_ACCEPT_INTERSECT. (Since 1.6)
+</parameter_description>
+</parameter>
 <parameter name="GST_PAD_FLAG_LAST">
 <parameter_description> offset to define more flags
 </parameter_description>
@@ -4349,6 +4356,17 @@ are called and #GST_FLOW_OK or %TRUE is returned to the caller.
 <parameter name="GST_PAD_PROBE_PASS">
 <parameter_description> pass the data item in the block probe and block on the
 next item.
+</parameter_description>
+</parameter>
+<parameter name="GST_PAD_PROBE_HANDLED">
+<parameter_description> Data has been handled in the probe and will not be
+forwarded further. For events and buffers this is the same behaviour as
+@GST_PAD_PROBE_DROP (except that in this case you need to unref the buffer
+or event yourself). For queries it will also return %TRUE to the caller.
+The probe can also modify the #GstFlowReturn value by using the
+#GST_PAD_PROBE_INFO_FLOW_RETURN() accessor.
+Note that the resulting query must contain valid entries.
+Since: 1.6
 </parameter_description>
 </parameter>
 </parameters>
@@ -5762,27 +5780,28 @@ complete scan of the file in those cases.
 
 When performing a segment seek: after the playback of the segment completes,
 no EOS will be emitted by the element that performed the seek, but a
-#GST_MESSAGE_SEGMENT_DONE message will be posted on the bus by the element.
+%GST_MESSAGE_SEGMENT_DONE message will be posted on the bus by the element.
 When this message is posted, it is possible to send a new seek event to
 continue playback. With this seek method it is possible to perform seamless
 looping or simple linear editing.
 
 When doing fast forward (rate &gt; 1.0) or fast reverse (rate &lt; -1.0) trickmode
-playback, the @GST_SEEK_FLAG_TRICKMODE flag can be used to instruct decoders
+playback, the %GST_SEEK_FLAG_TRICKMODE flag can be used to instruct decoders
 and demuxers to adjust the playback rate by skipping frames. This can improve
 performance and decrease CPU usage because not all frames need to be decoded.
 
-Beyond that, the @GST_SEEK_FLAG_TRICKMODE_KEY_UNITS flag can be used to
+Beyond that, the %GST_SEEK_FLAG_TRICKMODE_KEY_UNITS flag can be used to
 request that decoders skip all frames except key units, and
-@GST_SEEK_FLAG_TRICKMODE_NO_AUDIO flags can be used to request that audio
+%GST_SEEK_FLAG_TRICKMODE_NO_AUDIO flags can be used to request that audio
 decoders do no decoding at all, and simple output silence.
 
-The @GST_SEEK_FLAG_SNAP_BEFORE flag can be used to snap to the previous
-relevant location, and the @GST_SEEK_FLAG_SNAP_AFTER flag can be used to
-select the next relevant location. If KEY_UNIT is specified, the relevant
-location is a keyframe. If both flags are specified, the nearest of these
-locations will be selected. If none are specified, the implementation is
+The %GST_SEEK_FLAG_SNAP_BEFORE flag can be used to snap to the previous
+relevant location, and the %GST_SEEK_FLAG_SNAP_AFTER flag can be used to
+select the next relevant location. If %GST_SEEK_FLAG_KEY_UNIT is specified,
+the relevant location is a keyframe. If both flags are specified, the nearest
+of these locations will be selected. If none are specified, the implementation is
 free to select whichever it wants.
+
 The before and after here are in running time, so when playing backwards,
 the next location refers to the one that will played in next, and not the
 one that is located after in the actual source stream.
@@ -5823,21 +5842,21 @@ frames. (Since 1.6)
 </parameter>
 <parameter name="GST_SEEK_FLAG_SNAP_BEFORE">
 <parameter_description> go to a location before the requested position,
-if KEY_UNIT this means the keyframe at or before the
-requested position the one at or before the seek target.
+if %GST_SEEK_FLAG_KEY_UNIT this means the keyframe at or before
+the requested position the one at or before the seek target.
 </parameter_description>
 </parameter>
 <parameter name="GST_SEEK_FLAG_SNAP_AFTER">
 <parameter_description> go to a location after the requested position,
-if KEY_UNIT this means the keyframe at of after the
+if %GST_SEEK_FLAG_KEY_UNIT this means the keyframe at of after the
 requested position.
 </parameter_description>
 </parameter>
 <parameter name="GST_SEEK_FLAG_SNAP_NEAREST">
 <parameter_description> go to a position near the requested position,
-if KEY_UNIT this means the keyframe closest to the
-requested position, if both keyframes are at an equal
-distance, behaves like SNAP_BEFORE.
+if %GST_SEEK_FLAG_KEY_UNIT this means the keyframe closest
+to the requested position, if both keyframes are at an equal
+distance, behaves like %GST_SEEK_FLAG_SNAP_BEFORE.
 </parameter_description>
 </parameter>
 <parameter name="GST_SEEK_FLAG_TRICKMODE_KEY_UNITS">
@@ -5855,7 +5874,7 @@ decoding and output only gap events or silence. (Since 1.6)
 </parameter>
 <parameter name="GST_SEEK_FLAG_SKIP">
 <parameter_description> Deprecated backward compatibility flag, replaced
-by @GST_SEEK_FLAG_TRICKMODE
+by %GST_SEEK_FLAG_TRICKMODE
 </parameter_description>
 </parameter>
 </parameters>
@@ -10999,15 +11018,12 @@ MT safe.
 
 <function name="gst_audio_decoder_merge_tags">
 <description>
-Adds tags to so-called pending tags, which will be processed
-before pushing out data downstream.
+Sets the audio decoder tags and how they should be merged with any
+upstream stream tags. This will override any tags previously-set
+with gst_audio_decoder_merge_tags().
 
 Note that this is provided for convenience, and the subclass is
-not required to use this and can still do tag handling on its own,
-although it should be aware that baseclass already takes care
-of the usual CODEC/AUDIO_CODEC tags.
-
-MT safe.
+not required to use this and can still do tag handling on its own.
 
 </description>
 <parameters>
@@ -11016,11 +11032,11 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="tags">
-<parameter_description> a #GstTagList to merge
+<parameter_description> a #GstTagList to merge, or NULL
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description> the #GstTagMergeMode to use
+<parameter_description> the #GstTagMergeMode to use, usually #GST_TAG_MERGE_REPLACE
 </parameter_description>
 </parameter>
 </parameters>
@@ -11274,6 +11290,30 @@ MT safe.
 </parameter>
 <parameter name="tolerance">
 <parameter_description> new tolerance
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_decoder_set_use_default_pad_acceptcaps">
+<description>
+Lets #GstAudioDecoder sub-classes decide if they want the sink pad
+to use the default pad query handler to reply to accept-caps queries.
+
+By setting this to true it is possible to further customize the default
+handler with %GST_PAD_SET_ACCEPT_INTERSECT and
+%GST_PAD_SET_ACCEPT_TEMPLATE
+
+
+</description>
+<parameters>
+<parameter name="decoder">
+<parameter_description> a #GstAudioDecoder
+</parameter_description>
+</parameter>
+<parameter name="use">
+<parameter_description> if the default pad accept-caps query handling should be used
 </parameter_description>
 </parameter>
 </parameters>
@@ -11564,13 +11604,12 @@ MT safe.
 
 <function name="gst_audio_encoder_merge_tags">
 <description>
-Adds tags to so-called pending tags, which will be processed
-before pushing out data downstream.
+Sets the audio encoder tags and how they should be merged with any
+upstream stream tags. This will override any tags previously-set
+with gst_audio_encoder_merge_tags().
 
 Note that this is provided for convenience, and the subclass is
-not required to use this and can still do tag handling on its own,
-although it should be aware that baseclass already takes care
-of the usual CODEC/AUDIO_CODEC tags.
+not required to use this and can still do tag handling on its own.
 
 MT safe.
 
@@ -11581,11 +11620,12 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="tags">
-<parameter_description> a #GstTagList to merge
+<parameter_description> a #GstTagList to merge, or NULL to unset
+previously-set tags
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description> the #GstTagMergeMode to use
+<parameter_description> the #GstTagMergeMode to use, usually #GST_TAG_MERGE_REPLACE
 </parameter_description>
 </parameter>
 </parameters>
@@ -13109,6 +13149,35 @@ Set to -1 to mark the entire frame as metadata. If in doubt, set to 0.
 <return> a newly-allocated #GstBaseParseFrame. Free with
 gst_base_parse_frame_free() when no longer needed.
 </return>
+</function>
+
+<function name="gst_base_parse_merge_tags">
+<description>
+Sets the parser subclass's tags and how they should be merged with any
+upstream stream tags. This will override any tags previously-set
+with gst_base_parse_merge_tags().
+
+Note that this is provided for convenience, and the subclass is
+not required to use this and can still do tag handling on its own.
+
+
+</description>
+<parameters>
+<parameter name="parse">
+<parameter_description> a #GstBaseParse
+</parameter_description>
+</parameter>
+<parameter name="tags">
+<parameter_description> a #GstTagList to merge, or NULL to unset
+previously-set tags
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> the #GstTagMergeMode to use, usually #GST_TAG_MERGE_REPLACE
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_base_parse_push_frame">
@@ -16247,8 +16316,8 @@ when @buffer did not contain enough data.
 
 <function name="gst_buffer_extract_dup">
 <description>
-Extracts a copy of at most @size bytes the data at @offset into a #GBytes.
-@dest must be freed using g_free() when done.
+Extracts a copy of at most @size bytes the data at @offset into
+newly-allocated memory. @dest must be freed using g_free() when done.
 
 
 </description>
@@ -22179,8 +22248,8 @@ checking if there is enough free space available in the byte writer.
 
 <function name="gst_byte_writer_put_int8">
 <description>
-Writes a signed 8 bit integer to @writer.
-
+Writes a signed 8 bit integer to @writer without
+checking if there is enough free space available in the byte writer.
 
 </description>
 <parameters>
@@ -22193,8 +22262,7 @@ Writes a signed 8 bit integer to @writer.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the value could be written
-</return>
+<return></return>
 </function>
 
 <function name="gst_byte_writer_put_string">
@@ -28163,7 +28231,13 @@ or %NULL on error
 <function name="gst_date_time_new_from_iso8601_string">
 <description>
 Tries to parse common variants of ISO-8601 datetime strings into a
-#GstDateTime.
+#GstDateTime. Possible input formats are (for example):
+2012-06-30T22:46:43Z, 2012, 2012-06, 2012-06-30, 2012-06-30T22:46:43-0430,
+2012-06-30T22:46Z, 2012-06-30T22:46-0430, 2012-06-30 22:46,
+2012-06-30 22:46:43, 2012-06-00, 2012-00-00, 2012-00-30, 22:46:43Z, 22:46Z,
+22:46:43-0430, 22:46-0430, 22:46:30, 22:46
+If no date is provided, it is assumed to be &quot;today&quot; in the timezone
+provided (if any), otherwise UTC.
 
 Free-function: gst_date_time_unref
 
@@ -29157,6 +29231,24 @@ Gets the user-friendly name of the device.
 </return>
 </function>
 
+<function name="gst_device_get_properties">
+<description>
+Gets the extra properties of a device.
+
+
+</description>
+<parameters>
+<parameter name="device">
+<parameter_description> a #GstDevice
+</parameter_description>
+</parameter>
+</parameters>
+<return> The extra properties or %NULL when there are none.
+Free with gst_structure_free() after use.
+
+</return>
+</function>
+
 <function name="gst_device_has_classes">
 <description>
 Check if @device matches all of the given classes
@@ -29266,6 +29358,45 @@ probe the hardware if the monitor is not currently started.
 </return>
 </function>
 
+<function name="gst_device_monitor_get_providers">
+<description>
+Get a list of the currently selected device provider factories.
+
+This
+
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> a #GstDeviceMonitor
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+A list of device provider factory names that are currently being
+monitored by @monitor or %NULL when nothing is being monitored.
+
+</return>
+</function>
+
+<function name="gst_device_monitor_get_show_all_devices">
+<description>
+Get if @monitor is curretly showing all devices, even those from hidden
+providers.
+
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> a #GstDeviceMonitor
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE when all devices will be shown.
+
+</return>
+</function>
+
 <function name="gst_device_monitor_new">
 <description>
 Create a new #GstDeviceMonitor
@@ -29299,6 +29430,26 @@ by gst_device_monitor_add_filter().
 <return> %TRUE of the filter id was valid, %FALSE otherwise
 
 </return>
+</function>
+
+<function name="gst_device_monitor_set_show_all_devices">
+<description>
+Set if all devices should be visible, even those devices from hidden
+providers. Setting @show_all to true might show some devices multiple times.
+
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> a #GstDeviceMonitor
+</parameter_description>
+</parameter>
+<parameter name="show_all">
+<parameter_description> show all devices
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_device_monitor_start">
@@ -29782,6 +29933,49 @@ creating this device provider. no refcounting is needed.
 </return>
 </function>
 
+<function name="gst_device_provider_get_hidden_providers">
+<description>
+Get the provider factory names of the #GstDeviceProvider instances that
+are hidden by @provider.
+
+
+</description>
+<parameters>
+<parameter name="provider">
+<parameter_description> a #GstDeviceProvider
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+a list of hidden providers factory names or %NULL when
+nothing is hidden by @provider. Free with g_strfreev.
+
+</return>
+</function>
+
+<function name="gst_device_provider_hide_provider">
+<description>
+Make @provider hide the devices from the factory with @name.
+
+This function is used when @provider will also provide the devices reported
+by provider factory @name. A monitor should stop monitoring the
+device provider with @name to avoid duplicate devices.
+
+
+</description>
+<parameters>
+<parameter name="provider">
+<parameter_description> a #GstDeviceProvider
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a provider factory name
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_device_provider_register">
 <description>
 Create a new device providerfactory capable of instantiating objects of the
@@ -29848,6 +30042,30 @@ called the same number of times that gst_device_provider_start() was called.
 <parameters>
 <parameter name="provider">
 <parameter_description> A #GstDeviceProvider
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_device_provider_unhide_provider">
+<description>
+Make @provider unhide the devices from factory @name.
+
+This function is used when @provider will no longer provide the devices
+reported by provider factory @name. A monitor should start
+monitoring the devices from provider factory @name in order to see
+all devices again.
+
+
+</description>
+<parameters>
+<parameter name="provider">
+<parameter_description> a #GstDeviceProvider
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> a provider factory name
 </parameter_description>
 </parameter>
 </parameters>
@@ -36890,6 +37108,28 @@ MT safe.
 
 <function name="gst_harness_add_sink">
 <description>
+Similar to gst_harness_add_sink_harness, this is a convenience to
+directly create a sink-harness using the @sink_element_name name specified.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="sink_element_name">
+<parameter_description> a #gchar with the name of a #GstElement
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_sink_harness">
+<description>
 Similar to gst_harness_add_src, this allows you to send the data coming out
 of your harnessed #GstElement to a sink-element, allowing to test different
 responses the element output might create in sink elements. An example might
@@ -36908,8 +37148,8 @@ MT safe.
 <parameter_description> a #GstHarness
 </parameter_description>
 </parameter>
-<parameter name="sink_element_name">
-<parameter_description> a #gchar with the name of a #GstElement
+<parameter name="sink_harness">
+<parameter_description> a #GstHarness to be added as a sink-harness.
 </parameter_description>
 </parameter>
 </parameters>
@@ -36940,6 +37180,33 @@ MT safe.
 
 <function name="gst_harness_add_src">
 <description>
+Similar to gst_harness_add_src_harness, this is a convenience to
+directly create a src-harness using the @src_element_name name specified.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="src_element_name">
+<parameter_description> a #gchar with the name of a #GstElement
+</parameter_description>
+</parameter>
+<parameter name="has_clock_wait">
+<parameter_description> a #gboolean specifying if the #GstElement uses
+gst_clock_wait_id internally.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_src_harness">
+<description>
 A src-harness is a great way of providing the #GstHarness with data.
 By adding a src-type #GstElement, it is then easy to use functions like
 gst_harness_push_from_src or gst_harness_src_crank_and_push_many
@@ -36959,8 +37226,8 @@ MT safe.
 <parameter_description> a #GstHarness
 </parameter_description>
 </parameter>
-<parameter name="src_element_name">
-<parameter_description> a #gchar with the name of a #GstElement
+<parameter name="src_harness">
+<parameter_description> a #GstHarness to be added as a src-harness.
 </parameter_description>
 </parameter>
 <parameter name="has_clock_wait">
@@ -37099,7 +37366,7 @@ MT safe.
 <function name="gst_harness_create_buffer">
 <description>
 Allocates a buffer using a #GstBufferPool if present, or else using the
-configured #GstAllocator and #GstAllocatorParams
+configured #GstAllocator and #GstAllocationParams
 
 MT safe.
 
@@ -37255,13 +37522,12 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="allocator">
-<parameter_description> the #GstAllocator
-used
+<parameter_description> the #GstAllocator used
 </parameter_description>
 </parameter>
 <parameter name="params">
-<parameter_description> the
-#GstAllocatorParams of @allocator
+<parameter_description> the #GstAllocationParams of
+@allocator
 </parameter_description>
 </parameter>
 </parameters>
@@ -37349,11 +37615,11 @@ MT safe.
 %NULL will not create a harness srcpad.
 </parameter_description>
 </parameter>
-<parameter name="sinkpad">
-<parameter_description> a #gchar with the name of the element sinkpad that is
-then linked to the harness srcpad. Can be a static or request or a sometimes
-pad that has been added. %NULL will not get/request a sinkpad from the
-element. (Like if the element is a src)
+<parameter name="element_sinkpad_name">
+<parameter_description> a #gchar with the name of the element
+sinkpad that is then linked to the harness srcpad. Can be a static or request
+or a sometimes pad that has been added. %NULL will not get/request a sinkpad
+from the element. (Like if the element is a src.)
 </parameter_description>
 </parameter>
 <parameter name="hsink">
@@ -37361,9 +37627,10 @@ element. (Like if the element is a src)
 %NULL will not create a harness sinkpad.
 </parameter_description>
 </parameter>
-<parameter name="srcpad">
-<parameter_description> a #gchar with the name of the element srcpad that is
-then linked to the harness sinkpad, similar to the @sinkpad.
+<parameter name="element_srcpad_name">
+<parameter_description> a #gchar with the name of the element
+srcpad that is then linked to the harness sinkpad, similar to the
+@element_sinkpad_name.
 </parameter_description>
 </parameter>
 </parameters>
@@ -37409,14 +37676,16 @@ MT safe.
 <parameter_description> a #GstElement to attach the harness to (transfer none)
 </parameter_description>
 </parameter>
-<parameter name="sinkpad">
-<parameter_description> a #gchar with the name of the element sinkpad that
-is then linked to the harness srcpad. %NULL does not attach a sinkpad
+<parameter name="element_sinkpad_name">
+<parameter_description> a #gchar with the name of the element
+sinkpad that is then linked to the harness srcpad. %NULL does not attach a
+sinkpad
 </parameter_description>
 </parameter>
-<parameter name="srcpad">
-<parameter_description> a #gchar with the name of the element srcpad that is
-then linked to the harness sinkpad. %NULL does not attach a srcpad
+<parameter name="element_srcpad_name">
+<parameter_description> a #gchar with the name of the element
+srcpad that is then linked to the harness sinkpad. %NULL does not attach a
+srcpad
 </parameter_description>
 </parameter>
 </parameters>
@@ -37440,14 +37709,16 @@ MT safe.
 <parameter_description> a #gchar describing the #GstElement name
 </parameter_description>
 </parameter>
-<parameter name="sinkpad">
-<parameter_description> a #gchar with the name of the element sinkpad that
-is then linked to the harness srcpad. %NULL does not attach a sinkpad
+<parameter name="element_sinkpad_name">
+<parameter_description> a #gchar with the name of the element
+sinkpad that is then linked to the harness srcpad. %NULL does not attach a
+sinkpad
 </parameter_description>
 </parameter>
-<parameter name="srcpad">
-<parameter_description> a #gchar with the name of the element srcpad that is
-then linked to the harness sinkpad. %NULL does not attach a srcpad
+<parameter name="element_srcpad_name">
+<parameter_description> a #gchar with the name of the element
+srcpad that is then linked to the harness sinkpad. %NULL does not attach a
+srcpad
 </parameter_description>
 </parameter>
 </parameters>
@@ -37849,6 +38120,39 @@ MT safe.
 </parameter>
 <parameter name="drop_buffers">
 <parameter_description> a #gboolean specifying to drop outgoing buffers or not
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_set_forwarding">
+<description>
+As a convenience, a src-harness will forward %GST_EVENT_STREAM_START,
+%GST_EVENT_CAPS and %GST_EVENT_SEGMENT to the main-harness if forwarding
+is enabled, and forward any sticky-events from the main-harness to
+the sink-harness. It will also forward the %GST_QUERY_ALLOCATION.
+
+If forwarding is disabled, the user will have to either manually push
+these events from the src-harness using gst_harness_src_push_event, or
+create and push them manually. While this will allow full control and
+inspection of these events, for the most cases having forwarding enabled
+will be sufficient when writing a test where the src-harness' main function
+is providing data for the main-harness.
+
+Forwarding is enabled by default.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="forwarding">
+<parameter_description> a #gboolean to enable/disable forwarding
 </parameter_description>
 </parameter>
 </parameters>
@@ -73173,8 +73477,9 @@ metadata and passes it along for further processing, i.e. @handle_frame.
 
 <function name="gst_video_decoder_merge_tags">
 <description>
-Adds tags to so-called pending tags, which will be processed
-before pushing out data downstream.
+Sets the audio decoder tags and how they should be merged with any
+upstream stream tags. This will override any tags previously-set
+with gst_audio_decoder_merge_tags().
 
 Note that this is provided for convenience, and the subclass is
 not required to use this and can still do tag handling on its own.
@@ -73188,11 +73493,12 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="tags">
-<parameter_description> a #GstTagList to merge
+<parameter_description> a #GstTagList to merge, or NULL to unset
+previously-set tags
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description> the #GstTagMergeMode to use
+<parameter_description> the #GstTagMergeMode to use, usually #GST_TAG_MERGE_REPLACE
 </parameter_description>
 </parameter>
 </parameters>
@@ -73412,6 +73718,30 @@ input is packetized, then the @parse method will not be called.
 </parameter>
 <parameter name="packetized">
 <parameter_description> whether the input data should be considered as packetized.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_video_decoder_set_use_default_pad_acceptcaps">
+<description>
+Lets #GstVideoDecoder sub-classes decide if they want the sink pad
+to use the default pad query handler to reply to accept-caps queries.
+
+By setting this to true it is possible to further customize the default
+handler with %GST_PAD_SET_ACCEPT_INTERSECT and
+%GST_PAD_SET_ACCEPT_TEMPLATE
+
+
+</description>
+<parameters>
+<parameter name="decoder">
+<parameter_description> a #GstVideoDecoder
+</parameter_description>
+</parameter>
+<parameter name="use">
+<parameter_description> if the default pad accept-caps query handling should be used
 </parameter_description>
 </parameter>
 </parameters>
@@ -73702,8 +74032,9 @@ Get the current #GstVideoCodecState
 
 <function name="gst_video_encoder_merge_tags">
 <description>
-Adds tags to so-called pending tags, which will be processed
-before pushing out data downstream.
+Sets the video encoder tags and how they should be merged with any
+upstream stream tags. This will override any tags previously-set
+with gst_video_encoder_merge_tags().
 
 Note that this is provided for convenience, and the subclass is
 not required to use this and can still do tag handling on its own.
@@ -73717,11 +74048,12 @@ MT safe.
 </parameter_description>
 </parameter>
 <parameter name="tags">
-<parameter_description> a #GstTagList to merge
+<parameter_description> a #GstTagList to merge, or NULL to unset
+previously-set tags
 </parameter_description>
 </parameter>
 <parameter name="mode">
-<parameter_description> the #GstTagMergeMode to use
+<parameter_description> the #GstTagMergeMode to use, usually #GST_TAG_MERGE_REPLACE
 </parameter_description>
 </parameter>
 </parameters>

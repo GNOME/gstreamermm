@@ -1067,6 +1067,7 @@
     '("ok" "GST_PAD_PROBE_OK")
     '("remove" "GST_PAD_PROBE_REMOVE")
     '("pass" "GST_PAD_PROBE_PASS")
+    '("handled" "GST_PAD_PROBE_HANDLED")
   )
 )
 
@@ -1087,6 +1088,7 @@
     '("proxy-allocation" "GST_PAD_FLAG_PROXY_ALLOCATION")
     '("proxy-scheduling" "GST_PAD_FLAG_PROXY_SCHEDULING")
     '("accept-intersect" "GST_PAD_FLAG_ACCEPT_INTERSECT")
+    '("accept-template" "GST_PAD_FLAG_ACCEPT_TEMPLATE")
     '("last" "GST_PAD_FLAG_LAST")
   )
 )
@@ -4314,6 +4316,12 @@
   (return-type "gchar*")
 )
 
+(define-method get_properties
+  (of-object "GstDevice")
+  (c-name "gst_device_get_properties")
+  (return-type "GstStructure*")
+)
+
 (define-method reconfigure_element
   (of-object "GstDevice")
   (c-name "gst_device_reconfigure_element")
@@ -4397,6 +4405,27 @@
   (parameters
     '("guint" "filter_id")
   )
+)
+
+(define-method get_providers
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_get_providers")
+  (return-type "gchar**")
+)
+
+(define-method set_show_all_devices
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_set_show_all_devices")
+  (return-type "none")
+  (parameters
+    '("gboolean" "show_all")
+  )
+)
+
+(define-method get_show_all_devices
+  (of-object "GstDeviceMonitor")
+  (c-name "gst_device_monitor_get_show_all_devices")
+  (return-type "gboolean")
 )
 
 
@@ -4542,6 +4571,30 @@
   (return-type "none")
   (parameters
     '("GstDevice*" "device")
+  )
+)
+
+(define-method get_hidden_providers
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_get_hidden_providers")
+  (return-type "gchar**")
+)
+
+(define-method hide_provider
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_hide_provider")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method unhide_provider
+  (of-object "GstDeviceProvider")
+  (c-name "gst_device_provider_unhide_provider")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
   )
 )
 
@@ -15066,6 +15119,16 @@
   )
 )
 
+(define-method merge_tags
+  (of-object "GstBaseParse")
+  (c-name "gst_base_parse_merge_tags")
+  (return-type "none")
+  (parameters
+    '("GstTagList*" "tags")
+    '("GstTagMergeMode" "mode")
+  )
+)
+
 
 
 ;; From gstbasesink.h
@@ -18525,9 +18588,9 @@
   (parameters
     '("GstElement*" "element")
     '("GstStaticPadTemplate*" "hsrc")
-    '("const-gchar*" "sinkpad")
+    '("const-gchar*" "element_sinkpad_name")
     '("GstStaticPadTemplate*" "hsink")
-    '("const-gchar*" "srcpad")
+    '("const-gchar*" "element_srcpad_name")
   )
 )
 
@@ -18536,8 +18599,8 @@
   (return-type "GstHarness*")
   (parameters
     '("GstElement*" "element")
-    '("const-gchar*" "sinkpad")
-    '("const-gchar*" "srcpad")
+    '("const-gchar*" "element_sinkpad_name")
+    '("const-gchar*" "element_srcpad_name")
   )
 )
 
@@ -18546,8 +18609,8 @@
   (return-type "GstHarness*")
   (parameters
     '("const-gchar*" "element_name")
-    '("const-gchar*" "sinkpad")
-    '("const-gchar*" "srcpad")
+    '("const-gchar*" "element_sinkpad_name")
+    '("const-gchar*" "element_srcpad_name")
   )
 )
 
@@ -18720,6 +18783,15 @@
   (of-object "GstHarness")
   (c-name "gst_harness_set_blocking_push_mode")
   (return-type "none")
+)
+
+(define-method set_forwarding
+  (of-object "GstHarness")
+  (c-name "gst_harness_set_forwarding")
+  (return-type "none")
+  (parameters
+    '("gboolean" "forwarding")
+  )
 )
 
 (define-method create_buffer
@@ -18898,6 +18970,16 @@
   )
 )
 
+(define-method add_src_harness
+  (of-object "GstHarness")
+  (c-name "gst_harness_add_src_harness")
+  (return-type "none")
+  (parameters
+    '("GstHarness*" "src_harness")
+    '("gboolean" "has_clock_wait")
+  )
+)
+
 (define-method add_src
   (of-object "GstHarness")
   (c-name "gst_harness_add_src")
@@ -18938,6 +19020,15 @@
   (of-object "GstHarness")
   (c-name "gst_harness_src_push_event")
   (return-type "gboolean")
+)
+
+(define-method add_sink_harness
+  (of-object "GstHarness")
+  (c-name "gst_harness_add_sink_harness")
+  (return-type "none")
+  (parameters
+    '("GstHarness*" "sink_harness")
+  )
 )
 
 (define-method add_sink
@@ -22528,6 +22619,15 @@
   (parameters
     '("const-GstTagList*" "tags")
     '("GstTagMergeMode" "mode")
+  )
+)
+
+(define-method set_use_default_pad_acceptcaps
+  (of-object "GstAudioDecoder")
+  (c-name "gst_audio_decoder_set_use_default_pad_acceptcaps")
+  (return-type "none")
+  (parameters
+    '("gboolean" "use")
   )
 )
 
@@ -30485,6 +30585,15 @@
   (parameters
     '("GstCaps*" "caps")
     '("GstCaps*" "filter")
+  )
+)
+
+(define-method set_use_default_pad_acceptcaps
+  (of-object "GstVideoDecoder")
+  (c-name "gst_video_decoder_set_use_default_pad_acceptcaps")
+  (return-type "none")
+  (parameters
+    '("gboolean" "use")
   )
 )
 

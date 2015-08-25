@@ -1300,6 +1300,7 @@
 ;;   GST_PAD_PROBE_OK,
 ;;   GST_PAD_PROBE_REMOVE,
 ;;   GST_PAD_PROBE_PASS,
+;;   GST_PAD_PROBE_HANDLED
 ;; } GstPadProbeReturn;
 
 (define-enum-extended PadProbeReturn
@@ -1310,6 +1311,7 @@
     '("ok" "GST_PAD_PROBE_OK" "1")
     '("remove" "GST_PAD_PROBE_REMOVE" "2")
     '("pass" "GST_PAD_PROBE_PASS" "3")
+    '("handled" "GST_PAD_PROBE_HANDLED" "4")
   )
 )
 
@@ -1327,6 +1329,7 @@
 ;;   GST_PAD_FLAG_PROXY_ALLOCATION = (GST_OBJECT_FLAG_LAST << 9),
 ;;   GST_PAD_FLAG_PROXY_SCHEDULING = (GST_OBJECT_FLAG_LAST << 10),
 ;;   GST_PAD_FLAG_ACCEPT_INTERSECT = (GST_OBJECT_FLAG_LAST << 11),
+;;   GST_PAD_FLAG_ACCEPT_TEMPLATE  = (GST_OBJECT_FLAG_LAST << 12),
 ;;   /* padding */
 ;;   GST_PAD_FLAG_LAST        = (GST_OBJECT_FLAG_LAST << 16)
 ;; } GstPadFlags;
@@ -1347,6 +1350,7 @@
     '("proxy-allocation" "GST_PAD_FLAG_PROXY_ALLOCATION" "0x2000")
     '("proxy-scheduling" "GST_PAD_FLAG_PROXY_SCHEDULING" "0x4000")
     '("accept-intersect" "GST_PAD_FLAG_ACCEPT_INTERSECT" "0x8000")
+    '("accept-template" "GST_PAD_FLAG_ACCEPT_TEMPLATE" "0x10000")
     '("last" "GST_PAD_FLAG_LAST" "0x100000")
   )
 )
@@ -2690,6 +2694,27 @@
     '("random" "FAKE_SRC_FILLTYPE_RANDOM" "3")
     '("pattern" "FAKE_SRC_FILLTYPE_PATTERN" "4")
     '("pattern-cont" "FAKE_SRC_FILLTYPE_PATTERN_CONT" "5")
+  )
+)
+
+;; From gstfilesink.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_FILE_SINK_BUFFER_MODE_DEFAULT    = -1,
+;;   GST_FILE_SINK_BUFFER_MODE_FULL       = _IOFBF,
+;;   GST_FILE_SINK_BUFFER_MODE_LINE       = _IOLBF,
+;;   GST_FILE_SINK_BUFFER_MODE_UNBUFFERED = _IONBF
+;; } GstFileSinkBufferMode;
+
+(define-enum-extended FileSinkBufferMode
+  (in-module "Gst")
+  (c-name "GstFileSinkBufferMode")
+  (values
+    '("default" "GST_FILE_SINK_BUFFER_MODE_DEFAULT" "-1")
+    '("full" "GST_FILE_SINK_BUFFER_MODE_FULL" "_IOFBF")
+    '("line" "GST_FILE_SINK_BUFFER_MODE_LINE" "_IOLBF")
+    '("unbuffered" "GST_FILE_SINK_BUFFER_MODE_UNBUFFERED" "_IONBF")
   )
 )
 

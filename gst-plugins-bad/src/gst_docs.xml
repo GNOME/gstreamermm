@@ -240,7 +240,11 @@ Indicates the type of H264 Nal Units
 </parameter_description>
 </parameter>
 <parameter name="GST_H264_NAL_SUBSET_SPS">
-<parameter_description> Subset sequence parameter set (SPS) NAL unit
+<parameter_description> Subset sequence parameter set (SSPS) NAL unit
+</parameter_description>
+</parameter>
+<parameter name="GST_H264_NAL_DEPTH_SPS">
+<parameter_description> Depth parameter set (DPS) NAL unit
 </parameter_description>
 </parameter>
 <parameter name="GST_H264_NAL_SLICE_AUX">
@@ -249,6 +253,10 @@ Indicates the type of H264 Nal Units
 </parameter>
 <parameter name="GST_H264_NAL_SLICE_EXT">
 <parameter_description> Coded slice extension NAL unit
+</parameter_description>
+</parameter>
+<parameter name="GST_H264_NAL_SLICE_DEPTH">
+<parameter_description> Coded slice extension for depth or 3D-AVC texture view
 </parameter_description>
 </parameter>
 </parameters>
@@ -2849,6 +2857,8 @@ currently set window.  See gst_gl_context_set_window() for details.
 
 <function name="gst_gl_context_can_share">
 <description>
+Note: This will always fail for two wrapped #GstGLContext's
+
 
 </description>
 <parameters>
@@ -3005,6 +3015,10 @@ returned.
 
 </description>
 <parameters>
+<parameter name="platform">
+<parameter_description> the #GstGLPlatform to retreive the API for
+</parameter_description>
+</parameter>
 <parameter name="major">
 <parameter_description> the major version
 </parameter_description>
@@ -3858,7 +3872,8 @@ Adds the required #GstGLMemory&lt;!--  --&gt;s with the correct configuration to
 <function name="gst_gl_memory_setup_wrapped">
 <description>
 Wraps per plane data pointer in @data into the corresponding entry in
-@textures based on @info and padding from @valign.
+@textures based on @info and padding from @valign. Note that the @notify
+will be called as many time as there is planes.
 
 
 </description>
@@ -3881,6 +3896,14 @@ Wraps per plane data pointer in @data into the corresponding entry in
 </parameter>
 <parameter name="textures">
 <parameter_description> a list of #GstGLMemory
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data for the destroy function
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> A function called each time a memory is freed
 </parameter_description>
 </parameter>
 </parameters>

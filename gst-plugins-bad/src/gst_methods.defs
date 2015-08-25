@@ -105,6 +105,13 @@
   (gtype-id "GST_TYPE_GL_FRAMEBUFFER")
 )
 
+(define-object GLOverlayCompositor
+  (in-module "Gst")
+  (parent "GstObject")
+  (c-name "GstGLOverlayCompositor")
+  (gtype-id "GST_TYPE_GL_OVERLAY_COMPOSITOR")
+)
+
 (define-object GLShader
   (in-module "Gst")
   (parent "GstObject")
@@ -1464,6 +1471,15 @@
   (parameters
     '("GstAdaptiveDemuxStream*" "stream")
     '("GstClockTime" "duration")
+  )
+)
+
+(define-method queue_event
+  (of-object "GstAdaptiveDemuxStream")
+  (c-name "gst_adaptive_demux_stream_queue_event")
+  (return-type "none")
+  (parameters
+    '("GstEvent*" "event")
   )
 )
 
@@ -3233,6 +3249,15 @@
   )
 )
 
+(define-function gst_gl_context_get_proc_address_with_platform
+  (c-name "gst_gl_context_get_proc_address_with_platform")
+  (return-type "gpointer")
+  (parameters
+    '("GstGLAPI" "gl_api")
+    '("const-gchar*" "name")
+  )
+)
+
 (define-method set_window
   (of-object "GstGLContext")
   (c-name "gst_gl_context_set_window")
@@ -3290,6 +3315,7 @@
   (c-name "gst_gl_context_get_current_gl_api")
   (return-type "GstGLAPI")
   (parameters
+    '("GstGLPlatform" "platform")
     '("guint*" "major")
     '("guint*" "minor")
   )
@@ -3705,6 +3731,8 @@
     '("GstVideoAlignment*" "valign")
     '("gpointer" "data[GST_VIDEO_MAX_PLANES]")
     '("GstGLMemory*" "textures[GST_VIDEO_MAX_PLANES]")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
   )
 )
 
@@ -3745,6 +3773,53 @@
     '("GstGLContext*" "context")
     '("guint" "format")
     '("guint" "type")
+  )
+)
+
+
+
+;; From gstgloverlaycompositor.h
+
+(define-function gst_gl_overlay_compositor_get_type
+  (c-name "gst_gl_overlay_compositor_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_gl_overlay_compositor_new
+  (c-name "gst_gl_overlay_compositor_new")
+  (is-constructor-of "GstGlOverlayCompositor")
+  (return-type "GstGLOverlayCompositor*")
+  (parameters
+    '("GstGLContext*" "context")
+  )
+)
+
+(define-method free_overlays
+  (of-object "GstGLOverlayCompositor")
+  (c-name "gst_gl_overlay_compositor_free_overlays")
+  (return-type "none")
+)
+
+(define-method upload_overlays
+  (of-object "GstGLOverlayCompositor")
+  (c-name "gst_gl_overlay_compositor_upload_overlays")
+  (return-type "none")
+  (parameters
+    '("GstBuffer*" "buf")
+  )
+)
+
+(define-method draw_overlays
+  (of-object "GstGLOverlayCompositor")
+  (c-name "gst_gl_overlay_compositor_draw_overlays")
+  (return-type "none")
+)
+
+(define-function gst_gl_overlay_compositor_add_caps
+  (c-name "gst_gl_overlay_compositor_add_caps")
+  (return-type "GstCaps*")
+  (parameters
+    '("GstCaps*" "caps")
   )
 )
 
