@@ -79,3 +79,27 @@ TEST(QueryTest, CheckStoringAllocationParams)
   ASSERT_EQ(allocator, allocator2);
   ASSERT_EQ(params.get_align(), params2.get_align());
 }
+
+void ogoloc(Glib::RefPtr<Gst::Query> &query)
+{
+	Glib::RefPtr<Gst::QueryUri> query_uri(static_cast<Gst::QueryUri*>(query.release()));
+
+}
+
+TEST(QueryTest, ShouldCastToAnotherQueryTypeWithoutAdditionalReference)
+{
+  Glib::RefPtr<Gst::Query> query = QueryUri::create();
+  Glib::ustring uri = "file:///some/uri";
+
+  {
+    Glib::RefPtr<Gst::QueryUri> query_uri(static_cast<Gst::QueryUri*>(query.release()));
+    ASSERT_FALSE(query);
+    // QueryUri::set requires writable query object, so query object's refcount has to equal 1
+    ASSERT_TRUE(query_uri->is_writable());
+    query_uri->set(uri);
+    ASSERT_STREQ(uri.c_str(), query_uri->parse().c_str());
+    query = std::move(query_uri);
+    ASSERT_FALSE(query_uri);
+  }
+  ASSERT_EQ(1, query->get_refcount());
+}
