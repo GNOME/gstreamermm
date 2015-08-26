@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2015 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,11 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gst.h>
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/memory.h>
-#include <gstreamermm/mapinfo.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -30,6 +28,8 @@ namespace Gst
 
 _WRAP_ENUM(BufferFlags, GstBufferFlags)
 _WRAP_ENUM(BufferCopyFlags, GstBufferCopyFlags)
+
+class Memory;
 
 /**
  * SECTION:gstbuffer
@@ -97,12 +97,9 @@ class Buffer : public MiniObject
   _IGNORE(gst_buffer_ref, gst_buffer_unref)
 
 public:
-  /** Create a copy of the given buffer. This will also make a newly allocated
-   * copy of the data the source buffer contains.
-   * @return The Gst::Buffer copy.
-   */
-  Glib::RefPtr<Gst::Buffer> copy() const;
-  _IGNORE(gst_buffer_copy)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> copy() const, gst_buffer_copy)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> copy_deep() const, gst_buffer_copy_deep)
 
   _WRAP_METHOD(static void copy_into(const Glib::RefPtr<Gst::Buffer>& destination_buffer, const Glib::RefPtr<Gst::Buffer>& source_buffer, BufferCopyFlags flags, gsize offset, gsize size), gst_buffer_copy_into)
 
@@ -119,7 +116,7 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Memory> get_memory(guint idx) const, gst_buffer_get_memory)
 
-  _WRAP_METHOD(gsize get_size   () const, gst_buffer_get_size)
+  _WRAP_METHOD(gsize get_size() const, gst_buffer_get_size)
 
   _WRAP_METHOD(gsize get_sizes(gsize& offset, gsize& max_size) const, gst_buffer_get_sizes)
 
@@ -140,12 +137,6 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::Memory> get_all_memory() const, gst_buffer_get_all_memory)
 
   _WRAP_METHOD(gsize fill(gsize offset, gconstpointer src, gsize size), gst_buffer_fill)
-
-  Glib::RefPtr<Gst::Buffer> append_region(Glib::RefPtr<Gst::Buffer>&& buf, gssize offset, gssize size);
-  _IGNORE(gst_buffer_append_region)
-
-  Glib::RefPtr<Gst::Buffer> append(Glib::RefPtr<Gst::Buffer>&& buf);
-  _IGNORE(gst_buffer_append)
 
   _WRAP_METHOD(void replace_memory_range(guint idx, gint length, Glib::RefPtr<Gst::Memory>&& mem), gst_buffer_replace_memory_range)
 
@@ -175,6 +166,22 @@ public:
 
   _WRAP_METHOD(int memcmp(gsize offset, gconstpointer mem, gsize size), gst_buffer_memcmp)
 
+  _WRAP_METHOD(bool is_all_memory_writable() const, gst_buffer_is_all_memory_writable)
+
+  _WRAP_METHOD(bool is_memory_range_writable(guint idx, gint length) const, gst_buffer_is_memory_range_writable)
+
+  _WRAP_METHOD(bool map(const Glib::RefPtr<Gst::MapInfo>& info, MapFlags flags), gst_buffer_map)
+
+  _WRAP_METHOD(bool map_range(guint idx, gint length, const Glib::RefPtr<Gst::MapInfo>& info, MapFlags flags), gst_buffer_map_range)
+
+  _WRAP_METHOD(void unmap(const Glib::RefPtr<Gst::MapInfo>& info), gst_buffer_unmap)
+
+  Glib::RefPtr<Gst::Buffer> append_region(Glib::RefPtr<Gst::Buffer>&& buf, gssize offset, gssize size);
+  _IGNORE(gst_buffer_append_region)
+
+  Glib::RefPtr<Gst::Buffer> append(Glib::RefPtr<Gst::Buffer>&& buf);
+  _IGNORE(gst_buffer_append)
+
   _MEMBER_GET(pts, pts, ClockTime, GstClockTime)
   _MEMBER_SET(pts, pts, ClockTime, GstClockTime)
 
@@ -187,12 +194,6 @@ public:
    */
   _MEMBER_GET(duration, duration, ClockTime, GstClockTime)
   _MEMBER_SET(duration, duration, ClockTime, GstClockTime)
-
-  _WRAP_METHOD(bool map(const Glib::RefPtr<Gst::MapInfo>& info, MapFlags flags), gst_buffer_map)
-
-  _WRAP_METHOD(bool map_range(guint idx, gint length, const Glib::RefPtr<Gst::MapInfo>& info, MapFlags flags), gst_buffer_map_range)
-
-  _WRAP_METHOD(void unmap(const Glib::RefPtr<Gst::MapInfo>& info), gst_buffer_unmap)
   /** Get the offset of this buffer.
    * @return The offset in the source file of the beginning of this buffer.
    */
