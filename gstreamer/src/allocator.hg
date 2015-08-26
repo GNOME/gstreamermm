@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2014 The gstreamermm Development Team
+ * Copyright 2014-2015 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gst.h>
 #include <gstreamermm/memory.h>
-#include <gstreamermm/object.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
+
+class Object;
 
 class AllocationParams
 {
@@ -55,24 +55,8 @@ class Allocator : public Gst::Object
   _CLASS_GOBJECT(Allocator, GstAllocator, GST_ALLOCATOR, Gst::Object, GstObject)
 
 public:
-  /**
-   * Find a previously registered allocator with @name.
-   *
-   * @name: the name of the allocator
-   *
-   * @return: a #Glib::RefPtr<Gst::Allocator>.
-   */
-  static Glib::RefPtr<Gst::Allocator> find(const Glib::ustring& name);
-  _IGNORE(gst_allocator_find)
-
-  /**
-   * Registers the memory @allocator with @name.
-   *
-   * @name: the name of the allocator
-   * @allocator: (transfer full): #GstAllocator
-   */
-  void register_allocator(const Glib::ustring& name);
-  _IGNORE(gst_allocator_register)
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Allocator> find(const Glib::ustring& name), gst_allocator_find)
+  _WRAP_METHOD(static void register_allocator(const Glib::ustring& name, Glib::RefPtr<Gst::Allocator>&& allocator), gst_allocator_register)
 
   /**
    * Set the default allocator.
