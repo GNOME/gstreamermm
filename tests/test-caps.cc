@@ -134,3 +134,20 @@ TEST_F(CapsTest, CapsBoxedType)
   ASSERT_EQ(1, any_caps->get_refcount());
   ASSERT_EQ(2, any_caps2->get_refcount());
 }
+
+TEST_F(CapsTest, CreateSimpleWithManyParameters)
+{
+  caps = Caps::create_simple("video/x-raw", "width", width, "framerate", framerate, "test-data", "test-value");
+  CheckCaps("width", width);
+  CheckCaps("framerate", framerate);
+  CheckCaps<std::string>("test-data", "test-value");
+}
+
+TEST_F(CapsTest, SetSimpleWithManyParameters)
+{
+  caps = Caps::create_simple("video/x-raw");
+  caps->set_simple("width", width, "framerate", framerate, "test-data", "test-value");
+  CheckCaps("width", width);
+  CheckCaps("framerate", framerate);
+  CheckCaps<std::string>("test-data", "test-value");
+}

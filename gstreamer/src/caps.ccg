@@ -28,20 +28,6 @@ GType Caps::get_type()
   return gst_caps_get_type();
 }
 
-/*
-  This method is implemented because gst_caps_new_simple is a variable argument
-  function and cannot be wrapped.  In addition, because gst_caps_new_simple
-  creates a GstStructure for the GstCaps and will not be called, we must create
-  our own GstStructure here and append it to the GstCaps.
-*/
-Glib::RefPtr<Gst::Caps> Caps::create_simple(const Glib::ustring& media_type)
-{
-  Glib::RefPtr<Gst::Caps> result = Glib::wrap(gst_caps_new_empty());
-  GstStructure* gst_struct = gst_structure_new_empty(media_type.c_str());
-  gst_caps_append_structure(Glib::unwrap(result), gst_struct);
-  return result;
-}
-
 Glib::RefPtr<Caps> Caps::create_writable()
 {
   return Glib::RefPtr<Caps>::cast_static(MiniObject::create_writable());

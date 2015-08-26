@@ -31,32 +31,40 @@ _WRAP_ENUM(CapsIntersectMode, GstCapsIntersectMode, NO_GTYPE)
 
 class Structure;
 
-/** A class that describes sets of media formats.
- * Caps (capabilities) are lightweight objects describing media formats. They
- * are composed of an array of Gst::Structure.
+/** Structure describing sets of media formats.
+ * Caps (capabilities) are lightweight refcounted objects describing media types.
  *
- * Caps are exposed on Gst::PadTemplate to describe all possible types a given
- * pad can handle. They are also stored in the Gst::Registry along with a
- * description of the Gst::Element.
+ * They are composed of an array of Gst::Structure.
  *
- * Caps are exposed on the element pads using the Gst::Pad::get_caps() method.
- * This method describes the possible types that the pad can handle or produce
- * at runtime.
+ * Caps are exposed on Gst::PadTemplate to describe all possible types a
+ * given pad can handle. They are also stored in the Gst::Registry along with
+ * a description of the Gst::Element.
  *
- * Caps are also attached to buffers to describe to content of the data
- * pointed to by the buffer with Gst::Buffer::set_caps(). Gst::Caps attached
- * to a Gst::Buffer allow for format negotiation upstream and downstream.
- *
- * A Gst::Caps can be constructed with the following code fragment:
+ * Caps are exposed on the element pads using the Gst::Pad::query_caps() pad
+ * method. This function describes the possible types that the pad can
+ * handle or produce at runtime.
  *
  * @code
- * Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw-yuv");
- * caps->set_simple("format", Gst::Fourcc('I', '4', '2', '0'));
- * caps->set_simple("framerate", Gst::Fraction(25, 1));
- * caps->set_simple("pixel-aspect-ratio", Gst::Fraction(1, 1));
- * caps->set_simple("width", 320);
- * caps->set_simple("height", 240);
+ * Glib::RefPtr<Gst::Caps> caps = Gst::Caps::create_simple("video/x-raw",
+ *                                 "format", Gst::Fourcc('I', '4', '2', '0'),
+ *                                 "framerate", Gst::Fraction(25, 1),
+ *                                 "pixel-aspect-ratio", Gst::Fraction(1, 1),
+ *                                 "width", 320,
+ *                                 "height", 240);
  * @endcode
+ *
+ * A Gst::Caps is fixed when it has no properties with ranges or lists. Use
+ * Gst::Caps::is_fixed() to test for fixed caps. Fixed caps can be used in a
+ * caps event to notify downstream elements of the current media type.
+ *
+ * Various methods exist to work with the media types such as subtracting
+ * or intersecting.
+ *
+ * Be aware that the current Gst::Caps / Gst::Structure serialization into string
+ * has limited support for nested Gst::Caps / Gst::Structure fields. It can only
+ * support one level of nesting. Using more levels will lead to unexpected
+ * behavior when using serialization features, such as Gst::Caps::to_string() or
+ * gst_value_serialize() and their counterparts.
  */
 class Caps : public MiniObject
 {
@@ -72,9 +80,15 @@ public:
   /** Creates a new Gst::Caps that contains one Gst::Structure.
    *
    * @param media_type The media type of the structure.
+   * @param name Field to set.
+   * @param data A value which the field should be set to (this can be any
+   * supported C++ type).
+   * @param ...further_data further data to set in format: name, data.
+   *
    * @return The new Gst::Caps.
    */
-  static Glib::RefPtr<Gst::Caps> create_simple(const Glib::ustring& media_type);
+  template<class ...DataTypes>
+  static Glib::RefPtr<Gst::Caps> create_simple(const Glib::ustring& media_type, DataTypes... further_data);
 
   /** Creates a new Gst::Caps and adds the given Gst::Structure.
    * Use append_structure() to add additional structures.
@@ -159,9 +173,10 @@ public:
    * @param name Field to set.
    * @param data A value which the field should be set to (this can be any
    * supported C++ type).
+   * @param ...further_data further data to set in format: name, data.
    */
-  template <class DataType>
-  void set_simple(const Glib::ustring& name, const DataType& data);
+  template<class = Glib::ustring, class DataType, class ...T>
+  void set_simple(const Glib::ustring & name, const DataType& data, T ...further_data);
 
   /** Sets fields in a simple Gst::Caps. A simple Gst::Caps is one that only
    * has one structure.
@@ -254,21 +269,37 @@ public:
    */
   void set_features(guint index, const CapsFeatures& features);
   _IGNORE(gst_caps_set_features)
+
+private:
+  // This method is used for varadic template recursion
+  void set_simple() {}
 };
 
 /******************************* Gst::Caps *******************************/
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-template <class DataType>
-void Caps::set_simple(const Glib::ustring& name, const DataType& data)
+template<class, class DataType, class ...T>
+void Caps::set_simple(const Glib::ustring & name, const DataType& data, T ...further_data)
 {
-  typedef Glib::Value<DataType> ValueType;
+  this->set_value(name, data);
+  this->set_simple(further_data...);
+}
 
-  ValueType value;
-  value.init(ValueType::value_type());
-  value.set(data);
-  this->set_simple(name, reinterpret_cast<Glib::ValueBase&>(value));
+template<class ...DataTypes>
+Glib::RefPtr<Gst::Caps> Caps::create_simple(const Glib::ustring& media_type, DataTypes... data)
+{
+/*
+  This method is implemented because gst_caps_new_simple is a variable argument
+  function and cannot be wrapped.  In addition, because gst_caps_new_simple
+  creates a GstStructure for the GstCaps and will not be called, we must create
+  our own GstStructure here and append it to the GstCaps.
+*/
+  Glib::RefPtr<Gst::Caps> result(reinterpret_cast<Gst::Caps*>(gst_caps_new_empty()));
+  GstStructure* gst_struct = gst_structure_new_empty(media_type.c_str());
+  gst_caps_append_structure(Glib::unwrap(result), gst_struct);
+  result->set_simple(data...);
+  return result;
 }
 
 template <class DataType>
