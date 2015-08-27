@@ -135,6 +135,7 @@ _CONVERSION(`Glib::RefPtr<Gst::Clock>',`GstClock*', `Glib::unwrap($3)')
 dnl ClockID
 _CONVERSION(`GstClockID',`Glib::RefPtr<Gst::ClockID>',`Glib::wrap((GstClockEntry*)($3))')
 _CONVERSION(`const Glib::RefPtr<Gst::ClockID>&',`GstClockEntry*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::ClockID>&',`GstClockID',`Glib::unwrap($3)')
 
 dnl ColorBalanceChannel
 _CONVERSION(`const Glib::RefPtr<Gst::ColorBalanceChannel>&',`GstColorBalanceChannel*',`Glib::unwrap($3)')
