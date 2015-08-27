@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2015 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,27 +17,32 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gst.h>
+#include <gst/gstchildproxy.h>
 #include <glibmm/interface.h>
-#include <gstreamermm/object.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-/** An interface for multi child elements.
- * This interface abstracts handling of property sets for child elements.
- * Imagine elements such as mixers or polyphonic generators. They all have
- * multiple Gst::Pad or some kind of voice objects. The element acts as a
- * parent for those child objects. Each child has the same properties.
+class Object;
+
+/**
+ * Interface for multi child elements.
  *
- * By implementing this interface the child properties can be accessed from
- * the parent element by using get_proxy_property() and set_proxy_property().
+ * This interface abstracts handling of property sets for elements with
+ * children. Imagine elements such as mixers or polyphonic generators. They all
+ * have multiple Gst::Pad or some kind of voice objects. Another use case are
+ * container elements like Gst::Bin.
+ * The element implementing the interface acts as a parent for those child
+ * objects.
+ *
+ * By implementing this interface the child properties can be accessed from the
+ * parent element by using get_proxy_property() and set_proxy_property().
  *
  * Property names are written as "child-name::property-name". The whole naming
  * scheme is recursive. Thus "child1::child2::property" is valid too, if
- * "child1" also implements the Gst::ChildProxy interface.
+ * "child1" and "child2" implement the Gst::ChildProxy interface.
  * @ingroup GstInterfaces
  */
 class ChildProxy : public Glib::Interface
@@ -95,7 +100,11 @@ public:
   _WRAP_SIGNAL(void child_added(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name), "child-added")
   _WRAP_SIGNAL(void child_removed(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name), "child-removed")
 
-  /** Virtual method to fetch the child.
+  /** Virtual method to fetch the child by name.
+   */
+  _WRAP_VFUNC(Glib::RefPtr<Glib::Object> get_child_by_name(const Glib::ustring& name) const, "get_child_by_name")
+
+  /** Virtual method to fetch the child by index.
    */
   _WRAP_VFUNC(Glib::RefPtr<Glib::Object> get_child_by_index(guint index) const, "get_child_by_index")
 
