@@ -151,3 +151,39 @@ TEST_F(CapsTest, SetSimpleWithManyParameters)
   CheckCaps("framerate", framerate);
   CheckCaps<std::string>("test-data", "test-value");
 }
+
+class CapsTestDummy1
+{
+public:
+	int a = 0;
+	std::string b;
+	CapsTestDummy1(int a, std::string b) : a(a), b(b) {}
+	CapsTestDummy1() {}
+};
+class CapsTestDummy2
+{
+public:
+	char c = 0;
+	CapsTestDummy2(char c) : c(c) {}
+	CapsTestDummy2() {}
+};
+
+
+TEST_F(CapsTest, CreateWithManyCustomTypeParameters)
+{
+  caps = Caps::create_simple("video/x-raw");
+  caps->set_simple("d1", CapsTestDummy1(1, "dummy1"), "d2", CapsTestDummy2('x'), "d3", CapsTestDummy1(63, "dummy3"));
+  Glib::Value<CapsTestDummy1> d1, d3;
+  Glib::Value<CapsTestDummy2> d2;
+  caps->get_structure(0).get_field("d1", d1);
+  caps->get_structure(0).get_field("d2", d2);
+  caps->get_structure(0).get_field("d3", d3);
+
+  ASSERT_STREQ("dummy1", d1.get().b.c_str());
+  ASSERT_EQ(1, d1.get().a);
+
+  ASSERT_EQ('x', d2.get().c);
+
+  ASSERT_STREQ("dummy3", d3.get().b.c_str());
+  ASSERT_EQ(63, d3.get().a);
+}
