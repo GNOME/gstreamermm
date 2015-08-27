@@ -21,27 +21,18 @@
 
 namespace Gst
 {
-
-CapsFeatures::CapsFeatures()
+CapsFeatures::CapsFeatures(std::initializer_list<Glib::ustring> features)
+ : CapsFeatures()
 {
-  gobject_ =  gst_caps_features_new_empty();
+  for (auto feature : features)
+  {
+    gst_caps_features_add(gobject_, feature.c_str());
+  }
 }
 
-CapsFeatures::CapsFeatures(const Glib::ustring& feature1)
+Glib::ustring CapsFeatures::memory_system_memory()
 {
-  gobject_ =  gst_caps_features_new(feature1.c_str(), nullptr);
+  return GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY;
 }
-
-CapsFeatures CapsFeatures::create_any()
-{
-  return CapsFeatures(gst_caps_features_new_any(), false);
-}
-
-
-CapsFeatures CapsFeatures::create_from_string(const Glib::ustring& features)
-{
-  return CapsFeatures(gst_caps_features_from_string(features.c_str()), false);
-}
-
 
 }

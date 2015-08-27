@@ -123,6 +123,7 @@ _CONVERSION(`Glib::RefPtr<Gst::Caps>&&',`GstCaps*',`($3) ? $3.release()->gobj() 
 
 dnl CapsFeatures
 _CONVERSION(`const Gst::CapsFeatures&',`const GstCapsFeatures*',`$3.gobj()')
+_CONVERSION(`GstCapsFeatures*',`Gst::CapsFeatures',`CapsFeatures($3, false)')
 
 dnl Clock
 _CONVERSION(`GstClock*',`Glib::RefPtr<Gst::Clock>',`Glib::wrap($3)')

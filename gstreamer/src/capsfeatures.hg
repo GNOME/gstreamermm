@@ -24,41 +24,52 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
+/**
+ * A set of features in caps
+ *
+ * Gst::CapsFeatures can optionally be set on a Gst::Caps to add requirements
+ * for additional features for a specific Gst::Structure. Caps structures with
+ * the same name but with a non-equal set of caps features are not compatible.
+ * If a pad supports multiple sets of features it has to add multiple equal
+ * structures with different feature sets to the caps.
+ *
+ * Empty Gst::CapsFeatures are equivalent with the Gst::CapsFeatures that only
+ * contain Gst::CapsFeatures::memory_system_memory(). ANY Gst::CapsFeatures as
+ * created by Gst::CapsFeatures::create_any() are equal to any other Gst::CapsFeatures
+ * and can be used to specify that any Gst::CapsFeatures would be supported, e.g.
+ * for elements that don't touch buffer memory. Gst::Caps with ANY Gst::CapsFeatures
+ * are considered non-fixed and during negotiation some Gst::CapsFeatures have
+ * to be selected.
+ *
+ * Examples for caps features would be the requirement of a specific Gst::Memory
+ * types or the requirement of having a specific Gst::Meta on the buffer. Features
+ * are given as a string of the format "memory:GstMemoryTypeName" or
+ * "meta:GstMetaAPIName".
+ *
+ * Since: 1.2
+ */
 class CapsFeatures
 {
-  _CLASS_BOXEDTYPE(CapsFeatures, GstCapsFeatures, NONE, gst_caps_features_copy, gst_caps_features_free)
+  _CLASS_BOXEDTYPE(CapsFeatures, GstCapsFeatures, gst_caps_features_new_empty, gst_caps_features_copy, gst_caps_features_free)
 
 
   _IGNORE(gst_caps_features_new_id_valist)
   _IGNORE(gst_caps_features_new_valist)
+  _IGNORE(gst_caps_features_new_empty)
   _IGNORE(gst_caps_features_copy)
   _IGNORE(gst_caps_features_free)
 
 public:
-  _CUSTOM_DEFAULT_CTOR
-
   /**
-   * Creates a new, empty Gst::CapsFeatures.
-   */
-  CapsFeatures();
-  _IGNORE(gst_caps_features_new_empty)
-
-  /**
-   * Creates a new Gst::CapsFeatures with the given first feature.
+   * Creates a new Gst::CapsFeatures with the given features.
    *
-   * @param feature1 name of first feature to set.
+   * @param features name of features to set.
    */
-  explicit CapsFeatures(const Glib::ustring& feature1);
+  explicit CapsFeatures(std::initializer_list<Glib::ustring> features);
 
-  /**
-   * Creates a new, ANY Gst::CapsFeatures. This will be equal to any other
-   * Gst::CapsFeatures but caps with these are unfixed.
-   */
-  static CapsFeatures create_any();
-  _IGNORE(gst_caps_features_new_any)
+  _WRAP_METHOD(static Gst::CapsFeatures create_any(), gst_caps_features_new_any)
 
-  static CapsFeatures create_from_string(const Glib::ustring& features);
-  _IGNORE(gst_caps_features_from_string)
+  _WRAP_METHOD(static Gst::CapsFeatures create_from_string(const Glib::ustring& features), gst_caps_features_from_string)
 
   _WRAP_METHOD(Glib::ustring to_string() const, gst_caps_features_to_string)
 
@@ -85,6 +96,10 @@ public:
   _WRAP_METHOD(void remove(const Glib::ustring& feature), gst_caps_features_remove)
 
   _WRAP_METHOD(void remove(GQuark feature), gst_caps_features_remove_id)
+
+  /** Constant for system memory feature name.
+   */
+  static Glib::ustring memory_system_memory();
 };
 
 }
