@@ -16,7 +16,7 @@
 ACLOCAL_AMFLAGS = -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
-EXTRA_DIST =  tests/plugins/test-foo.h tests/regression/utils.h tests/regression/pluginbin.h tests/resources/input-image.png
+EXTRA_DIST =  tests/plugins/foo.h tests/regression/utils.h tests/regression/pluginbin.h tests/resources/input-image.png
 srcmm_subdirs = gstreamer/gstreamermm
 pkgconfig_files = gstreamer/$(GSTREAMERMM_MODULE_NAME).pc
 gstreamermm_include_HEADERS = gstreamer/gstreamermm.h
