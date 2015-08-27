@@ -12,7 +12,7 @@
 #include <iostream>
 
 static std::string
-get_element_factory_defs(GstElementFactory *factory, GTypeIsAPointerFunc is_a_pointer_func)
+get_element_factory_defs(GstElementFactory *factory)
 {
   GType type = 0;
   std::string result;
@@ -56,7 +56,7 @@ int main (int argc, char** argv)
     GstPluginFeature *feature = reinterpret_cast<GstPluginFeature*>(l->data);
 
     if (GST_IS_ELEMENT_FACTORY (feature)) {
-      std::cout << get_element_factory_defs (GST_ELEMENT_FACTORY_CAST (feature), gtype_is_a_pointer) << std::endl;
+      std::cout << get_element_factory_defs (GST_ELEMENT_FACTORY_CAST (feature)) << std::endl;
     }
     l = l->next;
   }
