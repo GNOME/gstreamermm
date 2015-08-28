@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2015 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,17 +17,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gst.h>
+#include <gst/gstelement.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/clock.h>
 #include <gstreamermm/enums.h>
 #include <gstreamermm/error.h>
-#include <gstreamermm/event.h>
 #include <gstreamermm/message.h>
-#include <gstreamermm/pad.h>
-#include <gstreamermm/query.h>
-#include <gstreamermm/context.h>
-#include <glibmm/arrayhandle.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -48,33 +43,19 @@ namespace Gst
 
 class Bus;
 class Caps;
-class Clock;
+class Context;
 class ElementFactory;
 class Event;
-class Message;
 class Pad;
 class PadTemplate;
 class Query;
-class TagList;
 
 //Gst::Iterator<> forward declaration.
 template <class CppType>
 class Iterator;
 
 _WRAP_ENUM(ElementFlags, GstElementFlags)
-
-//TODO: Fix gmmproc so that definition in gst_enums.defs does not cause errors
-//and this can be wrapped with _WRAP_ENUM.
-enum StateChange
-{
-  STATE_CHANGE_NULL_TO_READY = GST_STATE_CHANGE_NULL_TO_READY,
-  STATE_CHANGE_READY_TO_PAUSED = GST_STATE_CHANGE_READY_TO_PAUSED,
-  STATE_CHANGE_PAUSED_TO_PLAYING = GST_STATE_CHANGE_PAUSED_TO_PLAYING,
-  STATE_CHANGE_PLAYING_TO_PAUSED = GST_STATE_CHANGE_PLAYING_TO_PAUSED,
-  STATE_CHANGE_PAUSED_TO_READY = GST_STATE_CHANGE_PAUSED_TO_READY,
-  STATE_CHANGE_READY_TO_NULL = GST_STATE_CHANGE_READY_TO_NULL 
-};
-
+_WRAP_ENUM(StateChange, GstStateChange)
 _WRAP_ENUM(StateChangeReturn, GstStateChangeReturn)
 
 namespace Enums
@@ -96,7 +77,8 @@ Glib::ustring get_name(StateChangeReturn state_ret);
 
 } //namespace Enums
 
-/** The abstract base class for all pipeline elements.
+/** Abstract base class for all pipeline elements
+ *
  * Gst::Element is the abstract base class needed to construct an element that
  * can be used in a GStreamer pipeline. Please refer to the plugin writers
  * guide for more information on creating Gst::Element subclasses.
@@ -104,30 +86,47 @@ Glib::ustring get_name(StateChangeReturn state_ret);
  * The name of a Gst::Element can be get with get_name() and set with
  * set_name().
  *
- * All elements have pads (of the type Gst::Pad). These pads link to pads on
- * other elements. Gst::Buffer flow between these linked pads. An Element has a
- * GList of Gst::Pad structures for all their input (or sink) and output (or
- * source) pads.  Core and plug-in writers can add and remove pads with
- * add_pad() and remove_pad().
+ * Elements can have pads (of the type Gst::Pad).  These pads link to pads on
+ * other elements.  Gst::Buffer flow between these linked pads.
+ * A Gst::Element has a GList of Gst::Pad structures for all their input (or sink)
+ * and output (or source) pads.
+ * Core and plug-in writers can add and remove pads with add_pad()
+ * and remove_pad().
  *
- * A pad of an element can be retrieved by name with get_request_pad() or
- * get_static_pad(). An iterator of all pads can be retrieved with
- * iterate_pads().
+ * An existing pad of an element can be retrieved by name with
+ * get_static_pad(). A new dynamic pad can be created using
+ * request_pad() with a Gst::PadTemplate.
+ * An iterator of all pads can be retrieved with iterate_pads().
  *
- * Gst::Elements can be linked through their pads. Use the link() function to
- * link elements. Use link_filtered() to link two elements constrained by a
- * specified set of Gst::Caps. For finer control, use link_pads() and
- * link_pads_filtered() to specify the pads to link on each element by name.
+ * Elements can be linked through their pads.
+ * If the link is straightforward, use the link()
+ * convenience function to link two elements.
+ * Use link_filtered() to link two elements constrained by
+ * a specified set of Gst::Caps.
+ * For finer control, use link_pads() and
+ * link_pads_filtered() to specify the pads to link on
+ * each element by name.
  *
- * Each element has a state (see State). You can get and set the state of an
- * element with get_state() and set_state(). To get a string representation of
- * a State, use Gst::Enums::get_name().
+ * Each element has a state (see Gst::State).  You can get and set the state
+ * of an element with get_state() and set_state().
+ * Setting a state triggers a Gst::StateChange. To get a string representation
+ * of a Gst::State, use Gst::Enums::get_name().
  *
- * Note that clock slection and distribution is normally handled by the
+ * You can get and set a Gst::Clock on an element using get_clock()
+ * and set_clock().
+ * Some elements can provide a clock for the pipeline if
+ * the Gst::ELEMENT_FLAG_PROVIDE_CLOCK flag is set. With the
+ * provide_clock() method one can retrieve the clock provided by
+ * such an element.
+ * Not all elements require a clock to operate correctly. If the
+ * Gst::ELEMENT_FLAG_REQUIRE_CLOCK flag is set, a clock should be set on the
+ * element with set_clock().
+ *
+ * Note that clock selection and distribution is normally handled by the
  * toplevel Gst::Pipeline so the clock functions are only to be used in very
  * specific situations.
  *
- * Last reviewed on 2006-03-12 (0.10.5).
+ * Last reviewed on 2015-08-28 (1.5.2).
  * @ingroup GstBaseClasses
  */
 class Element : public Gst::Object
@@ -281,25 +280,8 @@ public:
 
   _WRAP_METHOD(bool query(const Glib::RefPtr<Gst::Query>& query) const, gst_element_query)
   _WRAP_METHOD(bool query_convert(Gst::Format src_format, gint64 src_val, Format dest_format, gint64& dest_val) const, gst_element_query_convert)
-  _WRAP_METHOD(bool query_position(Gst::Format format, gint64& cur) const, gst_element_query_position)
-
-  /** Queries an element for the stream position.
-   *
-   * @param format On return will
-   * contain the Gst::Format used.
-   * @return true if the query could be performed.
-   */
-  bool query_position(Gst::Format format) const;
-
-  _WRAP_METHOD(bool query_duration(Gst::Format format, gint64& duration) const, gst_element_query_duration)
-
-  /** Queries an element for the total stream duration.
-   *
-   * @param format On return contains
-   * the Gst::Format used.
-   * @return true if the query could be performed.
-   */
-  bool query_duration(Gst::Format format) const;
+  _WRAP_METHOD(bool query_position(Gst::Format format, gint64& cur{?}) const, gst_element_query_position)
+  _WRAP_METHOD(bool query_duration(Gst::Format format, gint64& duration{?}) const, gst_element_query_duration)
 
   _WRAP_METHOD(bool seek(Format format, SeekFlags seek_flags, gint64 seek_pos), gst_element_seek_simple)
   _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType cur_type, gint64 cur, SeekType stop_type, gint64 stop), gst_element_seek)
@@ -345,15 +327,10 @@ public:
    */
   _WRAP_VFUNC(Glib::RefPtr<Gst::Clock> provide_clock(), "provide_clock")
 
-  // This vfunc is hand-coded because it is necessary for the callback to
-  // return true instead of false (as would happen with the default gmmproc
-  // callback) because GstElement does not set its set_clock() vfunc
-  // by default and yet gst_element_set_clock() returns true when GstElement's
-  // set_clock() vfunc is not set (it's a strange thing, but look at
-  // gst_element_class_init() and gst_element_set_clock() for insight).
+#m4 _CONVERSION(`GstClock*', `const Glib::RefPtr<Gst::Clock>&', `Glib::wrap($3, true)')
   /** Set the Gst::Clock on the element.
    */
-  virtual bool set_clock_vfunc(const Glib::RefPtr<Gst::Clock>& clock);
+  _WRAP_VFUNC(bool set_clock(const Glib::RefPtr<Gst::Clock>& clock), "set_clock", return_value true)
 
 #m4 _CONVERSION(`GstEvent*',`const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3, true)')
   /** Send a Gst::Event to the element.
@@ -381,15 +358,6 @@ public:
        set_property(name, value);
        return Glib::RefPtr<Gst::Element>( dynamic_cast<Gst::Element*> (Glib::wrap_auto ((GObject*)(gobj()), true)) );
    }
-
-protected:
-#m4begin
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->set_clock = &set_clock_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static gboolean set_clock_vfunc_callback(GstElement* self, GstClock* clock);
-  _POP()
-#m4end
 };
 
 } // namespace Gst
