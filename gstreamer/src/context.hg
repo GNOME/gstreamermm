@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2014 The gstreamermm Development Team
+ * Copyright 2014-2015 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
  
-#include <gst/gst.h>
+#include <gst/gstcontext.h>
 #include <gstreamermm/miniobject.h>
 #include <gstreamermm/structure.h>
  
@@ -25,14 +25,42 @@ _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
+
+/** Lightweight objects to represent element contexts
+ *
+ * Gst::Context is a container object used to store contexts like a device
+ * context, a display server connection and similar concepts that should
+ * be shared between multiple elements.
+ *
+ * Applications can set a context on a complete pipeline by using
+ * Gst::Element::set_context(), which will then be propagated to all
+ * child elements. Elements can handle these in Gst::Element::set_context_vfunc()
+ * and merge them with the context information they already have.
+ *
+ * When an element needs a context it will do the following actions in this
+ * order until one step succeeds:
+ * 1. Check if the element already has a context
+ * 2. Query downstream with Gst::QUERY_CONTEXT for the context
+ * 3. Query upstream with Gst::QUERY_CONTEXT for the context
+ * 4. Post a Gst::MESSAGE_NEED_CONTEXT message on the bus with the required
+ *    context types and afterwards check if a usable context was set now
+ * 5. Create a context by itself and post a Gst::MESSAGE_HAVE_CONTEXT message
+ *    on the bus.
+ *
+ * Bins will catch Gst::MESSAGE_NEED_CONTEXT messages and will set any previously
+ * known context on the element that asks for it if possible. Otherwise the
+ * application should provide one if it can.
+ *
+ * Since: 1.2
+ */
 class Context : public MiniObject
 {
   _CLASS_OPAQUE_REFCOUNTED(Context, GstContext, NONE, gst_context_ref, gst_context_unref)
 
-  _IGNORE(gst_context_new, gst_context_ref, gst_context_unref)
+  _IGNORE(gst_context_ref, gst_context_unref)
 
 public:
-  static Glib::RefPtr<Context> create(const Glib::ustring& context_type, bool persistent);
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Context> create(const Glib::ustring& context_type, bool persistent), gst_context_new);
 
   _WRAP_METHOD(Glib::RefPtr<Gst::Context> copy(), gst_context_copy)
   _WRAP_METHOD(Glib::RefPtr<Gst::Context> copy() const, gst_context_copy, constversion)
