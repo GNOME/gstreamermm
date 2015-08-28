@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2015 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,6 @@
 #include <gst/gst.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pluginfeature.h>
-#include <glibmm/arrayhandle.h>
 #include <gstreamermm/urihandler.h>
 
 _DEFS(gstreamermm,gst)
@@ -54,19 +53,22 @@ enum ElementFactoryListType
   ELEMENT_FACTORY_TYPE_VIDEO_ENCODER
 };
 
+class ArrayHandler;
 class Caps;
 class Element;
-class PadTemplate;
 class StaticPadTemplate;
 struct StaticPadTemplateTraits;
 class Plugin;
 
-/** A class that creates Gst::Element objects from a factory.
+/** Create Gst::Element 's from a factory
+ *
  * Gst::ElementFactory is used to create instances of elements. A
  * Gst::ElementFactory can be added to a Gst::Plugin as it is also a
- * Gst::PluginFeature. Use find() to get a particular element factory. Use
- * create_named_element() and the create_element() functions to create element
- * instances.
+ * Gst::PluginFeature.
+ *
+ * Use the find() and create()
+ * functions to create element instances or use create_element() as a
+ * convenient shortcut.
  *
  * The following code example shows you how to create a 'filesrc' element.
  *
@@ -89,7 +91,7 @@ class Plugin;
  *      exit(1);
  *    }
  *
- *    src = srcfactory->create_named_element("src");
+ *    src = srcfactory->create("src");
  *
  *    if(!src)
  *    {
@@ -110,19 +112,9 @@ public:
 
   _WRAP_METHOD(static Glib::RefPtr<Gst::ElementFactory> find(const Glib::ustring& name), gst_element_factory_find)
 
-  //Note that name can't be null here, though it seems like gstreamer should allow that as for gst_element_factory_make().
-  _WRAP_METHOD(Glib::RefPtr<Gst::Element> create_named_element(const Glib::ustring& name), gst_element_factory_create)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Element> create(const Glib::ustring& name{?}), gst_element_factory_create)
 
-  _WRAP_METHOD(static Glib::RefPtr<Gst::Element> create_element(const Glib::ustring& factory_name, const Glib::ustring& name), gst_element_factory_make)
-  
-  /** Create a new element of the type defined by the given element factory, 
-   * with a guaranteed unique name consisting of the element factory name and a
-   * number.
-   * @param factoryname A named factory to instantiate.
-   * @param name Name of new element.
-   * @return New Gst::Element or an empty RefPtr if unable to create element.
-   */
-  static Glib::RefPtr<Gst::Element> create_element(const Glib::ustring& factory_name);
+  _WRAP_METHOD(static Glib::RefPtr<Gst::Element> create_element(const Glib::ustring& factory_name, const Glib::ustring& name{?}), gst_element_factory_make)
 
   _WRAP_METHOD(bool can_sink_all_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_sink_all_caps)
   _WRAP_METHOD(bool can_src_all_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_element_factory_can_src_all_caps)
