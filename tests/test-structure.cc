@@ -49,14 +49,20 @@ protected:
   }
 
   template<typename T>
-  void CheckGetSetField(const T& expected, const Glib::ustring& field_name)
+  void CheckGetField(const T& expected, const Glib::ustring& field_name)
   {
-    structure.set_field(field_name, expected);
-
     T output;
     structure.get_field(field_name, output);
 
     CheckEq(expected, output);
+  }
+
+  template<typename T>
+  void CheckGetSetField(const T& expected, const Glib::ustring& field_name)
+  {
+    structure.set_field(field_name, expected);
+
+    CheckGetField(expected, field_name);
   }
 };
 
@@ -94,4 +100,12 @@ TEST_F(StructureTest, GetSetEnumVariable)
   structure.get_field("state", Glib::Value<State>::value_type(), output_state);
 
   EXPECT_EQ(input_state, (State)output_state);
+}
+
+TEST_F(StructureTest, CreateStructureFromFieldsList)
+{
+  structure = Structure("first", "field1", "sample string", "field2", 12);
+
+  CheckGetField(Glib::ustring("sample string"), "field1");
+  CheckGetField(12, "field2");
 }
