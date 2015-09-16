@@ -29,8 +29,6 @@ namespace Gst
 
 _WRAP_ENUM(CapsIntersectMode, GstCapsIntersectMode, NO_GTYPE)
 
-class Structure;
-
 /** Structure describing sets of media formats.
  * Caps (capabilities) are lightweight refcounted objects describing media types.
  *
@@ -296,9 +294,8 @@ Glib::RefPtr<Gst::Caps> Caps::create_simple(const Glib::ustring& media_type, Dat
   our own GstStructure here and append it to the GstCaps.
 */
   Glib::RefPtr<Gst::Caps> result(reinterpret_cast<Gst::Caps*>(gst_caps_new_empty()));
-  GstStructure* gst_struct = gst_structure_new_empty(media_type.c_str());
-  gst_caps_append_structure(Glib::unwrap(result), gst_struct);
-  result->set_simple(data...);
+  Gst::Structure gst_struct(media_type, data...);
+  result->append_structure(gst_struct);
   return result;
 }
 
