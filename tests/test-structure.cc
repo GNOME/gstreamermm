@@ -109,3 +109,21 @@ TEST_F(StructureTest, CreateStructureFromFieldsList)
   CheckGetField(Glib::ustring("sample string"), "field1");
   CheckGetField(12, "field2");
 }
+
+struct StructureTestStruct
+{
+  int x = 0;
+  StructureTestStruct(int x) : x(x) {}
+  StructureTestStruct() {}
+};
+
+TEST_F(StructureTest, CreateStructureWithCustomFields)
+{
+  structure = Structure("first", "field1", StructureTestStruct(14), "field2", StructureTestStruct(85));
+  StructureTestStruct d1;
+  Glib::Value<StructureTestStruct> d2;
+  structure.get_field("field1", d1);
+  structure.get_field("field2", d2);
+  ASSERT_EQ(14, d1.x);
+  ASSERT_EQ(85, d2.get().x);
+}

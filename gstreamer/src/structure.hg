@@ -71,18 +71,7 @@ public:
    * should be passed as field name and value
    */
   template<class ...DataTypes>
-  explicit Structure(const Glib::ustring &name, DataTypes... data)
-  {
-    gobject_ = gst_structure_new_empty(name.c_str());
-    set_fields(data...);
-  }
-
-  template<class DataType, class ...DataTypes>
-  void set_fields(const Glib::ustring & name, const DataType& data, DataTypes ...further_data)
-  {
-    this->set_field(name, data);
-    this->set_fields(further_data...);
-  }
+  explicit Structure(const Glib::ustring &name, DataTypes... data);
 
   /** Creates a Gst::Structure from a string representation.
    *
@@ -109,6 +98,14 @@ public:
    */
   void get_field(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
+  /** Get the value of the field with name @fieldname.
+   *
+   * @param fieldname The name of the field to get.
+   * @param value The Value class in which to store the value.
+   */
+  template<typename DataType>
+  void get_field(const Glib::ustring& fieldname, Glib::Value<DataType>& value) const;
+
   // These are ignored because they are useful in the C API but are either
   // variable argument functions or their functionality is already provided.
   _IGNORE(gst_structure_id_get_value,
@@ -131,6 +128,26 @@ public:
     gst_structure_id_set_valist,
     gst_structure_set_valist
   )
+
+  /** Sets the field with name @fieldname to value. If the field does not
+   * exist, it is created. If the field exists, the previous value is replaced
+   * and freed.
+   *
+   * @param fieldname The name of the field to set.
+   * @param value The value to set the field to.
+   */
+  template<typename DataType>
+  void set_field(const Glib::ustring& fieldname, const Glib::Value<DataType>& value);
+
+  /** Sets the fields with name @fieldname to values. If one of the fields does not
+   * exist, it is created. If the field exists, the previous value is replaced
+   * and freed.
+   *
+   * @param fieldname The name of the field to set.
+   * @param value The value to set the field to.
+   */
+  template<class DataType, class ...DataTypes>
+  void set_fields(const Glib::ustring & fieldname, const DataType& value, DataTypes ...further_data);
 
   /** Sets the field with name @a fieldname to the boolean @a value. If the
    * field does not exist, it is created. If the field exists, the previous
@@ -297,6 +314,20 @@ public:
    * @param value The value to set the field to.
    */
   void set_field(const Glib::ustring& fieldname, const Gst::FractionRange& value);
+
+  /** Sets the field with name @fieldname field to the DataType @value.
+   * If the field does not exist, it is created. If the field exists,
+   * the previous value is replaced and freed. Please note that when setting
+   * fields to special types such as Gst::Fourcc and Gst::Fraction and
+   * Glib::Date they are converted to the GStreamer GTypes and thus when
+   * attempting to get these fields back as GValues, they will have the
+   * GStreamer GType.
+   *
+   * @param fieldname The name of the field to set.
+   * @param value The value to set the field to.
+   */
+  template<typename DataType>
+  void set_field(const Glib::ustring& fieldname, const DataType& value);
 
   // These take ownership of the GValue so they are not wrapped.
   _IGNORE(gst_structure_take_value, gst_structure_id_take_value)
@@ -538,6 +569,16 @@ public:
    */
   bool get_field(const Glib::ustring& fieldname, Gst::FractionRange& value) const;
 
+  /** Gets the value of field @a fieldname into DataType @value.
+   * The caller is responsible for making sure the field exists and has the
+   * correct type.
+   *
+   * @param fieldname The name of a field.
+   * @param value The DataType to set.
+   */
+  template<typename DataType>
+  void get_field(const Glib::ustring& fieldname, DataType& value) const;
+
   /** For example,
    * bool on_map(const Glib::ustring& id, Glib::ValueBase& value);.
    * The map function should return true if the map operation should continue,
@@ -591,8 +632,51 @@ public:
 private:
   // This method is used for varadic template recursion
   void set_fields() {}
-
-
 };
+
+template<class ...DataTypes>
+Structure::Structure(const Glib::ustring &name, DataTypes... data)
+{
+  gobject_ = gst_structure_new_empty(name.c_str());
+  set_fields(data...);
+}
+
+template<class DataType, class ...DataTypes>
+void Structure::set_fields(const Glib::ustring & name, const DataType& data, DataTypes ...further_data)
+{
+  this->set_field(name, data);
+  this->set_fields(further_data...);
+}
+
+template<typename DataType>
+void Structure::get_field(const Glib::ustring& fieldname, DataType& value) const
+{
+  typedef Glib::Value<DataType> ValueType;
+  ValueType v;
+  this->get_field(fieldname, reinterpret_cast<Glib::ValueBase&>(v));
+  value = v.get();
+}
+
+template<typename DataType>
+void Structure::set_field(const Glib::ustring& fieldname, const DataType& value)
+{
+  typedef Glib::Value<DataType> ValueType;
+  ValueType v;
+  v.init(ValueType::value_type());
+  v.set(value);
+  this->set_field(fieldname, reinterpret_cast<const Glib::ValueBase&>(v));
+}
+
+template<typename DataType>
+void Structure::get_field(const Glib::ustring& fieldname, Glib::Value<DataType>& value) const
+{
+  get_field(fieldname, reinterpret_cast<Glib::ValueBase&>(value));
+}
+
+template<typename DataType>
+void Structure::set_field(const Glib::ustring& fieldname, const Glib::Value<DataType>& value)
+{
+  set_field(fieldname, reinterpret_cast<const Glib::Value<DataType>&>(value));
+}
 
 } //namespace Gst
