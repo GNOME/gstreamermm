@@ -41,23 +41,10 @@ static void Task_Task_gstreamermm_callback(void* data)
   }
 }
 
-static void Task_Enter_gstreamermm_callback(GstTask* task, GThread* thread, gpointer user_data)
+static void Task_Thread_gstreamermm_callback(GstTask* task, GThread* thread, gpointer user_data)
 {
-  Gst::Task::SlotEnter* the_slot = static_cast<Gst::Task::SlotEnter*>(user_data);
+  Gst::Task::TaskThreadSlot* the_slot = static_cast<Gst::Task::TaskThreadSlot*>(user_data);
 
-  try
-  {
-    (*the_slot)(Glib::wrap(task, true), Glib::Threads::wrap(thread));
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-}
-
-static void Task_Leave_gstreamermm_callback(GstTask *task, GThread *thread, gpointer user_data)
-{
-  Gst::Task::SlotLeave* the_slot = static_cast<Gst::Task::SlotLeave*>(user_data);
   try
   {
     (*the_slot)(Glib::wrap(task, true), Glib::Threads::wrap(thread));
@@ -70,7 +57,7 @@ static void Task_Leave_gstreamermm_callback(GstTask *task, GThread *thread, gpoi
 
 static void Task_Callbacks_gstreamermm_callback_destroy(void* data)
 {
-  delete static_cast<Gst::Task::BiSlot*>(data);
+  delete static_cast<Gst::Task::TaskThreadSlot*>(data);
 }
 
 } // extern "C"
@@ -86,7 +73,7 @@ Task::Task(const SlotTask& task_slot)
 {
   // Create a copy of the slot.  A pointer to this copy will be passed through
   // the call back's data parameter.  It will be destroyed with the
-  // std::auto_ptr<>.
+  // std::unique_ptr<>.
   m_slot.reset(new SlotTask(task_slot));
 
   // These lines are taken verbatim from gst_task_create() after calling
@@ -95,11 +82,14 @@ Task::Task(const SlotTask& task_slot)
   gobj()->user_data = m_slot.get();
 }
 
-void Task::set_thread_slots(const SlotEnter& enter_slot,
-  const SlotLeave& leave_slot)
+void Task::set_leave_slot(const SlotLeave& leave_slot)
 {
-  gst_task_set_enter_callback(gobj(), &Task_Enter_gstreamermm_callback, new SlotEnter(enter_slot), &Task_Callbacks_gstreamermm_callback_destroy);
-  gst_task_set_leave_callback(gobj(), &Task_Leave_gstreamermm_callback, new SlotEnter(leave_slot), &Task_Callbacks_gstreamermm_callback_destroy);
+  gst_task_set_leave_callback(gobj(), &Task_Thread_gstreamermm_callback, new SlotLeave(leave_slot), &Task_Callbacks_gstreamermm_callback_destroy);
+}
+
+void Task::set_enter_slot(const SlotEnter& enter_slot)
+{
+  gst_task_set_enter_callback(gobj(), &Task_Thread_gstreamermm_callback, new SlotEnter(enter_slot), &Task_Callbacks_gstreamermm_callback_destroy);
 }
 
 } //namespace Gst

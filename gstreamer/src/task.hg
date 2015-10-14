@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2015 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,16 @@ class TaskPool;
  * running anymore. Use join() to make sure the task is completely stopped and
  * the thread is stopped.
  *
- * Last reviewed on 2006-02-13 (0.10.4)
+ * Task functions can send a Gst::Message to send out-of-band data to the
+ * application. The application can receive messages from the Gst::Bus in its
+ * mainloop.
+ *
+ * For debugging purposes, the task will configure its object name as the thread
+ * name on Linux. Please note that the object name should be configured before the
+ * task is started; changing the object name after the task has been started, has
+ * no effect on the thread name.
+ *
+ * Last reviewed on 2015-10-14 (1.5.2)
  */
 class Task : public Object
 {
@@ -75,14 +84,14 @@ public:
    * Bidirectional slot
    */
   typedef sigc::slot<void, const Glib::RefPtr<Gst::Task>&,
-          Glib::Threads::Thread*> BiSlot;
+          Glib::Threads::Thread*> TaskThreadSlot;
   /** For example,
    * void on_enter(const Glib::RefPtr<Gst::Task>& task, Glib::Threads::Thread&
    * thread);.
    * A thread is entered, this slot is called when the new thread enters its
    * function.
    */
-   typedef BiSlot SlotEnter;
+   typedef TaskThreadSlot SlotEnter;
 
   /** For example,
    * void on_leave(const Glib::RefPtr<Gst::Task>& task, Glib::Threads::Thread&
@@ -90,7 +99,7 @@ public:
    * A thread is exiting, this is called when the thread is about to leave its
    * function.
    */
-    typedef BiSlot SlotLeave;
+    typedef TaskThreadSlot SlotLeave;
 
 protected:
   explicit Task(const SlotTask& task_slot);
@@ -112,24 +121,19 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Gst::TaskPool> get_pool(), gst_task_get_pool)
   _WRAP_METHOD(Glib::RefPtr<const Gst::TaskPool> get_pool() const, gst_task_get_pool)
 
-  /** Set slots which will be executed when a new thread is needed, the thread
-   * function is entered and left and when the thread is joined.
+  /** Call enter_slot when the task function of task is entered.
    *
-   * By default a thread for the task will be created from a default thread
-   * pool.
-   *
-   * Objects can use custom Glib::Threads::Thread or can perform additional
-   * configuration of the threads (such as changing the thread priority) by
-   * installing slots.
-   *
-   * MT safe.
-   *
-   * @param enter_slot A SlotEnter slot.
-   * @param leave_slot A SlotLeave slot.
-   *
-   * Since 0.10.24.
+   * @param enter_slot
    */
-  void set_thread_slots(const SlotEnter& enter_slot, const SlotLeave& leave_slot);
+  void set_enter_slot(const SlotEnter& enter_slot);
+  _IGNORE(gst_task_set_enter_callback)
+
+  /** Call leave_func when the task function of task is left.
+   *
+   * @param leave_slot
+   */
+  void set_leave_slot(const SlotLeave& leave_slot);
+  _IGNORE(gst_task_set_leave_callback)
 
   _WRAP_METHOD(TaskState get_state() const, gst_task_get_state)
   _WRAP_METHOD(void set_state(Gst::TaskState state), gst_task_set_state)
@@ -141,7 +145,12 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
-  std::auto_ptr<SlotTask> m_slot;
+  // todo this slot should be moved in move constructor, but for now it's
+  // impossible to provide custom move constructor
+  // (see https://bugzilla.gnome.org/show_bug.cgi?id=756593).
+  // However, task should be managed by RefPtr class, so move constructor
+  // and move assignment operator will never be called.
+  std::unique_ptr<SlotTask> m_slot;
 #endif
 };
 
