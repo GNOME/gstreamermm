@@ -63,7 +63,7 @@ TESTS = $(check_PROGRAMS)
 TEST_GTEST_SOURCES = main.cc gtest/gtest-1.7.0/src/gtest-all.cc
 TEST_REGRESSION_UTILS = regression/utils.cc
 
-$(TEST_GTEST_SOURCES): gtest
+$(TEST_GTEST_SOURCES): gtest.zip
 
 test_allocator_SOURCES                          = $(TEST_GTEST_SOURCES) test-allocator.cc
 test_atomicqueue_SOURCES                        = $(TEST_GTEST_SOURCES) test-atomicqueue.cc
@@ -113,10 +113,8 @@ gtest.zip:
 	exit 1;,\
 	$(if\
 	$(CURL),$(download_curl) '$(gtest_url)',$(if\
-	$(WGET),$(download_wget) '$(gtest_url)',test -f $@)))
-
-gtest: gtest.zip
-	unzip -nq -d gtest gtest.zip
+	$(WGET),$(download_wget) '$(gtest_url)',test -f $@))); \
+	$(AM_V_GEN)unzip -nq -d gtest gtest.zip
 
 check_DATA = gtest
 CLEANFILES = gtest.zip
