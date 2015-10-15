@@ -32,7 +32,7 @@ namespace Gst
  * This object is internally used to implement the clock in
  * Gst::AudioBaseSink.
  *
- * Last reviewed on 2006-09-27 (0.10.12).
+ * Last reviewed on 2015-10-15 (1.5.2).
  */
 class AudioClock : public Gst::SystemClock
 {
@@ -66,7 +66,12 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
-  std::auto_ptr<SlotGetTime> m_slot;
+  // todo this slot should be moved in move constructor, but for now it's
+  // impossible to provide custom move constructor
+  // (see https://bugzilla.gnome.org/show_bug.cgi?id=756593).
+  // However, task should be managed by RefPtr class, so move constructor
+  // and move assignment operator will never be called.
+  std::unique_ptr<SlotGetTime> m_slot;
 #endif
 };
 
