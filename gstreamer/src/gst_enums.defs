@@ -1399,7 +1399,8 @@
 ;;   GST_PARSE_ERROR_LINK,
 ;;   GST_PARSE_ERROR_COULD_NOT_SET_PROPERTY,
 ;;   GST_PARSE_ERROR_EMPTY_BIN,
-;;   GST_PARSE_ERROR_EMPTY
+;;   GST_PARSE_ERROR_EMPTY,
+;;   GST_PARSE_ERROR_DELAYED_LINK
 ;; } GstParseError;
 
 (define-enum-extended ParseError
@@ -1413,6 +1414,7 @@
     '("could-not-set-property" "GST_PARSE_ERROR_COULD_NOT_SET_PROPERTY" "4")
     '("empty-bin" "GST_PARSE_ERROR_EMPTY_BIN" "5")
     '("empty" "GST_PARSE_ERROR_EMPTY" "6")
+    '("delayed-link" "GST_PARSE_ERROR_DELAYED_LINK" "7")
   )
 )
 
@@ -1514,7 +1516,8 @@
 ;;   GST_PLUGIN_DEPENDENCY_FLAG_NONE = 0,
 ;;   GST_PLUGIN_DEPENDENCY_FLAG_RECURSE = (1 << 0),
 ;;   GST_PLUGIN_DEPENDENCY_FLAG_PATHS_ARE_DEFAULT_ONLY = (1 << 1),
-;;   GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX = (1 << 2)
+;;   GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX = (1 << 2),
+;;   GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_PREFIX = (1 << 3)
 ;; } GstPluginDependencyFlags;
 
 (define-flags-extended PluginDependencyFlags
@@ -1525,6 +1528,7 @@
     '("recurse" "GST_PLUGIN_DEPENDENCY_FLAG_RECURSE" "(1 << 0)")
     '("paths-are-default-only" "GST_PLUGIN_DEPENDENCY_FLAG_PATHS_ARE_DEFAULT_ONLY" "(1 << 1)")
     '("file-name-is-suffix" "GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX" "(1 << 2)")
+    '("file-name-is-prefix" "GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_PREFIX" "(1 << 3)")
   )
 )
 
@@ -2265,6 +2269,116 @@
   )
 )
 
+;; From gsttracerrecord.h
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   GST_TRACER_VALUE_SCOPE_PROCESS,
+;;   GST_TRACER_VALUE_SCOPE_THREAD,
+;;   GST_TRACER_VALUE_SCOPE_ELEMENT,
+;;   GST_TRACER_VALUE_SCOPE_PAD
+;; } GstTracerValueScope;
+
+(define-enum-extended TracerValueScope
+  (in-module "Gst")
+  (c-name "GstTracerValueScope")
+  (values
+    '("process" "GST_TRACER_VALUE_SCOPE_PROCESS" "0")
+    '("thread" "GST_TRACER_VALUE_SCOPE_THREAD" "1")
+    '("element" "GST_TRACER_VALUE_SCOPE_ELEMENT" "2")
+    '("pad" "GST_TRACER_VALUE_SCOPE_PAD" "3")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   GST_TRACER_VALUE_FLAGS_NONE = 0,
+;;   GST_TRACER_VALUE_FLAGS_OPTIONAL = (1 << 0),
+;;   GST_TRACER_VALUE_FLAGS_AGGREGATED = (1 << 1),
+;; } GstTracerValueFlags;
+
+(define-flags-extended TracerValueFlags
+  (in-module "Gst")
+  (c-name "GstTracerValueFlags")
+  (values
+    '("none" "GST_TRACER_VALUE_FLAGS_NONE" "0x0")
+    '("optional" "GST_TRACER_VALUE_FLAGS_OPTIONAL" "(1 << 0)")
+    '("aggregated" "GST_TRACER_VALUE_FLAGS_AGGREGATED" "(1 << 1)")
+  )
+)
+
+;; From gsttracerutils.h
+
+;; Original typedef:
+;; typedef enum /*< skip >*/
+;; {
+;;   GST_TRACER_QUARK_HOOK_PAD_PUSH_PRE = 0,
+;;   GST_TRACER_QUARK_HOOK_PAD_PUSH_POST,
+;;   GST_TRACER_QUARK_HOOK_PAD_PUSH_LIST_PRE,
+;;   GST_TRACER_QUARK_HOOK_PAD_PUSH_LIST_POST,
+;;   GST_TRACER_QUARK_HOOK_PAD_PULL_RANGE_PRE,
+;;   GST_TRACER_QUARK_HOOK_PAD_PULL_RANGE_POST,
+;;   GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_PRE ,
+;;   GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_POST,
+;;   GST_TRACER_QUARK_HOOK_PAD_QUERY_PRE ,
+;;   GST_TRACER_QUARK_HOOK_PAD_QUERY_POST,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_PRE,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_POST,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_PRE,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_POST,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_NEW,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_ADD_PAD,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_REMOVE_PAD,
+;;   GST_TRACER_QUARK_HOOK_BIN_ADD_PRE,
+;;   GST_TRACER_QUARK_HOOK_BIN_ADD_POST,
+;;   GST_TRACER_QUARK_HOOK_BIN_REMOVE_PRE,
+;;   GST_TRACER_QUARK_HOOK_BIN_REMOVE_POST,
+;;   GST_TRACER_QUARK_HOOK_PAD_LINK_PRE,
+;;   GST_TRACER_QUARK_HOOK_PAD_LINK_POST,
+;;   GST_TRACER_QUARK_HOOK_PAD_UNLINK_PRE,
+;;   GST_TRACER_QUARK_HOOK_PAD_UNLINK_POST,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_CHANGE_STATE_PRE,
+;;   GST_TRACER_QUARK_HOOK_ELEMENT_CHANGE_STATE_POST,
+;;   GST_TRACER_QUARK_MAX
+;; } GstTracerQuarkId;
+
+(define-enum-extended TracerQuarkId
+  (in-module "Gst")
+  (c-name "GstTracerQuarkId")
+  (values
+    '("hook-pad-push-pre" "GST_TRACER_QUARK_HOOK_PAD_PUSH_PRE" "0")
+    '("hook-pad-push-post" "GST_TRACER_QUARK_HOOK_PAD_PUSH_POST" "1")
+    '("hook-pad-push-list-pre" "GST_TRACER_QUARK_HOOK_PAD_PUSH_LIST_PRE" "2")
+    '("hook-pad-push-list-post" "GST_TRACER_QUARK_HOOK_PAD_PUSH_LIST_POST" "3")
+    '("hook-pad-pull-range-pre" "GST_TRACER_QUARK_HOOK_PAD_PULL_RANGE_PRE" "4")
+    '("hook-pad-pull-range-post" "GST_TRACER_QUARK_HOOK_PAD_PULL_RANGE_POST" "5")
+    '("hook-pad-push-event-pre" "GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_PRE" "6")
+    '("hook-pad-push-event-post" "GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_POST" "7")
+    '("hook-pad-query-pre" "GST_TRACER_QUARK_HOOK_PAD_QUERY_PRE" "8")
+    '("hook-pad-query-post" "GST_TRACER_QUARK_HOOK_PAD_QUERY_POST" "9")
+    '("hook-element-post-message-pre" "GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_PRE" "10")
+    '("hook-element-post-message-post" "GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_POST" "11")
+    '("hook-element-query-pre" "GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_PRE" "12")
+    '("hook-element-query-post" "GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_POST" "13")
+    '("hook-element-new" "GST_TRACER_QUARK_HOOK_ELEMENT_NEW" "14")
+    '("hook-element-add-pad" "GST_TRACER_QUARK_HOOK_ELEMENT_ADD_PAD" "15")
+    '("hook-element-remove-pad" "GST_TRACER_QUARK_HOOK_ELEMENT_REMOVE_PAD" "16")
+    '("hook-bin-add-pre" "GST_TRACER_QUARK_HOOK_BIN_ADD_PRE" "17")
+    '("hook-bin-add-post" "GST_TRACER_QUARK_HOOK_BIN_ADD_POST" "18")
+    '("hook-bin-remove-pre" "GST_TRACER_QUARK_HOOK_BIN_REMOVE_PRE" "19")
+    '("hook-bin-remove-post" "GST_TRACER_QUARK_HOOK_BIN_REMOVE_POST" "20")
+    '("hook-pad-link-pre" "GST_TRACER_QUARK_HOOK_PAD_LINK_PRE" "21")
+    '("hook-pad-link-post" "GST_TRACER_QUARK_HOOK_PAD_LINK_POST" "22")
+    '("hook-pad-unlink-pre" "GST_TRACER_QUARK_HOOK_PAD_UNLINK_PRE" "23")
+    '("hook-pad-unlink-post" "GST_TRACER_QUARK_HOOK_PAD_UNLINK_POST" "24")
+    '("hook-element-change-state-pre" "GST_TRACER_QUARK_HOOK_ELEMENT_CHANGE_STATE_PRE" "25")
+    '("hook-element-change-state-post" "GST_TRACER_QUARK_HOOK_ELEMENT_CHANGE_STATE_POST" "26")
+    '("max" "GST_TRACER_QUARK_MAX" "27")
+  )
+)
+
 ;; From gsttypefind.h
 
 ;; Original typedef:
@@ -2534,7 +2648,8 @@
 ;; {
 ;;   GST_INTERPOLATION_MODE_NONE,
 ;;   GST_INTERPOLATION_MODE_LINEAR,
-;;   GST_INTERPOLATION_MODE_CUBIC
+;;   GST_INTERPOLATION_MODE_CUBIC,
+;;   GST_INTERPOLATION_MODE_CUBIC_MONOTONIC,
 ;; } GstInterpolationMode;
 
 (define-enum-extended InterpolationMode
@@ -2544,6 +2659,7 @@
     '("none" "GST_INTERPOLATION_MODE_NONE" "0")
     '("linear" "GST_INTERPOLATION_MODE_LINEAR" "1")
     '("cubic" "GST_INTERPOLATION_MODE_CUBIC" "2")
+    '("cubic-monotonic" "GST_INTERPOLATION_MODE_CUBIC_MONOTONIC" "3")
   )
 )
 
@@ -2779,7 +2895,7 @@
   (in-module "Gst")
   (c-name "GstQueueLeaky")
   (values
-    '("no" "GST_QUEUE_LEAK_NO_LEAK" "0")
+    '("no" "GST_QUEUE_LEAK_NO_LEAK" "1")
     '("upstream" "GST_QUEUE_LEAK_UPSTREAM" "1")
     '("downstream" "GST_QUEUE_LEAK_DOWNSTREAM" "2")
   )
@@ -2944,6 +3060,29 @@
   )
 )
 
+;; From audio-channel-mixer.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_AUDIO_CHANNEL_MIXER_FLAGS_NONE                = 0,
+;;   GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_IN  = (1 << 0),
+;;   GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_OUT = (1 << 1),
+;;   GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_IN     = (1 << 2),
+;;   GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_OUT    = (1 << 3)
+;; } GstAudioChannelMixerFlags;
+
+(define-flags-extended AudioChannelMixerFlags
+  (in-module "Gst")
+  (c-name "GstAudioChannelMixerFlags")
+  (values
+    '("none" "GST_AUDIO_CHANNEL_MIXER_FLAGS_NONE" "0x0")
+    '("non-interleaved-in" "GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_IN" "(1 << 0)")
+    '("non-interleaved-out" "GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_OUT" "(1 << 1)")
+    '("unpositioned-in" "GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_IN" "(1 << 2)")
+    '("unpositioned-out" "GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_OUT" "(1 << 3)")
+  )
+)
+
 ;; From audio-channels.h
 
 ;; Original typedef:
@@ -3021,6 +3160,25 @@
     '("wide-right" "GST_AUDIO_CHANNEL_POSITION_WIDE_RIGHT" "25")
     '("surround-left" "GST_AUDIO_CHANNEL_POSITION_SURROUND_LEFT" "26")
     '("surround-right" "GST_AUDIO_CHANNEL_POSITION_SURROUND_RIGHT" "27")
+  )
+)
+
+;; From audio-converter.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_AUDIO_CONVERTER_FLAG_NONE            = 0,
+;;   GST_AUDIO_CONVERTER_FLAG_IN_WRITABLE     = (1 << 0),
+;;   GST_AUDIO_CONVERTER_FLAG_VARIABLE_RATE   = (1 << 1)
+;; } GstAudioConverterFlags;
+
+(define-flags-extended AudioConverterFlags
+  (in-module "Gst")
+  (c-name "GstAudioConverterFlags")
+  (values
+    '("none" "GST_AUDIO_CONVERTER_FLAG_NONE" "0x0")
+    '("in-writable" "GST_AUDIO_CONVERTER_FLAG_IN_WRITABLE" "(1 << 0)")
+    '("variable-rate" "GST_AUDIO_CONVERTER_FLAG_VARIABLE_RATE" "(1 << 1)")
   )
 )
 
@@ -3163,7 +3321,8 @@
 ;; Original typedef:
 ;; typedef enum
 ;; {
-;;   GST_AUDIO_PACK_FLAG_NONE       = 0
+;;   GST_AUDIO_PACK_FLAG_NONE             = 0,
+;;   GST_AUDIO_PACK_FLAG_TRUNCATE_RANGE   = (1 << 0)
 ;; } GstAudioPackFlags;
 
 (define-flags-extended AudioPackFlags
@@ -3171,6 +3330,7 @@
   (c-name "GstAudioPackFlags")
   (values
     '("none" "GST_AUDIO_PACK_FLAG_NONE" "0x0")
+    '("truncate-range" "GST_AUDIO_PACK_FLAG_TRUNCATE_RANGE" "(1 << 0)")
   )
 )
 
@@ -3203,6 +3363,66 @@
   (values
     '("interleaved" "GST_AUDIO_LAYOUT_INTERLEAVED" "0")
     '("non-interleaved" "GST_AUDIO_LAYOUT_NON_INTERLEAVED" "1")
+  )
+)
+
+;; From audio-quantize.h
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   GST_AUDIO_DITHER_NONE = 0,
+;;   GST_AUDIO_DITHER_RPDF,
+;;   GST_AUDIO_DITHER_TPDF,
+;;   GST_AUDIO_DITHER_TPDF_HF
+;; } GstAudioDitherMethod;
+
+(define-enum-extended AudioDitherMethod
+  (in-module "Gst")
+  (c-name "GstAudioDitherMethod")
+  (values
+    '("none" "GST_AUDIO_DITHER_NONE" "0")
+    '("rpdf" "GST_AUDIO_DITHER_RPDF" "1")
+    '("tpdf" "GST_AUDIO_DITHER_TPDF" "2")
+    '("tpdf-hf" "GST_AUDIO_DITHER_TPDF_HF" "3")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   GST_AUDIO_NOISE_SHAPING_NONE = 0,
+;;   GST_AUDIO_NOISE_SHAPING_ERROR_FEEDBACK,
+;;   GST_AUDIO_NOISE_SHAPING_SIMPLE,
+;;   GST_AUDIO_NOISE_SHAPING_MEDIUM,
+;;   GST_AUDIO_NOISE_SHAPING_HIGH
+;; } GstAudioNoiseShapingMethod;
+
+(define-enum-extended AudioNoiseShapingMethod
+  (in-module "Gst")
+  (c-name "GstAudioNoiseShapingMethod")
+  (values
+    '("none" "GST_AUDIO_NOISE_SHAPING_NONE" "0")
+    '("error-feedback" "GST_AUDIO_NOISE_SHAPING_ERROR_FEEDBACK" "1")
+    '("simple" "GST_AUDIO_NOISE_SHAPING_SIMPLE" "2")
+    '("medium" "GST_AUDIO_NOISE_SHAPING_MEDIUM" "3")
+    '("high" "GST_AUDIO_NOISE_SHAPING_HIGH" "4")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   GST_AUDIO_QUANTIZE_FLAG_NONE            = 0,
+;;   GST_AUDIO_QUANTIZE_FLAG_NON_INTERLEAVED = (1 << 0)
+;; } GstAudioQuantizeFlags;
+
+(define-flags-extended AudioQuantizeFlags
+  (in-module "Gst")
+  (c-name "GstAudioQuantizeFlags")
+  (values
+    '("none" "GST_AUDIO_QUANTIZE_FLAG_NONE" "0x0")
+    '("non-interleaved" "GST_AUDIO_QUANTIZE_FLAG_NON_INTERLEAVED" "(1 << 0)")
   )
 )
 
@@ -3388,6 +3608,39 @@
     '("hann" "GST_FFT_WINDOW_HANN" "2")
     '("bartlett" "GST_FFT_WINDOW_BARTLETT" "3")
     '("blackman" "GST_FFT_WINDOW_BLACKMAN" "4")
+  )
+)
+
+;; From gstaudiovisualizer.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_AUDIO_VISUALIZER_SHADER_NONE,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_UP,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_DOWN,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_LEFT,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_RIGHT,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_OUT,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_IN,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_OUT,
+;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_IN
+;; } GstAudioVisualizerShader;
+
+(define-enum-extended AudioVisualizerShader
+  (in-module "Gst")
+  (c-name "GstAudioVisualizerShader")
+  (values
+    '("none" "GST_AUDIO_VISUALIZER_SHADER_NONE" "0")
+    '("fade" "GST_AUDIO_VISUALIZER_SHADER_FADE" "1")
+    '("fade-and-move-up" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_UP" "2")
+    '("fade-and-move-down" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_DOWN" "3")
+    '("fade-and-move-left" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_LEFT" "4")
+    '("fade-and-move-right" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_RIGHT" "5")
+    '("fade-and-move-horiz-out" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_OUT" "6")
+    '("fade-and-move-horiz-in" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_IN" "7")
+    '("fade-and-move-vert-out" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_OUT" "8")
+    '("fade-and-move-vert-in" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_IN" "9")
   )
 )
 
@@ -3584,6 +3837,24 @@
     '("tool" "GST_RTCP_SDES_TOOL" "6")
     '("note" "GST_RTCP_SDES_NOTE" "7")
     '("priv" "GST_RTCP_SDES_PRIV" "8")
+  )
+)
+
+;; From gstrtpbuffer.h
+
+;; Original typedef:
+;; typedef enum {
+;;   GST_RTP_BUFFER_MAP_FLAG_SKIP_PADDING = (GST_MAP_FLAG_LAST << 0),
+;;   GST_RTP_BUFFER_MAP_FLAG_LAST         = (GST_MAP_FLAG_LAST << 8)
+;;   /* 8 more flags possible afterwards */
+;; } GstRTPBufferMapFlags;
+
+(define-flags-extended RTPBufferMapFlags
+  (in-module "Gst")
+  (c-name "GstRTPBufferMapFlags")
+  (values
+    '("skip-padding" "GST_RTP_BUFFER_MAP_FLAG_SKIP_PADDING" "(GST_MAP_FLAG_LAST << 0)")
+    '("last" "GST_RTP_BUFFER_MAP_FLAG_LAST" "(GST_MAP_FLAG_LAST << 8)")
   )
 )
 
@@ -3958,7 +4229,7 @@
 ;;   GST_RTSP_HDR_HOST,                /* Host */
 ;;   GST_RTSP_HDR_PRAGMA,              /* Pragma */
 ;;   GST_RTSP_HDR_X_SERVER_IP_ADDRESS, /* X-Server-IP-Address */
-;;   GST_RTSP_HDR_X_SESSIONCOOKIE,     /* X-Sessioncookie */
+;;   GST_RTSP_HDR_X_SESSIONCOOKIE,     /* x-sessioncookie */
 ;; 
 ;;   GST_RTSP_HDR_RTCP_INTERVAL,       /* RTCP-Interval */
 ;; 
@@ -5000,7 +5271,8 @@
 ;;   GST_VIDEO_TRANSFER_GAMMA28,
 ;;   GST_VIDEO_TRANSFER_LOG100,
 ;;   GST_VIDEO_TRANSFER_LOG316,
-;;   GST_VIDEO_TRANSFER_BT2020_12
+;;   GST_VIDEO_TRANSFER_BT2020_12,
+;;   GST_VIDEO_TRANSFER_ADOBERGB
 ;; } GstVideoTransferFunction;
 
 (define-enum-extended VideoTransferFunction
@@ -5019,6 +5291,7 @@
     '("log100" "GST_VIDEO_TRANSFER_LOG100" "9")
     '("log316" "GST_VIDEO_TRANSFER_LOG316" "10")
     '("bt2020-12" "GST_VIDEO_TRANSFER_BT2020_12" "11")
+    '("adobergb" "GST_VIDEO_TRANSFER_ADOBERGB" "12")
   )
 )
 
@@ -5031,7 +5304,8 @@
 ;;   GST_VIDEO_COLOR_PRIMARIES_SMPTE170M,
 ;;   GST_VIDEO_COLOR_PRIMARIES_SMPTE240M,
 ;;   GST_VIDEO_COLOR_PRIMARIES_FILM,
-;;   GST_VIDEO_COLOR_PRIMARIES_BT2020
+;;   GST_VIDEO_COLOR_PRIMARIES_BT2020,
+;;   GST_VIDEO_COLOR_PRIMARIES_ADOBERGB
 ;; } GstVideoColorPrimaries;
 
 (define-enum-extended VideoColorPrimaries
@@ -5046,6 +5320,7 @@
     '("smpte240m" "GST_VIDEO_COLOR_PRIMARIES_SMPTE240M" "5")
     '("film" "GST_VIDEO_COLOR_PRIMARIES_FILM" "6")
     '("bt2020" "GST_VIDEO_COLOR_PRIMARIES_BT2020" "7")
+    '("adobergb" "GST_VIDEO_COLOR_PRIMARIES_ADOBERGB" "8")
   )
 )
 
@@ -5695,50 +5970,6 @@
   )
 )
 
-;; From audioconvert.h
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   DITHER_NONE = 0,
-;;   DITHER_RPDF,
-;;   DITHER_TPDF,
-;;   DITHER_TPDF_HF
-;; } GstAudioConvertDithering;
-
-(define-enum-extended AudioConvertDithering
-  (in-module "Gst")
-  (c-name "GstAudioConvertDithering")
-  (values
-    '("none" "DITHER_NONE" "0")
-    '("rpdf" "DITHER_RPDF" "1")
-    '("tpdf" "DITHER_TPDF" "2")
-    '("tpdf-hf" "DITHER_TPDF_HF" "3")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   NOISE_SHAPING_NONE = 0,
-;;   NOISE_SHAPING_ERROR_FEEDBACK,
-;;   NOISE_SHAPING_SIMPLE,
-;;   NOISE_SHAPING_MEDIUM,
-;;   NOISE_SHAPING_HIGH
-;; } GstAudioConvertNoiseShaping;
-
-(define-enum-extended AudioConvertNoiseShaping
-  (in-module "Gst")
-  (c-name "GstAudioConvertNoiseShaping")
-  (values
-    '("none" "NOISE_SHAPING_NONE" "0")
-    '("error-feedback" "NOISE_SHAPING_ERROR_FEEDBACK" "1")
-    '("simple" "NOISE_SHAPING_SIMPLE" "2")
-    '("medium" "NOISE_SHAPING_MEDIUM" "3")
-    '("high" "NOISE_SHAPING_HIGH" "4")
-  )
-)
-
 ;; From speex_resampler.h
 
 ;; Original typedef:
@@ -6192,39 +6423,6 @@
   )
 )
 
-;; From gstaudiovisualizer.h
-
-;; Original typedef:
-;; typedef enum {
-;;   GST_AUDIO_VISUALIZER_SHADER_NONE,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_UP,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_DOWN,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_LEFT,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_RIGHT,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_OUT,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_IN,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_OUT,
-;;   GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_IN
-;; } GstAudioVisualizerShader;
-
-(define-enum-extended AudioVisualizerShader
-  (in-module "Gst")
-  (c-name "GstAudioVisualizerShader")
-  (values
-    '("none" "GST_AUDIO_VISUALIZER_SHADER_NONE" "0")
-    '("fade" "GST_AUDIO_VISUALIZER_SHADER_FADE" "1")
-    '("fade-and-move-up" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_UP" "2")
-    '("fade-and-move-down" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_DOWN" "3")
-    '("fade-and-move-left" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_LEFT" "4")
-    '("fade-and-move-right" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_RIGHT" "5")
-    '("fade-and-move-horiz-out" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_OUT" "6")
-    '("fade-and-move-horiz-in" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_IN" "7")
-    '("fade-and-move-vert-out" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_OUT" "8")
-    '("fade-and-move-vert-in" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_IN" "9")
-  )
-)
-
 ;; From dirac_parse.h
 
 ;; Original typedef:
@@ -6473,6 +6671,26 @@
   )
 )
 
+;; From gstopusenc.h
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   BITRATE_TYPE_CBR,
+;;   BITRATE_TYPE_VBR,
+;;   BITRATE_TYPE_CONSTRAINED_VBR,
+;; } GstOpusEncBitrateType;
+
+(define-enum-extended OpusEncBitrateType
+  (in-module "Gst")
+  (c-name "GstOpusEncBitrateType")
+  (values
+    '("cbr" "BITRATE_TYPE_CBR" "0")
+    '("vbr" "BITRATE_TYPE_VBR" "1")
+    '("constrained-vbr" "BITRATE_TYPE_CONSTRAINED_VBR" "2")
+  )
+)
+
 ;; From gstbasetextoverlay.h
 
 ;; Original typedef:
@@ -6481,7 +6699,8 @@
 ;;     GST_BASE_TEXT_OVERLAY_VALIGN_BOTTOM,
 ;;     GST_BASE_TEXT_OVERLAY_VALIGN_TOP,
 ;;     GST_BASE_TEXT_OVERLAY_VALIGN_POS,
-;;     GST_BASE_TEXT_OVERLAY_VALIGN_CENTER
+;;     GST_BASE_TEXT_OVERLAY_VALIGN_CENTER,
+;;     GST_BASE_TEXT_OVERLAY_VALIGN_ABSOLUTE
 ;; } GstBaseTextOverlayVAlign;
 
 (define-enum-extended BaseTextOverlayVAlign
@@ -6493,6 +6712,7 @@
     '("top" "GST_BASE_TEXT_OVERLAY_VALIGN_TOP" "2")
     '("pos" "GST_BASE_TEXT_OVERLAY_VALIGN_POS" "3")
     '("center" "GST_BASE_TEXT_OVERLAY_VALIGN_CENTER" "4")
+    '("absolute" "GST_BASE_TEXT_OVERLAY_VALIGN_ABSOLUTE" "5")
   )
 )
 
@@ -6502,7 +6722,8 @@
 ;;     GST_BASE_TEXT_OVERLAY_HALIGN_CENTER,
 ;;     GST_BASE_TEXT_OVERLAY_HALIGN_RIGHT,
 ;;     GST_BASE_TEXT_OVERLAY_HALIGN_UNUSED,
-;;     GST_BASE_TEXT_OVERLAY_HALIGN_POS
+;;     GST_BASE_TEXT_OVERLAY_HALIGN_POS,
+;;     GST_BASE_TEXT_OVERLAY_HALIGN_ABSOLUTE
 ;; } GstBaseTextOverlayHAlign;
 
 (define-enum-extended BaseTextOverlayHAlign
@@ -6514,6 +6735,7 @@
     '("right" "GST_BASE_TEXT_OVERLAY_HALIGN_RIGHT" "2")
     '("unused" "GST_BASE_TEXT_OVERLAY_HALIGN_UNUSED" "3")
     '("pos" "GST_BASE_TEXT_OVERLAY_HALIGN_POS" "4")
+    '("absolute" "GST_BASE_TEXT_OVERLAY_HALIGN_ABSOLUTE" "5")
   )
 )
 
@@ -6645,18 +6867,6 @@
   )
 )
 
-;; Handwritten for the filesink plug-in (Gst::FileSink).
-(define-enum-extended FileSinkBufferMode
-  (in-module "Gst")
-  (c-name "GstFileSinkBufferMode")
-  (values
-    '("default" "GST_FILE_SINK_BUFFER_MODE_DEFAULT" "-1")
-    '("full" "GST_FILE_SINK_BUFFER_MODE_FULL" "0")
-    '("line" "GST_FILE_SINK_BUFFER_MODE_LINE" "1")
-    '("unbuffered" "GST_FILE_SINK_BUFFER_MODE_UNBUFFERED" "2")
-  )
-)
-
 ;; Handwritten for CdParanoiaSrc plugin (values taken from output of
 ;; `gst-inspect cdparanoiasrc' - "paranoia-mode" property information)
 (define-enum-extended CdParanoiaMode
@@ -6669,6 +6879,17 @@
     '("scratch" "GST_PARANOIA_MODE_SCRATCH" "1<<3")
     '("repair" "GST_PARANOIA_MODE_REPAIR" "1<<4")
     '("full" "GST_PARANOIA_MODE_FULL" "0xff")
+  )
+)
+
+;; Handwritten for EncodeBin plugin (values taken from file
+;; gst-plugins-base/gst/encoding/gstencodebin.c, enum used for 'flags' property)
+(define-enum-extended EncodeBinFlags
+  (in-module "Gst")
+  (c-name "GstEncodeBinFlags")
+  (values
+    '("no-audio-conversion" "GST_ENCODEBIN_FLAG_NO_AUDIO_CONVERSION" "1<<0")
+    '("no-video-conversion" "GST_ENCODEBIN_FLAG_NO_VIDEO_CONVERSION" "1<<1")
   )
 )
 
@@ -6687,122 +6908,7 @@
   )
 )
 
-;; Handwritten for OutputSelector plugin (values taken from output of
-;; `gst-inspect output-selector' - "pad-negotiation-mode" property information)
-(define-enum-extended OutputSelectorPadNegotiationMode
-  (in-module "Gst")
-  (c-name "GstOutputSelectorPadNegotiationMode")
-  (values
-    '("none" "GST_OUTPUT_SELECTOR_PAD_NEGOTIATION_MODE_NONE" "0")
-    '("all" "GST_OUTPUT_SELECTOR_PAD_NEGOTIATION_MODE_ALL" "1")
-    '("active" "GST_OUTPUT_SELECTOR_PAD_NEGOTIATION_MODE_ACTIVE" "2")
-  )
-)
-
-;; Handwritten for EncodeBin plugin (values taken from file 
-;; gst-plugins-base/gst/encoding/gstencodebin.c, enum used for 'flags' property)
-(define-enum-extended EncodeBinFlags
-  (in-module "Gst")
-  (c-name "GstEncodeBinFlags")
-  (values
-    '("no-audio-conversion" "GST_ENCODEBIN_FLAG_NO_AUDIO_CONVERSION" "1<<0")
-    '("no-video-conversion" "GST_ENCODEBIN_FLAG_NO_VIDEO_CONVERSION" "1<<1")
-  )
-)
-
-;; Handwritten for MultiSocketSink plugin (values taken from file 
-;; gst-plugins-base/gst/tcp/gstmultihandlesink.c, enum used for 'client-removed signal)
-(define-enum-extended MultiHandleSinkClientStatus
-  (in-module "Gst")
-  (c-name "GstMultiHandleSinkClientStatus")
-  (values
-    '("ok" "GST_CLIENT_STATUS_OK" "0")
-    '("closed" "GST_CLIENT_STATUS_CLOSED" "1")
-    '("removed" "GST_CLIENT_STATUS_REMOVED" "2")
-    '("slow" "GST_CLIENT_STATUS_SLOW" "3")
-    '("error" "GST_CLIENT_STATUS_ERROR" "4")
-    '("duplicate" "GST_CLIENT_STATUS_DUPLICATE" "5")
-    '("flushing" "GST_CLIENT_STATUS_FLUSHING" "6")
-  )
-)
-
-;; Handwritten for PlaySink plugin (values taken from file 
-;; gst-plugins-base/gst/playback/gstplaysink.c, enum used for 'send-event-mode' property)
-(define-enum-extended PlaySinkSendEventMode
-  (in-module "Gst")
-  (c-name "GstPlaySinkSendEventMode")
-  (values
-    '("default" "MODE_DEFAULT" "0")
-    '("first" "MODE_FIRST" "1")
-  )
-)
-
-;; Handwritten for the filesink plug-in (Gst::FileSink).
-(define-enum-extended FileSinkBufferMode
-  (in-module "Gst")
-  (c-name "GstFileSinkBufferMode")
-  (values
-    '("default" "GST_FILE_SINK_BUFFER_MODE_DEFAULT" "-1")
-    '("full" "GST_FILE_SINK_BUFFER_MODE_FULL" "0")
-    '("line" "GST_FILE_SINK_BUFFER_MODE_LINE" "1")
-    '("unbuffered" "GST_FILE_SINK_BUFFER_MODE_UNBUFFERED" "2")
-  )
-)
-
-;; Handwritten for CdParanoiaSrc plugin (values taken from output of
-;; `gst-inspect cdparanoiasrc' - "paranoia-mode" property information)
-(define-enum-extended CdParanoiaMode
-  (in-module "Gst")
-  (c-name "GstCdParanoiaMode")
-  (values
-    '("disable" "GST_PARANOIA_MODE_DISABLE" "1<<0")
-    '("fragment" "GST_PARANOIA_MODE_FRAGMENT" "1<<1")
-    '("overlap" "GST_PARANOIA_MODE_OVERLAP" "1<<2")
-    '("scratch" "GST_PARANOIA_MODE_SCRATCH" "1<<3")
-    '("repair" "GST_PARANOIA_MODE_REPAIR" "1<<4")
-    '("full" "GST_PARANOIA_MODE_FULL" "0xff")
-  )
-)
-
-;; Handwritten for MultiSocketSink plugin (values taken from output of
-;; `gst-inspect multisocketsink' - "sync-method" property information)
-(define-enum-extended MultiHandleSinkSyncMethod
-  (in-module "Gst")
-  (c-name "GstMultiHandleSinkSyncMethod")
-  (values
-    '("latest" "GST_SYNC_METHOD_LATEST" "0")
-    '("next-keyframe" "GST_SYNC_METHOD_NEXT_KEYFRAME" "1")
-    '("latest-keyframe" "GST_SYNC_METHOD_LATEST_KEYFRAME" "2")
-    '("burst" "GST_SYNC_METHOD_BURST" "3")
-    '("burst-keyframe" "GST_SYNC_METHOD_BURST_KEYFRAME" "4")
-    '("burst-with-keyframe" "GST_SYNC_METHOD_BURST_WITH_KEYFRAME" "5")
-  )
-)
-
-;; Handwritten for OutputSelector plugin (values taken from output of
-;; `gst-inspect output-selector' - "pad-negotiation-mode" property information)
-(define-enum-extended OutputSelectorPadNegotiationMode
-  (in-module "Gst")
-  (c-name "GstOutputSelectorPadNegotiationMode")
-  (values
-    '("none" "GST_OUTPUT_SELECTOR_PAD_NEGOTIATION_MODE_NONE" "0")
-    '("all" "GST_OUTPUT_SELECTOR_PAD_NEGOTIATION_MODE_ALL" "1")
-    '("active" "GST_OUTPUT_SELECTOR_PAD_NEGOTIATION_MODE_ACTIVE" "2")
-  )
-)
-
-;; Handwritten for EncodeBin plugin (values taken from file 
-;; gst-plugins-base/gst/encoding/gstencodebin.c, enum used for 'flags' property)
-(define-enum-extended EncodeBinFlags
-  (in-module "Gst")
-  (c-name "GstEncodeBinFlags")
-  (values
-    '("no-audio-conversion" "GST_ENCODEBIN_FLAG_NO_AUDIO_CONVERSION" "1<<0")
-    '("no-video-conversion" "GST_ENCODEBIN_FLAG_NO_VIDEO_CONVERSION" "1<<1")
-  )
-)
-
-;; Handwritten for MultiSocketSink plugin (values taken from file 
+;; Handwritten for MultiSocketSink plugin (values taken from file
 ;; gst-plugins-base/gst/tcp/gstmultihandlesink.c, enum used for 'client-removed' signal)
 (define-enum-extended MultiHandleSinkClientStatus
   (in-module "Gst")
@@ -6818,7 +6924,7 @@
   )
 )
 
-;; Handwritten for PlaySink plugin (values taken from file 
+;; Handwritten for PlaySink plugin (values taken from file
 ;; gst-plugins-base/gst/playback/gstplaysink.c, enum used for 'send-event-mode' property)
 (define-enum-extended PlaySinkSendEventMode
   (in-module "Gst")

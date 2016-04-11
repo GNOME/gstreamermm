@@ -40,7 +40,7 @@ Flags for allocators.
 <signal name="GstAppSink::eos">
 <description>
 Signal that the end-of-stream has been reached. This signal is emitted from
-the steaming thread.
+the streaming thread.
 
 </description>
 <parameters>
@@ -56,7 +56,7 @@ the steaming thread.
 <description>
 Signal that a new preroll sample is available.
 
-This signal is emitted from the steaming thread and only when the
+This signal is emitted from the streaming thread and only when the
 &quot;emit-signals&quot; property is %TRUE.
 
 The new preroll sample can be retrieved with the &quot;pull-preroll&quot; action
@@ -80,7 +80,7 @@ set to %TRUE, which it is not by default for performance reasons.
 <description>
 Signal that a new sample is available.
 
-This signal is emitted from the steaming thread and only when the
+This signal is emitted from the streaming thread and only when the
 &quot;emit-signals&quot; property is %TRUE.
 
 The new sample can be retrieved with the &quot;pull-sample&quot; action
@@ -158,6 +158,20 @@ If an EOS event was received before any buffers, this function returns
 </parameters>
 <return> a #GstSample or NULL when the appsink is stopped or EOS.
 </return>
+</signal>
+
+<signal name="GstAppSink::wait-on-eos">
+<description>
+Wait for all buffers to be processed after receiving an EOS.
+
+In cases where it is uncertain if an @appsink will have a consumer for its buffers
+when it receives an EOS, set to %FALSE to ensure that the @appsink will not hang.
+
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </signal>
 
 <signal name="GstAppSrc::block">
@@ -449,6 +463,41 @@ such as in a local file.
 </parameters>
 </enum>
 
+<enum name="GstAudioBaseSinkDiscontReason">
+<description>
+Different possible reasons for discontinuities. This enum is useful for the custom
+slave method.
+
+
+</description>
+<parameters>
+<parameter name="GST_AUDIO_BASE_SINK_DISCONT_REASON_NO_DISCONT">
+<parameter_description> No discontinuity occurred
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_BASE_SINK_DISCONT_REASON_NEW_CAPS">
+<parameter_description> New caps are set, causing renegotiotion
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_BASE_SINK_DISCONT_REASON_FLUSH">
+<parameter_description> Samples have been flushed
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_BASE_SINK_DISCONT_REASON_SYNC_LATENCY">
+<parameter_description> Sink was synchronized to the estimated latency (occurs during initialization)
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_BASE_SINK_DISCONT_REASON_ALIGNMENT">
+<parameter_description> Aligning buffers failed because the timestamps are too discontinuous
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_BASE_SINK_DISCONT_REASON_DEVICE_FAILURE">
+<parameter_description> Audio output device experienced and recovered from an error but introduced latency in the process (see also @gst_audio_base_sink_report_device_failure())
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GstAudioBaseSinkSlaveMethod">
 <description>
 Different possible clock slaving algorithms used when the internal audio
@@ -517,6 +566,35 @@ EOS handling and seeking.
 </parameter>
 <parameter name="GST_AUDIO_CD_SRC_MODE_CONTINUOUS">
 <parameter_description> the entire disc is a single stream
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GstAudioChannelMixerFlags">
+<description>
+Flags passed to gst_audio_channel_mixer_new()
+
+</description>
+<parameters>
+<parameter name="GST_AUDIO_CHANNEL_MIXER_FLAGS_NONE">
+<parameter_description> no flag
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_IN">
+<parameter_description> input channels are not interleaved
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_OUT">
+<parameter_description> output channels are not interleaved
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_IN">
+<parameter_description> input channels are explicitly unpositioned
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_OUT">
+<parameter_description> output channels are explicitly unpositioned
 </parameter_description>
 </parameter>
 </parameters>
@@ -676,6 +754,54 @@ any other channel position
 </parameter>
 <parameter name="GST_AUDIO_CHANNEL_POSITION_INVALID">
 <parameter_description> invalid position
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GstAudioConverterFlags">
+<description>
+Extra flags passed to gst_audio_converter_new() and gst_audio_converter_samples().
+
+</description>
+<parameters>
+<parameter name="GST_AUDIO_CONVERTER_FLAG_NONE">
+<parameter_description> no flag
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_CONVERTER_FLAG_IN_WRITABLE">
+<parameter_description> the input sample arrays are writable and can be
+used as temporary storage during conversion.
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_CONVERTER_FLAG_VARIABLE_RATE">
+<parameter_description> allow arbitrary rate updates with
+gst_audio_converter_update_config().
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GstAudioDitherMethod">
+<description>
+Set of available dithering methods.
+
+</description>
+<parameters>
+<parameter name="GST_AUDIO_DITHER_NONE">
+<parameter_description> No dithering
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_DITHER_RPDF">
+<parameter_description> Rectangular dithering
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_DITHER_TPDF">
+<parameter_description> Triangular dithering (default)
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_DITHER_TPDF_HF">
+<parameter_description> High frequency triangular dithering
 </parameter_description>
 </parameter>
 </parameters>
@@ -939,6 +1065,35 @@ Layout of the audio samples for the different channels.
 </parameters>
 </enum>
 
+<enum name="GstAudioNoiseShapingMethod">
+<description>
+Set of available noise shaping methods
+
+</description>
+<parameters>
+<parameter name="GST_AUDIO_NOISE_SHAPING_NONE">
+<parameter_description> No noise shaping (default)
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_NOISE_SHAPING_ERROR_FEEDBACK">
+<parameter_description> Error feedback
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_NOISE_SHAPING_SIMPLE">
+<parameter_description> Simple 2-pole noise shaping
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_NOISE_SHAPING_MEDIUM">
+<parameter_description> Medium 5-pole noise shaping
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_NOISE_SHAPING_HIGH">
+<parameter_description> High 8-pole noise shaping
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GstAudioPackFlags">
 <description>
 The different flags that can be used when packing and unpacking.
@@ -947,6 +1102,31 @@ The different flags that can be used when packing and unpacking.
 <parameters>
 <parameter name="GST_AUDIO_PACK_FLAG_NONE">
 <parameter_description> No flag
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_PACK_FLAG_TRUNCATE_RANGE">
+<parameter_description> When the source has a smaller depth
+than the target format, set the least significant bits of the target
+to 0. This is likely sightly faster but less accurate. When this flag
+is not specified, the most significant bits of the source are duplicated
+in the least significant bits of the destination.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GstAudioQuantizeFlags">
+<description>
+Extra flags that can be passed to gst_audio_quantize_new()
+
+</description>
+<parameters>
+<parameter name="GST_AUDIO_QUANTIZE_FLAG_NONE">
+<parameter_description> no flags
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_QUANTIZE_FLAG_NON_INTERLEAVED">
+<parameter_description> samples are non-interleaved
 </parameter_description>
 </parameter>
 </parameters>
@@ -1031,6 +1211,55 @@ The state of the ringbuffer.
 <parameter_description> The ringbuffer has encountered an
 error after it has been started, e.g. because the device was
 disconnected (Since 1.2)
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GstAudioVisualizerShader">
+<description>
+Different types of supported background shading functions.
+
+</description>
+<parameters>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_NONE">
+<parameter_description> no shading
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE">
+<parameter_description> plain fading
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_UP">
+<parameter_description> fade and move up
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_DOWN">
+<parameter_description> fade and move down
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_LEFT">
+<parameter_description> fade and move left
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_RIGHT">
+<parameter_description> fade and move right
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_OUT">
+<parameter_description> fade and move horizontally out
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_IN">
+<parameter_description> fade and move horizontally in
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_OUT">
+<parameter_description> fade and move vertically out
+</parameter_description>
+</parameter>
+<parameter name="GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_IN">
+<parameter_description> fade and move vertically in
 </parameter_description>
 </parameter>
 </parameters>
@@ -3022,7 +3251,14 @@ The various interpolation modes available.
 </parameter_description>
 </parameter>
 <parameter name="GST_INTERPOLATION_MODE_CUBIC">
-<parameter_description> cubic interpolation
+<parameter_description> cubic interpolation (natural), may overshoot
+the min or max values set by the control point, but is more 'curvy'
+</parameter_description>
+</parameter>
+<parameter name="GST_INTERPOLATION_MODE_CUBIC_MONOTONIC">
+<parameter_description> monotonic cubic interpolation, will not
+produce any values outside of the min-max range set by the control points
+(Since 1.8)
 </parameter_description>
 </parameter>
 </parameters>
@@ -3544,7 +3780,7 @@ made when this memory needs to be shared between buffers.
 </parameter_description>
 </parameter>
 <parameter name="GST_MEMORY_FLAG_PHYSICALLY_CONTIGUOUS">
-<parameter_description> the memory is physically contiguous. (Since 2.2)
+<parameter_description> the memory is physically contiguous. (Since 1.2)
 </parameter_description>
 </parameter>
 <parameter name="GST_MEMORY_FLAG_NOT_MAPPABLE">
@@ -4008,7 +4244,7 @@ Tyoes of navigation interface queries.
 </parameters>
 </enum>
 
-<signal name="GstNetClientClock::round-trip-limit">
+<signal name="GstNetClientInternalClock::round-trip-limit">
 <description>
 Maximum allowed round-trip for packets. If this property is set to a nonzero
 value, all packets with a round-trip interval larger than this limit will be
@@ -4539,6 +4775,10 @@ The different parsing errors that can occur.
 <parameter_description> An empty description was specified
 </parameter_description>
 </parameter>
+<parameter name="GST_PARSE_ERROR_DELAYED_LINK">
+<parameter_description> A delayed link did not get resolved.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -4606,6 +4846,12 @@ argument only if none of the environment variables is set
 <parameter_description> interpret
 filename argument as filter suffix and check all matching files in
 the directory
+</parameter_description>
+</parameter>
+<parameter name="GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_PREFIX">
+<parameter_description> interpret
+filename argument as filter prefix and check all matching files in
+the directory. Since 1.8.
 </parameter_description>
 </parameter>
 </parameters>
@@ -4966,6 +5212,26 @@ Different RTCP packet types.
 </parameter>
 <parameter name="GST_RTCP_TYPE_PSFB">
 <parameter_description> Payload-specific feedback.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GstRTPBufferMapFlags">
+<description>
+Additional mapping flags for gst_rtp_buffer_map().
+
+
+</description>
+<parameters>
+<parameter name="GST_RTP_BUFFER_MAP_FLAG_SKIP_PADDING">
+<parameter_description> Skip mapping and validation of RTP
+padding and RTP pad count when present. Useful for buffers where
+the padding may be encrypted.
+</parameter_description>
+</parameter>
+<parameter name="GST_RTP_BUFFER_MAP_FLAG_LAST">
+<parameter_description> Offset to define more flags
 </parameter_description>
 </parameter>
 </parameters>
@@ -6860,6 +7126,61 @@ current title)
 </parameters>
 </enum>
 
+<enum name="GstTracerValueFlags">
+<description>
+Flag that describe the value. These flags help applications processing the
+logs to understand the values.
+
+</description>
+<parameters>
+<parameter name="GST_TRACER_VALUE_FLAGS_NONE">
+<parameter_description> no flags
+</parameter_description>
+</parameter>
+<parameter name="GST_TRACER_VALUE_FLAGS_OPTIONAL">
+<parameter_description> the value is optional. When using this flag
+one need to have an additional boolean arg before this value in the
+var-args list passed to  gst_tracer_record_log().
+</parameter_description>
+</parameter>
+<parameter name="GST_TRACER_VALUE_FLAGS_AGGREGATED">
+<parameter_description> the value is combined since the start of
+tracing
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GstTracerValueScope">
+<description>
+Tracing record will contain fields that contain a meassured value or extra
+meta-data. One such meta data are values that tell where a measurement was
+taken. This enumerating declares to which scope such a meta data field
+relates to. If it is e.g. %GST_TRACER_VALUE_SCOPE_PAD, then each of the log
+events may contain values for different #GstPads.
+
+
+</description>
+<parameters>
+<parameter name="GST_TRACER_VALUE_SCOPE_PROCESS">
+<parameter_description> the value is related to the process
+</parameter_description>
+</parameter>
+<parameter name="GST_TRACER_VALUE_SCOPE_THREAD">
+<parameter_description> the value is related to a thread
+</parameter_description>
+</parameter>
+<parameter name="GST_TRACER_VALUE_SCOPE_ELEMENT">
+<parameter_description> the value is related to an #GstElement
+</parameter_description>
+</parameter>
+<parameter name="GST_TRACER_VALUE_SCOPE_PAD">
+<parameter_description> the value is related to a #GstPad
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GstTypeFindProbability">
 <description>
 The probability of the typefind function. Higher values have more certainty
@@ -7230,6 +7551,10 @@ the CIE XYZ colorspace.
 </parameter>
 <parameter name="GST_VIDEO_COLOR_PRIMARIES_BT2020">
 <parameter_description> BT2020 primaries. Since: 1.6.
+</parameter_description>
+</parameter>
+<parameter name="GST_VIDEO_COLOR_PRIMARIES_ADOBERGB">
+<parameter_description> Adobe RGB primaries. Since: 1.8
 </parameter_description>
 </parameter>
 </parameters>
@@ -8027,6 +8352,10 @@ range
 <parameter_description> Gamma 2.2 curve with a linear segment in the lower
 range. Used for BT.2020 with 12 bits per
 component. Since: 1.6.
+</parameter_description>
+</parameter>
+<parameter name="GST_VIDEO_TRANSFER_ADOBERGB">
+<parameter_description> Gamma 2.19921875. Since: 1.8
 </parameter_description>
 </parameter>
 </parameters>
@@ -9390,6 +9719,24 @@ Get the maximum amount of buffers that can be queued in @appsink.
 </return>
 </function>
 
+<function name="gst_app_sink_get_wait_on_eos">
+<description>
+Check if @appsink will wait for all buffers to be consumed when an EOS is
+received.
+
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> a #GstAppSink
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @appsink will wait for all buffers to be consumed when an
+EOS is received.
+</return>
+</function>
+
 <function name="gst_app_sink_is_eos">
 <description>
 Check if @appsink is EOS, which is when no more samples can be pulled because
@@ -9504,8 +9851,8 @@ reasons.
 <description>
 Set the capabilities on the appsink element.  This function takes
 a copy of the caps structure. After calling this method, the sink will only
-accept caps that match @caps. If @caps is non-fixed, you must check the caps
-on the buffers to get the actual used caps.
+accept caps that match @caps. If @caps is non-fixed, or incomplete,
+you must check the caps on the samples to get the actual used caps.
 
 </description>
 <parameters>
@@ -9574,6 +9921,25 @@ elements until a sample is pulled from @appsink.
 </parameter>
 <parameter name="max">
 <parameter_description> the maximum number of buffers to queue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_app_sink_set_wait_on_eos">
+<description>
+Instruct @appsink to wait for all buffers to be consumed when an EOS is received.
+
+
+</description>
+<parameters>
+<parameter name="appsink">
+<parameter_description> a #GstAppSink
+</parameter_description>
+</parameter>
+<parameter name="wait">
+<parameter_description> the new state
 </parameter_description>
 </parameter>
 </parameters>
@@ -9750,8 +10116,8 @@ space becomes available in the queue.
 <description>
 Extract a buffer from the provided sample and adds it to the queue of 
 buffers that the appsrc element will push to its source pad. Any 
-previous caps setted on appsrc will be replaced by the caps associated 
-with the sample if not equal.
+previous caps that were set on appsrc will be replaced by the caps
+associated with the sample if not equal.
 
 When the block property is TRUE, this function can block until free
 space becomes available in the queue.
@@ -9765,8 +10131,8 @@ space becomes available in the queue.
 </parameter_description>
 </parameter>
 <parameter name="sample">
-<parameter_description> a #GstSample from wich extract buffer to 
-push and caps to set
+<parameter_description> a #GstSample from which buffer and caps may be
+extracted
 </parameter_description>
 </parameter>
 </parameters>
@@ -10512,6 +10878,90 @@ copy of the structure (and take ownership of the taglist if there is one).
 </return>
 </function>
 
+<function name="gst_audio_channel_get_fallback_mask">
+<description>
+Get the fallback channel-mask for the given number of channels.
+
+This function returns a reasonable fallback channel-mask and should be
+called as a last resort when the specific channel map is unknown.
+
+
+</description>
+<parameters>
+<parameter name="channels">
+<parameter_description> the number of channels
+</parameter_description>
+</parameter>
+</parameters>
+<return> a fallback channel-mask for @channels or 0 when there is no
+mask.
+
+</return>
+</function>
+
+<function name="gst_audio_channel_mixer_free">
+<description>
+Free memory allocated by @mix.
+
+</description>
+<parameters>
+<parameter name="mix">
+<parameter_description> a #GstAudioChannelMixer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_channel_mixer_is_passthrough">
+<description>
+Check if @mix is in passthrough.
+
+
+</description>
+<parameters>
+<parameter name="mix">
+<parameter_description> a #GstAudioChannelMixer
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE is @mix is passthrough.
+</return>
+</function>
+
+<function name="gst_audio_channel_mixer_samples">
+<description>
+In case the samples are interleaved, @in and @out must point to an
+array with a single element pointing to a block of interleaved samples.
+
+If non-interleaved samples are used, @in and @out must point to an
+array with pointers to memory blocks, one for each channel.
+
+Perform channel mixing on @in_data and write the result to @out_data.
+@in_data and @out_data need to be in @format and @layout.
+
+</description>
+<parameters>
+<parameter name="mix">
+<parameter_description> a #GstAudioChannelMixer
+</parameter_description>
+</parameter>
+<parameter name="in">
+<parameter_description> input samples
+</parameter_description>
+</parameter>
+<parameter name="out">
+<parameter_description> output samples
+</parameter_description>
+</parameter>
+<parameter name="samples">
+<parameter_description> number of samples
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_audio_channel_positions_from_mask">
 <description>
 Convert the @channels present in @channel_mask to a @position array
@@ -10728,6 +11178,244 @@ the #GstClock object.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_audio_converter_free">
+<description>
+Free a previously allocated @convert instance.
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_converter_get_config">
+<description>
+Get the current configuration of @convert.
+
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+<parameter name="in_rate">
+<parameter_description> result input rate
+</parameter_description>
+</parameter>
+<parameter name="out_rate">
+<parameter_description> result output rate
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstStructure that remains valid for as long as @convert is valid
+or until gst_audio_converter_update_config() is called.
+</return>
+</function>
+
+<function name="gst_audio_converter_get_in_frames">
+<description>
+Calculate how many input frames are currently needed by @convert to produce
+@out_frames of output frames.
+
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+<parameter name="out_frames">
+<parameter_description> number of output frames
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of input frames
+</return>
+</function>
+
+<function name="gst_audio_converter_get_max_latency">
+<description>
+Get the maximum number of input frames that the converter would
+need before producing output.
+
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+</parameters>
+<return> the latency of @convert as expressed in the number of
+frames.
+</return>
+</function>
+
+<function name="gst_audio_converter_get_out_frames">
+<description>
+Calculate how many output frames can be produced when @in_frames input
+frames are given to @convert.
+
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+<parameter name="in_frames">
+<parameter_description> number of input frames
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of output frames
+</return>
+</function>
+
+<function name="gst_audio_converter_new">
+<description>
+Create a new #GstAudioConverter that is able to convert between @in and @out
+audio formats.
+
+@config contains extra configuration options, see #GST_VIDEO_CONVERTER_OPT_*
+parameters for details about the options and values.
+
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> #GstAudioConverterFlags
+</parameter_description>
+</parameter>
+<parameter name="in_info">
+<parameter_description> a source #GstAudioInfo
+</parameter_description>
+</parameter>
+<parameter name="out_info">
+<parameter_description> a destination #GstAudioInfo
+</parameter_description>
+</parameter>
+<parameter name="config">
+<parameter_description> a #GstStructure with configuration options
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstAudioConverter or %NULL if conversion is not possible.
+</return>
+</function>
+
+<function name="gst_audio_converter_reset">
+<description>
+Reset @convert to the state it was when it was first created, clearing
+any history it might currently have.
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_converter_samples">
+<description>
+Perform the conversion with @in_frames in @in to @out_frames in @out
+using @convert.
+
+In case the samples are interleaved, @in and @out must point to an
+array with a single element pointing to a block of interleaved samples.
+
+If non-interleaved samples are used, @in and @out must point to an
+array with pointers to memory blocks, one for each channel.
+
+@in may be %NULL, in which case @in_frames of silence samples are processed
+by the converter.
+
+This function always produces @out_frames of output and consumes @in_frames of
+input. Use gst_audio_converter_get_out_frames() and
+gst_audio_converter_get_in_frames() to make sure @in_frames and @out_frames
+are matching and @in and @out point to enough memory.
+
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> extra #GstAudioConverterFlags
+</parameter_description>
+</parameter>
+<parameter name="in">
+<parameter_description> input frames
+</parameter_description>
+</parameter>
+<parameter name="in_frames">
+<parameter_description> number of input frames
+</parameter_description>
+</parameter>
+<parameter name="out">
+<parameter_description> output frames
+</parameter_description>
+</parameter>
+<parameter name="out_frames">
+<parameter_description> number of output frames
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE is the conversion could be performed.
+</return>
+</function>
+
+<function name="gst_audio_converter_update_config">
+<description>
+Set @in_rate, @out_rate and @config as extra configuration for @convert.
+
+in_rate and @out_rate specify the new sample rates of input and output
+formats. A value of 0 leaves the sample rate unchanged.
+
+@config can be %NULL, in which case, the current configuration is not
+changed.
+
+If the parameters in @config can not be set exactly, this function returns
+%FALSE and will try to update as much state as possible. The new state can
+then be retrieved and refined with gst_audio_converter_get_config().
+
+Look at the #GST_AUDIO_CONVERTER_OPT_* fields to check valid configuration
+option and values.
+
+
+</description>
+<parameters>
+<parameter name="convert">
+<parameter_description> a #GstAudioConverter
+</parameter_description>
+</parameter>
+<parameter name="in_rate">
+<parameter_description> input rate
+</parameter_description>
+</parameter>
+<parameter name="out_rate">
+<parameter_description> output rate
+</parameter_description>
+</parameter>
+<parameter name="config">
+<parameter_description> a #GstStructure or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE when the new parameters could be set
+</return>
 </function>
 
 <function name="gst_audio_decoder_allocate_output_buffer">
@@ -11704,6 +12392,9 @@ MT safe.
 Sets max number of frames accepted at once (assumed minimally 1).
 Requires @frame_samples_min and @frame_samples_max to be the equal.
 
+Note: This value will be reset to 0 every time before
+GstAudioEncoder::set_format() is called.
+
 </description>
 <parameters>
 <parameter name="enc">
@@ -11726,6 +12417,9 @@ at most or will be handed all available if 0.
 If an exact number of samples is required, gst_audio_encoder_set_frame_samples_min()
 must be called with the same number.
 
+Note: This value will be reset to 0 every time before
+GstAudioEncoder::set_format() is called.
+
 </description>
 <parameters>
 <parameter name="enc">
@@ -11747,6 +12441,9 @@ at least or will be handed all available if 0.
 
 If an exact number of samples is required, gst_audio_encoder_set_frame_samples_max()
 must be called with the same number.
+
+Note: This value will be reset to 0 every time before
+GstAudioEncoder::set_format() is called.
 
 </description>
 <parameters>
@@ -11849,6 +12546,9 @@ Sets encoder latency.
 <function name="gst_audio_encoder_set_lookahead">
 <description>
 Sets encoder lookahead (in units of input rate samples)
+
+Note: This value will be reset to 0 every time before
+GstAudioEncoder::set_format() is called.
 
 </description>
 <parameters>
@@ -12306,6 +13006,70 @@ Convert the values of @info into a #GstCaps.
 <return> the new #GstCaps containing the
 info of @info.
 </return>
+</function>
+
+<function name="gst_audio_quantize_free">
+<description>
+Free a #GstAudioQuantize.
+
+</description>
+<parameters>
+<parameter name="quant">
+<parameter_description> a #GstAudioQuantize
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_quantize_reset">
+<description>
+Reset @quant to the state is was when created, clearing any
+history it might have.
+
+</description>
+<parameters>
+<parameter name="quant">
+<parameter_description> a #GstAudioQuantize
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_audio_quantize_samples">
+<description>
+Perform quantization on @samples in @in and write the result to @out.
+
+In case the samples are interleaved, @in and @out must point to an
+array with a single element pointing to a block of interleaved samples.
+
+If non-interleaved samples are used, @in and @out must point to an
+array with pointers to memory blocks, one for each channel.
+
+@in and @out may point to the same memory location, in which case samples will be
+modified in-place.
+
+</description>
+<parameters>
+<parameter name="quant">
+<parameter_description> a #GstAudioQuantize
+</parameter_description>
+</parameter>
+<parameter name="in">
+<parameter_description> input samples
+</parameter_description>
+</parameter>
+<parameter name="out">
+<parameter_description> output samples
+</parameter_description>
+</parameter>
+<parameter name="samples">
+<parameter_description> number of samples
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_audio_reorder_channels">
@@ -15720,6 +16484,35 @@ are enough bits available in the bit reader.
 <return></return>
 </function>
 
+<function name="gst_buffer_add_audio_clipping_meta">
+<description>
+Attaches #GstAudioClippingMeta metadata to @buffer with the given parameters.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> GstFormat of @start and @stop, GST_FORMAT_DEFAULT is samples
+</parameter_description>
+</parameter>
+<parameter name="start">
+<parameter_description> Amount of audio to clip from start of buffer
+</parameter_description>
+</parameter>
+<parameter name="end">
+<parameter_description> Amount of  to clip from end of buffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstAudioClippingMeta on @buffer.
+
+</return>
+</function>
+
 <function name="gst_buffer_add_audio_downmix_meta">
 <description>
 Attaches #GstAudioDownmixMeta metadata to @buffer with the given parameters.
@@ -15870,6 +16663,24 @@ function takes ownership of @info.
 </parameters>
 <return> a pointer to the added #GstProtectionMeta if successful; %NULL if
 unsuccessful.
+
+</return>
+</function>
+
+<function name="gst_buffer_add_video_affine_transformation_meta">
+<description>
+Attaches GstVideoAffineTransformationMeta metadata to @buffer with
+the given parameters.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstVideoAffineTransformationMeta on @buffer.
 
 </return>
 </function>
@@ -16585,6 +17396,23 @@ and check the meta-&gt;info.api member for the API type.
 </return>
 </function>
 
+<function name="gst_buffer_get_net_address_meta">
+<description>
+Find the #GstNetAddressMeta on @buffer.
+
+
+</description>
+<parameters>
+<parameter name="buffer">
+<parameter_description> a #GstBuffer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstNetAddressMeta or %NULL when there
+is no such metadata on @buffer.
+</return>
+</function>
+
 <function name="gst_buffer_get_parent_buffer_meta">
 <description>
 Find and return a #GstParentBufferMeta if one exists on the
@@ -17147,9 +17975,24 @@ buffer list will be freed.
 
 <function name="gst_buffer_make_writable">
 <description>
-Makes a writable buffer from the given buffer. If the source buffer is
-already writable, this will simply return the same buffer. A copy will
-otherwise be made using gst_buffer_copy().
+Returns a writable copy of @buf. If the source buffer is
+already writable, this will simply return the same buffer.
+
+Use this function to ensure that a buffer can be safely modified before
+making changes to it, including changing the metadata such as PTS/DTS.
+
+If the reference count of the source buffer @buf is exactly one, the caller
+is the sole owner and this function will return the buffer object unchanged.
+
+If there is more than one reference on the object, a copy will be made using
+gst_buffer_copy(). The passed-in @buf will be unreffed in that case, and the
+caller will now own a reference to the new returned buffer object. Note
+that this just copies the buffer structure itself, the underlying memory is
+not copied if it can be shared amongst multiple buffers.
+
+In short, this function unrefs the buf in the argument and refs the buffer
+that it returns. Don't access the argument after calling this function unless
+you have an additional reference to it.
 
 
 </description>
@@ -17521,11 +18364,11 @@ Get the @allocator and @params from @config.
 </parameter_description>
 </parameter>
 <parameter name="allocator">
-<parameter_description> a #GstAllocator
+<parameter_description> a #GstAllocator, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="params">
-<parameter_description> #GstAllocationParams
+<parameter_description> #GstAllocationParams, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -22248,8 +23091,8 @@ checking if there is enough free space available in the byte writer.
 
 <function name="gst_byte_writer_put_int8">
 <description>
-Writes a signed 8 bit integer to @writer without
-checking if there is enough free space available in the byte writer.
+Writes a signed 8 bit integer to @writer.
+
 
 </description>
 <parameters>
@@ -22262,7 +23105,8 @@ checking if there is enough free space available in the byte writer.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the value could be written
+</return>
 </function>
 
 <function name="gst_byte_writer_put_string">
@@ -23327,7 +24171,7 @@ the MT Refcounting section of the design documents.
 Converts @features to a human-readable string representation.
 
 For debugging purposes its easier to do something like this:
-|[
+|[&lt;!-- language=&quot;C&quot; --&gt;
 GST_LOG (&quot;features is %&quot; GST_PTR_FORMAT, features);
 ]|
 This prints the features in human readable form.
@@ -23381,6 +24225,10 @@ The caps must be mutable.
 Modifies the given @caps into a representation with only fixed
 values. First the caps will be truncated and then the first structure will be
 fixated with gst_structure_fixate().
+
+This function takes ownership of @caps and will call gst_caps_make_writable()
+on it so you must not use @caps afterwards unless you keep an additional
+reference to it with gst_caps_ref().
 
 
 </description>
@@ -24058,7 +24906,9 @@ Returns a #GstCaps that represents the same set of formats as
 @caps, but contains no lists.  Each list is expanded into separate
 @GstStructures.
 
-This function takes ownership of @caps.
+This function takes ownership of @caps and will call gst_caps_make_writable()
+on it so you must not use @caps afterwards unless you keep an additional
+reference to it with gst_caps_ref().
 
 
 </description>
@@ -24241,6 +25091,10 @@ same set of formats, but in a simpler form.  Component structures that are
 identical are merged.  Component structures that have values that can be
 merged are also merged.
 
+This function takes ownership of @caps and will call gst_caps_make_writable()
+on it if necessary, so you must not use @caps afterwards unless you keep an
+additional reference to it with gst_caps_ref().
+
 This method does not preserve the original order of @caps.
 
 
@@ -24329,7 +25183,7 @@ Converts @caps to a string representation.  This string representation
 can be converted back to a #GstCaps by gst_caps_from_string().
 
 For debugging purposes its easier to do something like this:
-|[
+|[&lt;!-- language=&quot;C&quot; --&gt;
 GST_LOG (&quot;caps are %&quot; GST_PTR_FORMAT, caps);
 ]|
 This prints the caps in human readable form.
@@ -24353,6 +25207,10 @@ when there are nested #GstCaps / #GstStructure deeper than one level.
 <description>
 Discard all but the first structure from @caps. Useful when
 fixating.
+
+This function takes ownership of @caps and will call gst_caps_make_writable()
+on it if necessary, so you must not use @caps afterwards unless you keep an
+additional reference to it with gst_caps_ref().
 
 
 </description>
@@ -24651,7 +25509,7 @@ Does the same as #gst_check_setup_sink_pad_by_name with the &lt;emphasis&gt; nam
 
 <function name="gst_check_setup_sink_pad_by_name">
 <description>
-Creates a new sink pad (based on the given @tmpl) and links it to the given @element src pad 
+Creates a new sink pad (based on the given @tmpl) and links it to the given @element src pad
 (the pad that matches the given @name).
 You can set event/chain/query functions on this pad to check the output of the @element.
 
@@ -25234,6 +26092,8 @@ using the passed calibration parameters. This function performs the
 same calculation as gst_clock_adjust_unlocked() when called using the
 current calibration parameters, but doesn't ensure a monotonically
 increasing result as gst_clock_adjust_unlocked() does.
+
+Note: The @clock parameter is unused and can be NULL
 
 
 </description>
@@ -25883,6 +26743,49 @@ This function is the reverse of gst_clock_adjust_unlocked().
 </return>
 </function>
 
+<function name="gst_clock_unadjust_with_calibration">
+<description>
+Converts the given @external_target clock time to the internal time,
+using the passed calibration parameters. This function performs the
+same calculation as gst_clock_unadjust_unlocked() when called using the
+current calibration parameters.
+
+Note: The @clock parameter is unused and can be NULL
+
+
+</description>
+<parameters>
+<parameter name="clock">
+<parameter_description> a #GstClock to use
+</parameter_description>
+</parameter>
+<parameter name="external_target">
+<parameter_description> a clock time
+</parameter_description>
+</parameter>
+<parameter name="cinternal">
+<parameter_description> a reference internal time
+</parameter_description>
+</parameter>
+<parameter name="cexternal">
+<parameter_description> a reference external time
+</parameter_description>
+</parameter>
+<parameter name="cnum">
+<parameter_description> the numerator of the rate of the clock relative to its
+internal time
+</parameter_description>
+</parameter>
+<parameter name="cdenom">
+<parameter_description> the denominator of the rate of the clock
+</parameter_description>
+</parameter>
+</parameters>
+<return> the converted time of the clock.
+
+</return>
+</function>
+
 <function name="gst_clock_wait_for_sync">
 <description>
 Waits until @clock is synced for reporting the current time. If @timeout
@@ -26352,6 +27255,200 @@ object sequence start code. Only the first byte
 </parameter>
 </parameters>
 <return> The profile as a const string, or NULL if there is an error.
+</return>
+</function>
+
+<function name="gst_codec_utils_opus_create_caps">
+<description>
+Creates Opus caps from the given parameters.
+
+
+</description>
+<parameters>
+<parameter name="rate">
+<parameter_description> the sample rate
+</parameter_description>
+</parameter>
+<parameter name="channels">
+<parameter_description> the number of channels
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping_family">
+<parameter_description> the channel mapping family
+</parameter_description>
+</parameter>
+<parameter name="stream_count">
+<parameter_description> the number of independent streams
+</parameter_description>
+</parameter>
+<parameter name="coupled_count">
+<parameter_description> the number of stereo streams
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping">
+<parameter_description> the mapping between the streams
+</parameter_description>
+</parameter>
+</parameters>
+<return> The #GstCaps.
+
+</return>
+</function>
+
+<function name="gst_codec_utils_opus_create_caps_from_header">
+<description>
+Creates Opus caps from the given OpusHead @header and comment header
+@comments.
+
+
+</description>
+<parameters>
+<parameter name="header">
+<parameter_description> OpusHead header
+</parameter_description>
+</parameter>
+<parameter name="comments">
+<parameter_description> Comment header or NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The #GstCaps.
+
+</return>
+</function>
+
+<function name="gst_codec_utils_opus_create_header">
+<description>
+Creates OpusHead header from the given parameters.
+
+
+</description>
+<parameters>
+<parameter name="rate">
+<parameter_description> the sample rate
+</parameter_description>
+</parameter>
+<parameter name="channels">
+<parameter_description> the number of channels
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping_family">
+<parameter_description> the channel mapping family
+</parameter_description>
+</parameter>
+<parameter name="stream_count">
+<parameter_description> the number of independent streams
+</parameter_description>
+</parameter>
+<parameter name="coupled_count">
+<parameter_description> the number of stereo streams
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping">
+<parameter_description> the mapping between the streams
+</parameter_description>
+</parameter>
+<parameter name="pre_skip">
+<parameter_description> Pre-skip in 48kHz samples or 0
+</parameter_description>
+</parameter>
+<parameter name="output_gain">
+<parameter_description> Output gain or 0
+</parameter_description>
+</parameter>
+</parameters>
+<return> The #GstBuffer containing the OpusHead.
+
+</return>
+</function>
+
+<function name="gst_codec_utils_opus_parse_caps">
+<description>
+Parses Opus caps and fills the different fields with defaults if possible.
+
+
+</description>
+<parameters>
+<parameter name="caps">
+<parameter_description> the #GstCaps to which the level and profile are to be added
+</parameter_description>
+</parameter>
+<parameter name="rate">
+<parameter_description> the sample rate
+</parameter_description>
+</parameter>
+<parameter name="channels">
+<parameter_description> the number of channels
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping_family">
+<parameter_description> the channel mapping family
+</parameter_description>
+</parameter>
+<parameter name="stream_count">
+<parameter_description> the number of independent streams
+</parameter_description>
+</parameter>
+<parameter name="coupled_count">
+<parameter_description> the number of stereo streams
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping">
+<parameter_description> the mapping between the streams
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if parsing was successful, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="gst_codec_utils_opus_parse_header">
+<description>
+Parses the OpusHead header.
+
+
+</description>
+<parameters>
+<parameter name="header">
+<parameter_description> the OpusHead #GstBuffer
+</parameter_description>
+</parameter>
+<parameter name="rate">
+<parameter_description> the sample rate
+</parameter_description>
+</parameter>
+<parameter name="channels">
+<parameter_description> the number of channels
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping_family">
+<parameter_description> the channel mapping family
+</parameter_description>
+</parameter>
+<parameter name="stream_count">
+<parameter_description> the number of independent streams
+</parameter_description>
+</parameter>
+<parameter name="coupled_count">
+<parameter_description> the number of stereo streams
+</parameter_description>
+</parameter>
+<parameter name="channel_mapping">
+<parameter_description> the mapping between the streams
+</parameter_description>
+</parameter>
+<parameter name="pre_skip">
+<parameter_description> Pre-skip in 48kHz samples or 0
+</parameter_description>
+</parameter>
+<parameter name="output_gain">
+<parameter_description> Output gain or 0
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if parsing was successful, %FALSE otherwise.
+
 </return>
 </function>
 
@@ -27434,8 +28531,8 @@ Get a writable version of the structure.
 </parameter>
 </parameters>
 <return> The structure of the context. The structure is still
-owned by the event, which means that you should not free it and
-that the pointer becomes invalid when you free the event.
+owned by the context, which means that you should not free it and
+that the pointer becomes invalid when you free the context.
 This function checks if @context is writable.
 
 </return>
@@ -29261,7 +30358,7 @@ Check if @device matches all of the given classes
 </parameter_description>
 </parameter>
 <parameter name="classes">
-<parameter_description> a &quot;/&quot; separate list of device classes to match, only match if
+<parameter_description> a &quot;/&quot;-separated list of device classes to match, only match if
 all classes are matched
 </parameter_description>
 </parameter>
@@ -29283,8 +30380,8 @@ Check if @factory matches all of the given classes
 </parameter_description>
 </parameter>
 <parameter name="classes">
-<parameter_description> a %NULL terminated array of classes to match, only match if all
-classes are matched
+<parameter_description> a %NULL terminated array of classes
+to match, only match if all classes are matched
 </parameter_description>
 </parameter>
 </parameters>
@@ -29296,7 +30393,14 @@ classes are matched
 <function name="gst_device_monitor_add_filter">
 <description>
 Adds a filter for which #GstDevice will be monitored, any device that matches
-all classes and the #GstCaps will be returned.
+all these classes and the #GstCaps will be returned.
+
+If this function is called multiple times to add more filters, each will be
+matched independently. That is, adding more filters will not further restrict
+what devices are matched.
+
+The #GstCaps supported by the device as returned by gst_device_get_caps() are
+not intersected with caps filters added using this function.
 
 Filters must be added before the #GstDeviceMonitor is started.
 
@@ -31249,6 +32353,28 @@ dynamically loaded plugins.)
 <return></return>
 </function>
 
+<function name="gst_element_class_add_static_pad_template">
+<description>
+Adds a pad template to an element class based on the static pad template
+@templ. This is mainly used in the _class_init functions of element
+implementations. If a pad template with the same name already exists,
+the old one is replaced by the new one.
+
+
+</description>
+<parameters>
+<parameter name="klass">
+<parameter_description> the #GstElementClass to add the pad template to.
+</parameter_description>
+</parameter>
+<parameter name="static_templ">
+<parameter_description> #GstStaticPadTemplate to add as pad template to the element class.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_element_class_get_metadata">
 <description>
 Get metadata with @key in @klass.
@@ -31926,6 +33052,69 @@ template for
 </parameters>
 <return> a compatible #GstPadTemplate,
 or %NULL if none was found. No unreferencing is necessary.
+</return>
+</function>
+
+<function name="gst_element_get_context">
+<description>
+Gets the context with @context_type set on the element or NULL.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="element">
+<parameter_description> a #GstElement to get the context of.
+</parameter_description>
+</parameter>
+<parameter name="context_type">
+<parameter_description> a name of a context to retrieve
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GstContext or NULL
+
+</return>
+</function>
+
+<function name="gst_element_get_context_unlocked">
+<description>
+Gets the context with @context_type set on the element or NULL.
+
+
+</description>
+<parameters>
+<parameter name="element">
+<parameter_description> a #GstElement to get the context of.
+</parameter_description>
+</parameter>
+<parameter name="context_type">
+<parameter_description> a name of a context to retrieve
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #GstContext or NULL
+
+</return>
+</function>
+
+<function name="gst_element_get_contexts">
+<description>
+Gets the contexts set on the element.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="element">
+<parameter_description> a #GstElement to set the context of.
+</parameter_description>
+</parameter>
+</parameters>
+<return> List of #GstContext
+
 </return>
 </function>
 
@@ -33514,7 +34703,8 @@ Find the #GstEncodingProfile with the specified name and category.
 </parameter_description>
 </parameter>
 <parameter name="profilename">
-<parameter_description> The name of the profile
+<parameter_description> The name of the profile, if %NULL
+provided, it will default to the encoding profile called `default`.
 </parameter_description>
 </parameter>
 <parameter name="category">
@@ -35086,7 +36276,10 @@ stream. A new stream-id should only be created for a stream if the upstream
 stream is split into (potentially) multiple new streams, e.g. in a demuxer,
 but not for every single element in the pipeline.
 gst_pad_create_stream_id() or gst_pad_create_stream_id_printf() can be
-used to create a stream-id.
+used to create a stream-id.  There are no particular semantics for the
+stream-id, though it should be deterministic (to support stream matching)
+and it might be used to order streams (besides any information conveyed by
+stream flags).
 
 
 </description>
@@ -37019,6 +38212,50 @@ Convert @value to a gdouble.
 </return>
 </function>
 
+<function name="gst_harness_add_element_full">
+<description>
+Adds a #GstElement to an empty #GstHarness
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="element">
+<parameter_description> a #GstElement to add to the harness (transfer none)
+</parameter_description>
+</parameter>
+<parameter name="hsrc">
+<parameter_description> a #GstStaticPadTemplate describing the harness srcpad.
+%NULL will not create a harness srcpad.
+</parameter_description>
+</parameter>
+<parameter name="element_sinkpad_name">
+<parameter_description> a #gchar with the name of the element
+sinkpad that is then linked to the harness srcpad. Can be a static or request
+or a sometimes pad that has been added. %NULL will not get/request a sinkpad
+from the element. (Like if the element is a src.)
+</parameter_description>
+</parameter>
+<parameter name="hsink">
+<parameter_description> a #GstStaticPadTemplate describing the harness sinkpad.
+%NULL will not create a harness sinkpad.
+</parameter_description>
+</parameter>
+<parameter name="element_srcpad_name">
+<parameter_description> a #gchar with the name of the element
+srcpad that is then linked to the harness sinkpad, similar to the
+@element_sinkpad_name.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_harness_add_element_sink_pad">
 <description>
 Links the specifed #GstPad the @GstHarness srcpad.
@@ -37057,6 +38294,28 @@ MT safe.
 </parameter>
 <parameter name="srcpad">
 <parameter_description> a #GstPad to link to the harness sinkpad
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_harness_add_parse">
+<description>
+Parses the @launchline and puts that in a #GstBin,
+and then attches the supplied #GstHarness to the bin.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="launchline">
+<parameter_description> a #gchar describing a gst-launch type line
 </parameter_description>
 </parameter>
 </parameters>
@@ -37311,7 +38570,7 @@ MT safe.
 
 <function name="gst_harness_crank_multiple_clock_waits">
 <description>
-Similar to gst_harness_crank_single_clock_wait, this is the function to use
+Similar to gst_harness_crank_single_clock_wait(), this is the function to use
 if your harnessed element(s) are using more then one gst_clock_id_wait.
 Failing to do so can (and will) make it racy which #GstClockID you actually
 are releasing, where as this function will process all the waits at the
@@ -37578,7 +38837,7 @@ present.
 
 <function name="gst_harness_new">
 <description>
-Creates a new harness. Works like gst_harness_new_with_padnames, except it
+Creates a new harness. Works like gst_harness_new_with_padnames(), except it
 assumes the #GstElement sinkpad is named &quot;sink&quot; and srcpad is named &quot;src&quot;
 
 MT safe.
@@ -37590,6 +38849,23 @@ MT safe.
 <parameter_description> a #gchar describing the #GstElement name
 </parameter_description>
 </parameter>
+</parameters>
+<return> a #GstHarness, or %NULL if the harness could
+not be created
+
+</return>
+</function>
+
+<function name="gst_harness_new_empty">
+<description>
+Creates a new empty harness. Use gst_harness_add_element_full() to add
+an #GstElement to it.
+
+MT safe.
+
+
+</description>
+<parameters>
 </parameters>
 <return> a #GstHarness, or %NULL if the harness could
 not be created
@@ -37663,7 +38939,7 @@ not be created
 
 <function name="gst_harness_new_with_element">
 <description>
-Creates a new harness. Works in the same way as gst_harness_new_full, only
+Creates a new harness. Works in the same way as gst_harness_new_full(), only
 that generic padtemplates are used for the harness src and sinkpads, which
 will be sufficient in most usecases.
 
@@ -37697,7 +38973,7 @@ not be created
 
 <function name="gst_harness_new_with_padnames">
 <description>
-Creates a new harness. Works in the same way as gst_harness_new_with_element,
+Creates a new harness. Works like gst_harness_new_with_element(),
 except you specify the factoryname of the #GstElement
 
 MT safe.
@@ -37730,7 +39006,7 @@ not be created
 
 <function name="gst_harness_new_with_templates">
 <description>
-Creates a new harness, like gst_harness_new_full, except it
+Creates a new harness, like gst_harness_new_full(), except it
 assumes the #GstElement sinkpad is named &quot;sink&quot; and srcpad is named &quot;src&quot;
 
 MT safe.
@@ -37767,7 +39043,7 @@ flag set is concidered a src #GstElement
 Non-src #GstElements (like sinks and filters) are automatically set to
 playing by the #GstHarness, but src #GstElements are not to avoid them
 starting to produce buffers.
-Hence, for src #GstElement you will need to call gst_harness_play explicitly.
+Hence, for src #GstElement you must call gst_harness_play() explicitly.
 
 MT safe.
 
@@ -38036,9 +39312,9 @@ name/value pairs, followed by %NULL
 <function name="gst_harness_set_blocking_push_mode">
 <description>
 Setting this will make the harness block in the chain-function, and
-then release when gst_harness_pull or gst_harness_try_pull is called.
+then release when gst_harness_pull() or gst_harness_try_pull() is called.
 Can be useful when wanting to control a src-element that is not implementing
-gst_clock_id_wait so it can't be controlled by the #GstTestClock, since
+gst_clock_id_wait() so it can't be controlled by the #GstTestClock, since
 it otherwise would produce buffers as fast as possible.
 
 MT safe.
@@ -38134,7 +39410,7 @@ is enabled, and forward any sticky-events from the main-harness to
 the sink-harness. It will also forward the %GST_QUERY_ALLOCATION.
 
 If forwarding is disabled, the user will have to either manually push
-these events from the src-harness using gst_harness_src_push_event, or
+these events from the src-harness using gst_harness_src_push_event(), or
 create and push them manually. While this will allow full control and
 inspection of these events, for the most cases having forwarding enabled
 will be sufficient when writing a test where the src-harness' main function
@@ -38501,7 +39777,7 @@ each call to gst_pad_push
 
 <function name="gst_harness_stress_push_buffer_with_cb_start_full">
 <description>
-Push a #GstBuffer in intervals of @sleep microseconds.
+Push a #GstBuffer returned by @func in intervals of @sleep microseconds.
 
 MT safe.
 
@@ -38530,8 +39806,7 @@ to prepare / create a #GstBuffer for pushing
 </parameter_description>
 </parameter>
 <parameter name="notify">
-<parameter_description> a #GDestroyNotify that is called for every push to allow cleaning
-up the #GstBuffer. (like gst_buffer_unref)
+<parameter_description> a #GDestroyNotify that is called when thread is stopped
 </parameter_description>
 </parameter>
 <parameter name="sleep">
@@ -38574,13 +39849,48 @@ each gst_event_push with @event
 </return>
 </function>
 
+<function name="gst_harness_stress_push_event_with_cb_start_full">
+<description>
+Push a #GstEvent returned by @func onto the harnessed #GstElement sinkpad
+in intervals of @sleep microseconds.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a #GstHarnessPrepareEventFunc function called before every iteration
+to prepare / create a #GstEvent for pushing
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> a #gpointer with data to the #GstHarnessPrepareEventFunc function
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> a #GDestroyNotify that is called when thread is stopped
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each call to gst_pad_push
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
 <function name="gst_harness_stress_push_upstream_event_start_full">
 <description>
 Push the @event onto the harnessed #GstElement srcpad in intervals of
 @sleep microseconds.
-Pushing events should generally be OOB events.
-If you need serialized events, you may use a custom stress thread which
-both pushes buffers and events.
 
 MT safe.
 
@@ -38598,6 +39908,44 @@ MT safe.
 <parameter name="sleep">
 <parameter_description> a #gulong specifying how long to sleep in (microseconds) for
 each gst_event_push with @event
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstHarnessThread
+
+</return>
+</function>
+
+<function name="gst_harness_stress_push_upstream_event_with_cb_start_full">
+<description>
+Push a #GstEvent returned by @func onto the harnessed #GstElement srcpad
+in intervals of @sleep microseconds.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="h">
+<parameter_description> a #GstHarness
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a #GstHarnessPrepareEventFunc function called before every iteration
+to prepare / create a #GstEvent for pushing
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> a #gpointer with data to the #GstHarnessPrepareEventFunc function
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> a #GDestroyNotify that is called when thread is stopped
+</parameter_description>
+</parameter>
+<parameter name="sleep">
+<parameter_description> a #gulong specifying how long to sleep in (microseconds) for
+each call to gst_pad_push
 </parameter_description>
 </parameter>
 </parameters>
@@ -39424,6 +40772,91 @@ ids to writer descriptions.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gst_info_strdup_printf">
+<description>
+Allocates, fills and returns a null terminated string from the printf style
+@format string and corresponding arguments.
+
+See gst_info_vasprintf() for when this function is required.
+
+Free with g_free().
+
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> a printf style format string
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> the printf arguments for @format
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated null terminated string or %NULL on any error
+
+</return>
+</function>
+
+<function name="gst_info_strdup_vprintf">
+<description>
+Allocates, fills and returns a null terminated string from the printf style
+@format string and @args.
+
+See gst_info_vasprintf() for when this function is required.
+
+Free with g_free().
+
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> a printf style format string
+</parameter_description>
+</parameter>
+<parameter name="args">
+<parameter_description> the va_list of printf arguments for @format
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated null terminated string or %NULL on any error
+
+</return>
+</function>
+
+<function name="gst_info_vasprintf">
+<description>
+Allocates and fills a string large enough (including the terminating null
+byte) to hold the specified printf style @format and @args.
+
+This function deals with the GStreamer specific printf specifiers
+#GST_PTR_FORMAT and #GST_SEGMENT_FORMAT.  If you do not have these specifiers
+in your @format string, you do not need to use this function and can use
+alternatives such as g_vasprintf().
+
+Free @result with g_free().
+
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> the resulting string
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> a printf style format string
+</parameter_description>
+</parameter>
+<parameter name="args">
+<parameter_description> the va_list of printf arguments for @format
+</parameter_description>
+</parameter>
+</parameters>
+<return> the length of the string allocated into @result or -1 on any error
+
+</return>
 </function>
 
 <function name="gst_init">
@@ -41914,7 +43347,7 @@ Extracts the GError and debug string from the GstMessage. The values returned
 in the output arguments are copies; the caller must free them when done.
 
 Typical usage of this function might be:
-|[
+|[&lt;!-- language=&quot;C&quot; --&gt;
 ...
 switch (GST_MESSAGE_TYPE (msg)) {
 case GST_MESSAGE_ERROR: {
@@ -42282,7 +43715,7 @@ MT safe.
 Extracts the old and new states from the GstMessage.
 
 Typical usage of this function might be:
-|[
+|[&lt;!-- language=&quot;C&quot; --&gt;
 ...
 switch (GST_MESSAGE_TYPE (msg)) {
 case GST_MESSAGE_STATE_CHANGED: {
@@ -42470,7 +43903,7 @@ Extracts the tag list from the GstMessage. The tag list returned in the
 output argument is a copy; the caller must free it when done.
 
 Typical usage of this function might be:
-|[
+|[&lt;!-- language=&quot;C&quot; --&gt;
 ...
 switch (GST_MESSAGE_TYPE (msg)) {
 case GST_MESSAGE_TAG: {
@@ -43102,6 +44535,21 @@ in NTP-UTC format.
 </return>
 </function>
 
+<function name="gst_mikey_message_base64_encode">
+<description>
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> a #GstMIKEYMessage
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gchar, base64-encoded data
+
+</return>
+</function>
+
 <function name="gst_mikey_message_copy">
 <description>
 Create a copy of the given message.
@@ -43308,6 +44756,27 @@ Make a new #GstMIKEYMessage from @bytes.
 </parameter>
 </parameters>
 <return> a new #GstMIKEYMessage
+
+</return>
+</function>
+
+<function name="gst_mikey_message_new_from_caps">
+<description>
+Makes mikey message including:
+- Security Policy Payload
+- Key Data Transport Payload
+- Key Data Sub-Payload
+
+
+</description>
+<parameters>
+<parameter name="caps">
+<parameter_description> a #GstCaps, including SRTP parameters (srtp/srtcp cipher, authorization, key data)
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstMIKEYMessage,
+or %NULL if there is no srtp information in the caps.
 
 </return>
 </function>
@@ -45236,7 +46705,7 @@ for mouse-move events.
 
 <function name="gst_net_client_clock_new">
 <description>
-Create a new #GstNetClientClock that will report the time
+Create a new #GstNetClientInternalClock that will report the time
 provided by the #GstNetTimeProvider on @remote_address and 
 @remote_port.
 
@@ -45248,7 +46717,7 @@ provided by the #GstNetTimeProvider on @remote_address and
 </parameter_description>
 </parameter>
 <parameter name="remote_address">
-<parameter_description> the address of the remote clock provider
+<parameter_description> the address or hostname of the remote clock provider
 </parameter_description>
 </parameter>
 <parameter name="remote_port">
@@ -45433,7 +46902,7 @@ the NTPv4 server on @remote_address and @remote_port.
 </parameter_description>
 </parameter>
 <parameter name="remote_address">
-<parameter_description> the address of the remote clock provider
+<parameter_description> the address or hostname of the remote clock provider
 </parameter_description>
 </parameter>
 <parameter name="remote_port">
@@ -46331,6 +47800,13 @@ MT safe.
 Be notified of different states of pads. The provided callback is called for
 every state that matches @mask.
 
+Probes are called in groups: First GST_PAD_PROBE_TYPE_BLOCK probes are
+called, then others, then finally GST_PAD_PROBE_TYPE_IDLE. The only
+exception here are GST_PAD_PROBE_TYPE_IDLE probes that are called
+immediately if the pad is already idle while calling gst_pad_add_probe().
+In each of the groups, probes are called in the order in which they were
+added.
+
 
 </description>
 <parameters>
@@ -46692,7 +48168,8 @@ Gets the capabilities currently configured on @pad with the last
 </parameter_description>
 </parameter>
 </parameters>
-<return> the current caps of the pad with incremented ref-count.
+<return> the current caps of the pad with
+incremented ref-count or %NULL when pad has no caps. Unref after usage.
 </return>
 </function>
 
@@ -47408,9 +48885,9 @@ if it is not %NULL the returned caps will be a subset of @filter.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the caps of the peer pad with incremented ref-count. When there is
-no peer pad, this function returns @filter or, when @filter is %NULL, ANY
-caps.
+<return> the caps of the peer pad with incremented
+ref-count. When there is no peer pad, this function returns @filter or,
+when @filter is %NULL, ANY caps.
 </return>
 </function>
 
@@ -47514,7 +48991,7 @@ position, or %NULL.
 </return>
 </function>
 
-<function name="gst_pad_probe_info_get_bufferlist">
+<function name="gst_pad_probe_info_get_buffer_list">
 <description>
 
 </description>
@@ -47524,7 +49001,7 @@ position, or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The #GstBufferlist from the probe
+<return> The #GstBufferList from the probe
 </return>
 </function>
 
@@ -48239,6 +49716,52 @@ No locking is performed in this function.
 </parameter>
 <parameter name="priv">
 <parameter_description> The private data to attach to the pad.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_pad_set_event_full_function">
+<description>
+Calls gst_pad_set_event_full_function_full() with %NULL for the user_data and
+notify.
+
+</description>
+<parameters>
+<parameter name="p">
+<parameter_description> a #GstPad of either direction.
+</parameter_description>
+</parameter>
+<parameter name="f">
+<parameter_description> the #GstPadEventFullFunction to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_pad_set_event_full_function_full">
+<description>
+Sets the given event handler for the pad.
+
+
+</description>
+<parameters>
+<parameter name="pad">
+<parameter_description> a #GstPad of either direction.
+</parameter_description>
+</parameter>
+<parameter name="event">
+<parameter_description> the #GstPadEventFullFunction to set.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user_data passed to @notify
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> notify called when @event will not be used anymore.
 </parameter_description>
 </parameter>
 </parameters>
@@ -49837,7 +51360,7 @@ Loads the plugin containing @feature if it's not already loaded. @feature is
 unaffected; use the return value instead.
 
 Normally this function is used like this:
-|[
+|[&lt;!-- language=&quot;C&quot; --&gt;
 GstPluginFeature *loaded_feature;
 
 loaded_feature = gst_plugin_feature_load (feature);
@@ -51524,8 +53047,8 @@ Free-function: gst_query_unref
 <function name="gst_query_find_allocation_meta">
 <description>
 Check if @query has metadata @api set. When this function returns %TRUE,
-@index will contain the index where the requested API and the flags can be
-found.
+@index will contain the index where the requested API and the parameters
+can be found.
 
 
 </description>
@@ -52407,7 +53930,7 @@ at @index of the metadata API array.
 </parameter_description>
 </parameter>
 <parameter name="params">
-<parameter_description> API specific flags
+<parameter_description> API specific parameters
 </parameter_description>
 </parameter>
 </parameters>
@@ -57325,6 +58848,37 @@ This function can be cancelled with gst_rtsp_connection_flush().
 </return>
 </function>
 
+<function name="gst_rtsp_connection_connect_with_response">
+<description>
+Attempt to connect to the url of @conn made with
+gst_rtsp_connection_create(). If @timeout is #NULL this function can block
+forever. If @timeout contains a valid timeout, this function will return
+#GST_RTSP_ETIMEOUT after the timeout expired.  If @conn is set to tunneled,
+@response will contain a response to the tunneling request messages.
+
+This function can be cancelled with gst_rtsp_connection_flush().
+
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GstRTSPConnection
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> a #GTimeVal timeout
+</parameter_description>
+</parameter>
+<parameter name="response">
+<parameter_description> a #GstRTSPMessage
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GST_RTSP_OK when a connection could be made.
+
+</return>
+</function>
+
 <function name="gst_rtsp_connection_create">
 <description>
 Create a newly allocated #GstRTSPConnection from @url and store it in @conn.
@@ -59938,6 +61492,27 @@ Set the connection with the given parameters.
 </return>
 </function>
 
+<function name="gst_sdp_make_keymgmt">
+<description>
+Makes key management data
+
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> a #gchar URI
+</parameter_description>
+</parameter>
+<parameter name="base64">
+<parameter_description> a #gchar base64-encoded key data
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gchar key-mgmt data,
+
+</return>
+</function>
+
 <function name="gst_sdp_media_add_attribute">
 <description>
 Add the attribute with @key and @value to @media.
@@ -60072,6 +61647,27 @@ Get the number of attribute fields in @media.
 </parameter>
 </parameters>
 <return> the number of attributes in @media.
+</return>
+</function>
+
+<function name="gst_sdp_media_attributes_to_caps">
+<description>
+Mapping of attributes of #GstSDPMedia to #GstCaps
+
+
+</description>
+<parameters>
+<parameter name="media">
+<parameter_description> a #GstSDPMedia
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstSDPResult.
+
 </return>
 </function>
 
@@ -60244,6 +61840,33 @@ Get the bandwidth at position @idx in @media.
 </parameter>
 </parameters>
 <return> the #GstSDPBandwidth at position @idx.
+</return>
+</function>
+
+<function name="gst_sdp_media_get_caps_from_media">
+<description>
+Mapping of caps from SDP fields:
+
+a=rtpmap:(payload) (encoding_name)/(clock_rate)[/(encoding_params)]
+
+a=framesize:(payload) (width)-(height)
+
+a=fmtp:(payload) (param)[=(value)];...
+
+
+</description>
+<parameters>
+<parameter name="media">
+<parameter_description> a #GstSDPMedia
+</parameter_description>
+</parameter>
+<parameter name="pt">
+<parameter_description> a payload type
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstCaps, or %NULL if an error happened
+
 </return>
 </function>
 
@@ -60772,6 +62395,33 @@ Set the media description of @media to @med.
 </return>
 </function>
 
+<function name="gst_sdp_media_set_media_from_caps">
+<description>
+Mapping of caps to SDP fields:
+
+a=rtpmap:(payload) (encoding_name) or (clock_rate)[or (encoding_params)]
+
+a=framesize:(payload) (width)-(height)
+
+a=fmtp:(payload) (param)[=(value)];...
+
+
+</description>
+<parameters>
+<parameter name="caps">
+<parameter_description> a #GstCaps
+</parameter_description>
+</parameter>
+<parameter name="media">
+<parameter_description> a #GstSDPMedia
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstSDPResult.
+
+</return>
+</function>
+
 <function name="gst_sdp_media_set_port_info">
 <description>
 Set the port information in @media.
@@ -61049,6 +62699,27 @@ Get the number of attributes in @msg.
 </parameter>
 </parameters>
 <return> the number of attributes in @msg.
+</return>
+</function>
+
+<function name="gst_sdp_message_attributes_to_caps">
+<description>
+Mapping of attributes of #GstSDPMessage to #GstCaps
+
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> a #GstSDPMessage
+</parameter_description>
+</parameter>
+<parameter name="caps">
+<parameter_description> a #GstCaps
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstSDPResult.
+
 </return>
 </function>
 
@@ -62570,6 +64241,146 @@ returned, @offset is not in @segment.
 </return>
 </function>
 
+<function name="gst_segment_position_from_running_time">
+<description>
+Convert @running_time into a position in the segment so that
+gst_segment_to_running_time() with that position returns @running_time.
+
+
+</description>
+<parameters>
+<parameter name="segment">
+<parameter_description> a #GstSegment structure.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the segment.
+</parameter_description>
+</parameter>
+<parameter name="running_time">
+<parameter_description> the running_time in the segment
+</parameter_description>
+</parameter>
+</parameters>
+<return> the position in the segment for @running_time. This function returns
+-1 when @running_time is -1 or when it is not inside @segment.
+
+</return>
+</function>
+
+<function name="gst_segment_position_from_running_time_full">
+<description>
+Translate @running_time to the segment position using the currently configured
+segment. Compared to gst_segment_position_from_running_time() this function can
+return negative segment position.
+
+This function is typically used by elements that need to synchronize buffers
+against the clock or each other.
+
+@running_time can be any value and the result of this function for values
+outside of the segment is extrapolated.
+
+When 1 is returned, @running_time resulted in a positive position returned
+in @position.
+
+When this function returns -1, the returned @position should be negated
+to get the real negative segment position.
+
+
+</description>
+<parameters>
+<parameter name="segment">
+<parameter_description> a #GstSegment structure.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the segment.
+</parameter_description>
+</parameter>
+<parameter name="running_time">
+<parameter_description> the running-time
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the resulting position in the segment
+</parameter_description>
+</parameter>
+</parameters>
+<return> a 1 or -1 on success, 0 on failure.
+
+</return>
+</function>
+
+<function name="gst_segment_position_from_stream_time">
+<description>
+Convert @stream_time into a position in the segment so that
+gst_segment_to_stream_time() with that position returns @stream_time.
+
+
+</description>
+<parameters>
+<parameter name="segment">
+<parameter_description> a #GstSegment structure.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the segment.
+</parameter_description>
+</parameter>
+<parameter name="stream_time">
+<parameter_description> the stream_time in the segment
+</parameter_description>
+</parameter>
+</parameters>
+<return> the position in the segment for @stream_time. This function returns
+-1 when @stream_time is -1 or when it is not inside @segment.
+
+</return>
+</function>
+
+<function name="gst_segment_position_from_stream_time_full">
+<description>
+Translate @stream_time to the segment position using the currently configured
+segment. Compared to gst_segment_position_from_stream_time() this function can
+return negative segment position.
+
+This function is typically used by elements that need to synchronize buffers
+against the clock or each other.
+
+@stream_time can be any value and the result of this function for values outside
+of the segment is extrapolated.
+
+When 1 is returned, @stream_time resulted in a positive position returned
+in @position.
+
+When this function returns -1, the returned @position should be negated
+to get the real negative segment position.
+
+
+</description>
+<parameters>
+<parameter name="segment">
+<parameter_description> a #GstSegment structure.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the segment.
+</parameter_description>
+</parameter>
+<parameter name="stream_time">
+<parameter_description> the stream-time
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the resulting position in the segment
+</parameter_description>
+</parameter>
+</parameters>
+<return> a 1 or -1 on success, 0 on failure.
+
+</return>
+</function>
+
 <function name="gst_segment_set_running_time">
 <description>
 Adjust the start/stop and base values of @segment such that the next valid
@@ -62619,6 +64430,8 @@ gst_segment_to_running_time() with that position returns @running_time.
 </parameters>
 <return> the position in the segment for @running_time. This function returns
 -1 when @running_time is -1 or when it is not inside @segment.
+
+Deprecated. Use gst_segment_position_from_running_time() instead.
 </return>
 </function>
 
@@ -62729,6 +64542,50 @@ media stream.
 </parameters>
 <return> the position in stream_time or -1 when an invalid position
 was given.
+
+</return>
+</function>
+
+<function name="gst_segment_to_stream_time_full">
+<description>
+Translate @position to the total stream time using the currently configured
+segment. Compared to gst_segment_to_stream_time() this function can return
+negative stream-time.
+
+This function is typically used by elements that need to synchronize buffers
+against the clock or eachother.
+
+@position can be any value and the result of this function for values outside
+of the segment is extrapolated.
+
+When 1 is returned, @position resulted in a positive stream-time returned
+in @stream_time.
+
+When this function returns -1, the returned @stream_time should be negated
+to get the real negative stream time.
+
+
+</description>
+<parameters>
+<parameter name="segment">
+<parameter_description> a #GstSegment structure.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> the format of the segment.
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position in the segment
+</parameter_description>
+</parameter>
+<parameter name="stream_time">
+<parameter_description> result stream-time
+</parameter_description>
+</parameter>
+</parameters>
+<return> a 1 or -1 on success, 0 on failure.
+
 </return>
 </function>
 
@@ -64534,7 +66391,7 @@ value is replaced and freed. The function will take ownership of @value.
 Converts @structure to a human-readable string representation.
 
 For debugging purposes its easier to do something like this:
-|[
+|[&lt;!-- language=&quot;C&quot; --&gt;
 GST_LOG (&quot;structure is %&quot; GST_PTR_FORMAT, structure);
 ]|
 This prints the structure in human readable form.
@@ -67759,6 +69616,30 @@ MT safe.
 <return></return>
 </function>
 
+<function name="gst_test_clock_crank">
+<description>
+A &quot;crank&quot; consists of three steps:
+1: Wait for a #GstClockID to be registered with the #GstTestClock.
+2: Advance the #GstTestClock to the time the #GstClockID is waiting for.
+3: Release the #GstClockID wait.
+A &quot;crank&quot; can be though of as the notion of
+manually driving the clock forward to its next logical step.
+
+Return: %TRUE if the crank was successful, %FALSE otherwise.
+
+MT safe.
+
+
+</description>
+<parameters>
+<parameter name="test_clock">
+<parameter_description> #GstTestClock to crank
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gst_test_clock_get_next_entry_time">
 <description>
 Retrieve the requested time for the next pending clock notification.
@@ -68743,6 +70624,140 @@ unreffed before setting a new one.
 </parameter>
 <parameter name="toc">
 <parameter_description> a #GstToc to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_tracer_factory_get_list">
+<description>
+Gets the list of all registered tracer factories. You must free the
+list using gst_plugin_feature_list_free().
+
+The returned factories are sorted by factory name.
+
+Free-function: gst_plugin_feature_list_free
+
+
+</description>
+<parameters>
+</parameters>
+<return> the list of all
+registered #GstTracerFactory.
+
+</return>
+</function>
+
+<function name="gst_tracer_record_log">
+<description>
+Serialzes the trace event into the log.
+
+Right now this is using the gstreamer debug log with the level TRACE (7) and
+the category &quot;GST_TRACER&quot;.
+&lt;note&gt;&lt;para&gt;
+Please note that this is still under discussion and subject to change.
+&lt;/para&gt;&lt;/note&gt;
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> the tracer-record
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> the args as described in the spec-
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gst_tracer_record_new">
+<description>
+Create a new tracer record. The record instance can be used to efficiently
+log entries using gst_tracer_record_log().
+
+The @name without the &quot;.class&quot; suffix will be used for the log records.
+There must be fields for each value that gets logged where the field name is
+the value name. The field must be a #GstStructure describing the value. The
+sub structure must contain a field called 'type' of %G_TYPE_GTYPE that
+contains the GType of the value. The resulting #GstTracerRecord will take
+ownership of the field structures.
+
+The way to deal with optional values is to log an additional boolean before
+the optional field, that if %TRUE signals that the optional field is valid
+and %FALSE signals that the optional field should be ignored. One must still
+log a placeholder value for the optional field though. Please also note, that
+pointer type values must not be NULL - the underlying serialisation can not
+handle that right now.
+
+&lt;note&gt;&lt;para&gt;
+Please note that this is still under discussion and subject to change.
+&lt;/para&gt;&lt;/note&gt;
+
+
+</description>
+<parameters>
+<parameter name="name">
+<parameter_description> name of new record, must end on &quot;.class&quot;.
+</parameter_description>
+</parameter>
+<parameter name="firstfield">
+<parameter_description> name of first field to set
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> additional arguments
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GstTracerRecord
+</return>
+</function>
+
+<function name="gst_tracer_register">
+<description>
+Create a new tracer-factory  capable of instantiating objects of the
+@type and add the factory to @plugin.
+
+
+</description>
+<parameters>
+<parameter name="plugin">
+<parameter_description> A #GstPlugin, or %NULL for a static typefind function
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> The name for registering
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> GType of tracer to register
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE, if the registering succeeded, %FALSE on error
+</return>
+</function>
+
+<function name="gst_tracing_register_hook">
+<description>
+Register @func to be called when the trace hook @detail is getting invoked.
+Use %NULL for @detail to register to all hooks.
+
+</description>
+<parameters>
+<parameter name="tracer">
+<parameter_description> the tracer
+</parameter_description>
+</parameter>
+<parameter name="detail">
+<parameter_description> the detailed hook
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> the callback
 </parameter_description>
 </parameter>
 </parameters>
@@ -72137,7 +74152,7 @@ Sets @b as the value of @v.  Caller retains reference to sample.
 
 <function name="gst_value_set_structure">
 <description>
-Sets the contents of @value to @structure.  The actual
+Sets the contents of @value to @structure.
 
 </description>
 <parameters>
@@ -72279,6 +74294,25 @@ of GStreamer to the outside world: user agent strings, logging, ...
 <return> a newly allocated string describing this version
 of GStreamer.
 </return>
+</function>
+
+<function name="gst_video_affine_transformation_meta_apply_matrix">
+<description>
+Apply a transformation using the given 4x4 transformation matrix
+
+
+</description>
+<parameters>
+<parameter name="meta">
+<parameter_description> a #GstVideoAffineTransformationMeta
+</parameter_description>
+</parameter>
+<parameter name="matrix">
+<parameter_description> a 4x4 transformation matrix to be applied
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gst_video_alignment_reset">
@@ -74614,10 +76648,47 @@ Copy the plane with index @plane from @src to @dest.
 
 <function name="gst_video_frame_map">
 <description>
-Use @info and @buffer to fill in the values of @frame.
+Use @info and @buffer to fill in the values of @frame. @frame is usually
+allocated on the stack, and you will pass the address to the #GstVideoFrame
+structure allocated on the stack; gst_video_frame_map() will then fill in
+the structures with the various video-specific information you need to access
+the pixels of the video buffer. You can then use accessor macros such as
+GST_VIDEO_FRAME_COMP_DATA(), GST_VIDEO_FRAME_PLANE_DATA(),
+GST_VIDEO_FRAME_COMP_STRIDE(), GST_VIDEO_FRAME_PLANE_STRIDE() etc.
+to get to the pixels.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GstVideoFrame vframe;
+...
+// set RGB pixels to black one at a time
+if (gst_video_frame_map (&amp;vframe, video_info, video_buffer)) {
+guint8 *pixels = GST_VIDEO_FRAME_PLANE_DATA (vframe, 0);
+guint stride = GST_VIDEO_FRAME_PLANE_STRIDE (vframe, 0);
+guint pixel_stride = GST_VIDEO_FRAME_PLANE_PSTRIDE (vframe, 0);
+
+for (h = 0; h &lt; height; ++h) {
+for (w = 0; w &lt; width; ++w) {
+guint8 *pixel = pixels + h * stride + w * pixel_stride;
+
+memset (pixel, 0, pixel_stride);
+}
+}
+}
+...
+]|
 
 All video planes of @buffer will be mapped and the pointers will be set in
 @frame-&gt;data.
+
+The purpose of this function is to make it easy for you to get to the video
+pixels in a generic way, without you having to worry too much about details
+such as whether the video data is allocated in one contiguous memory chunk
+or multiple memory chunks (e.g. one for each plane); or if custom strides
+and custom plane offsets are used or not (as signalled by GstVideoMeta on
+each buffer). This function will just fill the #GstVideoFrame structure
+with the right values and if you use the accessor macros everything will
+just work and you can access the data easily. It also maps the underlying
+memory chunks for you.
 
 
 </description>

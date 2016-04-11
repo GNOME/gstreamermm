@@ -294,6 +294,20 @@
   (gtype-id "GST_TYPE_INTERPOLATION_CONTROL_SOURCE")
 )
 
+(define-object Tracer
+  (in-module "Gst")
+  (parent "GstObject")
+  (c-name "GstTracer")
+  (gtype-id "GST_TYPE_TRACER")
+)
+
+(define-object TracerFactory
+  (in-module "Gst")
+  (parent "GstPluginFeature")
+  (c-name "GstTracerFactory")
+  (gtype-id "GST_TYPE_TRACER_FACTORY")
+)
+
 (define-object TriggerControlSource
   (in-module "Gst")
   (parent "GstTimedValueControlSource")
@@ -1125,6 +1139,7 @@
     '("could-not-set-property" "GST_PARSE_ERROR_COULD_NOT_SET_PROPERTY")
     '("empty-bin" "GST_PARSE_ERROR_EMPTY_BIN")
     '("empty" "GST_PARSE_ERROR_EMPTY")
+    '("delayed-link" "GST_PARSE_ERROR_DELAYED_LINK")
   )
 )
 
@@ -1191,6 +1206,7 @@
     '("recurse" "GST_PLUGIN_DEPENDENCY_FLAG_RECURSE")
     '("paths-are-default-only" "GST_PLUGIN_DEPENDENCY_FLAG_PATHS_ARE_DEFAULT_ONLY")
     '("file-name-is-suffix" "GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_SUFFIX")
+    '("file-name-is-prefix" "GST_PLUGIN_DEPENDENCY_FLAG_FILE_NAME_IS_PREFIX")
   )
 )
 
@@ -1429,6 +1445,65 @@
   )
 )
 
+(define-enum TracerValueScope
+  (in-module "Gst")
+  (c-name "GstTracerValueScope")
+  (gtype-id "GST_TYPE_TRACER_VALUE_SCOPE")
+  (values
+    '("process" "GST_TRACER_VALUE_SCOPE_PROCESS")
+    '("thread" "GST_TRACER_VALUE_SCOPE_THREAD")
+    '("element" "GST_TRACER_VALUE_SCOPE_ELEMENT")
+    '("pad" "GST_TRACER_VALUE_SCOPE_PAD")
+  )
+)
+
+(define-flags TracerValueFlags
+  (in-module "Gst")
+  (c-name "GstTracerValueFlags")
+  (gtype-id "GST_TYPE_TRACER_VALUE_FLAGS")
+  (values
+    '("none" "GST_TRACER_VALUE_FLAGS_NONE")
+    '("optional" "GST_TRACER_VALUE_FLAGS_OPTIONAL")
+    '("aggregated" "GST_TRACER_VALUE_FLAGS_AGGREGATED")
+  )
+)
+
+(define-enum TracerQuarkId
+  (in-module "Gst")
+  (c-name "GstTracerQuarkId")
+  (gtype-id "GST_TYPE_TRACER_QUARK_ID")
+  (values
+    '("hook-pad-push-pre" "GST_TRACER_QUARK_HOOK_PAD_PUSH_PRE")
+    '("hook-pad-push-post" "GST_TRACER_QUARK_HOOK_PAD_PUSH_POST")
+    '("hook-pad-push-list-pre" "GST_TRACER_QUARK_HOOK_PAD_PUSH_LIST_PRE")
+    '("hook-pad-push-list-post" "GST_TRACER_QUARK_HOOK_PAD_PUSH_LIST_POST")
+    '("hook-pad-pull-range-pre" "GST_TRACER_QUARK_HOOK_PAD_PULL_RANGE_PRE")
+    '("hook-pad-pull-range-post" "GST_TRACER_QUARK_HOOK_PAD_PULL_RANGE_POST")
+    '("hook-pad-push-event-pre" "GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_PRE")
+    '("hook-pad-push-event-post" "GST_TRACER_QUARK_HOOK_PAD_PUSH_EVENT_POST")
+    '("hook-pad-query-pre" "GST_TRACER_QUARK_HOOK_PAD_QUERY_PRE")
+    '("hook-pad-query-post" "GST_TRACER_QUARK_HOOK_PAD_QUERY_POST")
+    '("hook-element-post-message-pre" "GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_PRE")
+    '("hook-element-post-message-post" "GST_TRACER_QUARK_HOOK_ELEMENT_POST_MESSAGE_POST")
+    '("hook-element-query-pre" "GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_PRE")
+    '("hook-element-query-post" "GST_TRACER_QUARK_HOOK_ELEMENT_QUERY_POST")
+    '("hook-element-new" "GST_TRACER_QUARK_HOOK_ELEMENT_NEW")
+    '("hook-element-add-pad" "GST_TRACER_QUARK_HOOK_ELEMENT_ADD_PAD")
+    '("hook-element-remove-pad" "GST_TRACER_QUARK_HOOK_ELEMENT_REMOVE_PAD")
+    '("hook-bin-add-pre" "GST_TRACER_QUARK_HOOK_BIN_ADD_PRE")
+    '("hook-bin-add-post" "GST_TRACER_QUARK_HOOK_BIN_ADD_POST")
+    '("hook-bin-remove-pre" "GST_TRACER_QUARK_HOOK_BIN_REMOVE_PRE")
+    '("hook-bin-remove-post" "GST_TRACER_QUARK_HOOK_BIN_REMOVE_POST")
+    '("hook-pad-link-pre" "GST_TRACER_QUARK_HOOK_PAD_LINK_PRE")
+    '("hook-pad-link-post" "GST_TRACER_QUARK_HOOK_PAD_LINK_POST")
+    '("hook-pad-unlink-pre" "GST_TRACER_QUARK_HOOK_PAD_UNLINK_PRE")
+    '("hook-pad-unlink-post" "GST_TRACER_QUARK_HOOK_PAD_UNLINK_POST")
+    '("hook-element-change-state-pre" "GST_TRACER_QUARK_HOOK_ELEMENT_CHANGE_STATE_PRE")
+    '("hook-element-change-state-post" "GST_TRACER_QUARK_HOOK_ELEMENT_CHANGE_STATE_POST")
+    '("max" "GST_TRACER_QUARK_MAX")
+  )
+)
+
 (define-enum TypeFindProbability
   (in-module "Gst")
   (c-name "GstTypeFindProbability")
@@ -1591,6 +1666,7 @@
     '("none" "GST_INTERPOLATION_MODE_NONE")
     '("linear" "GST_INTERPOLATION_MODE_LINEAR")
     '("cubic" "GST_INTERPOLATION_MODE_CUBIC")
+    '("cubic-monotonic" "GST_INTERPOLATION_MODE_CUBIC_MONOTONIC")
   )
 )
 
@@ -3718,6 +3794,19 @@
   )
 )
 
+(define-method unadjust_with_calibration
+  (of-object "GstClock")
+  (c-name "gst_clock_unadjust_with_calibration")
+  (return-type "GstClockTime")
+  (parameters
+    '("GstClockTime" "external_target")
+    '("GstClockTime" "cinternal")
+    '("GstClockTime" "cexternal")
+    '("GstClockTime" "cnum")
+    '("GstClockTime" "cdenom")
+  )
+)
+
 (define-method unadjust_unlocked
   (of-object "GstClock")
   (c-name "gst_clock_unadjust_unlocked")
@@ -4799,6 +4888,15 @@
   )
 )
 
+(define-method add_static_pad_template
+  (of-object "GstElementClass")
+  (c-name "gst_element_class_add_static_pad_template")
+  (return-type "none")
+  (parameters
+    '("GstStaticPadTemplate*" "static_templ")
+  )
+)
+
 (define-method get_pad_template
   (of-object "GstElementClass")
   (c-name "gst_element_class_get_pad_template")
@@ -4944,6 +5042,30 @@
   (return-type "none")
   (parameters
     '("GstContext*" "context")
+  )
+)
+
+(define-method get_contexts
+  (of-object "GstElement")
+  (c-name "gst_element_get_contexts")
+  (return-type "GList*")
+)
+
+(define-method get_context
+  (of-object "GstElement")
+  (c-name "gst_element_get_context")
+  (return-type "GstContext*")
+  (parameters
+    '("const-gchar*" "context_type")
+  )
+)
+
+(define-method get_context_unlocked
+  (of-object "GstElement")
+  (c-name "gst_element_get_context_unlocked")
+  (return-type "GstContext*")
+  (parameters
+    '("const-gchar*" "context_type")
   )
 )
 
@@ -5522,6 +5644,16 @@
 
 (define-function gst_toc_loop_type_get_type
   (c-name "gst_toc_loop_type_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tracer_value_scope_get_type
+  (c-name "gst_tracer_value_scope_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tracer_value_flags_get_type
+  (c-name "gst_tracer_value_flags_get_type")
   (return-type "GType")
 )
 
@@ -6627,6 +6759,34 @@
   (parameters
     '("guint" "colorinfo")
   )
+)
+
+(define-function gst_info_vasprintf
+  (c-name "gst_info_vasprintf")
+  (return-type "gint")
+  (parameters
+    '("gchar**" "result")
+    '("const-gchar*" "format")
+    '("va_list" "args")
+  )
+)
+
+(define-function gst_info_strdup_vprintf
+  (c-name "gst_info_strdup_vprintf")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "format")
+    '("va_list" "args")
+  )
+)
+
+(define-function gst_info_strdup_printf
+  (c-name "gst_info_strdup_printf")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
 )
 
 (define-function GST_CAT_LEVEL_LOG_valist
@@ -8679,6 +8839,17 @@
   (return-type "none")
   (parameters
     '("GstPadEventFunction" "event")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method set_event_full_function_full
+  (of-object "GstPad")
+  (c-name "gst_pad_set_event_full_function_full")
+  (return-type "none")
+  (parameters
+    '("GstPadEventFullFunction" "event")
     '("gpointer" "user_data")
     '("GDestroyNotify" "notify")
   )
@@ -10928,6 +11099,17 @@
   )
 )
 
+(define-method to_stream_time_full
+  (of-object "GstSegment")
+  (c-name "gst_segment_to_stream_time_full")
+  (return-type "gint")
+  (parameters
+    '("GstFormat" "format")
+    '("guint64" "position")
+    '("guint64*" "stream_time")
+  )
+)
+
 (define-method to_stream_time
   (of-object "GstSegment")
   (c-name "gst_segment_to_stream_time")
@@ -10935,6 +11117,27 @@
   (parameters
     '("GstFormat" "format")
     '("guint64" "position")
+  )
+)
+
+(define-method position_from_stream_time_full
+  (of-object "GstSegment")
+  (c-name "gst_segment_position_from_stream_time_full")
+  (return-type "gint")
+  (parameters
+    '("GstFormat" "format")
+    '("guint64" "stream_time")
+    '("guint64*" "position")
+  )
+)
+
+(define-method position_from_stream_time
+  (of-object "GstSegment")
+  (c-name "gst_segment_position_from_stream_time")
+  (return-type "guint64")
+  (parameters
+    '("GstFormat" "format")
+    '("guint64" "stream_time")
   )
 )
 
@@ -10962,6 +11165,27 @@
 (define-method to_position
   (of-object "GstSegment")
   (c-name "gst_segment_to_position")
+  (return-type "guint64")
+  (parameters
+    '("GstFormat" "format")
+    '("guint64" "running_time")
+  )
+)
+
+(define-method position_from_running_time_full
+  (of-object "GstSegment")
+  (c-name "gst_segment_position_from_running_time_full")
+  (return-type "gint")
+  (parameters
+    '("GstFormat" "format")
+    '("guint64" "running_time")
+    '("guint64*" "position")
+  )
+)
+
+(define-method position_from_running_time
+  (of-object "GstSegment")
+  (c-name "gst_segment_position_from_running_time")
   (return-type "guint64")
   (parameters
     '("GstFormat" "format")
@@ -12775,6 +12999,71 @@
 
 
 ;; From gsttrace.h
+
+
+
+;; From gsttracerfactory.h
+
+(define-function gst_tracer_factory_get_type
+  (c-name "gst_tracer_factory_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tracer_factory_get_list
+  (c-name "gst_tracer_factory_get_list")
+  (return-type "GList*")
+)
+
+
+
+;; From gsttracer.h
+
+(define-function gst_tracer_get_type
+  (c-name "gst_tracer_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_tracing_register_hook
+  (c-name "gst_tracing_register_hook")
+  (return-type "none")
+  (parameters
+    '("GstTracer*" "tracer")
+    '("const-gchar*" "detail")
+    '("GCallback" "func")
+  )
+)
+
+(define-function gst_tracer_register
+  (c-name "gst_tracer_register")
+  (return-type "gboolean")
+  (parameters
+    '("GstPlugin*" "plugin")
+    '("const-gchar*" "name")
+    '("GType" "type")
+  )
+)
+
+
+
+;; From gsttracerrecord.h
+
+(define-function gst_tracer_record_get_type
+  (c-name "gst_tracer_record_get_type")
+  (return-type "GType")
+)
+
+(define-method log
+  (of-object "GstTracerRecord")
+  (c-name "gst_tracer_record_log")
+  (return-type "none")
+  (parameters
+  )
+  (varargs #t)
+)
+
+
+
+;; From gsttracerutils.h
 
 
 
@@ -18582,6 +18871,24 @@
 
 ;; From gstharness.h
 
+(define-function gst_harness_new_empty
+  (c-name "gst_harness_new_empty")
+  (return-type "GstHarness*")
+)
+
+(define-method add_element_full
+  (of-object "GstHarness")
+  (c-name "gst_harness_add_element_full")
+  (return-type "none")
+  (parameters
+    '("GstElement*" "element")
+    '("GstStaticPadTemplate*" "hsrc")
+    '("const-gchar*" "element_sinkpad_name")
+    '("GstStaticPadTemplate*" "hsink")
+    '("const-gchar*" "element_srcpad_name")
+  )
+)
+
 (define-function gst_harness_new_full
   (c-name "gst_harness_new_full")
   (return-type "GstHarness*")
@@ -18636,6 +18943,15 @@
 (define-function gst_harness_new_parse
   (c-name "gst_harness_new_parse")
   (return-type "GstHarness*")
+  (parameters
+    '("const-gchar*" "launchline")
+  )
+)
+
+(define-method add_parse
+  (of-object "GstHarness")
+  (c-name "gst_harness_add_parse")
+  (return-type "none")
   (parameters
     '("const-gchar*" "launchline")
   )
@@ -19174,12 +19490,36 @@
   )
 )
 
+(define-method stress_push_event_with_cb_start_full
+  (of-object "GstHarness")
+  (c-name "gst_harness_stress_push_event_with_cb_start_full")
+  (return-type "GstHarnessThread*")
+  (parameters
+    '("GstHarnessPrepareEventFunc" "func")
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+    '("gulong" "sleep")
+  )
+)
+
 (define-method stress_push_upstream_event_start_full
   (of-object "GstHarness")
   (c-name "gst_harness_stress_push_upstream_event_start_full")
   (return-type "GstHarnessThread*")
   (parameters
     '("GstEvent*" "event")
+    '("gulong" "sleep")
+  )
+)
+
+(define-method stress_push_upstream_event_with_cb_start_full
+  (of-object "GstHarness")
+  (c-name "gst_harness_stress_push_upstream_event_with_cb_start_full")
+  (return-type "GstHarnessThread*")
+  (parameters
+    '("GstHarnessPrepareEventFunc" "func")
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
     '("gulong" "sleep")
   )
 )
@@ -19328,6 +19668,12 @@
   (parameters
     '("const-GList*" "pending_list")
   )
+)
+
+(define-method crank
+  (of-object "GstTestClock")
+  (c-name "gst_test_clock_crank")
+  (return-type "gboolean")
 )
 
 
@@ -19544,6 +19890,12 @@
   (parameters
     '("GSocketAddress*" "addr")
   )
+)
+
+(define-method get_net_address_meta
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_get_net_address_meta")
+  (return-type "GstNetAddressMeta*")
 )
 
 
@@ -19907,6 +20259,13 @@
   (gtype-id "GST_TYPE_AUDIO_SRC")
 )
 
+(define-object AudioVisualizer
+  (in-module "Gst")
+  (parent "GstElement")
+  (c-name "GstAudioVisualizer")
+  (gtype-id "GST_TYPE_AUDIO_VISUALIZER")
+)
+
 (define-object ColorBalanceChannel
   (in-module "Gst")
   (parent "GObject")
@@ -20022,6 +20381,19 @@
   )
 )
 
+(define-flags AudioChannelMixerFlags
+  (in-module "Gst")
+  (c-name "GstAudioChannelMixerFlags")
+  (gtype-id "GST_TYPE_AUDIO_CHANNEL_MIXER_FLAGS")
+  (values
+    '("none" "GST_AUDIO_CHANNEL_MIXER_FLAGS_NONE")
+    '("non-interleaved-in" "GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_IN")
+    '("non-interleaved-out" "GST_AUDIO_CHANNEL_MIXER_FLAGS_NON_INTERLEAVED_OUT")
+    '("unpositioned-in" "GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_IN")
+    '("unpositioned-out" "GST_AUDIO_CHANNEL_MIXER_FLAGS_UNPOSITIONED_OUT")
+  )
+)
+
 (define-enum AudioChannelPosition
   (in-module "Gst")
   (c-name "GstAudioChannelPosition")
@@ -20058,6 +20430,17 @@
     '("wide-right" "GST_AUDIO_CHANNEL_POSITION_WIDE_RIGHT")
     '("surround-left" "GST_AUDIO_CHANNEL_POSITION_SURROUND_LEFT")
     '("surround-right" "GST_AUDIO_CHANNEL_POSITION_SURROUND_RIGHT")
+  )
+)
+
+(define-flags AudioConverterFlags
+  (in-module "Gst")
+  (c-name "GstAudioConverterFlags")
+  (gtype-id "GST_TYPE_AUDIO_CONVERTER_FLAGS")
+  (values
+    '("none" "GST_AUDIO_CONVERTER_FLAG_NONE")
+    '("in-writable" "GST_AUDIO_CONVERTER_FLAG_IN_WRITABLE")
+    '("variable-rate" "GST_AUDIO_CONVERTER_FLAG_VARIABLE_RATE")
   )
 )
 
@@ -20128,12 +20511,13 @@
   )
 )
 
-(define-enum AudioPackFlags
+(define-flags AudioPackFlags
   (in-module "Gst")
   (c-name "GstAudioPackFlags")
   (gtype-id "GST_TYPE_AUDIO_PACK_FLAGS")
   (values
     '("none" "GST_AUDIO_PACK_FLAG_NONE")
+    '("truncate-range" "GST_AUDIO_PACK_FLAG_TRUNCATE_RANGE")
   )
 )
 
@@ -20154,6 +20538,41 @@
   (values
     '("interleaved" "GST_AUDIO_LAYOUT_INTERLEAVED")
     '("non-interleaved" "GST_AUDIO_LAYOUT_NON_INTERLEAVED")
+  )
+)
+
+(define-enum AudioDitherMethod
+  (in-module "Gst")
+  (c-name "GstAudioDitherMethod")
+  (gtype-id "GST_TYPE_AUDIO_DITHER_METHOD")
+  (values
+    '("none" "GST_AUDIO_DITHER_NONE")
+    '("rpdf" "GST_AUDIO_DITHER_RPDF")
+    '("tpdf" "GST_AUDIO_DITHER_TPDF")
+    '("tpdf-hf" "GST_AUDIO_DITHER_TPDF_HF")
+  )
+)
+
+(define-enum AudioNoiseShapingMethod
+  (in-module "Gst")
+  (c-name "GstAudioNoiseShapingMethod")
+  (gtype-id "GST_TYPE_AUDIO_NOISE_SHAPING_METHOD")
+  (values
+    '("none" "GST_AUDIO_NOISE_SHAPING_NONE")
+    '("error-feedback" "GST_AUDIO_NOISE_SHAPING_ERROR_FEEDBACK")
+    '("simple" "GST_AUDIO_NOISE_SHAPING_SIMPLE")
+    '("medium" "GST_AUDIO_NOISE_SHAPING_MEDIUM")
+    '("high" "GST_AUDIO_NOISE_SHAPING_HIGH")
+  )
+)
+
+(define-flags AudioQuantizeFlags
+  (in-module "Gst")
+  (c-name "GstAudioQuantizeFlags")
+  (gtype-id "GST_TYPE_AUDIO_QUANTIZE_FLAGS")
+  (values
+    '("none" "GST_AUDIO_QUANTIZE_FLAG_NONE")
+    '("non-interleaved" "GST_AUDIO_QUANTIZE_FLAG_NON_INTERLEAVED")
   )
 )
 
@@ -20261,6 +20680,24 @@
   )
 )
 
+(define-enum AudioVisualizerShader
+  (in-module "Gst")
+  (c-name "GstAudioVisualizerShader")
+  (gtype-id "GST_TYPE_AUDIO_VISUALIZER_SHADER")
+  (values
+    '("none" "GST_AUDIO_VISUALIZER_SHADER_NONE")
+    '("fade" "GST_AUDIO_VISUALIZER_SHADER_FADE")
+    '("fade-and-move-up" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_UP")
+    '("fade-and-move-down" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_DOWN")
+    '("fade-and-move-left" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_LEFT")
+    '("fade-and-move-right" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_RIGHT")
+    '("fade-and-move-horiz-out" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_OUT")
+    '("fade-and-move-horiz-in" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_HORIZ_IN")
+    '("fade-and-move-vert-out" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_OUT")
+    '("fade-and-move-vert-in" "GST_AUDIO_VISUALIZER_SHADER_FADE_AND_MOVE_VERT_IN")
+  )
+)
+
 (define-enum DiscovererResult
   (in-module "Gst")
   (c-name "GstDiscovererResult")
@@ -20359,6 +20796,16 @@
     '("tool" "GST_RTCP_SDES_TOOL")
     '("note" "GST_RTCP_SDES_NOTE")
     '("priv" "GST_RTCP_SDES_PRIV")
+  )
+)
+
+(define-flags RTPBufferMapFlags
+  (in-module "Gst")
+  (c-name "GstRTPBufferMapFlags")
+  (gtype-id "GST_TYPE_RTP_BUFFER_MAP_FLAGS")
+  (values
+    '("skip-padding" "GST_RTP_BUFFER_MAP_FLAG_SKIP_PADDING")
+    '("last" "GST_RTP_BUFFER_MAP_FLAG_LAST")
   )
 )
 
@@ -21151,6 +21598,7 @@
     '("log100" "GST_VIDEO_TRANSFER_LOG100")
     '("log316" "GST_VIDEO_TRANSFER_LOG316")
     '("bt2020-12" "GST_VIDEO_TRANSFER_BT2020_12")
+    '("adobergb" "GST_VIDEO_TRANSFER_ADOBERGB")
   )
 )
 
@@ -21167,6 +21615,7 @@
     '("smpte240m" "GST_VIDEO_COLOR_PRIMARIES_SMPTE240M")
     '("film" "GST_VIDEO_COLOR_PRIMARIES_FILM")
     '("bt2020" "GST_VIDEO_COLOR_PRIMARIES_BT2020")
+    '("adobergb" "GST_VIDEO_COLOR_PRIMARIES_ADOBERGB")
   )
 )
 
@@ -21704,6 +22153,21 @@
   (return-type "gboolean")
 )
 
+(define-method set_wait_on_eos
+  (of-object "GstAppSink")
+  (c-name "gst_app_sink_set_wait_on_eos")
+  (return-type "none")
+  (parameters
+    '("gboolean" "wait")
+  )
+)
+
+(define-method get_wait_on_eos
+  (of-object "GstAppSink")
+  (c-name "gst_app_sink_get_wait_on_eos")
+  (return-type "gboolean")
+)
+
 (define-method pull_preroll
   (of-object "GstAppSink")
   (c-name "gst_app_sink_pull_preroll")
@@ -21879,6 +22343,47 @@
 
 
 
+;; From audio-channel-mixer.h
+
+(define-function gst_audio_channel_mixer_new
+  (c-name "gst_audio_channel_mixer_new")
+  (is-constructor-of "GstAudioChannelMixer")
+  (return-type "GstAudioChannelMixer*")
+  (parameters
+    '("GstAudioChannelMixerFlags" "flags")
+    '("GstAudioFormat" "format")
+    '("gint" "in_channels")
+    '("GstAudioChannelPosition*" "in_position")
+    '("gint" "out_channels")
+    '("GstAudioChannelPosition*" "out_position")
+  )
+)
+
+(define-method free
+  (of-object "GstAudioChannelMixer")
+  (c-name "gst_audio_channel_mixer_free")
+  (return-type "none")
+)
+
+(define-method is_passthrough
+  (of-object "GstAudioChannelMixer")
+  (c-name "gst_audio_channel_mixer_is_passthrough")
+  (return-type "gboolean")
+)
+
+(define-method samples
+  (of-object "GstAudioChannelMixer")
+  (c-name "gst_audio_channel_mixer_samples")
+  (return-type "none")
+  (parameters
+    '("const-gpointer[]" "in")
+    '("gpointer[]" "out")
+    '("gint" "samples")
+  )
+)
+
+
+
 ;; From audio-channels.h
 
 (define-function gst_audio_buffer_reorder_channels
@@ -21957,6 +22462,100 @@
   )
 )
 
+(define-function gst_audio_channel_get_fallback_mask
+  (c-name "gst_audio_channel_get_fallback_mask")
+  (return-type "guint64")
+  (parameters
+    '("gint" "channels")
+  )
+)
+
+
+
+;; From audio-converter.h
+
+(define-function gst_audio_converter_new
+  (c-name "gst_audio_converter_new")
+  (is-constructor-of "GstAudioConverter")
+  (return-type "GstAudioConverter*")
+  (parameters
+    '("GstAudioConverterFlags" "flags")
+    '("GstAudioInfo*" "in_info")
+    '("GstAudioInfo*" "out_info")
+    '("GstStructure*" "config")
+  )
+)
+
+(define-method free
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_free")
+  (return-type "none")
+)
+
+(define-method reset
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_reset")
+  (return-type "none")
+)
+
+(define-method update_config
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_update_config")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "in_rate")
+    '("gint" "out_rate")
+    '("GstStructure*" "config")
+  )
+)
+
+(define-method get_config
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_get_config")
+  (return-type "const-GstStructure*")
+  (parameters
+    '("gint*" "in_rate")
+    '("gint*" "out_rate")
+  )
+)
+
+(define-method get_out_frames
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_get_out_frames")
+  (return-type "gsize")
+  (parameters
+    '("gsize" "in_frames")
+  )
+)
+
+(define-method get_in_frames
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_get_in_frames")
+  (return-type "gsize")
+  (parameters
+    '("gsize" "out_frames")
+  )
+)
+
+(define-method get_max_latency
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_get_max_latency")
+  (return-type "gsize")
+)
+
+(define-method samples
+  (of-object "GstAudioConverter")
+  (c-name "gst_audio_converter_samples")
+  (return-type "gboolean")
+  (parameters
+    '("GstAudioConverterFlags" "flags")
+    '("gpointer[]" "in")
+    '("gsize" "in_frames")
+    '("gpointer[]" "out")
+    '("gsize" "out_frames")
+  )
+)
+
 
 
 ;; From audio-enumtypes.h
@@ -21981,6 +22580,16 @@
   (return-type "GType")
 )
 
+(define-function gst_audio_channel_mixer_flags_get_type
+  (c-name "gst_audio_channel_mixer_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_converter_flags_get_type
+  (c-name "gst_audio_converter_flags_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_audio_flags_get_type
   (c-name "gst_audio_flags_get_type")
   (return-type "GType")
@@ -21988,6 +22597,21 @@
 
 (define-function gst_audio_layout_get_type
   (c-name "gst_audio_layout_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_dither_method_get_type
+  (c-name "gst_audio_dither_method_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_noise_shaping_method_get_type
+  (c-name "gst_audio_noise_shaping_method_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_quantize_flags_get_type
+  (c-name "gst_audio_quantize_flags_get_type")
   (return-type "GType")
 )
 
@@ -22144,6 +22768,47 @@
   (return-type "gboolean")
   (parameters
     '("const-GstAudioInfo*" "other")
+  )
+)
+
+
+
+;; From audio-quantize.h
+
+(define-function gst_audio_quantize_new
+  (c-name "gst_audio_quantize_new")
+  (is-constructor-of "GstAudioQuantize")
+  (return-type "GstAudioQuantize*")
+  (parameters
+    '("GstAudioDitherMethod" "dither")
+    '("GstAudioNoiseShapingMethod" "ns")
+    '("GstAudioQuantizeFlags" "flags")
+    '("GstAudioFormat" "format")
+    '("guint" "channels")
+    '("guint" "quantizer")
+  )
+)
+
+(define-method free
+  (of-object "GstAudioQuantize")
+  (c-name "gst_audio_quantize_free")
+  (return-type "none")
+)
+
+(define-method reset
+  (of-object "GstAudioQuantize")
+  (c-name "gst_audio_quantize_reset")
+  (return-type "none")
+)
+
+(define-method samples
+  (of-object "GstAudioQuantize")
+  (c-name "gst_audio_quantize_samples")
+  (return-type "none")
+  (parameters
+    '("const-gpointer[]" "in")
+    '("gpointer[]" "out")
+    '("guint" "samples")
   )
 )
 
@@ -22969,12 +23634,43 @@
   )
 )
 
+(define-function gst_audio_clipping_meta_api_get_type
+  (c-name "gst_audio_clipping_meta_api_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_clipping_meta_get_info
+  (c-name "gst_audio_clipping_meta_get_info")
+  (return-type "const-GstMetaInfo*")
+)
+
+(define-method add_audio_clipping_meta
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_add_audio_clipping_meta")
+  (return-type "GstAudioClippingMeta*")
+  (parameters
+    '("GstFormat" "format")
+    '("guint64" "start")
+    '("guint64" "end")
+  )
+)
+
 
 
 ;; From gstaudiopack-dist.h
 
 (define-function audio_orc_unpack_u8
   (c-name "audio_orc_unpack_u8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u8_trunc
+  (c-name "audio_orc_unpack_u8_trunc")
   (return-type "none")
   (parameters
     '("gint32*-ORC_RESTRICT" "d1")
@@ -22993,8 +23689,28 @@
   )
 )
 
+(define-function audio_orc_unpack_s8_trunc
+  (c-name "audio_orc_unpack_s8_trunc")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
 (define-function audio_orc_unpack_u16
   (c-name "audio_orc_unpack_u16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_u16_trunc
+  (c-name "audio_orc_unpack_u16_trunc")
   (return-type "none")
   (parameters
     '("gint32*-ORC_RESTRICT" "d1")
@@ -23013,6 +23729,16 @@
   )
 )
 
+(define-function audio_orc_unpack_s16_trunc
+  (c-name "audio_orc_unpack_s16_trunc")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
 (define-function audio_orc_unpack_u16_swap
   (c-name "audio_orc_unpack_u16_swap")
   (return-type "none")
@@ -23023,8 +23749,28 @@
   )
 )
 
+(define-function audio_orc_unpack_u16_swap_trunc
+  (c-name "audio_orc_unpack_u16_swap_trunc")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
 (define-function audio_orc_unpack_s16_swap
   (c-name "audio_orc_unpack_s16_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s16_swap_trunc
+  (c-name "audio_orc_unpack_s16_swap_trunc")
   (return-type "none")
   (parameters
     '("gint32*-ORC_RESTRICT" "d1")
@@ -23359,6 +24105,59 @@
   (parameters
     '("guint64*-ORC_RESTRICT" "d1")
     '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_int_bias
+  (c-name "audio_orc_int_bias")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_int_dither
+  (c-name "audio_orc_int_dither")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("const-gint32*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_update_rand
+  (c-name "audio_orc_update_rand")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_s32_to_double
+  (c-name "audio_orc_s32_to_double")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_double_to_s32
+  (c-name "audio_orc_double_to_s32")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
     '("int" "n")
   )
 )
@@ -23377,8 +24176,28 @@
   )
 )
 
+(define-function audio_orc_unpack_u8_trunc
+  (c-name "audio_orc_unpack_u8_trunc")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
 (define-function audio_orc_unpack_s8
   (c-name "audio_orc_unpack_s8")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s8_trunc
+  (c-name "audio_orc_unpack_s8_trunc")
   (return-type "none")
   (parameters
     '("gint32*-ORC_RESTRICT" "d1")
@@ -23397,8 +24216,28 @@
   )
 )
 
+(define-function audio_orc_unpack_u16_trunc
+  (c-name "audio_orc_unpack_u16_trunc")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
 (define-function audio_orc_unpack_s16
   (c-name "audio_orc_unpack_s16")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s16_trunc
+  (c-name "audio_orc_unpack_s16_trunc")
   (return-type "none")
   (parameters
     '("gint32*-ORC_RESTRICT" "d1")
@@ -23417,8 +24256,28 @@
   )
 )
 
+(define-function audio_orc_unpack_u16_swap_trunc
+  (c-name "audio_orc_unpack_u16_swap_trunc")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
 (define-function audio_orc_unpack_s16_swap
   (c-name "audio_orc_unpack_s16_swap")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-guint8*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_unpack_s16_swap_trunc
+  (c-name "audio_orc_unpack_s16_swap_trunc")
   (return-type "none")
   (parameters
     '("gint32*-ORC_RESTRICT" "d1")
@@ -23753,6 +24612,59 @@
   (parameters
     '("guint64*-ORC_RESTRICT" "d1")
     '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_int_bias
+  (c-name "audio_orc_int_bias")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "p1")
+    '("int" "p2")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_int_dither
+  (c-name "audio_orc_int_dither")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("const-gint32*-ORC_RESTRICT" "s2")
+    '("int" "p1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_update_rand
+  (c-name "audio_orc_update_rand")
+  (return-type "none")
+  (parameters
+    '("guint32*-ORC_RESTRICT" "d1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_s32_to_double
+  (c-name "audio_orc_s32_to_double")
+  (return-type "none")
+  (parameters
+    '("gdouble*-ORC_RESTRICT" "d1")
+    '("const-gint32*-ORC_RESTRICT" "s1")
+    '("int" "n")
+  )
+)
+
+(define-function audio_orc_double_to_s32
+  (c-name "audio_orc_double_to_s32")
+  (return-type "none")
+  (parameters
+    '("gint32*-ORC_RESTRICT" "d1")
+    '("const-gdouble*-ORC_RESTRICT" "s1")
     '("int" "n")
   )
 )
@@ -24809,6 +25721,73 @@
   )
 )
 
+(define-function gst_codec_utils_opus_parse_caps
+  (c-name "gst_codec_utils_opus_parse_caps")
+  (return-type "gboolean")
+  (parameters
+    '("GstCaps*" "caps")
+    '("guint32*" "rate")
+    '("guint8*" "channels")
+    '("guint8*" "channel_mapping_family")
+    '("guint8*" "stream_count")
+    '("guint8*" "coupled_count")
+    '("guint8" "channel_mapping[256]")
+  )
+)
+
+(define-function gst_codec_utils_opus_create_caps
+  (c-name "gst_codec_utils_opus_create_caps")
+  (return-type "GstCaps*")
+  (parameters
+    '("guint32" "rate")
+    '("guint8" "channels")
+    '("guint8" "channel_mapping_family")
+    '("guint8" "stream_count")
+    '("guint8" "coupled_count")
+    '("const-guint8*" "channel_mapping")
+  )
+)
+
+(define-function gst_codec_utils_opus_create_caps_from_header
+  (c-name "gst_codec_utils_opus_create_caps_from_header")
+  (return-type "GstCaps*")
+  (parameters
+    '("GstBuffer*" "header")
+    '("GstBuffer*" "comments")
+  )
+)
+
+(define-function gst_codec_utils_opus_create_header
+  (c-name "gst_codec_utils_opus_create_header")
+  (return-type "GstBuffer*")
+  (parameters
+    '("guint32" "rate")
+    '("guint8" "channels")
+    '("guint8" "channel_mapping_family")
+    '("guint8" "stream_count")
+    '("guint8" "coupled_count")
+    '("const-guint8*" "channel_mapping")
+    '("guint16" "pre_skip")
+    '("gint16" "output_gain")
+  )
+)
+
+(define-function gst_codec_utils_opus_parse_header
+  (c-name "gst_codec_utils_opus_parse_header")
+  (return-type "gboolean")
+  (parameters
+    '("GstBuffer*" "header")
+    '("guint32*" "rate")
+    '("guint8*" "channels")
+    '("guint8*" "channel_mapping_family")
+    '("guint8*" "stream_count")
+    '("guint8*" "coupled_count")
+    '("guint8" "channel_mapping[256]")
+    '("guint16*" "pre_skip")
+    '("gint16*" "output_gain")
+  )
+)
+
 
 
 ;; From descriptions.h
@@ -25277,6 +26256,15 @@
   (parameters
     '("const-gchar*" "categoryname")
   )
+)
+
+
+
+;; From gstaudiovisualizer.h
+
+(define-function gst_audio_visualizer_get_type
+  (c-name "gst_audio_visualizer_get_type")
+  (return-type "GType")
 )
 
 
@@ -25897,6 +26885,11 @@
 
 (define-function gst_discoverer_serialize_flags_get_type
   (c-name "gst_discoverer_serialize_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_audio_visualizer_shader_get_type
+  (c-name "gst_audio_visualizer_shader_get_type")
   (return-type "GType")
 )
 
@@ -27134,6 +28127,11 @@
   (return-type "GType")
 )
 
+(define-function gst_rtp_buffer_map_flags_get_type
+  (c-name "gst_rtp_buffer_map_flags_get_type")
+  (return-type "GType")
+)
+
 (define-function gst_rtcp_type_get_type
   (c-name "gst_rtcp_type_get_type")
   (return-type "GType")
@@ -27264,6 +28262,16 @@
   (return-type "GstRTSPResult")
   (parameters
     '("GTimeVal*" "timeout")
+  )
+)
+
+(define-method connect_with_response
+  (of-object "GstRTSPConnection")
+  (c-name "gst_rtsp_connection_connect_with_response")
+  (return-type "GstRTSPResult")
+  (parameters
+    '("GTimeVal*" "timeout")
+    '("GstRTSPMessage*" "response")
   )
 )
 
@@ -28584,6 +29592,20 @@
   )
 )
 
+(define-function gst_mikey_message_new_from_caps
+  (c-name "gst_mikey_message_new_from_caps")
+  (return-type "GstMIKEYMessage*")
+  (parameters
+    '("GstCaps*" "caps")
+  )
+)
+
+(define-method base64_encode
+  (of-object "GstMIKEYMessage")
+  (c-name "gst_mikey_message_base64_encode")
+  (return-type "gchar*")
+)
+
 (define-method ref
   (of-object "GstMIKEYMessage")
   (c-name "gst_mikey_message_ref")
@@ -29804,6 +30826,51 @@
   )
 )
 
+(define-method get_caps_from_media
+  (of-object "GstSDPMedia")
+  (c-name "gst_sdp_media_get_caps_from_media")
+  (return-type "GstCaps*")
+  (parameters
+    '("gint" "pt")
+  )
+)
+
+(define-function gst_sdp_media_set_media_from_caps
+  (c-name "gst_sdp_media_set_media_from_caps")
+  (return-type "GstSDPResult")
+  (parameters
+    '("const-GstCaps*" "caps")
+    '("GstSDPMedia*" "media")
+  )
+)
+
+(define-function gst_sdp_make_keymgmt
+  (c-name "gst_sdp_make_keymgmt")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "uri")
+    '("const-gchar*" "base64")
+  )
+)
+
+(define-method attributes_to_caps
+  (of-object "GstSDPMessage")
+  (c-name "gst_sdp_message_attributes_to_caps")
+  (return-type "GstSDPResult")
+  (parameters
+    '("GstCaps*" "caps")
+  )
+)
+
+(define-method attributes_to_caps
+  (of-object "GstSDPMedia")
+  (c-name "gst_sdp_media_attributes_to_caps")
+  (return-type "GstSDPResult")
+  (parameters
+    '("GstCaps*" "caps")
+  )
+)
+
 
 
 ;; From sdp.h
@@ -30337,6 +31404,35 @@
   (parameters
     '("GstColorBalanceChannel*" "channel")
     '("gint" "value")
+  )
+)
+
+
+
+;; From gstvideoaffinetransformationmeta.h
+
+(define-function gst_video_affine_transformation_meta_api_get_type
+  (c-name "gst_video_affine_transformation_meta_api_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_video_affine_transformation_meta_get_info
+  (c-name "gst_video_affine_transformation_meta_get_info")
+  (return-type "const-GstMetaInfo*")
+)
+
+(define-method add_video_affine_transformation_meta
+  (of-object "GstBuffer")
+  (c-name "gst_buffer_add_video_affine_transformation_meta")
+  (return-type "GstVideoAffineTransformationMeta*")
+)
+
+(define-method apply_matrix
+  (of-object "GstVideoAffineTransformationMeta")
+  (c-name "gst_video_affine_transformation_meta_apply_matrix")
+  (return-type "none")
+  (parameters
+    '("const-gfloat" "matrix[16]")
   )
 )
 
@@ -33944,6 +35040,19 @@
   )
 )
 
+(define-function video_orc_convert_UYVY_GRAY8
+  (c-name "video_orc_convert_UYVY_GRAY8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-orc_uint16*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
+  )
+)
+
 
 
 ;; From video-orc.h
@@ -35723,6 +36832,19 @@
     '("const-guint16*-ORC_RESTRICT" "s1")
     '("orc_int64" "p1")
     '("int" "n")
+  )
+)
+
+(define-function video_orc_convert_UYVY_GRAY8
+  (c-name "video_orc_convert_UYVY_GRAY8")
+  (return-type "none")
+  (parameters
+    '("guint8*-ORC_RESTRICT" "d1")
+    '("int" "d1_stride")
+    '("const-orc_uint16*-ORC_RESTRICT" "s1")
+    '("int" "s1_stride")
+    '("int" "n")
+    '("int" "m")
   )
 )
 

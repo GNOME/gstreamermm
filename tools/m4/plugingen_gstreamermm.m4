@@ -14,6 +14,7 @@ _TRANSLATION(`GstAutoplugSelectResult',`Gst::AutoplugSelectResult',`Gst::Autoplu
 _TRANSLATION(`GstFlowReturn',`Gst::FlowReturn',`Gst::FlowReturn',,`<gstreamermm/pad.h>')
 _TRANSLATION(`GstVideoMultiviewFramePacking',`Gst::VideoMultiviewFramePacking',`Gst::VideoMultiviewFramePacking',,`<gstreamermm/videoinfo.h>')
 _TRANSLATION(`GstVideoMultiviewFlags',`Gst::VideoMultiviewFlags',`Gst::VideoMultiviewFlags',,`<gstreamermm/videoinfo.h>')
+_TRANSLATION(`GstBufferFlags',`Gst::BufferFlags',`Gst::BufferFlags',,`<gstreamermm/buffer.h>')
 
 dnl giomm
 _TRANSLATION(`GFile*',`Gio::File',`const Glib::RefPtr<Gio::File>&',`Glib::RefPtr<Gio::File>',`<giomm/file.h>')

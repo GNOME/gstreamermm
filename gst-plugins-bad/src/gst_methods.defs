@@ -35,25 +35,25 @@
   (gtype-id "GST_TYPE_FRAGMENT")
 )
 
-(define-object GLBaseBufferAllocator
-  (in-module "Gst")
-  (parent "GstAllocator")
-  (c-name "GstGLBaseBufferAllocator")
-  (gtype-id "GST_TYPE_GL_BASE_BUFFER_ALLOCATOR")
-)
-
-(define-object GLAllocator
-  (in-module "Gst")
-  (parent "GstGLBaseBufferAllocator")
-  (c-name "GstGLAllocator")
-  (gtype-id "GST_TYPE_GL_ALLOCATOR")
-)
-
 (define-object GLBaseFilter
   (in-module "Gst")
   (parent "GstBaseTransform")
   (c-name "GstGLBaseFilter")
   (gtype-id "GST_TYPE_GL_BASE_FILTER")
+)
+
+(define-object GLBaseMemoryAllocator
+  (in-module "Gst")
+  (parent "GstAllocator")
+  (c-name "GstGLBaseMemoryAllocator")
+  (gtype-id "GST_TYPE_GL_BASE_MEMORY_ALLOCATOR")
+)
+
+(define-object GLBufferAllocator
+  (in-module "Gst")
+  (parent "GstGLBaseMemoryAllocator")
+  (c-name "GstGLBufferAllocator")
+  (gtype-id "GST_TYPE_GL_BUFFER_ALLOCATOR")
 )
 
 (define-object GLBufferPool
@@ -77,18 +77,18 @@
   (gtype-id "GST_TYPE_GL_CONTEXT")
 )
 
+(define-object GLControlBindingProxy
+  (in-module "Gst")
+  (parent "GstControlBinding")
+  (c-name "GstGLControlBindingProxy")
+  (gtype-id "GST_TYPE_GL_CONTROL_BINDING_PROXY")
+)
+
 (define-object GLDisplay
   (in-module "Gst")
   (parent "GstObject")
   (c-name "GstGLDisplay")
   (gtype-id "GST_TYPE_GL_DISPLAY")
-)
-
-(define-object GLDownload
-  (in-module "Gst")
-  (parent "GstObject")
-  (c-name "GstGLDownload")
-  (gtype-id "GST_TYPE_GL_DOWNLOAD")
 )
 
 (define-object GLFilter
@@ -105,11 +105,32 @@
   (gtype-id "GST_TYPE_GL_FRAMEBUFFER")
 )
 
+(define-object GLMemoryAllocator
+  (in-module "Gst")
+  (parent "GstGLBaseMemoryAllocator")
+  (c-name "GstGLMemoryAllocator")
+  (gtype-id "GST_TYPE_GL_MEMORY_ALLOCATOR")
+)
+
+(define-object GLMemoryPBOAllocator
+  (in-module "Gst")
+  (parent "GstGLMemoryAllocator")
+  (c-name "GstGLMemoryPBOAllocator")
+  (gtype-id "GST_TYPE_GL_MEMORY_PBO_ALLOCATOR")
+)
+
 (define-object GLOverlayCompositor
   (in-module "Gst")
   (parent "GstObject")
   (c-name "GstGLOverlayCompositor")
   (gtype-id "GST_TYPE_GL_OVERLAY_COMPOSITOR")
+)
+
+(define-object GLSLStage
+  (in-module "Gst")
+  (parent "GstObject")
+  (c-name "GstGLSLStage")
+  (gtype-id "GST_TYPE_GLSL_STAGE")
 )
 
 (define-object GLShader
@@ -124,13 +145,6 @@
   (parent "GstObject")
   (c-name "GstGLUpload")
   (gtype-id "GST_TYPE_GL_UPLOAD")
-)
-
-(define-object GLUploadMeta
-  (in-module "Gst")
-  (parent "GstObject")
-  (c-name "GstGLUploadMeta")
-  (gtype-id "GST_TYPE_GL_UPLOAD_META")
 )
 
 (define-object GLViewConvert
@@ -395,24 +409,24 @@
   )
 )
 
-(define-enum GLBufferError
+(define-enum GLBaseMemoryError
   (in-module "Gst")
-  (c-name "GstGLBufferError")
-  (gtype-id "GST_TYPE_GL_BUFFER_ERROR")
+  (c-name "GstGLBaseMemoryError")
+  (gtype-id "GST_TYPE_GL_BASE_MEMORY_ERROR")
   (values
-    '("failed" "GST_GL_BASE_BUFFER_ERROR_FAILED")
-    '("old-libs" "GST_GL_BASE_BUFFER_ERROR_OLD_LIBS")
-    '("resource-unavailable" "GST_GL_BASE_BUFFER_ERROR_RESOURCE_UNAVAILABLE")
+    '("failed" "GST_GL_BASE_MEMORY_ERROR_FAILED")
+    '("old-libs" "GST_GL_BASE_MEMORY_ERROR_OLD_LIBS")
+    '("resource-unavailable" "GST_GL_BASE_MEMORY_ERROR_RESOURCE_UNAVAILABLE")
   )
 )
 
-(define-flags GLBaseBufferFlags
+(define-flags GLBaseMemoryTransfer
   (in-module "Gst")
-  (c-name "GstGLBaseBufferFlags")
-  (gtype-id "GST_TYPE_GL_BASE_BUFFER_FLAGS")
+  (c-name "GstGLBaseMemoryTransfer")
+  (gtype-id "GST_TYPE_GL_BASE_MEMORY_TRANSFER")
   (values
-    '("download" "GST_GL_BASE_BUFFER_FLAG_NEED_DOWNLOAD")
-    '("upload" "GST_GL_BASE_BUFFER_FLAG_NEED_UPLOAD")
+    '("download" "GST_GL_BASE_MEMORY_TRANSFER_NEED_DOWNLOAD")
+    '("upload" "GST_GL_BASE_MEMORY_TRANSFER_NEED_UPLOAD")
   )
 )
 
@@ -446,24 +460,76 @@
   )
 )
 
-(define-enum GLShaderError
+(define-enum GLTextureTarget
   (in-module "Gst")
-  (c-name "GstGLShaderError")
-  (gtype-id "GST_TYPE_GL_SHADER_ERROR")
+  (c-name "GstGLTextureTarget")
+  (gtype-id "GST_TYPE_GL_TEXTURE_TARGET")
   (values
-    '("compile" "GST_GL_SHADER_ERROR_COMPILE")
-    '("link" "GST_GL_SHADER_ERROR_LINK")
-    '("program" "GST_GL_SHADER_ERROR_PROGRAM")
+    '("none" "GST_GL_TEXTURE_TARGET_NONE")
+    '("2d" "GST_GL_TEXTURE_TARGET_2D")
+    '("rectangle" "GST_GL_TEXTURE_TARGET_RECTANGLE")
+    '("external-oes" "GST_GL_TEXTURE_TARGET_EXTERNAL_OES")
   )
 )
 
-(define-enum GLShaderSourceType
+(define-enum GLQueryType
   (in-module "Gst")
-  (c-name "GstGLShaderSourceType")
-  (gtype-id "GST_TYPE_GL_SHADER_SOURCE_TYPE")
+  (c-name "GstGLQueryType")
+  (gtype-id "GST_TYPE_GL_QUERY_TYPE")
   (values
-    '("fragment-source" "GST_GL_SHADER_FRAGMENT_SOURCE")
-    '("vertex-source" "GST_GL_SHADER_VERTEX_SOURCE")
+    '("none" "GST_GL_QUERY_NONE")
+    '("time-elapsed" "GST_GL_QUERY_TIME_ELAPSED")
+    '("timestamp" "GST_GL_QUERY_TIMESTAMP")
+  )
+)
+
+(define-enum GLSLError
+  (in-module "Gst")
+  (c-name "GstGLSLError")
+  (gtype-id "GST_TYPE_GLSL_ERROR")
+  (values
+    '("compile" "GST_GLSL_ERROR_COMPILE")
+    '("link" "GST_GLSL_ERROR_LINK")
+    '("program" "GST_GLSL_ERROR_PROGRAM")
+  )
+)
+
+(define-enum GLSLVersion
+  (in-module "Gst")
+  (c-name "GstGLSLVersion")
+  (gtype-id "GST_TYPE_GLSL_VERSION")
+  (values
+    '("none" "GST_GLSL_VERSION_NONE")
+    '("100" "GST_GLSL_VERSION_100")
+    '("110" "GST_GLSL_VERSION_110")
+    '("120" "GST_GLSL_VERSION_120")
+    '("130" "GST_GLSL_VERSION_130")
+    '("140" "GST_GLSL_VERSION_140")
+    '("150" "GST_GLSL_VERSION_150")
+    '("300" "GST_GLSL_VERSION_300")
+    '("310" "GST_GLSL_VERSION_310")
+    '("320" "GST_GLSL_VERSION_320")
+    '("330" "GST_GLSL_VERSION_330")
+    '("400" "GST_GLSL_VERSION_400")
+    '("410" "GST_GLSL_VERSION_410")
+    '("420" "GST_GLSL_VERSION_420")
+    '("430" "GST_GLSL_VERSION_430")
+    '("440" "GST_GLSL_VERSION_440")
+    '("450" "GST_GLSL_VERSION_450")
+    '("any" "GST_GLSL_VERSION_ANY")
+  )
+)
+
+(define-flags GLSLProfile
+  (in-module "Gst")
+  (c-name "GstGLSLProfile")
+  (gtype-id "GST_TYPE_GLSL_PROFILE")
+  (values
+    '("none" "GST_GLSL_PROFILE_NONE")
+    '("es" "GST_GLSL_PROFILE_ES")
+    '("core" "GST_GLSL_PROFILE_CORE")
+    '("compatibility" "GST_GLSL_PROFILE_COMPATIBILITY")
+    '("any" "GST_GLSL_PROFILE_ANY")
   )
 )
 
@@ -1431,6 +1497,15 @@
   )
 )
 
+(define-method find_stream_for_pad
+  (of-object "GstAdaptiveDemux")
+  (c-name "gst_adaptive_demux_find_stream_for_pad")
+  (return-type "GstAdaptiveDemuxStream*")
+  (parameters
+    '("GstPad*" "pad")
+  )
+)
+
 (define-method set_caps
   (of-object "GstAdaptiveDemuxStream")
   (c-name "gst_adaptive_demux_stream_set_caps")
@@ -1480,16 +1555,6 @@
   (return-type "none")
   (parameters
     '("GstEvent*" "event")
-  )
-)
-
-(define-method stream_advance_fragment_unlocked
-  (of-object "GstAdaptiveDemux")
-  (c-name "gst_adaptive_demux_stream_advance_fragment_unlocked")
-  (return-type "GstFlowReturn")
-  (parameters
-    '("GstAdaptiveDemuxStream*" "stream")
-    '("GstClockTime" "duration")
   )
 )
 
@@ -1683,26 +1748,6 @@
 
 
 ;; From dboolhuff.h
-
-(define-function vp8dx_start_decode
-  (c-name "vp8dx_start_decode")
-  (return-type "int")
-  (parameters
-    '("BOOL_DECODER*" "br")
-    '("const-unsigned-char*" "source")
-    '("unsigned-int" "source_sz")
-    '("vp8_decrypt_cb*" "decrypt_cb")
-    '("void*" "decrypt_state")
-  )
-)
-
-(define-function vp8dx_bool_decoder_fill
-  (c-name "vp8dx_bool_decoder_fill")
-  (return-type "none")
-  (parameters
-    '("BOOL_DECODER*" "br")
-  )
-)
 
 (define-function vp8dx_decode_bool
   (c-name "vp8dx_decode_bool")
@@ -2140,6 +2185,42 @@
 
 (define-function gst_h265_quant_matrix_8x8_get_raster_from_zigzag
   (c-name "gst_h265_quant_matrix_8x8_get_raster_from_zigzag")
+  (return-type "none")
+  (parameters
+    '("guint8" "out_quant[64]")
+    '("const-guint8" "quant[64]")
+  )
+)
+
+(define-function gst_h265_quant_matrix_4x4_get_uprightdiagonal_from_raster
+  (c-name "gst_h265_quant_matrix_4x4_get_uprightdiagonal_from_raster")
+  (return-type "none")
+  (parameters
+    '("guint8" "out_quant[16]")
+    '("const-guint8" "quant[16]")
+  )
+)
+
+(define-function gst_h265_quant_matrix_4x4_get_raster_from_uprightdiagonal
+  (c-name "gst_h265_quant_matrix_4x4_get_raster_from_uprightdiagonal")
+  (return-type "none")
+  (parameters
+    '("guint8" "out_quant[16]")
+    '("const-guint8" "quant[16]")
+  )
+)
+
+(define-function gst_h265_quant_matrix_8x8_get_uprightdiagonal_from_raster
+  (c-name "gst_h265_quant_matrix_8x8_get_uprightdiagonal_from_raster")
+  (return-type "none")
+  (parameters
+    '("guint8" "out_quant[64]")
+    '("const-guint8" "quant[64]")
+  )
+)
+
+(define-function gst_h265_quant_matrix_8x8_get_raster_from_uprightdiagonal
+  (c-name "gst_h265_quant_matrix_8x8_get_raster_from_uprightdiagonal")
   (return-type "none")
   (parameters
     '("guint8" "out_quant[64]")
@@ -2776,6 +2857,33 @@
 
 
 
+;; From gstvp9parser.h
+
+(define-function gst_vp9_parser_new
+  (c-name "gst_vp9_parser_new")
+  (is-constructor-of "GstVp9Parser")
+  (return-type "GstVp9Parser*")
+)
+
+(define-method parse_frame_header
+  (of-object "GstVp9Parser")
+  (c-name "gst_vp9_parser_parse_frame_header")
+  (return-type "GstVp9ParserResult")
+  (parameters
+    '("GstVp9FrameHdr*" "frame_hdr")
+    '("const-guint8*" "data")
+    '("gsize" "size")
+  )
+)
+
+(define-method free
+  (of-object "GstVp9Parser")
+  (c-name "gst_vp9_parser_free")
+  (return-type "none")
+)
+
+
+
 ;; From nalutils.h
 
 (define-function ceil_log2
@@ -2786,155 +2894,17 @@
   )
 )
 
-(define-method init
-  (of-object "NalReader")
-  (c-name "nal_reader_init")
-  (return-type "none")
-  (parameters
-    '("const-guint8*" "data")
-    '("guint" "size")
-  )
-)
-
-(define-method read
-  (of-object "NalReader")
-  (c-name "nal_reader_read")
-  (return-type "gboolean")
-  (parameters
-    '("guint" "nbits")
-  )
-)
-
-(define-method skip
-  (of-object "NalReader")
-  (c-name "nal_reader_skip")
-  (return-type "gboolean")
-  (parameters
-    '("guint" "nbits")
-  )
-)
-
-(define-method skip_long
-  (of-object "NalReader")
-  (c-name "nal_reader_skip_long")
-  (return-type "gboolean")
-  (parameters
-    '("guint" "nbits")
-  )
-)
-
-(define-method get_pos
-  (of-object "NalReader")
-  (c-name "nal_reader_get_pos")
-  (return-type "guint")
-)
-
-(define-method get_remaining
-  (of-object "NalReader")
-  (c-name "nal_reader_get_remaining")
-  (return-type "guint")
-)
-
-(define-method get_epb_count
-  (of-object "NalReader")
-  (c-name "nal_reader_get_epb_count")
-  (return-type "guint")
-)
-
-(define-method is_byte_aligned
-  (of-object "NalReader")
-  (c-name "nal_reader_is_byte_aligned")
-  (return-type "gboolean")
-)
-
-(define-method has_more_data
-  (of-object "NalReader")
-  (c-name "nal_reader_has_more_data")
-  (return-type "gboolean")
-)
-
-(define-method get_ue
-  (of-object "NalReader")
-  (c-name "nal_reader_get_ue")
-  (return-type "gboolean")
-  (parameters
-    '("guint32*" "val")
-  )
-)
-
-(define-method get_se
-  (of-object "NalReader")
-  (c-name "nal_reader_get_se")
-  (return-type "gboolean")
-  (parameters
-    '("gint32*" "val")
-  )
-)
-
-(define-function scan_for_start_codes
-  (c-name "scan_for_start_codes")
-  (return-type "gint")
-  (parameters
-    '("const-guint8*" "data")
-    '("guint" "size")
-  )
-)
-
 
 
 ;; From parserutils.h
-
-(define-function decode_vlc
-  (c-name "decode_vlc")
-  (return-type "gboolean")
-  (parameters
-    '("GstBitReader*" "br")
-    '("guint*" "res")
-    '("const-VLCTable*" "table")
-    '("guint" "length")
-  )
-)
 
 
 
 ;; From vp8utils.h
 
-(define-function gst_vp8_token_update_probs_init
-  (c-name "gst_vp8_token_update_probs_init")
-  (return-type "none")
-  (parameters
-    '("GstVp8TokenProbs*" "probs")
-  )
-)
 
-(define-method init_defaults
-  (of-object "GstVp8TokenProbs")
-  (c-name "gst_vp8_token_probs_init_defaults")
-  (return-type "none")
-)
 
-(define-function gst_vp8_mv_update_probs_init
-  (c-name "gst_vp8_mv_update_probs_init")
-  (return-type "none")
-  (parameters
-    '("GstVp8MvProbs*" "probs")
-  )
-)
-
-(define-method init_defaults
-  (of-object "GstVp8MvProbs")
-  (c-name "gst_vp8_mv_probs_init_defaults")
-  (return-type "none")
-)
-
-(define-method init_defaults
-  (of-object "GstVp8ModeProbs")
-  (c-name "gst_vp8_mode_probs_init_defaults")
-  (return-type "none")
-  (parameters
-    '("gboolean" "key_frame")
-  )
-)
+;; From vp9utils.h
 
 
 
@@ -2974,25 +2944,85 @@
 
 
 
-;; From gstglbasebuffer.h
+;; From gstglbasefilter.h
 
-(define-function gst_gl_base_buffer_allocator_get_type
-  (c-name "gst_gl_base_buffer_allocator_get_type")
+(define-function gst_gl_base_filter_get_type
+  (c-name "gst_gl_base_filter_get_type")
   (return-type "GType")
 )
 
-(define-function gst_gl_base_buffer_error_quark
-  (c-name "gst_gl_base_buffer_error_quark")
+
+
+;; From gstglbasememory.h
+
+(define-function gst_gl_base_memory_allocator_get_type
+  (c-name "gst_gl_base_memory_allocator_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_gl_base_memory_error_quark
+  (c-name "gst_gl_base_memory_error_quark")
   (return-type "GQuark")
 )
 
-(define-function gst_gl_base_buffer_init_once
-  (c-name "gst_gl_base_buffer_init_once")
+(define-function gst_gl_allocation_params_get_type
+  (c-name "gst_gl_allocation_params_get_type")
+  (return-type "GType")
+)
+
+(define-method init
+  (of-object "GstGLAllocationParams")
+  (c-name "gst_gl_allocation_params_init")
+  (return-type "gboolean")
+  (parameters
+    '("gsize" "struct_size")
+    '("guint" "alloc_flags")
+    '("GstGLAllocationParamsCopyFunc" "copy")
+    '("GstGLAllocationParamsFreeFunc" "free")
+    '("GstGLContext*" "context")
+    '("gsize" "alloc_size")
+    '("GstAllocationParams*" "alloc_params")
+    '("gpointer" "wrapped_data")
+    '("guint" "gl_handle")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method copy
+  (of-object "GstGLAllocationParams")
+  (c-name "gst_gl_allocation_params_copy")
+  (return-type "GstGLAllocationParams*")
+)
+
+(define-method free
+  (of-object "GstGLAllocationParams")
+  (c-name "gst_gl_allocation_params_free")
   (return-type "none")
 )
 
-(define-function gst_is_gl_base_buffer
-  (c-name "gst_is_gl_base_buffer")
+(define-method free_data
+  (of-object "GstGLAllocationParams")
+  (c-name "gst_gl_allocation_params_free_data")
+  (return-type "none")
+)
+
+(define-method copy_data
+  (of-object "GstGLAllocationParams")
+  (c-name "gst_gl_allocation_params_copy_data")
+  (return-type "none")
+  (parameters
+    '("GstGLAllocationParams*" "dest")
+  )
+)
+
+(define-function gst_gl_base_memory_init_once
+  (c-name "gst_gl_base_memory_init_once")
+  (return-type "none")
+)
+
+(define-function gst_is_gl_base_memory
+  (c-name "gst_is_gl_base_memory")
   (return-type "gboolean")
   (parameters
     '("GstMemory*" "mem")
@@ -3000,53 +3030,91 @@
 )
 
 (define-method init
-  (of-object "GstGLBaseBuffer")
-  (c-name "gst_gl_base_buffer_init")
+  (of-object "GstGLBaseMemory")
+  (c-name "gst_gl_base_memory_init")
   (return-type "none")
   (parameters
     '("GstAllocator*" "allocator")
     '("GstMemory*" "parent")
     '("GstGLContext*" "context")
     '("GstAllocationParams*" "params")
-    '("gsize" "maxsize")
+    '("gsize" "size")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
   )
 )
 
 (define-method alloc_data
-  (of-object "GstGLBaseBuffer")
-  (c-name "gst_gl_base_buffer_alloc_data")
-  (return-type "GstGLBaseBuffer*")
-)
-
-(define-method copy_buffer_sub_data
-  (of-object "GstGLBaseBuffer")
-  (c-name "gst_gl_base_buffer_copy_buffer_sub_data")
+  (of-object "GstGLBaseMemory")
+  (c-name "gst_gl_base_memory_alloc_data")
   (return-type "gboolean")
-  (parameters
-    '("GstGLBaseBuffer*" "dest")
-    '("gssize" "offset")
-    '("gssize" "size")
-  )
 )
 
 (define-method memcpy
-  (of-object "GstGLBaseBuffer")
-  (c-name "gst_gl_base_buffer_memcpy")
+  (of-object "GstGLBaseMemory")
+  (c-name "gst_gl_base_memory_memcpy")
   (return-type "gboolean")
   (parameters
-    '("GstGLBaseBuffer*" "dest")
+    '("GstGLBaseMemory*" "dest")
     '("gssize" "offset")
     '("gssize" "size")
   )
 )
 
+(define-function gst_gl_base_memory_alloc
+  (c-name "gst_gl_base_memory_alloc")
+  (return-type "GstGLBaseMemory*")
+  (parameters
+    '("GstGLBaseMemoryAllocator*" "allocator")
+    '("GstGLAllocationParams*" "params")
+  )
+)
 
 
-;; From gstglbasefilter.h
 
-(define-function gst_gl_base_filter_get_type
-  (c-name "gst_gl_base_filter_get_type")
+;; From gstglbuffer.h
+
+(define-function gst_gl_buffer_allocator_get_type
+  (c-name "gst_gl_buffer_allocator_get_type")
   (return-type "GType")
+)
+
+(define-function gst_gl_buffer_allocation_params_new
+  (c-name "gst_gl_buffer_allocation_params_new")
+  (is-constructor-of "GstGlBufferAllocationParams")
+  (return-type "GstGLBufferAllocationParams*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("gsize" "alloc_size")
+    '("GstAllocationParams*" "alloc_params")
+    '("guint" "gl_target")
+    '("guint" "gl_usage")
+  )
+)
+
+(define-function gst_gl_buffer_init_once
+  (c-name "gst_gl_buffer_init_once")
+  (return-type "none")
+)
+
+(define-function gst_is_gl_buffer
+  (c-name "gst_is_gl_buffer")
+  (return-type "gboolean")
+  (parameters
+    '("GstMemory*" "mem")
+  )
+)
+
+(define-function gst_gl_buffer_alloc
+  (c-name "gst_gl_buffer_alloc")
+  (return-type "GstGLBuffer*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("guint" "gl_target")
+    '("guint" "gl_usage")
+    '("GstAllocationParams*" "params")
+    '("gsize" "maxsize")
+  )
 )
 
 
@@ -3073,6 +3141,23 @@
   (return-type "none")
   (parameters
     '("GstBuffer*" "buffer")
+  )
+)
+
+(define-function gst_buffer_pool_config_get_gl_allocation_params
+  (c-name "gst_buffer_pool_config_get_gl_allocation_params")
+  (return-type "GstGLAllocationParams*")
+  (parameters
+    '("GstStructure*" "config")
+  )
+)
+
+(define-function gst_buffer_pool_config_set_gl_allocation_params
+  (c-name "gst_buffer_pool_config_set_gl_allocation_params")
+  (return-type "none")
+  (parameters
+    '("GstStructure*" "config")
+    '("GstGLAllocationParams*" "params")
   )
 )
 
@@ -3105,6 +3190,17 @@
   )
 )
 
+(define-function gst_gl_color_convert_fixate_caps
+  (c-name "gst_gl_color_convert_fixate_caps")
+  (return-type "GstCaps*")
+  (parameters
+    '("GstGLContext*" "convert")
+    '("GstPadDirection" "direction")
+    '("GstCaps*" "caps")
+    '("GstCaps*" "other")
+  )
+)
+
 (define-method set_caps
   (of-object "GstGLColorConvert")
   (c-name "gst_gl_color_convert_set_caps")
@@ -3112,6 +3208,15 @@
   (parameters
     '("GstCaps*" "in_caps")
     '("GstCaps*" "out_caps")
+  )
+)
+
+(define-method decide_allocation
+  (of-object "GstGLColorConvert")
+  (c-name "gst_gl_color_convert_decide_allocation")
+  (return-type "gboolean")
+  (parameters
+    '("GstQuery*" "query")
   )
 )
 
@@ -3253,6 +3358,7 @@
   (c-name "gst_gl_context_get_proc_address_with_platform")
   (return-type "gpointer")
   (parameters
+    '("GstGLPlatform" "context_type")
     '("GstGLAPI" "gl_api")
     '("const-gchar*" "name")
   )
@@ -3307,7 +3413,7 @@
   (c-name "gst_gl_context_get_current_gl_context")
   (return-type "guintptr")
   (parameters
-    '("GstGLPlatform" "platform")
+    '("GstGLPlatform" "context_type")
   )
 )
 
@@ -3318,6 +3424,21 @@
     '("GstGLPlatform" "platform")
     '("guint*" "major")
     '("guint*" "minor")
+  )
+)
+
+(define-method is_shared
+  (of-object "GstGLContext")
+  (c-name "gst_gl_context_is_shared")
+  (return-type "gboolean")
+)
+
+(define-method set_shared_with
+  (of-object "GstGLContext")
+  (c-name "gst_gl_context_set_shared_with")
+  (return-type "none")
+  (parameters
+    '("GstGLContext*" "share")
   )
 )
 
@@ -3337,6 +3458,138 @@
   (parameters
     '("GstGLContextThreadFunc" "func")
     '("gpointer" "data")
+  )
+)
+
+
+
+;; From gstglcontrolbindingproxy.h
+
+(define-function gst_gl_control_binding_proxy_get_type
+  (c-name "gst_gl_control_binding_proxy_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_gl_control_binding_proxy_new
+  (c-name "gst_gl_control_binding_proxy_new")
+  (is-constructor-of "GstGlControlBindingProxy")
+  (return-type "GstControlBinding*")
+  (parameters
+    '("GstObject*" "object")
+    '("const-gchar*" "property_name")
+    '("GstObject*" "ref_object")
+    '("const-gchar*" "ref_property_name")
+  )
+)
+
+(define-function gst_gl_object_add_control_binding_proxy
+  (c-name "gst_gl_object_add_control_binding_proxy")
+  (return-type "none")
+  (parameters
+    '("GstObject*" "object")
+    '("GstObject*" "ref_object")
+    '("const-gchar*" "prop")
+  )
+)
+
+
+
+;; From gstgldebug.h
+
+(define-function gst_gl_async_debug_new
+  (c-name "gst_gl_async_debug_new")
+  (is-constructor-of "GstGlAsyncDebug")
+  (return-type "GstGLAsyncDebug*")
+)
+
+(define-method free
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_free")
+  (return-type "none")
+)
+
+(define-method init
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_init")
+  (return-type "none")
+)
+
+(define-method unset
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_unset")
+  (return-type "none")
+)
+
+(define-method freeze
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_freeze")
+  (return-type "none")
+)
+
+(define-method thaw
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_thaw")
+  (return-type "none")
+)
+
+(define-function GST_GL_ASYNC_CAT_LEVEL_LOG
+  (c-name "GST_GL_ASYNC_CAT_LEVEL_LOG")
+  (return-type "none")
+  (parameters
+    '("GstGLAsyncDebug*" "ad")
+    '("GstDebugCategory*" "cat")
+    '("GstDebugLevel" "level")
+    '("GObject*" "object")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function gst_gl_insert_debug_marker
+  (c-name "gst_gl_insert_debug_marker")
+  (return-type "none")
+  (parameters
+    '("GstGLContext*" "context")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-method output_log_msg
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_output_log_msg")
+  (return-type "none")
+)
+
+(define-method store_log_msg
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_store_log_msg")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("GstDebugLevel" "level")
+    '("const-gchar*" "file")
+    '("const-gchar*" "function")
+    '("gint" "line")
+    '("GObject*" "object")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-method store_log_msg_valist
+  (of-object "GstGLAsyncDebug")
+  (c-name "gst_gl_async_debug_store_log_msg_valist")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("GstDebugLevel" "level")
+    '("const-gchar*" "file")
+    '("const-gchar*" "function")
+    '("gint" "line")
+    '("GObject*" "object")
+    '("const-gchar*" "format")
+    '("va_list" "varargs")
   )
 )
 
@@ -3372,7 +3625,7 @@
   (c-name "gst_gl_display_filter_gl_api")
   (return-type "none")
   (parameters
-    '("GstGLAPI" "api")
+    '("GstGLAPI" "gl_api")
   )
 )
 
@@ -3437,62 +3690,7 @@
 
 
 
-;; From gstgldownload.h
-
-(define-function gst_gl_download_get_type
-  (c-name "gst_gl_download_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_gl_download_new
-  (c-name "gst_gl_download_new")
-  (is-constructor-of "GstGlDownload")
-  (return-type "GstGLDownload*")
-  (parameters
-    '("GstGLContext*" "context")
-  )
-)
-
-(define-method set_format
-  (of-object "GstGLDownload")
-  (c-name "gst_gl_download_set_format")
-  (return-type "none")
-  (parameters
-    '("GstVideoInfo*" "out_info")
-  )
-)
-
-(define-function gst_gl_download_transform_caps
-  (c-name "gst_gl_download_transform_caps")
-  (return-type "GstCaps*")
-  (parameters
-    '("GstGLContext*" "convert")
-    '("GstPadDirection" "direction")
-    '("GstCaps*" "caps")
-    '("GstCaps*" "filter")
-  )
-)
-
-(define-method perform_with_data
-  (of-object "GstGLDownload")
-  (c-name "gst_gl_download_perform_with_data")
-  (return-type "gboolean")
-  (parameters
-    '("GLuint" "texture_id")
-    '("GLuint" "texture_target")
-    '("gpointer" "data[GST_VIDEO_MAX_PLANES]")
-  )
-)
-
-(define-method perform
-  (of-object "GstGLDownload")
-  (c-name "gst_gl_download_perform")
-  (return-type "gboolean")
-  (parameters
-    '("GstBuffer*" "inbuf")
-    '("GstBuffer*" "outbuf")
-  )
-)
+;; From gstgl_enums.h
 
 
 
@@ -3564,6 +3762,89 @@
 
 
 
+;; From gstglformat.h
+
+(define-function gst_gl_format_type_n_bytes
+  (c-name "gst_gl_format_type_n_bytes")
+  (return-type "guint")
+  (parameters
+    '("guint" "format")
+    '("guint" "type")
+  )
+)
+
+(define-function gst_gl_texture_type_n_bytes
+  (c-name "gst_gl_texture_type_n_bytes")
+  (return-type "guint")
+  (parameters
+    '("GstVideoGLTextureType" "tex_format")
+  )
+)
+
+(define-function gst_gl_format_from_gl_texture_type
+  (c-name "gst_gl_format_from_gl_texture_type")
+  (return-type "guint")
+  (parameters
+    '("GstVideoGLTextureType" "tex_format")
+  )
+)
+
+(define-function gst_gl_texture_type_from_format
+  (c-name "gst_gl_texture_type_from_format")
+  (return-type "GstVideoGLTextureType")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GstVideoFormat" "v_format")
+    '("guint" "plane")
+  )
+)
+
+(define-function gst_gl_sized_gl_format_from_gl_format_type
+  (c-name "gst_gl_sized_gl_format_from_gl_format_type")
+  (return-type "guint")
+  (parameters
+    '("GstGLContext*" "context")
+    '("guint" "format")
+    '("guint" "type")
+  )
+)
+
+(define-function gst_gl_texture_target_from_string
+  (c-name "gst_gl_texture_target_from_string")
+  (return-type "GstGLTextureTarget")
+  (parameters
+    '("const-gchar*" "str")
+  )
+)
+
+(define-method to_string
+  (of-object "GstGLTextureTarget")
+  (c-name "gst_gl_texture_target_to_string")
+  (return-type "const-gchar*")
+)
+
+(define-method to_gl
+  (of-object "GstGLTextureTarget")
+  (c-name "gst_gl_texture_target_to_gl")
+  (return-type "guint")
+)
+
+(define-function gst_gl_texture_target_from_gl
+  (c-name "gst_gl_texture_target_from_gl")
+  (return-type "GstGLTextureTarget")
+  (parameters
+    '("guint" "target")
+  )
+)
+
+(define-method to_buffer_pool_option
+  (of-object "GstGLTextureTarget")
+  (c-name "gst_gl_texture_target_to_buffer_pool_option")
+  (return-type "const-gchar*")
+)
+
+
+
 ;; From gstglframebuffer.h
 
 (define-function gst_gl_framebuffer_get_type
@@ -3625,13 +3906,96 @@
 
 ;; From gstglmemory.h
 
-(define-function gst_gl_allocator_get_type
-  (c-name "gst_gl_allocator_get_type")
+(define-function gst_gl_memory_allocator_get_type
+  (c-name "gst_gl_memory_allocator_get_type")
   (return-type "GType")
 )
 
-(define-function gst_gl_memory_init
-  (c-name "gst_gl_memory_init")
+(define-method init_full
+  (of-object "GstGLVideoAllocationParams")
+  (c-name "gst_gl_video_allocation_params_init_full")
+  (return-type "gboolean")
+  (parameters
+    '("gsize" "struct_size")
+    '("guint" "alloc_flags")
+    '("GstGLAllocationParamsCopyFunc" "copy")
+    '("GstGLAllocationParamsFreeFunc" "free")
+    '("GstGLContext*" "context")
+    '("GstAllocationParams*" "alloc_params")
+    '("GstVideoInfo*" "v_info")
+    '("guint" "plane")
+    '("GstVideoAlignment*" "valign")
+    '("GstGLTextureTarget" "target")
+    '("gpointer" "wrapped_data")
+    '("guint" "gl_handle")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function gst_gl_video_allocation_params_new
+  (c-name "gst_gl_video_allocation_params_new")
+  (is-constructor-of "GstGlVideoAllocationParams")
+  (return-type "GstGLVideoAllocationParams*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GstAllocationParams*" "alloc_params")
+    '("GstVideoInfo*" "v_info")
+    '("guint" "plane")
+    '("GstVideoAlignment*" "valign")
+    '("GstGLTextureTarget" "target")
+  )
+)
+
+(define-function gst_gl_video_allocation_params_new_wrapped_data
+  (c-name "gst_gl_video_allocation_params_new_wrapped_data")
+  (return-type "GstGLVideoAllocationParams*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GstAllocationParams*" "alloc_params")
+    '("GstVideoInfo*" "v_info")
+    '("guint" "plane")
+    '("GstVideoAlignment*" "valign")
+    '("GstGLTextureTarget" "target")
+    '("gpointer" "wrapped_data")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function gst_gl_video_allocation_params_new_wrapped_texture
+  (c-name "gst_gl_video_allocation_params_new_wrapped_texture")
+  (return-type "GstGLVideoAllocationParams*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GstAllocationParams*" "alloc_params")
+    '("GstVideoInfo*" "v_info")
+    '("guint" "plane")
+    '("GstVideoAlignment*" "valign")
+    '("GstGLTextureTarget" "target")
+    '("guint" "tex_id")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method free_data
+  (of-object "GstGLVideoAllocationParams")
+  (c-name "gst_gl_video_allocation_params_free_data")
+  (return-type "none")
+)
+
+(define-method copy_data
+  (of-object "GstGLVideoAllocationParams")
+  (c-name "gst_gl_video_allocation_params_copy_data")
+  (return-type "none")
+  (parameters
+    '("GstGLVideoAllocationParams*" "dest_vid")
+  )
+)
+
+(define-function gst_gl_memory_init_once
+  (c-name "gst_gl_memory_init_once")
   (return-type "none")
 )
 
@@ -3643,96 +4007,65 @@
   )
 )
 
-(define-function gst_gl_memory_alloc
-  (c-name "gst_gl_memory_alloc")
-  (return-type "GstMemory*")
+(define-method init
+  (of-object "GstGLMemory")
+  (c-name "gst_gl_memory_init")
+  (return-type "none")
   (parameters
+    '("GstAllocator*" "allocator")
+    '("GstMemory*" "parent")
     '("GstGLContext*" "context")
+    '("GstGLTextureTarget" "target")
     '("GstAllocationParams*" "params")
     '("GstVideoInfo*" "info")
     '("guint" "plane")
     '("GstVideoAlignment*" "valign")
-  )
-)
-
-(define-function gst_gl_memory_wrapped
-  (c-name "gst_gl_memory_wrapped")
-  (return-type "GstGLMemory*")
-  (parameters
-    '("GstGLContext*" "context")
-    '("GstVideoInfo*" "info")
-    '("guint" "plane")
-    '("GstVideoAlignment*" "valign")
-    '("gpointer" "data")
     '("gpointer" "user_data")
     '("GDestroyNotify" "notify")
   )
 )
 
-(define-function gst_gl_memory_wrapped_texture
-  (c-name "gst_gl_memory_wrapped_texture")
-  (return-type "GstGLMemory*")
-  (parameters
-    '("GstGLContext*" "context")
-    '("guint" "texture_id")
-    '("guint" "texture_target")
-    '("GstVideoInfo*" "info")
-    '("guint" "plane")
-    '("GstVideoAlignment*" "valign")
-    '("gpointer" "user_data")
-    '("GDestroyNotify" "notify")
-  )
-)
-
-(define-method download_transfer
+(define-method copy_into
   (of-object "GstGLMemory")
-  (c-name "gst_gl_memory_download_transfer")
-  (return-type "none")
-)
-
-(define-method upload_transfer
-  (of-object "GstGLMemory")
-  (c-name "gst_gl_memory_upload_transfer")
-  (return-type "none")
-)
-
-(define-method copy_into_texture
-  (of-object "GstGLMemory")
-  (c-name "gst_gl_memory_copy_into_texture")
+  (c-name "gst_gl_memory_copy_into")
   (return-type "gboolean")
   (parameters
     '("guint" "tex_id")
+    '("GstGLTextureTarget" "target")
     '("GstVideoGLTextureType" "tex_type")
     '("gint" "width")
     '("gint" "height")
-    '("gint" "stride")
-    '("gboolean" "respecify")
   )
 )
 
-(define-function gst_gl_memory_setup_buffer
-  (c-name "gst_gl_memory_setup_buffer")
+(define-method copy_teximage
+  (of-object "GstGLMemory")
+  (c-name "gst_gl_memory_copy_teximage")
   (return-type "gboolean")
   (parameters
-    '("GstGLContext*" "context")
-    '("GstAllocationParams*" "params")
-    '("GstVideoInfo*" "info")
-    '("GstVideoAlignment*" "valign")
-    '("GstBuffer*" "buffer")
+    '("guint" "tex_id")
+    '("GstGLTextureTarget" "out_target")
+    '("GstVideoGLTextureType" "out_tex_type")
+    '("gint" "width")
+    '("gint" "height")
   )
 )
 
-(define-function gst_gl_memory_setup_wrapped
-  (c-name "gst_gl_memory_setup_wrapped")
+(define-method read_pixels
+  (of-object "GstGLMemory")
+  (c-name "gst_gl_memory_read_pixels")
   (return-type "gboolean")
   (parameters
-    '("GstGLContext*" "context")
-    '("GstVideoInfo*" "info")
-    '("GstVideoAlignment*" "valign")
-    '("gpointer" "data[GST_VIDEO_MAX_PLANES]")
-    '("GstGLMemory*" "textures[GST_VIDEO_MAX_PLANES]")
-    '("gpointer" "user_data")
-    '("GDestroyNotify" "notify")
+    '("gpointer" "read_pointer")
+  )
+)
+
+(define-method texsubimage
+  (of-object "GstGLMemory")
+  (c-name "gst_gl_memory_texsubimage")
+  (return-type "none")
+  (parameters
+    '("gpointer" "read_pointer")
   )
 )
 
@@ -3748,31 +4081,88 @@
   (return-type "gint")
 )
 
-(define-function gst_gl_texture_type_from_format
-  (c-name "gst_gl_texture_type_from_format")
+(define-method get_texture_type
+  (of-object "GstGLMemory")
+  (c-name "gst_gl_memory_get_texture_type")
   (return-type "GstVideoGLTextureType")
+)
+
+(define-method get_texture_target
+  (of-object "GstGLMemory")
+  (c-name "gst_gl_memory_get_texture_target")
+  (return-type "GstGLTextureTarget")
+)
+
+(define-method get_texture_id
+  (of-object "GstGLMemory")
+  (c-name "gst_gl_memory_get_texture_id")
+  (return-type "guint")
+)
+
+(define-function gst_gl_memory_setup_buffer
+  (c-name "gst_gl_memory_setup_buffer")
+  (return-type "gboolean")
   (parameters
-    '("GstGLContext*" "context")
-    '("GstVideoFormat" "v_format")
-    '("guint" "plane")
+    '("GstGLMemoryAllocator*" "allocator")
+    '("GstBuffer*" "buffer")
+    '("GstGLVideoAllocationParams*" "params")
   )
 )
 
-(define-function gst_gl_format_from_gl_texture_type
-  (c-name "gst_gl_format_from_gl_texture_type")
-  (return-type "guint")
+(define-function gst_gl_memory_allocator_get_default
+  (c-name "gst_gl_memory_allocator_get_default")
+  (return-type "GstGLMemoryAllocator*")
   (parameters
-    '("GstVideoGLTextureType" "tex_format")
+    '("GstGLContext*" "context")
   )
 )
 
-(define-function gst_gl_sized_gl_format_from_gl_format_type
-  (c-name "gst_gl_sized_gl_format_from_gl_format_type")
-  (return-type "guint")
+
+
+;; From gstglmemorypbo.h
+
+(define-function gst_gl_memory_pbo_allocator_get_type
+  (c-name "gst_gl_memory_pbo_allocator_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_gl_memory_pbo_init_once
+  (c-name "gst_gl_memory_pbo_init_once")
+  (return-type "none")
+)
+
+(define-function gst_is_gl_memory_pbo
+  (c-name "gst_is_gl_memory_pbo")
+  (return-type "gboolean")
   (parameters
-    '("GstGLContext*" "context")
-    '("guint" "format")
-    '("guint" "type")
+    '("GstMemory*" "mem")
+  )
+)
+
+(define-method download_transfer
+  (of-object "GstGLMemoryPBO")
+  (c-name "gst_gl_memory_pbo_download_transfer")
+  (return-type "none")
+)
+
+(define-method upload_transfer
+  (of-object "GstGLMemoryPBO")
+  (c-name "gst_gl_memory_pbo_upload_transfer")
+  (return-type "none")
+)
+
+(define-method copy_into_texture
+  (of-object "GstGLMemoryPBO")
+  (c-name "gst_gl_memory_pbo_copy_into_texture")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "tex_id")
+    '("GstGLTextureTarget" "target")
+    '("GstVideoGLTextureType" "tex_type")
+    '("gint" "width")
+    '("gint" "height")
+    '("gint" "stride")
+    '("gboolean" "respecify")
   )
 )
 
@@ -3825,12 +4215,93 @@
 
 
 
-;; From gstglshader.h
+;; From gstglquery.h
 
-(define-function gst_gl_shader_error_quark
-  (c-name "gst_gl_shader_error_quark")
-  (return-type "GQuark")
+(define-method init
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_init")
+  (return-type "none")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GstGLQueryType" "query_type")
+  )
 )
+
+(define-method unset
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_unset")
+  (return-type "none")
+)
+
+(define-function gst_gl_query_new
+  (c-name "gst_gl_query_new")
+  (is-constructor-of "GstGlQuery")
+  (return-type "GstGLQuery*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GstGLQueryType" "query_type")
+  )
+)
+
+(define-method free
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_free")
+  (return-type "none")
+)
+
+(define-method start
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_start")
+  (return-type "none")
+)
+
+(define-method end
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_end")
+  (return-type "none")
+)
+
+(define-method counter
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_counter")
+  (return-type "none")
+)
+
+(define-method result
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_result")
+  (return-type "guint64")
+)
+
+(define-method start_log
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_start_log")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("GstDebugLevel" "level")
+    '("GObject*" "object")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-method counter_log
+  (of-object "GstGLQuery")
+  (c-name "gst_gl_query_counter_log")
+  (return-type "none")
+  (parameters
+    '("GstDebugCategory*" "cat")
+    '("GstDebugLevel" "level")
+    '("GObject*" "object")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+
+
+;; From gstglshader.h
 
 (define-function gst_gl_shader_get_type
   (c-name "gst_gl_shader_get_type")
@@ -3846,125 +4317,111 @@
   )
 )
 
-(define-method get_program_handle
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_get_program_handle")
-  (return-type "int")
+(define-function gst_gl_shader_new_with_stages
+  (c-name "gst_gl_shader_new_with_stages")
+  (return-type "GstGLShader*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GError**" "error")
+  )
+  (varargs #t)
 )
 
-(define-method set_vertex_source
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_set_vertex_source")
-  (return-type "none")
+(define-function gst_gl_shader_new_link_with_stages
+  (c-name "gst_gl_shader_new_link_with_stages")
+  (return-type "GstGLShader*")
   (parameters
-    '("const-gchar*" "src")
+    '("GstGLContext*" "context")
+    '("GError**" "error")
+  )
+  (varargs #t)
+)
+
+(define-function gst_gl_shader_new_default
+  (c-name "gst_gl_shader_new_default")
+  (return-type "GstGLShader*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GError**" "error")
   )
 )
 
-(define-method set_fragment_source
+(define-method attach
   (of-object "GstGLShader")
-  (c-name "gst_gl_shader_set_fragment_source")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "src")
-  )
-)
-
-(define-method get_vertex_source
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_get_vertex_source")
-  (return-type "const-gchar*")
-)
-
-(define-method get_fragment_source
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_get_fragment_source")
-  (return-type "const-gchar*")
-)
-
-(define-method set_active
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_set_active")
-  (return-type "none")
-  (parameters
-    '("gboolean" "active")
-  )
-)
-
-(define-method is_compiled
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_is_compiled")
+  (c-name "gst_gl_shader_attach")
   (return-type "gboolean")
+  (parameters
+    '("GstGLSLStage*" "stage")
+  )
 )
 
-(define-method compile
+(define-method attach_unlocked
   (of-object "GstGLShader")
-  (c-name "gst_gl_shader_compile")
+  (c-name "gst_gl_shader_attach_unlocked")
+  (return-type "gboolean")
+  (parameters
+    '("GstGLSLStage*" "stage")
+  )
+)
+
+(define-method detach
+  (of-object "GstGLShader")
+  (c-name "gst_gl_shader_detach")
+  (return-type "none")
+  (parameters
+    '("GstGLSLStage*" "stage")
+  )
+)
+
+(define-method detach_unlocked
+  (of-object "GstGLShader")
+  (c-name "gst_gl_shader_detach_unlocked")
+  (return-type "none")
+  (parameters
+    '("GstGLSLStage*" "stage")
+  )
+)
+
+(define-method compile_attach_stage
+  (of-object "GstGLShader")
+  (c-name "gst_gl_shader_compile_attach_stage")
+  (return-type "gboolean")
+  (parameters
+    '("GstGLSLStage*" "stage")
+    '("GError**" "error")
+  )
+)
+
+(define-method link
+  (of-object "GstGLShader")
+  (c-name "gst_gl_shader_link")
   (return-type "gboolean")
   (parameters
     '("GError**" "error")
   )
 )
 
-(define-method compile_and_check
+(define-method is_linked
   (of-object "GstGLShader")
-  (c-name "gst_gl_shader_compile_and_check")
+  (c-name "gst_gl_shader_is_linked")
   (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "source")
-    '("GstGLShaderSourceType" "type")
-  )
 )
 
-(define-method compile_all_with_attribs_and_check
+(define-method get_program_handle
   (of-object "GstGLShader")
-  (c-name "gst_gl_shader_compile_all_with_attribs_and_check")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "v_src")
-    '("const-gchar*" "f_src")
-    '("const-gint" "n_attribs")
-    '("const-gchar*[]" "attrib_names")
-    '("GLint[]" "attrib_locs")
-  )
-)
-
-(define-method compile_with_default_f_and_check
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_compile_with_default_f_and_check")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "v_src")
-    '("const-gint" "n_attribs")
-    '("const-gchar*[]" "attrib_names")
-    '("GLint[]" "attrib_locs")
-  )
-)
-
-(define-method compile_with_default_v_and_check
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_compile_with_default_v_and_check")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "f_src")
-    '("GLint*" "pos_loc")
-    '("GLint*" "tex_loc")
-  )
-)
-
-(define-method compile_with_default_vf_and_check
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shader_compile_with_default_vf_and_check")
-  (return-type "gboolean")
-  (parameters
-    '("GLint*" "pos_loc")
-    '("GLint*" "tex_loc")
-  )
+  (c-name "gst_gl_shader_get_program_handle")
+  (return-type "int")
 )
 
 (define-method release
   (of-object "GstGLShader")
   (c-name "gst_gl_shader_release")
+  (return-type "none")
+)
+
+(define-method release_unlocked
+  (of-object "GstGLShader")
+  (c-name "gst_gl_shader_release_unlocked")
   (return-type "none")
 )
 
@@ -4289,24 +4746,208 @@
 
 
 
-;; From gstglshadervariables.h
+;; From gstglshaderstrings.h
 
-(define-method variables_parse
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shadervariables_parse")
-  (return-type "int")
+
+
+;; From gstglsl.h
+
+(define-function gst_glsl_error_quark
+  (c-name "gst_glsl_error_quark")
+  (return-type "GQuark")
+)
+
+(define-function gst_glsl_version_from_string
+  (c-name "gst_glsl_version_from_string")
+  (return-type "GstGLSLVersion")
   (parameters
-    '("char*" "variables")
-    '("int-(*" "_setvariable")
+    '("const-gchar*" "string")
   )
 )
 
-(define-method variable_set
-  (of-object "GstGLShader")
-  (c-name "gst_gl_shadervariable_set")
-  (return-type "int")
+(define-method to_string
+  (of-object "GstGLSLVersion")
+  (c-name "gst_glsl_version_to_string")
+  (return-type "const-gchar*")
+)
+
+(define-function gst_glsl_profile_from_string
+  (c-name "gst_glsl_profile_from_string")
+  (return-type "GstGLSLProfile")
   (parameters
-    '("struct-gst_gl_shadervariable_desc*" "ret")
+    '("const-gchar*" "string")
+  )
+)
+
+(define-method to_string
+  (of-object "GstGLSLProfile")
+  (c-name "gst_glsl_profile_to_string")
+  (return-type "const-gchar*")
+)
+
+(define-method profile_to_string
+  (of-object "GstGLSLVersion")
+  (c-name "gst_glsl_version_profile_to_string")
+  (return-type "gchar*")
+  (parameters
+    '("GstGLSLProfile" "profile")
+  )
+)
+
+(define-function gst_glsl_version_profile_from_string
+  (c-name "gst_glsl_version_profile_from_string")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+    '("GstGLSLVersion*" "version")
+    '("GstGLSLProfile*" "profile")
+  )
+)
+
+(define-function gst_glsl_string_get_version_profile
+  (c-name "gst_glsl_string_get_version_profile")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "s")
+    '("GstGLSLVersion*" "version")
+    '("GstGLSLProfile*" "profile")
+  )
+)
+
+(define-function gst_gl_version_to_glsl_version
+  (c-name "gst_gl_version_to_glsl_version")
+  (return-type "GstGLSLVersion")
+  (parameters
+    '("GstGLAPI" "gl_api")
+    '("gint" "maj")
+    '("gint" "min")
+  )
+)
+
+(define-method supports_glsl_profile_version
+  (of-object "GstGLContext")
+  (c-name "gst_gl_context_supports_glsl_profile_version")
+  (return-type "gboolean")
+  (parameters
+    '("GstGLSLVersion" "version")
+    '("GstGLSLProfile" "profile")
+  )
+)
+
+
+
+;; From gstglsl_private.h
+
+(define-function GSTGLAPI
+  (c-name "GSTGLAPI")
+  (return-type "GLuint")
+  (parameters
+    '("*" "CreateProgram")
+  )
+)
+
+
+
+;; From gstglslstage.h
+
+(define-function gst_glsl_stage_get_type
+  (c-name "gst_glsl_stage_get_type")
+  (return-type "GType")
+)
+
+(define-function gst_glsl_stage_new
+  (c-name "gst_glsl_stage_new")
+  (is-constructor-of "GstGlslStage")
+  (return-type "GstGLSLStage*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("guint" "type")
+  )
+)
+
+(define-function gst_glsl_stage_new_with_string
+  (c-name "gst_glsl_stage_new_with_string")
+  (return-type "GstGLSLStage*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("guint" "type")
+    '("GstGLSLVersion" "version")
+    '("GstGLSLProfile" "profile")
+    '("const-gchar*" "str")
+  )
+)
+
+(define-function gst_glsl_stage_new_with_strings
+  (c-name "gst_glsl_stage_new_with_strings")
+  (return-type "GstGLSLStage*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("guint" "type")
+    '("GstGLSLVersion" "version")
+    '("GstGLSLProfile" "profile")
+    '("gint" "n_strings")
+    '("const-gchar**" "str")
+  )
+)
+
+(define-function gst_glsl_stage_new_default_fragment
+  (c-name "gst_glsl_stage_new_default_fragment")
+  (return-type "GstGLSLStage*")
+  (parameters
+    '("GstGLContext*" "context")
+  )
+)
+
+(define-function gst_glsl_stage_new_default_vertex
+  (c-name "gst_glsl_stage_new_default_vertex")
+  (return-type "GstGLSLStage*")
+  (parameters
+    '("GstGLContext*" "context")
+  )
+)
+
+(define-method get_handle
+  (of-object "GstGLSLStage")
+  (c-name "gst_glsl_stage_get_handle")
+  (return-type "guint")
+)
+
+(define-method get_profile
+  (of-object "GstGLSLStage")
+  (c-name "gst_glsl_stage_get_profile")
+  (return-type "GstGLSLProfile")
+)
+
+(define-method get_version
+  (of-object "GstGLSLStage")
+  (c-name "gst_glsl_stage_get_version")
+  (return-type "GstGLSLVersion")
+)
+
+(define-method get_shader_type
+  (of-object "GstGLSLStage")
+  (c-name "gst_glsl_stage_get_shader_type")
+  (return-type "guint")
+)
+
+(define-method set_strings
+  (of-object "GstGLSLStage")
+  (c-name "gst_glsl_stage_set_strings")
+  (return-type "gboolean")
+  (parameters
+    '("GstGLSLVersion" "version")
+    '("GstGLSLProfile" "profile")
+    '("gint" "n_strings")
+    '("const-gchar**" "str")
+  )
+)
+
+(define-method compile
+  (of-object "GstGLSLStage")
+  (c-name "gst_glsl_stage_compile")
+  (return-type "gboolean")
+  (parameters
+    '("GError**" "error")
   )
 )
 
@@ -4333,6 +4974,16 @@
   )
 )
 
+(define-function gst_buffer_add_gl_sync_meta_full
+  (c-name "gst_buffer_add_gl_sync_meta_full")
+  (return-type "GstGLSyncMeta*")
+  (parameters
+    '("GstGLContext*" "context")
+    '("GstBuffer*" "buffer")
+    '("gpointer" "data")
+  )
+)
+
 (define-method set_sync_point
   (of-object "GstGLSyncMeta")
   (c-name "gst_gl_sync_meta_set_sync_point")
@@ -4345,6 +4996,15 @@
 (define-method wait
   (of-object "GstGLSyncMeta")
   (c-name "gst_gl_sync_meta_wait")
+  (return-type "none")
+  (parameters
+    '("GstGLContext*" "context")
+  )
+)
+
+(define-method wait_cpu
+  (of-object "GstGLSyncMeta")
+  (c-name "gst_gl_sync_meta_wait_cpu")
   (return-type "none")
   (parameters
     '("GstGLContext*" "context")
@@ -4421,55 +5081,7 @@
   (return-type "GstGLUploadReturn")
   (parameters
     '("GstBuffer*" "buffer")
-    '("GstBuffer**" "outbuf")
-  )
-)
-
-(define-method release_buffer
-  (of-object "GstGLUpload")
-  (c-name "gst_gl_upload_release_buffer")
-  (return-type "none")
-)
-
-
-
-;; From gstgluploadmeta.h
-
-(define-function gst_gl_upload_meta_get_type
-  (c-name "gst_gl_upload_meta_get_type")
-  (return-type "GType")
-)
-
-(define-function gst_gl_upload_meta_new
-  (c-name "gst_gl_upload_meta_new")
-  (is-constructor-of "GstGlUploadMeta")
-  (return-type "GstGLUploadMeta*")
-  (parameters
-    '("GstGLContext*" "context")
-  )
-)
-
-(define-method set_format
-  (of-object "GstGLUploadMeta")
-  (c-name "gst_gl_upload_meta_set_format")
-  (return-type "none")
-  (parameters
-    '("GstVideoInfo*" "info")
-  )
-)
-
-(define-method get_format
-  (of-object "GstGLUploadMeta")
-  (c-name "gst_gl_upload_meta_get_format")
-  (return-type "GstVideoInfo*")
-)
-
-(define-method add_to_buffer
-  (of-object "GstGLUploadMeta")
-  (c-name "gst_gl_upload_meta_add_to_buffer")
-  (return-type "gboolean")
-  (parameters
-    '("GstBuffer*" "buffer")
+    '("GstBuffer**" "outbuf_ptr")
   )
 )
 
@@ -4642,12 +5254,48 @@
   )
 )
 
+(define-function gst_gl_get_plane_start
+  (c-name "gst_gl_get_plane_start")
+  (return-type "gsize")
+  (parameters
+    '("GstVideoInfo*" "info")
+    '("GstVideoAlignment*" "valign")
+    '("guint" "plane")
+  )
+)
+
 (define-function gst_gl_caps_replace_all_caps_features
   (c-name "gst_gl_caps_replace_all_caps_features")
   (return-type "GstCaps*")
   (parameters
     '("const-GstCaps*" "caps")
     '("const-gchar*" "feature_name")
+  )
+)
+
+(define-function gst_gl_value_set_texture_target_from_mask
+  (c-name "gst_gl_value_set_texture_target_from_mask")
+  (return-type "gboolean")
+  (parameters
+    '("GValue*" "value")
+    '("GstGLTextureTarget" "target_mask")
+  )
+)
+
+(define-function gst_gl_value_set_texture_target
+  (c-name "gst_gl_value_set_texture_target")
+  (return-type "gboolean")
+  (parameters
+    '("GValue*" "value")
+    '("GstGLTextureTarget" "target")
+  )
+)
+
+(define-function gst_gl_value_get_texture_target_mask
+  (c-name "gst_gl_value_get_texture_target_mask")
+  (return-type "GstGLTextureTarget")
+  (parameters
+    '("const-GValue*" "value")
   )
 )
 
@@ -4669,16 +5317,6 @@
   (c-name "gst_gl_view_convert_new")
   (is-constructor-of "GstGlViewConvert")
   (return-type "GstGLViewConvert*")
-)
-
-(define-method set_format
-  (of-object "GstGLViewConvert")
-  (c-name "gst_gl_view_convert_set_format")
-  (return-type "gboolean")
-  (parameters
-    '("GstVideoInfo*" "in_info")
-    '("GstVideoInfo*" "out_info")
-  )
 )
 
 (define-method set_caps
@@ -4875,25 +5513,19 @@
   )
 )
 
-(define-function gst_gl_window_key_event_cb
-  (c-name "gst_gl_window_key_event_cb")
-  (return-type "gboolean")
-  (parameters
-    '("gpointer" "data")
-  )
-)
-
-(define-function gst_gl_window_mouse_event_cb
-  (c-name "gst_gl_window_mouse_event_cb")
-  (return-type "gboolean")
-  (parameters
-    '("gpointer" "data")
-  )
-)
-
 (define-method send_key_event
   (of-object "GstGLWindow")
   (c-name "gst_gl_window_send_key_event")
+  (return-type "none")
+  (parameters
+    '("const-char*" "event_type")
+    '("const-char*" "key_str")
+  )
+)
+
+(define-method send_key_event_async
+  (of-object "GstGLWindow")
+  (c-name "gst_gl_window_send_key_event_async")
   (return-type "none")
   (parameters
     '("const-char*" "event_type")
@@ -4913,9 +5545,21 @@
   )
 )
 
-(define-method draw_unlocked
+(define-method send_mouse_event_async
   (of-object "GstGLWindow")
-  (c-name "gst_gl_window_draw_unlocked")
+  (c-name "gst_gl_window_send_mouse_event_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "event_type")
+    '("int" "button")
+    '("double" "posx")
+    '("double" "posy")
+  )
+)
+
+(define-method queue_resize
+  (of-object "GstGLWindow")
+  (c-name "gst_gl_window_queue_resize")
   (return-type "none")
 )
 
@@ -4960,6 +5604,16 @@
     '("gint" "y")
     '("gint" "width")
     '("gint" "height")
+  )
+)
+
+(define-method resize
+  (of-object "GstGLWindow")
+  (c-name "gst_gl_window_resize")
+  (return-type "none")
+  (parameters
+    '("guint" "width")
+    '("guint" "height")
   )
 )
 
@@ -6103,6 +6757,17 @@
   (return-type "GstMpegtsDescriptor*")
   (parameters
     '("guint8" "tag")
+    '("const-guint8*" "data")
+    '("gsize" "length")
+  )
+)
+
+(define-function gst_mpegts_descriptor_from_custom_with_extension
+  (c-name "gst_mpegts_descriptor_from_custom_with_extension")
+  (return-type "GstMpegtsDescriptor*")
+  (parameters
+    '("guint8" "tag")
+    '("guint8" "tag_extension")
     '("const-guint8*" "data")
     '("gsize" "length")
   )
