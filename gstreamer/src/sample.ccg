@@ -23,3 +23,14 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+namespace Gst {
+
+Glib::RefPtr<Gst::Sample> Sample::create(const Glib::RefPtr<Gst::Buffer>& buffer, const Glib::RefPtr<Gst::Caps>& caps, const Gst::Segment& segment, Gst::Structure&& info)
+{
+  GstSample *sample = gst_sample_new(buffer->gobj(), caps->gobj(), segment.gobj(), info.gobj());
+  Gst::Structure empty_structure;
+  info.swap(empty_structure);
+
+  return Glib::wrap(sample, false);
+}
+}

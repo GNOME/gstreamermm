@@ -39,6 +39,7 @@ check_PROGRAMS =                                \
         test-pad                                \
         test-pipeline                           \
         test-query                              \
+	test-sample				\
         test-structure                          \
         test-taglist                            \
         test-urihandler                         \
@@ -82,6 +83,7 @@ test_miniobject_SOURCES                         = $(TEST_GTEST_SOURCES) test-min
 test_pad_SOURCES                                = $(TEST_GTEST_SOURCES) test-pad.cc
 test_pipeline_SOURCES                           = $(TEST_GTEST_SOURCES) test-pipeline.cc
 test_query_SOURCES                              = $(TEST_GTEST_SOURCES) test-query.cc
+test_sample_SOURCES                             = $(TEST_GTEST_SOURCES) test-sample.cc
 test_structure_SOURCES                          = $(TEST_GTEST_SOURCES) test-structure.cc
 test_taglist_SOURCES                            = $(TEST_GTEST_SOURCES) test-taglist.cc
 test_urihandler_SOURCES                         = $(TEST_GTEST_SOURCES) test-urihandler.cc

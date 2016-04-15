@@ -45,13 +45,12 @@ class Sample : public MiniObject
   _CLASS_OPAQUE_REFCOUNTED(Sample, GstSample, NONE, gst_sample_ref, gst_sample_unref)
   _IGNORE(gst_sample_ref, gst_sample_unref)
 
-  static Glib::RefPtr<Gst::Buffer> create(Glib::RefPtr<Gst::Buffer> buffer, Glib::RefPtr<Gst::Caps> caps,
-          Glib::RefPtr<const Gst::Segment> segment, Glib::RefPtr<Gst::Structure> info);
-
 public:
+   static Glib::RefPtr<Gst::Sample> create(const Glib::RefPtr<Gst::Buffer>& buffer, const Glib::RefPtr<Gst::Caps>& caps, const Gst::Segment& segment, Gst::Structure&& info);
+
   _WRAP_METHOD(Glib::RefPtr<Gst::Buffer> get_buffer(), gst_sample_get_buffer, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Buffer> get_buffer() const, gst_sample_get_buffer, constversion)
-  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_sample_get_caps)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_sample_get_caps, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_caps() const, gst_sample_get_caps, constversion)
 
 };
