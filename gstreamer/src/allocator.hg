@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2014-2015 The gstreamermm Development Team
+ * Copyright 2014-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -50,6 +50,18 @@ public:
   _MEMBER_SET(padding, padding, gsize, gsize)
 };
 
+/** Allocate memory blocks.
+ *
+ * Memory is usually created by allocators with a alloc()
+ * method call. When nullptr is used as the allocator, the default allocator will
+ * be used.
+ *
+ * New allocators can be registered with register_allocator().
+ * Allocators are identified by name and can be retrieved with
+ * find(). set_default() can be used to change the
+ * default allocator.
+ */
+
 class Allocator : public Gst::Object
 {
   _CLASS_GOBJECT(Allocator, GstAllocator, GST_ALLOCATOR, Gst::Object, GstObject)
@@ -57,12 +69,11 @@ class Allocator : public Gst::Object
 public:
   _WRAP_METHOD(static Glib::RefPtr<Gst::Allocator> find(const Glib::ustring& name), gst_allocator_find)
   _WRAP_METHOD(static void register_allocator(const Glib::ustring& name, Glib::RefPtr<Gst::Allocator>&& allocator), gst_allocator_register)
+  _WRAP_METHOD(void free(Glib::RefPtr<Gst::Memory>&& memory), gst_allocator_free)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Memory> alloc(gsize size, Gst::AllocationParams params), gst_allocator_alloc)
 
-  /**
-   * Set the default allocator.
-   */
+  _WRAP_METHOD_DOCS_ONLY(gst_allocator_set_default)
   void set_default();
-  _IGNORE(gst_allocator_set_default)
 
   /**
    * Find default allocator.
@@ -71,8 +82,6 @@ public:
    */
   static Glib::RefPtr<Gst::Allocator> get_default_allocator();
 
-  _WRAP_METHOD(void free(Glib::RefPtr<Gst::Memory>&& memory), gst_allocator_free)
-  _WRAP_METHOD(Glib::RefPtr<Gst::Memory> alloc(gsize size, Gst::AllocationParams params), gst_allocator_alloc)
   _WRAP_VFUNC(Glib::RefPtr<Gst::Memory> alloc(gsize size, Gst::AllocationParams params), "alloc", refreturn_ctype)
 
   // This vfunc is hand-coded because it takes reference to a memory.
