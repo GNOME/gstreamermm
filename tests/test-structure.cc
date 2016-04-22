@@ -71,6 +71,13 @@ TEST_F(StructureTest, GetSetStringVariable)
   CheckGetSetField<std::string>("this is simple test", "string");
 }
 
+TEST_F(StructureTest, GetSetInt64Variable)
+{
+  structure.set_field<gint64>("int64", 123);
+  guint64 val;
+  ASSERT_FALSE(structure.get_field<guint64>("int64", val));
+}
+
 TEST_F(StructureTest, GetSetIntegerVariable)
 {
   CheckGetSetField(1234, "integer");
@@ -105,8 +112,8 @@ TEST_F(StructureTest, GetSetEnumVariable)
 TEST_F(StructureTest, CreateStructureFromFieldsList)
 {
   structure = Structure("first", "field1", "sample string", "field2", 12);
-
-  CheckGetField(Glib::ustring("sample string"), "field1");
+  CheckGetField<std::string>("sample string", "field1");
+  CheckGetField<Glib::ustring>("sample string", "field1");
   CheckGetField(12, "field2");
 }
 

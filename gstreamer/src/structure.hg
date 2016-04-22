@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008-2015 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ namespace Gst
  * behavior when using serialization features, such as Gst::Caps::to_string() or
  * gst_value_serialize() and their counterparts.
  *
- * Last reviewed on 2015-09-16 (1.5.2)
+ * Last reviewed on 2016-07-12 (1.8.0)
  */
 class Structure
 {
@@ -101,6 +101,27 @@ public:
   _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
   _WRAP_METHOD(void set_name(const Glib::ustring& name), gst_structure_set_name)
   _WRAP_METHOD(Glib::QueryQuark get_name_id() const, gst_structure_get_name_id)
+  _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
+  _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
+  _WRAP_METHOD(int size() const, gst_structure_n_fields)
+  _WRAP_METHOD(Glib::ustring get_nth_field_name(guint index) const, gst_structure_nth_field_name)
+  _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
+  _WRAP_METHOD(bool fixate_field_nearest_int(const Glib::ustring& name, int target), gst_structure_fixate_field_nearest_int)
+  _WRAP_METHOD(bool fixate_field_nearest_double(const Glib::ustring& name, double target), gst_structure_fixate_field_nearest_double)
+  _WRAP_METHOD(bool fixate_field_string(const Glib::ustring& name, const Glib::ustring& target), gst_structure_fixate_field_string)
+  _WRAP_METHOD(bool fixate_field(const Glib::ustring& name), gst_structure_fixate_field)
+  _WRAP_METHOD(bool fixate_field_boolean(const Glib::ustring& name, bool target), gst_structure_fixate_field_boolean)
+  _WRAP_METHOD(Gst::Structure intersect(const Gst::Structure& struct2) const, gst_structure_intersect)
+  _WRAP_METHOD(bool is_equal(const Gst::Structure& struct2) const, gst_structure_is_equal)
+  _WRAP_METHOD(bool is_subset(const Gst::Structure& superset) const, gst_structure_is_subset)
+  _WRAP_METHOD(bool can_intersect(const Gst::Structure& struct2) const, gst_structure_can_intersect)
+  _WRAP_METHOD(void fixate(), gst_structure_fixate)
+
+  _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname) const, gst_structure_has_field)
+  _IGNORE(gst_structure_id_has_field)
+
+  _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname, GType type) const, gst_structure_has_field_typed)
+  _IGNORE(gst_structure_id_has_field_typed)
 
   /** Get the value of the field with name @a fieldname.
    *
@@ -117,6 +138,38 @@ public:
   template<typename DataType>
   void get_field(const Glib::ustring& fieldname, Glib::Value<DataType>& value) const;
 
+    /** Gets the value of field @a fieldname with GType enum type @a enumtype
+   * into integer @a value.  Caller is responsible for making sure the
+   * field exists and has the correct type.  A call to this method would look
+   * like so:
+   * @code
+   * ...
+   * int state;
+   * structure.get_field("state", Glib::Value<Gst::State>::value_type(),
+   * state);
+   * ...
+   * @endcode
+   *
+   * @param fieldname The name of a field.
+   * @param enumtype The enum GType of the field.
+   * @param value An output parameter that will be set with the value.
+   * @return true if @a value could be set correctly. If there was no field
+   * with @a fieldname or the existing field did not contain an enum, this
+   * function returns false.
+   */
+  bool get_field(const Glib::ustring& fieldname, GType enumtype, int& value) const;
+  _IGNORE(gst_structure_get_enum)
+
+  /** Gets the value of field @a fieldname into DataType @value.
+   * The caller is responsible for making sure the field exists and has the
+   * correct type.
+   *
+   * @param fieldname The name of a field.
+   * @param value The DataType to set.
+   */
+  template<typename DataType>
+  bool get_field(const Glib::ustring& fieldname, DataType& value) const;
+
   // These are ignored because they are useful in the C API but are either
   // variable argument functions or their functionality is already provided.
   _IGNORE(gst_structure_id_get_value,
@@ -124,7 +177,19 @@ public:
           gst_structure_id_get_valist,
           gst_structure_get,
           gst_structure_id_get,
-          gst_structure_get_valist)
+          gst_structure_get_valist,
+	  gst_structure_get_int64,
+	  gst_structure_get_fraction,
+	  gst_structure_get_date_time,
+	  gst_structure_get_clock_time,
+	  gst_structure_get_int,
+	  gst_structure_get_boolean,
+	  gst_structure_get_double,
+	  gst_structure_get_uint,
+	  gst_structure_get_date,
+	  gst_structure_get_uint64,
+	  gst_structure_get_string
+	)
 
   /** Sets the field with name @a fieldname to value. If the field does not
    * exist, it is created. If the field exists, the previous value is replaced
@@ -150,6 +215,15 @@ public:
   template<typename DataType>
   void set_field(const Glib::ustring& fieldname, const Glib::Value<DataType>& value);
 
+  /** Sets the field with name @fieldname to value. If the field does not
+   * exist, it is created. If the field exists, the previous value is replaced
+   * and freed.
+   *
+   * @param fieldname The name of the field to set.
+   * @param value The value to set the field to.
+   */
+  void set_field(const Glib::ustring& fieldname, const char* value);
+
   /** Sets the fields with name @fieldname to values. If one of the fields does not
    * exist, it is created. If the field exists, the previous value is replaced
    * and freed.
@@ -159,103 +233,6 @@ public:
    */
   template<class DataType, class ...DataTypes>
   void set_fields(const Glib::ustring & fieldname, const DataType& value, DataTypes ...further_data);
-
-  /** Sets the field with name @a fieldname to the boolean @a value. If the
-   * field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, bool value);
-
-  /** Sets the field with name @a fieldname to the int @a value. If the
-   * field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, int value);
-
-  /** Sets the field with name @a fieldname to the guint @a value. If the
-   * field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, guint value);
-
-  /** Sets the field with name @a fieldname to the double @a value. If the
-   * field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, double value);
-
-  //We use std::string, because the encoding is unknown. murrayc
-  /** Sets the field with name @a fieldname to the std::string @a value. If
-   * the field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, const std::string& value);
-
-  /** Sets the field with name @a fieldname to the string constant @a value. If
-   * the field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, const char* value);
-
-  /** Sets the field with name @a fieldname to the Glib::Date @a value. If
-   * the field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed. Please note that when setting fields to
-   * special types such as Gst::Fourcc and Gst::Fraction and Glib::Date they
-   * are converted to the GStreamer GTypes and thus when attempting to get
-   * these fields back as GValues, they will have the GStreamer GType.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, const Glib::Date& value);
-
-  /** Sets the field with name @a fieldname to the Glib::DateTime @a value. If
-   * the field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed. Please note that when setting fields to
-   * special types such as Gst::Fourcc and Gst::Fraction and Glib::Date they
-   * are converted to the GStreamer GTypes and thus when attempting to get
-   * these fields back as GValues, they will have the GStreamer GType.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-    void set_field(const Glib::ustring& fieldname, const Glib::DateTime& value);
-
-  /** Sets the field with name @a fieldname to the @a value. If
-   * the field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, guint64 value);
-
-  /** Sets the field with name @a fieldname to the @a value. If
-   * the field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, gint64 value);
 
   /** Sets the field with name @a fieldname to the value @a value of the enum
    * type @a enum_type. If the field does not exist, it is created. If the
@@ -274,57 +251,6 @@ public:
    * @param value The value to set the field to.
    */
   void set_field(const Glib::ustring& fieldname, GType enumtype, int value);
-
-  /** Sets the field with name @a fieldname to the Gst::Fraction @a value. If
-   * the field does not exist, it is created. If the field exists, the previous
-   * value is replaced and freed. Please note that when setting fields to
-   * special types such as Gst::Fourcc and Gst::Fraction and Glib::Date they
-   * are converted to the GStreamer GTypes and thus when attempting to get
-   * these fields back as GValues, they will have the GStreamer GType.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, const Gst::Fraction& value);
-
-  /** Sets the field with name @a fieldname field to the Gst::IntRange @a
-   * value. If the field does not exist, it is created. If the field exists,
-   * the previous value is replaced and freed. Please note that when setting
-   * fields to special types such as Gst::Fourcc and Gst::Fraction and
-   * Glib::Date they are converted to the GStreamer GTypes and thus when
-   * attempting to get these fields back as GValues, they will have the
-   * GStreamer GType.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, const Gst::IntRange& value);
-
-  /** Sets the field with name @a fieldname field to the Gst::DoubleRange @a
-   * value. If the field does not exist, it is created. If the field exists,
-   * the previous value is replaced and freed. Please note that when setting
-   * fields to special types such as Gst::Fourcc and Gst::Fraction and
-   * Glib::Date they are converted to the GStreamer GTypes and thus when
-   * attempting to get these fields back as GValues, they will have the
-   * GStreamer GType.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, const Gst::DoubleRange& value);
-
-  /** Sets the field with name @a fieldname field to the Gst::FractionRange @a
-   * value. If the field does not exist, it is created. If the field exists,
-   * the previous value is replaced and freed. Please note that when setting
-   * fields to special types such as Gst::Fourcc and Gst::Fraction and
-   * Glib::Date they are converted to the GStreamer GTypes and thus when
-   * attempting to get these fields back as GValues, they will have the
-   * GStreamer GType.
-   *
-   * @param fieldname The name of the field to set.
-   * @param value The value to set the field to.
-   */
-  void set_field(const Glib::ustring& fieldname, const Gst::FractionRange& value);
 
   /** Sets the field with name @fieldname field to the DataType @value.
    * If the field does not exist, it is created. If the field exists,
@@ -351,9 +277,6 @@ public:
   void remove_field(const Glib::ustring& fieldname);
   _IGNORE(gst_structure_remove_field, gst_structure_remove_fields, gst_structure_remove_fields_valist)
 
-  _WRAP_METHOD(void remove_all_fields(), gst_structure_remove_all_fields)
-  _WRAP_METHOD(GType get_field_type(const Glib::ustring& fieldname) const, gst_structure_get_field_type)
-
   /** For example,
    * bool on_foreach(const Glib::ustring& id, const Glib::ValueBase& value);.
    * The on_foreach function should return true if the foreach operation should
@@ -370,225 +293,6 @@ public:
    */
   bool foreach(const SlotForeach& slot);
   _IGNORE(gst_structure_foreach)
-
-  _WRAP_METHOD(int size() const, gst_structure_n_fields)
-
-  _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname) const, gst_structure_has_field)
-  _IGNORE(gst_structure_id_has_field)
-
-  _WRAP_METHOD(bool has_field(const Glib::ustring& fieldname, GType type) const, gst_structure_has_field_typed)
-  _IGNORE(gst_structure_id_has_field_typed)
-
-  /** Gets the value of field @a fieldname into boolean @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a boolean, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, bool& value) const;
-  _IGNORE(gst_structure_get_boolean)
-
-  /** Gets the value of field @a fieldname into integer @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain an int, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, int& value) const;
-  _IGNORE(gst_structure_get_int)
-
-  /** Gets the value of field @a fieldname into guint @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain an guint, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, guint& value) const;
-  _IGNORE(gst_structure_get_uint)
-
-  /** Gets the value of field @a fieldname into ClockTime or guint64 @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain an guint, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, guint64& value) const;
-  _IGNORE(gst_structure_get_uint64)
-  _IGNORE(gst_structure_get_clock_time)
-
-  /** Gets the value of field @a fieldname into gint64 @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain an guint, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, gint64& value) const;
-  _IGNORE(gst_structure_get_int64)
-
-  /** Gets the value of field @a fieldname into double @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a double, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, double& value) const;
-  _IGNORE(gst_structure_get_double)
-
-  /** Gets the value of field @a fieldname into Glib::ustring @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a string, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, Glib::ustring& value) const;
-
-  /** Gets the value of field @a fieldname into std::string @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a string, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, std::string& value) const;
-  _IGNORE(gst_structure_get_string)
-
-  /** Gets the value of field @a fieldname into Glib::Date @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param date The Glib::Date to set.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a Glib::Date, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, Glib::Date& value) const;
-  _IGNORE(gst_structure_get_date)
-
-  /** Gets the value of field @a fieldname into Glib::DateTime @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value The Glib::DateTime to set.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a Glib::DateTime,
-   * this function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, Glib::DateTime& value) const;
-  _IGNORE(gst_structure_get_date_time)
-
-  /** Gets the value of field @a fieldname with GType enum type @a enumtype
-   * into integer @a value.  Caller is responsible for making sure the
-   * field exists and has the correct type.  A call to this method would look
-   * like so:
-   * @code
-   * ...
-   * int state;
-   * structure.get_field("state", Glib::Value<Gst::State>::value_type(),
-   * state);
-   * ...
-   * @endcode
-   *
-   * @param fieldname The name of a field.
-   * @param enumtype The enum GType of the field.
-   * @param value An output parameter that will be set with the value.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain an enum, this
-   * function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, GType enumtype, int& value) const;
-  _IGNORE(gst_structure_get_enum)
-
-  /** Gets the value of field @a fieldname into Gst::Fraction @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value The Gst::Fraction to set.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a Gst::Fraction,
-   * this function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, Gst::Fraction& value) const;
-  _IGNORE(gst_structure_get_fraction)
-
-  /** Gets the value of field @a fieldname into Gst::IntRange @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value The Gst::IntRange to set.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a Gst::IntRange,
-   * this function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, Gst::IntRange& value) const;
-
-  /** Gets the value of field @a fieldname into Gst::DoubleRange @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value The Gst::DoubleRange to set.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a
-   * Gst::DoubleRange, this function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, Gst::DoubleRange& value) const;
-
-  /** Gets the value of field @a fieldname into Gst::FractionRange @a value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value The Gst::FractionRange to set.
-   * @return true if @a value could be set correctly. If there was no field
-   * with @a fieldname or the existing field did not contain a
-   * Gst::FractionRange, this function returns false.
-   */
-  bool get_field(const Glib::ustring& fieldname, Gst::FractionRange& value) const;
-
-  /** Gets the value of field @a fieldname into DataType @value.
-   * The caller is responsible for making sure the field exists and has the
-   * correct type.
-   *
-   * @param fieldname The name of a field.
-   * @param value The DataType to set.
-   */
-  template<typename DataType>
-  void get_field(const Glib::ustring& fieldname, DataType& value) const;
 
   /** For example,
    * bool on_map(const Glib::ustring& id, Glib::ValueBase& value);.
@@ -608,13 +312,6 @@ public:
   bool map_in_place(const SlotMap& slot);
   _IGNORE(gst_structure_map_in_place)
 
-  _WRAP_METHOD(Glib::ustring get_nth_field_name(guint index) const, gst_structure_nth_field_name)
-  _WRAP_METHOD(Glib::ustring to_string() const, gst_structure_to_string)
-  _WRAP_METHOD(bool fixate_field_nearest_int(const Glib::ustring& name, int target), gst_structure_fixate_field_nearest_int)
-  _WRAP_METHOD(bool fixate_field_nearest_double(const Glib::ustring& name, double target), gst_structure_fixate_field_nearest_double)
-  _WRAP_METHOD(bool fixate_field_string(const Glib::ustring& name, const Glib::ustring& target), gst_structure_fixate_field_string)
-  _WRAP_METHOD(bool fixate_field(const Glib::ustring& name), gst_structure_fixate_field)
-
   /** Fixates a Gst::Structure by changing the given field to the nearest
    * fraction to given Gst::Fraction that is a subset of the existing field.
    *
@@ -625,20 +322,10 @@ public:
   bool fixate_nearest_fraction(const Glib::ustring& name, const Gst::Fraction& target);
   _IGNORE(gst_structure_fixate_field_nearest_fraction)
 
-  _WRAP_METHOD(bool fixate_field_boolean(const Glib::ustring& name, bool target), gst_structure_fixate_field_boolean)
-
   //Variable argument functions are ignored.
   _IGNORE(gst_structure_set, gst_structure_id_set)
 
-  _WRAP_METHOD(Gst::Structure intersect(const Gst::Structure& struct2) const, gst_structure_intersect)
 
-  _WRAP_METHOD(bool is_equal(const Gst::Structure& struct2) const, gst_structure_is_equal)
-
-  _WRAP_METHOD(bool is_subset(const Gst::Structure& superset) const, gst_structure_is_subset)
-
-  _WRAP_METHOD(bool can_intersect(const Gst::Structure& struct2) const, gst_structure_can_intersect)
-
-  _WRAP_METHOD(void fixate(), gst_structure_fixate)
 
 private:
   // This method is used for varadic template recursion
@@ -660,12 +347,20 @@ void Structure::set_fields(const Glib::ustring & name, const DataType& data, Dat
 }
 
 template<typename DataType>
-void Structure::get_field(const Glib::ustring& fieldname, DataType& value) const
+bool Structure::get_field(const Glib::ustring& fieldname, DataType& value) const
 {
   typedef Glib::Value<DataType> ValueType;
-  ValueType v;
-  this->get_field(fieldname, reinterpret_cast<Glib::ValueBase&>(v));
-  value = v.get();
+
+  bool ret = ValueType::value_type() == get_field_type(fieldname);
+
+  if (ret)
+  {
+    ValueType v;
+    this->get_field(fieldname, reinterpret_cast<Glib::ValueBase&>(v));
+    value = v.get();
+  }
+
+  return ret;
 }
 
 template<typename DataType>
