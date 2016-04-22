@@ -55,7 +55,7 @@ public:
   {
   }
 
-  virtual Glib::RefPtr<Gst::Memory> alloc_vfunc(gsize size, AllocationParams params)
+  Glib::RefPtr<Gst::Memory> alloc_vfunc(gsize size, const AllocationParams& params) override
   {
     Glib::RefPtr<Gst::Memory> r = the_allocator->alloc(size, params);
     r->gobj()->allocator = gobj(); // pretend that it was us who allocated this memory

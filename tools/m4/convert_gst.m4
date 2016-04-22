@@ -80,11 +80,11 @@ _CONV_GLIB_ENUM(ThreadPriority)
 dnl ############### gstreamermm Class Conversions ######################
 
 dnl AllocationParams
-_CONVERSION(`Gst::AllocationParams', `GstAllocationParams*', `$3.gobj()')
-_CONVERSION(`GstAllocationParams*', `Gst::AllocationParams', `Gst::AllocationParams($3, true)')
+_CONVERSION(`const Gst::AllocationParams&', `GstAllocationParams*', `const_cast<GstAllocationParams*>($3.gobj())')
+_CONVERSION(`GstAllocationParams*', `const Gst::AllocationParams&', `Gst::AllocationParams($3, true)')
 
 dnl Allocator
-_CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `const_cast<GstAllocator*>(Glib::unwrap($3))')
 _CONVERSION(`Glib::RefPtr<Gst::Allocator>&&',`GstAllocator*',`($3) ? $3.release()->gobj() : nullptr');
 _CONVERSION(`GstAllocator*', `Glib::RefPtr<Gst::Allocator>', `Glib::wrap($3)')
 
