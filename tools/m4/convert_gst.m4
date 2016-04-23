@@ -6,6 +6,8 @@ _CONV_ENUM(Gst,AutoplugSelectResult)
 _CONV_ENUM(Gst,AudioBaseSinkSlaveMethod)
 _CONV_ENUM(Gst,AudioBaseSinkDiscontReason)
 _CONV_ENUM(Gst,AudioBaseSrcSlaveMethod)
+_CONV_ENUM(Gst,AudioFlags)
+_CONV_ENUM(Gst,AudioLayout)
 _CONV_ENUM(Gst,BufferCopyFlags)
 _CONV_ENUM(Gst,BufferFlags)
 _CONV_ENUM(Gst,AudioFormat)
@@ -89,8 +91,12 @@ _CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `const_cast<G
 _CONVERSION(`Glib::RefPtr<Gst::Allocator>&&',`GstAllocator*',`($3) ? $3.release()->gobj() : nullptr');
 _CONVERSION(`GstAllocator*', `Glib::RefPtr<Gst::Allocator>', `Glib::wrap($3)')
 
+dnl AudioFormatInfo
+_CONVERSION(`const GstAudioFormatInfo*', `const Gst::AudioFormatInfo', `Gst::AudioFormatInfo($3)')
+
 dnl AudioInfo
 _CONVERSION(`const Gst::AudioInfo&', `const GstAudioInfo*', `$3.gobj()')
+_CONVERSION(`const GstAudioInfo*', `const Gst::AudioInfo&', `Gst::AudioInfo(const_cast<GstAudioInfo*>($3))')
 
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')

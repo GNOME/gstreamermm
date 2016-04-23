@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008-2009 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,36 +17,60 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gstreamermm/audioformat.h>
 #include <gst/audio/audio-info.h>
+#include <gstreamermm/audioformat.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
-  _WRAP_ENUM(AudioFlags, GstAudioFlags)
-  _WRAP_ENUM(AudioLayout, GstAudioLayout)
+_WRAP_ENUM(AudioFlags, GstAudioFlags)
+_WRAP_ENUM(AudioLayout, GstAudioLayout)
 
-/**
- * Information for an audio format.
+class Caps;
+
+/** Information describing audio properties. This information can be filled
+ * in from Gst::Caps with from_caps() or Gst::AudioInfo() constructor.
+ *
+ * Last reviewed on 2016-04-23 (1.8.0).
  */
-class AudioInfo : public Gst::AudioFormatInfo
+class AudioInfo
 {
-  _CLASS_GENERIC(AudioInfo, GstAudioInfo)
+  _CLASS_BOXEDTYPE(AudioInfo, GstAudioInfo, gst_audio_info_new, gst_audio_info_copy, gst_audio_info_free)
 public:
-  AudioInfo(const GstAudioInfo* info, bool take_ownership = false);
 
+  /** Create AudioInfo from @a caps.
+   *
+   * @param caps A Gst::Caps.
+   *
+   * @throw std::runtime_error if @a caps could not be parsed.
+   */
+  AudioInfo(const Glib::RefPtr<const Gst::Caps>& caps);
 
-  virtual ~AudioInfo();
-  /// Gets the underlying gobject.
-  const GstAudioInfo* gobj() const { return m_info; };
+  _WRAP_METHOD(bool is_equal(const Gst::AudioInfo& other) const, gst_audio_info_is_equal)
 
-protected:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  const GstAudioInfo* m_info;
-  bool take_ownership;
-#endif
+  _WRAP_METHOD(void init(), gst_audio_info_init)
+
+  _WRAP_METHOD(bool from_caps(const Glib::RefPtr<const Gst::Caps>& caps), gst_audio_info_from_caps)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> to_caps() const, gst_audio_info_to_caps)
+
+  _MEMBER_GET(flags, flags, Gst::AudioFlags, GstAudioFlags)
+  _MEMBER_SET(flags, flags, Gst::AudioFlags, GstAudioFlags)
+
+  _MEMBER_GET(layout, layout, Gst::AudioLayout, GstAudioLayout)
+  _MEMBER_SET(layout, layout, Gst::AudioLayout, GstAudioLayout)
+
+  _MEMBER_GET(rate, rate, int, gint)
+  _MEMBER_SET(rate, rate, int, gint)
+
+  _MEMBER_GET(channels, channels, int, gint)
+  _MEMBER_SET(channels, channels, int, gint)
+
+  _MEMBER_GET(bpf, bpf, int, gint)
+  _MEMBER_SET(bpf, bpf, int, gint)
+
+  _MEMBER_GET(finfo, finfo, const Gst::AudioFormatInfo, const GstAudioFormatInfo*)
 };
 
 }
