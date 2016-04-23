@@ -89,6 +89,9 @@ _CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `const_cast<G
 _CONVERSION(`Glib::RefPtr<Gst::Allocator>&&',`GstAllocator*',`($3) ? $3.release()->gobj() : nullptr');
 _CONVERSION(`GstAllocator*', `Glib::RefPtr<Gst::Allocator>', `Glib::wrap($3)')
 
+dnl AudioInfo
+_CONVERSION(`const Gst::AudioInfo&', `const GstAudioInfo*', `$3.gobj()')
+
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')
 _CONVERSION(`GstBuffer*',`const Glib::RefPtr<Gst::Buffer>&',`Glib::wrap($3, true)')

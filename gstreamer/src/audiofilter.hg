@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,6 @@
  */
 
 #include <gstreamermm/basetransform.h>
-#include <gstreamermm/audioringbuffer.h>
 #include <gstreamermm/audioinfo.h>
 
 _DEFS(gstreamermm,gst)
@@ -40,6 +39,8 @@ namespace Gst
  * Gst::BaseTransform::transform_ip_vfunc() and/or
  * Gst::BaseTransform::transform_vfunc() virtual functions.
  *
+ * Last reviewed on 2016-04-23 (1.8.0).
+ *
  * @ingroup GstBaseClasses
  */
 class AudioFilter : public Gst::BaseTransform
@@ -47,18 +48,10 @@ class AudioFilter : public Gst::BaseTransform
   _CLASS_GOBJECT(AudioFilter, GstAudioFilter, GST_AUDIO_FILTER, Gst::BaseTransform, GstBaseTransform)
 
 public:
+#m4 _CONVERSION(`const GstAudioInfo*', `const Gst::AudioInfo&', `Gst::AudioInfo($3, false)')
   /** Virtual function, called whenever the format changes.
    */
-  virtual bool setup_vfunc(Gst::AudioInfo& info);
-
-protected:
-#m4begin
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->setup = &setup_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static gboolean setup_vfunc_callback(GstAudioFilter* self, const GstAudioInfo* info);
-  _POP()
-#m4end
+  _WRAP_VFUNC(bool setup(const Gst::AudioInfo& info), "setup")
 };
 
 } // namespace Gst
