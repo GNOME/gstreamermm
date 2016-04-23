@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ gboolean AudioSrc_Class::prepare_vfunc_callback(GstAudioSrc* self, GstAudioRingB
       }
     }
   }
-  
+
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
   );
@@ -94,7 +94,7 @@ guint AudioSrc_Class::read_vfunc_callback(GstAudioSrc* self, gpointer data, guin
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
-        return obj->read_vfunc(data, length, timestamp);
+        return obj->read_vfunc(data, length, *timestamp);
       }
       catch(...)
       {
@@ -102,7 +102,7 @@ guint AudioSrc_Class::read_vfunc_callback(GstAudioSrc* self, gpointer data, guin
       }
     }
   }
-  
+
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
   );
@@ -115,14 +115,14 @@ guint AudioSrc_Class::read_vfunc_callback(GstAudioSrc* self, gpointer data, guin
   typedef guint RType;
   return RType();
 }
-guint Gst::AudioSrc::read_vfunc(const void* data, guint length, ClockTime* timestamp)
+guint Gst::AudioSrc::read_vfunc(const void* data, guint length, Gst::ClockTime& timestamp)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
   );
 
   if(base && base->read)
-    return (*base->read)(gobj(),const_cast<void*>(data),length, timestamp);
+    return (*base->read)(gobj(),const_cast<void*>(data),length, &timestamp);
 
   typedef guint RType;
   return RType();
