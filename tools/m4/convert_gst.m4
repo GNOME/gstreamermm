@@ -98,6 +98,13 @@ dnl AudioInfo
 _CONVERSION(`const Gst::AudioInfo&', `const GstAudioInfo*', `$3.gobj()')
 _CONVERSION(`const GstAudioInfo*', `const Gst::AudioInfo&', `Gst::AudioInfo(const_cast<GstAudioInfo*>($3))')
 
+dnl AudioRingBuffer
+_CONVERSION(`GstAudioRingBuffer*',`Glib::RefPtr<Gst::AudioRingBuffer>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gst::AudioRingBuffer>',`GstAudioRingBuffer*',`Glib::unwrap($3)')
+
+dnl AudioRingBufferSpec
+_CONVERSION(`Gst::AudioRingBufferSpec&', `GstAudioRingBufferSpec*', `$3.gobj()')
+
 dnl Buffer
 _CONVERSION(`GstBuffer*',`Glib::RefPtr<Gst::Buffer>',`Glib::wrap($3)')
 _CONVERSION(`GstBuffer*',`const Glib::RefPtr<Gst::Buffer>&',`Glib::wrap($3, true)')
@@ -283,16 +290,9 @@ _CONVERSION(`GstSegment*',`Glib::RefPtr<Gst::Segment>',`Glib::wrap($3)')
 _CONVERSION(`GstSegment*',`Glib::RefPtr<const Gst::Segment>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Segment>&',`GstSegment*', `Glib::unwrap($3)')
 
-dnl AudioRingBuffer
-_CONVERSION(`GstAudioRingBuffer*',`Glib::RefPtr<Gst::AudioRingBuffer>',`Glib::wrap($3)')
-_CONVERSION(`Glib::RefPtr<Gst::AudioRingBuffer>',`GstAudioRingBuffer*',`Glib::unwrap($3)')
-
-dnl AudioRingBufferSpec
-_CONVERSION(`Gst::AudioRingBufferSpec&', `GstAudioRingBufferSpec*', `$3.gobj()')
-
 dnl Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
-_CONVERSION(`const Gst::Structure&',`GstStructure*',`const_cast<GstStructure*>($3.gobj())') 
+_CONVERSION(`const Gst::Structure&',`GstStructure*',`const_cast<GstStructure*>($3.gobj())')
 _CONVERSION(`GstStructure*', `Gst::Structure', `Glib::wrap($3)')
 _CONVERSION(`const Gst::Structure&',`const GstStructure*',`$3.gobj()')
 _CONVERSION(`const GstStructure*',`Gst::Structure', `Glib::wrap($3, false)')

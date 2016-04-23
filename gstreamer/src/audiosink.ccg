@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/audio/gstaudiosink.h>
 _PINCLUDE(gstreamermm/private/audiobasesink_p.h)
 
 namespace Gst
@@ -51,7 +50,7 @@ gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstAudioRin
       }
     }
   }
-  
+
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
   );
@@ -76,56 +75,6 @@ bool Gst::AudioSink::prepare_vfunc(Gst::AudioRingBufferSpec& spec)
   typedef bool RType;
   return RType();
 }
-gint AudioSink_Class::write_vfunc_callback(GstAudioSink* self, gpointer data, guint length)
-{
-  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
-
-  // Non-gtkmmproc-generated custom classes implicitly call the default
-  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
-  // generated classes can use this optimisation, which avoids the unnecessary
-  // parameter conversions if there is no possibility of the virtual function
-  // being overridden:
-  if(obj_base && obj_base->is_derived_())
-  {
-    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
-    if(obj) // This can be NULL during destruction.
-    {
-      try // Trap C++ exceptions which would normally be lost because this is a C callback.
-      {
-        // Call the virtual member method, which derived classes might override.
-        return obj->write_vfunc(data, length);
-      }
-      catch(...)
-      {
-        Glib::exception_handlers_invoke();
-      }
-    }
-  }
-  
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  // Call the original underlying C function:
-  if(base && base->write)
-    return (*base->write)(self, data, length);
-
-
-  typedef guint RType;
-  return RType();
-}
-guint Gst::AudioSink::write_vfunc(const void* data, guint length)
-{
-  BaseClassType *const base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
-  );
-
-  if(base && base->write)
-    return (*base->write)(gobj(),const_cast<void*>(data),length);
-
-  typedef guint RType;
-  return RType();
-}
 
 } // namespace Gst
+

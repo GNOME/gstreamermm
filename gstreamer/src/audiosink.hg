@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,6 @@
  */
 
 #include <gstreamermm/audioringbuffer.h>
-#include <gst/audio/gstaudiosink.h>
 #include <gstreamermm/audiobasesink.h>
 
 _DEFS(gstreamermm,gst)
@@ -43,7 +42,7 @@ namespace Gst
  * with Gst::AudioBaseSink using a default implementation of a
  * Gst::AudioRingBuffer that uses threads.
  *
- * Last reviewed on 2006-09-27 (0.10.12)
+ * Last reviewed on 2016-04-23 (1.8.0)
  *
  * @ingroup GstBaseClasses
  */
@@ -71,7 +70,7 @@ public:
 
   /** vfunc to write data to the device.
    */
-  virtual guint write_vfunc(const void* data, guint length);
+  _WRAP_VFUNC(int write(gpointer data, guint lenght), "write")
 
   /** vfunc to return how many samples are still in the device. This is used to
    * drive the synchronisation.
@@ -87,10 +86,8 @@ protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->prepare = &prepare_vfunc_callback;
-  klass->write = &write_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static gboolean prepare_vfunc_callback(GstAudioSink* self, GstAudioRingBufferSpec* spec);
-  static gint write_vfunc_callback(GstAudioSink* self, gpointer data, guint length);
   _POP()
 #m4end
 };
