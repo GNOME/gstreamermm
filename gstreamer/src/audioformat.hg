@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008-2009 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,47 +24,52 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-  _WRAP_ENUM(AudioFormat, GstAudioFormat)
-  _WRAP_ENUM(AudioFormatFlags, GstAudioFormatFlags)
+_WRAP_ENUM(AudioFormat, GstAudioFormat)
+_WRAP_ENUM(AudioFormatFlags, GstAudioFormatFlags)
+_WRAP_ENUM(AudioPackFlags, GstAudioPackFlags)
 
 /**
  * Information for an audio format.
+ *
+ * Last reviewed on 2016-04-23 (1.8.0).
  */
 class AudioFormatInfo
 {
   _CLASS_GENERIC(AudioFormatInfo, GstAudioFormatInfo)
 public:
-  /**
-   * Defualt constructor.
-   */
-  virtual ~AudioFormatInfo();
+  /// Gets the underlying gobject.
+  GstAudioFormatInfo* gobj() { return &m_info; };
 
   /// Gets the underlying gobject.
-  GstAudioFormatInfo* gobj() { return m_info; };
-
-  /// Gets the underlying gobject.
-  const GstAudioFormatInfo* gobj() const { return m_info; };
+  const GstAudioFormatInfo* gobj() const { return &m_info; };
 
   _MEMBER_GET(format, format, AudioFormat, GstAudioFormat)
-
   _MEMBER_SET(format, format, AudioFormat, GstAudioFormat)
 
   _MEMBER_GET(name, name, std::string, const char*)
-
   _MEMBER_SET(name, name, std::string, const char*)
 
   _MEMBER_GET(description, description, std::string, const char*)
-
   _MEMBER_SET(description, description, std::string, const char*)
 
   _MEMBER_GET(flags, flags, AudioFormatFlags, GstAudioFormatFlags)
-
   _MEMBER_SET(flags, flags, AudioFormatFlags, GstAudioFormatFlags)
+
+  _MEMBER_GET(endianness, endianness, int, gint)
+  _MEMBER_SET(endianness, endianness, int, gint)
+
+  _MEMBER_GET(width, width, int, gint)
+  _MEMBER_SET(width, width, int, gint)
+
+  _MEMBER_GET(depth, depth, int, gint)
+  _MEMBER_SET(depth, depth, int, gint)
+
+  _MEMBER_GET(unpack_format, unpack_format, AudioFormat, GstAudioFormat)
+  _MEMBER_SET(unpack_format, unpack_format, AudioFormat, GstAudioFormat)
 
 protected:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GstAudioFormatInfo* m_info;
-  bool take_ownership;
+  GstAudioFormatInfo m_info;
 #endif
 };
 } //namespace Gst
