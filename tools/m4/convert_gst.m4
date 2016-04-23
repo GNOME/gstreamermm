@@ -4,6 +4,7 @@ dnl Enums
 _CONV_ENUM(Gst,AssocFlags)
 _CONV_ENUM(Gst,AutoplugSelectResult)
 _CONV_ENUM(Gst,AudioBaseSinkSlaveMethod)
+_CONV_ENUM(Gst,AudioBaseSinkDiscontReason)
 _CONV_ENUM(Gst,AudioBaseSrcSlaveMethod)
 _CONV_ENUM(Gst,BufferCopyFlags)
 _CONV_ENUM(Gst,BufferFlags)

@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,5 +17,45 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gstreamermm/audiobasesink.h>
 #include <gstreamermm/audioringbuffer.h>
+
+namespace Gst
+{
+
+extern "C"
+{
+
+static void AudioBaseSink_CustomSlaving_gstreamermm_callback(GstAudioBaseSink* sink, GstClockTime etime, GstClockTime itime,
+  GstClockTimeDiff *requested_skew, GstAudioBaseSinkDiscontReason discont_reason, gpointer user_data)
+{
+  Gst::AudioBaseSink::SlotCustomSlaving* the_slot = static_cast<Gst::AudioBaseSink::SlotCustomSlaving*>(user_data);
+  Glib::RefPtr<Gst::AudioBaseSink> sink_wrapper = Glib::wrap(sink, true);
+  try
+  {
+    (*the_slot)(sink_wrapper, static_cast<Gst::ClockTime>(etime), static_cast<Gst::ClockTime>(itime),
+		*requested_skew, static_cast<Gst::AudioBaseSinkDiscontReason>(discont_reason));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+static void AudioBaseSink_CustomSlaving_gstreamermm_callback_disconnect(gpointer data)
+{
+  Gst::AudioBaseSink::SlotCustomSlaving* the_slot = static_cast<Gst::AudioBaseSink::SlotCustomSlaving*>(data);
+
+  if(the_slot)
+    delete the_slot;
+}
+
+}
+
+void AudioBaseSink::set_custom_slaving_callback(const SlotCustomSlaving& slot)
+{
+  SlotCustomSlaving *slot_copy = new SlotCustomSlaving(slot);
+
+  return gst_audio_base_sink_set_custom_slaving_callback(gobj(), &AudioBaseSink_CustomSlaving_gstreamermm_callback, slot_copy, &AudioBaseSink_CustomSlaving_gstreamermm_callback_disconnect);
+}
+
+}

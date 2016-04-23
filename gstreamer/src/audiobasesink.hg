@@ -1,6 +1,6 @@
-/* gstreamermm - a C++ wrapper for gstreamer
+	/* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/audio/audio.h>
 #include <gst/audio/gstaudiobasesink.h>
 #include <gstreamermm/basesink.h>
+
 _PINCLUDE(gstreamermm/private/basesink_p.h)
 
 _DEFS(gstreamermm,gst)
@@ -30,13 +30,14 @@ namespace Gst
 class AudioRingBuffer;
 
 _WRAP_ENUM(AudioBaseSinkSlaveMethod, GstAudioBaseSinkSlaveMethod)
+_WRAP_ENUM(AudioBaseSinkDiscontReason, GstAudioBaseSinkDiscontReason, NO_GTYPE)
 
 /** The base class for audio sinks.
  * This is the base class for audio sinks. Subclasses need to implement the
  * create_ringbuffer_vfunc vmethod. This base class will then take care of
  * writing samples to the audioringbuffer, synchronisation, clipping and flushing.
  *
- * Last reviewed on 2006-09-27 (0.10.12).
+ * Last reviewed on 2016-04-23 (1.8.0).
  *
  * @ingroup GstBaseClasses
  */
@@ -45,6 +46,33 @@ class AudioBaseSink : public Gst::BaseSink
   _CLASS_GOBJECT(AudioBaseSink, GstAudioBaseSink, GST_AUDIO_BASE_SINK, Gst::BaseSink, GstBaseSink)
 
 public:
+  /** This slot is set with set_custom_slaving_callback()
+   * and is called during playback. It receives the current time of external and
+   * internal clocks, which the callback can then use to apply any custom
+   * slaving/synchronization schemes.
+   *
+   * The external clock is the sink's element clock, the internal one is the
+   * internal audio clock. The internal audio clock's calibration is applied to
+   * the timestamps before they are passed to the callback. The difference between
+   * etime and itime is the skew; how much internal and external clock lie apart
+   * from each other. A skew of 0 means both clocks are perfectly in sync.
+   * itime > etime means the external clock is going slower, while itime < etime
+   * means it is going faster than the internal clock. etime and itime are always
+   * valid timestamps, except for when a discontinuity happens.
+   *
+   * requested_skew is an output value the callback can write to. It informs the
+   * sink of whether or not it should move the playout pointer, and if so, by how
+   * much. This pointer is only nullptr if a discontinuity occurs; otherwise, it is
+   * safe to write to *requested_skew. The default skew is 0.
+   *
+   * The sink may experience discontinuities. If one happens, discont is TRUE,
+   * itime, etime are set to CLOCK_TIME_NONE, and requested_skew is nullptr.
+   * This makes it possible to reset custom clock slaving algorithms when a
+   * discontinuity happens.
+   *
+   */
+  typedef sigc::slot<void, const Glib::RefPtr<Gst::AudioBaseSink>&, Gst::ClockTime, Gst::ClockTime, Gst::ClockTimeDiff&, Gst::AudioBaseSinkDiscontReason> SlotCustomSlaving;
+
   /** Get the Gst::Clock of the Gst::AudioBaseSink.
    */
   _MEMBER_GET_GOBJECT(provided_clock, provided_clock, Gst::Clock, GstClock*)
@@ -65,6 +93,11 @@ public:
   _WRAP_METHOD(void set_alignment_threshold(Gst::ClockTime alignment_threshold), gst_audio_base_sink_set_alignment_threshold)
   _WRAP_METHOD(Gst::ClockTime get_alignment_threshold() const, gst_audio_base_sink_get_alignment_threshold)
 
+  _WRAP_METHOD(void report_device_failure(), gst_audio_base_sink_report_device_failure)
+
+  _WRAP_METHOD_DOCS_ONLY(gst_audio_base_sink_set_custom_slaving_callback)
+  void set_custom_slaving_callback(const SlotCustomSlaving& slot);
+
   _WRAP_PROPERTY("alignment-threshold", guint64)
   _WRAP_PROPERTY("buffer-time", gint64)
   _WRAP_PROPERTY("can-activate-pull", bool)
@@ -77,6 +110,13 @@ public:
   /** vfunc to create and return a Gst::AudioRingBuffer to write to.
    */
   _WRAP_VFUNC(Glib::RefPtr<Gst::AudioRingBuffer> create_ring_buffer(), "create_ringbuffer")
+
+  /** vfunc to payload data in a format suitable to write to the sink. If no
+   * payloading is required, returns a reffed copy of the original
+   * buffer, else returns the payloaded buffer with all other metadata
+   * copied.
+   */
+  _WRAP_VFUNC(Glib::RefPtr<Gst::Buffer> payload(const Glib::RefPtr<Gst::Buffer>& buffer), "payload")
 };
 
 } // namespace Gst
