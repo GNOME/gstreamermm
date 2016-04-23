@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -62,6 +62,21 @@ AudioClock::AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot)
   // accepted.
   gobj()->func = &AudioClock_GetTime_gstreamermm_callback;
   gobj()->user_data = m_slot.get();
+}
+
+Gst::ClockTime AudioClock::adjust(Gst::ClockTime time)
+{
+  return static_cast<Gst::ClockTime>(gst_audio_clock_adjust(GST_CLOCK_CAST(gobj()), static_cast<GstClockTime>(time)));
+}
+
+Gst::ClockTime AudioClock::get_time() const
+{
+  return static_cast<Gst::ClockTime>(gst_audio_clock_get_time(GST_CLOCK_CAST(gobj())));
+}
+
+void AudioClock::invalidate()
+{
+  gst_audio_clock_invalidate(GST_CLOCK_CAST(gobj()));
 }
 
 } //namespace Gst
