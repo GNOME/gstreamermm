@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -120,11 +120,11 @@ class BufferList;
  * information can then be used by upstream elements to reduce their processing
  * rate, for example.
  *
- * Since GStreamer 0.10.15 the async property can be used to instruct the sink
+ * The async property can be used to instruct the sink
  * to never perform an ASYNC state change. This feature is mostly usable when
  * dealing with non-synchronized streams or sparse streams.
  *
- * Last reviewed on 2007-08-29 (0.10.15)
+ * Last reviewed on 2016-04-29 (1.8.0)
  *
  * @ingroup GstBaseClasses
  */
@@ -134,55 +134,12 @@ class BaseSink
   _CLASS_GOBJECT(BaseSink, GstBaseSink, GST_BASE_SINK, Element, GstElement)
 
 public:
-  _WRAP_METHOD_DOCS_ONLY(gst_base_sink_query_latency)
-  bool query_latency(bool& live, bool& upstream_live, Gst::ClockTime& min_latency,
-    Gst::ClockTime& max_latency) const;
+  _WRAP_METHOD(bool query_latency(bool& live, bool& upstream_live, Gst::ClockTime& min_latency, Gst::ClockTime& max_latency) const, gst_base_sink_query_latency)
   _WRAP_METHOD(Gst::ClockTime get_latency() const, gst_base_sink_get_latency)
   _WRAP_METHOD(Gst::FlowReturn do_preroll(const Glib::RefPtr<Gst::MiniObject>& obj), gst_base_sink_do_preroll)
   _WRAP_METHOD(Gst::FlowReturn wait_preroll(), gst_base_sink_wait_preroll)
-  _WRAP_METHOD(Gst::ClockReturn wait_clock(Gst::ClockTime time, Gst::ClockTimeDiff& jitter), gst_base_sink_wait_clock)
-  _WRAP_METHOD(Gst::FlowReturn wait(Gst::ClockTime time, Gst::ClockTimeDiff& jitter), gst_base_sink_wait)
-
-  /** This function will block until time is reached.  It is usually called by
-   * subclasses that use their own internal synchronisation.
-   *
-   * If time is not valid, no sycnhronisation is done and Gst::CLOCK_BADTIME is
-   * returned. Likewise, if synchronisation is disabled in the element or there
-   * is no clock, no synchronisation is done and Gst::CLOCK_BADTIME is
-   * returned.
-   *
-   * This function should only be called with the PREROLL_LOCK held, like when
-   * receiving an EOS event in the event vmethod or when receiving a buffer in
-   * the render vmethod.
-   *
-   * The time argument should be the running_time of when this method should
-   * return and is not adjusted with any latency or offset configured in the
-   * sink.
-   *
-   * Since 0.10.20.
-   *
-   * @param time The running_time to be reached.
-   * @return Gst::ClockReturn.
-   */
-  Gst::ClockReturn wait_clock(Gst::ClockTime time);
-
-
-  /** This function will block until time is reached.  It is usually called by
-   * subclasses that use their own internal synchronisation but want to let the
-   * EOS be handled by the base class.
-   *
-   * This function should only be called with the PREROLL_LOCK held, like when
-   * receiving an EOS event in the event vmethod.
-   *
-   * The time argument should be the running_time of when the EOS should happen
-   * and will be adjusted with any latency and offset configured in the sink.
-   * 
-   * Since 0.10.15.
-   * 
-   * @param time The running time to be reached.
-   * @return Gst::FlowReturn.
-   */
-  Gst::FlowReturn wait(Gst::ClockTime time);
+  _WRAP_METHOD(Gst::ClockReturn wait_clock(Gst::ClockTime time, Gst::ClockTimeDiff& jitter{?}), gst_base_sink_wait_clock)
+  _WRAP_METHOD(Gst::FlowReturn wait(Gst::ClockTime time, Gst::ClockTimeDiff& jitter{?}), gst_base_sink_wait)
 
   _WRAP_METHOD(void set_sync(bool sync), gst_base_sink_set_sync)
   _WRAP_METHOD(bool get_sync() const, gst_base_sink_get_sync)
@@ -193,7 +150,7 @@ public:
   _WRAP_METHOD(void set_qos_enabled(bool enabled), gst_base_sink_set_qos_enabled)
   _WRAP_METHOD(bool is_qos_enabled() const, gst_base_sink_is_qos_enabled)
 
-  _WRAP_METHOD(void set_async_enabled(bool enabled), gst_base_sink_set_async_enabled) 
+  _WRAP_METHOD(void set_async_enabled(bool enabled), gst_base_sink_set_async_enabled)
   _WRAP_METHOD(bool is_async_enabled() const, gst_base_sink_is_async_enabled)
 
   _WRAP_METHOD(void set_ts_offset(Gst::ClockTimeDiff offset), gst_base_sink_set_ts_offset)
@@ -219,6 +176,8 @@ public:
   /** Gets the sink Gst::Pad object of the element.
    */
   _MEMBER_GET_GOBJECT(sink_pad, sinkpad, Gst::Pad, GstPad*)
+
+  // TODO: wrap preroll?
 
   _WRAP_PROPERTY("async", bool)
   _WRAP_PROPERTY("max-lateness", gint64)
@@ -250,25 +209,32 @@ public:
 
   /** Start processing. Ideal for opening resources in the subclass.
    */
-  virtual bool start_vfunc();
+  _WRAP_VFUNC(bool start(), "start", return_value true)
 
   /** Stop processing. Subclasses should use this to close resources.
    */
-  virtual bool stop_vfunc();
+  _WRAP_VFUNC(bool stop(), "stop", return_value true)
 
   /** Unlock any pending access to the resource. Subclasses should unblock any
    * blocked function ASAP.
    */
-  virtual bool unlock_vfunc();
+  _WRAP_VFUNC(bool unlock(), "unlock", return_value true)
 
 #m4 _CONVERSION(`GstEvent*', `const Glib::RefPtr<Gst::Event>&', `Glib::wrap($3, true)')
   /** Override this to handle events arriving on the sink pad.
    */
   _WRAP_VFUNC(bool event(const Glib::RefPtr<Gst::Event>& event), "event", return_value true)
 
+  /** Override this to implement custom logic to wait for the event time (for events
+   * like EOS and GAP). Subclasses should always first chain up to the default
+   * implementation.
+   */
+  _WRAP_VFUNC(FlowReturn wait_event(const Glib::RefPtr<Gst::Event>& event), "wait_event")
+
   /** Called to present the preroll buffer if desired.
    */
   _WRAP_VFUNC(FlowReturn preroll(const Glib::RefPtr<Gst::Buffer>& buffer), "preroll")
+
 
   /** Called when a buffer should be presented or output, at the correct moment
    * if the Gst::BaseSink has been set to sync to the clock.
@@ -286,7 +252,7 @@ public:
    * Called after actually activating the sink pad in pull mode. The default
    * implementation starts a task on the sink pad. 
    */
-  virtual bool activate_pull_vfunc(bool active);
+  _WRAP_VFUNC(bool activate_pull(bool active), "activate_pull", return_value true)
 
   /** Only useful in pull mode, this vmethod will be called in response to
    * Gst::Pad::fixate_caps() being called on the sink pad. Implement if you
@@ -298,26 +264,42 @@ public:
   /** Clear the previous unlock request. Subclasses should clear any state they
    * set during unlock_vfunc(), such as clearing command queues.
    */
-  virtual bool unlock_stop_vfunc();
+  _WRAP_VFUNC(bool unlock_stop(), "unlock_stop", return_value true)
 
 #m4 _CONVERSION(`GstBufferList*', `const Glib::RefPtr<Gst::BufferList>&', `Glib::wrap($3, true)')
   /// Render a BufferList.
-  _WRAP_VFUNC(FlowReturn render_list(const Glib::RefPtr<Gst::BufferList>& buffer_list), render_list)
+  /** Same as render but used with buffer lists instead of buffers.
+   */
+  _WRAP_VFUNC(FlowReturn render_list(const Glib::RefPtr<Gst::BufferList>& buffer_list), "render_list")
+
+  /** Called to prepare the buffer for render and preroll.
+   * This function is called before synchronisation is performed.
+   */
+  _WRAP_VFUNC(FlowReturn prepare(const Glib::RefPtr<Gst::Buffer>& buffer), "prepare")
+
+  /** Called to prepare the buffer list for render_list.
+   * This function is called before synchronisation is performed.
+   */
+  _WRAP_VFUNC(FlowReturn prepare_list(const Glib::RefPtr<Gst::BufferList>& buffer_list), "prepare_list")
+
+  // Cannot use query_vfunc because the name has been used in the Gst::Element class.
+  // We have to provide custom implementation, because query vfunc expects writable
+  // query object.
+  /** Perform a GstQuery on the element.
+   */
+  virtual bool base_sink_query_vfunc(const Glib::RefPtr<Gst::Query>& query);
+
+  /** Configure the allocation query.
+   */
+#m4 _CONVERSION(`GstQuery*', `const Glib::RefPtr<Gst::Query>&', `Glib::wrap($3, true)')
+  _WRAP_VFUNC(bool propose_allocation(const Glib::RefPtr<Gst::Query>& query), "propose_allocation")
 
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->start = &start_vfunc_callback;
-  klass->stop = &stop_vfunc_callback;
-  klass->unlock = &unlock_vfunc_callback;
-  klass->activate_pull = &activate_pull_vfunc_callback;
-  klass->unlock_stop = &unlock_stop_vfunc_callback;
+  klass->query = &query_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
-  static gboolean start_vfunc_callback(GstBaseSink* self);
-  static gboolean stop_vfunc_callback(GstBaseSink* self);
-  static gboolean unlock_vfunc_callback(GstBaseSink* self);
-  static gboolean activate_pull_vfunc_callback(GstBaseSink* self, gboolean active);
-  static gboolean unlock_stop_vfunc_callback(GstBaseSink* self);
+  static gboolean query_vfunc_callback(GstBaseSink* self, GstQuery* query);
   _POP()
 #m4end
 };
