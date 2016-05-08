@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,8 @@ _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
+
+_WRAP_ENUM(BaseSrcFlags, GstBaseSrcFlags, NO_GTYPE)
 
 /** A base class for getrange based source elements.
  * This is a generice base class for source elements. The following types of
@@ -134,7 +136,7 @@ namespace Gst
  * The old behaviour for controlled shutdown introduced since GStreamer 0.10.3
  * is still available but deprecated as it is dangerous and less flexible.
  *
- * Last reviewed on 2007-12-19 (0.10.16).
+ * Last reviewed on 2016-05-05 (1.8.0).
  *
  * @ingroup GstBaseClasses
  */
@@ -148,11 +150,7 @@ public:
   _WRAP_METHOD(bool is_live() const, gst_base_src_is_live)
   _WRAP_METHOD(void set_live(bool live), gst_base_src_set_live)
   _WRAP_METHOD(void set_format(Format format), gst_base_src_set_format)
-
-  _WRAP_METHOD_DOCS_ONLY(gst_base_src_query_latency)
-  bool query_latency(bool& live, Gst::ClockTime& min_latency,
-    Gst::ClockTime& max_latency) const;
-
+  _WRAP_METHOD(bool query_latency(bool& live, Gst::ClockTime& min_latency, Gst::ClockTime& max_latency) const, gst_base_src_query_latency)
   _WRAP_METHOD(guint get_blocksize() const, gst_base_src_get_blocksize)
   _WRAP_METHOD(void set_blocksize(guint blocksize), gst_base_src_set_blocksize)
   _WRAP_METHOD(bool get_do_timestamp() const, gst_base_src_get_do_timestamp)
@@ -166,6 +164,11 @@ public:
   _WRAP_METHOD(void start_complete(Gst::FlowReturn ret), gst_base_src_start_complete)
   _WRAP_METHOD(void set_automatic_eos(bool automatic_eos), gst_base_src_set_automatic_eos)
 
+  /** Returns the memory @a allocator used by the base class and its @a params.
+   *
+   * @param params The Gst::AllocationParams of @a allocator.
+   * @return The Gst::Allocator used.
+   */
   Glib::RefPtr<Gst::Allocator> get_allocator(Gst::AllocationParams& params);
   _IGNORE(gst_base_src_get_allocator)
 
@@ -232,10 +235,12 @@ public:
    */
   virtual bool do_seek_vfunc(Gst::Segment& segment); 
 
-#m4 _CONVERSION(`GstQuery*', `const Glib::RefPtr<Gst::Query>&', `Glib::wrap($3, true)')
+  // Cannot use query_vfunc because the name has been used in the Gst::Element class.
+  // We have to provide custom implementation, because query vfunc expects writable
+  // query object.
   /** Handle a requested query.
    */
-  //_WRAP_VFUNC(bool query(const Glib::RefPtr<Gst::Query>& query) const, "query")
+  virtual bool base_src_query_vfunc(const Glib::RefPtr<Gst::Query>& query);
 
   /** Called during negotiation if caps need fixating. Implement instead of
    * setting a fixate function on the source pad.
@@ -255,16 +260,34 @@ public:
    */
    virtual bool prepare_seek_segment_vfunc(const Glib::RefPtr<Gst::Event>& seek, Gst::Segment& segment);
 
+#m4 _CONVERSION(`GstQuery*', `const Glib::RefPtr<Gst::Query>&', `Glib::wrap($3, true)')
+  /** Configure the allocation query.
+   */
+  _WRAP_VFUNC(bool decide_allocation(const Glib::RefPtr<Gst::Query>& query), "decide_allocation")
+
+  /** Ask the subclass to allocate a buffer with for offset and size. The default
+   * implementation will create a new buffer from the negotiated allocator.
+   */
+  Gst::FlowReturn alloc_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer);
+
+  /** Ask the subclass to fill the buffer with data for offset and size. The passed
+   * buffer is guaranteed to hold the requested amount of bytes.
+   */
+  _WRAP_VFUNC(Gst::FlowReturn fill(guint64 offset, guint size, const Glib::RefPtr<Gst::Buffer>& buffer), "fill")
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->do_seek = &do_seek_vfunc_callback;
   klass->prepare_seek_segment = &prepare_seek_segment_vfunc_callback;
   klass->create = &create_vfunc_callback;
+  klass->query = &query_vfunc_callback;
+  klass->alloc = &alloc_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static gboolean do_seek_vfunc_callback(GstBaseSrc* self, GstSegment* segment);
   static gboolean prepare_seek_segment_vfunc_callback(GstBaseSrc* self, GstEvent* seek, GstSegment* segment);
   static GstFlowReturn create_vfunc_callback(GstBaseSrc* self, guint64 offset, guint size, GstBuffer** buf);
+  static gboolean query_vfunc_callback(GstBaseSrc* self, GstQuery* query);
+  static GstFlowReturn alloc_vfunc_callback(GstBaseSrc* self, guint64 offset, guint size, GstBuffer** buf);
   _POP()
 #m4end
 };

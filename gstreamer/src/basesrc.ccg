@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,19 +24,6 @@ _PINCLUDE(gstreamermm/private/element_p.h)
 
 namespace Gst
 {
-
-bool BaseSrc::query_latency(bool& live, ClockTime& min_latency,
-  ClockTime& max_latency) const
-{
-  gboolean gst_live = 0;
-
-  const bool result =
-    gst_base_src_query_latency(const_cast<GstBaseSrc*>(gobj()),
-    &gst_live, static_cast<GstClockTime*>(&min_latency),
-    static_cast<GstClockTime*>(&max_latency));
-  live = gst_live;
-  return result;
-}
 
 gboolean BaseSrc_Class::do_seek_vfunc_callback(GstBaseSrc* self, GstSegment* segment)
 {
@@ -209,5 +196,128 @@ Glib::RefPtr<Allocator> BaseSrc::get_allocator(AllocationParams& params)
   gst_base_src_get_allocator(gobj(), &alloc, params.gobj());
   return Glib::wrap(alloc, false);
 }
+
+gboolean BaseSrc_Class::query_vfunc_callback(GstBaseSrc* self, GstQuery* query)
+{
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        // Call the virtual member method, which derived classes might override.
+	auto query_cpp = Glib::wrap(query, false);
+        int ret = static_cast<int>(obj->base_src_query_vfunc(query_cpp));
+	query_cpp.release();
+	return ret;
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->query)
+  {
+    gboolean retval = (*base->query)(self, query);
+    return retval;
+  }
+
+  typedef gboolean RType;
+  return RType();
+}
+
+bool Gst::BaseSrc::base_src_query_vfunc(const Glib::RefPtr<Gst::Query>& query)
+{
+  const auto base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->query)
+  {
+    bool retval((*base->query)(const_cast<GstBaseSrc*>(gobj()),Glib::unwrap(query)));
+    return retval;
+  }
+
+  typedef bool RType;
+  return RType();
+}
+
+GstFlowReturn BaseSrc_Class::alloc_vfunc_callback(GstBaseSrc* self, guint64 offset, guint size, GstBuffer** buf)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        Glib::RefPtr<Gst::Buffer> cpp_buffer;
+        // Call the virtual member method, which derived classes might override.
+        GstFlowReturn const result = static_cast<GstFlowReturn>(obj->alloc_vfunc(offset, size, cpp_buffer));
+        *buf = cpp_buffer ? cpp_buffer->gobj_copy() : 0;
+        return result;
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  // Call the original underlying C function:
+  if(base && base->alloc)
+    return (*base->alloc)(self, offset, size, buf);
+
+
+  typedef GstFlowReturn RType;
+  return RType();
+}
+FlowReturn Gst::BaseSrc::alloc_vfunc(guint64 offset, guint size, Glib::RefPtr<Gst::Buffer>& buffer)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->alloc)
+  {
+    GstBuffer* gst_buffer = NULL;
+    Gst::FlowReturn const result =
+      static_cast<FlowReturn>((*base->alloc)(gobj(),offset, size,&gst_buffer));
+    buffer = Glib::wrap(gst_buffer, false); // Don't take copy because callback returns a newly created copy.
+    return result;
+  }
+
+  typedef FlowReturn RType;
+  return RType();
+}
+
 
 } // namespace Gst
