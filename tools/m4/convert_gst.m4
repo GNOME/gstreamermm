@@ -125,6 +125,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::BufferList>&', `GstBufferList*', `Glib::unw
 dnl Bus
 _CONVERSION(`const Glib::RefPtr<Gst::Bus>&',`GstBus*', `Glib::unwrap($3)')
 _CONVERSION(`GstBus*',`Glib::RefPtr<Gst::Bus>',`Glib::wrap($3)')
+_CONVERSION(`GstBus*',`Glib::RefPtr<const Gst::Bus>',`Glib::wrap($3)')
 
 dnl Caps
 _CONVERSION(`GstCaps*',`Glib::RefPtr<Gst::Caps>',`Glib::wrap($3)')
