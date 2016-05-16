@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008-2015 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,12 +22,11 @@
 namespace Gst
 {
 
-bool ChildProxy::lookup(const Glib::RefPtr<Gst::ChildProxy>& object,
-  const Glib::ustring& name, Glib::RefPtr<Glib::Object>& target,
+bool ChildProxy::lookup(const Glib::ustring& name, Glib::RefPtr<Glib::Object>& target,
   GParamSpec*& pspec)
 {
   GObject* g_object = nullptr;
-  bool const result = gst_child_proxy_lookup(Glib::unwrap(object),
+  bool const result = gst_child_proxy_lookup(gobj(),
     name.c_str(), &g_object, &pspec);
   target = Glib::wrap(g_object);
   return result;
