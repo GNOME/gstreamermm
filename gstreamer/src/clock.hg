@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008-2015 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -209,7 +209,7 @@ guint get_fractional_seconds(Gst::ClockTime time);
  * calibrating and "window-threshold" defines the minimum number of samples
  * before the calibration is performed.
  *
- * Last reviewed on 2015-08-27 (1.5.2)
+ * Last reviewed on 2016-05-16 (1.8.0)
  */
 class Clock : public Object
 {
@@ -232,6 +232,7 @@ public:
   _WRAP_METHOD(Gst::ClockTime adjust_unlocked(Gst::ClockTime internal_time), gst_clock_adjust_unlocked)
   _WRAP_METHOD(Gst::ClockTime unadjust_unlocked(Gst::ClockTime external_time), gst_clock_unadjust_unlocked)
   _WRAP_METHOD(Gst::ClockTime adjust_with_calibration(Gst::ClockTime internal_target, Gst::ClockTime cinternal, Gst::ClockTime cexternal, Gst::ClockTime cnum, Gst::ClockTime cdenom), gst_clock_adjust_with_calibration)
+  _WRAP_METHOD(Gst::ClockTime unadjust_with_calibration(Gst::ClockTime external_target, Gst::ClockTime cinternal, Gst::ClockTime cexternal, Gst::ClockTime cnum, Gst::ClockTime cdenom), gst_clock_unadjust_with_calibration)
   _WRAP_METHOD(void get_calibration(Gst::ClockTime& internal, Gst::ClockTime& external, Gst::ClockTime& rate_num, Gst::ClockTime& rate_denom) const, gst_clock_get_calibration)
   _WRAP_METHOD(void set_calibration(Gst::ClockTime internal, Gst::ClockTime external, Gst::ClockTime rate_num, Gst::ClockTime rate_denom), gst_clock_set_calibration)
   _WRAP_METHOD(bool wait_for_sync(Gst::ClockTime timeout), gst_clock_wait_for_sync)
@@ -273,6 +274,8 @@ public:
   /** Unblock a blocking or async wait operation.
    */
   _WRAP_VFUNC(void unschedule(const Glib::RefPtr<Gst::ClockID>& id), "unschedule")
+
+  _WRAP_SIGNAL(void synced(bool synced), "synced", no_default_handler)
 };
 
 } //namespace Gst
