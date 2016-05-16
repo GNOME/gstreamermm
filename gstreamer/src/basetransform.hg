@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -124,6 +124,8 @@ namespace Gst
  *           - Implied TRUE if no transform function is implemented.
  *           - Implied FALSE if ONLY transform function is implemented.
  *
+ * Last reviewed on 2016-05-16 (1.8.0).
+ *
  * @ingroup GstBaseClasses
 **/
 class BaseTransform
@@ -140,6 +142,11 @@ public:
    */
   static const Glib::ustring SRC_NAME;
 
+  /** A Gst::FlowReturn that can be returned from transform_vfunc and transform_ip_vfunc
+   * to indicate that no output buffer was generated.
+   */
+  static constexpr Gst::FlowReturn FLOW_DROPPED = static_cast<Gst::FlowReturn>(GST_BASE_TRANSFORM_FLOW_DROPPED);
+
   _WRAP_METHOD(bool is_passthrough() const, gst_base_transform_is_passthrough)
   _WRAP_METHOD(void set_passthrough(bool passthrough), gst_base_transform_set_passthrough)
   _WRAP_METHOD(bool is_in_place() const, gst_base_transform_is_in_place)
@@ -151,7 +158,12 @@ public:
   _WRAP_METHOD(void reconfigure_sink(), gst_base_transform_reconfigure_sink)
   _WRAP_METHOD(void reconfigure_src(), gst_base_transform_reconfigure_src)
   _WRAP_METHOD(void set_prefer_passthrough(bool prefer_passthrough), gst_base_transform_set_prefer_passthrough)
+  _WRAP_METHOD(bool update_src_caps(const Glib::RefPtr<Gst::Caps>& updated_caps), gst_base_transform_update_src_caps)
 
+  /* Return the memory @allocator used by the base class and its @a params.
+   * @param params The Gst::AllocationParams of the allocator.
+   * @return A Gst::Allocator used.
+   */
   Glib::RefPtr<Gst::Allocator> get_allocator(Gst::AllocationParams& params);
   _IGNORE(gst_base_transform_get_allocator)
 
@@ -214,17 +226,23 @@ public:
    */
   virtual FlowReturn prepare_output_buffer_vfunc(const Glib::RefPtr<Gst::Buffer>& input, Glib::RefPtr<Gst::Buffer>& buffer);
 
-  /** Optional. Event handler on the source pad.
+  /** Optional. Event handler on the source pad. The default implementation
+   * handles the event and forwards it downstream.
    */
   _WRAP_VFUNC(bool src_event(const Glib::RefPtr<Gst::Event>& event), "src_event")
 
-  /** Optional. Since 0.10.22 This method is called right before the base class
+  /** Optional. Event handler on the sink pad. The default implementation handles
+   * the event and forwards it downstream.
+   */
+  _WRAP_VFUNC(bool sink_event(const Glib::RefPtr<Gst::Event>& event), "sink_event")
+
+  /** Optional. This method is called right before the base class
    * will start processing. Dynamic properties or other delayed configuration
    * could be performed in this method.
    */
   _WRAP_VFUNC(void before_transform(const Glib::RefPtr<Gst::Buffer>& buffer), "before_transform")
 
-  /** Optional. Since 0.10.30 Subclasses can override this method to check if
+  /** Optional. Subclasses can override this method to check if
    * the caps can be handled by the element. The default implementation might
    * not be the most optimal way to check this in all cases.
    */
@@ -239,18 +257,81 @@ public:
    * external resources.
    */
   _WRAP_VFUNC(bool stop(), "stop", return_value true)
+
+#m4 _CONVERSION(`GstQuery*', `const Glib::RefPtr<Gst::Query>&', `Glib::wrap($3, true)')
+
+  /** Setup the allocation parameters for allocating output buffers. The passed
+   * in query contains the result of the downstream allocation query.This function
+   * is only called when not operating in passthrough mode. The default implementation
+   * will remove all memory dependent metadata. If there is a filter_meta method
+   * implementation, it will be called for all metadata API in the downstream query,
+   * otherwise the metadata API is removed.
+   */
+  _WRAP_VFUNC(bool decide_allocation(const Glib::RefPtr<Gst::Query>& query), "decide_allocation")
+
+  /** Return TRUE if the metadata API should be proposed in the upstream allocation query.
+   * The default implementation is NULL and will cause all metadata to be removed.
+   */
+  _WRAP_VFUNC(bool filter_meta(const Glib::RefPtr<Gst::Query>& query, GType api, const Gst::Structure& params), "filter_meta", return_value true)
+
+  /** Propose buffer allocation parameters for upstream elements. This function must
+   * be implemented if the element reads or writes the buffer content.
+   * The query that was passed to the decide_allocation is passed in this method (or nullptr
+   * when the element is in passthrough mode). The default implementation will pass the
+   * query downstream when in passthrough mode and will copy all the filtered metadata API
+   * in non-passthrough mode.
+   */
+  _WRAP_VFUNC(bool propose_allocation(const Glib::RefPtr<Gst::Query>& decide_query, const Glib::RefPtr<Gst::Query>& query), "propose_allocation")
+
+  #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
+
+  /** Function which accepts a new input buffer and pre-processes it. The default
+   * implementation performs caps (re)negotiation, then QoS if needed, and places
+   * the input buffer into the queued_buf member variable. If the buffer is dropped
+   * due to QoS, it returns Gst::BASE_TRANSFORM_FLOW_DROPPED. If this input buffer
+   * is not contiguous with any previous input buffer, then is_discont is set to TRUE.
+   */
+  _WRAP_VFUNC(Gst::FlowReturn submit_input_buffer(bool is_discont, const Glib::RefPtr<Gst::Buffer>& input), "submit_input_buffer")
+
+  /** Called after each new input buffer is submitted repeatedly until it either generates
+   * an error or fails to generate an output buffer. The default implementation takes the
+   * contents of the queued_buf variable, generates an output buffer if needed by calling
+   * the class prepare_output_buffer, and then calls either transform or transform_ip.
+   * Elements that don't do 1-to-1 transformations on input to output buffers can either
+   * return Gst::BASE_TRANSFORM_FLOW_DROPPED or simply not generate an output buffer until
+   * they are ready to do so.
+   */
+  virtual Gst::FlowReturn generate_output_vfunc(Glib::RefPtr<Gst::Buffer>& buffer);
+
+  // TODO: wrap GstMeta first.
+  //_WRAP_VFUNC(bool transform_meta(const Glib::RefPtr<Gst::Buffer>& outbuf, const Glib::RefPtr<Gst::Meta>& meta, const Glib::RefPtr<Gst::Buffer>& inbuf), "transform_meta")
+
+  /** Optional. Copy the metadata from the input buffer to the output buffer.
+   * The default implementation will copy the flags, timestamps and offsets of the buffer.
+   */
+  _WRAP_VFUNC(bool copy_metadata(const Glib::RefPtr<Gst::Buffer>& input, const Glib::RefPtr<Gst::Buffer>& outbuf), "copy_metadata")
+
+  /** Optional. Handle a requested query. Subclasses that implement this should must chain up to
+   * the parent if they didn't handle the query
+   */
+  bool base_transform_query_vfunc(Gst::PadDirection direction, const Glib::RefPtr<Gst::Query>& query);
+
 protected:
 #m4begin
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->start = &start_vfunc_callback;
-  klass->stop = &stop_vfunc_callback;
   klass->prepare_output_buffer = &prepare_output_buffer_vfunc_callback;
   klass->transform = &transform_vfunc_callback;
+  klass->generate_output = &generate_output_vfunc_callback;
+  klass->generate_output = &generate_output_vfunc_callback;
+  klass->query = &query_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer** buf);
   static GstFlowReturn transform_vfunc_callback(GstBaseTransform* self, GstBuffer* inbuf, GstBuffer* outbuf);
+  static GstFlowReturn generate_output_vfunc_callback(GstBaseTransform* self, GstBuffer** outbuf);
+  static gboolean query_vfunc_callback(GstBaseTransform* self, GstPadDirection direction, GstQuery* query);
   _POP()
 #m4end
 };
 
 } //namespace Gst
+
