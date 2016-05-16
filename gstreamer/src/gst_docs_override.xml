@@ -162,4 +162,176 @@ members must be set.
 <return></return>
 </function>
 
+<function name="gst_bus_poll">
+<description>
+Poll the bus for messages. Will block while waiting for messages to come.
+You can specify a maximum time to poll with the @timeout parameter. If
+@timeout is negative, this function will block indefinitely.
+
+All messages not in @events will be popped off the bus and will be ignored.
+It is not possible to use message enums beyond #GST_MESSAGE_EXTENDED in the
+@events mask
+
+Because poll is implemented using the &quot;message&quot; signal enabled by
+gst_bus_add_signal_watch(), calling gst_bus_poll() will cause the &quot;message&quot;
+signal to be emitted for every message that poll sees. Thus a &quot;message&quot;
+signal handler will see the same messages that this function sees -- neither
+will steal messages from the other.
+
+This function will run a main loop from the default main context when
+polling.
+
+You should never use this function, since it is pure evil. This is
+especially true for GUI applications based on Gtk+ or Qt, but also for any
+other non-trivial application that uses the GLib main loop. As this function
+runs a GLib main loop, any callback attached to the default GLib main
+context may be invoked. This could be timeouts, GUI events, I/O events etc.;
+even if gst_bus_poll() is called with a 0 timeout. Any of these callbacks
+may do things you do not expect, e.g. destroy the main application window or
+some other resource; change other application state; display a dialog and
+run another main loop until the user clicks it away. In short, using this
+function may add a lot of complexity to your code through unexpected
+re-entrancy and unexpected changes to your application's state.
+
+For 0 timeouts use gst_bus_pop_filtered() instead of this function; for
+other short timeouts use gst_bus_timed_pop_filtered(); everything else is
+better handled by setting up an asynchronous bus watch and doing things
+from there.
+
+
+</description>
+<parameters>
+<parameter name="bus">
+<parameter_description> a #GstBus
+</parameter_description>
+</parameter>
+<parameter name="events">
+<parameter_description> a mask of #GstMessageType, representing the set of message types to
+poll for (note special handling of extended message types below)
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> the poll timeout, as a #GstClockTime, or #GST_CLOCK_TIME_NONE to poll
+indefinitely.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the message that was received,
+or %NULL if the poll timed out. The message is taken from the
+bus.
+</return>
+</function>
+
+<function name="gst_bus_pop">
+<description>
+Get a message from the bus.
+
+
+</description>
+<parameters>
+<parameter name="bus">
+<parameter_description> a #GstBus to pop
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstMessage that is on the
+bus, or %NULL if the bus is empty. The message is taken from
+the bus.
+
+MT safe.
+</return>
+</function>
+
+<function name="gst_bus_pop_filtered">
+<description>
+Get a message matching @type from the bus.  Will discard all messages on
+the bus that do not match @type and that have been posted before the first
+message that does match @type.  If there is no message matching @type on
+the bus, all messages will be discarded. It is not possible to use message
+enums beyond #GST_MESSAGE_EXTENDED in the @events mask.
+
+
+</description>
+<parameters>
+<parameter name="bus">
+<parameter_description> a #GstBus to pop
+</parameter_description>
+</parameter>
+<parameter name="types">
+<parameter_description> message types to take into account
+</parameter_description>
+</parameter>
+</parameters>
+<return> the next #GstMessage matching
+@type that is on the bus, or %NULL if the bus is empty or there
+is no message matching @type. The message is taken from the bus.
+
+MT safe.
+</return>
+</function>
+
+<function name="gst_bus_timed_pop">
+<description>
+Get a message from the bus, waiting up to the specified timeout.
+
+If @timeout is 0, this function behaves like gst_bus_pop(). If @timeout is
+#GST_CLOCK_TIME_NONE, this function will block forever until a message was
+posted on the bus.
+
+
+</description>
+<parameters>
+<parameter name="bus">
+<parameter_description> a #GstBus to pop
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> a timeout
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GstMessage that is on the
+bus after the specified timeout or %NULL if the bus is empty
+after the timeout expired.  The message is taken from the bus.
+
+MT safe.
+</return>
+</function>
+
+
+<function name="gst_bus_timed_pop_filtered">
+<description>
+Get a message from the bus whose type matches the message type mask @types,
+waiting up to the specified timeout (and discarding any messages that do not
+match the mask provided).
+
+If @timeout is 0, this function behaves like gst_bus_pop_filtered(). If
+@timeout is #GST_CLOCK_TIME_NONE, this function will block forever until a
+matching message was posted on the bus.
+
+
+</description>
+<parameters>
+<parameter name="bus">
+<parameter_description> a #GstBus to pop from
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> a timeout in nanoseconds, or GST_CLOCK_TIME_NONE to wait forever
+</parameter_description>
+</parameter>
+<parameter name="types">
+<parameter_description> message types to take into account, GST_MESSAGE_ANY for any type
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GstMessage matching the
+filter in @types, or %NULL if no matching message was found on
+the bus until the timeout expired. The message is taken from
+the bus.
+
+MT safe.
+</return>
+</function>
+
 </root>
