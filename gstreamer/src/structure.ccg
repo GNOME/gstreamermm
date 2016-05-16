@@ -84,6 +84,13 @@ Structure::operator const void*() const
   return gobject_ ? GINT_TO_POINTER(1) : nullptr;
 }
 
+GstStructure* Structure::release() noexcept
+{
+  GstStructure *tmp = gobj();
+  gobject_ = nullptr;
+  return tmp;
+}
+
 void Structure::get_field(const Glib::ustring& name, Glib::ValueBase& value) const
 {
   value.init(gst_structure_get_value(gobj(), name.c_str()));

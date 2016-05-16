@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,17 +17,19 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gst/gst.h>
 #include <gstreamermm/miniobject.h>
-#include <gstreamermm/structure.h>
-#include <gstreamermm/capsfeatures.h>
 
 _DEFS(gstreamermm,gst)
 
+
 namespace Gst
 {
-
 _WRAP_ENUM(CapsIntersectMode, GstCapsIntersectMode, NO_GTYPE)
+
+_WRAP_ENUM(CapsFlags, GstCapsFlags)
+
+class Structure;
+class CapsFeatures;
 
 /** Structure describing sets of media formats.
  * Caps (capabilities) are lightweight refcounted objects describing media types.
@@ -63,6 +65,9 @@ _WRAP_ENUM(CapsIntersectMode, GstCapsIntersectMode, NO_GTYPE)
  * support one level of nesting. Using more levels will lead to unexpected
  * behavior when using serialization features, such as Gst::Caps::to_string() or
  * gst_value_serialize() and their counterparts.
+ *
+ * Last reviewed on 2016-05-16 (1.8.0)
+ *
  */
 class Caps : public MiniObject
 {
@@ -110,8 +115,8 @@ public:
    * @param structure The Gst::Structure to append.
    */
   void append_structure(const Structure& structure);
-  _IGNORE(gst_caps_append_structure)
 
+  _WRAP_METHOD(void append_structure(Gst::Structure&& structure), gst_caps_append_structure)
 
   /** Appends a structure to caps.
    *

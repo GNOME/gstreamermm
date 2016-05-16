@@ -14,6 +14,7 @@ _CONV_ENUM(Gst,AudioFormat)
 _CONV_ENUM(Gst,AudioFormatFlags)
 _CONV_ENUM(Gst,AudioRingBufferFormatType)
 _CONV_ENUM(Gst,BaseSrcFlags)
+_CONV_ENUM(Gst,CapsFlags)
 _CONV_ENUM(Gst,CapsIntersectMode)
 _CONV_ENUM(Gst,ClockEntryType)
 _CONV_ENUM(Gst,ClockReturn)
@@ -299,6 +300,8 @@ _CONVERSION(`GstStructure*', `Gst::Structure', `Glib::wrap($3)')
 _CONVERSION(`const Gst::Structure&',`const GstStructure*',`$3.gobj()')
 _CONVERSION(`const GstStructure*',`Gst::Structure', `Glib::wrap($3, false)')
 _CONVERSION(`const GstStructure*',`const Gst::Structure&', `Glib::wrap(const_cast<GstStructure*>($3), false)')
+_CONVERSION(`Gst::Structure&&',`GstStructure*',`($3) ? $3.release() : nullptr')
+
 
 dnl TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')

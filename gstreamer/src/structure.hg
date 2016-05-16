@@ -86,6 +86,17 @@ public:
    */
   operator const void*() const;
 
+  /** Release the ownership of underlying GstStructure instance.
+   *
+   * Gst::Structure's underlying instance is set to nullptr, therefore underlying
+   * object can't be accessed through this Gst::Structure anymore.
+   * @return an underlying instance of GstStructure object.
+   *
+   * Most users should not use release(). It can spoil the automatic destruction
+   * of the managed object.
+   */
+  GstStructure* release() noexcept;
+
   _WRAP_METHOD(Glib::ustring get_name() const, gst_structure_get_name)
   _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_structure_has_name)
   _WRAP_METHOD(void set_name(const Glib::ustring& name), gst_structure_set_name)
