@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,15 @@ _WRAP_ENUM(ColorBalanceType, GstColorBalanceType, NO_GTYPE)
 class ColorBalanceChannel;
 
 /** An interface for adjusting color balance settings.
+ *
+ * This interface is implemented by elements which can perform some color balance
+ * operation on video frames they process. For example, modifying the brightness,
+ * contrast, hue or saturation.
+ *
+ * Example elements are 'xvimagesink' and 'colorbalance'.
+ *
+ * Last reviewed on 2016-05-16 (1.8.0)
+ *
  * @ingroup GstInterfaces
  */
 class ColorBalance : public Glib::Interface
@@ -65,6 +74,10 @@ public:
   /** Gets the value of a Gst::ColorBalanceChannel of the Gst::ColorBalance.
    */
   _WRAP_VFUNC(int get_value(const Glib::RefPtr<const Gst::ColorBalanceChannel>& channel) const, "get_value")
+
+  /** Gets the implementation type.
+   */
+  _WRAP_VFUNC(Gst::ColorBalanceType get_balance_type(), "get_balance_type")
 
 protected:
 #m4begin
