@@ -2,6 +2,7 @@ dnl Copyright 2008 The gstreamermm Development Team
 
 dnl Enums
 _CONV_ENUM(Gst,AssocFlags)
+_CONV_ENUM(Gst,AudioCdSrcMode)
 _CONV_ENUM(Gst,AutoplugSelectResult)
 _CONV_ENUM(Gst,AudioBaseSinkSlaveMethod)
 _CONV_ENUM(Gst,AudioBaseSinkDiscontReason)

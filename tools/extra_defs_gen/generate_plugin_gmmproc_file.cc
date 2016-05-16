@@ -892,7 +892,7 @@ int main(int argc, char** argv)
       cppParentTypeName.compare("BaseSrc") == 0 ||
       cppParentTypeName.compare("BaseTransform") == 0 ||
       cppParentTypeName.compare("Bin") == 0 ||
-      cppParentTypeName.compare("CddaBaseSrc") == 0 ||
+      cppParentTypeName.compare("AudioCdSrc") == 0 ||
       cppParentTypeName.compare("Element") == 0 ||
       cppParentTypeName.compare("Object") == 0 ||
       cppParentTypeName.compare("Pipeline") == 0 ||

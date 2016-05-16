@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
  
-#include <gst/cdda/gstcddabasesrc.h>
+#include <gst/audio/gstaudiocdsrc.h>
 #include <gstreamermm/pushsrc.h>
 #include <gstreamermm/taglist.h>
 #include <glibmm/arrayhandle.h>
@@ -27,13 +27,13 @@ _DEFS(gstreamermm,gst)
 namespace Gst
 {
 
-_WRAP_ENUM(CddaBaseSrcMode,GstCddaBaseSrcMode)
+_WRAP_ENUM(AudioCdSrcMode,GstAudioCdSrcMode)
 
-/** A base class for CD digital audio (CDDA) sources.
- * Provides a base class for CDDA sources, which handles things like seeking,
- * querying, discid calculation, tags, and buffer timestamping.
+/** A base class for CD digital audio (CDDA) sources, which handles
+ * things like seeking, querying, discid calculation, tags, and buffer
+ * timestamping.
  *
- * Gst::CddaBaseSrc registers two Gst::Formats of its own, namely the
+ * Gst::AudioCdSrc registers two Gst::Formats of its own, namely the
  * "track" format and the "sector" format. Applications will usually only find
  * the "track" format interesting. You can retrieve that Gst::Format for use in
  * seek events or queries with Gst::get_format("track").
@@ -60,11 +60,20 @@ _WRAP_ENUM(CddaBaseSrcMode,GstCddaBaseSrcMode)
  * Gst::TAG_CDDA_MUSICBRAINZ_DISCID, Gst::TAG_CDDA_MUSICBRAINZ_DISCID_FULL,
  * among others.
  *
+ * Applications will be informed of the available tracks via a TOC message
+ * on the pipeline's Gst::Bus. The Gst::Toc will contain a Gst::TocEntry for
+ * each track, with information about each track. The duration for each
+ * track can be retrieved via the Gst::TAG_DURATION tag from each entry's
+ * tag list, or calculated via Gst::TocEntry::get_start_stop_times().
+ * The track entries in the TOC will be sorted by track number.
+ *
+ * Last reviewed on 2016-05-16 (1.8.0)
+ *
  * @ingroup GstBaseClasses
  */
-class CddaBaseSrc : public Gst::PushSrc
+class AudioCdSrc : public Gst::PushSrc
 {
-  _CLASS_GOBJECT(CddaBaseSrc, GstCddaBaseSrc, GST_CDDA_BASE_SRC, Gst::PushSrc, GstPushSrc)
+  _CLASS_GOBJECT(AudioCdSrc, GstAudioCdSrc, GST_AUDIO_CD_SRC, Gst::PushSrc, GstPushSrc)
 
 public:
   /** CDDA sources use this function from their start vfunc to announce the
@@ -79,15 +88,15 @@ public:
    */
   bool add_track(guint num, guint start, guint end, bool is_audio = true,
     const Gst::TagList& tags = Gst::TagList());
-  _IGNORE(gst_cdda_base_src_add_track)
+  _IGNORE(gst_audio_cd_src_add_track)
 
   _WRAP_PROPERTY("device", std::string)
-  _WRAP_PROPERTY("mode", CddaBaseSrcMode)
+  _WRAP_PROPERTY("mode", AudioCdSrcMode)
   _WRAP_PROPERTY("track", guint)
 
   /** Virtual function to open a CD device.
    */
-   virtual bool open_vfunc(std::string& device);
+  _WRAP_VFUNC(bool open(const std::string& device), "open")
 
   /** Virtual function to close the device.
    */
@@ -96,27 +105,6 @@ public:
   /** Virtual function to read one sector (LBA).
    */
   _WRAP_VFUNC(Glib::RefPtr<Gst::Buffer> read_sector(gint sector), "read_sector")
-
-  /** Virtual function to get default device.  It is optional and may return
-   * an empty string.
-   */
-  _WRAP_VFUNC(std::string get_default_device() const, "get_default_device")
-
-  /** Virtual function to return array of CD devices.  It is optional and may
-   * return an empty array.
-   */
-  virtual Glib::ArrayHandle<std::string> probe_devices_vfunc();
-
-protected:
-#m4begin
-  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
-  klass->open = &open_vfunc_callback;
-  klass->probe_devices = &probe_devices_vfunc_callback;
-  _SECTION(SECTION_PH_VFUNCS)
-  static gboolean open_vfunc_callback(GstCddaBaseSrc* self, const gchar* device);
-  static gchar** probe_devices_vfunc_callback(GstCddaBaseSrc* self);
-  _POP()
-#m4end
 };
 
 } // namespace Gst
