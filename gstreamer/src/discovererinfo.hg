@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2011 The gstreamermm Development Team
+ * Copyright 2011-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,11 +51,13 @@ namespace Gst
 {
 
 _WRAP_ENUM(DiscovererResult, GstDiscovererResult)
+_WRAP_ENUM(DiscovererSerializeFlags, GstDiscovererSerializeFlags)
 
 class Caps;
 class DiscovererStreamInfo;
 class Structure;
 class TagList;
+class Toc;
 
 /** DiscovererInfo - Class containing the information of a URI analyzed by
  * Gst::Discoverer.
@@ -66,7 +68,9 @@ class DiscovererInfo : public MiniObject
   _STRUCT_NOT_HIDDEN
 
 public:
-  _WRAP_METHOD(ClockTime get_duration() const, gst_discoverer_info_get_duration) 
+  _WRAP_METHOD(Glib::RefPtr<Gst::DiscovererInfo> copy() const, gst_discoverer_info_copy)
+
+  _WRAP_METHOD(ClockTime get_duration() const, gst_discoverer_info_get_duration)
 #m4 _CONVERSION(`const GstStructure*', `Structure', `Glib::wrap(const_cast<GstStructure*>($3), true)')
 
   _WRAP_METHOD(Structure get_misc() const, gst_discoverer_info_get_misc) 
@@ -99,6 +103,14 @@ public:
 
   _WRAP_METHOD(std::vector< Glib::RefPtr<Gst::DiscovererStreamInfo> > get_video_streams(), gst_discoverer_info_get_video_streams)
   _WRAP_METHOD(std::vector< Glib::RefPtr<const Gst::DiscovererStreamInfo> > get_video_streams() const, gst_discoverer_info_get_video_streams)
+
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Gst::DiscovererStreamInfo> > get_subtitle_streams(), gst_discoverer_info_get_subtitle_streams)
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const Gst::DiscovererStreamInfo> > get_subtitle_streams() const, gst_discoverer_info_get_subtitle_streams)
+
+#m4 _CONVERSION(`const gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_missing_elements_installer_details() const, gst_discoverer_info_get_missing_elements_installer_details)
+
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Toc> get_toc() const, gst_discoverer_info_get_toc)
 };
 
 /** DiscovererStreamInfo - Base class for information concerning a media
@@ -138,6 +150,9 @@ public:
   _WRAP_METHOD(Gst::TagList get_tags() const, gst_discoverer_stream_info_get_tags)
 
   _WRAP_METHOD(Glib::ustring get_stream_type_nick() const, gst_discoverer_stream_info_get_stream_type_nick)
+  _WRAP_METHOD(Glib::ustring get_stream_id() const, gst_discoverer_stream_info_get_stream_id)
+
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Toc> get_toc() const, gst_discoverer_stream_info_get_toc)
 };
 
 /** DiscovererContainerInfo - Gst::DiscovererStreamInfo specific to container
@@ -167,6 +182,7 @@ public:
   _WRAP_METHOD(guint get_depth() const, gst_discoverer_audio_info_get_depth)
   _WRAP_METHOD(guint get_max_bitrate() const, gst_discoverer_audio_info_get_max_bitrate)
   _WRAP_METHOD(guint get_sample_rate() const, gst_discoverer_audio_info_get_sample_rate)
+  _WRAP_METHOD(Glib::ustring get_language() const, gst_discoverer_audio_info_get_language)
 };
 
 /** DiscovererVideoInfo - Gst::DiscovererStreamInfo specific to video streams

@@ -314,6 +314,9 @@ _CONVERSION(`const Glib::RefPtr<Gst::TaskPool>&',`GstTaskPool*', `Glib::unwrap($
 _CONVERSION(`GstTaskPool*',`Glib::RefPtr<Gst::TaskPool>',`Glib::wrap($3)')
 _CONVERSION(`GstTaskPool*',`Glib::RefPtr<const Gst::TaskPool>',`Glib::wrap($3)')
 
+dnl Toc
+_CONVERSION(`const GstToc*',`Glib::RefPtr<const Gst::Toc>',`Glib::wrap(const_cast<GstToc*>($3))')
+
 dnl TocEntry
 _CONVERSION(`GstTocEntry*',`Glib::RefPtr<Gst::TocEntry>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::TocEntry>', `GstTocEntry*',`Glib::unwrap($3)')

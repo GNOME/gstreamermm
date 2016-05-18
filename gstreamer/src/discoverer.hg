@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2011 The gstreamermm Development Team
+ * Copyright 2011-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@ namespace Gst
 {
 
 class DiscovererInfo;
+class Element;
 
 /** Discoverer - Utility for discovering information on URIs.
  * The Discoverer is a utility object which allows to get as much information
@@ -37,12 +38,16 @@ class DiscovererInfo;
  * The blocking mode just requires calling discover_uri() with the URI one
  * wishes to discover.
  *
- * The non-blocking mode requires a running Glib::MainLoop in the default
+ * The non-blocking mode requires a running Glib::MainLoop iterating a
  * Glib::MainContext, where one connects to the various signals, appends the
- * URIs to be processed (through discover_uri_async()) and then asks for the
- * discovery to begin (through start()).
+ * URIs to be processed (through discover_uri_async()) and then
+ * asks for the discovery to begin (through start()).
+ * By default this will use the GLib default main context unless you have
+ * set a custom context using Glib::MainContext::push_thread_default().
  *
  * All the information is returned in a DiscovererInfo structure.
+ *
+ * Last reviewed on 2016-05-18 (1.8.0)
  */
 class Discoverer : public Glib::Object 
 {
@@ -68,6 +73,9 @@ public:
 
   _WRAP_SIGNAL(void finished(), "finished")
   _WRAP_SIGNAL(void starting(), "starting")
+
+#m4 _CONVERSION(`GstElement*', `const Glib::RefPtr<Gst::Element>&', `Glib::wrap($3,true)')
+  _WRAP_SIGNAL(void source_setup(const Glib::RefPtr<Gst::Element>& source), "source_setup")
 };
 
 } //namespace Gst
