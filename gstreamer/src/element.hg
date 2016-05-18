@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008-2015 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -126,7 +126,8 @@ Glib::ustring get_name(StateChangeReturn state_ret);
  * toplevel Gst::Pipeline so the clock functions are only to be used in very
  * specific situations.
  *
- * Last reviewed on 2015-08-28 (1.5.2).
+ * Last reviewed on 2016-05-18 (1.8.0).
+ *
  * @ingroup GstBaseClasses
  */
 class Element : public Gst::Object
@@ -287,9 +288,15 @@ public:
   _WRAP_METHOD(bool seek(double rate, Format format, SeekFlags flags, SeekType cur_type, gint64 cur, SeekType stop_type, gint64 stop), gst_element_seek)
 
   _WRAP_METHOD(bool send_event(Glib::RefPtr<Gst::Event>&& event), gst_element_send_event)
-
   /// A send_event() convenience overload. Allows to re-use @event parameter after function call.
   bool send_event(const Glib::RefPtr<Gst::Event>& event);
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Context> get_context(const Glib::ustring& context_type), gst_element_get_context)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Context> get_context_unlocked(const Glib::ustring& context_type), gst_element_get_context_unlocked)
+
+#m4 _CONVERSION(`GList*', `std::vector< Glib::RefPtr<Gst::Context> >', `Glib::ListHandler< Glib::RefPtr<Gst::Context> >::list_to_vector(const_cast<GList*>($3), Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Gst::Context> > get_contexts(), gst_element_get_contexts)
+
 
   _WRAP_SIGNAL(void no_more_pads(), "no-more-pads")
 
@@ -317,6 +324,10 @@ public:
   /** Called by set_state to perform an incremental state change.
    */
   _WRAP_VFUNC(StateChangeReturn change_state(StateChange transition), "change_state")
+
+  /** Called immediately after a new state was set.
+   */
+  _WRAP_VFUNC(void state_changed(Gst::State oldstate, Gst::State newstate, Gst::State pending), "state_changed")
 
 #m4 _CONVERSION(`GstBus*', `const Glib::RefPtr<Gst::Bus>&', `Glib::wrap($3, true)')
   /** Set a Gst::Bus on the element.
@@ -346,11 +357,22 @@ public:
    */
   _WRAP_VFUNC(void set_context(const Glib::RefPtr<Gst::Context>& context), "set_context")
 
+#m4 _CONVERSION(`GstMessage*',`const Glib::RefPtr<Gst::Message>&',`Glib::wrap($3, true)')
+  /** Called when a message is posted on the element.
+   * Chain up to the parent class' handler to have it posted on the bus.
+   */
+  _WRAP_VFUNC(bool post_message(const Glib::RefPtr<Gst::Message>& message), "post_message")
+
   Glib::RefPtr<Gst::PadTemplate> get_pad_template(const Glib::ustring &factory_name) const;
 
   /**
    * Sets specified property. Allows to create property-chain
    * (e.g. element->property("location", "test.ogg")->property("num_buffers", 20);
+   *
+   * @param name The property name.
+   * @param value The property value.
+   *
+   * @return A this element.
    */
   template<typename T>
    Glib::RefPtr<Gst::Element> property(const Glib::ustring& name, const T& value)
