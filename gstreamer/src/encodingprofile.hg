@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,12 +19,23 @@
  
 #include <gst/gst.h>
 #include <gstreamermm/object.h>
-#include <gstreamermm/caps.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
+
+class Caps;
+
+/** Gst::EncodingProfile can be provided to the 'encodebin' element, which will take
+ * care of selecting and setting up the required elements to produce an output stream
+ * conforming to the specifications of the profile.
+ *
+ * TODO update example
+ *
+ * Last reviewed on 2016-05-21 (1.8.0).
+ *
+ */
 class EncodingProfile : public Gst::Object
 {
   _CLASS_GOBJECT(EncodingProfile, GstEncodingProfile, GST_ENCODING_PROFILE, Gst::Object, GstObject)
@@ -52,6 +63,11 @@ public:
   _WRAP_METHOD(bool is_enabled() const, gst_encoding_profile_is_enabled)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_input_caps() const, gst_encoding_profile_get_input_caps)
   _WRAP_METHOD(Glib::ustring get_type_nick() const, gst_encoding_profile_get_type_nick)
+
+  _WRAP_METHOD(bool get_allow_dynamic_output() const, gst_encoding_profile_get_allow_dynamic_output)
+  _WRAP_METHOD(void set_allow_dynamic_output(bool allow_dynamic_output), gst_encoding_profile_set_allow_dynamic_output)
+
+  _WRAP_PROPERTY("restriction-caps", Glib::RefPtr<Gst::Caps>)
 };
 
 } // namespace Gst
