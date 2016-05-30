@@ -59,6 +59,7 @@ _CONV_ENUM(Gst,SeekType)
 _CONV_ENUM(Gst,State)
 _CONV_ENUM(Gst,StateChange)
 _CONV_ENUM(Gst,StateChangeReturn)
+_CONV_ENUM(Gst,StreamFlags)
 _CONV_ENUM(Gst,StreamVolumeFormat)
 _CONV_ENUM(Gst,TagMergeMode)
 _CONV_ENUM(Gst,TaskState)
@@ -292,7 +293,9 @@ _CONVERSION(`Glib::RefPtr<Gst::Sample>', `GstSample*', `Glib::unwrap($3)')
 dnl Segment
 _CONVERSION(`GstSegment*',`Glib::RefPtr<Gst::Segment>',`Glib::wrap($3)')
 _CONVERSION(`GstSegment*',`Glib::RefPtr<const Gst::Segment>',`Glib::wrap($3)')
+_CONVERSION(`const GstSegment*',`Glib::RefPtr<const Gst::Segment>',`Glib::wrap(const_cast<GstSegment*>($3))'
 _CONVERSION(`const Glib::RefPtr<Gst::Segment>&',`GstSegment*', `Glib::unwrap($3)')
+_CONVERSION(`const Gst::Segment&',`const GstSegment*', `$3.gobj()')
 
 dnl Structure
 _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
@@ -306,6 +309,7 @@ _CONVERSION(`Gst::Structure&&',`GstStructure*',`($3) ? $3.release() : nullptr')
 
 dnl TagList
 _CONVERSION(`const Gst::TagList&',`const GstTagList*',`$3.gobj()')
+_CONVERSION(`const Gst::TagList&',`GstTagList*',`const_cast<GstTagList*>($3.gobj())')
 _CONVERSION(`Gst::TagList&',`GstTagList*',`$3.gobj()')
 _CONVERSION(`Gst::TagList',`GstTagList*',`$3.gobj()')
 
@@ -316,6 +320,7 @@ _CONVERSION(`GstTaskPool*',`Glib::RefPtr<const Gst::TaskPool>',`Glib::wrap($3)')
 
 dnl Toc
 _CONVERSION(`const GstToc*',`Glib::RefPtr<const Gst::Toc>',`Glib::wrap(const_cast<GstToc*>($3))')
+_CONVERSION(`const Glib::RefPtr<Gst::Toc>&', `GstToc*',`Glib::unwrap($3)')
 
 dnl TocEntry
 _CONVERSION(`GstTocEntry*',`Glib::RefPtr<Gst::TocEntry>',`Glib::wrap($3)')
