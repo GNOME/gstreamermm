@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -69,12 +69,13 @@ _WRAP_ENUM(SeekType, GstSeekType)
  * to_stream_time() can be used to convert a timestamp and the segment info to
  * stream time (which is always between 0 and the duration of the stream).
  *
- * Last reviewed on 2007-05-17 (0.10.13)
+ * Last reviewed on 2016-07-12 (1.8.0)
  */
 class Segment
 {
   _CLASS_BOXEDTYPE(Segment, GstSegment, gst_segment_new, gst_segment_copy, gst_segment_free)
   _IGNORE(gst_segment_free, gst_segment_copy)
+  _IGNORE(gst_segment_copy_into)
 
 public:
   _WRAP_METHOD(bool clip(Format format, guint64 start, guint64 stop, guint64& clip_start, guint64& clip_stop) const, gst_segment_clip)
@@ -82,9 +83,18 @@ public:
   _WRAP_METHOD_DOCS_ONLY(gst_segment_do_seek)
   void set_seek(double rate, Format format, SeekFlags flags, SeekType start_type, gint64 start, SeekType stop_type, gint64 stop, bool& update);
   _WRAP_METHOD(guint64 to_running_time(Format format, guint64 position) const, gst_segment_to_running_time)
+  _WRAP_METHOD(int to_running_time(Format format, guint64 position, guint64& running_time) const, gst_segment_to_running_time_full)
   _WRAP_METHOD(guint64 to_stream_time(Format format, guint64 position) const, gst_segment_to_stream_time)
+  _WRAP_METHOD(int to_stream_time(Format format, guint64 position, guint64& stream_time) const, gst_segment_to_stream_time_full)
   _WRAP_METHOD(guint64 to_position(Format format, guint64 running_time) const, gst_segment_to_position)
   _WRAP_METHOD(bool set_running_time(Format format, guint64 running_time), gst_segment_set_running_time)
+  _WRAP_METHOD(guint64 position_from_running_time(Gst::Format format, guint64 running_time) const, gst_segment_position_from_running_time)
+  _WRAP_METHOD(int position_from_running_time(Gst::Format format, guint64 running_time, guint64& position) const, gst_segment_position_from_running_time_full)
+  _WRAP_METHOD(guint64 position_from_stream_time(Gst::Format format, guint64 stream_time) const, gst_segment_position_from_stream_time)
+  _WRAP_METHOD(int position_from_stream_time(Gst::Format format, guint64 stream_time, guint64& position) const, gst_segment_position_from_stream_time_full)
+  _WRAP_METHOD(bool offset_running_time(Gst::Format format, gint64 offset), gst_segment_offset_running_time)
+  _WRAP_METHOD(bool is_equal(const Gst::Segment& s2) const, gst_segment_is_equal)
+
 };
 
 } //namespace Gst
