@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,8 +41,7 @@ void Navigation_Class::send_event_vfunc_callback(GstNavigation* self, GstStructu
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
-        Gst::Structure wrapped_structure(structure);
-        obj->send_event_vfunc(wrapped_structure);
+        obj->send_event_vfunc(Gst::Structure(structure));
         return;
       }
       catch(...)
@@ -62,7 +61,7 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Ge
     (*base->send_event)(self, structure);
 
 }
-void Gst::Navigation::send_event_vfunc(Gst::Structure& structure) 
+void Gst::Navigation::send_event_vfunc(Gst::Structure&& structure)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
@@ -70,7 +69,7 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
 )  );
 
   if(base && base->send_event)
-    (*base->send_event)(gobj(),(structure).gobj());
+    (*base->send_event)(gobj(), structure ? structure.release() : nullptr);
 }
 
 } // namespace Gst

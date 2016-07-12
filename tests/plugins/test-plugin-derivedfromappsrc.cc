@@ -92,9 +92,9 @@ TEST_F(DerivedFromAppSrcPluginTest, SimpleDataFlowInPipelineWithAppSrcElement)
   std::string data = "hello world";
   RefPtr<Buffer> buf = Buffer::create(data.length() + 1);
   ASSERT_TRUE(buf);
-  RefPtr<MapInfo> mapinfo(new MapInfo());
+  MapInfo mapinfo;
   ASSERT_TRUE(buf->map(mapinfo, MAP_WRITE));
-  strcpy((char *)mapinfo->get_data(), data.c_str());
+  strcpy((char *)mapinfo.get_data(), data.c_str());
 
   RefPtr<AppSrc> appsrc;
   appsrc = appsrc.cast_dynamic(source);

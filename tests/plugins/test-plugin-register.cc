@@ -84,10 +84,10 @@ TEST_F(RegisterPluginTest, CheckDataFlowThroughCreatedElement)
   std::vector<guint8> data = {4, 5, 2, 7, 1};
   RefPtr<Buffer> buf = Buffer::create(data.size());
   ASSERT_TRUE(buf);
-  RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
+  Gst::MapInfo mapinfo;
 
   ASSERT_TRUE(buf->map(mapinfo, MAP_WRITE));
-  std::copy(data.begin(), data.end(), mapinfo->get_data());
+  std::copy(data.begin(), data.end(), mapinfo.get_data());
   EXPECT_EQ(FLOW_OK, source->push_buffer(buf));
   buf->unmap(mapinfo);
 
@@ -97,9 +97,9 @@ TEST_F(RegisterPluginTest, CheckDataFlowThroughCreatedElement)
   ASSERT_TRUE(samp);
   buf_out = samp->get_buffer();
   ASSERT_TRUE(buf_out->map(mapinfo, MAP_READ));
-  ASSERT_TRUE(mapinfo->get_data());
+  ASSERT_TRUE(mapinfo.get_data());
   std::sort(data.begin(), data.end());
-  ASSERT_TRUE(std::equal(data.begin(), data.end(), mapinfo->get_data()));
+  ASSERT_TRUE(std::equal(data.begin(), data.end(), mapinfo.get_data()));
   buf_out->unmap(mapinfo);
   EXPECT_EQ(FLOW_OK, source->end_of_stream());
 

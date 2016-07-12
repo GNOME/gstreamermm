@@ -34,9 +34,9 @@ public:
   {
     buf = buf->create_writable();
     assert(buf->gobj()->mini_object.refcount==1);
-    Glib::RefPtr<Gst::MapInfo> mapinfo(new Gst::MapInfo());
+    Gst::MapInfo mapinfo;
     buf->map(mapinfo, Gst::MAP_WRITE);
-    std::sort(mapinfo->get_data(), mapinfo->get_data() + mapinfo->get_size());
+    std::sort(mapinfo.get_data(), mapinfo.get_data() + mapinfo.get_size());
     buf->unmap(mapinfo);
     assert(buf->gobj()->mini_object.refcount==1);
     return srcpad->push(std::move(buf));

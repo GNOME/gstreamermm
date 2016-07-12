@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ _WRAP_ENUM(ObjectFlags, GstObjectFlags)
  * The functions set_name() and get_name() are used to set/get the name of the
  * object.
  *
- * Last reviewed on 2005-11-09 (0.9.4)
+ * Last reviewed on 2016-06-06 (1.8.0)
  * @ingroup GstBaseClasses
  */
 class Object : public Glib::Object 
@@ -80,6 +80,15 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Gst::Object> get_parent() const, gst_object_get_parent, constversion)
   _WRAP_METHOD(void unparent(), gst_object_unparent)
 
+  // TODO: Use Gst::ClockTime instead
+  _WRAP_METHOD(void set_control_rate(GstClockTime control_rate), gst_object_set_control_rate)
+  _WRAP_METHOD(GstClockTime get_control_rate() const, gst_object_get_control_rate)
+  _WRAP_METHOD(GstClockTime suggest_next_sync() const, gst_object_suggest_next_sync)
+  _WRAP_METHOD(bool sync_values(GstClockTime timestamp), gst_object_sync_values)
+
+  _WRAP_METHOD(void set_control_bindings_disabled(bool disabled), gst_object_set_control_bindings_disabled)
+  _WRAP_METHOD(bool has_asctive_control_bindings() const, gst_object_has_active_control_bindings)
+
   // Ignore default signal and error callback.
   _IGNORE(gst_object_default_deep_notify, gst_object_default_error)
 
@@ -87,10 +96,13 @@ public:
   _WRAP_METHOD(static bool check_uniqueness(const Glib::ListHandle<const Gst::Object>& list, const Glib::ustring& name), gst_object_check_uniqueness)
 
   _WRAP_METHOD(bool has_ancestor(const Glib::RefPtr<const Gst::Object>& ancestor) const, gst_object_has_ancestor)
+  _WRAP_METHOD(bool has_as_ancestor(const Glib::RefPtr<Gst::Object>& ancestor) const, gst_object_has_as_ancestor)
+  _WRAP_METHOD(bool has_as_parent(const Glib::RefPtr<Gst::Object>& parent) const, gst_object_has_as_parent)
 
   _WRAP_METHOD(Glib::ustring get_path_string(), gst_object_get_path_string)
 
   _WRAP_PROPERTY("name", Glib::ustring)
+  _WRAP_PROPERTY("parent", Glib::RefPtr<Gst::Object>)
 
 #m4 _CONVERSION(`GstObject*', `const Glib::RefPtr<Gst::Object>&', `Glib::wrap($3, true)')
   //TODO: Maybe GParamSpec should be wrapped in glibmm?

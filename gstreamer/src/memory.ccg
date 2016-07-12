@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,10 @@ Glib::RefPtr<Gst::Memory> Memory::create(Gst::MemoryFlags flags, gpointer data, 
     return Glib::RefPtr<Memory>(reinterpret_cast<Memory*>(gst_memory_new_wrapped(GstMemoryFlags(flags), data, maxsize, offset, size, 0, 0)));
 }
 
-Glib::RefPtr<Gst::Memory> Memory::make_mapped(const Glib::RefPtr<Gst::MapInfo>& info, Gst::MapFlags flags)
+Glib::RefPtr<Gst::Memory> Memory::make_mapped(Gst::MapInfo& info, Gst::MapFlags flags)
 {
   reference();
-  GstMemory* new_mem = gst_memory_make_mapped(gobj(), info->gobj(), static_cast<GstMapFlags>(flags));
+  GstMemory* new_mem = gst_memory_make_mapped(gobj(), info.gobj(), static_cast<GstMapFlags>(flags));
   return Glib::wrap(new_mem, gobj() != new_mem);
 }
 

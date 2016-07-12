@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -75,7 +75,7 @@ _WRAP_ENUM(PadProbeReturn, GstPadProbeReturn)
  *
  * To send a Gst::Event on a pad, use send_event() and push_event().
  *
- * Last reviewed on 2006-07-06 (0.10.9)
+ * Last reviewed on 2016-06-06 (1.8.0)
  */
 class Pad : public Object 
 {
@@ -182,6 +182,7 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_pad_template_caps() const, gst_pad_get_pad_template_caps, constversion)
 
   gulong add_probe(PadProbeType mask, const SlotProbe& slot);
+  _IGNORE(gst_pad_add_probe)
   _WRAP_METHOD(void remove_probe(gulong id), gst_pad_remove_probe)
 
 
@@ -194,6 +195,23 @@ public:
 
   _WRAP_METHOD(bool is_blocked() const, gst_pad_is_blocked)
   _WRAP_METHOD(bool is_blocking() const, gst_pad_is_blocking)
+
+  _WRAP_METHOD(void mark_reconfigure(), gst_pad_mark_reconfigure)
+  _WRAP_METHOD(bool needs_reconfigure() const, gst_pad_needs_reconfigure)
+  _WRAP_METHOD(bool check_reconfigure(), gst_pad_check_reconfigure)
+
+  _WRAP_METHOD(bool has_current_caps() const, gst_pad_has_current_caps)
+
+  _WRAP_METHOD(Glib::ustring create_stream_id(const Glib::RefPtr<Gst::Element>& parent, const Glib::ustring& stream_id), gst_pad_create_stream_id)
+  _WRAP_METHOD(Glib::ustring get_stream_id() const, gst_pad_get_stream_id)
+
+  _WRAP_METHOD(void set_offset(gint64 offset), gst_pad_set_offset)
+  _WRAP_METHOD(gint64 get_offset() const, gst_pad_get_offset)
+
+  _WRAP_METHOD(void set_element_private(gpointer priv), gst_pad_set_element_private)
+  _WRAP_METHOD(gpointer get_element_private(), gst_pad_get_element_private)
+
+
 
   //This is handwritten because conversion from Glib::RefPtr<Gst::Buffer>& to
   //GstBuffer** is difficult.
@@ -215,9 +233,11 @@ public:
   _IGNORE(gst_pad_get_range)
 
   _WRAP_METHOD(bool query_accept_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_pad_query_accept_caps)
-  _WRAP_METHOD(bool proxy_query_caps(const Glib::RefPtr<Gst::Query>& query), gst_pad_proxy_query_caps)
-  _WRAP_METHOD(bool proxy_query_caps(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_proxy_query_caps, constversion)
+  _WRAP_METHOD(bool proxy_query_caps(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_proxy_query_caps)
+  _WRAP_METHOD(bool proxy_query_accept_caps(const Glib::RefPtr<Gst::Query>& query) const, gst_pad_proxy_accept_caps)
   _WRAP_METHOD(bool peer_query_accept_caps(const Glib::RefPtr<const Gst::Caps>& caps) const, gst_pad_peer_query_accept_caps)
+  _WRAP_METHOD(bool peer_query_position(Gst::Format format, gint64& cur) const, gst_pad_peer_query_position)
+  _WRAP_METHOD(bool peer_query_duration(Gst::Format format, gint64& duration) const, gst_pad_peer_query_duration)
   _WRAP_METHOD(FlowReturn push(Glib::RefPtr<Gst::Buffer>&& buffer), gst_pad_push)
 
   _WRAP_METHOD(bool push_event(Glib::RefPtr<Gst::Event>&& event), gst_pad_push_event)
@@ -294,20 +314,28 @@ public:
   _WRAP_METHOD(bool stop_task() , gst_pad_stop_task)
   _WRAP_METHOD(bool set_active(bool active = true), gst_pad_set_active)
 
+  _WRAP_METHOD(Gst::FlowReturn get_last_flow_return() const, gst_pad_get_last_flow_return)
+
   _WRAP_METHOD(Glib::RefPtr<Gst::Event> get_sticky_event(Gst::EventType event_type, guint idx) const, gst_pad_get_sticky_event)
 
   static GstFlowReturn Pad_Chain_gstreamermm_callback(GstPad* pad, GstObject* parent, GstBuffer *buffer);
   void set_chain_function(const SlotChain& slot);
+  _IGNORE(gst_pad_set_chain_function_full)
   static gboolean Pad_Event_gstreamermm_callback(GstPad* pad, GstObject* parent, GstEvent* event);
   void set_event_function(const SlotEvent& slot);
+  _IGNORE(gst_pad_set_event_full_function_full)
   static gboolean Pad_Query_gstreamermm_callback(GstPad* pad, GstObject* parent, GstQuery* query);
   void set_query_function(const SlotQuery& slot);
+  _IGNORE(gst_pad_set_query_function_full)
   static gboolean Pad_Activate_gstreamermm_callback(GstPad* pad, GstObject* parent);
   void set_activate_function(const SlotActivate& slot);
+  _IGNORE(gst_pad_set_activate_function_full)
   static gboolean Pad_Activatemode_gstreamermm_callback(GstPad* pad, GstObject* parent, GstPadMode mode, gboolean active);
   void set_activatemode_function(const SlotActivatemode& slot);
+  _IGNORE(gst_pad_set_activatemode_function_full)
   static GstFlowReturn Pad_Getrange_gstreamermm_callback(GstPad* pad, GstObject* parent, guint64 offset, guint length, GstBuffer **buffer);
   void set_getrange_function(const SlotGetrange& slot);
+  _IGNORE(gst_pad_set_getrange_function_full)
 
     //C API specific pad callback setting functions are ignored.
     _IGNORE()

@@ -96,9 +96,9 @@ TEST_F(DerivedFromAppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
   std::string data = "hello world";
   RefPtr<Buffer> buf = Buffer::create(data.length() + 1);
   ASSERT_TRUE(buf);
-  RefPtr<MapInfo> map_info(new MapInfo());
+  MapInfo map_info;
   ASSERT_TRUE(buf->map(map_info, MAP_WRITE));
-  strcpy((char *)map_info->get_data(), data.c_str());
+  strcpy((char *)map_info.get_data(), data.c_str());
   buf->unmap(map_info);
 
   EXPECT_EQ(FLOW_OK, appsrc->push_buffer(buf));

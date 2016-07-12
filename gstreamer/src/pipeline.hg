@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -75,7 +75,7 @@ class Bus;
  * PAUSED and resumed as well as set the new stream time to 0 when the seek
  * succeeded.
  *
- * Last reviewed on 2014-08-14 (1.2.4)
+ * Last reviewed on 2016-06-06 (1.8.0)
  * @ingroup GstBaseClasses
  */
 class Pipeline : public Bin 
@@ -110,7 +110,12 @@ public:
   _WRAP_METHOD(bool get_auto_flush_bus() const, gst_pipeline_get_auto_flush_bus)
   _WRAP_METHOD(void set_delay(ClockTime delay), gst_pipeline_set_delay)
   _WRAP_METHOD(ClockTime get_delay() const, gst_pipeline_get_delay)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Clock> get_pipeline_clock(), gst_pipeline_get_pipeline_clock)
+  _WRAP_METHOD(Glib::RefPtr<const Gst::Clock> get_pipeline_clock() const, gst_pipeline_get_pipeline_clock, constversion)
+  _WRAP_METHOD(void set_latency(Gst::ClockTime latency), gst_pipeline_set_latency)
+  _WRAP_METHOD(Gst::ClockTime get_latency() const, gst_pipeline_get_latency)
 
+  _WRAP_PROPERTY("latency", guint64)
   _WRAP_PROPERTY("auto-flush-bus", bool)
   _WRAP_PROPERTY("delay", ClockTime)
 };

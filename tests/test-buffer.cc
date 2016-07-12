@@ -15,11 +15,11 @@ TEST(BufferTest, CheckBufferSize)
 {
   gsize buff_size = 23;
   Glib::RefPtr<Buffer> buf = Buffer::create(buff_size);
-  Glib::RefPtr<MapInfo> map_info(new MapInfo());
+  MapInfo map_info;
 
   buf->map(map_info, MAP_READ);
 
-  EXPECT_EQ(buff_size, map_info->get_size());
+  EXPECT_EQ(buff_size, map_info.get_size());
 
   buf->unmap(map_info);
 }
@@ -50,7 +50,7 @@ TEST(BufferTest, ShouldInsertMemoryObjectAndResetItButAllowToMakeExplicityRef)
   Glib::RefPtr<Memory> mem2;
   char *data = new char[10];
   Glib::RefPtr<Memory> mem = Memory::create(Gst::MEMORY_FLAG_READONLY, data, 10, 0, 10);
-  delete data;
+  delete [] data;
   Glib::RefPtr<Buffer> buf = Buffer::create(10);
   mem2 = mem;
   buf->insert_memory(0, std::move(mem));
@@ -73,7 +73,7 @@ TEST(BufferTest, ShouldResetMemoryPointerButAllowIncreaseRefcount)
 {
   char *data = new char[10];
   Glib::RefPtr<Memory> mem = Memory::create(Gst::MEMORY_FLAG_READONLY, data, 10, 0, 10);
-  delete data;
+  delete [] data;
   Glib::RefPtr<Memory> mem2 = mem;
   {
     Glib::RefPtr<Buffer> buf = Buffer::create(10);
@@ -105,9 +105,9 @@ TEST(BufferTest, CheckBufferCopyIntoMethod)
   Glib::RefPtr<Buffer> src = Buffer::create(data.size());
   Glib::RefPtr<Buffer> dest = Buffer::create();
   src->set_pts(10);
-  Glib::RefPtr<MapInfo> info(new MapInfo());
+  MapInfo info;
   src->map(info, MAP_READ);
-  std::copy(data.begin(), data.end(), info->get_data());
+  std::copy(data.begin(), data.end(), info.get_data());
   src->unmap(info);
 
   Gst::Buffer::copy_into(dest, src, BUFFER_COPY_TIMESTAMPS | BUFFER_COPY_MEMORY, 0, data.size());

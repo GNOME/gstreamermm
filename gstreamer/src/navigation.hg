@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,11 +26,16 @@ namespace Gst
 {
 
 _WRAP_ENUM(NavigationCommand, GstNavigationCommand)
+_WRAP_ENUM(NavigationEventType, GstNavigationEventType)
+_WRAP_ENUM(NavigationMessageType, GstNavigationMessageType)
+_WRAP_ENUM(NavigationQueryType, GstNavigationQueryType)
 
 class Structure;
 
 /** An interface for elements that provide navigation functionality.
  * @ingroup GstInterfaces
+ *
+ * Last reviewed on 2016-06-06 (1.8.0)
  */
 class Navigation : public Glib::Interface
 {
@@ -42,9 +47,10 @@ public:
   _WRAP_METHOD(void send_mouse_event(const Glib::ustring& event, int button, double x, double y), gst_navigation_send_mouse_event)
   _WRAP_METHOD(void send_command(Gst::NavigationCommand command), gst_navigation_send_command)
 
+
   /** Called when an event has been sent to the Gst::Navigation.
    */
-  virtual void send_event_vfunc(Gst::Structure& structure);
+  virtual void send_event_vfunc(Gst::Structure&& structure);
 
 protected:
 #m4begin

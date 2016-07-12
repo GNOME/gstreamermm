@@ -1,60 +1,63 @@
-/*
- * mapinfo.ccg
+/* gstreamermm - a C++ wrapper for gstreamer
  *
- *  Created on: Jul 31, 2013
- *      Author: m.kolny
+ * Copyright 2013-2016 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#include <gstreamermm/handle_error.h>
-_PINCLUDE(gstreamermm/private/object_p.h)
+
+#include <gstreamermm/memory.h>
 
 namespace Gst
 {
+
+static GstMapInfo empty_map_info()
+{
+  // TODO: GST_MAP_INFO_INIT has been fixed in the further GStreamer version (1.8.x)
+  static GstMapInfo info = { NULL, (GstMapFlags) 0, NULL, 0, 0, { NULL, NULL, NULL, NULL}, {NULL, NULL, NULL, NULL}};
+  return info;
+}
+
 MapInfo::MapInfo()
 : m_spec(g_try_new(GstMapInfo, 1)),
   take_ownership(true)
 {
-  if(!m_spec)
-  {
-    gstreamermm_handle_error(
-      "Failed to allocate a new Gst::MapInfo.");
-    return;
-  }
 }
 
-MapInfo::MapInfo(GstMapInfo& castitem, bool take_ownership)
-: m_spec(&castitem),
-  take_ownership(take_ownership)
+MapInfo::MapInfo()
+: m_spec(empty_map_info())
 {
 }
 
-MapInfo::MapInfo(const MapInfo& other)
-: sigc::trackable(),
-  Glib::ObjectBase(),
-  Glib::Object(),
-  m_spec(g_try_new(GstMapInfo, 1)),
-  take_ownership(true)
+MapInfo::MapInfo(const GstMapInfo& castitem)
+: m_spec(castitem)
 {
-  // Handle possible memory allocation failure.
-  if(!m_spec)
-  {
-    gstreamermm_handle_error("Failed to allocate a new Gst::MapInfo.");
-    return;
-  }
-
-  m_spec->memory = other.m_spec->memory;
-  m_spec->data = other.m_spec->data;
-  m_spec->flags = other.m_spec->flags;
-  m_spec->maxsize = other.m_spec->maxsize;
-  m_spec->size = other.m_spec->size;
-
 }
 
-
-MapInfo::~MapInfo()
+MapInfo::MapInfo(MapInfo&& other)
 {
-  if(take_ownership)
-    g_free(m_spec);
+  m_spec = other.m_spec;
+  other.m_spec = empty_map_info();
 }
+
+MapInfo& MapInfo::operator=(MapInfo&& other)
+{
+  m_spec = other.m_spec;
+  other.m_spec = empty_map_info();
+  return *this;
+}
+
 }
 
 

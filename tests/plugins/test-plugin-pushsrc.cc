@@ -44,10 +44,10 @@ public:
     std::string s = std::to_string(COUNT - count_left);
     buffer = Gst::Buffer::create(s.size());
 
-    RefPtr<MapInfo> info(new MapInfo());
+    MapInfo info;
     buffer->map(info, MAP_WRITE);
 
-    std::copy(s.begin(), s.end(), info->get_data());
+    std::copy(s.begin(), s.end(), info.get_data());
     return Gst::FLOW_OK;
   }
 

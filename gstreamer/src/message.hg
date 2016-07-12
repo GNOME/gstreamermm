@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,6 @@ namespace Gst
 _WRAP_ENUM(MessageType, GstMessageType)
 _WRAP_ENUM(ProgressType, GstProgressType)
 _WRAP_ENUM(StructureChangeType, GstStructureChangeType)
-
 _WRAP_ENUM(StreamStatusType, GstStreamStatusType)
 
 namespace Enums
@@ -82,10 +81,12 @@ class TagList;
  * @code
  * bus->post(Gst::MessageEos::create(my_element));
  * @endcode
+ *
+ * Last reviewed on 2016-06-06 (1.8.0)
  */
 class Message : public Gst::MiniObject
 {
-    _CLASS_OPAQUE_REFCOUNTED(Message, GstMessage, NONE, gst_message_ref, gst_message_unref)
+  _CLASS_OPAQUE_REFCOUNTED(Message, GstMessage, NONE, gst_message_ref, gst_message_unref)
   _IGNORE(gst_message_ref, gst_message_unref)
 
 public:
@@ -117,36 +118,17 @@ public:
   _MEMBER_GET_GOBJECT(source, src, Gst::Object, GstObject*)
 
   _WRAP_METHOD(bool has_name(const Glib::ustring& name) const, gst_message_has_name)
-
-protected:
-  // This method is used in the create() methods to convert a wrapped
-  // GstMessage to one of the more specific Gst::Message types.
-  template <class MsgType>
-    static inline Glib::RefPtr<MsgType> wrap(GstMessage* message,
-    bool take_copy = false);
 };
-
-//TODO: Modify create methods of derived Message classes to return
-//Glib::RefPtr<...> to the derived class and not just Gst::Message. Must deal
-//with GstStructure immutability problem (bug #510301) first because casting
-//Glib::RefPtrs references the objects which causes problems when GStreamer API
-//tries to modify the GstStructures of the objects.
 
 /** An end of stream message.
  * See create() for more details.
  */
 class MessageEos : public Message
 {
+  _CLASS_GENERIC(MessageEos, GstMessage)
 public:
-  /** Create a new eos message. This message is generated and posted in the
-   * sink elements of a Gst::Bin. The bin will only forward the EOS message to
-   * the application if all sinks have posted an EOS message.
-   * 
-   * @param src The object originating the message.
-   * @return The new eos message. MT safe. 
-   */
-  static Glib::RefPtr<Gst::MessageEos>
-    create(const Glib::RefPtr<Gst::Object>& src);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageEos>',`Gst::wrap_msg_derived<MessageEos>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageEos> create(const Glib::RefPtr<Gst::Object>& src), gst_message_new_eos)
 };
 
 /** An error message.
@@ -154,21 +136,10 @@ public:
  */
 class MessageError : public Message
 {
+  _CLASS_GENERIC(MessageError, GstMessage)
 public:
-
-  /** Create a new error message. The message will copy error and debug. This
-   * message is posted by elements when a fatal event occured. The pipeline
-   * will probably (partially) stop. The application receiving this message
-   * should stop the pipeline.
-   *
-   * @param src The object originating the message.
-   * @param error The Glib::Error for this message.
-   * @param debug A debugging string for something or other.
-   * @return The new error message. MT safe. 
-   */
-  static Glib::RefPtr<Gst::MessageError>
-    create(const Glib::RefPtr<Gst::Object>& src,
-    Glib::Error& error, const std::string& debug);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageError>',`Gst::wrap_msg_derived<MessageError>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageError> create(const Glib::RefPtr<Gst::Object>& src, const Glib::Error& error, const std::string& debug), gst_message_new_error)
 
   /** Extracts the Glib::Error and debug string from the Gst::MessageError.
    *
@@ -186,7 +157,7 @@ public:
    *
    * @return The Glib::Error.
    */
-  Glib::Error parse() const;
+  Glib::Error parse_error() const;
 
   /** Extracts and returns the debug message from the Gst::MessageError.
    *
@@ -202,19 +173,10 @@ public:
  */
 class MessageWarning : public Message
 {
+  _CLASS_GENERIC(MessageWarning, GstMessage)
 public:
-
-  /** Create a new warning message. The message will make copies of error and
-   * debug.
-   *
-   * @param src The object originating the message.
-   * @param error The Glib::Error for this message.
-   * @param debug A debugging string for something or other.
-   * @return The new warning message. MT safe. 
-   */
-  static Glib::RefPtr<Gst::MessageWarning>
-    create(const Glib::RefPtr<Gst::Object>& src, Glib::Error& error,
-    const std::string& debug);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageWarning>',`Gst::wrap_msg_derived<MessageWarning>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageWarning> create(const Glib::RefPtr<Gst::Object>& src, const Glib::Error& error, const std::string& debug), gst_message_new_warning)
 
   /** Extracts the Glib::Error and debug string from the Gst::MessageWarning.
    *
@@ -232,7 +194,7 @@ public:
    *
    * @return The Glib::Error.
    */
-  Glib::Error parse() const;
+  Glib::Error parse_error() const;
 
   /** Extracts and returns the debug message from the Gst::MessageWarning.
    *
@@ -248,20 +210,10 @@ public:
  */
 class MessageInfo : public Message
 {
+  _CLASS_GENERIC(MessageInfo, GstMessage)
 public:
-
-  /** Create a new info message.
-   *
-   * @param src The object originating the message.
-   * @param error The Glib::Error for this message.
-   * @param debug A debugging string for something or other.
-   * @return The new info message.
-   *
-   * Since 0.10.12 MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageInfo>
-    create(const Glib::RefPtr<Gst::Object>& src,
-    Glib::Error& error, const std::string& debug);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageInfo>',`Gst::wrap_msg_derived<MessageInfo>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageInfo> create(const Glib::RefPtr<Gst::Object>& src, const Glib::Error& error, const std::string& debug), gst_message_new_info)
 
   /** Extracts the Glib::Error and debug string from the Gst::MessageInfo.
    *
@@ -295,28 +247,11 @@ public:
  */
 class MessageTag : public Message
 {
+  _CLASS_GENERIC(MessageTag, GstMessage)
 public:
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageTag>',`Gst::wrap_msg_derived<MessageTag>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageTag> create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist), gst_message_new_tag)
 
-  /** Create a new tag message. The taglist will be copied.  The message is
-   * posted by elements that discovered a new taglist.
-   *
-   * @param src The object originating the message.
-   * @param tag_list The tag list for the message.
-   * @return The new tag message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageTag>
-    create(const Glib::RefPtr<Gst::Object>& src, const Gst::TagList& taglist);
-
-  /** Extracts the Gst::Pad and Gst::TagList from the Gst::MessageTag.
-   *
-   * MT safe.
-   *
-   * @param pad Location where the originating pad is stored.
-   * @param tag_list Location for the tag-list.
-   *
-   * Since 0.10.24.
-   */
-  void parse(Gst::TagList& tag_list) const;
 
   /** Extracts and returns the Gst::TagList from the Gst::MessageTag.
    *
@@ -324,7 +259,7 @@ public:
    *
    * @return A copy of the Gst::TagList.
    */
-  Gst::TagList parse() const;
+  Gst::TagList parse_tag_list() const;
   _IGNORE(gst_message_parse_tag)
 
 };
@@ -334,34 +269,16 @@ public:
  */
 class MessageBuffering : public Message
 {
+  _CLASS_GENERIC(MessageBuffering, GstMessage)
 public:
-
-  /** Create a new buffering message. This message can be posted by an element
-   * that needs to buffer data before it can continue processing. @a percent
-   * should be a value between 0 and 100. A value of 100 means that the
-   * buffering completed.
-   *
-   * When @a percent is < 100 the application should PAUSE a PLAYING pipeline.
-   * When @a percent is 100, the application can set the pipeline (back) to
-   * PLAYING. The application must be prepared to receive BUFFERING messages in
-   * the PREROLLING state and may only set the pipeline to PLAYING after
-   * receiving a message with @a percent set to 100, which can happen after the
-   * pipeline completed prerolling.
-   *
-   * @param src The object originating the message.  
-   * @param percent The buffering percent.
-   * @return The new buffering message.
-   *
-   * Since 0.10.11 MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageBuffering>
-    create(const Glib::RefPtr<Gst::Object>& src, int percent);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageBuffering>',`Gst::wrap_msg_derived<MessageBuffering>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageBuffering> create(const Glib::RefPtr<Gst::Object>& src, int percent), gst_message_new_buffering)
 
   /** Extracts and returns the buffering percent from the
    * Gst::MessageBuffering.
    * @return The percent as an integer.
    */
-  int parse() const;
+  int parse_buffering() const;
   _IGNORE(gst_message_parse_buffering)
 
   /** Configures the buffering stats values in message.
@@ -419,20 +336,10 @@ public:
  */
 class MessageStateChanged : public Message
 {
+  _CLASS_GENERIC(MessageStateChanged, GstMessage)
 public:
-
-  /** Create a state change message. This message is posted whenever an element
-   * changed its state.
-   *
-   * @param src The object originating the message.
-   * @param oldstate The previous state.
-   * @param newstate The new (current) state.
-   * @param pending The pending (target) state.
-   * @return The new state change message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageStateChanged>
-    create(const Glib::RefPtr<Gst::Object>& src, State oldstate,
-    State newstate, State pending);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageStateChanged>',`Gst::wrap_msg_derived<MessageStateChanged>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageStateChanged> create(const Glib::RefPtr<Gst::Object>& src, State oldstate, State newstate, State pending), gst_message_new_state_changed)
 
   /** Extracts the old, new and pending states from the
    * Gst::MessageStateChanged.
@@ -452,7 +359,7 @@ public:
    *
    * @return The new (current) state.
    */
-  State parse() const;
+  State parse_new_state() const;
 
   /** Extracts and returns the old state from the Gst::MessageStateChanged.
    *
@@ -460,7 +367,7 @@ public:
    *
    * @return The old state.
    */
-  State parse_old() const;
+  State parse_old_state() const;
 
   /** Extracts and returns the pending state from the Gst::MessageStateChanged.
    *
@@ -468,7 +375,7 @@ public:
    *
    * @return The pending state.
    */
-  State parse_pending() const;
+  State parse_pending_state() const;
 };
 
 /** A state dirty message.
@@ -476,17 +383,10 @@ public:
  */
 class MessageStateDirty : public Message
 {
+  _CLASS_GENERIC(MessageStateDirty, GstMessage)
 public:
-
-  /** Create a state dirty message. This message is posted whenever an element
-   * changed its state asynchronously and is used internally to update the
-   * states of container objects.
-   *
-   * @param src The object originating the message.
-   * @return The new state dirty message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageStateDirty>
-    create(const Glib::RefPtr<Gst::Object>& src);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageStateDirty>',`Gst::wrap_msg_derived<MessageStateDirty>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageStateDirty> create(const Glib::RefPtr<Gst::Object>& src), gst_message_new_state_dirty)
 };
 
 /** A step done message.
@@ -494,31 +394,12 @@ public:
  */
 class MessageStepDone : public Message
 {
+  _CLASS_GENERIC(MessageStepDone, GstMessage)
 public:
-
-  /** Create a step done message.  This message is posted by elements when they
-   * complete a part, when @a intermediate set to true, or a complete step
-   * operation.
-   *
-   * @a duration will contain the amount of time (in Gst::FORMAT_TIME) of the
-   * stepped @a amount of media in format @a format.
-   *
-   * @param src The object originating the message.
-   * @param format The format of amount.
-   * @param amount The amount of stepped data.
-   * @param rate The rate of the stepped amount.
-   * @param flush Is this an flushing step.
-   * @param intermediate Is this an intermediate step.
-   * @param duration The duration of the data.
-   * @param eos The step caused EOS.
-   * @return The new step done message. MT safe.
-   *
-   * Since 0.10.24.
-   */
-  static Glib::RefPtr<Gst::MessageStepDone>
-    create(const Glib::RefPtr<Gst::Object>& src, Gst::Format format,
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageStepDone>',`Gst::wrap_msg_derived<MessageStepDone>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageStepDone> create(const Glib::RefPtr<Gst::Object>& src, Gst::Format format,
     guint64 amount, double rate, bool flush, bool intermediate,
-    guint64 duration, bool eos);
+    guint64 duration, bool eos), gst_message_new_step_done)
 
   /** Extract the values of the step done message.
    *
@@ -541,7 +422,7 @@ public:
   /** Extracts the duration of the step done message.
    * @return The duration.
    */
-  guint64 parse() const;
+  guint64 parse_duration() const;
 
   /** Extracts the format of the step done message.
    * @return The format.
@@ -579,21 +460,10 @@ public:
  */
 class MessageClockProvide : public Message
 {
+  _CLASS_GENERIC(MessageClockProvide, GstMessage)
 public:
-  /** Create a clock provide message. This message is posted whenever an
-   * element is ready to provide a clock or lost its ability to provide a clock
-   * (maybe because it paused or became EOS).
-   *
-   * This message is mainly used internally to manage the clock selection.
-   *
-   * @param src The object originating the message.
-   * @param clock The clock it provides.
-   * @param ready true if the sender can provide a clock.
-   * @return The new provide clock message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageClockProvide>
-    create(const Glib::RefPtr<Gst::Object>& src,
-    const Glib::RefPtr<Gst::Clock>& clock, bool ready);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageClockProvide>',`Gst::wrap_msg_derived<MessageClockProvide>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageClockProvide> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock, bool ready), gst_message_new_clock_provide)
 
   /** Extracts the clock and ready flag from the Gst::MessageClockProvide. The
    * clock object returned remains valid until the message is freed.
@@ -613,7 +483,7 @@ public:
    *
    * @return The clock object of the message.
    */
-  Glib::RefPtr<Gst::Clock> parse();
+  Glib::RefPtr<Gst::Clock> parse_clock_provide();
 
   /** Extracts and returns the clock from the Gst::MessageClockProvide. The
    * clock object returned remains valid until the message is freed.
@@ -622,7 +492,7 @@ public:
    *
    * @return The clock object of the message.
    */
-  Glib::RefPtr<const Gst::Clock> parse() const;
+  Glib::RefPtr<const Gst::Clock> parse_clock_provide() const;
 
   /** Extracts and returns the ready flag from the Gst::MessageClockProvide.
    *
@@ -638,20 +508,10 @@ public:
  */
 class MessageClockLost : public Message
 {
+  _CLASS_GENERIC(MessageClockLost, GstMessage)
 public:
-
-  /** Create a clock lost message. This message is posted whenever the clock is
-   * not valid anymore.  If this message is posted by the pipeline, the
-   * pipeline will select a new clock again when it goes to PLAYING. It might
-   * therefore be needed to set the pipeline to PAUSED and PLAYING again.
-   *
-   * @param src The object originating the message.
-   * @param clock The clock that was lost.
-   * @return The new clock lost message. MT safe. 
-   */
-  static Glib::RefPtr<Gst::MessageClockLost>
-    create(const Glib::RefPtr<Gst::Object>& src,
-    const Glib::RefPtr<Gst::Clock>& clock);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageClockLost>',`Gst::wrap_msg_derived<MessageClockLost>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageClockLost> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock), gst_message_new_clock_lost)
 
   /** Extracts and returns the lost clock from the Gst::MessageClockLost. The
    * clock object returned remains valid until the message is freed.
@@ -659,7 +519,7 @@ public:
    * MT safe.
    * @return The lost clock.
    */
-  Glib::RefPtr<Gst::Clock> parse();
+  Glib::RefPtr<Gst::Clock> parse_clock_lost();
   _IGNORE(gst_message_parse_clock_lost)
 
   /** Extracts and returns the lost clock from the Gst::MessageClockLost. The
@@ -668,7 +528,7 @@ public:
    * MT safe.
    * @return The lost clock.
    */
-  Glib::RefPtr<const Gst::Clock> parse() const;
+  Glib::RefPtr<const Gst::Clock> parse_clock_lost() const;
 };
 
 /** A new clock message.
@@ -676,18 +536,10 @@ public:
  */
 class MessageNewClock: public Message
 {
+  _CLASS_GENERIC(MessageNewClock, GstMessage)
 public:
-
-  /** Create a new clock message. This message is posted whenever the pipeline
-   * selectes a new clock for the pipeline.
-   *
-   * @param src The object originating the message.
-   * @param clock The new selected clock.
-   * @return The new new clock message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageNewClock>
-    create(const Glib::RefPtr<Gst::Object>& src,
-    const Glib::RefPtr<Gst::Clock>& clock);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageNewClock>',`Gst::wrap_msg_derived<MessageNewClock>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageNewClock> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Clock>& clock), gst_message_new_new_clock)
 
   /** Extracts and returns the new clock from the Gst::MessageNewClock. The
    * clock object returned remains valid until the message is freed.
@@ -696,7 +548,7 @@ public:
    *
    * @return The selected new clock.
    */
-  Glib::RefPtr<Gst::Clock> parse();
+  Glib::RefPtr<Gst::Clock> parse_new_clock();
   _IGNORE(gst_message_parse_new_clock)
 
   /** Extracts and returns the new clock from the Gst::MessageNewClock. The
@@ -706,7 +558,7 @@ public:
    *
    * @return The selected new clock.
    */
-  Glib::RefPtr<const Gst::Clock> parse() const;
+  Glib::RefPtr<const Gst::Clock> parse_new_clock() const;
 };
 
 /** An application message.
@@ -714,18 +566,22 @@ public:
  */
 class MessageApplication : public Message
 {
+  _CLASS_GENERIC(MessageApplication, GstMessage)
 public:
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageApplication>',`Gst::wrap_msg_derived<MessageApplication>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageApplication> create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure&& structure), gst_message_new_application)
 
   /** Create a new application-typed message. GStreamer will never create these
    * messages; they are a gift from us to you. Enjoy.
    *
    * @param src The object originating the message.
-   * @param structure The structure for the message.  The structure will be
-   * copied.
-   * @return The new application message. MT safe.
+   * @param structure The structure for the message. The message
+   * will take ownership of the structure.
+   * @return The new application message.
+   *
+   * MT safe.
    */
-  static Glib::RefPtr<Gst::MessageApplication>
-    create(const Glib::RefPtr<Gst::Object>& src, const Gst::Structure& structure);
+  static Glib::RefPtr<Gst::MessageApplication> create(const Glib::RefPtr<Gst::Object>& src, const Gst::Structure& structure);
 };
 
 /** An element specific message.
@@ -733,32 +589,24 @@ public:
  */
 class MessageElement : public Message
 {
+  _CLASS_GENERIC(MessageElement, GstMessage)
 public:
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageElement>',`Gst::wrap_msg_derived<MessageElement>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageElement> create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure&& structure{?}), gst_message_new_element)
 
   /** Create a new element-specific message. This is meant as a generic way of
-   * allowing one-way communication from an element to an application, for
-   * example "the firewire cable was unplugged". The format of the message
-   * should be documented in the element's documentation.
+   * allowing one-way communication from an element to an application, for example
+   * "the firewire cable was unplugged". The format of the message should be
+   * documented in the element's documentation. The structure field can be <tt>0</tt>.
    *
    * @param src The object originating the message.
-   * @param structure The structure for the message. The message will take a
-   * copy of the structure.
-   * @return The new element message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageElement>
-    create(const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure);
-
-  /** Create a new element-specific message. This is meant as a generic way of
-   * allowing one-way communication from an element to an application, for
-   * example "the firewire cable was unplugged". The format of the message
-   * should be documented in the element's documentation. No Gst::Structure is
-   * needed.
+   * @param structure The structure for the
+   * message. The message will take ownership of the structure.
+   * @return The new element message.
    *
-   * @param src The object originating the message.
-   * @return The new element message. MT safe.
+   * MT safe.
    */
-  static Glib::RefPtr<Gst::MessageElement>
-    create(const Glib::RefPtr<Gst::Object>& src);
+  static Glib::RefPtr<Gst::MessageElement> create(const Glib::RefPtr<Gst::Object>& src, const Gst::Structure& structure);
 };
 
 /** A custom message.
@@ -766,31 +614,10 @@ public:
  */
 class MessageCustom : public Message
 {
+  _CLASS_GENERIC(MessageCustom, GstMessage)
 public:
-
-  /** Create a new custom-typed message. This can be used for anything not
-   * handled by other message-specific functions to pass a message to the app.
-   *
-   * @param type The Gst::MessageType to distinguish messages.
-   * @param src The object originating the message.
-   * @param structure The Gst::Structure for the message. The message will take
-   * a copy of the structure.
-   * @return The new message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageCustom>
-    create(MessageType type, const Glib::RefPtr<Gst::Object>& src,
-    Gst::Structure& structure);
-
-  /** Create a new custom-typed message. This can be used for anything not
-   * handled by other message-specific functions to pass a message to the app.
-   * No Gst::Structure is needed.
-   *
-   * @param type The Gst::MessageType to distinguish messages.
-   * @param src The object originating the message.
-   * @return The new message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageCustom>
-    create(MessageType type, const Glib::RefPtr<Gst::Object>& src);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageCustom>',`Gst::wrap_msg_derived<MessageCustom>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageCustom> create(MessageType type, const Glib::RefPtr<Gst::Object>& src, Gst::Structure& structure{?}), gst_message_new_custom)
 };
 
 /** A segment start message.
@@ -798,21 +625,10 @@ public:
  */
 class MessageSegmentStart : public Message
 {
+  _CLASS_GENERIC(MessageSegmentStart, GstMessage)
 public:
-
-  /** Create a new segment message. This message is posted by elements that
-   * start playback of a segment as a result of a segment seek. This message is
-   * not received by the application but is used for maintenance reasons in
-   * container elements.
-   *
-   * @param src The object originating the message.
-   * @param format The format of the position being played.
-   * @param position The position of the segment being played.
-   * @return The new segment start message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageSegmentStart>
-    create(const Glib::RefPtr<Gst::Object>& src, Format format,
-    gint64 position);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageSegmentStart>',`Gst::wrap_msg_derived<MessageSegmentStart>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageSegmentStart> create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position), gst_message_new_segment_start)
 
   /** Extracts the position and format from the segment start message.
    *
@@ -830,7 +646,7 @@ public:
    *
    * @return The position.
    */
-  gint64 parse() const;
+  gint64 parse_position() const;
 
   /** Extracts and returns the format from the segment start message.
    *
@@ -846,21 +662,10 @@ public:
  */
 class MessageSegmentDone : public Message
 {
+  _CLASS_GENERIC(MessageSegmentDone, GstMessage)
 public:
-
-  /** Create a new segment done message. This message is posted by elements
-   * that finish playback of a segment as a result of a segment seek. This
-   * message is received by the application after all elements that posted a
-   * Gst::MessageSegmentStart have posted the Gst::MessageSegmentDone.
-   *
-   * @param src The object originating the message.  
-   * @param format The format of the position being done.
-   * @param position The position of the segment being done.
-   * @return The new segment done message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageSegmentDone>
-    create(const Glib::RefPtr<Gst::Object>& src, Format format,
-    gint64 position);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageSegmentDone>',`Gst::wrap_msg_derived<MessageSegmentDone>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageSegmentDone> create(const Glib::RefPtr<Gst::Object>& src, Format format, gint64 position), gst_message_new_segment_done)
 
   /** Extracts the position and format from the segment done message.
    *
@@ -878,7 +683,7 @@ public:
    *
    * @return The position.
    */
-  gint64 parse() const;
+  gint64 parse_position() const;
 
   /** Extracts and returns the format from the segment done message.
    *
@@ -894,21 +699,10 @@ public:
  */
 class MessageDurationChanged : public Message
 {
+  _CLASS_GENERIC(MessageDurationChanged, GstMessage)
 public:
-
-  /** Create a new duration changed message. This message is posted by elements
-   * that know the duration of a stream when the duration changes. This message
-   * is received by bins and is used to calculate the total duration of a
-   * pipeline. Elements may post a duration message with a duration of
-   * Gst::CLOCK_TIME_NONE to indicate that the duration has changed and the
-   * cached duration should be discarded. The new duration can then be
-   * retrieved via a query.
-   *
-   * @param src The object originating the message.
-   * @return The new duration-changed message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageDurationChanged>
-    create(const Glib::RefPtr<Gst::Object>& src);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageDurationChanged>',`Gst::wrap_msg_derived<MessageDurationChanged>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageDurationChanged> create(const Glib::RefPtr<Gst::Object>& src), gst_message_new_duration_changed)
 };
 
 /** A latency message.
@@ -916,18 +710,10 @@ public:
  */
 class MessageLatency : public Message
 {
+  _CLASS_GENERIC(MessageLatency, GstMessage)
 public:
-
-  /** Creates a new latency message.  This message can be posted by elements
-   * when their latency requirements have changed.
-   *
-   * @param src The object originating the message.
-   * @return The new latency message. MT safe.
-   *
-   * Since 0.10.12.
-   */
-  static Glib::RefPtr<Gst::MessageLatency>
-    create(const Glib::RefPtr<Gst::Object>& src);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageLatency>',`Gst::wrap_msg_derived<MessageLatency>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageLatency> create(const Glib::RefPtr<Gst::Object>& src), gst_message_new_latency)
 };
 
 /** An asynchronous start message.
@@ -935,18 +721,10 @@ public:
  */
 class MessageAsyncStart : public Message
 {
+  _CLASS_GENERIC(MessageAsyncStart, GstMessage)
 public:
-
-  /** Creates a new async message.  This message is posted by elements when
-   * they start an ASYNC state change.
-   *
-   * @param src The object originating the message.
-   * @return The new async_start message. MT safe.
-   *
-   * Since 0.10.13 
-   */
-  static Glib::RefPtr<Gst::MessageAsyncStart>
-    create(const Glib::RefPtr<Gst::Object>& src);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageAsyncStart>',`Gst::wrap_msg_derived<MessageAsyncStart>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageAsyncStart> create(const Glib::RefPtr<Gst::Object>& src), gst_message_new_async_start)
 };
 
 /** An asynchronous done message.
@@ -954,16 +732,10 @@ public:
  */
 class MessageAsyncDone : public Message
 {
+  _CLASS_GENERIC(MessageAsyncDone, GstMessage)
 public:
-
-  /** Create an async done message. The message is posted when elements
-   * completed an ASYNC state change.
-   *
-   * @param src The object originating the message.  
-   * @return The new async_done message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageAsyncDone>
-    create(const Glib::RefPtr<Gst::Object>& src, Gst::ClockTime running_time);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageAsyncDone>',`Gst::wrap_msg_derived<MessageAsyncDone>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageAsyncDone> create(const Glib::RefPtr<Gst::Object>& src, Gst::ClockTime running_time), gst_message_new_async_done)
 
   /** Extract the running_time from the async_done message.
    *
@@ -971,7 +743,7 @@ public:
    *
    * @return The running time from the async_done message.
    */
-  Gst::ClockTime parse() const;
+  Gst::ClockTime parse_running_time() const;
   _IGNORE(gst_message_parse_async_done)
 };
 
@@ -980,45 +752,22 @@ public:
  */
 class MessageStepStart : public Message
 {
+  _CLASS_GENERIC(MessageStepStart, GstMessage)
 public:
-  explicit MessageStepStart(GstMessage* castitem);
-
-  /** Create a step start message.  This message is posted by elements when
-   * they accept or activate a new step event for @a amount in @a format.
-   *
-   * @a active is set to false when the element accepted the new step event and
-   * has queued it for execution in the streaming threads.
-   *
-   * @a active is set to true when the element has activated the step operation
-   * and is now ready to start executing the step in the streaming thread.
-   * After this message is emited, the application can queue a new step
-   * operation in the element.
-   *
-   * @param src The object originating the message.  
-   * @param active If the step is active or queued.  
-   * @param format The format of amount.  
-   * @param amount The amount of stepped data.
-   * @param rate The rate of the stepped amount.  
-   * @param flush Is this an flushing step.
-   * @param intermediate Is this an intermediate step.
-   * @return The new step start message. MT safe.
-   *
-   * Since 0.10.24.
-   */
-  static Glib::RefPtr<Gst::MessageStepStart>
-    create(const Glib::RefPtr<Gst::Object>& src, bool active,
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageStepStart>',`Gst::wrap_msg_derived<MessageStepStart>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageStepStart> create(const Glib::RefPtr<Gst::Object>& src, bool active,
     Gst::Format format, guint64 amount, double rate, bool flush,
-    bool intermediate);
+    bool intermediate), gst_message_new_step_start)
 
   /** Extract the values of the step start message.
    *
    * MT safe.
    *
-   * @param active Result location for the active flag.  
-   * @param format Result location for the format.  
-   * @param amount Result location for the amount.  
-   * @param rate Result location for the rate.  
-   * @param flush Result location for the flush flag.  
+   * @param active Result location for the active flag.
+   * @param format Result location for the format.
+   * @param amount Result location for the amount.
+   * @param rate Result location for the rate.
+   * @param flush Result location for the flush flag.
    * @param intermediate Result location for the intermediate flag.
    *
    * Since 0.10.24.
@@ -1030,7 +779,7 @@ public:
   /** Extracts the amount of the step start message.
    * @return The amount.
    */
-  guint64 parse() const;
+  guint64 parse_amount() const;
 
   /** Extracts the active flag of the step start message.
    * @return The active flag.
@@ -1063,26 +812,12 @@ public:
  */
 class MessageStructureChange : public Message
 {
+  _CLASS_GENERIC(MessageStructureChange, GstMessage)
 public:
-
-  /** Create a new structure change message. This message is posted when the
-   * structure of a pipeline is in the process of being changed, for example
-   * when pads are linked or unlinked.
-   *
-   * @a src should be the srcpad that unlinked or linked.
-   *
-   * @param src The object originating the message.
-   * @param type The change type.
-   * @param owner The owner element of src.
-   * @param busy Whether the structure change is busy.
-   * @return The new structure change message. MT safe.
-   *
-   * Since 0.10.22.
-   */
-  static Glib::RefPtr<Gst::MessageStructureChange>
-    create(const Glib::RefPtr<Gst::Object>& src,
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageStructureChange>',`Gst::wrap_msg_derived<MessageStructureChange>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageStructureChange> create(const Glib::RefPtr<Gst::Object>& src,
     Gst::StructureChangeType type, const Glib::RefPtr<Gst::Element>& owner,
-    bool busy);
+    bool busy), gst_message_new_structure_change)
 
   /** Extracts the change type and completion status from the Gst::Message.
    * MT safe.
@@ -1105,7 +840,7 @@ public:
    *
    * Since 0.10.22.
    */
-  Gst::StructureChangeType parse() const;
+  Gst::StructureChangeType parse_type() const;
 
   /** Extracts the owner from the Gst::Message.
    * MT safe.
@@ -1131,27 +866,17 @@ public:
  */
 class MessageRequestState : public Message
 {
+  _CLASS_GENERIC(MessageRequestState, GstMessage)
 public:
-
-  /** This message can be posted by elements when they want to have their
-   * state changed. A typical use case would be an audio server that wants to
-   * pause the pipeline because a higher priority stream is being played.
-   *
-   * @param src The object originating the message.
-   * @param state The new requested state.
-   * @return The new requst state message. MT safe.
-   *
-   * Since 0.10.23.
-   */
-  static Glib::RefPtr<Gst::MessageRequestState>
-    create(const Glib::RefPtr<Gst::Object>& src, Gst::State state);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageRequestState>',`Gst::wrap_msg_derived<MessageRequestState>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageRequestState> create(const Glib::RefPtr<Gst::Object>& src, Gst::State state), gst_message_new_request_state)
 
   /** Extract the requested state from the request_state message.
    * @return The state. MT safe.
    *
    * Since 0.10.23.
    */
-  Gst::State parse() const;
+  Gst::State parse_state() const;
   _IGNORE(gst_message_parse_request_state)
 };
 
@@ -1160,18 +885,11 @@ public:
  */
 class MessageStreamStatus : public Message
 {
+  _CLASS_GENERIC(MessageStreamStatus, GstMessage)
 public:
-  /** Create a new stream status message. This message is posted when a
-   * streaming thread is created/destroyed or when the state changed. 
-   *
-   * @param src The object originating the message.  
-   * @param type The stream status type.  
-   * @param owner The owner element of @a src.  
-   * @return The new stream status message. MT safe.
-   */
-  static Glib::RefPtr<Gst::MessageStreamStatus>
-    create(const Glib::RefPtr<Gst::Object>& src, Gst::StreamStatusType type,
-    const Glib::RefPtr<Gst::Element>& owner);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageStreamStatus>',`Gst::wrap_msg_derived<MessageStreamStatus>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageStreamStatus> create(const Glib::RefPtr<Gst::Object>& src, Gst::StreamStatusType type,
+    const Glib::RefPtr<Gst::Element>& owner), gst_message_new_stream_status)
 
   /** Configures the object handling the streaming thread. This is usually a
    * Gst::Task object but other objects might be added in the future.
@@ -1212,7 +930,7 @@ public:
    *
    * Since 0.10.24.
    */
-  Gst::StreamStatusType parse() const;
+  Gst::StreamStatusType parse_type() const;
 
   /** Extracts the owner of the Gst::Message. The returned owner remains valid
    * for as long as the reference to the message is valid.
@@ -1231,30 +949,11 @@ public:
  */
 class MessageQos : public Message
 {
+  _CLASS_GENERIC(MessageQos, GstMessage)
 public:
-  /** A QOS message is posted on the bus whenever an element decides to drop a
-   * buffer because of QoS reasons or whenever it changes its processing strategy
-   * because of QoS reasons (quality adjustments such as processing at lower
-   * accuracy).
-   *
-   * This message can be posted by an element that performs synchronisation against the
-   * clock (live) or it could be dropped by an element that performs QoS because of QOS
-   * events received from a downstream element (!live).
-   *
-   * MT safe.
-   *
-   * @param src The object originating the message.
-   * @param live If the message was generated by a live element
-   * @param running_time The running time of the buffer that generated the message
-   * @param stream_time The stream time of the buffer that generated the message
-   * @param timestamp The timestamps of the buffer that generated the message
-   * @param duration The duration of the buffer that generated the message
-   *
-   * @return The new qos message.
-   */
-  static Glib::RefPtr<Gst::MessageQos>
-    create(const Glib::RefPtr<Gst::Object>& src, bool live, guint64 running_time,
-    guint64 stream_time, guint64 timestamp, guint64 duration);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageQos>',`Gst::wrap_msg_derived<MessageQos>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageQos> create(const Glib::RefPtr<Gst::Object>& src, bool live, guint64 running_time,
+    guint64 stream_time, guint64 timestamp, guint64 duration), gst_message_new_qos)
 
   /** Set the QoS values that have been calculated/analysed from the QoS data.
    *
@@ -1350,18 +1049,10 @@ public:
  */
 class MessageStreamStart : public Message
 {
+  _CLASS_GENERIC(MessageStreamStart, GstMessage)
 public:
-	/** Create a new stream_start message. This message is generated and posted in
-	 * the sink elements of a GstBin. The bin will only forward the STREAM_START
-	 * message to the application if all sinks have posted an STREAM_START message.
-	 *
-	 * MT safe.
-	 *
-	 * @param src The object originating the message.
-	 *
-	 * @return The new stream_start message.
-	 */
-  static Glib::RefPtr<Gst::MessageStreamStart> create(const Glib::RefPtr<Gst::Object>& src);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageStreamStart>',`Gst::wrap_msg_derived<MessageStreamStart>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageStreamStart> create(const Glib::RefPtr<Gst::Object>& src), gst_message_new_stream_start)
 
   /** Sets the group id on the stream-start message.
    *
@@ -1395,18 +1086,10 @@ public:
  */
 class MessageHaveContext : public Message
 {
+  _CLASS_GENERIC(MessageHaveContext, GstMessage)
 public:
-  /** This message is posted when an element has a new local Gst::Context.
-   *
-   * MT safe
-   *
-   * @param src The object originating the message.
-   * @param context The context.
-   *
-   * @return The new have-context message.
-   */
-  static Glib::RefPtr<Gst::MessageHaveContext>
-    create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Context>& context);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageHaveContext>',`Gst::wrap_msg_derived<MessageHaveContext>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageHaveContext> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Context>& context), gst_message_new_have_context)
 
   /** Extract the context from the HAVE_CONTEXT message.
    *
@@ -1414,8 +1097,16 @@ public:
    *
    * @return context Result location for the context.
    */
-  Glib::RefPtr<Gst::Context> parse() const;
+  Glib::RefPtr<Gst::Context> parse_have_context();
   _IGNORE(gst_message_parse_have_context)
+
+  /** Extract the context from the HAVE_CONTEXT message.
+   *
+   * MT safe.
+   *
+   * @return context Result location for the context.
+   */
+  Glib::RefPtr<const Gst::Context> parse_have_context() const;
 };
 
 /** A need-context message.
@@ -1423,18 +1114,10 @@ public:
  */
 class MessageNeedContext : public Message
 {
+  _CLASS_GENERIC(MessageNeedContext, GstMessage)
 public:
-  /** This message is posted when an element needs a specific Gst::Context.
-   *
-   * MT safe.
-   *
-   * @param src The object originating the message.
-   * @param context_type The context type that is needed.
-   *
-   * @return The new need-context message.
-   */
-  static Glib::RefPtr<Gst::MessageNeedContext>
-    create(const Glib::RefPtr<Gst::Object>& src, const Glib::ustring& context_type);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageNeedContext>',`Gst::wrap_msg_derived<MessageNeedContext>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageNeedContext> create(const Glib::RefPtr<Gst::Object>& src, const Glib::ustring& context_type), gst_message_new_need_context)
 
   /** Parse a context type from an existing Gst::MESSAGE_NEED_CONTEXT message.
    *
@@ -1451,19 +1134,10 @@ public:
  */
 class MessageResetTime : public Message
 {
+  _CLASS_GENERIC(MessageResetTime, GstMessage)
 public:
-  /** This message is posted when the pipeline running-time should be reset to
-    *     @running_time, like after a flushing seek.
-    *
-    * MT safe.
-    *
-    * @param src The object originating the message.
-    * @param running_time The requested running-time.
-    *
-    * @return The new reset_time message.
-    */
-  static Glib::RefPtr<Gst::MessageResetTime>
-    create(const Glib::RefPtr<Gst::Object>& src, Gst::ClockTime running_time);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageResetTime>',`Gst::wrap_msg_derived<MessageResetTime>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageResetTime> create(const Glib::RefPtr<Gst::Object>& src, Gst::ClockTime running_time), gst_message_new_reset_time)
 
   /** Extract the running-time from the RESET_TIME message.
    *
@@ -1471,7 +1145,7 @@ public:
    *
    * @return Result location for the running_time.
    */
-  Gst::ClockTime parse() const;
+  Gst::ClockTime parse_running_time() const;
   _IGNORE(gst_message_parse_reset_time)
 };
 
@@ -1480,21 +1154,10 @@ public:
  */
 class MessageToc : public Message
 {
+  _CLASS_GENERIC(MessageToc, GstMessage)
 public:
-  /** Create a new TOC message. The message is posted by elements
-   * that discovered or updated a TOC.
-   *
-   * MT safe.
-   *
-   * @param src The object originating the message.
-   * @param toc Gst::Toc structure for hte message.
-   * @param updated whether TOC was updated
-   *
-   * @return A new TOC message.
-   */
-  static Glib::RefPtr<Gst::MessageToc>
-    create(const Glib::RefPtr<Gst::Object>& src,
-      const Glib::RefPtr<Gst::Toc>& toc, bool updated);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageToc>',`Gst::wrap_msg_derived<MessageToc>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageToc> create(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Toc>& toc, bool updated), gst_message_new_toc)
 
   /** Extract the TOC from the Gst::Message.
    *
@@ -1512,23 +1175,11 @@ public:
  */
 class MessageProgress : public Message
 {
+  _CLASS_GENERIC(MessageProgress, GstMessage)
 public:
-  /** Progress messages are posted by elements when they use an asynchronous task
-   * to perform actions triggered by a state change.
-   *
-   * @code contains a well defined string describing the action.
-   * @text should contain a user visible string detailing the current action.
-   *
-   * @param src The object originating the message.
-   * @param type A Gst::ProgressType.
-   * @param code A progress code.
-   * @param text Free, user visible text describing the progress.
-   *
-   * @return The new progress message.
-   */
-  static Glib::RefPtr<Gst::MessageProgress>
-    create(const Glib::RefPtr<Gst::Object>& src,
-      Gst::ProgressType type, const Glib::ustring& code, const Glib::ustring& text);
+#m4 _CONVERSION(`GstMessage*',`Glib::RefPtr<Gst::MessageProgress>',`Gst::wrap_msg_derived<MessageProgress>($3, false)')
+  _WRAP_METHOD(static Glib::RefPtr<Gst::MessageProgress> create(const Glib::RefPtr<Gst::Object>& src,
+								Gst::ProgressType type, const Glib::ustring& code, const Glib::ustring& text), gst_message_new_progress)
 
   /** Parses the progress @type, @code and @text.
    *

@@ -40,6 +40,9 @@ _CONV_ENUM(Gst,MixerType)
 _CONV_ENUM(Gst,MultiHandleSinkClientStatus)
 _CONV_ENUM(Gst,MultiHandleSinkSyncMethod)
 _CONV_ENUM(Gst,NavigationCommand)
+_CONV_ENUM(Gst,NavigationEventType)
+_CONV_ENUM(Gst,NavigationMessageType)
+_CONV_ENUM(Gst,NavigationQueryType)
 _CONV_ENUM(Gst,PadDirection)
 _CONV_ENUM(Gst,PadLinkCheck)
 _CONV_ENUM(Gst,PadLinkReturn)
@@ -48,6 +51,7 @@ _CONV_ENUM(Gst,PadPresence)
 _CONV_ENUM(Gst,PadProbeType)
 _CONV_ENUM(Gst,PlayFlags)
 _CONV_ENUM(Gst,PluginDependencyFlags)
+_CONV_ENUM(Gst,PluginFlags)
 _CONV_ENUM(Gst,ProgressType)
 _CONV_ENUM(Gst,QOSType)
 _CONV_ENUM(Gst,QueryType)
@@ -60,7 +64,9 @@ _CONV_ENUM(Gst,State)
 _CONV_ENUM(Gst,StateChange)
 _CONV_ENUM(Gst,StateChangeReturn)
 _CONV_ENUM(Gst,StreamFlags)
+_CONV_ENUM(Gst,StreamStatusType)
 _CONV_ENUM(Gst,StreamVolumeFormat)
+_CONV_ENUM(Gst,StructureChangeType)
 _CONV_ENUM(Gst,TagMergeMode)
 _CONV_ENUM(Gst,TaskState)
 _CONV_ENUM(Gst,TocEntryType)
@@ -94,6 +100,7 @@ dnl Allocator
 _CONVERSION(`const Glib::RefPtr<Gst::Allocator>&',`GstAllocator*', `const_cast<GstAllocator*>(Glib::unwrap($3))')
 _CONVERSION(`Glib::RefPtr<Gst::Allocator>&&',`GstAllocator*',`($3) ? $3.release()->gobj() : nullptr');
 _CONVERSION(`GstAllocator*', `Glib::RefPtr<Gst::Allocator>', `Glib::wrap($3)')
+_CONVERSION(`GstAllocator*', `Glib::RefPtr<const Gst::Allocator>', `Glib::wrap($3)')
 
 dnl AudioFormatInfo
 _CONVERSION(`const GstAudioFormatInfo*', `const Gst::AudioFormatInfo', `Gst::AudioFormatInfo($3)')
@@ -216,11 +223,13 @@ _CONVERSION(`GstIterator*',`Gst::Iterator<const Gst::Pad>',`Gst::Iterator<const 
 _CONVERSION(`GstIterator*',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>',`Gst::IteratorBasic<const Gst::QueryTypeDefinition>($3)')
 
 dnl MapInfo
-_CONVERSION(`const Glib::RefPtr<Gst::MapInfo>&', `GstMapInfo*', `$3->gobj()')
+_CONVERSION(`const Gst::MapInfo&', `GstMapInfo*', `const_cast<GstMapInfo*>($3.gobj())')
+_CONVERSION(`Gst::MapInfo&', `GstMapInfo*', `($3.gobj())')
 
 dnl Memory
 _CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>&',`Glib::wrap($3)')
 _CONVERSION(`GstMemory*',`Glib::RefPtr<Gst::Memory>',`Glib::wrap($3)')
+_CONVERSION(`GstMemory*',`Glib::RefPtr<const Gst::Memory>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gst::Memory>&',`GstMemory*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Memory>',`GstMemory*', `Glib::unwrap($3)')
@@ -375,6 +384,7 @@ _CONVERSION(`gsize*',`gsize&',`*$3')
 _CONVERSION(`const guint32&',`guint32',`$3')
 _CONVERSION(`guint8*&',`guint8**',`&$3')
 _CONVERSION(`gdouble&',`gdouble*',`&$3')
+_CONVERSION(`guint8*',`const guint8*',`$3')
 
 dnl Basic Gstreamermm Conversions
 _CONVERSION(`Gst::ClockTime&',`GstClockTime*',`(GstClockTime*)(&$3)')
@@ -394,6 +404,7 @@ _CONVERSION(`const va_list&',`va_list',`const_cast<va_list&>($3)')
 
 dnl Glibmm Conversions
 _CONVERSION(`const Glib::Error&', `const GError*', `$3.gobj()')
+_CONVERSION(`const Glib::Error&', `GError*', `const_cast<GError*>($3.gobj())')
 _CONVERSION(`GQuark',`Glib::QueryQuark',`Glib::QueryQuark($3)')
 _CONVERSION(`const Glib::QueryQuark&',`GQuark',`$3')
 _CONVERSION(`Glib::Threads::RecMutex&',`GRecMutex*',`$3.gobj()')

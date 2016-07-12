@@ -1,12 +1,6 @@
-/*
- * mapinfo.hg
- *
- *  Created on: Jul 31, 2013
- *      Author: m.kolny
- */
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2013-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,44 +18,59 @@
  */
 
 #include <gst/gst.h>
-#include <gstreamermm/object.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
 
+class Memory;
+
 _WRAP_ENUM(MapFlags, GstMapFlags)
 
 /* A structure containing the result of a map operation such as
- * Memory::Map(). It contains the data and size.
+ * Memory::map(). It contains the data and size.
+ *
+ * Last reviewed on 2016-06-05 (1.8.0)
  */
-class MapInfo : public Glib::Object
+class MapInfo
 {
   _CLASS_GENERIC(MapInfo, GstMapInfo)
 public:
   MapInfo();
 
-  explicit MapInfo(GstMapInfo& castitem,
-    bool take_ownership = false);
+  explicit MapInfo(const GstMapInfo& castitem);
 
-  MapInfo(const MapInfo& other);
+  MapInfo(MapInfo&& other);
+  MapInfo& operator=(MapInfo&& other);
 
-  virtual ~MapInfo();
-
-
+  /** Get flags used when mapping the memory.
+   */
   _MEMBER_GET(flags, flags, MapFlags, GstMapFlags)
-  _MEMBER_GET(data, data, guint8*, guint8*)
-  _MEMBER_GET(maxsize, maxsize, gsize, gsize)
-  _MEMBER_GET(size, size, gsize, gsize)
 
-  GstMapInfo* gobj() { return m_spec; };
-  const GstMapInfo* gobj() const { return m_spec; };
+  /** Get a pointer to the mapped data.
+   */
+  _MEMBER_GET_PTR(data, data, guint8*, guint8*)
+
+  /** Get the maximum bytes in data.
+   */
+  _MEMBER_GET(maxsize, maxsize, gsize, gsize)
+
+  /** Get the valid size in data.
+   */
+  _MEMBER_GET(size, size, gsize, gsize)
+  _MEMBER_GET(memory, memory, Glib::RefPtr<Gst::Memory>, GstMemory*)
+
+  /** Get a Glib::RefPtr to the mapped memory.
+   */
+  _MEMBER_GET_GOBJECT(memory, memory, Gst::Memory, GstMemory*)
+
+  GstMapInfo* gobj() { return &m_spec; };
+  const GstMapInfo* gobj() const { return &m_spec; };
 
 protected:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GstMapInfo* m_spec;
-  bool take_ownership;
+  GstMapInfo m_spec;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 

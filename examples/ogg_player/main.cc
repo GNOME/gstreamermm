@@ -78,7 +78,7 @@ bool on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<
       if(msgError)
       {
         Glib::Error err;
-        err = msgError->parse();
+        err = msgError->parse_error();
         std::cerr << "Error: " << err.what() << std::endl;
       }
       else

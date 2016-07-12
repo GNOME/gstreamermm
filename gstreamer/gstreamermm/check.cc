@@ -69,10 +69,10 @@ void Check::_Check::caps_equal (RefPtr<Caps> caps1, RefPtr<Caps> caps2)
 
 void buffer_data (RefPtr<Buffer> buffer, gconstpointer data, gsize size)
 {
-    RefPtr<MapInfo> info;
+    MapInfo info;
 
     ThrowIfNot (buffer->map(info, MAP_READ), "Error occurs during mapping.");
-    ThrowIf ((std::equal (info->get_data(), info->get_data() + size,
+    ThrowIf ((std::equal (info.get_data(), info.get_data() + size,
             static_cast<const guint8*>(data)) != 0), "Buffer data not equals.");
     // TODO: using gst_util to display/throw/return dump of memory
 
