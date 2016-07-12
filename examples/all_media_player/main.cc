@@ -18,7 +18,7 @@ class AllMediaPlayer
 private:
   RefPtr<Glib::MainLoop> main_loop;
   RefPtr<Pipeline> pipeline;
-  RefPtr<FileSrc> source;
+  RefPtr<Element> source;
   RefPtr<Element> decoder;
 
   bool on_bus_message(const RefPtr<Bus>&, const RefPtr<Message>& message);
@@ -26,7 +26,7 @@ private:
 
   void init()
   {
-    source = FileSrc::create();
+    source = ElementFactory::create_element("filesrc");
     decoder = ElementFactory::create_element("decodebin");
 
     if (!decoder || !source)
@@ -51,7 +51,7 @@ public:
   void play_until_eos(const std::string& filename)
   {
     init();
-    source->property_location() = filename;
+    source->set_property("location", filename);
     pipeline->set_state(STATE_PLAYING);
     main_loop->run();
     pipeline->set_state(STATE_NULL);

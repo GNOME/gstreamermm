@@ -20,7 +20,6 @@
 #include <glibmm.h>
 #include <iostream>
 #include <stdlib.h>
-#include <gstreamermm/playbin.h>
 
 namespace
 {
@@ -75,11 +74,11 @@ int main(int argc, char** argv)
   }
 
   // Create a playbin2 element.
-  Glib::RefPtr<Gst::PlayBin> playbin = Gst::PlayBin::create();
+  Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create_element("playbin");
 
   if(!playbin)
   {
-    std::cerr << "The playbin2 element could not be created." << std::endl;
+    std::cerr << "The playbin element could not be created." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -92,7 +91,7 @@ int main(int argc, char** argv)
     uri = Glib::filename_to_uri(argv[1]);
 
   // Set the playbyin2's uri property.
-  playbin->property_uri() = uri;
+  playbin->set_property("uri", uri);
 
   // Create the main loop.
   mainloop = Glib::MainLoop::create();

@@ -19,7 +19,6 @@
 #include "player_window.h"
 
 #include <gstreamermm.h>
-#include <gstreamermm/xvimagesink.h>
 
 #if defined (GDK_WINDOWING_X11)
 #include <gdk/gdkx.h>
@@ -30,7 +29,20 @@
 #include <iostream>
 #include <iomanip>
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
+
+static const Glib::SignalProxyInfo PlayBin_signal_video_changed_info =
+{
+  "video-changed",
+  (GCallback) &Glib::SignalProxyNormal::slot0_void_callback,
+  (GCallback) &Glib::SignalProxyNormal::slot0_void_callback
+};
+
+Glib::SignalProxy0< void > signal_video_changed(const Glib::RefPtr<Gst::Element>& playbin)
+{
+  return Glib::SignalProxy0< void >(playbin.operator->(), &PlayBin_signal_video_changed_info);
+}
+
+PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::Element>& playbin)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button("Play"),
@@ -102,8 +114,9 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
   m_forward_button.set_sensitive(false);
 
   m_playbin = playbin;
-  m_playbin->property_video_sink() = Gst::XvImageSink::create();
-  m_playbin->signal_video_changed().connect(
+  m_playbin->set_property("video-sink", Gst::ElementFactory::create_element("xvimagesink"));
+
+  signal_video_changed(m_playbin).connect(
     sigc::mem_fun(*this, &PlayerWindow::on_video_changed) );
 
   show_all_children();
@@ -186,7 +199,7 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
       Glib::RefPtr<Gst::MessageError> msg_error = Glib::RefPtr<Gst::MessageError>::cast_static(message);
       if(msg_error)
       {
-        Glib::Error err = msg_error->parse();
+        Glib::Error err = msg_error->parse_error();
         std::cerr << "Error: " << err.what() << std::endl;
       }
       else
@@ -206,7 +219,11 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
 
 void PlayerWindow::on_video_changed()
 {
-  Glib::RefPtr<Gst::Pad> pad = m_playbin->get_video_pad(0);
+  // TODO wrap it
+  GstPad* result;
+  g_signal_emit_by_name(m_playbin->gobj(), "get-video-pad", 0, &result, static_cast<void*>(0));
+  Glib::RefPtr<Gst::Pad> pad = Glib::wrap(result);
+
   if(pad)
   {
     // Add a buffer probe to the video sink pad which will be removed after
@@ -385,7 +402,7 @@ void PlayerWindow::on_button_open()
     working_dir = chooser.get_current_folder();
 
     // Set uri property on the playbin.
-    m_playbin->property_uri() = chooser.get_uri();
+    m_playbin->set_property("uri", chooser.get_uri());
 
     // Resize m_video_area and window to minimum when opening a file
     m_video_area.set_size_request(0, 0);

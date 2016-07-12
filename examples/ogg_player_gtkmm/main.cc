@@ -21,19 +21,13 @@
 #include <gstreamermm/element.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
-
-// Plug-ins
-#include <gstreamermm/alsasink.h>
-#include <gstreamermm/audioconvert.h>
-#include <gstreamermm/filesrc.h>
-#include <gstreamermm/oggdemux.h>
-#include <gstreamermm/vorbisdec.h>
+#include <gstreamermm/elementfactory.h>
 
 #include <iostream>
 #include "player_window.h"
 
 Glib::RefPtr<Gst::Pipeline> pipeline;
-Glib::RefPtr<Gst::VorbisDec> decoder;
+Glib::RefPtr<Gst::Element> decoder;
 
 void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 {
@@ -58,7 +52,7 @@ int main(int argc, char** argv)
 
   // Create the elements
   // Reads file from disk
-  Glib::RefPtr<Gst::FileSrc> source = Gst::FileSrc::create();
+  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("filesrc");
   if(!source)
   {
     std::cerr << "filesrc element could not be created" << std::endl;
@@ -67,7 +61,7 @@ int main(int argc, char** argv)
 
   // Parses the ogg streams into elementary streams (note that an ogg file may
   // contain a video stream too)
-  Glib::RefPtr<Gst::OggDemux> parser = Gst::OggDemux::create();
+  Glib::RefPtr<Gst::Element> parser = Gst::ElementFactory::create_element("oggdemux");
   if(!parser)
   {
     std::cerr << "oggdemux element could not be created" << std::endl;
@@ -75,7 +69,7 @@ int main(int argc, char** argv)
   }
 
   // Decodes a vorbis stream
-  decoder = Gst::VorbisDec::create();
+  decoder = Gst::ElementFactory::create_element("vorbisdec");
   if(!decoder)
   {
     std::cerr << "vorbisdec element could not be created" << std::endl;
@@ -83,7 +77,7 @@ int main(int argc, char** argv)
   }
 
   // Converts audio to a format which can be used by the next element
-  Glib::RefPtr<Gst::AudioConvert> conv = Gst::AudioConvert::create();
+  Glib::RefPtr<Gst::Element> conv = Gst::ElementFactory::create_element("audioconvert");
   if(!conv)
   {
     std::cerr << "audioconvert element could not be created" << std::endl;
@@ -91,7 +85,7 @@ int main(int argc, char** argv)
   }
 
   // Outputs sound to an ALSA audio device
-  Glib::RefPtr<Gst::AlsaSink> sink = Gst::AlsaSink::create();
+  Glib::RefPtr<Gst::Element> sink = Gst::ElementFactory::create_element("alsasink");
   if(!sink)
   {
     std::cerr << "sink element could not be created" << std::endl;

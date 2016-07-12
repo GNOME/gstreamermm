@@ -129,41 +129,6 @@
 #include <gstreamermm/navigation.h>
 #include <gstreamermm/videoorientation.h>
 
-// Plug-in core includes
-#include <gstreamermm/capsfilter.h>
-#include <gstreamermm/fakesrc.h>
-#include <gstreamermm/fakesink.h>
-#include <gstreamermm/fdsink.h>
-#include <gstreamermm/fdsrc.h>
-#include <gstreamermm/filesrc.h>
-#include <gstreamermm/filesink.h>
-#include <gstreamermm/funnel.h>
-#include <gstreamermm/identity.h>
-#include <gstreamermm/multiqueue.h>
-#include <gstreamermm/queue.h>
-#include <gstreamermm/queue2.h>
-
-// Plug-in base includes
-#include <gstreamermm/adder.h>
-#include <gstreamermm/alsasink.h>
-#include <gstreamermm/alsasrc.h>
-#include <gstreamermm/audioconvert.h>
-#include <gstreamermm/audiorate.h>
-//#include <gstreamermm/audioresample.h>
-#include <gstreamermm/audiotestsrc.h>
-#include <gstreamermm/cdparanoiasrc.h>
-#include <gstreamermm/clockoverlay.h>
-#include <gstreamermm/decodebin.h>
-#include <gstreamermm/giosink.h>
-#include <gstreamermm/giosrc.h>
-#include <gstreamermm/giostreamsink.h>
-#include <gstreamermm/giostreamsrc.h>
-//TODO? (Add plug-in first): #include <gstreamermm/gnomevfssink.h>
-//TODO? (Add plug-in first): #include <gstreamermm/gnomevfssrc.h>
-#include <gstreamermm/oggdemux.h>
-#include <gstreamermm/oggmux.h>
-#include <gstreamermm/subtitleoverlay.h>
-#include <gstreamermm/typefindelement.h>
 #include <gstreamermm/videooverlay.h>
 
 

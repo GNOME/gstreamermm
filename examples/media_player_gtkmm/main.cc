@@ -30,7 +30,7 @@ int main (int argc, char **argv)
 
   // playbin plays any media type, choosing an appropriate set of elements
   // and linking them together.
-  Glib::RefPtr<Gst::PlayBin> playbin = Gst::PlayBin::create("playbin");
+  Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create_element("playbin", "playbin");
 
   if(!playbin)
   {

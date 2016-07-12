@@ -19,6 +19,9 @@
 #include <gstreamermm.h>
 #include <glibmm.h>
 #include <iostream>
+#include <type_traits>
+
+typedef struct _GstTypeFindElement GstTypeFindElement;
 
 Glib::RefPtr<Glib::MainLoop> mainloop;
 bool have_type = false;
@@ -31,6 +34,56 @@ static bool on_structure_foreach(const Glib::QueryQuark& id, const Glib::ValueBa
   g_free(str_value);
 
   return true;
+}
+
+namespace Glib{
+template <typename T>
+constexpr T wrap (const T& v, bool=true)
+{
+  return v;
+}
+
+template <typename T>
+constexpr T unwrap (const T& v, bool=true)
+{
+  return v;
+}
+}
+
+template<typename ...T>
+static void signal_callback(void* self, T ...v)
+{
+  using namespace Gst;
+  typedef sigc::slot< void, decltype(Glib::wrap(v))... > SlotType;
+
+  void* data = std::get<sizeof...(T)-1>(std::tuple<T...>(v...));
+
+  try
+  {
+    if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+    {
+      (*static_cast<SlotType*>(slot))(Glib::wrap(std::forward<T>(v), true)...);
+    }
+  }
+  catch(...)
+  {
+     Glib::exception_handlers_invoke();
+  }
+}
+
+
+template<typename ...T>
+Glib::SignalProxy< void, T... > signal_have_type(const Glib::RefPtr<Glib::Object>& obj)
+{
+
+  static const Glib::SignalProxyInfo signal_info =
+  {
+    "have-type",
+    (GCallback) &signal_callback<decltype(Glib::unwrap(*((typename std::remove_reference<T>::type*)nullptr)))..., void*>,
+    (GCallback) &signal_callback<decltype(Glib::unwrap(*((typename std::remove_reference<T>::type*)nullptr)))..., void*>
+  };
+
+  return Glib::SignalProxy< void, T... >(obj.operator->(), &signal_info);
 }
 
 static void on_typefind_have_type(guint probability, const Glib::RefPtr<Gst::Caps>& caps)
@@ -81,17 +134,17 @@ int main(int argc, char** argv)
   Glib::RefPtr<Gst::Pipeline> pipeline = Gst::Pipeline::create("my-pipeline");
 
   // Create elements:
-  Glib::RefPtr<Gst::FileSrc> element_source = Gst::FileSrc::create();
-  element_source->property_location() = filename;
+  Glib::RefPtr<Gst::Element> element_source = Gst::ElementFactory::create_element("filesrc");
+  element_source->set_property("location", filename);
 
   //If using an MP3 file, this should provide more Caps information from typefind.
   //Glib::RefPtr<Gst::Element> element_id3demux = Gst::ElementFactory::create_element("id3demux");
   //g_assert(element_id3demux);
 
-  Glib::RefPtr<Gst::TypeFindElement> element_typefind = Gst::TypeFindElement::create();
-  element_typefind->signal_have_type().connect(
+  Glib::RefPtr<Gst::Element> element_typefind = Gst::ElementFactory::create_element("typefind");
+  signal_have_type<guint, const Glib::RefPtr<Gst::Caps>&>(element_typefind).connect(
     sigc::ptr_fun(&on_typefind_have_type) );
-  Glib::RefPtr<Gst::Element> element_sink = Gst::FakeSink::create();
+  Glib::RefPtr<Gst::Element> element_sink = Gst::ElementFactory::create_element("fakesink");
 
   // We must add the elements to the pipeline before linking them:
   try

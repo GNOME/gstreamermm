@@ -68,8 +68,8 @@ int main(int argc, char** argv)
   RefPtr<Bus> bus = pipeline->get_bus();
   bus->add_watch(sigc::ptr_fun(&on_bus_message));
 
-  RefPtr<FileSrc> video_source = FileSrc::create(),
-    audio_source = FileSrc::create();
+  RefPtr<Element> video_source = ElementFactory::create_element("filesrc"),
+    audio_source = ElementFactory::create_element("filesrc");
 
   RefPtr<Element> ogg_demuxer = ElementFactory::create_element("oggdemux");
   audio_parser = ElementFactory::create_element("mad");
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     videosink = ElementFactory::create_element("autovideosink");
 
   RefPtr<Element> muxer = ElementFactory::create_element("matroskamux");
-  RefPtr<FileSink> filesink = FileSink::create();
+  RefPtr<Element> filesink = ElementFactory::create_element("filesink");
 
   video_parser = ElementFactory::create_element("theoraparse");
 
@@ -88,9 +88,9 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  video_source->property_location() = argv[1];
-  audio_source->property_location() = argv[2];
-  filesink->property_location() = argv[3];
+  video_source->set_property("location", argv[1]);
+  audio_source->set_property("location", argv[2]);
+  filesink->set_property("location", argv[3]);
 
   pipeline->add(video_source)->
             add(ogg_demuxer)->
