@@ -1,12 +1,6 @@
-/*
- * tocsetter.hg
- *
- *  Created on: Sep 25, 2013
- *      Author: m.kolny
- */
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2013 The gstreamermm Development Team
+ * Copyright 2013-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,8 +25,34 @@ _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
+class Toc;
+
+/** An interface that allows setting and retrieval of the TOC.
+ *
+ * Elements that support some kind of chapters or editions (or tracks like in
+ * the FLAC cue sheet) will implement this interface.
+ *
+ * If you just want to retrieve the TOC in your application then all you
+ * need to do is watch for TOC messages on your pipeline's bus (or you can
+ * perform TOC query). This interface is only for setting TOC data, not for
+ * extracting it. To set TOC from the application, find proper tocsetter element
+ * and set TOC using set_toc().
+ *
+ * Elements implementing the Gst::TocSetter interface can extend existing TOC
+ * by getting extend UID for that (you can use gst_toc_find_entry() to retrieve it)
+ * with any TOC entries received from downstream.
+ *
+ * Last reviewed on 2016-08-27 (1.8.0)
+ *
+ * @ingroup GstInterfaces
+ */
 class TocSetter : public Glib::Interface
 {
   _CLASS_INTERFACE(TocSetter, GstTocSetter, GST_TOC_SETTER, GstTocSetterInterface)
+
+public:
+  _WRAP_METHOD(void set_toc(const Glib::RefPtr<Gst::Toc>& toc), gst_toc_setter_set_toc)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Toc> get_toc() const, gst_toc_setter_get_toc)
+  _WRAP_METHOD(void reset(), gst_toc_setter_reset)
 };
 }
