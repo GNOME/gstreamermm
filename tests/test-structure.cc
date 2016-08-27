@@ -134,3 +134,16 @@ TEST_F(StructureTest, CreateStructureWithCustomFields)
   ASSERT_EQ(14, d1.x);
   ASSERT_EQ(85, d2.get().x);
 }
+
+TEST_F(StructureTest, UseStructureWithGlibValue)
+{
+  structure = Structure("dummy");
+  Glib::Value<int> value;
+  value.init(Glib::Value<int>::value_type());
+  value.set(123);
+  structure.set_field("field1", value);
+
+  Glib::Value<int> read_value;
+  structure.get_field("field1", read_value);
+  ASSERT_EQ(123, read_value.get());
+}
