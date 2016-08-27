@@ -70,6 +70,7 @@ _CONV_ENUM(Gst,StructureChangeType)
 _CONV_ENUM(Gst,TagMergeMode)
 _CONV_ENUM(Gst,TaskState)
 _CONV_ENUM(Gst,TocEntryType)
+_CONV_ENUM(Gst,TocLoopType)
 _CONV_ENUM(Gst,TocScope)
 _CONV_ENUM(Gst,TunerChannelFlags)
 _CONV_ENUM(Gst,URIType)
@@ -335,6 +336,9 @@ _CONVERSION(`const Glib::RefPtr<Gst::Toc>&', `GstToc*',`Glib::unwrap($3)')
 dnl TocEntry
 _CONVERSION(`GstTocEntry*',`Glib::RefPtr<Gst::TocEntry>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::TocEntry>', `GstTocEntry*',`Glib::unwrap($3)')
+
+dnl TocLoopType
+_CONVERSION(`Gst::TocLoopType&',`GstTocLoopType*',`reinterpret_cast<GstTocLoopType*>(&($3))')
 
 dnl TypeFind
 _CONVERSION(`Gst::TypeFind&',`GstTypeFind*',`$3.gobj()')

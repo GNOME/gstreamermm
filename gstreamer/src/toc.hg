@@ -1,12 +1,6 @@
-/*
- * toc.hg
- *
- *  Created on: Sep 25, 2013
- *      Author: m.kolny
- */
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008-20013 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,16 +19,61 @@
 
 #include <gst/gst.h>
 #include <gstreamermm/miniobject.h>
+#include <gstreamermm/taglist.h>
 
 _DEFS(gstreamermm,gst)
 
 namespace Gst
 {
-  class TocEntry;
+class TocEntry;
 
-  _WRAP_ENUM(TocScope, GstTocScope)
-  _WRAP_ENUM(TocEntryType, GstTocEntryType)
+_WRAP_ENUM(TocScope, GstTocScope)
+_WRAP_ENUM(TocEntryType, GstTocEntryType)
+_WRAP_ENUM(TocLoopType, GstTocLoopType)
 
+/** Gst::Toc lets you to inform other elements in pipeline or application that playing
+ * source has some kind of table of contents (TOC). These may be chapters, editions,
+ * angles or other types. For example: DVD chapters, Matroska chapters or cue sheet
+ * TOC. Such TOC will be useful for applications to display instead of just a
+ * playlist.
+ *
+ * Using TOC is very easy. Firstly, create Gst::Toc structure which represents root
+ * contents of the source. You can also attach TOC-specific tags to it. Then fill
+ * it with Gst::TocEntry entries by appending them to the Gst::Toc using
+ * append_entry(), and appending subentries to a Gst::TocEntry using
+ * append_sub_entry().
+ *
+ * Note that root level of the TOC can contain only either editions or chapters. You
+ * should not mix them together at the same level. Otherwise you will get serialization
+ * /deserialization errors. Make sure that no one of the entries has negative start and
+ *  stop values.
+ *
+ * Use Gst::EventToc class to create TOC event, and parse_toc() to
+ * parse received TOC event. Use Gst::EventTocSelect to create a new TOC select event,
+ * and parse_toc_select() to parse received TOC select event. The same rule for
+ * the messages: MessageToc to create new TOC message, and
+ * parse() to parse received TOC message.
+ *
+ * TOCs can have global scope or current scope. Global scope TOCs contain
+ * all entries that can possibly be selected using a toc select event, and
+ * are what an application is usually interested in. TOCs with current scope
+ * only contain the parts of the TOC relevant to the currently selected/playing
+ * stream; the current scope TOC is used by downstream elements such as muxers
+ * to write correct TOC entries when transcoding files, for example. When
+ * playing a DVD, the global TOC would contain a hierarchy of all titles,
+ * chapters and angles, for example, while the current TOC would only contain
+ * the chapters for the currently playing title if playback of a specific
+ * title was requested.
+ *
+ * Applications and plugins should not rely on TOCs having a certain kind of
+ * structure, but should allow for different alternatives. For example, a
+ * simple CUE sheet embedded in a file may be presented as a flat list of
+ * track entries, or could have a top-level edition node (or some other
+ * alternative type entry) with track entries underneath that node; or even
+ * multiple top-level edition nodes (or some other alternative type entries)
+ * each with track entries underneath, in case the source file has extracted
+ * a track listing from different sources).
+ */
 class Toc : public MiniObject
 {
   _CLASS_OPAQUE_REFCOUNTED(Toc, GstToc, NONE, gst_toc_ref, gst_toc_unref)
@@ -42,6 +81,13 @@ public:
   _WRAP_METHOD(void append_entry(Glib::RefPtr<Gst::TocEntry> entry), gst_toc_append_entry)
   _WRAP_METHOD(void dump(), gst_toc_dump)
   _WRAP_METHOD(void dump() const, gst_toc_dump, constversion)
+
+  _WRAP_METHOD(void set_tags(const Gst::TagList& tags), gst_toc_set_tags)
+#m4 _CONVERSION(`GstTagList*',`Gst::TagList',`Glib::wrap_taglist(const_cast<GstTagList*>($3), true)')
+  _WRAP_METHOD(Gst::TagList get_tags() const, gst_toc_get_tags)
+
+  _WRAP_METHOD(Gst::TocScope get_scope() const, gst_toc_get_scope)
+  _WRAP_METHOD(Glib::RefPtr<Gst::TocEntry> find_entry(const Glib::ustring& uid) const, gst_toc_find_entry)
 };
 
 class TocEntry : public MiniObject
@@ -63,6 +109,11 @@ public:
 
   _WRAP_METHOD(bool get_start_stop_times(gint64& start, gint64& stop), gst_toc_entry_get_start_stop_times)
   _WRAP_METHOD(bool get_start_stop_times(gint64& start, gint64& stop) const, gst_toc_entry_get_start_stop_times, constversion)
+
+  _WRAP_METHOD(bool get_loop(Gst::TocLoopType& loop_type, gint& repeat_count) const, gst_toc_entry_get_loop)
+  _WRAP_METHOD(void set_loop(Gst::TocLoopType loop_type, gint repeat_count), gst_toc_entry_set_loop)
+
+  _WRAP_METHOD(Glib::RefPtr<Gst::Toc> get_toc() const, gst_toc_entry_get_toc)
 };
 
 
