@@ -32,12 +32,13 @@ namespace Gst
 _WRAP_ENUM(BaseSrcFlags, GstBaseSrcFlags, NO_GTYPE)
 
 /** A base class for getrange based source elements.
+ *
  * This is a generice base class for source elements. The following types of
  * sources are supported:
  *
- *- random access sources like files
- *- seekable sources
- *- live sources
+ * - random access sources like files,
+ * - seekable sources,
+ * - live sources.
  *
  * The source can be configured to operate in any Gst::Format with the
  * set_format() method. The currently set format determines the format of the
@@ -47,8 +48,8 @@ _WRAP_ENUM(BaseSrcFlags, GstBaseSrcFlags, NO_GTYPE)
  * Gst::BaseSrc always supports push mode scheduling. If the following
  * conditions are met, it also supports pull mode scheduling:
  *
- *     - The format is set to Gst::FORMAT_BYTES (default).
- *     - Gst::BaseSrc::is_seekable_vfunc() returns TRUE.
+ * - The format is set to Gst::FORMAT_BYTES (default).
+ * - Gst::BaseSrc::is_seekable_vfunc() returns TRUE.
  *
  * Since GStreamer 0.10.9, any Gst::BaseSrc can enable pull based scheduling at
  * any time by overriding Gst::BaseSrc::check_get_range_vfunc() so that it
@@ -59,11 +60,11 @@ _WRAP_ENUM(BaseSrcFlags, GstBaseSrcFlags, NO_GTYPE)
  * be met to make the element seekable in push mode when the format is not
  * Gst::FORMAT_BYTES:
  *
- *     - Gst::BaseSrc::is_seekable_vfunc() returns TRUE.
- *     - Gst::BaseSrc::query_vfunc() can convert all supported seek formats to
- *     the internal format as set with set_format().
- *     - Gst::BaseSrc::do_seek_vfunc() is implemented, performs the seek and
- *     returns TRUE.
+ * - Gst::BaseSrc::is_seekable_vfunc() returns TRUE.
+ * - Gst::BaseSrc::query_vfunc() can convert all supported seek formats to
+ * the internal format as set with set_format().
+ * - Gst::BaseSrc::do_seek_vfunc() is implemented, performs the seek and
+ * returns TRUE.
  *
  * When the element does not meet the requirements to operate in pull mode, the
  * offset and length in the Gst::BaseSrc::create_vfunc() method should be
@@ -112,6 +113,20 @@ _WRAP_ENUM(BaseSrcFlags, GstBaseSrcFlags, NO_GTYPE)
  * There is only support in Gst::BaseSrc for exactly one source pad, which
  * should be named "src". A source implementation (subclass of Gst::BaseSrc)
  * should install a pad template in its class_init function, like so:
+ * @code
+ * // static
+ * void SampleBaseSrc::base_init(Gst::ElementClass<SampleBaseSrc> *klass)
+ * {
+ *   klass->add_pad_template(Gst::PadTemplate::create(
+ *                                 "src",
+ *                                 Gst::PAD_SRC,
+ *                                 Gst::PAD_ALWAYS,
+ *                                 Gst::Caps::create_from_string("x-application/x-foo1")
+ *   ));
+ *
+ *   klass->set_metadata("Source name", "Source", "My source element", "The author <my.sink@my.email>");
+ * }
+ * @endcode
  *
  * <H2>Controlled shutdown of live sources in applications</H2>
  *
