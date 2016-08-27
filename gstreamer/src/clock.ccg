@@ -47,6 +47,12 @@ static gboolean ClockID_Clock_gstreamermm_callback(GstClock* clock, GstClockTime
   return false;
 }
 
+
+static void ClockID_Clock_gstreamermm_callback_destroy(void* data)
+{
+  delete static_cast<Gst::ClockID::SlotClock*>(data);
+}
+
 } // extern "C"
 
 } // anonymous namespace
@@ -57,7 +63,7 @@ namespace Gst
 ClockReturn ClockID::wait_async(const SlotClock& slot)
 {
   SlotClock* slot_copy = new SlotClock(slot);
-  return static_cast<ClockReturn>(gst_clock_id_wait_async(gobj(), &ClockID_Clock_gstreamermm_callback, slot_copy, nullptr)); // TODO temporary NULL value
+  return static_cast<ClockReturn>(gst_clock_id_wait_async(gobj(), &ClockID_Clock_gstreamermm_callback, slot_copy, &ClockID_Clock_gstreamermm_callback_destroy));
 }
 
 }
