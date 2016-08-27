@@ -25,7 +25,7 @@ void CheckEq(const Fraction& expected, const Fraction& output)
 }
 
 template<>
-void CheckEq(const FractionRange& expected, const FractionRange& output)
+void CheckEq(const Range<Fraction>& expected, const Range<Fraction>& output)
 {
   CheckEq(expected.min, output.min);
   CheckEq(expected.max, output.max);
@@ -90,7 +90,7 @@ TEST_F(StructureTest, GetSetFractionVariable)
 
 TEST_F(StructureTest, GetSetFractionRangeVariable)
 {
-  CheckGetSetField(FractionRange(Fraction(5,6), Gst::Fraction(13,14)), "fraction_range");
+  CheckGetSetField(Gst::Range<Gst::Fraction>(Fraction(5,6), Fraction(13,14)), "fraction_range");
 }
 
 TEST_F(StructureTest, GetSetDateVariable)

@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -105,72 +105,18 @@ Fraction& Fraction::operator=(const Fraction& src)
   return *this;
 }
 
-
-IntRange::IntRange()
-: min(0), max(0)
-{}
-
-IntRange::IntRange(int min, int max)
-: min(min), max(max)
-{}
-
-IntRange::IntRange(const IntRange& src)
-: min(src.min), max(src.max)
-{}
-
-IntRange::IntRange(const Glib::ValueBase& value)
-: min(0), max(0)
+template <>
+void Range<int>::init_range(const GValue& value)
 {
-//  if(GST_VALUE_HOLDS_INT_RANGE(value.gobj()))
-  {
-    min = gst_value_get_int_range_min(value.gobj());
-    max = gst_value_get_int_range_max(value.gobj());
-  }
-}
-
-IntRange::IntRange(const GValue& value)
-: min(0), max(0)
-{
-//  if(GST_VALUE_HOLDS_INT_RANGE(&value))
+  if(GST_VALUE_HOLDS_INT_RANGE(&value))
   {
     min = gst_value_get_int_range_min(&value);
     max = gst_value_get_int_range_max(&value);
   }
 }
 
-IntRange& IntRange::operator=(const IntRange& src)
-{
-  min = src.min;
-  max = src.max;
-
-  return *this;
-}
-
-
-DoubleRange::DoubleRange()
-: min(0), max(0)
-{}
-
-DoubleRange::DoubleRange(double min, double max)
-: min(min), max(max)
-{}
-
-DoubleRange::DoubleRange(const DoubleRange& r)
-: min(r.min), max(r.max)
-{}
-
-DoubleRange::DoubleRange(const Glib::ValueBase& value)
-: min(0), max(0)
-{
-  if(GST_VALUE_HOLDS_DOUBLE_RANGE(value.gobj()))
-  {
-    min = gst_value_get_double_range_min(value.gobj());
-    max = gst_value_get_double_range_max(value.gobj());
-  }
-}
-
-DoubleRange::DoubleRange(const GValue& value)
-: min(0), max(0)
+template <>
+void Range<double>::init_range(const GValue& value)
 {
   if(GST_VALUE_HOLDS_DOUBLE_RANGE(&value))
   {
@@ -179,54 +125,10 @@ DoubleRange::DoubleRange(const GValue& value)
   }
 }
 
-DoubleRange& DoubleRange::operator=(const DoubleRange& src)
+template <>
+void Range<Gst::Fraction>::init_range(const GValue& value)
 {
-  min = src.min;
-  max = src.max;
-
-  return *this;
-}
-
-FractionRange::FractionRange()
-: min(), max()
-{}
-
-FractionRange::FractionRange(const Fraction& min, const Fraction& max)
-: min(min), max(max)
-{}
-
-FractionRange::FractionRange(const FractionRange& src)
-: min(src.min), max(src.max)
-{}
-
-FractionRange& FractionRange::operator=(const FractionRange& src)
-{
-  min = src.min;
-  max = src.max;
-
-  return *this;
-}
-
-FractionRange::FractionRange(const Glib::ValueBase& value)
-: min(), max()
-{
- // if(GST_VALUE_HOLDS_FRACTION_RANGE(value.gobj()))
-  {
-    const GValue* min = gst_value_get_fraction_range_min(value.gobj());
-    const GValue* max = gst_value_get_fraction_range_max(value.gobj());
-
-    this->min.num = gst_value_get_fraction_numerator(min);
-    this->min.denom = gst_value_get_fraction_denominator(min);
-
-    this->max.num = gst_value_get_fraction_numerator(max);
-    this->max.denom = gst_value_get_fraction_denominator(max);
-  }
-}
-
-FractionRange::FractionRange(const GValue& value)
-: min(), max()
-{
-//  if(GST_VALUE_HOLDS_FRACTION_RANGE(&value))
+  if(GST_VALUE_HOLDS_FRACTION_RANGE(&value))
   {
     const GValue* min = gst_value_get_fraction_range_min(&value);
     const GValue* max = gst_value_get_fraction_range_max(&value);
@@ -245,35 +147,35 @@ namespace Glib
 {
 
 // static
-GType Value<Gst::IntRange>::value_type()
+GType Value<Gst::Range<int>>::value_type()
 {
   return GST_TYPE_INT_RANGE;
 }
 
-void Value<Gst::IntRange>::set(const Gst::IntRange& data)
+void Value<Gst::Range<int>>::set(const Gst::Range<int>& data)
 {
   gst_value_set_int_range(&gobject_, data.min, data.max);
 }
 
-Gst::IntRange Value<Gst::IntRange>::get() const
+Gst::Range<int> Value<Gst::Range<int>>::get() const
 {
-  return Gst::IntRange(gobject_);
+  return Gst::Range<int>(gobject_);
 }
 
 // static
-GType Value<Gst::DoubleRange>::value_type()
+GType Value<Gst::Range<double>>::value_type()
 {
   return GST_TYPE_DOUBLE_RANGE;
 }
 
-void Value<Gst::DoubleRange>::set(const Gst::DoubleRange& data)
+void Value<Gst::Range<double>>::set(const Gst::Range<double>& data)
 {
   gst_value_set_double_range(&gobject_, data.min, data.max);
 }
 
-Gst::DoubleRange Value<Gst::DoubleRange>::get() const
+Gst::Range<double> Value<Gst::Range<double>>::get() const
 {
-  return Gst::DoubleRange(gobject_);
+  return Gst::Range<double>(gobject_);
 }
 
 // static
@@ -293,20 +195,20 @@ Gst::Fraction Value<Gst::Fraction>::get() const
 }
 
 // static
-GType Value<Gst::FractionRange>::value_type()
+GType Value<Gst::Range<Gst::Fraction>>::value_type()
 {
   return GST_TYPE_FRACTION_RANGE;
 }
 
-void Value<Gst::FractionRange>::set(const Gst::FractionRange& data)
+void Value<Gst::Range<Gst::Fraction>>::set(const Gst::Range<Gst::Fraction>& data)
 {
   gst_value_set_fraction_range_full(&gobject_, data.min.num, data.min.denom,
     data.max.num, data.max.denom);
 }
 
-Gst::FractionRange Value<Gst::FractionRange>::get() const
+Gst::Range<Gst::Fraction> Value<Gst::Range<Gst::Fraction>>::get() const
 {
-  return Gst::FractionRange(gobject_);
+  return Gst::Range<Gst::Fraction>(gobject_);
 }
 
 } // namespace Glib

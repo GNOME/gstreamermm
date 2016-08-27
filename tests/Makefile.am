@@ -43,6 +43,7 @@ check_PROGRAMS =                                \
         test-structure                          \
         test-taglist                            \
         test-urihandler                         \
+        test-value				\
                                                 \
         test-plugin-appsink                     \
         test-plugin-appsrc                      \
@@ -87,6 +88,7 @@ test_sample_SOURCES                             = $(TEST_GTEST_SOURCES) test-sam
 test_structure_SOURCES                          = $(TEST_GTEST_SOURCES) test-structure.cc
 test_taglist_SOURCES                            = $(TEST_GTEST_SOURCES) test-taglist.cc
 test_urihandler_SOURCES                         = $(TEST_GTEST_SOURCES) test-urihandler.cc
+test_value_SOURCES                              = $(TEST_GTEST_SOURCES) test-value.cc
 
 test_plugin_appsink_SOURCES                     = $(TEST_GTEST_SOURCES) plugins/test-plugin-appsink.cc
 test_plugin_appsrc_SOURCES                      = $(TEST_GTEST_SOURCES) plugins/test-plugin-appsrc.cc

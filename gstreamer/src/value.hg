@@ -1,6 +1,6 @@
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,6 +53,9 @@ namespace Gst
  * char first_char = fourcc.first;
  * ...
  * @endcode
+ *
+ * Last reviewed on 2016-08-27 (1.8.0)
+ *
  * @ingroup GstHelperClasses
  */
 class Fourcc
@@ -116,6 +119,9 @@ private:
  * int numerator = fract.num;
  * ...
  * @endcode
+ *
+ * Last reviewed on 2016-08-27 (1.8.0) 
+ *
  * @ingroup GstHelperClasses
  */
 class Fraction
@@ -149,10 +155,8 @@ public:
   int denom;
 };
 
-//TODO: Use a template for IntRange, DoubleRange, FractionRange? murrayc
-
-/** A class that represents an integer range (min - max).
- * Gst::IntRange is used to store an integer range in Gst::Structures of
+/** A class that represents a range (min - max).
+ * Gst::Range is used to store a range in Gst::Structures of
  * Gst::Caps as a value representing a property (see GStreamer Application
  * Development Manual section 8.2.2 and GstValue docs).  When the value is set,
  * it is transformed to a GStreamer GType so retrieving the value is a bit
@@ -160,157 +164,70 @@ public:
  * field like so:
  *
  * @code
- * Glib::Value<Gst::IntRange> value;
- * value.init(Glib::Value<Gst::IntRange>::value_type());
- * value.set(Gst::IntRange(8000, 50000));
+ * Glib::Value<Gst::Range<int>> value;
+ * value.init(Glib::Value<Gst::Range<int>>::value_type());
+ * value.set(Gst::Range<int>(8000, 50000));
  *
  * Gst::Structure structure("my-structure");
  * structure.set_field("rate", value);
  * ...
  * Glib::ValueBase gst_value;
  * structure.get_field("rate", gst_value);
- * Gst::IntRange range(gst_value);
+ * Gst::Range<int> range(gst_value);
  * int max = range.max;
  * ...
  * @endcode
+ *
+ * Gst::Range should be used with following types: int, double, Gst::Fraction.
+ *
+ * Last reviewed on 2016-08-27 (1.8.0)
+ *
  * @ingroup GstHelperClasses
  */
-class IntRange
+template<typename T>
+class Range
 {
 public:
-  /** Constructs a zero Gst::IntRange (0 - 0).
+  /** Constructs a zero Gst::Range.
    */
-  IntRange();
+  Range() : min(T()), max(T()) {}
 
-  /** Constructs an Gst::IntRange (min - max).
+  /** Constructs a Gst::Range (min - max).
    */
-  IntRange(int min, int max);
+  Range(T min, T max) : min(min), max(max) {}
 
-  /** Constructs an Gst::IntRange from another.
+  /** Constructs an Gst::Range from another range.
    */
-  IntRange(const IntRange& src);
+  Range(const Range& src) : min(src.min), max(src.max) {}
 
-  /** Constructs an Gst::IntRange from a GST_TYPE_INT_RANGE.
+  /** Constructs an Gst::Range from a Glib::ValueBase.
    */
-  explicit IntRange(const Glib::ValueBase& gst_int_range_value);
+  explicit Range(const Glib::Value<Range<T>>& range_value)
+  {
+    min = range_value.get().min;
+    max = range_value.get().max;
+  }
 
-  /** Constructs an Gst::IntRange from a GST_TYPE_INT_RANGE.
+  /** Constructs an Gst::Range from a GValue.
    */
-  explicit IntRange(const GValue& gst_int_range_value);
+  explicit Range(const GValue& range_value)
+  {
+    init_range(range_value);
+  }
 
-  IntRange& operator=(const IntRange& src);
+  Range& operator=(const Range& src)
+  {
+    min = src.min;
+    max = src.max;
+    return *this;
+  }
 
 public:
-  int min;
-  int max;
-};
-
-/** A class that represents a double range (min - max).
- * Gst::DoubleRange is used to use to store a double precision floating point
- * range in Gst::Structures of Gst::Caps as a value representing a property
- * (see GStreamer Application Development Manual section 8.2.2 and GstValue
- * docs).  When the value is set, it is transformed to a GStreamer GType so
- * retrieving the value is a bit different.  The class can be used in setting
- * and getting a Gst::Structure field like so:
- *
- * @code
- * Glib::Value<Gst::DoubleRange> value;
- * value.init(Glib::Value<Gst::DoubleRange>::value_type());
- * value.set(Gst::DoubleRange(44.1, 48.0));
- *
- * Gst::Structure structure("my-structure");
- * structure.set_field("rate", value);
- * ...
- * Glib::ValueBase gst_value;
- * structure.get_field("rate", gst_value);
- * Gst::DoubleRange range(gst_value);
- * double min = range.min;
- * ...
- * @endcode
- * @ingroup GstHelperClasses
- */
-class DoubleRange
-{
-public:
-  /** Constructs a zero Gst::DoubleRange (0.0 - 0.0).
-   */
-  DoubleRange();
-
-  /** Constructs a Gst::DoubleRange (min - max).
-   */
-  DoubleRange(double min, double max);
-
-  /** Constructs a Gst::DoubleRange from another.
-   */
-  DoubleRange(const DoubleRange& src);
-
-  /** Constructs a Gst::DoubleRange from a GST_TYPE_DOUBLE_RANGE.
-   */
-  explicit DoubleRange(const Glib::ValueBase& gst_double_range_value);
-
-  /** Constructs a Gst::DoubleRange from a GST_TYPE_DOUBLE_RANGE.
-   */
-  explicit DoubleRange(const GValue& gst_double_range_value);
-
-  DoubleRange& operator=(const DoubleRange& src);
-
-public:
-  double min;
-  double max;
-};
-
-/** A class that represents a fractional range.
- * Gst::FractionRange is used to store a fractional range in Gst::Structures of
- * Gst::Caps as a value representing a property (see GStreamer Application
- * Development Manual section 8.2.2 and GstValue docs).  When the value is set,
- * it is transformed to a GStreamer GType so retrieving the value is a bit
- * different.  The class can be used in setting and getting a Gst::Structure
- * field like so:
- *
- * @code
- * Glib::Value<Gst::FractionRange> value;
- * value.init(Glib::Value<Gst::Fraction>::value_type());
- * value.set(Gst::FractionRange(Gst::Fraction(1,2), Gst::Fraction(3,4)));
- *
- * Gst::Structure structure("my-structure");
- * structure.set_field("range", value);
- * ...
- * Glib::ValueBase gst_value;
- * structure.get_field("rate", gst_value);
- * Gst::FractionRange range(gst_value);
- * int min_numerator = range.min.num;
- * ...
- * @endcode
- * @ingroup GstHelperClasses
- */
-class FractionRange
-{
-public:
-  /** Constructs a zero Gst::FractionRange (0/1 - 0/1).
-   */
-  FractionRange();
-
-  /** Constructs a Gst::FractionRange (min - max).
-   */
-  FractionRange(const Fraction& min, const Fraction& max);
-
-  /** Constructs a Gst::FractionRange from another.
-   */
-  FractionRange(const FractionRange& src);
-
-  /** Constructs a Gst::FractionRange from a GST_TYPE_FRACTION_RANGE.
-   */
-  explicit FractionRange(const Glib::ValueBase& gst_fraction_range_value);
-
-  /** Constructs a Gst::FractionRange from a GST_TYPE_FRACTION_RANGE.
-   */
-  explicit FractionRange(const GValue& gst_fraction_range_value);
-
-  FractionRange& operator=(const FractionRange& src);
-
-public:
-  Fraction min;
-  Fraction max;
+  T min;
+  T max;
+  
+private:
+  void init_range(const GValue& range_value);
 };
 
 } //namespace Gst
@@ -333,27 +250,27 @@ public:
 };
 
 template<>
-class Value<Gst::IntRange> : public ValueBase_Boxed
+class Value<Gst::Range<int>> : public ValueBase_Boxed
 {
 public:
-  typedef Gst::IntRange CppType;
+  typedef Gst::Range<int> CppType;
 
   static GType value_type() G_GNUC_CONST;
 
-  void set(const Gst::IntRange& data);
-  Gst::IntRange get() const;
+  void set(const Gst::Range<int>& data);
+  Gst::Range<int> get() const;
 };
 
 template<>
-class Value<Gst::DoubleRange> : public ValueBase_Boxed
+class Value<Gst::Range<double>> : public ValueBase_Boxed
 {
 public:
-  typedef Gst::DoubleRange CppType;
+  typedef Gst::Range<double> CppType;
 
   static GType value_type() G_GNUC_CONST;
 
-  void set(const Gst::DoubleRange& data);
-  Gst::DoubleRange get() const;
+  void set(const Gst::Range<double>& data);
+  Gst::Range<double> get() const;
 };
 
 template<>
@@ -369,15 +286,15 @@ public:
 };
 
 template<>
-class Value<Gst::FractionRange> : public ValueBase_Boxed
+class Value<Gst::Range<Gst::Fraction>> : public ValueBase_Boxed
 {
 public:
-  typedef Gst::FractionRange CppType;
+  typedef Gst::Range<Gst::Fraction> CppType;
 
   static GType value_type() G_GNUC_CONST;
 
-  void set(const Gst::FractionRange& data);
-  Gst::FractionRange get() const;
+  void set(const Gst::Range<Gst::Fraction>& data);
+  Gst::Range<Gst::Fraction> get() const;
 };
 
 } // namespace Glib
