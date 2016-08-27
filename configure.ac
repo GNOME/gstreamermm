@@ -38,7 +38,7 @@ MM_CONFIG_DOCTOOL_DIR([docs])
 AC_SUBST([GSTREAMERMM_SO_VERSION], [0:0:0])
 
 AM_INIT_AUTOMAKE([1.9 subdir-objects -Wno-portability check-news dist-bzip2 no-define nostdinc tar-ustar])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
