@@ -54,52 +54,10 @@ static gboolean ClockID_Clock_gstreamermm_callback(GstClock* clock, GstClockTime
 namespace Gst
 {
 
-const ClockTime CLOCK_TIME_NONE = GST_CLOCK_TIME_NONE;
-const ClockTime SECOND = GST_SECOND;
-const ClockTime MILLI_SECOND = GST_MSECOND;
-const ClockTime MICRO_SECOND = GST_USECOND;
-const ClockTime NANO_SECOND = GST_NSECOND;
-
-
-guint get_hours(ClockTime time)
-{
-  return GST_CLOCK_TIME_IS_VALID (time) ? time / (GST_SECOND * 60 * 60) : 99;
-}
-
-guint get_minutes(ClockTime time)
-{
-  return GST_CLOCK_TIME_IS_VALID (time) ? (time / (GST_SECOND * 60)) % 60 : 99;
-}
-
-guint get_seconds(ClockTime time)
-{
-  return GST_CLOCK_TIME_IS_VALID (time) ? (time / GST_SECOND) % 60 : 99;
-}
-
-guint get_milliseconds(ClockTime time)
-{
-  return GST_CLOCK_TIME_IS_VALID (time) ? (time / GST_MSECOND) % 1000 : 999;
-}
-
-guint get_microseconds(ClockTime time)
-{
-  return GST_CLOCK_TIME_IS_VALID (time) ? (time / GST_USECOND) % 1000 : 999;
-}
-
-guint get_nanoseconds(ClockTime time)
-{
-  return GST_CLOCK_TIME_IS_VALID (time) ?  (time / GST_NSECOND) % 1000 : 999;
-}
-
-guint get_fractional_seconds(ClockTime time)
-{
-  return GST_CLOCK_TIME_IS_VALID (time) ? time % GST_SECOND : 999999999;
-}
-
 ClockReturn ClockID::wait_async(const SlotClock& slot)
 {
   SlotClock* slot_copy = new SlotClock(slot);
   return static_cast<ClockReturn>(gst_clock_id_wait_async(gobj(), &ClockID_Clock_gstreamermm_callback, slot_copy, nullptr)); // TODO temporary NULL value
 }
 
-} //namespace Gst
+}
