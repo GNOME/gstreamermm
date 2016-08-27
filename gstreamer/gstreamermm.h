@@ -74,6 +74,7 @@
 #include <gstreamermm/capsfeatures.h>
 #include <gstreamermm/childproxy.h>
 #include <gstreamermm/clock.h>
+#include <gstreamermm/clockutils.h>
 #include <gstreamermm/context.h>
 #include <gstreamermm/element.h>
 #include <gstreamermm/elementfactory.h>
@@ -84,6 +85,7 @@
 #include <gstreamermm/ghostpad.h>
 #include <gstreamermm/iterator.h>
 #include <gstreamermm/message.h>
+#include <gstreamermm/miniobject.h>
 #include <gstreamermm/object.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/padtemplate.h>
@@ -94,6 +96,7 @@
 #include <gstreamermm/preset.h>
 #include <gstreamermm/query.h>
 #include <gstreamermm/registry.h>
+#include <gstreamermm/sample.h>
 #include <gstreamermm/segment.h>
 #include <gstreamermm/structure.h>
 #include <gstreamermm/systemclock.h>
@@ -101,6 +104,8 @@
 #include <gstreamermm/tagsetter.h>
 #include <gstreamermm/task.h>
 #include <gstreamermm/taskpool.h>
+#include <gstreamermm/toc.h>
+#include <gstreamermm/tocsetter.h>
 #include <gstreamermm/typefind.h>
 #include <gstreamermm/typefindfactory.h>
 #include <gstreamermm/urihandler.h>
