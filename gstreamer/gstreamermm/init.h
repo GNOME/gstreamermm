@@ -250,6 +250,11 @@ void registry_fork_set_enabled(bool enabled);
  */
 bool update_registry();
 
+
+/*! A gstreamermm init example.
+ * @example basics/init_gstreamermm.cc
+ */
+
 }//end namespace Gst
 
 #endif //_GSTREAMERMM_INIT_H

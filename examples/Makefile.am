@@ -55,12 +55,14 @@ noinst_PROGRAMS =						\
 	ogg_rewriter/example				\
 	typefind/example					\
 	optiongroup/example					\
+	basics/element_factory				\
+	basics/init_gstreamermm				\
 	$(gl_examples)						\
 	$(gui_examples)
 
 
 AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(examples_cppflags)
-AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -std=c++0x
+AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -std=c++11
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm)
 
 all_media_player_example_SOURCES			= all_media_player/main.cc
@@ -74,3 +76,7 @@ ogg_player_example_SOURCES					= ogg_player/main.cc
 opengl_filter_example_SOURCES				= opengl_filter/main.cc 
 optiongroup_example_SOURCES					= optiongroup/main.cc
 typefind_example_SOURCES					= typefind/main.cc
+
+# basic examples
+basics_element_factory_SOURCES				= basics/element_factory.cc
+basics_init_gstreamermm_SOURCES				= basics/init_gstreamermm.cc
