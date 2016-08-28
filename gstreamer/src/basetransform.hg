@@ -267,7 +267,7 @@ public:
    * implementation, it will be called for all metadata API in the downstream query,
    * otherwise the metadata API is removed.
    */
-  _WRAP_VFUNC(bool decide_allocation(const Glib::RefPtr<Gst::Query>& query), "decide_allocation")
+  virtual bool decide_allocation_vfunc(const Glib::RefPtr<Gst::Query>& query);
 
   /** Return TRUE if the metadata API should be proposed in the upstream allocation query.
    * The default implementation is NULL and will cause all metadata to be removed.
@@ -281,7 +281,7 @@ public:
    * query downstream when in passthrough mode and will copy all the filtered metadata API
    * in non-passthrough mode.
    */
-  _WRAP_VFUNC(bool propose_allocation(const Glib::RefPtr<Gst::Query>& decide_query, const Glib::RefPtr<Gst::Query>& query), "propose_allocation")
+  virtual bool propose_allocation_vfunc(const Glib::RefPtr<Gst::Query>& decide_query, const Glib::RefPtr<Gst::Query>& query);
 
   #m4 _CONVERSION(`GstBuffer*', `const Glib::RefPtr<Gst::Buffer>&', `Glib::wrap($3, true)')
 
@@ -322,13 +322,16 @@ protected:
   klass->prepare_output_buffer = &prepare_output_buffer_vfunc_callback;
   klass->transform = &transform_vfunc_callback;
   klass->generate_output = &generate_output_vfunc_callback;
-  klass->generate_output = &generate_output_vfunc_callback;
   klass->query = &query_vfunc_callback;
+  klass->propose_allocation = &propose_allocation_vfunc_callback;
+  klass->decide_allocation = &decide_allocation_vfunc_callback;
   _SECTION(SECTION_PH_VFUNCS)
   static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer** buf);
   static GstFlowReturn transform_vfunc_callback(GstBaseTransform* self, GstBuffer* inbuf, GstBuffer* outbuf);
   static GstFlowReturn generate_output_vfunc_callback(GstBaseTransform* self, GstBuffer** outbuf);
   static gboolean query_vfunc_callback(GstBaseTransform* self, GstPadDirection direction, GstQuery* query);
+  static gboolean propose_allocation_vfunc_callback(GstBaseTransform* self, GstQuery* decide_query, GstQuery* query);
+  static gboolean decide_allocation_vfunc_callback(GstBaseTransform* self, GstQuery* query);
   _POP()
 #m4end
 };
