@@ -55,6 +55,8 @@ noinst_PROGRAMS =						\
 	ogg_rewriter/example				\
 	typefind/example					\
 	optiongroup/example					\
+	basics/bin							\
+	basics/bus							\
 	basics/element_factory				\
 	basics/init_gstreamermm				\
 	$(gl_examples)						\
@@ -78,5 +80,7 @@ optiongroup_example_SOURCES					= optiongroup/main.cc
 typefind_example_SOURCES					= typefind/main.cc
 
 # basic examples
+basics_bin_SOURCES							= basics/bin.cc
+basics_bus_SOURCES							= basics/bus.cc
 basics_element_factory_SOURCES				= basics/element_factory.cc
 basics_init_gstreamermm_SOURCES				= basics/init_gstreamermm.cc
