@@ -657,6 +657,7 @@ static void generate_hg_file(const std::string& includeMacroCalls,
     "otherwise there will\n * be errors and possibly a crash." << std::endl;
   std::cout << " *" << std::endl;
   std::cout << " * @ingroup " << nmspace << "Plugins" << std::endl;
+  std::cout << " * @deprecated Plugins API is deprecated, and should not be used in a new code." << std::endl;
   std::cout << " */" << std::endl;
   std::cout << "class " << cppTypeName << std::endl;
   std::cout << ": public " << parentNameSpace << "::" << cppParentTypeName;
