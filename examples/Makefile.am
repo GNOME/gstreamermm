@@ -57,6 +57,7 @@ noinst_PROGRAMS =						\
 	optiongroup/example					\
 	basics/bin							\
 	basics/bus							\
+	basics/dynamic_pads					\
 	basics/element_factory				\
 	basics/init_gstreamermm				\
 	$(gl_examples)						\
@@ -82,5 +83,6 @@ typefind_example_SOURCES					= typefind/main.cc
 # basic examples
 basics_bin_SOURCES							= basics/bin.cc
 basics_bus_SOURCES							= basics/bus.cc
+basics_dynamic_pads_SOURCES					= basics/dynamic_pads.cc
 basics_element_factory_SOURCES				= basics/element_factory.cc
 basics_init_gstreamermm_SOURCES				= basics/init_gstreamermm.cc
