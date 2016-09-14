@@ -97,7 +97,7 @@ namespace Gst
  */
 class VideoOverlay : public Glib::Interface
 {
-  _CLASS_INTERFACE(VideoOverlay, GstVideoOverlay, GST_VIDEO_OVERLAY, GstVideoOverlayClass)
+  _CLASS_INTERFACE(VideoOverlay, GstVideoOverlay, GST_VIDEO_OVERLAY, GstVideoOverlayInterface)
 
 public:
   _WRAP_METHOD(void set_window_handle(guintptr window_handle), gst_video_overlay_set_window_handle)
@@ -107,6 +107,9 @@ public:
   _WRAP_METHOD(void handle_events(bool handle_events), gst_video_overlay_handle_events)
   _WRAP_METHOD(bool set_render_rectangle(int x, int y, int width, int height), gst_video_overlay_set_render_rectangle)
 
+  /** Virtual method to configure the window handle.
+   */
+  _WRAP_VFUNC(void set_window_handle(guintptr handle), "set_window_handle")
 
   /** Virtual method to handle expose events.
    */
@@ -115,6 +118,11 @@ public:
   /** Virtual method to handle events.
    */
   _WRAP_VFUNC(void handle_events(bool handle_events), "handle_events")
+
+  /** Virtual method to set the render rectangle.
+   */
+  _WRAP_VFUNC(void set_render_rectangle(int x, int y, int width, int height), "set_render_rectangle")
+
 };
 
 } // namespace Gst

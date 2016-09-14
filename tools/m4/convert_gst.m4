@@ -301,10 +301,7 @@ _CONVERSION(`const Glib::RefPtr<Gst::Sample>&',`GstSample*', `Glib::unwrap($3)')
 _CONVERSION(`Glib::RefPtr<Gst::Sample>', `GstSample*', `Glib::unwrap($3)')
 
 dnl Segment
-_CONVERSION(`GstSegment*',`Glib::RefPtr<Gst::Segment>',`Glib::wrap($3)')
-_CONVERSION(`GstSegment*',`Glib::RefPtr<const Gst::Segment>',`Glib::wrap($3)')
-_CONVERSION(`const GstSegment*',`Glib::RefPtr<const Gst::Segment>',`Glib::wrap(const_cast<GstSegment*>($3))'
-_CONVERSION(`const Glib::RefPtr<Gst::Segment>&',`GstSegment*', `Glib::unwrap($3)')
+_CONVERSION(`GstSegment*',`Gst::Segment',`Glib::wrap($3)')
 _CONVERSION(`const Gst::Segment&',`const GstSegment*', `$3.gobj()')
 
 dnl Structure
@@ -312,7 +309,7 @@ _CONVERSION(`Gst::Structure&',`GstStructure*',`$3.gobj()')
 _CONVERSION(`const Gst::Structure&',`GstStructure*',`const_cast<GstStructure*>($3.gobj())')
 _CONVERSION(`GstStructure*', `Gst::Structure', `Glib::wrap($3)')
 _CONVERSION(`const Gst::Structure&',`const GstStructure*',`$3.gobj()')
-_CONVERSION(`const GstStructure*',`Gst::Structure', `Glib::wrap($3, false)')
+_CONVERSION(`const GstStructure*',`Gst::Structure', `Glib::wrap(const_cast<GstStructure*>($3), false)')
 _CONVERSION(`const GstStructure*',`const Gst::Structure&', `Glib::wrap(const_cast<GstStructure*>($3), false)')
 _CONVERSION(`Gst::Structure&&',`GstStructure*',`($3) ? $3.release() : nullptr')
 

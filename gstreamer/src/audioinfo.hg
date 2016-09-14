@@ -19,6 +19,7 @@
 
 #include <gst/audio/audio-info.h>
 #include <gstreamermm/audioformat.h>
+#include <gstreamermm/audioringbuffer.h>
 
 _DEFS(gstreamermm,gst)
 
@@ -38,6 +39,7 @@ class Caps;
 class AudioInfo
 {
   _CLASS_BOXEDTYPE(AudioInfo, GstAudioInfo, gst_audio_info_new, gst_audio_info_copy, gst_audio_info_free)
+  _IGNORE(gst_audio_info_copy, gst_audio_info_free)
 public:
 
   /** Create AudioInfo from @a caps.
@@ -54,6 +56,11 @@ public:
 
   _WRAP_METHOD(bool from_caps(const Glib::RefPtr<const Gst::Caps>& caps), gst_audio_info_from_caps)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> to_caps() const, gst_audio_info_to_caps)
+
+  _WRAP_METHOD(bool convert(Gst::Format fmt, gint64 src_val, Gst::Format dest_fmt, gint64& dest_val) const, gst_audio_info_convert, newin "1,8")
+
+#m4 _CONVERSION(`const Gst::AudioChannelPosition*',`const GstAudioChannelPosition*',`reinterpret_cast<const GstAudioChannelPosition*>($3)')
+  _WRAP_METHOD(void set_format(Gst::AudioFormat format, int rate, int channels, const Gst::AudioChannelPosition *position), gst_audio_info_set_format, newin "1,8")
 
   _MEMBER_GET(flags, flags, Gst::AudioFlags, GstAudioFlags)
   _MEMBER_SET(flags, flags, Gst::AudioFlags, GstAudioFlags)

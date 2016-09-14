@@ -6,7 +6,7 @@
  */
 /* gstreamermm - a C++ wrapper for gstreamer
  *
- * Copyright 2008 The gstreamermm Development Team
+ * Copyright 2008-2016 The gstreamermm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,8 @@ namespace Gst
 /**
  * A Gst::Sample is a small object containing data, a type, timing and
  * extra arbitrary information.
+ *
+ * Last reviewed on 2016-09-14 (1.8.0).
  */
 class Sample : public MiniObject
 {
@@ -52,7 +54,11 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const Gst::Buffer> get_buffer() const, gst_sample_get_buffer, constversion)
   _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps(), gst_sample_get_caps, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Gst::Caps> get_caps() const, gst_sample_get_caps, constversion)
+  _WRAP_METHOD(Gst::Structure get_info() const, gst_sample_get_info)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Sample> copy() const, gst_sample_copy)
 
+#m4 _CONVERSION(`GstSegment*',`Gst::Segment',`Glib::wrap($3, true)')
+  _WRAP_METHOD(Gst::Segment get_segment() const, gst_sample_get_segment)
 };
 
 }//namespace Gst
