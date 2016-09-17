@@ -349,7 +349,7 @@ _CONVERSION(`Gst::VideoInfo', `GstVideoInfo', `*($3.gobj())')
 _CONVERSION(`GstVideoInfo', `Gst::VideoInfo', `Gst::VideoInfo(Gst::VideoInfo(const_cast<GstVideoInfo*>(&$3), false))')
 
 dnl VideoFormatInfo
-_CONVERSION(`const GstVideoFormatInfo*', `const VideoFormatInfo&', `VideoFormatInfo($3)')
+_CONVERSION(`const GstVideoFormatInfo*', `const VideoFormatInfo', `VideoFormatInfo($3)')
 
 dnl VideoFrame
 _CONVERSION(`const Gst::VideoFrame&', `GstVideoFrame*', `$3.gobj()')

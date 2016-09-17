@@ -19,8 +19,10 @@
 
 _PINCLUDE(gstreamermm/private/element_p.h)
 
+#define IGNORE_RESULT(x) { auto release_value = x; (void)release_value; }
+
 namespace Gst {
-  
+
 gboolean BaseSink_Class::query_vfunc_callback(GstBaseSink* self, GstQuery* query)
 {
   const auto obj_base = static_cast<Glib::ObjectBase*>(
@@ -39,9 +41,10 @@ gboolean BaseSink_Class::query_vfunc_callback(GstBaseSink* self, GstQuery* query
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
-	auto qurery_wrapper = Glib::wrap(query, false);
+        auto qurery_wrapper = Glib::wrap(query, false);
         int retval = static_cast<int>(obj->base_sink_query_vfunc(qurery_wrapper));
-	qurery_wrapper.release();
+        IGNORE_RESULT(qurery_wrapper.release());
+        return retval;
       }
       catch(...)
       {

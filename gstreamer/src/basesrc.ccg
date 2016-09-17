@@ -22,6 +22,8 @@
 
 _PINCLUDE(gstreamermm/private/element_p.h)
 
+#define IGNORE_RESULT(x) { auto release_value = x; (void)release_value; }
+
 namespace Gst
 {
 
@@ -215,10 +217,10 @@ gboolean BaseSrc_Class::query_vfunc_callback(GstBaseSrc* self, GstQuery* query)
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
-	auto query_cpp = Glib::wrap(query, false);
+        auto query_cpp = Glib::wrap(query, false);
         int ret = static_cast<int>(obj->base_src_query_vfunc(query_cpp));
-	query_cpp.release();
-	return ret;
+        IGNORE_RESULT(query_cpp.release());
+        return ret;
       }
       catch(...)
       {

@@ -22,7 +22,7 @@ _PINCLUDE(gstreamermm/private/audiobasesink_p.h)
 namespace Gst
 {
 
-gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstAudioRingBufferSpec* spec)
+gboolean AudioSink_Class::prepare_audiosink_vfunc_callback(GstAudioSink* self, GstAudioRingBufferSpec* spec)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
@@ -42,7 +42,7 @@ gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstAudioRin
         Gst::AudioRingBufferSpec cpp_spec(*spec);
 
         // Call the virtual member method, which derived classes might override.
-        return static_cast<int>(obj->prepare_vfunc(cpp_spec));
+        return static_cast<int>(obj->prepare_audiosink_vfunc(cpp_spec));
       }
       catch(...)
       {
@@ -63,7 +63,7 @@ gboolean AudioSink_Class::prepare_vfunc_callback(GstAudioSink* self, GstAudioRin
   typedef gboolean RType;
   return RType();
 }
-bool Gst::AudioSink::prepare_vfunc(Gst::AudioRingBufferSpec& spec)
+bool Gst::AudioSink::prepare_audiosink_vfunc(Gst::AudioRingBufferSpec& spec)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).

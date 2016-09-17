@@ -54,7 +54,7 @@ RefPtr<Element> Check::_Check::setup_element (const ustring& factory)
 
     element = ElementFactory::create_element (factory, factory);
 
-    ThrowIf (element, "Could not create a '" + factory + "' element");
+    ThrowIf (!!element, "Could not create a '" + factory + "' element");
     CheckRefCount (element->gobj(), factory, 1);
 
     return element;

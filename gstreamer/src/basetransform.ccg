@@ -23,6 +23,8 @@
 
 _PINCLUDE(gstreamermm/private/element_p.h)
 
+#define IGNORE_RESULT(x) { auto release_value = x; (void)release_value; }
+
 namespace Gst
 {
 
@@ -245,7 +247,7 @@ gboolean BaseTransform_Class::query_vfunc_callback(GstBaseTransform* self, GstPa
         // Call the virtual member method, which derived classes might override.
         auto query_cpp = Glib::wrap(query, false);
         int ret = static_cast<int>(obj->base_transform_query_vfunc(static_cast<Gst::PadDirection>(direction), query_cpp));
-        query_cpp.release();
+        IGNORE_RESULT(query_cpp.release());
         return ret;
       }
       catch(...)
@@ -324,8 +326,8 @@ gboolean BaseTransform_Class::propose_allocation_vfunc_callback(GstBaseTransform
         auto query_cpp = Glib::wrap(query, false);
         auto decide_query_cpp = Glib::wrap(decide_query, false);
         auto ret = static_cast<int>(obj->propose_allocation_vfunc(decide_query_cpp, query_cpp));
-        query_cpp.release();
-        decide_query_cpp.release();
+        IGNORE_RESULT(query_cpp.release());
+        IGNORE_RESULT(decide_query_cpp.release());
         return ret;
       }
       catch(...)
@@ -383,7 +385,7 @@ gboolean BaseTransform_Class::decide_allocation_vfunc_callback(GstBaseTransform*
         // Call the virtual member method, which derived classes might override.
           auto query_cpp = Glib::wrap(query, false);
           auto ret = static_cast<int>(obj->decide_allocation_vfunc(query_cpp));
-          query_cpp.release();
+          IGNORE_RESULT(query_cpp.release());
           return ret;
       }
       catch(...)
