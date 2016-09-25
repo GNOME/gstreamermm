@@ -5,7 +5,7 @@
  *      Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;

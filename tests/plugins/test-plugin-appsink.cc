@@ -5,7 +5,7 @@
  *      Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/appsink.h>
 #include <gstreamermm/appsrc.h>
@@ -27,8 +27,8 @@ protected:
     sink = ElementFactory::create_element("appsink", "sink");
     source = ElementFactory::create_element("appsrc", "source");
 
-    ASSERT_TRUE(sink);
-    ASSERT_TRUE(source);
+    MM_ASSERT_TRUE(sink);
+    MM_ASSERT_TRUE(source);
 
     ASSERT_NO_THROW(pipeline->add(source)->add(sink));
     ASSERT_NO_THROW(source->link(sink));
@@ -38,13 +38,13 @@ protected:
 TEST_F(AppSinkPluginTest, CorrectCreatedAppSinkElement)
 {
   RefPtr<AppSink> source = AppSink::create("sink");
-  ASSERT_TRUE(source);
+  MM_ASSERT_TRUE(source);
 
   RefPtr<Element> source_element = ElementFactory::create_element("appsink", "source");
-  ASSERT_TRUE(source_element);
+  MM_ASSERT_TRUE(source_element);
 
   source = source.cast_dynamic(source_element);
-  ASSERT_TRUE(source);
+  MM_ASSERT_TRUE(source);
 }
 
 TEST_F(AppSinkPluginTest, CreatePipelineWithAppsink)
@@ -58,15 +58,15 @@ TEST_F(AppSinkPluginTest, SinkPadQueryCapsShouldReturnProperCapsObjects)
 
   RefPtr<BaseSink> basesink;
   basesink = basesink.cast_dynamic(sink);
-  ASSERT_TRUE(basesink);
+  MM_ASSERT_TRUE(basesink);
 
   RefPtr<Pad> sink_pad = basesink->get_sink_pad();
-  ASSERT_TRUE(sink_pad);
-  ASSERT_TRUE(GST_IS_PAD(sink_pad->gobj()));
+  MM_ASSERT_TRUE(sink_pad);
+  MM_ASSERT_TRUE(GST_IS_PAD(sink_pad->gobj()));
   RefPtr<Caps> caps = sink_pad->query_caps(Caps::create_any());
-  ASSERT_TRUE(caps);
-  ASSERT_TRUE(caps->gobj());
-  ASSERT_TRUE(GST_IS_CAPS(caps->gobj()));
+  MM_ASSERT_TRUE(caps);
+  MM_ASSERT_TRUE(caps->gobj());
+  MM_ASSERT_TRUE(GST_IS_CAPS(caps->gobj()));
   RefPtr<Caps> template_caps = Glib::wrap(gst_pad_get_pad_template_caps(sink_pad->gobj()), false);
 
   sink_pad.reset();
@@ -97,9 +97,9 @@ TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
 
   std::string data = "hello world";
   RefPtr<Buffer> buf = Buffer::create(data.length() + 1);
-  ASSERT_TRUE(buf);
+  MM_ASSERT_TRUE(buf);
   MapInfo map_info;
-  ASSERT_TRUE(buf->map(map_info, MAP_WRITE));
+  MM_ASSERT_TRUE(buf->map(map_info, MAP_WRITE));
   strcpy((char *)map_info.get_data(), data.c_str());
   buf->unmap(map_info);
 
@@ -107,16 +107,16 @@ TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
 
   RefPtr<Buffer> buf_out;
   RefPtr<Sample> sample = appsink->pull_sample();
-  ASSERT_TRUE(sample);
+  MM_ASSERT_TRUE(sample);
   buf_out = sample->get_buffer();
-  ASSERT_TRUE(buf_out);
+  MM_ASSERT_TRUE(buf_out);
 
   EXPECT_TRUE(buf_out->memcmp(0, data.c_str(), data.length()) == 0);
 
   EXPECT_EQ(FLOW_OK, appsrc->end_of_stream());
 
   RefPtr<Message> msg = pipeline->get_bus()->poll((MessageType)(MESSAGE_EOS | MESSAGE_ERROR) , 1*SECOND);
-  ASSERT_TRUE(msg);
+  MM_ASSERT_TRUE(msg);
   EXPECT_EQ(MESSAGE_EOS, msg->get_message_type());
   EXPECT_EQ(STATE_CHANGE_SUCCESS, pipeline->set_state(STATE_NULL));
 }

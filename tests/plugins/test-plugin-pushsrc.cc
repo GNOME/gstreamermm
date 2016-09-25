@@ -5,7 +5,7 @@
  *      Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <string>
 #include <gstreamermm/appsink.h>
@@ -83,13 +83,13 @@ protected:
   {
     RefPtr<Pipeline> pipeline = Pipeline::create("my-pipeline");
 
-    EXPECT_TRUE(pipeline);
+    EXPECT_TRUE(!!pipeline);
 
     RefPtr<Element> source = ElementFactory::create_element("foosrcmm", "src");
     RefPtr<AppSink> sink = AppSink::create("sink");
 
-    EXPECT_TRUE(source);
-    EXPECT_TRUE(sink);
+    EXPECT_TRUE(!!source);
+    EXPECT_TRUE(!!sink);
 
     pipeline->add(source)->add(sink);
     source->link(sink);
@@ -102,7 +102,7 @@ TEST_F(PushSrcPluginTest, CreateRegisteredElement)
 {
   Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("foosrcmm", "src");
 
-  ASSERT_TRUE(source);
+  MM_ASSERT_TRUE(source);
 }
 
 TEST_F(PushSrcPluginTest, DISABLED_CreatePipelineWithRegisteredElement)

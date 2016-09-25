@@ -5,7 +5,7 @@
  *      Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/appsink.h>
 #include <gstreamermm/appsrc.h>
@@ -38,9 +38,9 @@ protected:
     filter = ElementFactory::create_element("foomm", "filter");
     sink = AppSink::create("sink");
 
-    ASSERT_TRUE(source);
-    ASSERT_TRUE(filter);
-    ASSERT_TRUE(sink);
+    MM_ASSERT_TRUE(source);
+    MM_ASSERT_TRUE(filter);
+    MM_ASSERT_TRUE(sink);
 
     EXPECT_NO_THROW(pipeline->add(source)->add(filter)->add(sink));
     EXPECT_NO_THROW(source->link(filter)->link(sink));
@@ -51,14 +51,14 @@ TEST_F(RegisterPluginTest, CreateRegisteredElement)
 {
   filter = Gst::ElementFactory::create_element("foomm", "filter");
 
-  ASSERT_TRUE(filter);
+  MM_ASSERT_TRUE(filter);
 }
 
 TEST_F(RegisterPluginTest, CheckPropertyUsage)
 {
   filter = Gst::ElementFactory::create_element("foomm", "filter");
 
-  ASSERT_TRUE(filter);
+  MM_ASSERT_TRUE(filter);
 
   Glib::ustring property_value;
   filter->get_property("sample_property", property_value);
@@ -83,10 +83,10 @@ TEST_F(RegisterPluginTest, CheckDataFlowThroughCreatedElement)
 
   std::vector<guint8> data = {4, 5, 2, 7, 1};
   RefPtr<Buffer> buf = Buffer::create(data.size());
-  ASSERT_TRUE(buf);
+  MM_ASSERT_TRUE(buf);
   Gst::MapInfo mapinfo;
 
-  ASSERT_TRUE(buf->map(mapinfo, MAP_WRITE));
+  MM_ASSERT_TRUE(buf->map(mapinfo, MAP_WRITE));
   std::copy(data.begin(), data.end(), mapinfo.get_data());
   EXPECT_EQ(FLOW_OK, source->push_buffer(buf));
   buf->unmap(mapinfo);
@@ -94,12 +94,12 @@ TEST_F(RegisterPluginTest, CheckDataFlowThroughCreatedElement)
   RefPtr<Gst::Buffer> buf_out;
   RefPtr<Gst::Sample> samp = sink->pull_preroll();
 
-  ASSERT_TRUE(samp);
+  MM_ASSERT_TRUE(samp);
   buf_out = samp->get_buffer();
-  ASSERT_TRUE(buf_out->map(mapinfo, MAP_READ));
-  ASSERT_TRUE(mapinfo.get_data());
+  MM_ASSERT_TRUE(buf_out->map(mapinfo, MAP_READ));
+  MM_ASSERT_TRUE(mapinfo.get_data());
   std::sort(data.begin(), data.end());
-  ASSERT_TRUE(std::equal(data.begin(), data.end(), mapinfo.get_data()));
+  MM_ASSERT_TRUE(std::equal(data.begin(), data.end(), mapinfo.get_data()));
   buf_out->unmap(mapinfo);
   EXPECT_EQ(FLOW_OK, source->end_of_stream());
 

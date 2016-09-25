@@ -4,7 +4,7 @@
  *  Created on: Aug 27, 2016
  *      Author: m.kolny
  */
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 TEST(ValueTest, TestDefaultRangeValue)

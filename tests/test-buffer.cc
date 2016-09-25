@@ -5,7 +5,7 @@
  *    Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <glibmm/threads.h>
 #include <gstreamermm/buffer.h>
 
@@ -54,7 +54,7 @@ TEST(BufferTest, ShouldInsertMemoryObjectAndResetItButAllowToMakeExplicityRef)
   Glib::RefPtr<Buffer> buf = Buffer::create(10);
   mem2 = mem;
   buf->insert_memory(0, std::move(mem));
-  ASSERT_FALSE(mem);
+  MM_ASSERT_FALSE(mem);
   ASSERT_EQ(2, mem2->gobj()->mini_object.refcount); // two - one handled by mem2,
                           //and the second by memory stored in buffer
 }
@@ -79,7 +79,7 @@ TEST(BufferTest, ShouldResetMemoryPointerButAllowIncreaseRefcount)
     Glib::RefPtr<Buffer> buf = Buffer::create(10);
     buf->replace_memory_range(0, -1, std::move(mem));
   }
-  ASSERT_FALSE(mem);
+  MM_ASSERT_FALSE(mem);
   ASSERT_EQ(1, mem2->gobj()->mini_object.refcount);
 }
 
@@ -128,21 +128,21 @@ TEST(BufferTest, CheckRefcountAppendBufferToBuffer)
     Glib::RefPtr<Gst::Buffer> buf2 = Gst::Buffer::create(6);
   Glib::RefPtr<Gst::Buffer> dummy = buf1;
     Glib::RefPtr<Gst::Buffer> b = buf1->append(std::move(buf2));
-    ASSERT_FALSE(buf2);
+    MM_ASSERT_FALSE(buf2);
     ASSERT_EQ(2, buf1->get_refcount()); // dummy + buf1
     ASSERT_EQ(1, b->get_refcount());
     ASSERT_EQ(16u, b->get_size());
     ASSERT_EQ(10u, buf1->get_size());
-    ASSERT_FALSE(b == buf1);
+    MM_ASSERT_FALSE(b == buf1);
   }
 
   { // buf1 writable
     Glib::RefPtr<Gst::Buffer> buf2 = Gst::Buffer::create(6);
     Glib::RefPtr<Gst::Buffer> b = buf1->append(std::move(buf2));
-    ASSERT_FALSE(buf2);
+    MM_ASSERT_FALSE(buf2);
     ASSERT_EQ(2, buf1->get_refcount()); // b + buf1
     ASSERT_EQ(2, b->get_refcount());
     ASSERT_EQ(16u, b->get_size());
-    ASSERT_TRUE(b == buf1);
+    MM_ASSERT_TRUE(b == buf1);
   }
 }

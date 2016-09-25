@@ -5,7 +5,7 @@
  *      Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/fakesink.h>
 #include <glibmm.h>
@@ -95,7 +95,7 @@ void on_pad_added(const RefPtr<Pad>& newPad)
 
   PadLinkReturn ret = newPad->link(sink_pad);
 
-  ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
+  MM_ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
 }
 
 void no_more_pads()
@@ -114,9 +114,9 @@ TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
 
   mainloop = Glib::MainLoop::create();
   pipeline = Pipeline::create("seekonstartup-pipeline");
-  ASSERT_TRUE(pipeline);
+  MM_ASSERT_TRUE(pipeline);
   bus = pipeline->get_bus();
-  ASSERT_TRUE(bus);
+  MM_ASSERT_TRUE(bus);
   bus->add_watch(sigc::ptr_fun(&on_bus_message));
 
   RefPtr<Element> src = ElementFactory::create_element("uridecodebin"),
@@ -124,10 +124,10 @@ TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
       vs = ElementFactory::create_element("videoscale"),
       sink = ElementFactory::create_element("ximagesink");
 
-  ASSERT_TRUE(src);
-  ASSERT_TRUE(csp);
-  ASSERT_TRUE(vs);
-  ASSERT_TRUE(sink);
+  MM_ASSERT_TRUE(src);
+  MM_ASSERT_TRUE(csp);
+  MM_ASSERT_TRUE(vs);
+  MM_ASSERT_TRUE(sink);
 
   ASSERT_NO_THROW(src->set_property("uri", URIHandler::filename_to_uri(input_filename)));
 
@@ -148,7 +148,7 @@ TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
 
   pipeline->set_state(Gst::STATE_NULL);
 
-  ASSERT_TRUE(was_check);
+  MM_ASSERT_TRUE(was_check);
 
   remove(input_filename.c_str());
 }

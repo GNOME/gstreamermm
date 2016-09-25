@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/appsrc.h>
 
@@ -21,8 +21,8 @@ protected:
     sink = ElementFactory::create_element("fakesink", "sink");
     source = ElementFactory::create_element("derivedfromappsrc", "source");
 
-    ASSERT_TRUE(sink);
-    ASSERT_TRUE(source);
+    MM_ASSERT_TRUE(sink);
+    MM_ASSERT_TRUE(source);
 
     ASSERT_NO_THROW(pipeline->add(source)->add(sink));
     ASSERT_NO_THROW(source->link(sink));
@@ -41,7 +41,7 @@ TEST_F(DerivedFromAppSrcPluginTest, CreateRegisteredElement)
 {
   RefPtr<Element> source_element = ElementFactory::create_element("derivedfromappsrc", "source");
 
-  ASSERT_TRUE(source_element);
+  MM_ASSERT_TRUE(source_element);
 }
 
 TEST_F(DerivedFromAppSrcPluginTest, CreatePipelineWithRegisteredElement)
@@ -55,15 +55,15 @@ TEST_F(DerivedFromAppSrcPluginTest, SrcPadQueryCapsShouldReturnProperCapsObjects
 
   RefPtr<BaseSrc> basesrc;
   basesrc = basesrc.cast_dynamic(source);
-  ASSERT_TRUE(basesrc);
+  MM_ASSERT_TRUE(basesrc);
 
   RefPtr<Pad> src_pad = basesrc->get_src_pad();
-  ASSERT_TRUE(src_pad);
-  ASSERT_TRUE(GST_IS_PAD(src_pad->gobj()));
+  MM_ASSERT_TRUE(src_pad);
+  MM_ASSERT_TRUE(GST_IS_PAD(src_pad->gobj()));
   RefPtr<Caps> caps = src_pad->query_caps(Caps::create_any());
-  ASSERT_TRUE(caps);
-  ASSERT_TRUE(caps->gobj());
-  ASSERT_TRUE(GST_IS_CAPS(caps->gobj()));
+  MM_ASSERT_TRUE(caps);
+  MM_ASSERT_TRUE(caps->gobj());
+  MM_ASSERT_TRUE(GST_IS_CAPS(caps->gobj()));
   RefPtr<Caps> template_caps = Glib::wrap(gst_pad_get_pad_template_caps(src_pad->gobj()), false);
 
   src_pad.reset();
@@ -91,14 +91,14 @@ TEST_F(DerivedFromAppSrcPluginTest, SimpleDataFlowInPipelineWithAppSrcElement)
 
   std::string data = "hello world";
   RefPtr<Buffer> buf = Buffer::create(data.length() + 1);
-  ASSERT_TRUE(buf);
+  MM_ASSERT_TRUE(buf);
   MapInfo mapinfo;
-  ASSERT_TRUE(buf->map(mapinfo, MAP_WRITE));
+  MM_ASSERT_TRUE(buf->map(mapinfo, MAP_WRITE));
   strcpy((char *)mapinfo.get_data(), data.c_str());
 
   RefPtr<AppSrc> appsrc;
   appsrc = appsrc.cast_dynamic(source);
-  ASSERT_TRUE(appsrc);
+  MM_ASSERT_TRUE(appsrc);
 
   EXPECT_EQ(FLOW_OK, appsrc->push_buffer(buf));
 
@@ -112,7 +112,7 @@ TEST_F(DerivedFromAppSrcPluginTest, SimpleDataFlowInPipelineWithAppSrcElement)
   EXPECT_EQ(FLOW_OK, appsrc->end_of_stream());
 
   RefPtr<Message> msg = pipeline->get_bus()->poll((MessageType)(MESSAGE_EOS | MESSAGE_ERROR) , 1*SECOND);
-  ASSERT_TRUE(msg);
+  MM_ASSERT_TRUE(msg);
   EXPECT_EQ(MESSAGE_EOS, msg->get_message_type());
   EXPECT_EQ(STATE_CHANGE_SUCCESS, pipeline->set_state(STATE_NULL));
 }

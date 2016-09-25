@@ -15,8 +15,8 @@
 
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
 local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
-gtest_includes = -I$(srcdir)/gtest/gtest-1.7.0 -I$(srcdir)/gtest/gtest-1.7.0/include
-AM_CPPFLAGS = -I$(top_builddir) $(gstreamermm_includes) $(gtest_includes) $(GSTREAMERMM_CFLAGS) -std=c++0x -Wall -Werror -Wextra
+gtest_includes = -I$(srcdir)/gtest/googletest-release-1.7.0 -I$(srcdir)/gtest/googletest-release-1.7.0/include
+AM_CPPFLAGS = -I$(top_builddir) -I$(srcdir) $(gstreamermm_includes) $(gtest_includes) $(GSTREAMERMM_CFLAGS) -std=c++0x -Wall -Werror -Wextra
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g -Wno-missing-field-initializers
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lpthread
 
@@ -62,10 +62,10 @@ check_PROGRAMS =                                \
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
-TEST_GTEST_SOURCES = main.cc gtest/gtest-1.7.0/src/gtest-all.cc
+TEST_GTEST_SOURCES = main.cc gtest/googletest-release-1.7.0/src/gtest-all.cc
 TEST_REGRESSION_UTILS = regression/utils.cc
 
-$(TEST_GTEST_SOURCES): gtest.zip
+$(TEST_GTEST_SOURCES): release-1.7.0.zip
 
 test_allocator_SOURCES                          = $(TEST_GTEST_SOURCES) test-allocator.cc
 test_atomicqueue_SOURCES                        = $(TEST_GTEST_SOURCES) test-atomicqueue.cc
@@ -107,9 +107,9 @@ test_regression_videoduration_SOURCES           = $(TEST_GTEST_SOURCES) $(TEST_R
 download_curl = $(CURL) --compressed --connect-timeout 300 -g -L -m 3600 -R --retry 5 \
 		$(if $(wildcard $@),-z $@) -o $@
 download_wget = $(WGET) -N -nd -T 300 -t 5 -P $(dir $@)
-gtest_url = https://googletest.googlecode.com/files/gtest-1.7.0.zip
+gtest_url = https://github.com/google/googletest/archive/release-1.7.0.zip
 
-gtest.zip:
+release-1.7.0.zip:
 	$(AM_V_GEN)$(if $(filter no,$(ENABLE_UNITTESTS)),\
 	echo 'Error: $@ does not exist.';\
 	echo 'Unit tests are disabled.';\
@@ -118,9 +118,9 @@ gtest.zip:
 	$(if\
 	$(CURL),$(download_curl) '$(gtest_url)',$(if\
 	$(WGET),$(download_wget) '$(gtest_url)',test -f $@))); \
-	$(AM_V_GEN)unzip -nq -d gtest gtest.zip
+	$(AM_V_GEN)unzip -nq -d gtest release-1.7.0.zip
 
 check_DATA = gtest
-CLEANFILES = gtest.zip
+CLEANFILES = release-1.7.0.zip
 clean-local:
 	rm -rf gtest

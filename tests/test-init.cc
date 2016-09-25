@@ -5,7 +5,7 @@
  *      Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <glibmm.h>
 
@@ -29,7 +29,7 @@ protected:
 TEST(InitTest, ShouldValidInitializeAndDeinitialize)
 {
   init();
-  ASSERT_TRUE(is_initialized());
+  MM_ASSERT_TRUE(is_initialized());
 }
 
 TEST(InitTest, ShouldReturnCorrectGstreamerVersion)

@@ -5,7 +5,7 @@
  *    Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <functional>
 
@@ -17,7 +17,7 @@ void CreatingQueryTest(std::function<RefPtr<QType>()> create_method, QueryType t
 {
   RefPtr<QType> query = create_method();
 
-  ASSERT_TRUE(query);
+  MM_ASSERT_TRUE(query);
   ASSERT_EQ(type, query->get_query_type());
 }
 
@@ -26,12 +26,12 @@ void CreatingQueryTestStatic(std::function<RefPtr<Query>()> create_method, Query
 {
   RefPtr<Query> query = create_method();
 
-  ASSERT_TRUE(query);
+  MM_ASSERT_TRUE(query);
   ASSERT_EQ(type, query->get_query_type());
 
   RefPtr<QType> query_position = RefPtr<QType>::cast_static(query);
 
-  ASSERT_TRUE(query_position);
+  MM_ASSERT_TRUE(query_position);
 }
 
 TEST(QueryTest, CorrectCreatingQueryBuffering)
@@ -93,13 +93,13 @@ TEST(QueryTest, ShouldCastToAnotherQueryTypeWithoutAdditionalReference)
 
   {
     Glib::RefPtr<Gst::QueryUri> query_uri(static_cast<Gst::QueryUri*>(query.release()));
-    ASSERT_FALSE(query);
+    MM_ASSERT_FALSE(query);
     // QueryUri::set requires writable query object, so query object's refcount has to equal 1
-    ASSERT_TRUE(query_uri->is_writable());
+    MM_ASSERT_TRUE(query_uri->is_writable());
     query_uri->set(uri);
     ASSERT_STREQ(uri.c_str(), query_uri->parse().c_str());
     query = std::move(query_uri);
-    ASSERT_FALSE(query_uri);
+    MM_ASSERT_FALSE(query_uri);
   }
   ASSERT_EQ(1, query->get_refcount());
 }

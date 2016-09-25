@@ -5,7 +5,7 @@
  *    Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -80,5 +80,5 @@ TEST_F(TagListTest, GetNonExistingTag)
 
   bool album_exists = tag_list.get(TAG_ALBUM, album);
 
-  ASSERT_FALSE(album_exists);
+  MM_ASSERT_FALSE(album_exists);
 }

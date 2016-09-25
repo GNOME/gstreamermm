@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -15,7 +15,7 @@ TEST(SampleTest, CheckGetCapsMethod)
   {
     auto tmp_caps = sample->get_caps();
     ASSERT_EQ(3, caps->get_refcount());
-    ASSERT_TRUE(tmp_caps->equals(caps));
+    MM_ASSERT_TRUE(tmp_caps->equals(caps));
   }
   
   ASSERT_EQ(2, caps->get_refcount());

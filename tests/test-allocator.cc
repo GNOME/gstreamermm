@@ -5,7 +5,7 @@
  *      Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -14,7 +14,7 @@ TEST(AllocatorTest, ShouldFindSystemAllocator)
 {
   Glib::RefPtr<Allocator> allocator = Allocator::find(GST_ALLOCATOR_SYSMEM);
 
-  ASSERT_TRUE(allocator);
+  MM_ASSERT_TRUE(allocator);
 }
 
 TEST(AllocatorTest, DefaultAllocatorTheSameAsSystemAllocator)
@@ -22,7 +22,7 @@ TEST(AllocatorTest, DefaultAllocatorTheSameAsSystemAllocator)
   Glib::RefPtr<Allocator> allocator1 = Allocator::find(GST_ALLOCATOR_SYSMEM),
 		allocator2 = Allocator::get_default_allocator();
 
-  ASSERT_TRUE(allocator1);
+  MM_ASSERT_TRUE(allocator1);
   ASSERT_EQ(allocator1, allocator2);
 }
 
@@ -35,7 +35,7 @@ TEST(AllocatorTest, ShouldCorrectAllocateMemory)
   Glib::RefPtr<Allocator> allocator = Allocator::get_default_allocator();
   Glib::RefPtr<Memory> mem = allocator->alloc(10, params);
 
-  ASSERT_TRUE(mem);
+  MM_ASSERT_TRUE(mem);
   EXPECT_EQ(10ul, mem->get_size());
   EXPECT_EQ(7ul, mem->get_align());
   EXPECT_TRUE(flags & mem->get_flags());
@@ -77,9 +77,9 @@ public:
 TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedWrappedGstMemory)
 {
   Glib::RefPtr<Allocator> allocator = DerivedFromAllocator::create();
-  ASSERT_TRUE(allocator);
-  ASSERT_TRUE(allocator->gobj());
-  ASSERT_TRUE(GST_IS_ALLOCATOR(allocator->gobj()));
+  MM_ASSERT_TRUE(allocator);
+  MM_ASSERT_TRUE(allocator->gobj());
+  MM_ASSERT_TRUE(GST_IS_ALLOCATOR(allocator->gobj()));
 
   AllocationParams params;
   params.set_align(7);
@@ -87,9 +87,9 @@ TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedWrappedGst
   params.set_flags(flags);
 
   Glib::RefPtr<Memory> mem = allocator->alloc(10, params);
-  ASSERT_TRUE(mem);
-  ASSERT_TRUE(mem->gobj());
-  ASSERT_TRUE(GST_IS_MINI_OBJECT_TYPE(mem->gobj(), GST_TYPE_MEMORY));
+  MM_ASSERT_TRUE(mem);
+  MM_ASSERT_TRUE(mem->gobj());
+  MM_ASSERT_TRUE(GST_IS_MINI_OBJECT_TYPE(mem->gobj(), GST_TYPE_MEMORY));
   ASSERT_EQ(1, mem->get_refcount());
   EXPECT_EQ(10ul, mem->get_size());
   EXPECT_EQ(7ul, mem->get_align());
@@ -101,9 +101,9 @@ TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedWrappedGst
 TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedGstMemory)
 {
   Glib::RefPtr<Allocator> allocator = DerivedFromAllocator::create();
-  ASSERT_TRUE(allocator);
-  ASSERT_TRUE(allocator->gobj());
-  ASSERT_TRUE(GST_IS_ALLOCATOR(allocator->gobj()));
+  MM_ASSERT_TRUE(allocator);
+  MM_ASSERT_TRUE(allocator->gobj());
+  MM_ASSERT_TRUE(GST_IS_ALLOCATOR(allocator->gobj()));
 
   AllocationParams params;
   params.set_align(7);
@@ -111,8 +111,8 @@ TEST(AllocatorTest, DerivedFromAllocatorShouldReturnProperlyRefcountedGstMemory)
   params.set_flags(flags);
 
   GstMemory *mem = gst_allocator_alloc(allocator->gobj(), 10, params.gobj());
-  ASSERT_TRUE(mem);
-  ASSERT_TRUE(GST_IS_MINI_OBJECT_TYPE(mem, GST_TYPE_MEMORY));
+  MM_ASSERT_TRUE(mem);
+  MM_ASSERT_TRUE(GST_IS_MINI_OBJECT_TYPE(mem, GST_TYPE_MEMORY));
   ASSERT_EQ(1, mem->mini_object.refcount);
   EXPECT_EQ(10ul, mem->size);
   EXPECT_EQ(7ul, mem->align);

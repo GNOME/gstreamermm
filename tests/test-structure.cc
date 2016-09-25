@@ -6,7 +6,7 @@
  */
 
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -75,7 +75,7 @@ TEST_F(StructureTest, GetSetInt64Variable)
 {
   structure.set_field<gint64>("int64", 123);
   guint64 val;
-  ASSERT_FALSE(structure.get_field<guint64>("int64", val));
+  MM_ASSERT_FALSE(structure.get_field<guint64>("int64", val));
 }
 
 TEST_F(StructureTest, GetSetIntegerVariable)

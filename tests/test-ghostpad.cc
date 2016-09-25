@@ -5,7 +5,7 @@
  *    Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -17,7 +17,7 @@ TEST(GhostPadTest, CreatingGhostPad)
   PadDirection direction = PAD_SINK;
   RefPtr<GhostPad> ghost_pad = GhostPad::create(direction, pad_name);
 
-  ASSERT_TRUE(ghost_pad);
+  MM_ASSERT_TRUE(ghost_pad);
   ASSERT_EQ(direction, ghost_pad->get_direction());
   ASSERT_STREQ(pad_name.c_str(), ghost_pad->get_name().c_str());
 }
@@ -30,6 +30,6 @@ TEST(GhostPadTest, CreatingGhostPadFromTemplate)
 
   RefPtr<GhostPad> ghost_pad = GhostPad::create(templ);
 
-  ASSERT_TRUE(ghost_pad);
+  MM_ASSERT_TRUE(ghost_pad);
   ASSERT_EQ(direction, ghost_pad->get_direction());
 }

@@ -5,7 +5,7 @@
  *    Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -19,7 +19,7 @@ protected:
   void PostMessage()
   {
     bool message_posted = bus->post(MessageEos::create(Glib::RefPtr<Object>()));
-    ASSERT_TRUE(message_posted);
+    MM_ASSERT_TRUE(message_posted);
   }
 
   void CheckPending(bool expected = true)
@@ -33,7 +33,7 @@ TEST_F(BusTest, CorrectCreateBus)
 {
   bus = Bus::create();
 
-  ASSERT_TRUE(bus);
+  MM_ASSERT_TRUE(bus);
 }
 
 TEST_F(BusTest, PostMessageAndPeekIt)
@@ -45,7 +45,7 @@ TEST_F(BusTest, PostMessageAndPeekIt)
 
   Glib::RefPtr<Message> msg = bus->peek();
 
-  ASSERT_TRUE(msg);
+  MM_ASSERT_TRUE(msg);
 }
 
 TEST_F(BusTest, PostMessageAndPopIt)
@@ -57,7 +57,7 @@ TEST_F(BusTest, PostMessageAndPopIt)
 
   Glib::RefPtr<Message> msg = bus->pop();
 
-  ASSERT_TRUE(msg);
+  MM_ASSERT_TRUE(msg);
 
   CheckPending(false);
 }

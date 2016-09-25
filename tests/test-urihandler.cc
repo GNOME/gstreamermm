@@ -4,7 +4,7 @@
  *  Created on: May 16, 2014
  *      Author: m.kolny
  */
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/private/element_p.h>
 

@@ -5,7 +5,7 @@
  *      Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm/bufferlist.h>
 #include <gstreamermm/buffer.h>
 
@@ -17,7 +17,7 @@ TEST(BufferTest, BufferShouldBeReleasedAfterAddToAList)
   Glib::RefPtr<Gst::Buffer> buff = Gst::Buffer::create();
   Glib::RefPtr<Gst::Buffer> buff2 = buff;
   list->insert(0, std::move(buff));
-  ASSERT_FALSE(buff);
+  MM_ASSERT_FALSE(buff);
   buff = list->get(0);
-  ASSERT_TRUE(buff == buff2);
+  MM_ASSERT_TRUE(buff == buff2);
 }

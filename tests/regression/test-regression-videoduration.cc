@@ -5,7 +5,7 @@
  *      Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/fakesink.h>
 #include <glibmm.h>
@@ -40,7 +40,7 @@ void on_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
   RefPtr<Gst::Pad> sinkPad = decoder->get_static_pad("sink");
   PadLinkReturn ret = newPad->link(sinkPad);
 
-  ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
+  MM_ASSERT_TRUE(PAD_LINK_OK == ret || PAD_LINK_WAS_LINKED == ret);
 }
 
 
@@ -64,7 +64,7 @@ TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
   GenerateSampleOggFile(10, input_filename);
 
   RefPtr<FileSrc> filesrc = Gst::FileSrc::create();
-  ASSERT_TRUE(filesrc);
+  MM_ASSERT_TRUE(filesrc);
 
   filesrc->property_location() = input_filename;
 
@@ -73,9 +73,9 @@ TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
   RefPtr<Element> sink = ElementFactory::create_element("fakesink"),
         demuxer = ElementFactory::create_element("oggdemux");
   decoder = ElementFactory::create_element("theoradec");
-  ASSERT_TRUE(sink);
-  ASSERT_TRUE(demuxer);
-  ASSERT_TRUE(decoder);
+  MM_ASSERT_TRUE(sink);
+  MM_ASSERT_TRUE(demuxer);
+  MM_ASSERT_TRUE(decoder);
 
   RefPtr<Bus> bus = pipeline->get_bus();
   bus->add_watch(sigc::ptr_fun(&on_bus_message));

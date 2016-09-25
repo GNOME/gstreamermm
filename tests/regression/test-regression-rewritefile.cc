@@ -5,7 +5,7 @@
  *      Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <glibmm.h>
 #include <cstdio>
@@ -42,14 +42,14 @@ TEST(RegressionRewriteFileTest, CreateAndRewriteFile)
 
   Glib::RefPtr<Gst::Pipeline> pipeline;
   RefPtr<FileSrc> filesrc = Gst::FileSrc::create();
-  ASSERT_TRUE(filesrc);
+  MM_ASSERT_TRUE(filesrc);
 
   filesrc->property_location() = input_filename;
 
   mainloop = Glib::MainLoop::create();
   pipeline = Gst::Pipeline::create("rewriter");
   Glib::RefPtr<Gst::FileSink> filesink = Gst::FileSink::create();
-  ASSERT_TRUE(filesink);
+  MM_ASSERT_TRUE(filesink);
 
   filesink->property_location() = output_filename;
 

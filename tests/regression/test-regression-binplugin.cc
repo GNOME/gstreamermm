@@ -5,7 +5,7 @@
  *      Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <glibmm.h>
 
@@ -43,21 +43,21 @@ TEST(BinPluginRegressionTest, DISABLED_ShouldDecodeAndEncodeFile)
           output_jpg = "resources/test-regression-binplugin-output-image.jpg";
 
   mainloop = Glib::MainLoop::create();
-  ASSERT_TRUE(mainloop);
+  MM_ASSERT_TRUE(mainloop);
   RefPtr<Element> pluginbin = Gst::ElementFactory::create_element("pluginbin", "sample-pluginbin");
-  ASSERT_TRUE(pluginbin);
+  MM_ASSERT_TRUE(pluginbin);
   RefPtr<Element> jpg_encoder = ElementFactory::create_element("queue");
-  ASSERT_TRUE(jpg_encoder);
+  MM_ASSERT_TRUE(jpg_encoder);
   RefPtr<FileSink> file_sink = FileSink::create("file-sink");
-  ASSERT_TRUE(file_sink);
+  MM_ASSERT_TRUE(file_sink);
   RefPtr<Pipeline> pipeline = Pipeline::create("image-converter-pipeline");
-  ASSERT_TRUE(pipeline);
+  MM_ASSERT_TRUE(pipeline);
 
   ASSERT_NO_THROW(pipeline->add(pluginbin)->add(jpg_encoder)->add(file_sink));
   ASSERT_NO_THROW(pluginbin->link(jpg_encoder)->link(file_sink));
 
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
-  ASSERT_TRUE(bus);
+  MM_ASSERT_TRUE(bus);
   bus->add_watch(sigc::ptr_fun(&on_bus_message));
 
   pluginbin->set_property("location", input_png);
@@ -70,5 +70,5 @@ TEST(BinPluginRegressionTest, DISABLED_ShouldDecodeAndEncodeFile)
 
   struct stat st;
   stat(output_jpg.c_str(), &st);
-  ASSERT_TRUE( st.st_size > 0 ); // weak checking
+  MM_ASSERT_TRUE( st.st_size > 0 ); // weak checking
 }

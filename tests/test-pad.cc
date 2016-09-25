@@ -5,7 +5,7 @@
  *    Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -20,7 +20,7 @@ protected:
 
   void CheckPad()
   {
-    ASSERT_TRUE(pad);
+    MM_ASSERT_TRUE(pad);
     EXPECT_EQ(pad_direction, pad->get_direction());
     ASSERT_STREQ(pad_name.c_str(), pad->get_name().c_str());
   }
@@ -67,7 +67,7 @@ TEST_F(PadTest, PadPushVerifyBufferRefcount)
 
   ASSERT_EQ(1, buffer->get_refcount());
   pad->push(std::move(buffer));
-  ASSERT_FALSE(buffer);
+  MM_ASSERT_FALSE(buffer);
 }
 
 TEST_F(PadTest, PadEventDefault)
@@ -77,5 +77,5 @@ TEST_F(PadTest, PadEventDefault)
 
   ASSERT_EQ(1, event->get_refcount());
   pad->event_default(std::move(event));
-  ASSERT_FALSE(event);
+  MM_ASSERT_FALSE(event);
 }

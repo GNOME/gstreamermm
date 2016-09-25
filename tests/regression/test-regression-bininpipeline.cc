@@ -5,7 +5,7 @@
  *      Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/filesrc.h>
 #include <gstreamermm/filesink.h>
@@ -73,21 +73,21 @@ TEST(BinInPipelineRegressionTest, CustomBinShouldCorrectPassThroughImage)
       output_jpg = "resources/test-regression-bininpipeline-output-image.jpg";
 
   mainloop = Glib::MainLoop::create();
-  ASSERT_TRUE(mainloop);
+  MM_ASSERT_TRUE(mainloop);
   RefPtr<CustomBin> custom_bin = CustomBin::create("file-png-decoder");
-  ASSERT_TRUE(custom_bin);
+  MM_ASSERT_TRUE(custom_bin);
   RefPtr<Element> queue = ElementFactory::create_element("queue");
-  ASSERT_TRUE(queue);
+  MM_ASSERT_TRUE(queue);
   RefPtr<FileSink> file_sink = FileSink::create("file-sink");
-  ASSERT_TRUE(file_sink);
+  MM_ASSERT_TRUE(file_sink);
   RefPtr<Pipeline> pipeline = Pipeline::create("image-converter-pipeline");
-  ASSERT_TRUE(custom_bin);
+  MM_ASSERT_TRUE(custom_bin);
 
   ASSERT_NO_THROW(pipeline->add(custom_bin)->add(queue)->add(file_sink));
   ASSERT_NO_THROW(custom_bin->link(queue)->link(file_sink));
 
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
-  ASSERT_TRUE(bus);
+  MM_ASSERT_TRUE(bus);
   bus->add_watch(sigc::ptr_fun(&on_bus_message));
 
   custom_bin->set_location(input_png);

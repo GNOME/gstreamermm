@@ -5,7 +5,7 @@
  *    Author: m.kolny
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 
 using namespace Gst;
@@ -35,7 +35,7 @@ protected:
     T output;
     bool ok = caps->get_structure(struct_id).get_field(field_name, output);
 
-    ASSERT_TRUE(ok);
+    MM_ASSERT_TRUE(ok);
     MakeAssert(expected, output);
   }
 };
@@ -47,7 +47,7 @@ TEST_F(CapsTest, CapsCreateSimple)
 {
   caps = Caps::create_simple("video/x-raw");
 
-  ASSERT_TRUE(caps);
+  MM_ASSERT_TRUE(caps);
 }
 
 TEST_F(CapsTest, CapsCreateUsingStructure)
@@ -88,7 +88,7 @@ TEST_F(CapsTest, AppendCapsToCaps)
 
   CheckCaps("width", width, 1);
   CheckCaps("framerate", framerate);
-  ASSERT_FALSE(new_caps);
+  MM_ASSERT_FALSE(new_caps);
 }
 
 TEST_F(CapsTest, GetNonExistingValue)
@@ -98,7 +98,7 @@ TEST_F(CapsTest, GetNonExistingValue)
   int output;
   bool ok = caps->get_structure(0).get_field("nonexisting-value", output);
 
-  ASSERT_FALSE(ok);
+  MM_ASSERT_FALSE(ok);
 }
 
 TEST_F(CapsTest, SetCapsToElement)
@@ -119,7 +119,7 @@ TEST_F(CapsTest, MergeCaps)
   Glib::RefPtr<Caps> tmp2 = Caps::create_from_string("video/x-raw, format=RGB");
   tmp = tmp->merge(std::move(tmp2));
   ASSERT_EQ(1, tmp->get_refcount());
-  ASSERT_FALSE(tmp2);
+  MM_ASSERT_FALSE(tmp2);
 }
 
 TEST_F(CapsTest, CapsBoxedType)

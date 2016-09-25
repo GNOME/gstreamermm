@@ -5,7 +5,7 @@
  *      Author: loganek
  */
 
-#include <gtest/gtest.h>
+#include "mmtest.h"
 #include <gstreamermm.h>
 #include <string>
 
@@ -52,7 +52,7 @@ TEST(AtomicQueueTest, ShouldImitateGstAtomicQueueStructByGpointerAsTemplate)
   int* new_data = static_cast<int*>(queue->pop());
   GstElement* new_element = static_cast<GstElement*>(queue->pop());
   ASSERT_EQ(*new_data, *data);
-  ASSERT_TRUE(GST_IS_ELEMENT(element));
+  MM_ASSERT_TRUE(GST_IS_ELEMENT(element));
   ASSERT_EQ(new_element, element);
   EXPECT_STREQ("dummy-name", gst_element_get_name(new_element));
   delete new_data;
