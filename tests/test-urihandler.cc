@@ -22,7 +22,7 @@ public:
     return Element::get_base_type();
   }
 
-  static void base_init(Gst::ElementClass<UriTestElement> *klass)
+  static void class_init(Gst::ElementClass<UriTestElement> *klass)
   {
     klass->set_metadata("uri_longname", "uri_classification",
         "uri_detail_description", "uri_detail_author");

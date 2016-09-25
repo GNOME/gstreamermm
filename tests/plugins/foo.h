@@ -19,7 +19,7 @@ class Foo : public Gst::Element
   Glib::Property<Glib::ustring> sample_property;
 
 public:
-  static void base_init(Gst::ElementClass<Foo> *klass)
+  static void class_init(Gst::ElementClass<Foo> *klass)
   {
     klass->set_metadata("foo_longname",
           "foo_classification", "foo_detail_description", "foo_detail_author");

@@ -20,7 +20,7 @@ class FooSrc : public Gst::PushSrc
 
 public:
   static const int COUNT = 5;
-  static void base_init(Gst::ElementClass<FooSrc> *klass)
+  static void class_init(Gst::ElementClass<FooSrc> *klass)
   {
     klass->set_metadata("foosrc_longname",
            "foosrc_classification", "foosrc_detail_description", "foosrc_detail_author");

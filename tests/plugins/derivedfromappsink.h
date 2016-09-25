@@ -9,7 +9,7 @@
 class DerivedFromAppSink : public Gst::AppSink
 {
 public:
-  static void base_init(Gst::ElementClass<DerivedFromAppSink> *klass)
+  static void class_init(Gst::ElementClass<DerivedFromAppSink> *klass)
   {
     klass->set_metadata("derivedfromappsink_longname",
             "derivedfromappsink_classification", "derivedfromappsink_detail_description", "derivedfromappsink_detail_author");

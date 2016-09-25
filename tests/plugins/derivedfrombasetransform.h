@@ -8,7 +8,7 @@
 class DerivedFromBaseTransform : public Gst::BaseTransform
 {
 public:
-  static void base_init(Gst::ElementClass<DerivedFromBaseTransform> *klass)
+  static void class_init(Gst::ElementClass<DerivedFromBaseTransform> *klass)
   {
     klass->set_metadata("derivedfrombasetransform_longname",
           "derivedfrombasetransform_classification", "derivedfrombasetransform_detail_description", "derivedfrombasetransform_detail_author");

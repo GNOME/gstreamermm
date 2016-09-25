@@ -9,7 +9,7 @@
 class DerivedFromAppSrc : public Gst::AppSrc
 {
 public:
-  static void base_init(Gst::ElementClass<DerivedFromAppSrc> *klass)
+  static void class_init(Gst::ElementClass<DerivedFromAppSrc> *klass)
   {
     klass->set_metadata("derivedfromappsrc_longname",
           "derivedfromappsrc_classification", "derivedfromappsrc_detail_description", "derivedfromappsrc_detail_author");
