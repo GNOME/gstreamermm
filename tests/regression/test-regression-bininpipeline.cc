@@ -9,7 +9,7 @@
 #include <gstreamermm.h>
 #include <gstreamermm/filesrc.h>
 #include <gstreamermm/filesink.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 
 using namespace Gst;
 using Glib::RefPtr;

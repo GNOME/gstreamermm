@@ -7,7 +7,7 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 #include <cstdio>
 #include "utils.h"
 

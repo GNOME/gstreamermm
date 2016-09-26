@@ -7,7 +7,7 @@
 
 #include <gstreamermm.h>
 #include <iostream>
-#include <glibmm.h>
+#include <glibmm/main.h>
 
 using namespace Gst;
 using Glib::RefPtr;

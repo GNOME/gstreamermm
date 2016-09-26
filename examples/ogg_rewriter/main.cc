@@ -1,5 +1,5 @@
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 #include <iostream>
 #include <stdlib.h>
 

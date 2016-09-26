@@ -17,7 +17,7 @@
  */
 
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/optioncontext.h>
 #include <iostream>
 
 Glib::OptionEntry make_entry(const Glib::ustring& long_name, const gchar& short_name, const Glib::ustring& description)
@@ -44,11 +44,6 @@ int main(int argc, char** argv)
 
   m_OptionGroup.add_entry(make_entry("silent", 's', "do not output status information"), silent);
   m_OptionGroup.add_entry_filename(make_entry("output", 'o', "save xml representation of pipeline to file and exit"), path);
-
-  // We must initialise the threading system before using any other GLib function.
-  // See Gstreamer's documentation for more info.
-  if(!Glib::thread_supported())
-    Glib::thread_init();
 
   m_OptionContext.set_main_group(m_OptionGroup);
 

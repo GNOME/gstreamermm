@@ -2,7 +2,7 @@
  * This example presents basic usage of the Gst::Bus class.
  */
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 
 #include <iostream>
 

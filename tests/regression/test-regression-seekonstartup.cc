@@ -8,7 +8,7 @@
 #include "mmtest.h"
 #include <gstreamermm.h>
 #include <gstreamermm/fakesink.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 #include "utils.h"
 
 using namespace Gst;

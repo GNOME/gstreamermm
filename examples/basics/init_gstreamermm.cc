@@ -4,7 +4,7 @@
  * with your application's option group.
  */
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/optioncontext.h>
 
 #include <iostream>
 

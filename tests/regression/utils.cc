@@ -8,7 +8,7 @@
 #include <gstreamermm.h>
 #include <gstreamermm/videotestsrc.h>
 #include <gstreamermm/filesink.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 #include "utils.h"
 
 using Glib::RefPtr;

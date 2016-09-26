@@ -17,7 +17,8 @@
  */
 
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
+#include <glibmm/convert.h>
 #include <iostream>
 #include <stdlib.h>
 #include <gstreamermm/playbin.h>

@@ -12,7 +12,6 @@
 #include <gstreamermm/private/bin_p.h>
 #include <gstreamermm/filesrc.h>
 #include <gstreamermm/filesink.h>
-#include <glibmm.h>
 #include <cstdio>
 #include <sys/stat.h>
 

@@ -7,7 +7,6 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
-#include <glibmm.h>
 
 using namespace Gst;
 using Glib::RefPtr;

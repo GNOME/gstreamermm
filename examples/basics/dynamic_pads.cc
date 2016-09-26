@@ -2,7 +2,7 @@
  * This example presents basic usage of dynamics Gst::Pad objects.
  */
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 
 #include <iostream>
 

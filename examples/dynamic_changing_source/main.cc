@@ -5,7 +5,7 @@
  *      Author: m.kolny
  */
 #include <gstreamermm.h>
-#include <glibmm.h>
+#include <glibmm/main.h>
 #include <iostream>
 
 using namespace Gst;
