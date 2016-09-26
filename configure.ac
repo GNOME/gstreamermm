@@ -97,26 +97,19 @@ MM_ARG_WITH_TAGFILE_DOC([cairomm-1.0.tag], [cairomm-1.0])
 MM_ARG_WITH_TAGFILE_DOC([pangomm-1.4.tag], [pangomm-1.4])
 
 AC_ARG_ENABLE(unittests,
-       AS_HELP_STRING([--disable-unittests], 
-       [Disable unit tests]),
-       [enable_unittests=no],
-       [enable_unittests=yes])
+       AS_HELP_STRING([--enable-unittests=@<:@yes/no/auto@:>@], 
+       [Enable unit tests]),
+       [enable_unittests=$enableval],
+       [enable_unittests=auto])
+
+AS_IF([test "$enable_unittests" != no],[
+       AC_CHECK_LIB([gtest_main], [main], [have_gtest=yes],[have_gtest=no])
+       AS_IF([test "$enable_unittests" = "yes" && test "$have_gtest" = "no"],
+               AC_MSG_FAILURE([Unit tests are enabled so gtest library is required for building unit tests.])], [enable_unittests=$have_gtest)
+])
 
 AC_SUBST([ENABLE_UNITTESTS], ["$enable_unittests"])
 
-if test "x$enable_unittests" = xyes; then
-  AC_CHECK_PROG([CURL], [curl], [curl])
-  AC_CHECK_PROG([WGET], [wget], [wget])
-  AC_CHECK_PROG([UNZIP], [unzip], [unzip])
-  AS_VAR_IF([UNZIP], [], [AC_MSG_FAILURE([[Unit tests are enabled so unzip is required for building unit tests.]])])
-  AS_VAR_IF([CURL], [], [
-    AS_VAR_IF([WGET], [],[
-      AC_MSG_FAILURE([[
-        Unit tests are enabled so either curl or wget is required for building unit tests.
-        ]])
-    ])
-  ])
-fi
 
 #########################################################################
 #  Plug-in processing
