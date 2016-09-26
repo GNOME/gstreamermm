@@ -76,7 +76,7 @@ element_link_example_SOURCES 				= element_link/element_link.cc
 hello_world_example_SOURCES 				= hello_world/main.cc
 ogg_rewriter_example_SOURCES	 			= ogg_rewriter/main.cc
 ogg_player_example_SOURCES					= ogg_player/main.cc
-opengl_filter_example_SOURCES				= opengl_filter/main.cc 
+opengl_filter_example_SOURCES				= opengl_filter/main.cc opengl_filter/sample_gl_filter.h
 optiongroup_example_SOURCES					= optiongroup/main.cc
 typefind_example_SOURCES					= typefind/main.cc
 

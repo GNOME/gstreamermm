@@ -29,7 +29,7 @@ class SampleGLFilter: public Gst::Bad::GLFilter
   }
 
 public:
-  static void base_init(Gst::ElementClass<SampleGLFilter> *klass)
+  static void class_init(Gst::ElementClass<SampleGLFilter> *klass)
   {
       klass->set_metadata("sample gl filter",
               "gstreamermm/examples",

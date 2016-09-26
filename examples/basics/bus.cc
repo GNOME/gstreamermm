@@ -9,7 +9,7 @@
 Glib::RefPtr<Glib::MainLoop> main_loop;
 
 // Message watch function
-bool bus_message_watch(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message)
+bool bus_message_watch(const Glib::RefPtr<Gst::Bus>& /* bus */, const Glib::RefPtr<Gst::Message>& message)
 {
   // Print type of the message posted on the bus, and the source object name.
   std::cout << "Got message of type " << Gst::Enums::get_name(message->get_message_type()) << std::endl;
