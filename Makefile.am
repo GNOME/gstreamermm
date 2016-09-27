@@ -59,7 +59,11 @@ nodist_gstreamermm_libinclude_HEADERS = gstreamer/gstreamermmconfig.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = $(pkgconfig_files)
+include $(srcdir)/MSVC_2015/filelist.am
 
+msvc_files = $(addprefix MSVC_2015/,$(msvc_2015_data))
+
+dist_noinst_DATA = $(msvc_files)
 dist_noinst_SCRIPTS = autogen.sh
 
 # Auto-generate the ChangeLog file from the git log on make dist
