@@ -18,8 +18,8 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 EXTRA_DIST = \
 	tests/plugins/foo.h \
-	tests/regression/utils.h \
-	tests/regression/pluginbin.h \
+	tests/integration/utils.h \
+	tests/integration/pluginbin.h \
 	tests/resources/input-image.png \
 	tests/mmtest.h \
 	tests/plugins/derivedfromappsink.h \
@@ -64,7 +64,7 @@ include $(srcdir)/MSVC_2015/filelist.am
 text_files = COPYING.tools COPYING.examples
 msvc_files = $(addprefix MSVC_2015/,$(msvc_2015_data))
 
-dist_noinst_DATA = $(msvc_files)
+dist_noinst_DATA = $(text_files) $(msvc_files)
 dist_noinst_SCRIPTS = autogen.sh
 
 # Auto-generate the ChangeLog file from the git log on make dist

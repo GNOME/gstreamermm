@@ -27,7 +27,6 @@ check_PROGRAMS =                                \
         test-bufferlist                         \
         test-bus                                \
         test-caps                               \
-        test-caps                               \
         test-capsfeatures                       \
         test-element                            \
         test-ghostpad                           \
