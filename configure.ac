@@ -64,7 +64,7 @@ AS_IF([test "x$enable_static" = xyes],
 # file.
 
 AC_SUBST([GSTREAMERMM_MODULES],
-         ['giomm-2.4 >= 2.45.41[]m4_foreach([gstmm_mod],
+         ['giomm-2.4 >= 2.47.6[]m4_foreach([gstmm_mod],
          [[], [-base], [-check], [-controller], [-net],
           [-allocators], [-app], [-audio], [-fft], [-pbutils],
           [-plugins-base], [-riff], [-rtp], [-rtsp], [-sdp],
