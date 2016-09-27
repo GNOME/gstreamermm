@@ -1,5 +1,5 @@
 /*
- * test-regression-binplugin.cc
+ * test-integration-binplugin.cc
  *
  *  Created on: 8 sie 2013
  *      Author: loganek
@@ -33,14 +33,14 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
   return true;
 }
 
-TEST(BinPluginRegressionTest, DISABLED_ShouldDecodeAndEncodeFile)
+TEST(IntegrationBinPluginTest, DISABLED_ShouldDecodeAndEncodeFile)
 {
   Plugin::register_static(GST_VERSION_MAJOR, GST_VERSION_MINOR, "pluginbin",
               "pluginbin is example of C++ element", sigc::ptr_fun(&PluginBin::register_pluginbin), "0.1",
               "LGPL", "source?", "package?", "http://example.com");
 
   Glib::ustring input_png = "resources/input-image.png",
-          output_jpg = "resources/test-regression-binplugin-output-image.jpg";
+          output_jpg = "resources/test-integration-binplugin-output-image.jpg";
 
   mainloop = Glib::MainLoop::create();
   MM_ASSERT_TRUE(mainloop);

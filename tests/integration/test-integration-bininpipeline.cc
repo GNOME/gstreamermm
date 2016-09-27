@@ -1,5 +1,5 @@
 /*
- * test-regression-bininpipeline.cc
+ * test-integration-bininpipeline.cc
  *
  *  Created on: 5 sie 2013
  *      Author: loganek
@@ -67,10 +67,10 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
   return true;
 }
 
-TEST(BinInPipelineRegressionTest, CustomBinShouldCorrectPassThroughImage)
+TEST(IntegrationBinInPipelineTest, CustomBinShouldCorrectPassThroughImage)
 {
   Glib::ustring input_png = "resources/input-image.png",
-      output_jpg = "resources/test-regression-bininpipeline-output-image.jpg";
+      output_jpg = "resources/test-integration-bininpipeline-output-image.jpg";
 
   mainloop = Glib::MainLoop::create();
   MM_ASSERT_TRUE(mainloop);

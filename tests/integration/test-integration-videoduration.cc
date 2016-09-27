@@ -1,5 +1,5 @@
 /*
- * test-regression-videoduration.cc
+ * test-integration-videoduration.cc
  *
  *  Created on: Aug 5, 2013
  *      Author: m.kolny
@@ -57,7 +57,7 @@ bool on_timeout()
   return TRUE;
 }
 
-TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
+TEST(IntegrationVideodurationTest, CreateVideoAndCheckDuration)
 {
   Glib::ustring input_filename = "videoduration-test.ogg";
 

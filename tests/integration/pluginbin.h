@@ -5,8 +5,8 @@
  *      Author: loganek
  */
 
-#ifndef TESTS_REGRESSION_PLUGINBIN_H_
-#define TESTS_REGRESSION_PLUGINBIN_H_
+#ifndef TESTS_INTEGRATION_PLUGINBIN_H_
+#define TESTS_INTEGRATION_PLUGINBIN_H_
 
 #include <gstreamermm.h>
 #include <gstreamermm/private/bin_p.h>
@@ -66,4 +66,4 @@ public:
   }
 };
 
-#endif /* TESTS_REGRESSION_PLUGINBIN_H_ */
+#endif /* TESTS_INTEGRATION_PLUGINBIN_H_ */

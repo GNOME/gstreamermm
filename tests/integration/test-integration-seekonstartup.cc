@@ -1,5 +1,5 @@
 /*
- * test-regression-seekonstartup.cc
+ * test-integration-seekonstartup.cc
  *
  *  Created on: 5 sie 2013
  *      Author: loganek
@@ -106,7 +106,7 @@ void no_more_pads()
   dec_counter();
 }
 
-TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
+TEST(IntegrationSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
 {
   Glib::ustring input_filename = "seek-on-startup-test.ogg";
 

@@ -52,17 +52,17 @@ check_PROGRAMS =                                \
         test-plugin-pushsrc                     \
         test-plugin-register                    \
                                                 \
-        test-regression-bininpipeline           \
-        test-regression-binplugin               \
-        test-regression-rewritefile             \
-        test-regression-seekonstartup           \
-        test-regression-videoduration
+        test-integration-bininpipeline          \
+        test-integration-binplugin              \
+        test-integration-rewritefile            \
+        test-integration-seekonstartup          \
+        test-integration-videoduration
 
 
 # Include run of test programs in check:
 TESTS = $(check_PROGRAMS)
 TEST_GTEST_SOURCES = main.cc
-TEST_REGRESSION_UTILS = regression/utils.cc
+TEST_INTEGRATION_UTILS = integration/utils.cc
 
 test_allocator_SOURCES                          = $(TEST_GTEST_SOURCES) test-allocator.cc
 test_atomicqueue_SOURCES                        = $(TEST_GTEST_SOURCES) test-atomicqueue.cc
@@ -95,8 +95,8 @@ test_plugin_derivedfrombasetransform_SOURCES    = $(TEST_GTEST_SOURCES) plugins/
 test_plugin_pushsrc_SOURCES                     = $(TEST_GTEST_SOURCES) plugins/test-plugin-pushsrc.cc
 test_plugin_register_SOURCES                    = $(TEST_GTEST_SOURCES) plugins/test-plugin-register.cc
 
-test_regression_bininpipeline_SOURCES           = $(TEST_GTEST_SOURCES) $(TEST_REGRESSION_UTILS) regression/test-regression-bininpipeline.cc
-test_regression_binplugin_SOURCES               = $(TEST_GTEST_SOURCES) regression/test-regression-binplugin.cc
-test_regression_rewritefile_SOURCES             = $(TEST_GTEST_SOURCES) $(TEST_REGRESSION_UTILS) regression/test-regression-rewritefile.cc
-test_regression_seekonstartup_SOURCES           = $(TEST_GTEST_SOURCES) $(TEST_REGRESSION_UTILS) regression/test-regression-seekonstartup.cc
-test_regression_videoduration_SOURCES           = $(TEST_GTEST_SOURCES) $(TEST_REGRESSION_UTILS) regression/test-regression-videoduration.cc 
+test_integration_bininpipeline_SOURCES          = $(TEST_GTEST_SOURCES) $(TEST_INTEGRATION_UTILS) integration/test-integration-bininpipeline.cc
+test_integration_binplugin_SOURCES              = $(TEST_GTEST_SOURCES) integration/test-integration-binplugin.cc
+test_integration_rewritefile_SOURCES            = $(TEST_GTEST_SOURCES) $(TEST_INTEGRATION_UTILS) integration/test-integration-rewritefile.cc
+test_integration_seekonstartup_SOURCES          = $(TEST_GTEST_SOURCES) $(TEST_INTEGRATION_UTILS) integration/test-integration-seekonstartup.cc
+test_integration_videoduration_SOURCES          = $(TEST_GTEST_SOURCES) $(TEST_INTEGRATION_UTILS) integration/test-integration-videoduration.cc 

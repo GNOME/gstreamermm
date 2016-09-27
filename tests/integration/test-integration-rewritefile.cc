@@ -1,5 +1,5 @@
 /*
- * test-rewritefile.cc
+ * test-integration-rewritefile.cc
  *
  *  Created on: Aug 5, 2013
  *      Author: m.kolny
@@ -33,7 +33,7 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
   return true;
 }
 
-TEST(RegressionRewriteFileTest, CreateAndRewriteFile)
+TEST(IntegrationRewriteFileTest, CreateAndRewriteFile)
 {
   Glib::ustring input_filename = "rewrite-file-test.ogg",
           output_filename = "rewrite-file-output.ogg";
