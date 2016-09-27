@@ -61,6 +61,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = $(pkgconfig_files)
 include $(srcdir)/MSVC_2015/filelist.am
 
+text_files = COPYING.tools COPYING.examples
 msvc_files = $(addprefix MSVC_2015/,$(msvc_2015_data))
 
 dist_noinst_DATA = $(msvc_files)
