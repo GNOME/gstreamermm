@@ -59,7 +59,7 @@ bool on_timeout()
 
 TEST(RegressionVideodurationTest, CreateVideoAndCheckDuration)
 {
-  Glib::ustring input_filename = "test.ogg";
+  Glib::ustring input_filename = "videoduration-test.ogg";
 
   GenerateSampleOggFile(10, input_filename);
 

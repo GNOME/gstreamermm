@@ -35,8 +35,8 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
 
 TEST(RegressionRewriteFileTest, CreateAndRewriteFile)
 {
-  Glib::ustring input_filename = "test.ogg",
-          output_filename = "output.ogg";
+  Glib::ustring input_filename = "rewrite-file-test.ogg",
+          output_filename = "rewrite-file-output.ogg";
 
   GenerateSampleOggFile(20, input_filename);
 

@@ -108,7 +108,7 @@ void no_more_pads()
 
 TEST(RegressionSeekOnStartupTest, SeekToPositionWhenPipelineStarts)
 {
-  Glib::ustring input_filename = "test.ogg";
+  Glib::ustring input_filename = "seek-on-startup-test.ogg";
 
   GenerateSampleOggFile(100, input_filename);
 
