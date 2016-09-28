@@ -58,13 +58,13 @@ namespace Enums
 
 /** Gets a printable name for the given query type.
  *
- * @param query The query type.
+ * @param type The query type.
  * @return The name of the query.
  */
 Glib::ustring get_name(QueryType type);
 _IGNORE(gst_query_type_get_name)
 
-/** Gets the Gst::QueryTypeFlags associated with @type.
+/** Gets the Gst::QueryTypeFlags associated with @a type.
  *
  * @param type a Gst::QueryType.
  * @return a Gst::QueryTypeFlags;
@@ -74,7 +74,7 @@ _IGNORE(gst_query_type_get_flags)
 
 /** Gets the unique quark for the given query type.
  *
- * @param query The query type.
+ * @param type The query type.
  * @return The quark associated with the query type.
  */
 Glib::QueryQuark get_quark(QueryType type);
@@ -451,7 +451,7 @@ public:
    * @param segment_start The segment_start to set.
    * @param segment_end The segment_end to set.
    */
-  void set(Format format, bool seeakable, gint64 segment_start, gint64 segment_end);
+  void set(Format format, bool seekable, gint64 segment_start, gint64 segment_end);
 
   /** Parse a seeking query, writing the format into format, and other results
    * into the passed parameters.  Use the other parse() methods for parsing
@@ -716,8 +716,8 @@ public:
    */
   guint get_n_buffering_ranges() const;
 
-  /** Set the buffering-ranges array field in @query. The current last
-   * start position of the array should be inferior to @start.
+  /** Set the buffering-ranges array field in @a query. The current last
+   * start position of the array should be inferior to @a start.
    * @param start start position of the range.
    * @param stop stop position of the range.
    * @return a bool indicating if the range was added or not.
@@ -725,7 +725,7 @@ public:
   bool add_buffering_range(gint64 start, gint64 stop);
 
   /** Parse an available query and get the start and stop values stored
-   * at the @index of the buffered ranges array.
+   * at the @a index of the buffered ranges array.
    * @param index position in the buffered-ranges array to read.
    * @param start the start position to set, or NULL.
    * @param stop the stop position to set, or NULL.
@@ -754,8 +754,8 @@ public:
    * the CAPS query should return the most specific caps it reasonably can, since this
    * helps with autoplugging.
    *
-   * The @filter is used to restrict the result caps, only the caps matching
-   * @filter should be returned from the CAPS query. Specifying a filter might
+   * The @a filter is used to restrict the result caps, only the caps matching
+   * @a filter should be returned from the CAPS query. Specifying a filter might
    * greatly reduce the amount of processing an element needs to do.
    * @param filter a filter.
    * @return The new Gst::QureyCaps.
@@ -763,19 +763,19 @@ public:
   static Glib::RefPtr<Gst::QueryCaps>
     create(const Glib::RefPtr<Gst::Caps>& filter);
 
-  /** Get the filter from the caps @query. The caps remains valid as long as
-   * @query remains valid.
+  /** Get the filter from the caps @a query. The caps remains valid as long as
+   * @a query remains valid.
    * @return caps filter.
    */
   Glib::RefPtr<Gst::Caps> parse() const;
 
-  /** Get the caps result from @query. The caps remains valid as long as
-   * @query remains valid.
+  /** Get the caps result from @a query. The caps remains valid as long as
+   * @a query remains valid.
    * @return a pointer to the caps.
    */
   Glib::RefPtr<Gst::Caps> parse_caps_result() const;
 
-  /** Set the @caps result in @query.
+  /** Set the @a caps result in @a query.
    * @param caps a pointer to the caps.
    */
   void set_caps_result(const Glib::RefPtr<Gst::Caps>& caps);
@@ -809,31 +809,32 @@ public:
    */
   void set(Gst::SchedulingFlags flags, gint minsize, gint maxsize, gint align);
 
-  /** Add @mode as aone of the supported scheduling modes to @query.
-   * @param a Gst::PadMode.
+  /** Add @a mode as aone of the supported scheduling modes to @a query.
+   *
+   * @param mode A Gst::PadMode.
    */
   void add_scheduling_mode(Gst::PadMode mode);
 
   /** Retrieve the number of values currently stored in the
    * scheduling mode array of the query's structure.
-   * @return the scheduling mode array size as a @guint.
+   * @return the scheduling mode array size as a guint.
    */
   guint get_n_scheduling_modes() const;
 
   /** Parse an available query and get the scheduling mode
-   * at @index of the scheduling modes array.
+   * at @a index of the scheduling modes array.
    * @param index position in the scheduling modes array to read
-   * @return a Gst::PadMode of the scheduling mode at @index.
+   * @return a Gst::PadMode of the scheduling mode at @a index.
    */
   Gst::PadMode parse_nth_scheduling_mode(guint index) const;
 
-  /** Check if @query has scheduling mode set.
+  /** Check if @a query has scheduling mode set.
    * @param mode the scheduling mode.
-   * @return true when @mode is in the list of scheduling modes.
+   * @return true when @a mode is in the list of scheduling modes.
    */
   bool has_scheduling_mode(Gst::PadMode mode) const;
 
-  /** Check if @query has scheduling mode set and @flags is set in
+  /** Check if @a query has scheduling mode set and @a flags is set in
    * query scheduling flags.
    * @param mode the scheduling mode.
    * @param flags Gst::SchedulingFlags.
@@ -854,8 +855,8 @@ public:
   static Glib::RefPtr<Gst::QueryAllocation>
     create(const Glib::RefPtr<Gst::Caps>& caps, bool need_pool);
 
-  /** Parse an allocation query, writing the requested caps in @caps and
-   * whether a pool is needed in @need_pool, if the respective parameters
+  /** Parse an allocation query, writing the requested caps in @a caps and
+   * whether a pool is needed in @a need_pool, if the respective parameters
    * are non-NULL.
    * @param caps the Gst::Caps.
    * @param need_pool whether a Gst::BufferPool is needed.
@@ -868,12 +869,12 @@ public:
    */
   guint get_n_allocation_pools() const;
 
-  /** Remove the allocation pool at @index of the allocation pool array.
+  /** Remove the allocation pool at @a index of the allocation pool array.
    * @param index position in the allocation pool array to remove.
    */
   void remove_nth_allocation_pool(guint index);
 
-  /** Add @allocator and its @params as a supported memory allocator.
+  /** Add @a allocator and its @a params as a supported memory allocator.
    * @param allocator the memory allocator.
    * @param params a Gst::AllocationParams.
    */
@@ -891,7 +892,7 @@ public:
   guint get_n_allocation_params() const;
 
   /** Parse an available query and get the alloctor and its params
-   * at @index of the allocator array.
+   * at @a index of the allocator array.
    * @param index position in the allocator array to read.
    * @param allocator variable to hold the result.
    * @param params parameters for the allocator.
@@ -899,19 +900,19 @@ public:
   void parse_nth_allocation_param(guint index, Glib::RefPtr<Gst::Allocator>& allocator, Gst::AllocationParams& params) const;
 
   /** Parse an available query and get the alloctor and its params
-   * at @index of the allocator array.
+   * at @a index of the allocator array.
    * @param index position in the allocator array to set.
    * @param allocator new allocator to set.
    * @param params parameters for the allocator.
    */
   void set_nth_allocation_param(guint index, const Glib::RefPtr<Gst::Allocator>& allocator, const Gst::AllocationParams& params);
 
-  /** Remove the allocation param at @index of the allocation param array.
+  /** Remove the allocation param at @a index of the allocation param array.
    * @param index position in the allocation param array to remove
    */
   void remove_nth_allocation_param(guint index);
 
-  /** Add @api with @params as one of the supported metadata API to @query.
+  /** Add @a api with @a params as one of the supported metadata API to @a query.
    * @param api the metadata API.
    * @param params API specific parameters.
    */
@@ -924,23 +925,23 @@ public:
   guint get_n_allocation_metas() const;
 
   /** Parse an available query and get the metadata API
-   * at @index of the metadata API array.
+   * at @a index of the metadata API array.
    * @param index position in the metadata API array to read.
    * @param params API specific flags.
    */
   GType parse_nth_allocation_meta(guint index, Gst::Structure& params) const;
 
-  /** Remove the metadata API at @index of the metadata API array.
+  /** Remove the metadata API at @a index of the metadata API array.
    * @param index positon in the metadata API array to remove.
    */
   void remove_nth_allocation_meta(guint index);
 
-  /** Check if @query has metadata @api set. When this function returns TRUE,
-   * @index will contain the index where the requested API and the flags can be
+  /** Check if @a query has metadata @a api set. When this function returns TRUE,
+   * @a index will contain the index where the requested API and the flags can be
    * found.
    * @param api the metadata API.
    * @param index the index
-   * @return true when @api is in the list of metadata.
+   * @return true when @a api is in the list of metadata.
    */
   bool find_allocation_meta(GType api, guint& index) const;
 };
@@ -957,7 +958,7 @@ public:
    */
   static Glib::RefPtr<Gst::QueryUri> create();
 
-  /** Parse an URI query, writing the URI into @uri as a newly
+  /** Parse an URI query, writing the URI into @a uri as a newly
    * allocated string, if the respective parameters are non-NULL.
    * Free the string with g_free() after usage.
    * @return the storage for the current URI.
@@ -985,23 +986,23 @@ public:
 class QueryAcceptCaps : public Query
 {
 public:
-  /** Constructs a new query object for querying if @caps are accepted.
+  /** Constructs a new query object for querying if @a caps are accepted.
    * @return a new Gst::Query.
    */
   static Glib::RefPtr<Gst::QueryAcceptCaps> create(const Glib::RefPtr<Gst::Caps>& caps);
 
-  /** Get the caps from @query. The caps remains valid as long as @query remains
+  /** Get the caps from @a query. The caps remains valid as long as @a query remains
     * valid.
     * @return a caps.
     */
   Glib::RefPtr<Gst::Caps> parse_accept_caps() const;
 
-  /** Parse the result from @query and store in @result.
+  /** Parse the result from @a query and store in @a result.
    * @return location for the result.
    */
   bool parse_accept_caps_result() const;
 
-  /** Set @result as the result for the @query.
+  /** Set @a result as the result for the @a query.
    * @param result the result to set.
    */
   void set_accept_caps_result(bool result);

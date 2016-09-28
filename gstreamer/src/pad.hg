@@ -130,7 +130,7 @@ public:
   /** Creates a new pad with the given name in the given direction.
    *
    * @param name The name of the new pad.
-   * @param direction The GstPadDirection of the pad.
+   * @param dir The PadDirection of the pad.
    * @return A new Gst::Pad, or a null RefPtr<> in case of an error. MT safe.
    */
   _WRAP_CREATE(const Glib::ustring& name, PadDirection dir)
@@ -138,15 +138,15 @@ public:
   /** Creates a new pad with a guaranteed unique name (across all pads) in the
    * given direction.
    *
-   * @param direction The GstPadDirection of the pad.
+   * @param dir The PadDirection of the pad.
    * @return A new Gst::Pad, or a null RefPtr<> in case of an error. MT safe.
    */
   _WRAP_CREATE(PadDirection dir)
 
   /** Creates a new pad with the given name from the given template.
    *
-   * @param templ The pad template to use.
-   * @param name The name of the element.
+   * @param pad_template The pad template to use.
+   *
    * @return A new Gst::Pad, or a null RefPtr<> in case of an error.
    * @throw std::runtime_error if construction fails.
    */
@@ -155,7 +155,9 @@ public:
   /** Creates a new pad with a guaranteed unique name (across all pads) from
    * the given template.
    *
-   * @param templ The pad template to use.
+   * @param pad_template The pad template to use.
+   * @param name The name of the pad.
+   * 
    * @return A new Gst::Pad, or a null RefPtr<> in case of an error.
    * @throw std::runtime_error if construction fails.
    */
@@ -242,7 +244,7 @@ public:
 
   _WRAP_METHOD(bool push_event(Glib::RefPtr<Gst::Event>&& event), gst_pad_push_event)
 
-  /// A push_event() convenience overload. Allows to re-use @event parameter after function call.
+  /// A push_event() convenience overload. Allows to re-use @a event parameter after function call.
   bool push_event(const Glib::RefPtr<Gst::Event>& event);
 
   /** Pulls a buffer from the peer pad.  This function will first trigger the
@@ -271,7 +273,7 @@ public:
 
   _WRAP_METHOD(bool send_event(Glib::RefPtr<Gst::Event>&& event), gst_pad_send_event)
 
-  /// A send_event() convenience overload. Allows to re-use @event parameter after function call.
+  /// A send_event() convenience overload. Allows to re-use @a event parameter after function call.
   bool send_event(const Glib::RefPtr<Gst::Event>& event);
 
   _WRAP_METHOD(bool activate_mode(Gst::PadMode mode, bool active = true), gst_pad_activate_mode)

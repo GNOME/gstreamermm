@@ -35,15 +35,7 @@ namespace Gst
  * If this is not an option, your program must initialize the GLib thread
  * system using Glib::thread_init() before any other GLib functions are called
  * and use either Gst::init(), or Gst::init_check() without the command line
- * arguments before calling any gstreamermm functions.  GLib thread
- * initialization can be done as follows:
- *
- * @code
- * if(!Glib::thread_supported())
- *   Glib::thread_init();
- * ...
- * @endcode
- * 
+ * arguments before calling any gstreamermm functions. 
  *
  * Note: This function will terminate your program if it was unable to
  * initialize GStreamer for some reason. If you want your program to fall back,
@@ -65,14 +57,7 @@ void init(int& argc, char**& argv);
  * GLib functions. If this is not an option, your program must initialize the
  * GLib thread system using Glib::thread_init() before any other GLib functions
  * are called and use either this function or Gst::init_check() without the
- * command line arguments before calling any gstreamermm functions.  GLib
- * thread initialization can be done as follows:
- *
- * @code
- * if(!Glib::thread_supported())
- *   Glib::thread_init();
- * ...
- * @endcode
+ * command line arguments before calling any gstreamermm functions.
  *
  * Note: This function will terminate your program if it was unable to
  * initialize GStreamer for some reason. If you want your program to fall
@@ -87,14 +72,7 @@ void init();
  * If this is not an option, your program must initialize the GLib thread
  * system using Glib::thread_init() before any other GLib functions are called
  * and use either Gst::init() or Gst::init_check() without the command line
- * arguments before calling any gstreamermm functions.  GLib thread
- * initialization can be done as follows:
- *
- * @code
- * if(!Glib::thread_supported())
- *   Glib::thread_init();
- * ...
- * @endcode
+ * arguments before calling any gstreamermm functions.
  * 
  * This function will return false if GStreamer could not be initialized for
  * some reason. If you want your program to fail fatally, use Gst::init()
@@ -114,14 +92,7 @@ bool init_check(int& argc, char**& argv);
  * GLib functions. If this is not an option, your program must initialize the
  * GLib thread system using Glib::thread_init() before any other GLib functions
  * are called and use either this function or Gst::init() without the command
- * line arguments before calling any gstreamermm functions.  GLib thread
- * initialization can be done as follows:
- *
- * @code
- * if(!Glib::thread_supported())
- *   Glib::thread_init();
- * ...
- * @endcode
+ * line arguments before calling any gstreamermm functions.
  * 
  * This function will return false if GStreamer could not be initialized for
  * some reason. If you want your program to fail fatally, use Gst::init()
@@ -168,10 +139,10 @@ Glib::OptionGroup get_option_group();
 /**
  * Gets the version number of the GStreamer library.
  *
- * @major: (out): pointer to a guint to store the major version number
- * @minor: (out): pointer to a guint to store the minor version number
- * @micro: (out): pointer to a guint to store the micro version number
- * @nano:  (out): pointer to a guint to store the nano version number
+ * @param major The major version number.
+ * @param minor The minor version number.
+ * @param micro The micro version number.
+ * @param nano The nano version number.
  */
 void version(guint& major, guint& minor, guint& micro, guint& nano);
 
@@ -201,7 +172,7 @@ bool segtrap_is_enabled();
  * Applications might want to disable/enable the SIGSEGV handling of
  * the GStreamer core. See gst_segtrap_is_enabled() for more information.
  *
- * @enabled: whether a custom SIGSEGV handler should be installed.
+ * @param enabled Whether a custom SIGSEGV handler should be installed.
  */
 void segtrap_set_enabled(bool enabled);
 
@@ -223,7 +194,7 @@ bool registry_fork_is_enabled();
  * when rebuilding the registry. See gst_registry_fork_is_enabled() for more
  * information.
  *
- * @enabled: whether rebuilding the registry can use a temporary child helper process.
+ * @param enabled Whether rebuilding the registry can use a temporary child helper process.
  */
 void registry_fork_set_enabled(bool enabled);
 

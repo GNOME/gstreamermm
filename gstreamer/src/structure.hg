@@ -66,7 +66,7 @@ class Structure
   _IGNORE(gst_structure_copy, gst_structure_free, gst_structure_set_parent_refcount)
 
 public:
-  /** Creates a Structure with the given @name. Parses the list of variable
+  /** Creates a Structure with the given @a name. Parses the list of variable
    * arguments and sets fields to the values listed. Variable arguments
    * should be passed as field name and value
    */
@@ -76,7 +76,7 @@ public:
   /** Creates a Gst::Structure from a string representation.
    *
    * @param the_string A string representation of a Gst::Structure. See to_string().
-   * @returns A Structure. This will be invalid (see operator=) when the string 
+   * @return A Structure. This will be invalid (see operator=) when the string 
    * could not be parsed.
    */
   static Structure create_from_string(const Glib::ustring& the_string);
@@ -131,7 +131,7 @@ public:
    */
   void get_field(const Glib::ustring& fieldname, Glib::ValueBase& value) const;
 
-  /** Get the value of the field with name @fieldname.
+  /** Get the value of the field with name @a fieldname.
    *
    * @param fieldname The name of the field to get.
    * @param value The Value class in which to store the value.
@@ -161,7 +161,7 @@ public:
   bool get_field(const Glib::ustring& fieldname, GType enumtype, int& value) const;
   _IGNORE(gst_structure_get_enum)
 
-  /** Gets the value of field @a fieldname into DataType @value.
+  /** Gets the value of field @a fieldname into DataType @a value.
    * The caller is responsible for making sure the field exists and has the
    * correct type.
    *
@@ -206,7 +206,7 @@ public:
     gst_structure_set_valist
   )
 
-  /** Sets the field with name @fieldname to value. If the field does not
+  /** Sets the field with name @a fieldname to value. If the field does not
    * exist, it is created. If the field exists, the previous value is replaced
    * and freed.
    *
@@ -216,7 +216,7 @@ public:
   template<typename DataType>
   void set_field(const Glib::ustring& fieldname, const Glib::Value<DataType>& value);
 
-  /** Sets the field with name @fieldname to value. If the field does not
+  /** Sets the field with name @a fieldname to value. If the field does not
    * exist, it is created. If the field exists, the previous value is replaced
    * and freed.
    *
@@ -225,12 +225,13 @@ public:
    */
   void set_field(const Glib::ustring& fieldname, const char* value);
 
-  /** Sets the fields with name @fieldname to values. If one of the fields does not
+  /** Sets the fields with name @a fieldname to values. If one of the fields does not
    * exist, it is created. If the field exists, the previous value is replaced
    * and freed.
    *
    * @param fieldname The name of the field to set.
    * @param value The value to set the field to.
+   * @param further_data List of pairs of the format: fieldname, value.
    */
   template<class DataType, class ...DataTypes>
   void set_fields(const Glib::ustring & fieldname, const DataType& value, DataTypes ...further_data);
@@ -253,7 +254,7 @@ public:
    */
   void set_field(const Glib::ustring& fieldname, GType enumtype, int value);
 
-  /** Sets the field with name @fieldname field to the DataType @value.
+  /** Sets the field with name @a fieldname field to the DataType @a value.
    * If the field does not exist, it is created. If the field exists,
    * the previous value is replaced and freed. Please note that when setting
    * fields to special types such as Gst::Fourcc and Gst::Fraction and
@@ -320,7 +321,7 @@ public:
    * @param target The target value of the fixation.
    * @return true If the structure could be fixated.
    */
-  bool fixate_nearest_fraction(const Glib::ustring& name, const Gst::Fraction& target);
+  bool fixate_nearest_fraction(const Glib::ustring& field_name, const Gst::Fraction& target);
   _IGNORE(gst_structure_fixate_field_nearest_fraction)
 
   //Variable argument functions are ignored.
