@@ -217,8 +217,7 @@ void PlayerWindow::on_video_changed()
   }
 }
 
-Gst::PadProbeReturn PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad,
-        const Gst::PadProbeInfo& data)
+Gst::PadProbeReturn PlayerWindow::on_video_pad_got_buffer(const Glib::RefPtr<Gst::Pad>& pad, const Gst::PadProbeInfo& /* data */)
 {
   int width_value;
   int height_value;

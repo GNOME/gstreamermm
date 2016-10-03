@@ -140,7 +140,7 @@ void MessageInfo::parse(Glib::Error& error, std::string& debug) const
   error = Glib::Error(c_error);
 }
 
-Glib::Error MessageInfo::parse() const
+Glib::Error MessageInfo::parse_error() const
 {
   GError* c_error = nullptr;
   gst_message_parse_info(const_cast<GstMessage*>(gobj()), &c_error, nullptr);
@@ -683,7 +683,7 @@ void MessageToc::parse(Glib::RefPtr<Gst::Toc>& toc, bool& updated) const
   updated = updated;
 }
 
-void MessageProgress::parse(Gst::ProgressType& type, Glib::ustring code, Glib::ustring& text) const
+void MessageProgress::parse(Gst::ProgressType& type, Glib::ustring& code, Glib::ustring& text) const
 {
   GstProgressType c_type;
   gchar* c_code, * c_text;
@@ -695,6 +695,48 @@ void MessageProgress::parse(Gst::ProgressType& type, Glib::ustring code, Glib::u
   if(c_text)
     g_free(c_text);
   type = static_cast<Gst::ProgressType>(c_type);
+}
+
+Gst::ProgressType MessageProgress::parse_type() const
+{
+  GstProgressType c_type;
+
+  gst_message_parse_progress(const_cast<GstMessage*>(gobj()),
+    &c_type, nullptr, nullptr);
+
+  return static_cast<Gst::ProgressType>(c_type);
+}
+
+Glib::ustring MessageProgress::parse_code() const
+{
+  gchar* c_code;
+  Glib::ustring code;
+  
+  gst_message_parse_progress(const_cast<GstMessage*>(gobj()),
+    nullptr, &c_code, nullptr);
+
+  code = c_code;
+
+  if(c_code)
+    g_free(c_code);
+
+  return code;
+}
+
+Glib::ustring MessageProgress::parse_text() const
+{
+  gchar* c_text;
+  Glib::ustring text;
+  
+  gst_message_parse_progress(const_cast<GstMessage*>(gobj()),
+    nullptr, nullptr, &c_text);
+
+  text = c_text;
+
+  if(c_text)
+    g_free(c_text);
+
+  return text;
 }
 
 } //namespace Gst
