@@ -37,20 +37,30 @@ int main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::FileSrc> filesrc = Gst::FileSrc::create();
+  Glib::RefPtr<Gst::FileSink> filesink = Gst::FileSink::create();
+#else
+  Glib::RefPtr<Gst::Element> filesrc = Gst::ElementFactory::create_element("filesrc");
+  Glib::RefPtr<Gst::Element> filesink = Gst::ElementFactory::create_element("filesink");
+#endif
 
-  if(!filesrc)
+  if(!filesrc || !filesink)
   {
-    std::cerr << "The FileSrc element could not be created." << std::endl;
+    std::cerr << "The FileSrc or FileSink element could not be created." << std::endl;
     return EXIT_FAILURE;
   }
 
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   filesrc->property_location() = argv[1];
-
+  filesink->property_location() = argv[2];
+#else
+  filesrc->set_property<Glib::ustring>("location", argv[1]);
+  filesink->set_property<Glib::ustring>("location", argv[2]);
+#endif
+  
   mainloop = Glib::MainLoop::create();
   pipeline = Gst::Pipeline::create("rewriter");
-  Glib::RefPtr<Gst::FileSink> filesink = Gst::FileSink::create();
-  filesink->property_location() = argv[2];
 
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
   bus->add_watch(sigc::ptr_fun(&on_bus_message));

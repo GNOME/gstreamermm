@@ -48,7 +48,7 @@ TEST(IntegrationBinPluginTest, DISABLED_ShouldDecodeAndEncodeFile)
   MM_ASSERT_TRUE(pluginbin);
   RefPtr<Element> jpg_encoder = ElementFactory::create_element("queue");
   MM_ASSERT_TRUE(jpg_encoder);
-  RefPtr<FileSink> file_sink = FileSink::create("file-sink");
+  RefPtr<Element> file_sink = ElementFactory::create_element("filesink", "file-sink");
   MM_ASSERT_TRUE(file_sink);
   RefPtr<Pipeline> pipeline = Pipeline::create("image-converter-pipeline");
   MM_ASSERT_TRUE(pipeline);
@@ -61,7 +61,7 @@ TEST(IntegrationBinPluginTest, DISABLED_ShouldDecodeAndEncodeFile)
   bus->add_watch(sigc::ptr_fun(&on_bus_message));
 
   pluginbin->set_property("location", input_png);
-  file_sink->property_location() = output_jpg;
+  file_sink->set_property("location", output_jpg);
 
   pipeline->set_state(STATE_PLAYING);
   mainloop->run();

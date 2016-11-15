@@ -18,6 +18,7 @@
 
 #include <gstreamermm.h>
 #include <glibmm/main.h>
+#include <glibmm/exceptionhandler.h>
 #include <iostream>
 
 Glib::RefPtr<Glib::MainLoop> mainloop;
@@ -63,6 +64,38 @@ static void on_typefind_have_type(guint probability, const Glib::RefPtr<Gst::Cap
     std::cerr << "on_typefind_have_type(): mainloop is null" << std::endl;
 }
 
+#ifdef GSTREAMERMM_DISABLE_DEPRECATED
+
+#include <gst/gsttypefind.h>
+
+static void TypeFindElement_signal_have_type_callback(struct _GstTypeFindElement* self, guint p0,GstCaps* p1,void* data)
+{
+  using SlotType = sigc::slot< void,guint,const Glib::RefPtr<Gst::Caps>& >;
+
+  auto obj = dynamic_cast<Gst::Element*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
+  if(obj)
+  {
+    try
+    {
+      if(const auto slot = Glib::SignalProxyNormal::data_to_slot(data))
+	(*static_cast<SlotType*>(slot))(p0, Glib::wrap(p1, true));
+    }
+    catch(...)
+    {
+       Glib::exception_handlers_invoke();
+    }
+  }
+}
+
+
+static const Glib::SignalProxyInfo TypeFindElement_signal_have_type_info =
+{
+  "have-type",
+  (GCallback) &TypeFindElement_signal_have_type_callback,
+  (GCallback) &TypeFindElement_signal_have_type_callback
+};
+#endif
+
 int main(int argc, char** argv)
 {
   // Initialize Gstreamermm:
@@ -81,17 +114,27 @@ int main(int argc, char** argv)
   Glib::RefPtr<Gst::Pipeline> pipeline = Gst::Pipeline::create("my-pipeline");
 
   // Create elements:
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::FileSrc> element_source = Gst::FileSrc::create();
   element_source->property_location() = filename;
+  Glib::RefPtr<Gst::FakeSink> element_sink = Gst::FakeSink::create();
+  Glib::RefPtr<Gst::TypeFindElement> element_typefind = Gst::TypeFindElement::create();
+  element_typefind->signal_have_type().connect(
+    sigc::ptr_fun(&on_typefind_have_type) );
+
+#else
+  Glib::RefPtr<Gst::Element> element_source = Gst::ElementFactory::create_element("filesrc");
+  element_source->set_property("location", filename);
+  Glib::RefPtr<Gst::Element> element_sink = Gst::ElementFactory::create_element("fakesink");
+  Glib::RefPtr<Gst::Element> element_typefind = Gst::ElementFactory::create_element("typefind");
+
+  Glib::SignalProxy< void,guint,const Glib::RefPtr<Gst::Caps>& > proxy(element_typefind.operator->(), &TypeFindElement_signal_have_type_info);
+  proxy.connect(sigc::ptr_fun(&on_typefind_have_type));
+#endif  
 
   //If using an MP3 file, this should provide more Caps information from typefind.
   //Glib::RefPtr<Gst::Element> element_id3demux = Gst::ElementFactory::create_element("id3demux");
   //g_assert(element_id3demux);
-
-  Glib::RefPtr<Gst::TypeFindElement> element_typefind = Gst::TypeFindElement::create();
-  element_typefind->signal_have_type().connect(
-    sigc::ptr_fun(&on_typefind_have_type) );
-  Glib::RefPtr<Gst::Element> element_sink = Gst::FakeSink::create();
 
   // We must add the elements to the pipeline before linking them:
   try

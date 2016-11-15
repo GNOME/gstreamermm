@@ -18,7 +18,13 @@ class AllMediaPlayer
 private:
   RefPtr<Glib::MainLoop> main_loop;
   RefPtr<Pipeline> pipeline;
+
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   RefPtr<FileSrc> source;
+#else
+  RefPtr<Gst::Element> source;
+#endif
+
   RefPtr<Element> decoder;
 
   bool on_bus_message(const RefPtr<Bus>&, const RefPtr<Message>& message);
@@ -26,7 +32,12 @@ private:
 
   void init()
   {
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
     source = FileSrc::create();
+#else
+    source = ElementFactory::create_element("filesrc");
+#endif
+    
     decoder = ElementFactory::create_element("decodebin");
 
     if (!decoder || !source)
@@ -51,7 +62,13 @@ public:
   void play_until_eos(const std::string& filename)
   {
     init();
+
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
     source->property_location() = filename;
+#else
+    source->set_property("location", filename);
+#endif
+
     pipeline->set_state(STATE_PLAYING);
     main_loop->run();
     pipeline->set_state(STATE_NULL);

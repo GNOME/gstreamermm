@@ -19,6 +19,7 @@
 #include <gtkmm/main.h>
 #include <gstreamermm/init.h>
 #include <gstreamermm/element.h>
+#include <gstreamermm/elementfactory.h>
 #include <gstreamermm/pad.h>
 #include <gstreamermm/pipeline.h>
 
@@ -33,7 +34,12 @@
 #include "player_window.h"
 
 Glib::RefPtr<Gst::Pipeline> pipeline;
+
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
 Glib::RefPtr<Gst::VorbisDec> decoder;
+#else
+Glib::RefPtr<Gst::Element> decoder;
+#endif
 
 void on_parser_pad_added(const Glib::RefPtr<Gst::Pad>& newPad)
 {
@@ -58,7 +64,11 @@ int main(int argc, char** argv)
 
   // Create the elements
   // Reads file from disk
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::FileSrc> source = Gst::FileSrc::create();
+#else
+  Glib::RefPtr<Gst::Element> source = Gst::ElementFactory::create_element("filesrc");
+#endif
   if(!source)
   {
     std::cerr << "filesrc element could not be created" << std::endl;
@@ -67,7 +77,11 @@ int main(int argc, char** argv)
 
   // Parses the ogg streams into elementary streams (note that an ogg file may
   // contain a video stream too)
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::OggDemux> parser = Gst::OggDemux::create();
+#else
+  Glib::RefPtr<Gst::Element> parser = Gst::ElementFactory::create_element("oggdemux");
+#endif
   if(!parser)
   {
     std::cerr << "oggdemux element could not be created" << std::endl;
@@ -75,7 +89,12 @@ int main(int argc, char** argv)
   }
 
   // Decodes a vorbis stream
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   decoder = Gst::VorbisDec::create();
+#else
+  decoder = Gst::ElementFactory::create_element("vorbisdec");
+#endif
+  
   if(!decoder)
   {
     std::cerr << "vorbisdec element could not be created" << std::endl;
@@ -83,7 +102,12 @@ int main(int argc, char** argv)
   }
 
   // Converts audio to a format which can be used by the next element
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::AudioConvert> conv = Gst::AudioConvert::create();
+#else
+  Glib::RefPtr<Gst::Element> conv = Gst::ElementFactory::create_element("audioconvert");
+#endif
+
   if(!conv)
   {
     std::cerr << "audioconvert element could not be created" << std::endl;
@@ -91,7 +115,11 @@ int main(int argc, char** argv)
   }
 
   // Outputs sound to an ALSA audio device
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::AlsaSink> sink = Gst::AlsaSink::create();
+#else
+  Glib::RefPtr<Gst::Element> sink = Gst::ElementFactory::create_element("alsasink");
+#endif
   if(!sink)
   {
     std::cerr << "sink element could not be created" << std::endl;

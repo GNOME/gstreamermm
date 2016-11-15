@@ -7,6 +7,9 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
+
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
+
 #include <gstreamermm/appsrc.h>
 
 using namespace Gst;
@@ -118,3 +121,5 @@ TEST_F(AppSrcPluginTest, SimpleDataFlowInPipelineWithAppSrcElement)
   EXPECT_EQ(MESSAGE_EOS, msg->get_message_type());
   EXPECT_EQ(STATE_CHANGE_SUCCESS, pipeline->set_state(STATE_NULL));
 }
+
+#endif

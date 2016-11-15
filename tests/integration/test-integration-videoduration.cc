@@ -7,7 +7,6 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
-#include <gstreamermm/fakesink.h>
 #include <glibmm/main.h>
 #include "utils.h"
 
@@ -63,10 +62,10 @@ TEST(IntegrationVideodurationTest, CreateVideoAndCheckDuration)
 
   GenerateSampleOggFile(10, input_filename);
 
-  RefPtr<FileSrc> filesrc = Gst::FileSrc::create();
+  RefPtr<Element> filesrc = Gst::ElementFactory::create_element("filesrc");
   MM_ASSERT_TRUE(filesrc);
 
-  filesrc->property_location() = input_filename;
+  filesrc->set_property("location", input_filename);
 
   mainloop = Glib::MainLoop::create();
   pipeline = Pipeline::create("rewriter");

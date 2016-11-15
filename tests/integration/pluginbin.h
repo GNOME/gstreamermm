@@ -10,8 +10,6 @@
 
 #include <gstreamermm.h>
 #include <gstreamermm/private/bin_p.h>
-#include <gstreamermm/filesrc.h>
-#include <gstreamermm/filesink.h>
 #include <cstdio>
 #include <sys/stat.h>
 
@@ -50,10 +48,10 @@ public:
   {
     if (transition == Gst::STATE_CHANGE_NULL_TO_READY)
     {
-      Glib::RefPtr<Gst::FileSrc> source_file = Gst::FileSrc::create("source-file");
+      Glib::RefPtr<Gst::Element> source_file = Gst::ElementFactory::create_element("filesrc", "source-file");
       Glib::RefPtr<Gst::Element> png_decoder = Gst::ElementFactory::create_element("pngdec");
       Glib::ustring str = "resources/input-image.png";
-      source_file->property_location() = location.get_value();
+      source_file->set_property("location", location.get_value());
 
       add(source_file);
       add(png_decoder);

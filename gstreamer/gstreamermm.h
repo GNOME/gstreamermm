@@ -58,6 +58,8 @@
  * @endcode
  */
 
+#include <gstreamermmconfig.h>
+
 #include <gstreamermm/check.h>
 #include <gstreamermm/init.h>
 #include <gstreamermm/version.h>

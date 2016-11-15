@@ -41,17 +41,17 @@ TEST(IntegrationRewriteFileTest, CreateAndRewriteFile)
   GenerateSampleOggFile(20, input_filename);
 
   Glib::RefPtr<Gst::Pipeline> pipeline;
-  RefPtr<FileSrc> filesrc = Gst::FileSrc::create();
+  RefPtr<Element> filesrc = Gst::ElementFactory::create_element("filesrc");
   MM_ASSERT_TRUE(filesrc);
 
-  filesrc->property_location() = input_filename;
+  filesrc->set_property("location", input_filename);
 
   mainloop = Glib::MainLoop::create();
   pipeline = Gst::Pipeline::create("rewriter");
-  Glib::RefPtr<Gst::FileSink> filesink = Gst::FileSink::create();
+  Glib::RefPtr<Gst::Element> filesink = Gst::ElementFactory::create_element("filesink");
   MM_ASSERT_TRUE(filesink);
 
-  filesink->property_location() = output_filename;
+  filesink->set_property("location", output_filename);
 
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
   bus->add_watch(sigc::ptr_fun(&on_bus_message));

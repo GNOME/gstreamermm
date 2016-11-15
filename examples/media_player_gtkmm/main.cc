@@ -19,7 +19,7 @@
 #include "player_window.h"
 
 #include <gtkmm.h>
-#include <gstreamermm/init.h>
+#include <gstreamermm.h>
 
 #include <iostream>
 
@@ -30,7 +30,11 @@ int main (int argc, char **argv)
 
   // playbin plays any media type, choosing an appropriate set of elements
   // and linking them together.
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::PlayBin> playbin = Gst::PlayBin::create("playbin");
+#else
+  Glib::RefPtr<Gst::Element> playbin = Gst::ElementFactory::create_element("playbin");
+#endif
 
   if(!playbin)
   {

@@ -124,13 +124,13 @@ TEST_F(CapsTest, MergeCaps)
 
 TEST_F(CapsTest, CapsBoxedType)
 {
-  Glib::RefPtr<Gst::CapsFilter> filter = Gst::CapsFilter::create();
+  Glib::RefPtr<Gst::Element> filter = Gst::ElementFactory::create_element("capsfilter");
   Glib::RefPtr<Gst::Caps> any_caps = Gst::Caps::create_any();
   Glib::RefPtr<Gst::Caps> any_caps2 = Gst::Caps::create_any();
   ASSERT_EQ(1, any_caps->get_refcount());
-  filter->property_caps() = any_caps;
+  filter->set_property("caps", any_caps);
   ASSERT_EQ(2, any_caps->get_refcount());
-  filter->property_caps() = any_caps2;
+  filter->set_property("caps", any_caps2);
   ASSERT_EQ(1, any_caps->get_refcount());
   ASSERT_EQ(2, any_caps2->get_refcount());
 }

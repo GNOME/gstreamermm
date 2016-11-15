@@ -207,6 +207,10 @@ MM_ARG_ENABLE_WARNINGS([GSTREAMERMM_WXXFLAGS],
                        [-Wall], [-Wall -Wextra],
                        [G GSTREAMER])
 
+# Offer the ability to omit some API from the library,
+# to reduce the code size:
+MM_ARG_DISABLE_DEPRECATED_API([GSTREAMERMM])
+
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
                  gstreamer/${GSTREAMERMM_MODULE_NAME}.pc:gstreamer/gstreamermm.pc.in
@@ -235,7 +239,9 @@ ${PACKAGE}-${VERSION}
     gstreamer-plugins-bad:       ${gstmm_enable_plugins_bad} ${gstmm_plugins_bad_version}
         gstreamer-gl:            ${gstmm_enable_gl}
 
+
   Extra features
+    Use deprecated API:          ${mm_enable_deprecated_api}
     GUI Examples:                ${gstmm_enable_gui_examples}
     Unit Tests:                  ${enable_unittests}
 

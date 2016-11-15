@@ -18,7 +18,6 @@
 
 #include "player_window.h"
 
-#include <gstreamermm.h>
 #include <gstreamermm/xvimagesink.h>
 
 #if defined (GDK_WINDOWING_X11)
@@ -30,7 +29,19 @@
 #include <iostream>
 #include <iomanip>
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
+#ifdef GSTREAMERMM_DISABLE_DEPRECATED
+
+static const Glib::SignalProxyInfo PlayBin_signal_video_changed_info =
+{
+  "video-changed",
+  (GCallback) &Glib::SignalProxyNormal::slot0_void_callback,
+  (GCallback) &Glib::SignalProxyNormal::slot0_void_callback
+};
+
+#endif
+
+
+PlayerWindow::PlayerWindow(const Glib::RefPtr<PlayBinT>& playbin)
 : m_vbox(false, 6),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
   m_play_button("Play"),
@@ -102,10 +113,17 @@ PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin)
   m_forward_button.set_sensitive(false);
 
   m_playbin = playbin;
+
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   m_playbin->property_video_sink() = Gst::XvImageSink::create();
   m_playbin->signal_video_changed().connect(
     sigc::mem_fun(*this, &PlayerWindow::on_video_changed) );
-
+#else
+  m_playbin->set_property("video-sink", Gst::ElementFactory::create_element("xvimagesink"));
+  Glib::SignalProxy< void >(m_playbin.operator->(), &PlayBin_signal_video_changed_info).connect(
+     sigc::mem_fun(*this, &PlayerWindow::on_video_changed) );
+#endif
+  
   show_all_children();
   m_pause_button.hide();
 }
@@ -206,7 +224,14 @@ bool PlayerWindow::on_bus_message(const Glib::RefPtr<Gst::Bus>& /* bus */,
 
 void PlayerWindow::on_video_changed()
 {
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::Pad> pad = m_playbin->get_video_pad(0);
+#else
+  GstPad* result;
+  g_signal_emit_by_name(m_playbin->gobj(), "get-video-pad", 0, &result, static_cast<void*>(0));
+  Glib::RefPtr<Gst::Pad> pad = Glib::wrap(result);
+#endif
+  
   if(pad)
   {
     // Add a buffer probe to the video sink pad which will be removed after
@@ -384,7 +409,7 @@ void PlayerWindow::on_button_open()
     working_dir = chooser.get_current_folder();
 
     // Set uri property on the playbin.
-    m_playbin->property_uri() = chooser.get_uri();
+    m_playbin->set_property("uri", chooser.get_uri());
 
     // Resize m_video_area and window to minimum when opening a file
     m_video_area.set_size_request(0, 0);

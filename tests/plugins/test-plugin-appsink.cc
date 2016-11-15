@@ -7,6 +7,9 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
+
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
+
 #include <gstreamermm/appsink.h>
 #include <gstreamermm/appsrc.h>
 
@@ -120,3 +123,5 @@ TEST_F(AppSinkPluginTest, UseAppSinkDuringDataFlowInPipeline)
   EXPECT_EQ(MESSAGE_EOS, msg->get_message_type());
   EXPECT_EQ(STATE_CHANGE_SUCCESS, pipeline->set_state(STATE_NULL));
 }
+
+#endif

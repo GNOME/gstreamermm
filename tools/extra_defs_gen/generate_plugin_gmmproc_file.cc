@@ -639,6 +639,9 @@ static void generate_hg_file(const std::string& includeMacroCalls,
   std::cout << "_DEFS(" << target << ',' << defsFile << ')' << std::endl <<
     std::endl;
 
+  std::cout << "_CONFIGINCLUDE(gstreamermmconfig.h)" << std::endl;
+  std::cout << "_IS_DEPRECATED" << std::endl << std::endl;
+
   if(!cEnumDefinitions.empty())
   {
     std::cout << "// Plug-in C enums used in signals:" << std::endl;

@@ -7,6 +7,10 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
+
+// TODO re-write this tests to not use AppSrc/AppSink
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
+
 #include <gstreamermm/appsink.h>
 #include <gstreamermm/appsrc.h>
 #include <vector>
@@ -105,3 +109,5 @@ TEST_F(RegisterPluginTest, CheckDataFlowThroughCreatedElement)
 
   EXPECT_EQ(STATE_CHANGE_SUCCESS, pipeline->set_state(Gst::STATE_NULL));
 }
+
+#endif

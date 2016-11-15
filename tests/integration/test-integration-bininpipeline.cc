@@ -7,8 +7,6 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
-#include <gstreamermm/filesrc.h>
-#include <gstreamermm/filesink.h>
 #include <glibmm/main.h>
 
 using namespace Gst;
@@ -17,14 +15,14 @@ using Glib::RefPtr;
 class CustomBin : public Bin
 {
 private:
-  RefPtr<FileSrc> source_file;
+  RefPtr<Element> source_file;
   RefPtr<Element> queue;
   RefPtr<GhostPad> src_pad;
 protected:
   explicit CustomBin(const Glib::ustring& name)
   : Bin(name)
   {
-    source_file = FileSrc::create("source-file");
+    source_file = ElementFactory::create_element("filesrc", "source-file");
     queue = ElementFactory::create_element("queue");
 
     add(source_file);
@@ -44,7 +42,7 @@ public:
 
   void set_location(const Glib::ustring& filename)
   {
-    source_file->property_location() = filename;
+    source_file->set_property("location", filename);
   }
 };
 
@@ -69,8 +67,8 @@ bool on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& message)
 
 TEST(IntegrationBinInPipelineTest, CustomBinShouldCorrectPassThroughImage)
 {
-  Glib::ustring input_png = "resources/input-image.png",
-      output_jpg = "resources/test-integration-bininpipeline-output-image.jpg";
+  Glib::ustring input_png = "/home/loganek/repos/gstreamermm/tests/resources/input-image.png",
+      output_jpg = "test-integration-bininpipeline-output-image.jpg";
 
   mainloop = Glib::MainLoop::create();
   MM_ASSERT_TRUE(mainloop);
@@ -78,7 +76,7 @@ TEST(IntegrationBinInPipelineTest, CustomBinShouldCorrectPassThroughImage)
   MM_ASSERT_TRUE(custom_bin);
   RefPtr<Element> queue = ElementFactory::create_element("queue");
   MM_ASSERT_TRUE(queue);
-  RefPtr<FileSink> file_sink = FileSink::create("file-sink");
+  RefPtr<Element> file_sink = ElementFactory::create_element("filesink", "file-sink");
   MM_ASSERT_TRUE(file_sink);
   RefPtr<Pipeline> pipeline = Pipeline::create("image-converter-pipeline");
   MM_ASSERT_TRUE(custom_bin);
@@ -92,9 +90,10 @@ TEST(IntegrationBinInPipelineTest, CustomBinShouldCorrectPassThroughImage)
 
   custom_bin->set_location(input_png);
 
-  file_sink->property_location() = output_jpg;
+  file_sink->set_property("location", output_jpg);
 
   pipeline->set_state(STATE_PLAYING);
+
   mainloop->run();
 
   pipeline->set_state(Gst::STATE_NULL);

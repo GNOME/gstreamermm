@@ -20,12 +20,17 @@
 #define PLAYER_WINDOW_H_
 
 #include <gtkmm.h>
-#include <gstreamermm/playbin.h>
+#include <gstreamermm.h>
 
 class PlayerWindow : public Gtk::Window
 {
 public:
-  PlayerWindow(const Glib::RefPtr<Gst::PlayBin>& playbin);
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
+  using PlayBinT = Gst::PlayBin;
+#else
+  using PlayBinT = Gst::Element;
+#endif
+  PlayerWindow(const Glib::RefPtr<PlayBinT>& playbin);
   virtual ~PlayerWindow();
 
 protected:
@@ -61,7 +66,12 @@ protected:
   Gtk::Button m_forward_button;
   Gtk::Button m_open_button;
 
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
   Glib::RefPtr<Gst::PlayBin> m_playbin;
+#else
+  Glib::RefPtr<Gst::Element> m_playbin;
+#endif
+  
   sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;

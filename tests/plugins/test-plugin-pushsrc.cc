@@ -7,6 +7,10 @@
 
 #include "mmtest.h"
 #include <gstreamermm.h>
+
+// TODO re-write this tests to not use AppSrc/AppSink
+#ifndef GSTREAMERMM_DISABLE_DEPRECATED
+
 #include <string>
 #include <gstreamermm/appsink.h>
 #include <gstreamermm/private/pushsrc_p.h>
@@ -109,3 +113,5 @@ TEST_F(PushSrcPluginTest, DISABLED_CreatePipelineWithRegisteredElement)
 {
   CreatePipeline();
 }
+
+#endif

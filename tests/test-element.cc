@@ -1,8 +1,5 @@
 #include "mmtest.h"
-#include <glibmm/threads.h>
-#include <gstreamermm/identity.h>
-#include <gstreamermm/iterator.h>
-#include <gstreamermm/bus.h>
+#include <gstreamermm.h>
 
 using namespace Gst;
 using namespace Glib;
@@ -11,7 +8,7 @@ TEST(ElementTest, PostMessageShouldProperlyRefcountGivenMessage)
 {
   RefPtr<Bus> bus = Bus::create();
   MM_ASSERT_TRUE(bus);
-  RefPtr<Element> element = Identity::create();
+  RefPtr<Element> element = ElementFactory::create_element("identity");
   MM_ASSERT_TRUE(element);
   element->set_bus(bus);
   MM_ASSERT_TRUE(element->post_message(MessageStateDirty::create(element)));

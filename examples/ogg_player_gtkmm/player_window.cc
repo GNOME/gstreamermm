@@ -30,7 +30,7 @@
 #include <iomanip>
 #include "player_window.h"
 
-PlayerWindow::PlayerWindow(const Glib::RefPtr<Gst::FileSrc>& source_element,
+PlayerWindow::PlayerWindow(const Glib::RefPtr<FileSrcT>& source_element,
   const Glib::RefPtr<Gst::Pipeline>& main_pipeline)
 : m_vbox(false, 5),
   m_progress_label("000:00:00.000000000 / 000:00:00.000000000"),
@@ -290,7 +290,7 @@ void PlayerWindow::on_button_open()
 
     // Set uri on the file source. 
     const std::string uri = chooser.get_uri();
-    m_source_element->set_uri(uri);
+    m_source_element->set_property("uri", uri);
     set_title(uri);
 
     m_play_button.set_sensitive();

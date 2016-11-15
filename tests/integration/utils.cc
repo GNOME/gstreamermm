@@ -37,10 +37,10 @@ bool utils_on_bus_message(const RefPtr<Bus>&, const Glib::RefPtr<Message>& messa
 void GenerateSampleOggFile(int num_buffers, const Glib::ustring& filename)
 {
   RefPtr<Pipeline> pipeline = Pipeline::create("create-ogg");
-  RefPtr<VideoTestSrc> source = VideoTestSrc::create("testsource");
+  RefPtr<Element> source = ElementFactory::create_element("videotestsrc", "testsource");
   RefPtr<Element> encoder = ElementFactory::create_element("theoraenc"),
       muxer = ElementFactory::create_element("oggmux");
-  RefPtr<FileSink> sink = FileSink::create("fsink");
+  RefPtr<Element> sink = ElementFactory::create_element("filesink", "fsink");
     //RefPtr<Element> sink = ElementFactory::create_element("xvimagesink");
 
   Glib::RefPtr<Gst::Bus> bus = pipeline->get_bus();
@@ -50,8 +50,8 @@ void GenerateSampleOggFile(int num_buffers, const Glib::ustring& filename)
 
   pipeline->add(source)->add(encoder)->add(muxer)->add(sink);
 
-  source->property_num_buffers() = num_buffers;
-  sink->property_location() = filename;
+  source->set_property("num_buffers", num_buffers);
+  sink->set_property("location", filename);
 
   muxer->link(sink);
   source->link(encoder);
