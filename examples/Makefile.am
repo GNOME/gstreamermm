@@ -15,7 +15,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-examples_cppflags = $(GSTREAMERMM_CFLAGS)
+examples_cppflags = $(GSTREAMERMM_CFLAGS) $(GSTREAMERMM_PLUGINS_BAD_CFLAGS) $(GSTREAMERMM_GL_CFLAGS)
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer) 
 local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
 

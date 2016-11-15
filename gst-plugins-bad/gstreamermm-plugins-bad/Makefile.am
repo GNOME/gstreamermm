@@ -23,11 +23,11 @@ include $(top_srcdir)/build/compile-binding.am
 local_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer)
 local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags) -DGSTREAMERMM_PLUGINS_BAD_BUILD=1
 
-AM_CPPFLAGS = $(local_cppflags) $(GSTREAMERMM_PLUGINS_BAD_CFLAGS) $(GSTREAMERMM_CFLAGS)
+AM_CPPFLAGS = $(local_cppflags) $(GSTREAMERMM_PLUGINS_BAD_CFLAGS) $(GSTREAMERMM_CFLAGS) $(GSTREAMERMM_GL_CFLAGS)
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS)
 
 local_libadd = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
 
 libgstreamermm_plugins_bad_@GSTREAMERMM_API_VERSION@_la_SOURCES = $(binding_sources)
 libgstreamermm_plugins_bad_@GSTREAMERMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(GSTREAMERMM_SO_VERSION)
-libgstreamermm_plugins_bad_@GSTREAMERMM_API_VERSION@_la_LIBADD  = $(GSTREAMERMM_PLUGINS_BAD_LIBS) $(local_libadd)
+libgstreamermm_plugins_bad_@GSTREAMERMM_API_VERSION@_la_LIBADD  = $(GSTREAMERMM_PLUGINS_BAD_LIBS) $(GSTREAMERMM_GL_LIBS) $(local_libadd)
