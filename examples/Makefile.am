@@ -53,6 +53,7 @@ noinst_PROGRAMS =						\
 	hello_world/example					\
 	ogg_player/example					\
 	ogg_rewriter/example				\
+	tee_request_pad/example					\
 	typefind/example					\
 	optiongroup/example					\
 	basics/bin							\
@@ -78,6 +79,7 @@ ogg_rewriter_example_SOURCES	 			= ogg_rewriter/main.cc
 ogg_player_example_SOURCES					= ogg_player/main.cc
 opengl_filter_example_SOURCES				= opengl_filter/main.cc opengl_filter/sample_gl_filter.h
 optiongroup_example_SOURCES					= optiongroup/main.cc
+tee_request_pad_example_SOURCES					= tee_request_pad/main.cc
 typefind_example_SOURCES					= typefind/main.cc
 
 # basic examples
