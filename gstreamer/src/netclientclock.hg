@@ -1,0 +1,75 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2016 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gstreamermm/systemclock.h>
+
+_DEFS(gstreamermm,gst)
+
+namespace Gst
+{
+
+class Bus;
+
+/** Special clock that synchronizes to a remote time provider.
+ *
+ * Gst::NetClientClock implements a custom Gst::Clock that synchronizes its time
+ * to a remote time provider such as Gst::NetTimeProvider. Gst::NtpClock
+ * implements a Gst::Clock that synchronizes its time to a remote NTPv4 server.
+ *
+ * A new clock is created with create() or gst_ntp_clock_new(), which takes
+ * the address and port of the remote time provider along with a name and an
+ * initial time.
+ *
+ * This clock will poll the time provider and will update its calibration
+ * parameters based on the local and remote observations.
+ *
+ * The "round-trip" property limits the maximum round trip packets can take.
+ *
+ * Various parameters of the clock can be configured with the parent Gst::Clock
+ * "timeout", "window-size" and "window-threshold" object properties.
+ *
+ * A Gst::NetClientClock and Gst::NtpClock is typically set on a Gst::Pipeline with
+ * Gst::Pipeline::use_clock().
+ *
+ * If you set a Gst::Bus on the clock via the "bus" object property, it will
+ * send Gst::MESSAGE_ELEMENT messages with an attached Gst::Structure containing
+ * statistics about clock accuracy and network traffic.
+ *
+ * Last reviewed on 2016-12-02 (1.8.1)
+ */
+class NetClientClock : public SystemClock
+{
+  _CLASS_GOBJECT(NetClientClock, GstNetClientClock, GST_NET_CLIENT_CLOCK, SystemClock, GstSystemClock)
+
+protected:
+  NetClientClock(const Glib::ustring& name, const Glib::ustring& address, int remote_port, Gst::ClockTime base_time);
+
+public:
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::ustring& remote_address, int remote_port, Gst::ClockTime base_time)
+
+  _WRAP_PROPERTY("address", Glib::ustring)
+  _WRAP_PROPERTY("base-time", guint64)
+  _WRAP_PROPERTY("bus", Glib::RefPtr<Gst::Bus>)
+  _WRAP_PROPERTY("internal-clock", Glib::RefPtr<Gst::Clock>)
+  _WRAP_PROPERTY("minimum-update-interval", guint64)
+  _WRAP_PROPERTY("port", int)
+  _WRAP_PROPERTY("round-trip-limit", guint64)
+};
+
+} //namespace Gst

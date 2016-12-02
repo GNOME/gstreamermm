@@ -136,6 +136,7 @@
 #include <gstreamermm/discoverer.h>
 #include <gstreamermm/discovererinfo.h>
 #include <gstreamermm/encodingprofile.h>
+#include <gstreamermm/netclientclock.h>
 #include <gstreamermm/videosink.h>
 #include <gstreamermm/videochroma.h>
 #include <gstreamermm/videoformat.h>
