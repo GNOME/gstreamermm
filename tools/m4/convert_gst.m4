@@ -86,6 +86,7 @@ _CONV_ENUM(Gst,VideoMultiviewFlags)
 _CONV_ENUM(Gst,VideoMultiviewFramePacking)
 _CONV_ENUM(Gst,VideoMultiviewMode)
 _CONV_ENUM(Gst,VideoPackFlags)
+_CONV_ENUM(GstSDP,Result)
 
 dnl Glibmm Enums
 _CONV_GLIB_ENUM(ThreadPriority)

@@ -1,0 +1,114 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2016 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * Last reviewed on 2016-12-11 (1.10.0)
+ */
+
+_DEFS(gstreamermm,gst)
+
+#include <gst/sdp/gstsdpmessage.h>
+
+namespace Gst
+{
+
+class Caps;
+
+namespace SDP
+{
+_WRAP_ENUM(Result, GstSDPResult, NO_GTYPE)
+
+/** The contents of the SDP "k=" field which is used to convey encryption
+ * keys.
+ */
+class Key
+{
+  _CLASS_GENERIC(Key, GstSDPKey)
+
+public:
+  explicit Key(const GstSDPKey* gobject_);
+  Key(const Key& other);
+  Key(Key&& other);
+  ~Key();
+
+  GstSDPKey* gobj() { return &gobject_; }
+  const GstSDPKey* gobj() const { return &gobject_; }
+
+  _MEMBER_GET(type, type, Glib::ustring, gchar*)
+  _MEMBER_GET(data, data, Glib::ustring, gchar*)
+
+protected:
+  GstSDPKey gobject_;
+};
+
+/** The contents of the SDP "m=" field with all related fields.
+ */
+class Media
+{
+  _CLASS_GENERIC(Media, GstSDPMedia)
+public:
+  Media();
+  Media(const Media& other);
+  Media(Media&& other);
+  virtual ~Media();
+
+  GstSDPMedia* gobj() { return gobject_; }
+  const GstSDPMedia* gobj() const { return gobject_; }
+
+  _IGNORE(gst_sdp_media_free, gst_sdp_media_copy, gst_sdp_media_init, gst_sdp_media_uninit)
+
+  _WRAP_METHOD(Glib::ustring as_text() const, gst_sdp_media_as_text)
+  _WRAP_METHOD(Glib::ustring get_media() const, gst_sdp_media_get_media)
+  _WRAP_METHOD(Result set_media(const Glib::ustring& med), gst_sdp_media_set_media)
+  _WRAP_METHOD(guint get_port() const, gst_sdp_media_get_port)
+  _WRAP_METHOD(guint get_num_ports() const, gst_sdp_media_get_num_ports)
+  _WRAP_METHOD(Result set_port_info(guint port, guint num_ports), gst_sdp_media_set_port_info)
+  _WRAP_METHOD(Glib::ustring get_proto() const, gst_sdp_media_get_proto)
+  _WRAP_METHOD(Result set_proto(const Glib::ustring& proto), gst_sdp_media_set_proto)
+  _WRAP_METHOD(guint formats_len() const, gst_sdp_media_formats_len)
+  _WRAP_METHOD(Glib::ustring get_format(guint idx) const, gst_sdp_media_get_format)
+  _WRAP_METHOD(Result insert_format(gint idx, const Glib::ustring& format), gst_sdp_media_insert_format)
+  _WRAP_METHOD(Result replace_format(guint idx, const Glib::ustring& format), gst_sdp_media_replace_format)
+  _WRAP_METHOD(Result remove_format(guint idx), gst_sdp_media_remove_format)
+  _WRAP_METHOD(Result add_format(const Glib::ustring& format), gst_sdp_media_add_format)
+  _WRAP_METHOD(Glib::ustring get_information() const, gst_sdp_media_get_information)
+  _WRAP_METHOD(Result set_information(const Glib::ustring& information), gst_sdp_media_set_information)
+  _WRAP_METHOD(guint connections_len() const, gst_sdp_media_connections_len)
+  _WRAP_METHOD(Result remove_connection(guint idx), gst_sdp_media_remove_connection)
+  _WRAP_METHOD(Result add_connection(const Glib::ustring& nettype, const Glib::ustring& addrtype, const Glib::ustring& address, guint ttl, guint addr_number), gst_sdp_media_add_connection)
+  _WRAP_METHOD(guint bandwidths_len() const, gst_sdp_media_bandwidths_len)
+  _WRAP_METHOD(Result remove_bandwidth(guint idx), gst_sdp_media_remove_bandwidth)
+  _WRAP_METHOD(Result add_bandwidth(const Glib::ustring& bwtype, guint bandwith), gst_sdp_media_add_bandwidth)
+
+#m4 _CONVERSION(`const GstSDPKey*',`Gst::SDP::Key',`Gst::SDP::Key($3)')
+  _WRAP_METHOD(Gst::SDP::Key get_key() const, gst_sdp_media_get_key)
+
+  _WRAP_METHOD(Result set_key(const Glib::ustring& key, const Glib::ustring& data), gst_sdp_media_set_key)
+  _WRAP_METHOD(guint attributes_len() const, gst_sdp_media_attributes_len)
+  _WRAP_METHOD(Glib::ustring get_attribute_val(const Glib::ustring& key) const, gst_sdp_media_get_attribute_val)
+  _WRAP_METHOD(Glib::ustring get_attribute_val(const Glib::ustring& key, guint nth) const, gst_sdp_media_get_attribute_val_n)
+  _WRAP_METHOD(Result remove_attribute(guint idx), gst_sdp_media_remove_attribute)
+  _WRAP_METHOD(Result add_attribute(const Glib::ustring& key, const Glib::ustring& value), gst_sdp_media_add_attribute)
+  _WRAP_METHOD(Glib::RefPtr<Gst::Caps> get_caps_from_media(int pt) const, gst_sdp_media_get_caps_from_media)
+  _WRAP_METHOD(Result attributes_to_caps(const Glib::RefPtr<Gst::Caps>& caps) const, gst_sdp_media_attributes_to_caps)
+
+protected:
+  GstSDPMedia *gobject_ = nullptr;
+};
+
+} // SDP
+} // Gst

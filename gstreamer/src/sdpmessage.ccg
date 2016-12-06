@@ -1,0 +1,76 @@
+/* gstreamermm - a C++ wrapper for gstreamer
+ *
+ * Copyright 2016 The gstreamermm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * Last reviewed on 2016-12-11 (1.10.0)
+ */
+
+#include <gstreamermm/caps.h>
+
+namespace Gst
+{
+namespace SDP
+{
+
+Key::Key(const GstSDPKey* gobject_)
+{
+  this->gobject_.type = g_strdup(gobject_->type);
+  this->gobject_.data = g_strdup(gobject_->data);
+}
+
+Key::Key(const Key& other)
+: Key(&other.gobject_)
+{
+}
+
+Key::Key(Key&& other)
+{
+  gobject_.type = other.gobject_.type;
+  gobject_.data = other.gobject_.data;
+  other.gobject_.type = nullptr;
+  other.gobject_.data = nullptr;
+}
+
+Key::~Key()
+{
+  g_free(gobject_.type);
+  g_free(gobject_.data);
+}
+
+Media::Media()
+{
+  gst_sdp_media_new(&gobject_);
+}
+
+Media::~Media()
+{
+  if (gobject_)
+    gst_sdp_media_free(gobject_);
+}
+
+Media::Media(const Media& other)
+{
+  gst_sdp_media_copy(other.gobject_, &gobject_);
+}
+
+Media::Media(Media&& other)
+{
+  std::swap(other.gobject_, gobject_);
+}
+
+}
+}
