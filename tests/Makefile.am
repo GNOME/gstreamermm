@@ -31,6 +31,7 @@ check_PROGRAMS =                                \
         test-element                            \
         test-ghostpad                           \
         test-init                               \
+        test-iterator                           \
         test-memory                             \
         test-message                            \
         test-miniobject                         \
@@ -74,6 +75,7 @@ test_caps_SOURCES                               = $(TEST_GTEST_SOURCES) test-cap
 test_element_SOURCES                            = $(TEST_GTEST_SOURCES) test-element.cc
 test_ghostpad_SOURCES                           = $(TEST_GTEST_SOURCES) test-ghostpad.cc
 test_init_SOURCES                               = $(TEST_GTEST_SOURCES) test-init.cc
+test_iterator_SOURCES                           = $(TEST_GTEST_SOURCES) test-iterator.cc
 test_memory_SOURCES                             = $(TEST_GTEST_SOURCES) test-memory.cc
 test_message_SOURCES                            = $(TEST_GTEST_SOURCES) test-message.cc
 test_miniobject_SOURCES                         = $(TEST_GTEST_SOURCES) test-miniobject.cc

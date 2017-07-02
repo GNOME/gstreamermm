@@ -125,9 +125,6 @@ private:
   GstIterator* cobject_;    // The underlying  C object.
   bool take_ownership;      // Whether to destroy C object with the wrapper.
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
-private:
-  void swap(IteratorBase<CppType>& other);
 };
 
 /**  A class used to retrieve multiple elements in a thread safe way.
@@ -243,18 +240,25 @@ template<class CppType>
 IteratorBase<CppType>::IteratorBase()
 : current(G_VALUE_INIT),
   current_result(Gst::ITERATOR_OK),
-  cobject_(0),
+  cobject_(nullptr),
   take_ownership(true)
 {
 }
 
 template<class CppType>
 IteratorBase<CppType>::IteratorBase(const IteratorBase<CppType>& other)
-  : current(other.current),
+  : current(G_VALUE_INIT),
     current_result(other.current_result),
-    cobject_(const_cast<GstIterator*>(other.cobj())),
-    take_ownership((other.cobj()) ? false : true)
-{}
+    take_ownership(other.take_ownership)
+{
+  cobject_ = other.take_ownership ? gst_iterator_copy(other.cobject_) : other.cobject_;
+
+  if (G_IS_VALUE (&other.current))
+  {
+    g_value_init(&current, G_VALUE_TYPE(&other.current));
+    g_value_copy(&other.current, &current);
+  }
+}
 
 template<class CppType>
 IteratorBase<CppType>::IteratorBase(GstIterator* castitem, bool take_ownership)
@@ -267,8 +271,25 @@ IteratorBase<CppType>::IteratorBase(GstIterator* castitem, bool take_ownership)
 template<class CppType>
 IteratorBase<CppType>& IteratorBase<CppType>::operator=(const IteratorBase<CppType>& other)
 {
-  IteratorBase temp(other);
-  swap(temp);
+  if (cobject_ && take_ownership)
+  {
+    gst_iterator_free(cobject_);
+  }
+
+  if (G_IS_VALUE(&current))
+  {
+    g_value_unset(&current);
+  }
+
+  current_result = other.current_result;
+  cobject_ = other.take_ownership ? gst_iterator_copy(other.cobject_) : other.cobject_;
+
+  if (G_IS_VALUE (&other.current))
+  {
+    g_value_init(&current, G_VALUE_TYPE(&other.current));
+    g_value_copy(&other.current, &current);
+  }
+
   return *this;
 }
 
@@ -313,28 +334,6 @@ template<class CppType>
 IteratorBase<CppType>::operator bool() const
 {
   return (! G_VALUE_HOLDS_OBJECT(&current));
-}
-
-template<class CppType>
-void IteratorBase<CppType>::swap(IteratorBase<CppType>& other)
-{
-  GstIterator *const temp_obj = cobject_;
-  cobject_ = other.cobject_;
-  other.cobject_ = temp_obj;
-
-  const bool temp_take_ownership = take_ownership;
-  take_ownership = other.take_ownership;
-  other.take_ownership = temp_take_ownership;
-
-  GValue temp_current = G_VALUE_INIT;
-  g_value_init(&temp_current, G_VALUE_TYPE(current));
-  g_value_copy(&current, &temp_current);
-  g_value_copy(other.current, &current);
-  g_value_copy(&temp_current, other.current);
-
-  const IteratorResult temp_result = current_result;
-  current_result = other.current_result;
-  other.current_result = temp_result;
 }
 
 //virtual
