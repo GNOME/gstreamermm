@@ -21,6 +21,13 @@
 
 _PINCLUDE(gstreamermm/private/systemclock_p.h)
 
+// TODO: remove this check after we require at least gstreamer 1.12
+#if GST_VERSION_MINOR < 12
+#define GSTMM_AUDIO_CLOCK_CAST(obj) GST_CLOCK(obj)
+#else
+#define GSTMM_AUDIO_CLOCK_CAST(obj) GST_AUDIO_CLOCK(obj)
+#endif
+
 namespace
 {
 
@@ -62,6 +69,21 @@ AudioClock::AudioClock(const Glib::ustring& name, const SlotGetTime& time_slot)
   // accepted.
   gobj()->func = &AudioClock_GetTime_gstreamermm_callback;
   gobj()->user_data = m_slot.get();
+}
+
+Gst::ClockTime AudioClock::adjust(Gst::ClockTime time)
+{
+  return static_cast<Gst::ClockTime>(gst_audio_clock_adjust(GSTMM_AUDIO_CLOCK_CAST(gobj()), static_cast<GstClockTime>(time)));
+}
+
+Gst::ClockTime AudioClock::get_time() const
+{
+  return static_cast<Gst::ClockTime>(gst_audio_clock_get_time(GSTMM_AUDIO_CLOCK_CAST(gobj())));
+}
+
+void AudioClock::invalidate()
+{
+  gst_audio_clock_invalidate(GSTMM_AUDIO_CLOCK_CAST(gobj()));
 }
 
 } //namespace Gst

@@ -66,11 +66,18 @@ public:
 
   _WRAP_METHOD(void reset(Gst::ClockTime time), gst_audio_clock_reset)
 
-  _WRAP_METHOD(Gst::ClockTime adjust(Gst::ClockTime time), gst_audio_clock_adjust)
+  // TODO methods below get GstClock as a first argument,
+  // so have to be wrapped manually. It has been fixed in
+  // GStreamer (https://bugzilla.gnome.org/show_bug.cgi?id=756628)
+  // but patch is not available in 1.8.0 version.
+  _WRAP_METHOD_DOCS_ONLY(gst_audio_clock_adjust)
+  Gst::ClockTime adjust(Gst::ClockTime time);
 
-  _WRAP_METHOD(Gst::ClockTime get_time() const, gst_audio_clock_get_time)
+  _WRAP_METHOD_DOCS_ONLY(gst_audio_clock_get_time)
+  Gst::ClockTime get_time() const;
 
-  _WRAP_METHOD(void invalidate(), gst_audio_clock_invalidate)
+  _WRAP_METHOD_DOCS_ONLY(gst_audio_clock_invalidate)
+  void invalidate();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
