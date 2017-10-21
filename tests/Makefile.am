@@ -19,6 +19,8 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(srcdir) $(gstreamermm_includes) $(GSTREAMERM
 AM_CXXFLAGS = $(GSTREAMERMM_WXXFLAGS) -g -Wno-missing-field-initializers
 LDADD = $(GSTREAMERMM_LIBS) $(local_libgstreamermm) -lgtest -lpthread
 
+CLEANFILES = test-integration-bininpipeline-output-image.jpg
+
 check_PROGRAMS =                                \
         test-allocator                          \
         test-atomicqueue                        \
