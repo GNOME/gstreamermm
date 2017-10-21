@@ -23,11 +23,10 @@ AC_PREREQ([2.59])
 AC_CONFIG_SRCDIR([gstreamer/gstreamermm.h])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
-AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h gst-plugins-bad/gstreamermm-plugins-bad.h])
+AC_CONFIG_HEADERS([config.h gstreamer/gstreamermmconfig.h])
 
 MM_PREREQ([0.9.8])
 MM_INIT_MODULE([gstreamermm-1.0])
-MM_INIT_MODULE([gstreamermm-plugins-bad-1.0])
 
 # Copy the mm-common .pl scripts into docs/,
 # and use them from there,
@@ -57,7 +56,6 @@ AC_PROG_SED
 AS_IF([test "x$enable_static" = xyes],
 [
   AC_DEFINE([GSTREAMERMM_STATIC_LIB], [1], [Define if gstreamermm is built as a static library])
-  AC_DEFINE([GSTREAMERMM_PLUGINS_BAD_STATIC_LIB], [1], [Define if gstreamermm-plugins-bad is built as a static library])
 ])
 
 # The format below is used so that the requirements appear nicely in the .pc
@@ -72,13 +70,6 @@ AC_SUBST([GSTREAMERMM_MODULES],
          [ gstreamer[]m4_defn([gstmm_mod])[]-1.0 >= GSTMM_VERSION])'])
 
 PKG_CHECK_MODULES([GSTREAMERMM], [$GSTREAMERMM_MODULES])
-
-AC_SUBST([GSTREAMERMM_PLUGINS_BAD_MODULES],
-         ["gstreamer-plugins-bad-1.0 >= GSTMM_VERSION gstreamermm-1.0 >= GSTMM_VERSION"])
-
-FIND_GST_MODULE(GSTREAMERMM_PLUGINS_BAD, plugins-bad, plugins_bad)
-FIND_GST_MODULE(GSTREAMERMM_GL, gl, gl, $gstmm_enable_plugins_bad)
-ADD_MODULE_CONDITIONALLY([GSTREAMERMM_PLUGINS_BAD_MODULES], [gstreamer-gl-1.0], [$gstmm_enable_gl])
 
 PKG_CHECK_MODULES([GUI_EXAMPLES], [$GSTREAMERMM_MODULES gtkmm-3.0 >= 3.0],
                   [gstmm_enable_gui_examples=yes], [gstmm_enable_gui_examples=no])
@@ -217,10 +208,6 @@ AC_CONFIG_FILES([Makefile
                  gstreamer/${GSTREAMERMM_MODULE_NAME}-uninstalled.pc:gstreamer/gstreamermm-uninstalled.pc.in
                  gstreamer/src/Makefile
                  gstreamer/gstreamermm/Makefile
-                 gst-plugins-bad/${GSTREAMERMM_PLUGINS_BAD_MODULE_NAME}.pc:gst-plugins-bad/gstreamermm-plugins-bad.pc.in
-                 gst-plugins-bad/${GSTREAMERMM_PLUGINS_BAD_MODULE_NAME}-uninstalled.pc:gst-plugins-bad/gstreamermm-plugins-bad-uninstalled.pc.in
-                 gst-plugins-bad/src/Makefile
-                 gst-plugins-bad/gstreamermm-plugins-bad/Makefile
                  examples/Makefile
                  tests/Makefile
                  docs/Makefile
@@ -236,9 +223,6 @@ ${PACKAGE}-${VERSION}
 
   Libraries
     GStreamer Version:           $(pkg-config --modversion gstreamer-1.0)
-    gstreamer-plugins-bad:       ${gstmm_enable_plugins_bad} ${gstmm_plugins_bad_version}
-        gstreamer-gl:            ${gstmm_enable_gl}
-
 
   Extra features
     Use deprecated API:          ${mm_enable_deprecated_api}

@@ -41,15 +41,6 @@ else
 doc_subdirs =
 endif
 
-if ENABLE_GSTREAMERMM_PLUGINS_BAD
-if MAINTAINER_MODE
-src_subdirs += gst-plugins-bad/src
-endif # MAINTAINER_MODE
-srcmm_subdirs += gst-plugins-bad/gstreamermm-plugins-bad
-pkgconfig_files += gst-plugins-bad/$(GSTREAMERMM_PLUGINS_BAD_MODULE_NAME).pc
-gstreamermm_include_HEADERS += gst-plugins-bad/gstreamermm-plugins-bad.h
-endif #ENABLE_PLUGINS_BAD
-
 SUBDIRS = tools $(src_subdirs) $(srcmm_subdirs) \
           tests examples $(doc_subdirs)
 

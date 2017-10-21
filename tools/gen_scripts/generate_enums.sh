@@ -27,10 +27,4 @@ interfaces,netbuffer,pbutils,riff,rtp,rtsp,sdp,tag,video}/*.h \
 #Patch generated file.
 patch $OUT_DIR/gst_enums.defs $OUT_DIR/gst_enums.defs.patch
 
-OUT_DIR="$ROOT_DIR/gst-plugins-bad/src"
-PREFIX="$JHBUILD_SOURCES/gst-plugins-bad"
-$ENUM_PL  "$PREFIX"/gst-libs/gst/{adaptivedemux,base,basecamerabinsrc,\
-codecparsers,gl,insertbin,interfaces,mpegts,uridownloader,video,wayland}/*.h > \
-"$OUT_DIR/gst_enums.defs"
-
 

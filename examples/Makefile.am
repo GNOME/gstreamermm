@@ -15,7 +15,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-examples_cppflags = $(GSTREAMERMM_CFLAGS) $(GSTREAMERMM_PLUGINS_BAD_CFLAGS) $(GSTREAMERMM_GL_CFLAGS)
+examples_cppflags = $(GSTREAMERMM_CFLAGS) $(GSTREAMERMM_GL_CFLAGS)
 gstreamermm_includes = -I$(top_builddir)/gstreamer $(if $(srcdir:.=),-I$(top_srcdir)/gstreamer) 
 local_libgstreamermm = $(top_builddir)/gstreamer/gstreamermm/libgstreamermm-$(GSTREAMERMM_API_VERSION).la
 
@@ -32,16 +32,6 @@ ogg_player_gtkmm_example_SOURCES			= ogg_player_gtkmm/main.cc \
 												ogg_player_gtkmm/player_window.cc \
 												ogg_player_gtkmm/player_window.h
 ogg_player_gtkmm_example_LDADD				= $(GUI_EXAMPLES_LIBS) $(local_libgstreamermm)
-endif
-
-if ENABLE_GSTREAMERMM_PLUGINS_BAD
-gstreamermm_includes += -I$(top_builddir)/gst-plugins-bad $(if $(srcdir:.=),-I$(top_srcdir)/gst-plugins-bad)
-local_libgstreamermm += $(top_builddir)/gst-plugins-bad/gstreamermm-plugins-bad/libgstreamermm-plugins-bad-$(GSTREAMERMM_API_VERSION).la
-endif
-
-if ENABLE_GSTREAMERMM_GL
-gl_examples = opengl_filter/example
-local_libgstreamermm += $(GSTREAMERMM_GL_LIBS)
 endif
 
 noinst_PROGRAMS =						\
