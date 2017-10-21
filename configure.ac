@@ -13,9 +13,9 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-m4_define([GSTMM_VERSION], [1.8.0])
+m4_define([GSTMM_VERSION], [1.10.0])
 
-AC_INIT([gstreamermm], [1.8.0],
+AC_INIT([gstreamermm], [1.10.0],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gstreamermm],
         [gstreamermm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
