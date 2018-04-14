@@ -309,7 +309,7 @@ public:
   /** Optional. Copy the metadata from the input buffer to the output buffer.
    * The default implementation will copy the flags, timestamps and offsets of the buffer.
    */
-  _WRAP_VFUNC(bool copy_metadata(const Glib::RefPtr<Gst::Buffer>& input, const Glib::RefPtr<Gst::Buffer>& outbuf), "copy_metadata")
+  virtual bool copy_metadata_vfunc(const Glib::RefPtr<Gst::Buffer>& input, const Glib::RefPtr<Gst::Buffer>& outbuf);
 
   /** Optional. Handle a requested query. Subclasses that implement this should must chain up to
    * the parent if they didn't handle the query
@@ -321,6 +321,7 @@ protected:
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->prepare_output_buffer = &prepare_output_buffer_vfunc_callback;
   klass->transform = &transform_vfunc_callback;
+  klass->copy_metadata = &copy_metadata_vfunc_callback;
   klass->generate_output = &generate_output_vfunc_callback;
   klass->query = &query_vfunc_callback;
   klass->propose_allocation = &propose_allocation_vfunc_callback;
@@ -328,6 +329,7 @@ protected:
   _SECTION(SECTION_PH_VFUNCS)
   static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer** buf);
   static GstFlowReturn transform_vfunc_callback(GstBaseTransform* self, GstBuffer* inbuf, GstBuffer* outbuf);
+  static gboolean copy_metadata_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer* outbuf);
   static GstFlowReturn generate_output_vfunc_callback(GstBaseTransform* self, GstBuffer** outbuf);
   static gboolean query_vfunc_callback(GstBaseTransform* self, GstPadDirection direction, GstQuery* query);
   static gboolean propose_allocation_vfunc_callback(GstBaseTransform* self, GstQuery* decide_query, GstQuery* query);
