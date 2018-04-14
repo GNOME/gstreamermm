@@ -217,7 +217,7 @@ public:
   /** Required if the element operates in-place. Transform the incoming buffer
    * in-place.
    */
-  _WRAP_VFUNC(FlowReturn transform_ip(const Glib::RefPtr<Gst::Buffer>& buf), "transform_ip")
+  virtual FlowReturn transform_ip_vfunc(const Glib::RefPtr<Gst::Buffer>& buf);
 
   /** Optional. Subclasses can override this to do their own allocation of
    * output buffers. Elements that only do analysis can return a subbuffer or
@@ -321,6 +321,7 @@ protected:
   _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
   klass->prepare_output_buffer = &prepare_output_buffer_vfunc_callback;
   klass->transform = &transform_vfunc_callback;
+  klass->transform_ip = &transform_ip_vfunc_callback;
   klass->copy_metadata = &copy_metadata_vfunc_callback;
   klass->generate_output = &generate_output_vfunc_callback;
   klass->query = &query_vfunc_callback;
@@ -329,6 +330,7 @@ protected:
   _SECTION(SECTION_PH_VFUNCS)
   static GstFlowReturn prepare_output_buffer_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer** buf);
   static GstFlowReturn transform_vfunc_callback(GstBaseTransform* self, GstBuffer* inbuf, GstBuffer* outbuf);
+  static GstFlowReturn transform_ip_vfunc_callback(GstBaseTransform* self, GstBuffer* buf);
   static gboolean copy_metadata_vfunc_callback(GstBaseTransform* self, GstBuffer* input, GstBuffer* outbuf);
   static GstFlowReturn generate_output_vfunc_callback(GstBaseTransform* self, GstBuffer** outbuf);
   static gboolean query_vfunc_callback(GstBaseTransform* self, GstPadDirection direction, GstQuery* query);
