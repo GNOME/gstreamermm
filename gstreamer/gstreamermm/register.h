@@ -110,7 +110,7 @@ register_mm_type(const gchar * type_name)
     /* The typedef for GType may be gulong or gsize, depending on the
      * system and whether the compiler is c++ or not. The g_once_init_*
      * functions always take a gsize * though ... */
-    static volatile gsize gonce_data = 0;
+    static gsize gonce_data = 0;
     if (g_once_init_enter (&gonce_data)) {
         GTypeInfo info;
 
