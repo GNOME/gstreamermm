@@ -18,7 +18,7 @@ RefPtr<Glib::MainLoop> mainloop;
 RefPtr<Bus> bus;
 RefPtr<Pipeline> pipeline;
 RefPtr<Pad> sink_pad;
-static volatile gint counter;
+static gint counter;
 bool prerolled = false;
 gboolean was_check = 0;
 
