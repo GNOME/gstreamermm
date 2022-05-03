@@ -23,22 +23,26 @@ _TRANSLATION(`GOutputStream*',`Gio::OutputStream',`const Glib::RefPtr<Gio::Outpu
 _TRANSLATION(`GSocket*',`Gio::Socket',`const Glib::RefPtr<Gio::Socket>&',`Glib::RefPtr<Gio::Socket>',`<giomm/socket.h>')
 
 dnl glibmm
+_TRANSLATION(`GDateTime*',`Glib::DateTime',`const Glib::DateTime&',`Glib::DateTime', `<glibmm/datetime.h>')
 _TRANSLATION(`GValueArray*',`Glib::ValueArray',`const Glib::ValueArray&',`Glib::ValueArray',`<glibmm/valuearray.h>')
 _TRANSLATION(`GObject*',`Glib::Object',`const Glib::RefPtr<Glib::Object>&',`Glib::Object',`<glibmm/object.h>')
 
 dnl gstreamermm
 _TRANSLATION(`GstBuffer*',`Gst::Buffer',`const Glib::RefPtr<Gst::Buffer>&',`Glib::RefPtr<Gst::Buffer>',`<gstreamermm/buffer.h>')
+_TRANSLATION(`GstBufferList*',`Gst::BufferList',`const Glib::RefPtr<Gst::BufferList>&',`Glib::RefPtr<Gst::BufferList>',`<gstreamermm/bufferlist.h>')
 _TRANSLATION(`GstCaps*',`Gst::Caps',`const Glib::RefPtr<Gst::Caps>&',`Glib::RefPtr<Gst::Caps>',`<gstreamermm/caps.h>')
 _TRANSLATION(`GstChildProxy*',`Gst::ChildProxy',`const Glib::RefPtr<Gst::ChildProxy>&',`Glib::RefPtr<Gst::ChildProxy>',`<gstreamermm/childproxy.h>')
 _TRANSLATION(`GstElement*',`Gst::Element',`const Glib::RefPtr<Gst::Element>&',`Glib::RefPtr<Gst::Element>',`<gstreamermm/element.h>')
 _TRANSLATION(`GstElementFactory*',`Gst::ElementFactory',`const Glib::RefPtr<Gst::ElementFactory>&',`Glib::RefPtr<Gst::ElementFactory>',`<gstreamermm/elementfactory.h>')
 _TRANSLATION(`GstEncodingProfile*',`Gst::EncodingProfile',`const Glib::RefPtr<Gst::EncodingProfile>&',`Glib::RefPtr<Gst::EncodingProfile>',`<gstreamermm/encodingprofile.h>')
 _TRANSLATION(`GstFraction',`Gst::Fraction',`const Gst::Fraction&',`Gst::Fraction',`<gstreamermm/value.h>')
+_TRANSLATION(`GstMiniObject*',`Gst::MiniObject',`const Glib::RefPtr<Gst::MiniObject>&',`Glib::RefPtr<Gst::MiniObject>',`<gstreamermm/miniobject.h>')
 _TRANSLATION(`GstPad*',`Gst::Pad',`const Glib::RefPtr<Gst::Pad>&',`Glib::RefPtr<Gst::Pad>',`<gstreamermm/pad.h>')
 _TRANSLATION(`GstQuery*',`Gst::Query',`const Glib::RefPtr<Gst::Query>&',`Glib::RefPtr<Gst::Query>',`<gstreamermm/query.h>')
 _TRANSLATION(`GstSample*',`Gst::Sample',`const Glib::RefPtr<Gst::Sample>&',`Glib::RefPtr<Gst::Sample>',`<gstreamermm/sample.h>')
 _TRANSLATION(`GstStructure*',`Gst::Structure',`const Gst::Structure&',`Gst::Structure',`<gstreamermm/structure.h>')
 _TRANSLATION(`GstTagList*',`Gst::TagList',`const Gst::TagList&',`Gst::TagList',`<gstreamermm/taglist.h>')
+_TRANSLATION(`GstValueArray',`Gst::ValueArray',`const Gst::ValueArray',`Gst::ValueArray',`<gstreamermm/valuearray.h>')
 
 dnl Interfaces
 _TRANSLATION(`GstColorBalance*',`Gst::ColorBalance',`const Glib::RefPtr<Gst::ColorBalance>&',`Glib::RefPtr<Gst::ColorBalance>',`<gstreamermm/colorbalance.h>')
