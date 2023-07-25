@@ -138,7 +138,7 @@ void PlayerWindow::on_video_area_realize()
   window_handler = GDK_WINDOW_XID (m_video_area.get_window()->gobj());
 #endif
 #ifdef GDK_WINDOWING_WIN32
-  window_handler = GDK_WINDOW_HWND ((m_video_area.get_window()->gobj());
+  window_handler = (guintptr) GDK_WINDOW_HWND (m_video_area.get_window()->gobj());
 #endif
 }
 

@@ -75,7 +75,7 @@ protected:
   sigc::connection m_timeout_connection;
   guint m_watch_id;
   gint64 m_duration;
-  gulong window_handler;
+  guintptr window_handler;
   gulong m_pad_probe_id;
 
   const gint64 rewind_skip_amount = Gst::SECOND * 2;
